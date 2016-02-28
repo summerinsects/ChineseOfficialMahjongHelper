@@ -17,7 +17,10 @@ bool PointsCalculatorScene::init() {
     if (!Layer::init()) {
         return false;
     }
-    setKeyboardEnabled(true);
+
+    auto listener = EventListenerKeyboard::create();
+    listener->onKeyReleased = CC_CALLBACK_2(Layer::onKeyReleased, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -29,7 +32,7 @@ bool PointsCalculatorScene::init() {
     float y = origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f;
     tileLabel->setPosition(Vec2(x, y));
 
-    _editBox = ui::EditBox::create(Size(visibleSize.width - 50, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
+    _editBox = ui::EditBox::create(Size(visibleSize.width - 50, 22.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     _editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -38,7 +41,7 @@ bool PointsCalculatorScene::init() {
 
     ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     button->setScale9Enabled(true);
-    button->setContentSize(Size(28.0f, 22.0f));
+    button->setContentSize(Size(34.0f, 22.0f));
     button->setTitleText("算番");
     button->setTitleColor(Color3B::BLACK);
     this->addChild(button);
@@ -49,8 +52,7 @@ bool PointsCalculatorScene::init() {
 
     Label *prevalentWindLabel = Label::createWithSystemFont("圈风", "Arial", 12);
     this->addChild(prevalentWindLabel);
-    prevalentWindLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    prevalentWindLabel->setPosition(Vec2(origin.x + 10.0f, y - 60));
+    prevalentWindLabel->setPosition(Vec2(origin.x + 30.0f, y - 60));
 
     for (int i = 0; i < 4; ++i) {
         _prevalentButton[i] = ui::Button::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png");
@@ -74,8 +76,7 @@ bool PointsCalculatorScene::init() {
 
     Label *seatWindLabel = Label::createWithSystemFont("门风", "Arial", 12);
     this->addChild(seatWindLabel);
-    seatWindLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    seatWindLabel->setPosition(Vec2(origin.x + 10.0f, y - 90));
+    seatWindLabel->setPosition(Vec2(origin.x + 30.0f, y - 90));
 
     for (int i = 0; i < 4; ++i) {
         _seatButton[i] = ui::Button::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png");
@@ -101,7 +102,7 @@ bool PointsCalculatorScene::init() {
     this->addChild(_byDiscardButton);
     _byDiscardButton->setScale9Enabled(true);
     _byDiscardButton->setContentSize(Size(22.0f, 22.0f));
-    _byDiscardButton->setPosition(Vec2(origin.x + 25.0f, y - 120));
+    _byDiscardButton->setPosition(Vec2(origin.x + 20.0f, y - 120));
     _byDiscardButton->setHighlighted(true);
     _byDiscardButton->setTag(1);
     _byDiscardButton->addClickEventListener([this](Ref *) {
@@ -127,13 +128,13 @@ bool PointsCalculatorScene::init() {
     Label *byDiscardLabel = Label::createWithSystemFont("点和", "Arial", 12);
     this->addChild(byDiscardLabel);
     byDiscardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    byDiscardLabel->setPosition(Vec2(origin.x + 40.0f, y - 120));
+    byDiscardLabel->setPosition(Vec2(origin.x + 35.0f, y - 120));
 
     _selfDrawnButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_selfDrawnButton);
     _selfDrawnButton->setScale9Enabled(true);
     _selfDrawnButton->setContentSize(Size(22.0f, 22.0f));
-    _selfDrawnButton->setPosition(Vec2(origin.x + 95.0f, y - 120));
+    _selfDrawnButton->setPosition(Vec2(origin.x + 90.0f, y - 120));
     _selfDrawnButton->setHighlighted(false);
     _selfDrawnButton->setTag(0);
     _selfDrawnButton->addClickEventListener([this](Ref *) {
@@ -159,13 +160,13 @@ bool PointsCalculatorScene::init() {
     Label *selfDrawnLabel = Label::createWithSystemFont("自摸", "Arial", 12);
     this->addChild(selfDrawnLabel);
     selfDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    selfDrawnLabel->setPosition(Vec2(origin.x + 110.0f, y - 120));
+    selfDrawnLabel->setPosition(Vec2(origin.x + 105.0f, y - 120));
 
     _fourthTileButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_fourthTileButton);
     _fourthTileButton->setScale9Enabled(true);
     _fourthTileButton->setContentSize(Size(22.0f, 22.0f));
-    _fourthTileButton->setPosition(Vec2(origin.x + 165.0f, y - 120));
+    _fourthTileButton->setPosition(Vec2(origin.x + 160.0f, y - 120));
     _fourthTileButton->setHighlighted(false);
     _fourthTileButton->setTag(0);
     _fourthTileButton->addClickEventListener([this](Ref *) {
@@ -182,16 +183,16 @@ bool PointsCalculatorScene::init() {
         }
     });
 
-    Label *fourthTileLabel = Label::createWithSystemFont("和绝张", "Arial", 12);
+    Label *fourthTileLabel = Label::createWithSystemFont("绝张", "Arial", 12);
     this->addChild(fourthTileLabel);
     fourthTileLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    fourthTileLabel->setPosition(Vec2(origin.x + 180.0f, y - 120));
+    fourthTileLabel->setPosition(Vec2(origin.x + 175.0f, y - 120));
 
     _replacementButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_replacementButton);
     _replacementButton->setScale9Enabled(true);
     _replacementButton->setContentSize(Size(22.0f, 22.0f));
-    _replacementButton->setPosition(Vec2(origin.x + 25.0f, y - 150));
+    _replacementButton->setPosition(Vec2(origin.x + 20.0f, y - 150));
     _replacementButton->setHighlighted(false);
     _replacementButton->setTag(0);
     _replacementButton->addClickEventListener([this](Ref *) {
@@ -211,16 +212,16 @@ bool PointsCalculatorScene::init() {
         }
     });
 
-    Label *replacementLabel = Label::createWithSystemFont("杠上开花", "Arial", 12);
+    Label *replacementLabel = Label::createWithSystemFont("杠开", "Arial", 12);
     this->addChild(replacementLabel);
     replacementLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    replacementLabel->setPosition(Vec2(origin.x + 40.0f, y - 150));
+    replacementLabel->setPosition(Vec2(origin.x + 35.0f, y - 150));
 
     _robKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_robKongButton);
     _robKongButton->setScale9Enabled(true);
     _robKongButton->setContentSize(Size(22.0f, 22.0f));
-    _robKongButton->setPosition(Vec2(origin.x + 95.0f, y - 150));
+    _robKongButton->setPosition(Vec2(origin.x + 90.0f, y - 150));
     _robKongButton->setHighlighted(false);
     _robKongButton->setTag(0);
     _robKongButton->addClickEventListener([this](Ref *) {
@@ -249,16 +250,16 @@ bool PointsCalculatorScene::init() {
         }
     });
 
-    Label *robKongLabel = Label::createWithSystemFont("抢杠和", "Arial", 12);
+    Label *robKongLabel = Label::createWithSystemFont("抢杠", "Arial", 12);
     this->addChild(robKongLabel);
     robKongLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    robKongLabel->setPosition(Vec2(origin.x + 110.0f, y - 150));
+    robKongLabel->setPosition(Vec2(origin.x + 105.0f, y - 150));
 
     _lastTileDrawnButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_lastTileDrawnButton);
     _lastTileDrawnButton->setScale9Enabled(true);
     _lastTileDrawnButton->setContentSize(Size(22.0f, 22.0f));
-    _lastTileDrawnButton->setPosition(Vec2(origin.x + 165.0f, y - 150));
+    _lastTileDrawnButton->setPosition(Vec2(origin.x + 160.0f, y - 150));
     _lastTileDrawnButton->setHighlighted(false);
     _lastTileDrawnButton->setTag(0);
     _lastTileDrawnButton->addClickEventListener([this](Ref *) {
@@ -284,16 +285,16 @@ bool PointsCalculatorScene::init() {
         }
     });
 
-    Label *lastTileDrawnLabel = Label::createWithSystemFont("妙手回春", "Arial", 12);
+    Label *lastTileDrawnLabel = Label::createWithSystemFont("妙手", "Arial", 12);
     this->addChild(lastTileDrawnLabel);
     lastTileDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    lastTileDrawnLabel->setPosition(Vec2(origin.x + 180.0f, y - 150));
+    lastTileDrawnLabel->setPosition(Vec2(origin.x + 175.0f, y - 150));
 
     _lastTileChaimButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_lastTileChaimButton);
     _lastTileChaimButton->setScale9Enabled(true);
     _lastTileChaimButton->setContentSize(Size(22.0f, 22.0f));
-    _lastTileChaimButton->setPosition(Vec2(origin.x + 235.0f, y - 150));
+    _lastTileChaimButton->setPosition(Vec2(origin.x + 230.0f, y - 150));
     _lastTileChaimButton->setHighlighted(false);
     _lastTileChaimButton->setTag(0);
     _lastTileChaimButton->addClickEventListener([this](Ref *) {
@@ -322,19 +323,21 @@ bool PointsCalculatorScene::init() {
         }
     });
 
-    Label *lastTileChaimLabel = Label::createWithSystemFont("海底捞月", "Arial", 12);
+    Label *lastTileChaimLabel = Label::createWithSystemFont("海底", "Arial", 12);
     this->addChild(lastTileChaimLabel);
     lastTileChaimLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    lastTileChaimLabel->setPosition(Vec2(origin.x + 250.0f, y - 150));
+    lastTileChaimLabel->setPosition(Vec2(origin.x + 245.0f, y - 150));
 
     Label *tipsLabel = Label::createWithSystemFont("使用说明：\n"
         "1.万条饼分别用小写m s p作为后缀。同花色的数牌可以合并用一个后缀。\n"
-        "2.东南西北中发白分别用大写字母ESWNCFP表示\n"
-        "3.每一组副露（即吃、碰、明杠）用英文[]括起来，每一组暗杠用英文{}括起来\n"
-        "4.请将所有副露放在最前面，然后是立牌，和牌用英文逗号与手牌分隔开\n"
+        "2.东南西北中发白分别用大写字母ESWNCFP表示。\n"
+        "3.每一组副露（即吃、碰、明杠）用英文[]括起来，每一组暗杠用英文{}括起来。\n"
+        "4.请将所有副露放在最前面，然后是立牌，和牌用英文逗号与手牌分隔开。\n"
+        "5.如果牌数目不对将导致程序闪退！\n"
         "范例1：{EEEE}{CCCC}{FFFF}{PPPP}N,N\n"
-        "范例2：1112345678999s,9s\n",
-        "Arial", 10, Size(visibleSize.width, 0.0f));
+        "范例2：1112345678999s,9s\n"
+        "范例3：[WWWW][444s]45m678pFF,6m\n",
+        "Arial", 10, Size(visibleSize.width - 10, 0.0f));
     this->addChild(tipsLabel);
     tipsLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     tipsLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y));
@@ -375,6 +378,7 @@ void PointsCalculatorScene::calculate() {
         if (!string_to_tiles(tilesString.c_str(), sets, &set_cnt, tiles, &tile_cnt)) {
             break;
         }
+        sort_tiles(tiles, tile_cnt);
 
         TILE win_tile;
         const char *p = parse_tiles(winString.c_str(), &win_tile, nullptr);
