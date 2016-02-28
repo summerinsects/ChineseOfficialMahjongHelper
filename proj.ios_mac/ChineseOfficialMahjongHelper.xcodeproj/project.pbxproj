@@ -11,6 +11,14 @@
 		1AC6FB30180E99EB004C840B /* libcocos2d iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AC6FB07180E9839004C840B /* libcocos2d iOS.a */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		1FDD94431C8337140031BC38 /* points_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* points_calculator.cpp */; };
+		1FDD94441C8337140031BC38 /* points_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* points_calculator.cpp */; };
+		1FDD94451C8337140031BC38 /* wait_and_win_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */; };
+		1FDD94461C8337140031BC38 /* wait_and_win_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */; };
+		1FDD94471C8337140031BC38 /* PointsCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD94411C8337140031BC38 /* PointsCalculatorScene.cpp */; };
+		1FDD94481C8337140031BC38 /* PointsCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD94411C8337140031BC38 /* PointsCalculatorScene.cpp */; };
+		1FDD950E1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
+		1FDD950F1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		3EACC98F19EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
 		3EACC99019EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
@@ -100,6 +108,13 @@
 			remoteGlobalIDString = A07A4C241783777C0073F6A7;
 			remoteInfo = "cocos2dx iOS";
 		};
+		1FDD944A1C8337150031BC38 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1AC6FAE5180E9839004C840B /* cocos2d_libs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 507B40FD1C31BDD30067B53E;
+			remoteInfo = "libcocos2d tvOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -108,6 +123,14 @@
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* ChineseOfficialMahjongHelper-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ChineseOfficialMahjongHelper-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		1FDD943C1C8337140031BC38 /* points_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = points_calculator.cpp; sourceTree = "<group>"; };
+		1FDD943D1C8337140031BC38 /* points_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = points_calculator.h; sourceTree = "<group>"; };
+		1FDD943E1C8337140031BC38 /* tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tile.h; sourceTree = "<group>"; };
+		1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wait_and_win_test.cpp; sourceTree = "<group>"; };
+		1FDD94401C8337140031BC38 /* wait_and_win_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wait_and_win_test.h; sourceTree = "<group>"; };
+		1FDD94411C8337140031BC38 /* PointsCalculatorScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointsCalculatorScene.cpp; sourceTree = "<group>"; };
+		1FDD94421C8337140031BC38 /* PointsCalculatorScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointsCalculatorScene.h; sourceTree = "<group>"; };
+		1FDD950D1C8338700031BC38 /* source_material */ = {isa = PBXFileReference; lastKnownFileType = folder; path = source_material; sourceTree = "<group>"; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		3EACC98E19EE6D4300EB3C5E /* res */ = {isa = PBXFileReference; lastKnownFileType = folder; path = res; sourceTree = "<group>"; };
 		46880B7619C43A67006E1F66 /* CloseNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CloseNormal.png; sourceTree = "<group>"; };
@@ -237,8 +260,21 @@
 			children = (
 				1AC6FAF9180E9839004C840B /* libcocos2d Mac.a */,
 				1AC6FB07180E9839004C840B /* libcocos2d iOS.a */,
+				1FDD944B1C8337150031BC38 /* libcocos2d tvOS.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		1FDD943B1C8337140031BC38 /* mahjong-algorithm */ = {
+			isa = PBXGroup;
+			children = (
+				1FDD943C1C8337140031BC38 /* points_calculator.cpp */,
+				1FDD943D1C8337140031BC38 /* points_calculator.h */,
+				1FDD943E1C8337140031BC38 /* tile.h */,
+				1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */,
+				1FDD94401C8337140031BC38 /* wait_and_win_test.h */,
+			);
+			path = "mahjong-algorithm";
 			sourceTree = "<group>";
 		};
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
@@ -284,11 +320,12 @@
 		46880B7519C43A67006E1F66 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				521A8EA819F11F5000D177D7 /* fonts */,
-				3EACC98E19EE6D4300EB3C5E /* res */,
 				46880B7619C43A67006E1F66 /* CloseNormal.png */,
 				46880B7719C43A67006E1F66 /* CloseSelected.png */,
+				521A8EA819F11F5000D177D7 /* fonts */,
 				46880B7A19C43A67006E1F66 /* HelloWorld.png */,
+				3EACC98E19EE6D4300EB3C5E /* res */,
+				1FDD950D1C8338700031BC38 /* source_material */,
 			);
 			name = Resources;
 			path = ../Resources;
@@ -301,6 +338,9 @@
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
 				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
 				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
+				1FDD943B1C8337140031BC38 /* mahjong-algorithm */,
+				1FDD94411C8337140031BC38 /* PointsCalculatorScene.cpp */,
+				1FDD94421C8337140031BC38 /* PointsCalculatorScene.h */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -441,6 +481,13 @@
 			remoteRef = 1AC6FB06180E9839004C840B /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		1FDD944B1C8337150031BC38 /* libcocos2d tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libcocos2d tvOS.a";
+			remoteRef = 1FDD944A1C8337150031BC38 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -471,6 +518,7 @@
 				521A8E6419F0C34300D177D7 /* Default-667h@2x.png in Resources */,
 				46880B7B19C43A67006E1F66 /* CloseNormal.png in Resources */,
 				50EF629717ECD46A001EB2F8 /* Icon-58.png in Resources */,
+				1FDD950E1C8338700031BC38 /* source_material in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -484,6 +532,7 @@
 				521A8EAA19F11F5000D177D7 /* fonts in Resources */,
 				46880B7C19C43A67006E1F66 /* CloseNormal.png in Resources */,
 				46880B7E19C43A67006E1F66 /* CloseSelected.png in Resources */,
+				1FDD950F1C8338700031BC38 /* source_material in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -494,11 +543,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1FDD94431C8337140031BC38 /* points_calculator.cpp in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
+				1FDD94451C8337140031BC38 /* wait_and_win_test.cpp in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
+				1FDD94471C8337140031BC38 /* PointsCalculatorScene.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -506,9 +558,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1FDD94441C8337140031BC38 /* points_calculator.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,
+				1FDD94481C8337140031BC38 /* PointsCalculatorScene.cpp in Sources */,
 				46880B8B19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
+				1FDD94461C8337140031BC38 /* wait_and_win_test.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
