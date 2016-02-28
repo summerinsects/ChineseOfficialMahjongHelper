@@ -18,17 +18,18 @@ private:
     void calculate();
 
     cocos2d::ui::EditBox *_editBox = nullptr;
-    cocos2d::ui::CheckBox *_prevalentBox[4];
-    cocos2d::ui::CheckBox *_seatBox[4];
-    cocos2d::ui::CheckBox *_byDiscardBox = nullptr;
-    cocos2d::ui::CheckBox *_selfDrawnBox = nullptr;
-    cocos2d::ui::CheckBox *_fourthTileBox = nullptr;
-    cocos2d::ui::CheckBox *_robKongBox = nullptr;
-    cocos2d::ui::CheckBox *_replacementBox = nullptr;
-    cocos2d::ui::CheckBox *_lastTileDrawnBox = nullptr;
-    cocos2d::ui::CheckBox *_lastTileChaimBox = nullptr;
+    cocos2d::ui::Button *_prevalentButton[4];
+    cocos2d::ui::Button *_seatButton[4];
+    cocos2d::ui::Button *_byDiscardButton = nullptr;
+    cocos2d::ui::Button *_selfDrawnButton = nullptr;
+    cocos2d::ui::Button *_fourthTileButton = nullptr;
+    cocos2d::ui::Button *_robKongButton = nullptr;
+    cocos2d::ui::Button *_replacementButton = nullptr;
+    cocos2d::ui::Button *_lastTileDrawnButton = nullptr;
+    cocos2d::ui::Button *_lastTileChaimButton = nullptr;
 
-    cocos2d::Size _pointsAreaSize;
+    float _pointsAreaTop;
+    float _pointsAreaBottom;
     cocos2d::Node *_pointsAreaNode = nullptr;
 };
 
