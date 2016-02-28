@@ -10,6 +10,9 @@
     <Filter Include="src">
       <UniqueIdentifier>{bb6c862e-70e9-49d9-81b7-3829a6f50471}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\mahjong-algorithm">
+      <UniqueIdentifier>{b30a3da7-0281-44fa-b97c-3fef043608b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -21,6 +24,15 @@
     <ClCompile Include="..\Classes\HelloWorldScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\PointsCalculatorScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\mahjong-algorithm\points_calculator.cpp">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\mahjong-algorithm\wait_and_win_test.cpp">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -31,6 +43,18 @@
     </ClInclude>
     <ClInclude Include="..\Classes\HelloWorldScene.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\PointsCalculatorScene.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\tile.h">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\points_calculator.h">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\wait_and_win_test.h">
+      <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,10 +1,9 @@
-#ifndef __HELLOWORLD_SCENE_H__
+﻿#ifndef __HELLOWORLD_SCENE_H__
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
 
-class HelloWorld : public cocos2d::Layer
-{
+class HelloWorld : public cocos2d::Layer {
 public:
     static cocos2d::Scene* createScene();
 
@@ -12,7 +11,9 @@ public:
     
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
-    
+
+    void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* unused_event);
+
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 };
