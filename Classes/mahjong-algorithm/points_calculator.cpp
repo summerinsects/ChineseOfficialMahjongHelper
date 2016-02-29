@@ -1780,7 +1780,7 @@ const char *parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt) {
     TILE temp[14];
     long temp_cnt = 0;
     const char *p = str;
-    for (; *p; ++p) {
+    for (; temp_cnt < 14 && tile_cnt < 14 && *p != '\0'; ++p) {
         char c = *p;
         switch (c) {
         case '1': temp[temp_cnt++] = 1; break;
@@ -1793,19 +1793,19 @@ const char *parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt) {
         case '8': temp[temp_cnt++] = 8; break;
         case '9': temp[temp_cnt++] = 9; break;
         case 'm':
-            for (long i = 0; i < temp_cnt; ++i) {
+            for (long i = 0; i < temp_cnt && tile_cnt < 14; ++i) {
                 tiles[tile_cnt++] = temp[i] | 0x10;
             }
             temp_cnt = 0;
             break;
         case 's':
-            for (long i = 0; i < temp_cnt; ++i) {
+            for (long i = 0; i < temp_cnt && tile_cnt < 14; ++i) {
                 tiles[tile_cnt++] = temp[i] | 0x20;
             }
             temp_cnt = 0;
             break;
         case 'p':
-            for (long i = 0; i < temp_cnt; ++i) {
+            for (long i = 0; i < temp_cnt && tile_cnt < 14; ++i) {
                 tiles[tile_cnt++] = temp[i] | 0x30;
             }
             temp_cnt = 0;
@@ -1824,6 +1824,7 @@ const char *parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt) {
 end:
     if (temp_cnt != 0) {
         puts("Expect m/s/p to finish a series of numbers");
+        return nullptr;
     }
     if (out_tile_cnt != nullptr) {
         *out_tile_cnt = tile_cnt;
@@ -1917,7 +1918,7 @@ bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
             break;
         default:
             q = parse_tiles(p, tiles, &tile_cnt);
-            if (q == p) {
+            if (q == p || q == nullptr) {
                 puts("Unexpect character");
                 return false;
             }
@@ -1970,7 +1971,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
     //default: return false;
     //}
     if (fixed_cnt < 0 || fixed_cnt > 4 || fixed_cnt * 3 + concealed_cnt != 13) {
-        return false;
+        return ERROR_WRONG_TILES_COUNT;
     }
 
     TILE _concealed_tiles[14];
@@ -2072,7 +2073,9 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
         }
         printf("points = %d\n\n", current_points);
     }
-    assert(max_idx >= 0);
+    if (max_idx == -1) {
+        return ERROR_NOT_WIN;
+    }
 
     if (points_table != nullptr) {
         memcpy(points_table, points_tables[max_idx], sizeof(points_tables[max_idx]));

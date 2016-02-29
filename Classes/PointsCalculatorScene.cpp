@@ -362,10 +362,12 @@ void PointsCalculatorScene::calculate() {
 
     Vec2 pos(origin.x + visibleSize.width * 0.5f, origin.y + _pointsAreaBottom + pointsAreaSize.height * 0.5f);
 
+    std::string errorStr;
     do {
         std::string str = _editBox->getText();
         std::string::iterator it = std::find(str.begin(), str.end(), ',');
         if (it == str.end()) {
+            errorStr = "缺少和牌张";
             break;
         }
         std::string tilesString(str.begin(), it);
@@ -376,6 +378,7 @@ void PointsCalculatorScene::calculate() {
         TILE tiles[13];
         long tile_cnt;
         if (!string_to_tiles(tilesString.c_str(), sets, &set_cnt, tiles, &tile_cnt)) {
+            errorStr = "解析牌出错";
             break;
         }
         sort_tiles(tiles, tile_cnt);
@@ -383,6 +386,7 @@ void PointsCalculatorScene::calculate() {
         TILE win_tile;
         const char *p = parse_tiles(winString.c_str(), &win_tile, nullptr);
         if (*p != '\0') {
+            errorStr = "解析牌出错";
             break;
         }
 
@@ -410,6 +414,14 @@ void PointsCalculatorScene::calculate() {
         }
 
         int points = calculate_points(sets, set_cnt, tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);
+        if (points == ERROR_NOT_WIN) {
+            errorStr = "诈和";
+            break;
+        }
+        if (points == ERROR_WRONG_TILES_COUNT) {
+            errorStr = "相公";
+            break;
+        }
 
         int n = FLOWER_TILES - std::count(std::begin(points_table), std::end(points_table), 0);
         Node *innerNode = Node::create();
@@ -462,7 +474,7 @@ void PointsCalculatorScene::calculate() {
 
     } while (0);
 
-    Label *errorLabel = Label::createWithSystemFont("无法正确解析牌", "Arial", FONT_SIZE);
+    Label *errorLabel = Label::createWithSystemFont(errorStr, "Arial", FONT_SIZE);
     errorLabel->setPosition(pos);
     this->addChild(errorLabel);
     _pointsAreaNode = errorLabel;

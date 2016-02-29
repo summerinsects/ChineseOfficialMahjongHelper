@@ -78,6 +78,9 @@ typedef uint8_t WIN_TYPE;
 #define WIN_TYPE_WALL_LAST 8
 
 #define MAX_SEPARAION_CNT 10
+    
+#define ERROR_WRONG_TILES_COUNT -1
+#define ERROR_NOT_WIN -2
 
 int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed_tiles, long concealed_cnt, TILE win_tile, WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long *points_table);
 
