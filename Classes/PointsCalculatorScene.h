@@ -26,7 +26,7 @@ private:
     cocos2d::ui::Button *_robKongButton = nullptr;
     cocos2d::ui::Button *_replacementButton = nullptr;
     cocos2d::ui::Button *_lastTileDrawnButton = nullptr;
-    cocos2d::ui::Button *_lastTileChaimButton = nullptr;
+    cocos2d::ui::Button *_lastTileClaimButton = nullptr;
 
     float _pointsAreaTop;
     float _pointsAreaBottom;

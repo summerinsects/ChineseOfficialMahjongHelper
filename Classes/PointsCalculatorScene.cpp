@@ -149,7 +149,7 @@ bool PointsCalculatorScene::init() {
             setButtonChecked(_selfDrawnButton);
             setButtonUnchecked(_byDiscardButton);
             setButtonUnchecked(_robKongButton);
-            setButtonUnchecked(_lastTileChaimButton);
+            setButtonUnchecked(_lastTileClaimButton);
         }
     });
 
@@ -192,7 +192,7 @@ bool PointsCalculatorScene::init() {
         else {
             setButtonChecked(_replacementButton);
             setButtonUnchecked(_robKongButton);
-            setButtonUnchecked(_lastTileChaimButton);
+            setButtonUnchecked(_lastTileClaimButton);
         }
     });
 
@@ -240,7 +240,7 @@ bool PointsCalculatorScene::init() {
             setButtonUnchecked(_byDiscardButton);
             setButtonUnchecked(_selfDrawnButton);
             setButtonUnchecked(_robKongButton);
-            setButtonUnchecked(_lastTileChaimButton);
+            setButtonUnchecked(_lastTileClaimButton);
         }
     });
 
@@ -249,18 +249,18 @@ bool PointsCalculatorScene::init() {
     lastTileDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     lastTileDrawnLabel->setPosition(Vec2(origin.x + 175.0f, y - 150));
 
-    _lastTileChaimButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    this->addChild(_lastTileChaimButton);
-    _lastTileChaimButton->setScale9Enabled(true);
-    _lastTileChaimButton->setContentSize(Size(22.0f, 22.0f));
-    _lastTileChaimButton->setPosition(Vec2(origin.x + 230.0f, y - 150));
-    setButtonUnchecked(_lastTileChaimButton);
-    _lastTileChaimButton->addClickEventListener([this](Ref *) {
-        if (isButtonChecked(_lastTileChaimButton)) {
-            setButtonUnchecked(_lastTileChaimButton);
+    _lastTileClaimButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    this->addChild(_lastTileClaimButton);
+    _lastTileClaimButton->setScale9Enabled(true);
+    _lastTileClaimButton->setContentSize(Size(22.0f, 22.0f));
+    _lastTileClaimButton->setPosition(Vec2(origin.x + 230.0f, y - 150));
+    setButtonUnchecked(_lastTileClaimButton);
+    _lastTileClaimButton->addClickEventListener([this](Ref *) {
+        if (isButtonChecked(_lastTileClaimButton)) {
+            setButtonUnchecked(_lastTileClaimButton);
         }
         else {
-            setButtonChecked(_lastTileChaimButton);
+            setButtonChecked(_lastTileClaimButton);
             setButtonUnchecked(_byDiscardButton);
             setButtonUnchecked(_selfDrawnButton);
             setButtonUnchecked(_replacementButton);
@@ -268,10 +268,10 @@ bool PointsCalculatorScene::init() {
         }
     });
 
-    Label *lastTileChaimLabel = Label::createWithSystemFont("海底", "Arial", 12);
-    this->addChild(lastTileChaimLabel);
-    lastTileChaimLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    lastTileChaimLabel->setPosition(Vec2(origin.x + 245.0f, y - 150));
+    Label *lastTileClaimLabel = Label::createWithSystemFont("海底", "Arial", 12);
+    this->addChild(lastTileClaimLabel);
+    lastTileClaimLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    lastTileClaimLabel->setPosition(Vec2(origin.x + 245.0f, y - 150));
 
     Label *tipsLabel = Label::createWithSystemFont("使用说明：\n"
         "1.万条饼分别用小写m s p作为后缀。同花色的数牌可以合并用一个后缀。\n"
@@ -342,7 +342,7 @@ void PointsCalculatorScene::calculate() {
         if (_robKongButton->isHighlighted()) win_type |= WIN_TYPE_ABOUT_KONG;
         if (_replacementButton->isHighlighted()) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
         if (_lastTileDrawnButton->isHighlighted()) win_type |= (WIN_TYPE_WALL_LAST | WIN_TYPE_SELF_DRAWN);
-        if (_lastTileChaimButton->isHighlighted()) win_type |= WIN_TYPE_WALL_LAST;
+        if (_lastTileClaimButton->isHighlighted()) win_type |= WIN_TYPE_WALL_LAST;
 
         WIND_TYPE prevalent_wind = WIND_TYPE::EAST, seat_wind = WIND_TYPE::EAST;
         for (int i = 0; i < 4; ++i) {
