@@ -13,6 +13,20 @@ Scene *PointsCalculatorScene::createScene() {
     return scene;
 }
 
+static inline void setButtonChecked(ui::Button *button) {
+    button->setHighlighted(true);
+    button->setTag(1);
+}
+
+static inline void setButtonUnchecked(ui::Button *button) {
+    button->setTag(0);
+    button->setHighlighted(false);
+}
+
+static inline bool isButtonChecked(ui::Button *button) {
+    return button->getTag() == 1;
+}
+
 bool PointsCalculatorScene::init() {
     if (!Layer::init()) {
         return false;
@@ -103,25 +117,16 @@ bool PointsCalculatorScene::init() {
     _byDiscardButton->setScale9Enabled(true);
     _byDiscardButton->setContentSize(Size(22.0f, 22.0f));
     _byDiscardButton->setPosition(Vec2(origin.x + 20.0f, y - 120));
-    _byDiscardButton->setHighlighted(true);
-    _byDiscardButton->setTag(1);
+    setButtonChecked(_byDiscardButton);
     _byDiscardButton->addClickEventListener([this](Ref *) {
-        if (_byDiscardButton->getTag() == 1) {
-            _byDiscardButton->setTag(0);
-            _byDiscardButton->setHighlighted(false);
+        if (isButtonChecked(_byDiscardButton)) {
+            setButtonUnchecked(_byDiscardButton);
         }
         else {
-            _byDiscardButton->setTag(1);
-            _byDiscardButton->setHighlighted(true);
-
-            _selfDrawnButton->setTag(0);
-            _selfDrawnButton->setHighlighted(false);
-
-            _replacementButton->setTag(0);
-            _replacementButton->setHighlighted(false);
-
-            _lastTileDrawnButton->setTag(0);
-            _lastTileDrawnButton->setHighlighted(false);
+            setButtonChecked(_byDiscardButton);
+            setButtonUnchecked(_selfDrawnButton);
+            setButtonUnchecked(_replacementButton);
+            setButtonUnchecked(_lastTileDrawnButton);
         }
     });
 
@@ -135,25 +140,16 @@ bool PointsCalculatorScene::init() {
     _selfDrawnButton->setScale9Enabled(true);
     _selfDrawnButton->setContentSize(Size(22.0f, 22.0f));
     _selfDrawnButton->setPosition(Vec2(origin.x + 90.0f, y - 120));
-    _selfDrawnButton->setHighlighted(false);
-    _selfDrawnButton->setTag(0);
+    setButtonUnchecked(_selfDrawnButton);
     _selfDrawnButton->addClickEventListener([this](Ref *) {
-        if (_selfDrawnButton->getTag() == 1) {
-            _selfDrawnButton->setTag(0);
-            _selfDrawnButton->setHighlighted(false);
+        if (isButtonChecked(_selfDrawnButton)) {
+            setButtonUnchecked(_selfDrawnButton);
         }
         else {
-            _selfDrawnButton->setTag(1);
-            _selfDrawnButton->setHighlighted(true);
-
-            _byDiscardButton->setTag(0);
-            _byDiscardButton->setHighlighted(false);
-
-            _robKongButton->setTag(0);
-            _robKongButton->setHighlighted(false);
-
-            _lastTileChaimButton->setTag(0);
-            _lastTileChaimButton->setHighlighted(false);
+            setButtonChecked(_selfDrawnButton);
+            setButtonUnchecked(_byDiscardButton);
+            setButtonUnchecked(_robKongButton);
+            setButtonUnchecked(_lastTileChaimButton);
         }
     });
 
@@ -167,19 +163,14 @@ bool PointsCalculatorScene::init() {
     _fourthTileButton->setScale9Enabled(true);
     _fourthTileButton->setContentSize(Size(22.0f, 22.0f));
     _fourthTileButton->setPosition(Vec2(origin.x + 160.0f, y - 120));
-    _fourthTileButton->setHighlighted(false);
-    _fourthTileButton->setTag(0);
+    setButtonUnchecked(_fourthTileButton);
     _fourthTileButton->addClickEventListener([this](Ref *) {
-        if (_fourthTileButton->getTag() == 1) {
-            _fourthTileButton->setTag(0);
-            _fourthTileButton->setHighlighted(false);
+        if (isButtonChecked(_fourthTileButton)) {
+            setButtonUnchecked(_fourthTileButton);
         }
         else {
-            _fourthTileButton->setTag(1);
-            _fourthTileButton->setHighlighted(true);
-
-            _robKongButton->setTag(0);
-            _robKongButton->setHighlighted(false);
+            setButtonChecked(_fourthTileButton);
+            setButtonUnchecked(_robKongButton);
         }
     });
 
@@ -193,22 +184,15 @@ bool PointsCalculatorScene::init() {
     _replacementButton->setScale9Enabled(true);
     _replacementButton->setContentSize(Size(22.0f, 22.0f));
     _replacementButton->setPosition(Vec2(origin.x + 20.0f, y - 150));
-    _replacementButton->setHighlighted(false);
-    _replacementButton->setTag(0);
+    setButtonUnchecked(_replacementButton);
     _replacementButton->addClickEventListener([this](Ref *) {
-        if (_replacementButton->getTag() == 1) {
-            _replacementButton->setTag(0);
-            _replacementButton->setHighlighted(false);
+        if (isButtonChecked(_replacementButton)) {
+            setButtonUnchecked(_replacementButton);
         }
         else {
-            _replacementButton->setTag(1);
-            _replacementButton->setHighlighted(true);
-
-            _robKongButton->setTag(0);
-            _robKongButton->setHighlighted(false);
-
-            _lastTileChaimButton->setTag(0);
-            _lastTileChaimButton->setHighlighted(false);
+            setButtonChecked(_replacementButton);
+            setButtonUnchecked(_robKongButton);
+            setButtonUnchecked(_lastTileChaimButton);
         }
     });
 
@@ -222,31 +206,17 @@ bool PointsCalculatorScene::init() {
     _robKongButton->setScale9Enabled(true);
     _robKongButton->setContentSize(Size(22.0f, 22.0f));
     _robKongButton->setPosition(Vec2(origin.x + 90.0f, y - 150));
-    _robKongButton->setHighlighted(false);
-    _robKongButton->setTag(0);
+    setButtonUnchecked(_robKongButton);
     _robKongButton->addClickEventListener([this](Ref *) {
-        if (_robKongButton->getTag() == 1) {
-            _robKongButton->setTag(0);
-            _robKongButton->setHighlighted(false);
+        if (isButtonChecked(_robKongButton)) {
+            setButtonUnchecked(_robKongButton);
         }
         else {
-            _robKongButton->setTag(1);
-            _robKongButton->setHighlighted(true);
-
-            _selfDrawnButton->setTag(0);
-            _selfDrawnButton->setHighlighted(false);
-
-            _fourthTileButton->setTag(0);
-            _fourthTileButton->setHighlighted(false);
-
-            _replacementButton->setTag(0);
-            _replacementButton->setHighlighted(false);
-
-            _lastTileDrawnButton->setTag(0);
-            _lastTileDrawnButton->setHighlighted(false);
-
-            _lastTileChaimButton->setTag(0);
-            _lastTileChaimButton->setHighlighted(false);
+            setButtonChecked(_robKongButton);
+            setButtonUnchecked(_selfDrawnButton);
+            setButtonUnchecked(_fourthTileButton);
+            setButtonUnchecked(_replacementButton);
+            setButtonUnchecked(_lastTileDrawnButton);
         }
     });
 
@@ -260,28 +230,17 @@ bool PointsCalculatorScene::init() {
     _lastTileDrawnButton->setScale9Enabled(true);
     _lastTileDrawnButton->setContentSize(Size(22.0f, 22.0f));
     _lastTileDrawnButton->setPosition(Vec2(origin.x + 160.0f, y - 150));
-    _lastTileDrawnButton->setHighlighted(false);
-    _lastTileDrawnButton->setTag(0);
+    setButtonUnchecked(_lastTileDrawnButton);
     _lastTileDrawnButton->addClickEventListener([this](Ref *) {
-        if (_lastTileDrawnButton->getTag() == 1) {
-            _lastTileDrawnButton->setTag(0);
-            _lastTileDrawnButton->setHighlighted(false);
+        if (isButtonChecked(_lastTileDrawnButton)) {
+            setButtonUnchecked(_lastTileDrawnButton);
         }
         else {
-            _lastTileDrawnButton->setTag(1);
-            _lastTileDrawnButton->setHighlighted(true);
-
-            _byDiscardButton->setTag(0);
-            _byDiscardButton->setHighlighted(false);
-
-            _selfDrawnButton->setTag(0);
-            _selfDrawnButton->setHighlighted(false);
-
-            _robKongButton->setTag(0);
-            _robKongButton->setHighlighted(false);
-
-            _lastTileChaimButton->setTag(0);
-            _lastTileChaimButton->setHighlighted(false);
+            setButtonChecked(_lastTileDrawnButton);
+            setButtonUnchecked(_byDiscardButton);
+            setButtonUnchecked(_selfDrawnButton);
+            setButtonUnchecked(_robKongButton);
+            setButtonUnchecked(_lastTileChaimButton);
         }
     });
 
@@ -295,31 +254,17 @@ bool PointsCalculatorScene::init() {
     _lastTileChaimButton->setScale9Enabled(true);
     _lastTileChaimButton->setContentSize(Size(22.0f, 22.0f));
     _lastTileChaimButton->setPosition(Vec2(origin.x + 230.0f, y - 150));
-    _lastTileChaimButton->setHighlighted(false);
-    _lastTileChaimButton->setTag(0);
+    setButtonUnchecked(_lastTileChaimButton);
     _lastTileChaimButton->addClickEventListener([this](Ref *) {
-        if (_lastTileChaimButton->getTag() == 1) {
-            _lastTileChaimButton->setTag(0);
-            _lastTileChaimButton->setHighlighted(false);
+        if (isButtonChecked(_lastTileChaimButton)) {
+            setButtonUnchecked(_lastTileChaimButton);
         }
         else {
-            _lastTileChaimButton->setTag(1);
-            _lastTileChaimButton->setHighlighted(true);
-
-            _byDiscardButton->setTag(0);
-            _byDiscardButton->setHighlighted(false);
-
-            _selfDrawnButton->setTag(0);
-            _selfDrawnButton->setHighlighted(false);
-
-            _replacementButton->setTag(0);
-            _replacementButton->setHighlighted(false);
-
-            _robKongButton->setTag(0);
-            _robKongButton->setHighlighted(false);
-
-            _lastTileDrawnButton->setTag(0);
-            _lastTileDrawnButton->setHighlighted(false);
+            setButtonChecked(_lastTileChaimButton);
+            setButtonUnchecked(_byDiscardButton);
+            setButtonUnchecked(_selfDrawnButton);
+            setButtonUnchecked(_replacementButton);
+            setButtonUnchecked(_lastTileDrawnButton);
         }
     });
 
