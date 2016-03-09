@@ -1196,6 +1196,8 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
         points_table[OUTSIDE_HAND] = 0;
         points_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
         points_table[NO_HONORS] = 0;
+        points_table[TRIPLE_PUNG] = 0;
+        points_table[DOUBLE_PUNG] = 0;
     }
     if (points_table[LITTLE_FOUR_WINDS]) {
         points_table[BIG_THREE_WINDS] = 0;
