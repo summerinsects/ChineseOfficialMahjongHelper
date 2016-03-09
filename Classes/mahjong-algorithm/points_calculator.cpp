@@ -1162,6 +1162,7 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
     if (points_table[BIG_THREE_DRAGONS]) {
         points_table[TWO_DRAGONS_PUNGS] = 0;
         points_table[DRAGON_PUNG] = 0;
+        points_table[ONE_VOIDED_SUIT] = 0;
     }
     if (points_table[ALL_GREEN]) {
         points_table[HALF_FLUSH] = 0;
@@ -1202,6 +1203,7 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
     if (points_table[LITTLE_THREE_DRAGONS]) {
         points_table[TWO_DRAGONS_PUNGS] = 0;
         points_table[DRAGON_PUNG] = 0;
+        points_table[ONE_VOIDED_SUIT] = 0;
     }
     if (points_table[ALL_HONORS]) {
         points_table[ALL_TERMINALS_AND_HONORS] = 0;
@@ -1231,15 +1233,18 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
         points_table[PURE_SHIFTED_PUNGS] = 0;
         points_table[TILE_HOG] = 0;
         points_table[PURE_DOUBLE_CHOW] = 0;
+        points_table[ONE_VOIDED_SUIT] = 0;
     }
     if (points_table[FOUR_PURE_SHIFTED_PUNGS]) {
         points_table[PURE_TRIPLE_CHOW] = 0;
         points_table[ALL_PUNGS] = 0;
+        points_table[ONE_VOIDED_SUIT] = 0;
     }
 
     if (points_table[FOUR_PURE_SHIFTED_CHOWS]) {
         points_table[TWO_TERMINAL_CHOWS] = 0;
         points_table[SHORT_STRAIGHT] = 0;
+        points_table[ONE_VOIDED_SUIT] = 0;
     }
     if (points_table[THREE_KONGS]) {
 
@@ -1324,7 +1329,7 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
         points_table[NO_HONORS] = 0;
     }
     if (points_table[BIG_THREE_WINDS]) {
-
+        points_table[ONE_VOIDED_SUIT] = 0;
     }
 
     if (points_table[MIXED_STRAIGHT]) {
