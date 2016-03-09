@@ -293,7 +293,7 @@ bool PointsCalculatorScene::init() {
     return true;
 }
 
-#define FONT_SIZE 18
+#define FONT_SIZE 16
 
 void PointsCalculatorScene::calculate() {
     if (_pointsAreaNode != nullptr) {
