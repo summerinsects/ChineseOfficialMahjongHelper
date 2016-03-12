@@ -13,6 +13,12 @@
     <Filter Include="src\mahjong-algorithm">
       <UniqueIdentifier>{b30a3da7-0281-44fa-b97c-3fef043608b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ScoreSheet">
+      <UniqueIdentifier>{c70d58d3-f21e-45b5-8fdb-54c4d378ccfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\PointsCalculator">
+      <UniqueIdentifier>{ee88c5ab-d66e-486f-9367-a564efe30b78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -24,14 +30,20 @@
     <ClCompile Include="..\Classes\HelloWorldScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\PointsCalculatorScene.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\mahjong-algorithm\points_calculator.cpp">
       <Filter>src\mahjong-algorithm</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\mahjong-algorithm\wait_and_win_test.cpp">
       <Filter>src\mahjong-algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\PointsCalculator\PointsCalculatorScene.cpp">
+      <Filter>src\PointsCalculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ScoreSheet\ScoreSheetScene.cpp">
+      <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp">
+      <Filter>src\ScoreSheet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -44,9 +56,6 @@
     <ClInclude Include="..\Classes\HelloWorldScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\PointsCalculatorScene.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
@@ -55,6 +64,15 @@
     </ClInclude>
     <ClInclude Include="..\Classes\mahjong-algorithm\wait_and_win_test.h">
       <Filter>src\mahjong-algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\PointsCalculator\PointsCalculatorScene.h">
+      <Filter>src\PointsCalculator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScoreSheet\ScoreSheetScene.h">
+      <Filter>src\ScoreSheet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScoreSheet\RecordScene.h">
+      <Filter>src\ScoreSheet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

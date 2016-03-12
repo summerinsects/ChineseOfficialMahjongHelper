@@ -13,9 +13,11 @@ LOCAL_MODULE_FILENAME := libcocos2dcpp
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/mahjong-algorithm/points_calculator.cpp \
                    ../../Classes/mahjong-algorithm/wait_and_win_test.cpp \
+                   ../../Classes/PointsCalculator/PointsCalculatorScene.cpp \
+                   ../../Classes/ScoreSheet/RecordScene.cpp \
+                   ../../Classes/ScoreSheet/ScoreSheetScene.cpp \
                    ../../Classes/AppDelegate.cpp \
-                   ../../Classes/HelloWorldScene.cpp \
-                   ../../Classes/PointsCalculatorScene.cpp
+                   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 

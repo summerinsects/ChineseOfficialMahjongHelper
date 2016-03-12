@@ -10,7 +10,7 @@ public:
 
     virtual bool init() override;
 
-    virtual void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* unused_event) override;
+    virtual void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent) override;
 
     CREATE_FUNC(PointsCalculatorScene);
 

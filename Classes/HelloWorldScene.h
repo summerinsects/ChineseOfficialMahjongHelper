@@ -5,16 +5,9 @@
 
 class HelloWorld : public cocos2d::Layer {
 public:
-    static cocos2d::Scene* createScene();
-
-    virtual bool init();
-    
-    // a selector callback
-    void menuCloseCallback(cocos2d::Ref* pSender);
-
-    void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* unused_event);
-
-    // implement the "static create()" method manually
+    static cocos2d::Scene *createScene();
+    virtual bool init() override;
+    void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent);
     CREATE_FUNC(HelloWorld);
 };
 

@@ -2,7 +2,7 @@
 
 #pragma execution_character_set("utf-8")
 
-#include "mahjong-algorithm/points_calculator.h"
+#include "../mahjong-algorithm/points_calculator.h"
 
 USING_NS_CC;
 
@@ -425,7 +425,7 @@ void PointsCalculatorScene::calculate() {
     _pointsAreaNode = errorLabel;
 }
 
-void PointsCalculatorScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* unused_event) {
+void PointsCalculatorScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
     if (keyCode == EventKeyboard::KeyCode::KEY_BACK) {
         Director::getInstance()->end();
 
