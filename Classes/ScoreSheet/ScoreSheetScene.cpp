@@ -66,6 +66,7 @@ bool ScoreSheetScene::init() {
     node->addChild(_lockButton);
     _lockButton->setScale9Enabled(true);
     _lockButton->setContentSize(Size(gap, 20.0f));
+    _lockButton->setTitleFontSize(12);
     _lockButton->setTitleText("锁定");
     _lockButton->setPosition(Vec2(gap * 5.5f, 390));
     _lockButton->addClickEventListener(std::bind(&ScoreSheetScene::lockCallback, this, std::placeholders::_1));
@@ -110,6 +111,7 @@ bool ScoreSheetScene::init() {
         node->addChild(_recordButton[k]);
         _recordButton[k]->setScale9Enabled(true);
         _recordButton[k]->setContentSize(Size(gap, 20.0f));
+        _recordButton[k]->setTitleFontSize(12);
         _recordButton[k]->setTitleText("计分");
         _recordButton[k]->setPosition(Vec2(gap * 5.5f, y));
         _recordButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::recordCallback, this, std::placeholders::_1, k));
