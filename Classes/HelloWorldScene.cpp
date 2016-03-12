@@ -28,9 +28,10 @@ bool HelloWorld::init() {
     ui::Button *button = ui::Button::create();
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(54.0, 25.0f));
+    button->setContentSize(Size(75.0, 32.0f));
+    button->setTitleFontSize(24);
     button->setTitleText("算番器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 10));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 20));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(PointsCalculatorScene::createScene());
     });
@@ -38,9 +39,10 @@ bool HelloWorld::init() {
     button = ui::Button::create();
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(54.0, 25.0f));
+    button->setContentSize(Size(75.0, 32.0f));
+    button->setTitleFontSize(24);
     button->setTitleText("计分器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 10));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(ScoreSheetScene::createScene());
     });
