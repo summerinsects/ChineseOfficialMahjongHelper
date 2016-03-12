@@ -5,6 +5,10 @@
 
 USING_NS_CC;
 
+static char g_name[4][255];
+static int g_scores[16][4];
+static int g_currentIndex;
+
 Scene *ScoreSheetScene::createScene() {
     auto scene = Scene::create();
     auto layer = ScoreSheetScene::create();
@@ -22,7 +26,6 @@ bool ScoreSheetScene::init() {
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     memset(_scores, 0, sizeof(_scores));
-    _currentIndex = 0;
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -31,6 +34,15 @@ bool ScoreSheetScene::init() {
     this->addChild(tileLabel);
     tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
         origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
+
+    ui::Button *button = ui::Button::create();
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(45, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("重置");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - tileLabel->getContentSize().height - 10));
+    button->addClickEventListener([this](Ref *) { reset(); });
 
     Node *node = Node::create();
     this->addChild(node);
@@ -119,6 +131,7 @@ bool ScoreSheetScene::init() {
         _recordButton[k]->setVisible(false);
     }
 
+    recover();
     return true;
 }
 
@@ -128,34 +141,105 @@ void ScoreSheetScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unuse
     }
 }
 
-void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
-    memset(_scores, 0, sizeof(_scores));
-    _currentIndex = 0;
+void ScoreSheetScene::recover() {
+    bool empty = false;
+    for (int i = 0; i < 4; ++i) {
+        if (g_name[i][0] == '\0') {
+            empty = true;
+            break;
+        }
+    }
+
+    if (empty) {
+        memset(g_scores, 0, sizeof(g_scores));
+        g_currentIndex = 0;
+        return;
+    }
 
     for (int i = 0; i < 4; ++i) {
+        _editBox[i]->setText(g_name[i]);
         _editBox[i]->setEnabled(false);
         _totalLabel[i]->setString("0");
         _scoreLabels[0][i]->setString("0");
     }
 
+    _lockButton->setEnabled(false);
+    _lockButton->setVisible(false);
+
+    memset(_scores, 0, sizeof(_scores));
+    int index;
+    for (index = 0; index < g_currentIndex; ++index) {
+        for (int i = 0; i < 4; ++i) {
+            _scoreLabels[index][i]->setString(StringUtils::format("%d", g_scores[index][i]));
+            _scores[i] += g_scores[index][i];
+            _totalLabel[i]->setString(StringUtils::format("%d", _scores[index]));
+        }
+
+        _recordButton[index]->setVisible(false);
+        _recordButton[index]->setEnabled(false);
+    }
+
+    if (g_currentIndex < 16) {
+        _recordButton[g_currentIndex]->setVisible(true);
+    }
+}
+
+void ScoreSheetScene::reset() {
+    memset(g_name, 0, sizeof(g_name));
+    memset(g_scores, 0, sizeof(g_scores));
+    g_currentIndex = 0;
+
+    for (int i = 0; i < 4; ++i) {
+        _editBox[i]->setText("");
+        _editBox[i]->setEnabled(true);
+        _totalLabel[i]->setString("0");
+    }
+
+    _lockButton->setEnabled(true);
+    _lockButton->setVisible(true);
+
+    for (int k = 0; k < 16; ++k) {
+        for (int i = 0; i < 4; ++i) {
+            _scoreLabels[k][i]->setString("");
+        }
+        _recordButton[k]->setVisible(false);
+    }
+}
+
+void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
+    for (int i = 0; i < 4; ++i) {
+        const char *str = _editBox[i]->getText();
+        if (str[0] == '\0') {
+            return;
+        }
+        strncpy(g_name[i], str, sizeof(g_name[i]));
+    }
+
+    memset(_scores, 0, sizeof(_scores));
+
+    for (int i = 0; i < 4; ++i) {
+        _editBox[i]->setEnabled(false);
+    }
+
     _recordButton[0]->setVisible(true);
     _lockButton->setEnabled(false);
-    _lockButton->setTitleText("");
+    _lockButton->setVisible(false);
 }
 
 void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
     const char *name[] = { _editBox[0]->getText(), _editBox[1]->getText(), _editBox[2]->getText(), _editBox[3]->getText() };
     Director::getInstance()->pushScene(RecordScene::createScene(index, name, [this, index](const int (&scores)[4]) {
         for (int i = 0; i < 4; ++i) {
+            g_scores[index][i] = scores[i];
             _scoreLabels[index][i]->setString(StringUtils::format("%d", scores[i]));
             _scores[i] += scores[i];
             _totalLabel[i]->setString(StringUtils::format("%d", _scores[i]));
         }
 
-        _recordButton[_currentIndex]->setTitleText("");
-        _recordButton[_currentIndex]->setEnabled(false);
-        if (++_currentIndex < 16) {
-            _recordButton[_currentIndex]->setVisible(true);
+        _recordButton[g_currentIndex]->setVisible(false);
+        _recordButton[g_currentIndex]->setEnabled(false);
+        if (++g_currentIndex < 16) {
+            _recordButton[g_currentIndex]->setVisible(true);
         }
     }));
 }

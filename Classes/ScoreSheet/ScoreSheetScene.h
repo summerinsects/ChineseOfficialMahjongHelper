@@ -20,8 +20,9 @@ private:
     cocos2d::Label *_totalLabel[4];
     cocos2d::Label *_scoreLabels[16][4];
     cocos2d::ui::Button *_recordButton[16];
-    int _currentIndex;
 
+    void recover();
+    void reset();
     void lockCallback(cocos2d::Ref *sender);
     void recordCallback(cocos2d::Ref *sender, int index);
 };
