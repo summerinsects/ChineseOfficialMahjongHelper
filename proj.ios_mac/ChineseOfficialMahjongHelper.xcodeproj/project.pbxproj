@@ -15,10 +15,14 @@
 		1FDD94441C8337140031BC38 /* points_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* points_calculator.cpp */; };
 		1FDD94451C8337140031BC38 /* wait_and_win_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */; };
 		1FDD94461C8337140031BC38 /* wait_and_win_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */; };
-		1FDD94471C8337140031BC38 /* PointsCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD94411C8337140031BC38 /* PointsCalculatorScene.cpp */; };
-		1FDD94481C8337140031BC38 /* PointsCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD94411C8337140031BC38 /* PointsCalculatorScene.cpp */; };
 		1FDD950E1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
 		1FDD950F1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
+		1FE04ADE1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04AD71C94682A008401EA /* PointsCalculatorScene.cpp */; };
+		1FE04ADF1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04AD71C94682A008401EA /* PointsCalculatorScene.cpp */; };
+		1FE04AE01C94682A008401EA /* RecordScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADA1C94682A008401EA /* RecordScene.cpp */; };
+		1FE04AE11C94682A008401EA /* RecordScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADA1C94682A008401EA /* RecordScene.cpp */; };
+		1FE04AE21C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
+		1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		3EACC98F19EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
 		3EACC99019EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
@@ -128,9 +132,13 @@
 		1FDD943E1C8337140031BC38 /* tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tile.h; sourceTree = "<group>"; };
 		1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wait_and_win_test.cpp; sourceTree = "<group>"; };
 		1FDD94401C8337140031BC38 /* wait_and_win_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wait_and_win_test.h; sourceTree = "<group>"; };
-		1FDD94411C8337140031BC38 /* PointsCalculatorScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointsCalculatorScene.cpp; sourceTree = "<group>"; };
-		1FDD94421C8337140031BC38 /* PointsCalculatorScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointsCalculatorScene.h; sourceTree = "<group>"; };
 		1FDD950D1C8338700031BC38 /* source_material */ = {isa = PBXFileReference; lastKnownFileType = folder; path = source_material; sourceTree = "<group>"; };
+		1FE04AD71C94682A008401EA /* PointsCalculatorScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointsCalculatorScene.cpp; sourceTree = "<group>"; };
+		1FE04AD81C94682A008401EA /* PointsCalculatorScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointsCalculatorScene.h; sourceTree = "<group>"; };
+		1FE04ADA1C94682A008401EA /* RecordScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecordScene.cpp; sourceTree = "<group>"; };
+		1FE04ADB1C94682A008401EA /* RecordScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordScene.h; sourceTree = "<group>"; };
+		1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScoreSheetScene.cpp; sourceTree = "<group>"; };
+		1FE04ADD1C94682A008401EA /* ScoreSheetScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreSheetScene.h; sourceTree = "<group>"; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		3EACC98E19EE6D4300EB3C5E /* res */ = {isa = PBXFileReference; lastKnownFileType = folder; path = res; sourceTree = "<group>"; };
 		46880B7619C43A67006E1F66 /* CloseNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CloseNormal.png; sourceTree = "<group>"; };
@@ -277,6 +285,26 @@
 			path = "mahjong-algorithm";
 			sourceTree = "<group>";
 		};
+		1FE04AD61C94682A008401EA /* PointsCalculator */ = {
+			isa = PBXGroup;
+			children = (
+				1FE04AD71C94682A008401EA /* PointsCalculatorScene.cpp */,
+				1FE04AD81C94682A008401EA /* PointsCalculatorScene.h */,
+			);
+			path = PointsCalculator;
+			sourceTree = "<group>";
+		};
+		1FE04AD91C94682A008401EA /* ScoreSheet */ = {
+			isa = PBXGroup;
+			children = (
+				1FE04ADA1C94682A008401EA /* RecordScene.cpp */,
+				1FE04ADB1C94682A008401EA /* RecordScene.h */,
+				1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */,
+				1FE04ADD1C94682A008401EA /* ScoreSheetScene.h */,
+			);
+			path = ScoreSheet;
+			sourceTree = "<group>";
+		};
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
@@ -339,8 +367,8 @@
 				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
 				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
 				1FDD943B1C8337140031BC38 /* mahjong-algorithm */,
-				1FDD94411C8337140031BC38 /* PointsCalculatorScene.cpp */,
-				1FDD94421C8337140031BC38 /* PointsCalculatorScene.h */,
+				1FE04AD61C94682A008401EA /* PointsCalculator */,
+				1FE04AD91C94682A008401EA /* ScoreSheet */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -550,7 +578,9 @@
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
-				1FDD94471C8337140031BC38 /* PointsCalculatorScene.cpp in Sources */,
+				1FE04AE01C94682A008401EA /* RecordScene.cpp in Sources */,
+				1FE04ADE1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */,
+				1FE04AE21C94682A008401EA /* ScoreSheetScene.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,9 +591,11 @@
 				1FDD94441C8337140031BC38 /* points_calculator.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,
-				1FDD94481C8337140031BC38 /* PointsCalculatorScene.cpp in Sources */,
+				1FE04ADF1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */,
 				46880B8B19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				1FDD94461C8337140031BC38 /* wait_and_win_test.cpp in Sources */,
+				1FE04AE11C94682A008401EA /* RecordScene.cpp in Sources */,
+				1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
