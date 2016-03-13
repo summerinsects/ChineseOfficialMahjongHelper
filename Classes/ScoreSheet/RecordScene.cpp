@@ -52,7 +52,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
 
     const char *nameText[] = { "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
         "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北" };
-    Label *tileLabel = Label::createWithSystemFont(nameText[index], "Arial", 24);
+    Label *tileLabel = Label::createWithSystemFont(nameText[index], "Arial", 18);
     this->addChild(tileLabel);
     tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
         origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
@@ -89,7 +89,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         this->addChild(_nameLabel[i]);
         _nameLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
 
-        _scoreLabel[i] = Label::createWithSystemFont("0", "Arial", 12);
+        _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);
         this->addChild(_scoreLabel[i]);
         _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 110));
 
@@ -191,7 +191,7 @@ void RecordScene::updateScoreLabel() {
     }
 
     for (int i = 0; i < 4; ++i) {
-        _scoreLabel[i]->setString(StringUtils::format("%d", _scoreTable[i]));
+        _scoreLabel[i]->setString(StringUtils::format("%+d", _scoreTable[i]));
     }
 }
 
@@ -205,7 +205,7 @@ void RecordScene::drawCallback(cocos2d::Ref *sender) {
             _claimButton[i]->setEnabled(true);
             setButtonUnchecked(_falseWinButton[i]);
             _falseWinButton[i]->setEnabled(true);
-            _scoreLabel[i]->setString("0");
+            _scoreLabel[i]->setString("+0");
         }
     }
     else {

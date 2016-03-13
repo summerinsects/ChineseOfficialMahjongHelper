@@ -159,28 +159,32 @@ void ScoreSheetScene::recover() {
     for (int i = 0; i < 4; ++i) {
         _editBox[i]->setText(g_name[i]);
         _editBox[i]->setEnabled(false);
-        _totalLabel[i]->setString("0");
-        _scoreLabels[0][i]->setString("0");
+        _totalLabel[i]->setString("+0");
+        _scoreLabels[0][i]->setString("+0");
     }
 
     _lockButton->setEnabled(false);
     _lockButton->setVisible(false);
 
     memset(_scores, 0, sizeof(_scores));
-    int index;
-    for (index = 0; index < g_currentIndex; ++index) {
+    for (int k = 0; k < g_currentIndex; ++k) {
         for (int i = 0; i < 4; ++i) {
-            _scoreLabels[index][i]->setString(StringUtils::format("%d", g_scores[index][i]));
-            _scores[i] += g_scores[index][i];
-            _totalLabel[i]->setString(StringUtils::format("%d", _scores[index]));
+            _scoreLabels[k][i]->setString(StringUtils::format("%+d", g_scores[k][i]));
+            _scores[i] += g_scores[k][i];
+
         }
 
-        _recordButton[index]->setVisible(false);
-        _recordButton[index]->setEnabled(false);
+        _recordButton[k]->setVisible(false);
+        _recordButton[k]->setEnabled(false);
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        _totalLabel[i]->setString(StringUtils::format("%+d", _scores[i]));
     }
 
     if (g_currentIndex < 16) {
         _recordButton[g_currentIndex]->setVisible(true);
+        _recordButton[g_currentIndex]->setEnabled(true);
     }
 }
 
@@ -189,6 +193,7 @@ void ScoreSheetScene::reset() {
     memset(g_scores, 0, sizeof(g_scores));
     g_currentIndex = 0;
 
+    memset(_scores, 0, sizeof(_scores));
     for (int i = 0; i < 4; ++i) {
         _editBox[i]->setText("");
         _editBox[i]->setEnabled(true);
@@ -203,6 +208,7 @@ void ScoreSheetScene::reset() {
             _scoreLabels[k][i]->setString("");
         }
         _recordButton[k]->setVisible(false);
+        _recordButton[k]->setEnabled(false);
     }
 }
 
@@ -222,6 +228,7 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
     }
 
     _recordButton[0]->setVisible(true);
+    _recordButton[0]->setEnabled(true);
     _lockButton->setEnabled(false);
     _lockButton->setVisible(false);
 }
@@ -231,15 +238,16 @@ void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
     Director::getInstance()->pushScene(RecordScene::createScene(index, name, [this, index](const int (&scores)[4]) {
         for (int i = 0; i < 4; ++i) {
             g_scores[index][i] = scores[i];
-            _scoreLabels[index][i]->setString(StringUtils::format("%d", scores[i]));
+            _scoreLabels[index][i]->setString(StringUtils::format("%+d", scores[i]));
             _scores[i] += scores[i];
-            _totalLabel[i]->setString(StringUtils::format("%d", _scores[i]));
+            _totalLabel[i]->setString(StringUtils::format("%+d", _scores[i]));
         }
 
         _recordButton[g_currentIndex]->setVisible(false);
         _recordButton[g_currentIndex]->setEnabled(false);
         if (++g_currentIndex < 16) {
             _recordButton[g_currentIndex]->setVisible(true);
+            _recordButton[g_currentIndex]->setEnabled(true);
         }
     }));
 }
