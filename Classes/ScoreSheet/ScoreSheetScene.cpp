@@ -1,5 +1,9 @@
 ﻿#include "ScoreSheetScene.h"
 #include "RecordScene.h"
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+#define PRId64 "lld"
+#endif
+#include "../wheels/cppJSON.hpp"
 
 #pragma execution_character_set("utf-8")
 
@@ -137,7 +141,84 @@ void ScoreSheetScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unuse
     }
 }
 
+static void readFromJson() {
+    char str[1024] = "";
+    std::string path = FileUtils::getInstance()->getWritablePath();
+    path.append("record.json");
+    FILE *file = fopen(path.c_str(), "rb");
+    if (file == nullptr) {
+        return;
+    }
+
+    fread(str, 1, sizeof(str), file);
+    CCLOG("%s", str);
+    fclose(file);
+
+    try {
+        jw::cppJSON json;
+        json.Parse(str);
+        jw::cppJSON::iterator it = json.find("name");
+        if (it != json.end()) {
+            auto vec = it->as<std::vector<std::string> >();
+            if (vec.size() == 4) {
+                for (int i = 0; i < 4; ++i) {
+                    char *str = nullptr;
+                    base64Decode((const unsigned char *)vec[i].c_str(), vec[i].length(), (unsigned char **)&str);
+                    strncpy(g_name[i], str, sizeof(g_name[i]));
+                    free(str);
+                }
+            }
+        }
+        it = json.find("record");
+        if (it != json.end()) {
+            auto vec = it->as<std::vector<std::vector<int> > >();
+            g_currentIndex = vec.size();
+            for (int i = 0; i < g_currentIndex; ++i) {
+                memcpy(g_scores[i], &vec[i][0], sizeof(g_scores[i]));
+            }
+        }
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+    }
+}
+
+static void writeToJson() {
+    try {
+        jw::cppJSON json(jw::cppJSON::ValueType::Object);
+        std::vector<std::string> nameVec;
+        for (int i = 0; i < 4; ++i) {
+            char *base64Name = nullptr;
+            base64Encode((const unsigned char *)g_name[i], strlen(g_name[i]) + 1, &base64Name);
+            nameVec.push_back(base64Name);
+            free(base64Name);
+        }
+        json.insert(std::make_pair("name", std::move(nameVec)));
+        std::vector<std::vector<int> > scoreVec;
+        scoreVec.reserve(16);
+        for (int k = 0; k < g_currentIndex; ++k) {
+            scoreVec.push_back(std::vector<int>({ g_scores[k][0], g_scores[k][1], g_scores[k][2], g_scores[k][3] }));
+        }
+        json.insert(std::make_pair("record", std::move(scoreVec)));
+        std::string str = json.stringfiy();
+        CCLOG("%s", str.c_str());
+
+        std::string path = FileUtils::getInstance()->getWritablePath();
+        path.append("record.json");
+        FILE *file = fopen(path.c_str(), "wb");
+        if (file != nullptr) {
+            fwrite(str.c_str(), 1, str.length(), file);
+            fclose(file);
+        }
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+    }
+}
+
 void ScoreSheetScene::recover() {
+    readFromJson();
+
     bool empty = false;
     for (int i = 0; i < 4; ++i) {
         if (g_name[i][0] == '\0') {
@@ -245,5 +326,6 @@ void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
             _recordButton[g_currentIndex]->setVisible(true);
             _recordButton[g_currentIndex]->setEnabled(true);
         }
+        writeToJson();
     }));
 }
