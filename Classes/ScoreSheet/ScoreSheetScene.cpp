@@ -193,7 +193,7 @@ void ScoreSheetScene::reset() {
     for (int i = 0; i < 4; ++i) {
         _editBox[i]->setText("");
         _editBox[i]->setEnabled(true);
-        _totalLabel[i]->setString("0");
+        _totalLabel[i]->setString("+0");
     }
 
     _lockButton->setEnabled(true);
