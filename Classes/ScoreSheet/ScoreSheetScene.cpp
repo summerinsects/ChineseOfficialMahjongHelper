@@ -44,24 +44,20 @@ bool ScoreSheetScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - tileLabel->getContentSize().height - 10));
     button->addClickEventListener([this](Ref *) { reset(); });
 
-    Node *node = Node::create();
+    DrawNode *node = DrawNode::create();
     this->addChild(node);
     node->setPosition(Vec2(origin.x, (origin.y + visibleSize.height - 430) * 0.5f));
 
     const float gap = visibleSize.width / 6;
 
     for (int i = 0; i < 5; ++i) {
-        LayerColor *vertLine = LayerColor::create(Color4B(255, 255, 255, 255), 2, 400);
-        node->addChild(vertLine);
-        vertLine->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
-        vertLine->setPosition(Vec2(gap * (i + 1), 0.0f));
+        const float x = gap * (i + 1);
+        node->drawLine(Vec2(x, 0.0f), Vec2(x, 400.0f), Color4F::WHITE);
     }
 
     for (int i = 0; i < 21; ++i) {
-        LayerColor *horzLine = LayerColor::create(Color4B(255, 255, 255, 255), visibleSize.width, 2);
-        node->addChild(horzLine);
-        horzLine->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        horzLine->setPosition(Vec2(0.0f, 20.0f * i));
+        const float y = 20.0f * i;
+        node->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y), Color4F::WHITE);
     }
 
     Label *label = Label::createWithSystemFont("选手姓名", "Arail", 12);
