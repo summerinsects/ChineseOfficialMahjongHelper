@@ -78,7 +78,12 @@ bool ScoreSheetScene::init() {
     for (int i = 0; i < 4; ++i) {
         _editBox[i] = ui::EditBox::create(Size(gap, 20.0f), ui::Scale9Sprite::create());
         _editBox[i]->setPosition(Vec2(gap * (i + 1.5f), 390));
+        _editBox[i]->setFontSize(12);
         node->addChild(_editBox[i]);
+
+        _nameLabel[i] = Label::createWithSystemFont("", "Arail", 12);
+        _nameLabel[i]->setPosition(Vec2(gap * (i + 1.5f), 390));
+        node->addChild(_nameLabel[i]);
     }
 
     _lockButton = ui::Button::create();
@@ -252,9 +257,10 @@ void ScoreSheetScene::recover() {
     }
 
     for (int i = 0; i < 4; ++i) {
-        _editBox[i]->setText(g_name[i]);
+        _editBox[i]->setVisible(false);
         _editBox[i]->setEnabled(false);
-        _totalLabel[i]->setString("+0");
+        _nameLabel[i]->setString(g_name[i]);
+        _nameLabel[i]->setVisible(true);
     }
 
     _lockButton->setEnabled(false);
@@ -303,7 +309,9 @@ void ScoreSheetScene::reset() {
     memset(_scores, 0, sizeof(_scores));
     for (int i = 0; i < 4; ++i) {
         _editBox[i]->setText("");
+        _editBox[i]->setVisible(true);
         _editBox[i]->setEnabled(true);
+        _nameLabel[i]->setVisible(false);
         _totalLabel[i]->setString("+0");
     }
 
@@ -333,7 +341,10 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
     memset(_scores, 0, sizeof(_scores));
 
     for (int i = 0; i < 4; ++i) {
+        _editBox[i]->setVisible(false);
         _editBox[i]->setEnabled(false);
+        _nameLabel[i]->setVisible(true);
+        _nameLabel[i]->setString(g_name[i]);
     }
 
     _recordButton[0]->setVisible(true);
@@ -351,7 +362,7 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
-    const char *name[] = { _editBox[0]->getText(), _editBox[1]->getText(), _editBox[2]->getText(), _editBox[3]->getText() };
+    const char *name[] = { g_name[0], g_name[1], g_name[2], g_name[3] };
     Director::getInstance()->pushScene(RecordScene::createScene(index, name, [this, index](const int (&scores)[4]) {
         for (int i = 0; i < 4; ++i) {
             g_scores[index][i] = scores[i];

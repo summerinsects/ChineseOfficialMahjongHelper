@@ -15,6 +15,7 @@ public:
 
 private:
     cocos2d::ui::EditBox *_editBox[4];
+    cocos2d::Label *_nameLabel[4];
     int _scores[4];
     cocos2d::ui::Button *_lockButton;
     cocos2d::Label *_totalLabel[4];
