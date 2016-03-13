@@ -12,6 +12,8 @@ USING_NS_CC;
 static char g_name[4][255];
 static int g_scores[16][4];
 static int g_currentIndex;
+static time_t g_startTime;
+static time_t g_endTime;
 
 Scene *ScoreSheetScene::createScene() {
     auto scene = Scene::create();
@@ -47,6 +49,11 @@ bool ScoreSheetScene::init() {
     button->setTitleText("重置");
     button->setPosition(Vec2(origin.x + visibleSize.width - 23, origin.y + visibleSize.height - 35));
     button->addClickEventListener([this](Ref *) { reset(); });
+
+    _timeLabel = Label::createWithSystemFont("当前时间", "Arial", 12);
+    this->addChild(_timeLabel);
+    _timeLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    _timeLabel->setPosition(Vec2(origin.x + 5, (origin.y + visibleSize.height - 430) * 0.5f - 10));
 
     DrawNode *node = DrawNode::create();
     this->addChild(node);
@@ -177,6 +184,14 @@ static void readFromJson() {
                 memcpy(g_scores[i], &vec[i][0], sizeof(g_scores[i]));
             }
         }
+        it = json.find("startTime");
+        if (it != json.end()) {
+            g_startTime = it->as<time_t>();
+        }
+        it = json.find("endTime");
+        if (it != json.end()) {
+            g_endTime = it->as<time_t>();
+        }
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
@@ -200,6 +215,8 @@ static void writeToJson() {
             scoreVec.push_back(std::vector<int>({ g_scores[k][0], g_scores[k][1], g_scores[k][2], g_scores[k][3] }));
         }
         json.insert(std::make_pair("record", std::move(scoreVec)));
+        json.insert(std::make_pair("startTime", g_startTime));
+        json.insert(std::make_pair("endTime", g_endTime));
         std::string str = json.stringfiy();
         CCLOG("%s", str.c_str());
 
@@ -230,6 +247,7 @@ void ScoreSheetScene::recover() {
     if (empty) {
         memset(g_scores, 0, sizeof(g_scores));
         g_currentIndex = 0;
+        this->schedule(schedule_selector(ScoreSheetScene::timeScheduler), 1.0f);
         return;
     }
 
@@ -260,6 +278,20 @@ void ScoreSheetScene::recover() {
     if (g_currentIndex < 16) {
         _recordButton[g_currentIndex]->setVisible(true);
         _recordButton[g_currentIndex]->setEnabled(true);
+
+        char str[255] = "开始时间：";
+        size_t len = strlen(str);
+        strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
+        _timeLabel->setString(str);
+    }
+    else {
+        char str[255] = "起止时间：";
+        size_t len = strlen(str);
+        len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
+        strcpy(str + len, " -- ");
+        len += 4;
+        strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_endTime));
+        _timeLabel->setString(str);
     }
 }
 
@@ -277,6 +309,8 @@ void ScoreSheetScene::reset() {
 
     _lockButton->setEnabled(true);
     _lockButton->setVisible(true);
+    timeScheduler(0.0f);
+    this->schedule(schedule_selector(ScoreSheetScene::timeScheduler), 1.0f);
 
     for (int k = 0; k < 16; ++k) {
         for (int i = 0; i < 4; ++i) {
@@ -306,6 +340,14 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
     _recordButton[0]->setEnabled(true);
     _lockButton->setEnabled(false);
     _lockButton->setVisible(false);
+
+    this->unschedule(schedule_selector(ScoreSheetScene::timeScheduler));
+
+    char str[255] = "开始时间：";
+    size_t len = strlen(str);
+    g_startTime = time(nullptr);
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
+    _timeLabel->setString(str);
 }
 
 void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
@@ -324,6 +366,24 @@ void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
             _recordButton[g_currentIndex]->setVisible(true);
             _recordButton[g_currentIndex]->setEnabled(true);
         }
+        else {
+            g_endTime = time(nullptr);
+            char str[255] = "起止时间：";
+            size_t len = strlen(str);
+            len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
+            strcpy(str + len, " -- ");
+            len += 4;
+            strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_endTime));
+            _timeLabel->setString(str);
+        }
         writeToJson();
     }));
+}
+
+void ScoreSheetScene::timeScheduler(float dt) {
+    char str[255] = "当前时间：";
+    size_t len = strlen(str);
+    time_t t = time(nullptr);
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&t));
+    _timeLabel->setString(str);
 }

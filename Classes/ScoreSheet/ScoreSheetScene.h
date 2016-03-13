@@ -20,11 +20,13 @@ private:
     cocos2d::Label *_totalLabel[4];
     cocos2d::Label *_scoreLabels[16][4];
     cocos2d::ui::Button *_recordButton[16];
+    cocos2d::Label *_timeLabel;
 
     void recover();
     void reset();
     void lockCallback(cocos2d::Ref *sender);
     void recordCallback(cocos2d::Ref *sender, int index);
+    void timeScheduler(float dt);
 };
 
 #endif // __SCORE_SHEET_SCENE_H__
