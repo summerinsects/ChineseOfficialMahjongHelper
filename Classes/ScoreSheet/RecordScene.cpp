@@ -143,7 +143,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         setButtonUnchecked(_falseWinButton[i]);
         _falseWinButton[i]->addClickEventListener(std::bind(&RecordScene::falseWinCallback, this, std::placeholders::_1, i));
 
-        label = Label::createWithSystemFont("诈和", "Arial", 12);
+        label = Label::createWithSystemFont("错和", "Arial", 12);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 230));
