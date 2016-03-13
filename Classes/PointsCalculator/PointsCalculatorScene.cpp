@@ -427,10 +427,6 @@ void PointsCalculatorScene::calculate() {
 
 void PointsCalculatorScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
     if (keyCode == EventKeyboard::KeyCode::KEY_BACK) {
-        Director::getInstance()->end();
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-        exit(0);
-#endif
+        Director::getInstance()->popScene();
     }
 }
