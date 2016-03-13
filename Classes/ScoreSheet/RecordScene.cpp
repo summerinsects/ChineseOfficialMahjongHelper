@@ -64,6 +64,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     _editBox->setFontColor(Color4B(0, 0, 0, 255));
     _editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 95, origin.y + visibleSize.height - 50));
     _editBox->setDelegate(this);
+    _editBox->setText("8");
 
     Label *label = Label::createWithSystemFont("番", "Arial", 12);
     this->addChild(label);
@@ -304,6 +305,9 @@ void RecordScene::backCallback(cocos2d::Ref *sender) {
 }
 
 void RecordScene::okCallback(cocos2d::Ref *sender) {
+    if (_scoreTable[0] + _scoreTable[1] + _scoreTable[2] + _scoreTable[3] != 0) {
+        return;
+    }
     _okCallback(_scoreTable);
     Director::getInstance()->popScene();
 }
