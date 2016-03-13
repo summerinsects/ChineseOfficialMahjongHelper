@@ -43,11 +43,13 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    ui::Button *backBtn = ui::Button::create("source_material/btn_left_blue.png");
+    ui::Button *backBtn = ui::Button::create();
     this->addChild(backBtn);
     backBtn->setScale9Enabled(true);
-    backBtn->setScale(30 / backBtn->getContentSize().width);
-    backBtn->setPosition(Vec2(origin.x + 15, origin.y + visibleSize.height - 15));
+    backBtn->setContentSize(Size(45, 20));
+    backBtn->setTitleFontSize(12);
+    backBtn->setTitleText("返回");
+    backBtn->setPosition(Vec2(origin.x + 15, origin.y + visibleSize.height - 10));
     backBtn->addClickEventListener(std::bind(&RecordScene::backCallback, this, std::placeholders::_1));
 
     const char *nameText[] = { "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",

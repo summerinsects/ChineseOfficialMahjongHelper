@@ -34,7 +34,7 @@ bool ScoreSheetScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Label *tileLabel = Label::createWithSystemFont("麻将竞赛成绩记录表", "Arial", 24);
+    Label *tileLabel = Label::createWithSystemFont("国标麻将记分器", "Arial", 24);
     this->addChild(tileLabel);
     tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
         origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
@@ -42,10 +42,10 @@ bool ScoreSheetScene::init() {
     ui::Button *button = ui::Button::create();
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(45, 20.0f));
+    button->setContentSize(Size(45.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("重置");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - tileLabel->getContentSize().height - 10));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 23, origin.y + visibleSize.height - 35));
     button->addClickEventListener([this](Ref *) { reset(); });
 
     DrawNode *node = DrawNode::create();
@@ -237,7 +237,6 @@ void ScoreSheetScene::recover() {
         _editBox[i]->setText(g_name[i]);
         _editBox[i]->setEnabled(false);
         _totalLabel[i]->setString("+0");
-        _scoreLabels[0][i]->setString("+0");
     }
 
     _lockButton->setEnabled(false);
@@ -248,7 +247,6 @@ void ScoreSheetScene::recover() {
         for (int i = 0; i < 4; ++i) {
             _scoreLabels[k][i]->setString(StringUtils::format("%+d", g_scores[k][i]));
             _scores[i] += g_scores[k][i];
-
         }
 
         _recordButton[k]->setVisible(false);
