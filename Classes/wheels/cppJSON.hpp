@@ -334,9 +334,9 @@ namespace jw {
             }
 
             inline reference operator*() throw() { return *_ptr; }
-            inline const reference operator*() const throw() { return *_ptr; }
+            inline const_reference operator*() const throw() { return *_ptr; }
             inline pointer operator->() throw() { return _ptr; }
-            inline const pointer operator->() const throw() { return _ptr; }
+            inline const_pointer operator->() const throw() { return _ptr; }
 
             inline iterator &operator++() throw() {
                 _ptr = _ptr->_next;
