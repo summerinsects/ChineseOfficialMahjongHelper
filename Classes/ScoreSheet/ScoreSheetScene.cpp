@@ -263,6 +263,7 @@ void ScoreSheetScene::recover() {
     if (empty) {
         memset(g_scores, 0, sizeof(g_scores));
         g_currentIndex = 0;
+        timeScheduler(0.0f);
         this->schedule(schedule_selector(ScoreSheetScene::timeScheduler), 1.0f);
         return;
     }
