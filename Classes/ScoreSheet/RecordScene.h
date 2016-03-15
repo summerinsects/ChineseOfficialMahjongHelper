@@ -35,7 +35,6 @@ private:
     void claimCallback(cocos2d::Ref *sender, int index);
     void falseWinCallback(cocos2d::Ref *sender, int index);
 
-    void backCallback(cocos2d::Ref *sender);
     void okCallback(cocos2d::Ref *sender);
 };
 

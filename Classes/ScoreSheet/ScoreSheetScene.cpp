@@ -41,6 +41,17 @@ bool ScoreSheetScene::init() {
     tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
         origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
 
+    ui::Button *backBtn = ui::Button::create();
+    this->addChild(backBtn);
+    backBtn->setScale9Enabled(true);
+    backBtn->setContentSize(Size(45, 20));
+    backBtn->setTitleFontSize(16);
+    backBtn->setTitleText("返回");
+    backBtn->setPosition(Vec2(origin.x + 15, origin.y + visibleSize.height - 10));
+    backBtn->addClickEventListener([](Ref *) {
+        Director::getInstance()->popScene();
+    });
+
     ui::Button *button = ui::Button::create();
     this->addChild(button);
     button->setScale9Enabled(true);

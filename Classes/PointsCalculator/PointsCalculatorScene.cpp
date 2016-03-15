@@ -46,6 +46,17 @@ bool PointsCalculatorScene::init() {
     float y = origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f;
     tileLabel->setPosition(Vec2(x, y));
 
+    ui::Button *backBtn = ui::Button::create();
+    this->addChild(backBtn);
+    backBtn->setScale9Enabled(true);
+    backBtn->setContentSize(Size(45, 20));
+    backBtn->setTitleFontSize(16);
+    backBtn->setTitleText("返回");
+    backBtn->setPosition(Vec2(origin.x + 15, origin.y + visibleSize.height - 10));
+    backBtn->addClickEventListener([](Ref *) {
+        Director::getInstance()->popScene();
+    });
+
     _editBox = ui::EditBox::create(Size(visibleSize.width - 50, 22.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);

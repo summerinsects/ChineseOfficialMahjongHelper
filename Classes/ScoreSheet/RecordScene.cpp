@@ -47,10 +47,12 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     this->addChild(backBtn);
     backBtn->setScale9Enabled(true);
     backBtn->setContentSize(Size(45, 20));
-    backBtn->setTitleFontSize(12);
+    backBtn->setTitleFontSize(16);
     backBtn->setTitleText("返回");
     backBtn->setPosition(Vec2(origin.x + 15, origin.y + visibleSize.height - 10));
-    backBtn->addClickEventListener(std::bind(&RecordScene::backCallback, this, std::placeholders::_1));
+    backBtn->addClickEventListener([](Ref *) {
+        Director::getInstance()->popScene();
+    });
 
     const char *nameText[] = { "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
         "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北" };
@@ -300,10 +302,6 @@ void RecordScene::falseWinCallback(cocos2d::Ref *sender, int index) {
         setButtonChecked(_falseWinButton[index]);
     }
     updateScoreLabel();
-}
-
-void RecordScene::backCallback(cocos2d::Ref *sender) {
-    Director::getInstance()->popScene();
 }
 
 void RecordScene::okCallback(cocos2d::Ref *sender) {
