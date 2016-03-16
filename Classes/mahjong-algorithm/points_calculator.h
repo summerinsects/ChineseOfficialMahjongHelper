@@ -107,6 +107,10 @@ static const char *points_name[] = {
 
 #else
 
+#ifdef _MSC_VER
+#pragma execution_character_set("utf-8")
+#endif
+
 static const char *points_name[] = {
     "无",
     "大四喜", "大三元", "绿一色", "九莲宝灯", "四杠", "连七对", "十三幺",
