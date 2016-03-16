@@ -78,7 +78,7 @@ typedef uint8_t WIN_TYPE;
 #define WIN_TYPE_WALL_LAST 8
 
 #define MAX_SEPARAION_CNT 10
-    
+
 #define ERROR_WRONG_TILES_COUNT -1
 #define ERROR_NOT_WIN -2
 

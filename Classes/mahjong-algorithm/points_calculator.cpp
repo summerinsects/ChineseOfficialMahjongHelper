@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <string.h>
 
 static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SET (*output_sets)[5], long *separation_cnt) {
     if (tile_cnt == 2 && tiles[0] == tiles[1]) {  // if the branch reaches here, seperation is success

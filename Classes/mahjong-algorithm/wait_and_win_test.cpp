@@ -1,6 +1,7 @@
 ﻿#include "wait_and_win_test.h"
 
 #include <assert.h>
+#include <string.h>
 
 bool is_basic_type_1_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]) {
     waiting_table[tile_suit(concealed_tiles[0])][tile_rank(concealed_tiles[0])] = true;
