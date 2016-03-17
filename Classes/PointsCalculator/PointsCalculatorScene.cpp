@@ -1,7 +1,4 @@
 ﻿#include "PointsCalculatorScene.h"
-
-#pragma execution_character_set("utf-8")
-
 #include "../mahjong-algorithm/points_calculator.h"
 
 USING_NS_CC;
@@ -304,7 +301,7 @@ bool PointsCalculatorScene::init() {
     return true;
 }
 
-#define FONT_SIZE 16
+#define FONT_SIZE 14
 
 void PointsCalculatorScene::calculate() {
     if (_pointsAreaNode != nullptr) {
@@ -380,8 +377,9 @@ void PointsCalculatorScene::calculate() {
         }
 
         int n = FLOWER_TILES - std::count(std::begin(points_table), std::end(points_table), 0);
+        long rows = n / 2 + n % 2;
         Node *innerNode = Node::create();
-        float pointsAreaHeight = (FONT_SIZE + 2)* (n + 2);
+        float pointsAreaHeight = (FONT_SIZE + 2) * (rows + 2);
         innerNode->setContentSize(Size(visibleSize.width, pointsAreaHeight));
 
         for (int i = 0, j = 0; i < n; ++i) {
@@ -398,7 +396,8 @@ void PointsCalculatorScene::calculate() {
             Label *pointName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
             innerNode->addChild(pointName);
             pointName->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-            pointName->setPosition(Vec2(5.0f, (FONT_SIZE + 2) * (n - i + 2)));
+            div_t ret = div(i, 2);
+            pointName->setPosition(Vec2(ret.rem == 0 ? 5.0f : visibleSize.width * 0.5f + 5.0f, (FONT_SIZE + 2) * (rows - ret.quot + 2)));
         }
         str = StringUtils::format("总计：%d番", points);
         Label *pointTotal = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
