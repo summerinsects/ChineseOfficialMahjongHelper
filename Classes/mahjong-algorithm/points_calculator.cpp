@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <string.h>
 
+//#define STRICT_98_RULE
+
 static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SET (*output_sets)[5], long *separation_cnt) {
     if (tile_cnt == 2 && tiles[0] == tiles[1]) {  // if the branch reaches here, seperation is success
         // this 2 tiles is pair
@@ -926,7 +928,16 @@ static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_ta
             points_table[NO_HONORS] = 1;
         }
         else if (has_winds && has_dragons) {
+#ifdef STRICT_98_RULE
+            if (points_table[SEVEN_PAIRS] == 0) {
+                points_table[ALL_HONORS] = 1;
+            }
+            else {
+                points_table[ONE_VOIDED_SUIT] = 3;
+            }
+#else
             points_table[ALL_HONORS] = 1;
+#endif
         }
         else {
             points_table[HALF_FLUSH] = 1;
@@ -947,6 +958,11 @@ static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_ta
 }
 
 static void check_tiles_rank_by_tiles(const TILE *tiles, long tile_cnt, long (&points_table)[FLOWER_TILES]) {
+#ifdef STRICT_98_RULE
+    if (points_table[SEVEN_PAIRS]) {
+        return;
+    }
+#endif
     // Mapped rank to a table
     uint16_t rank_flag = 0;
     for (long i = 0; i < tile_cnt; ++i) {
@@ -1036,7 +1052,11 @@ static void check_tiles_traits(const TILE *tiles, long tile_cnt, long (&points_t
     if (std::all_of(tiles, tiles + tile_cnt, &is_reversible_tile)) {
         points_table[REVERSIBLE_TILES] = 1;
     }
-
+#ifdef STRICT_98_RULE
+    if (points_table[SEVEN_PAIRS]) {
+        return;
+    }
+#endif
     if (std::all_of(tiles, tiles + tile_cnt, &is_green)) {
         points_table[ALL_GREEN] = 1;
     }
@@ -1163,7 +1183,9 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
     if (points_table[BIG_THREE_DRAGONS]) {
         points_table[TWO_DRAGONS_PUNGS] = 0;
         points_table[DRAGON_PUNG] = 0;
+#ifdef STRICT_98_RULE
         points_table[ONE_VOIDED_SUIT] = 0;
+#endif
     }
     if (points_table[ALL_GREEN]) {
         points_table[HALF_FLUSH] = 0;
@@ -1197,8 +1219,10 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
         points_table[OUTSIDE_HAND] = 0;
         points_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
         points_table[NO_HONORS] = 0;
+#ifdef STRICT_98_RULE
         points_table[TRIPLE_PUNG] = 0;
         points_table[DOUBLE_PUNG] = 0;
+#endif
     }
     if (points_table[LITTLE_FOUR_WINDS]) {
         points_table[BIG_THREE_WINDS] = 0;
@@ -1206,7 +1230,9 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
     if (points_table[LITTLE_THREE_DRAGONS]) {
         points_table[TWO_DRAGONS_PUNGS] = 0;
         points_table[DRAGON_PUNG] = 0;
+#ifdef STRICT_98_RULE
         points_table[ONE_VOIDED_SUIT] = 0;
+#endif
     }
     if (points_table[ALL_HONORS]) {
         points_table[ALL_TERMINALS_AND_HONORS] = 0;
@@ -1236,18 +1262,24 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
         points_table[PURE_SHIFTED_PUNGS] = 0;
         points_table[TILE_HOG] = 0;
         points_table[PURE_DOUBLE_CHOW] = 0;
+#ifdef STRICT_98_RULE
         points_table[ONE_VOIDED_SUIT] = 0;
+#endif
     }
     if (points_table[FOUR_PURE_SHIFTED_PUNGS]) {
         points_table[PURE_TRIPLE_CHOW] = 0;
         points_table[ALL_PUNGS] = 0;
+#ifdef STRICT_98_RULE
         points_table[ONE_VOIDED_SUIT] = 0;
+#endif
     }
 
     if (points_table[FOUR_PURE_SHIFTED_CHOWS]) {
         points_table[TWO_TERMINAL_CHOWS] = 0;
         points_table[SHORT_STRAIGHT] = 0;
+#ifdef STRICT_98_RULE
         points_table[ONE_VOIDED_SUIT] = 0;
+#endif
     }
     if (points_table[THREE_KONGS]) {
 
@@ -1332,7 +1364,9 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
         points_table[NO_HONORS] = 0;
     }
     if (points_table[BIG_THREE_WINDS]) {
+#ifdef STRICT_98_RULE
         points_table[ONE_VOIDED_SUIT] = 0;
+#endif
     }
 
     if (points_table[MIXED_STRAIGHT]) {
