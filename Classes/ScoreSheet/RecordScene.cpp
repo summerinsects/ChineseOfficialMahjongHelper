@@ -98,7 +98,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         this->addChild(_scoreLabel[i]);
         _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 110));
 
-        _winButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        _winButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_winButton[i]);
         _winButton[i]->setScale9Enabled(true);
         _winButton[i]->setContentSize(Size(22.0f, 22.0f));
@@ -111,7 +111,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 140));
 
-        _selfDrawnButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        _selfDrawnButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_selfDrawnButton[i]);
         _selfDrawnButton[i]->setScale9Enabled(true);
         _selfDrawnButton[i]->setContentSize(Size(22.0f, 22.0f));
@@ -124,7 +124,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 170));
 
-        _claimButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        _claimButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_claimButton[i]);
         _claimButton[i]->setScale9Enabled(true);
         _claimButton[i]->setContentSize(Size(22.0f, 22.0f));
@@ -137,7 +137,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 200));
 
-        _falseWinButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        _falseWinButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_falseWinButton[i]);
         _falseWinButton[i]->setScale9Enabled(true);
         _falseWinButton[i]->setContentSize(Size(22.0f, 22.0f));
@@ -151,14 +151,14 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 230));
     }
 
-    ui::Button *okButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    this->addChild(okButton);
-    okButton->setScale9Enabled(true);
-    okButton->setContentSize(Size(52.0f, 22.0f));
-    okButton->setTitleText("确定");
-    okButton->setTitleColor(Color3B::BLACK);
-    okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15));
-    okButton->addClickEventListener(std::bind(&RecordScene::okCallback, this, std::placeholders::_1));
+    _okButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
+    this->addChild(_okButton);
+    _okButton->setScale9Enabled(true);
+    _okButton->setContentSize(Size(52.0f, 22.0f));
+    _okButton->setTitleText("确定");
+    _okButton->setTitleColor(Color3B::BLACK);
+    _okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15));
+    _okButton->addClickEventListener(std::bind(&RecordScene::okCallback, this, std::placeholders::_1));
 
     _winIndex = -1;
     return true;
@@ -198,6 +198,8 @@ void RecordScene::updateScoreLabel() {
     for (int i = 0; i < 4; ++i) {
         _scoreLabel[i]->setString(StringUtils::format("%+d", _scoreTable[i]));
     }
+
+    _okButton->setEnabled(_scoreTable[0] + _scoreTable[1] + _scoreTable[2] + _scoreTable[3] == 0);
 }
 
 void RecordScene::drawCallback(cocos2d::Ref *sender) {
@@ -305,9 +307,6 @@ void RecordScene::falseWinCallback(cocos2d::Ref *sender, int index) {
 }
 
 void RecordScene::okCallback(cocos2d::Ref *sender) {
-    if (_scoreTable[0] + _scoreTable[1] + _scoreTable[2] + _scoreTable[3] != 0) {
-        return;
-    }
     _okCallback(_scoreTable);
     Director::getInstance()->popScene();
 }

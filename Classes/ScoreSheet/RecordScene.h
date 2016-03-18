@@ -22,6 +22,7 @@ private:
     cocos2d::ui::Button *_claimButton[4];
     cocos2d::ui::Button *_falseWinButton[4];
     cocos2d::Label *_scoreLabel[4];
+    cocos2d::ui::Button *_okButton;
 
     int _winIndex;
     int _scoreTable[4];
