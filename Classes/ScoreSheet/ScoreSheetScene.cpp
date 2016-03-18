@@ -375,7 +375,9 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
 
 void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
     const char *name[] = { g_name[0], g_name[1], g_name[2], g_name[3] };
-    Director::getInstance()->pushScene(RecordScene::createScene(index, name, [this, index](const int (&scores)[4]) {
+    Director::getInstance()->pushScene(RecordScene::createScene(index, name, [this, index](RecordScene *scene) {
+        const int (&scores)[4] = scene->getScoreTable();
+        uint64_t pointsFlag = scene->getPointsFlag();
         for (int i = 0; i < 4; ++i) {
             g_scores[index][i] = scores[i];
             _scoreLabels[index][i]->setString(StringUtils::format("%+d", scores[i]));

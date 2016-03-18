@@ -1,4 +1,5 @@
 ﻿#include "RecordScene.h"
+#include "mahjong-algorithm/points_calculator.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -18,7 +19,7 @@ static inline bool isButtonChecked(ui::Button *button) {
     return button->getTag() == 1;
 }
 
-Scene *RecordScene::createScene(int index, const char **name, const std::function<void (const int (&scores)[4])> &okCallback) {
+Scene *RecordScene::createScene(int index, const char **name, const std::function<void (RecordScene *)> &okCallback) {
     auto scene = Scene::create();
     auto layer = new (std::nothrow) RecordScene();
     layer->initWithIndex(index, name);
@@ -35,6 +36,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
 
     _winIndex = -1;
     memset(_scoreTable, 0, sizeof(_scoreTable));
+    _pointsFlag = 0;
 
     auto listener = EventListenerKeyboard::create();
     listener->onKeyReleased = CC_CALLBACK_2(Layer::onKeyReleased, this);
@@ -150,6 +152,66 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 230));
     }
+
+    ui::Widget *innerNode = ui::Widget::create();
+    innerNode->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+    static const float innerNodeHeight = 572.0f;  // 18行 * 24像素 + 10行 * 14像素
+    innerNode->setContentSize(Size(visibleSize.width, innerNodeHeight));
+
+    static const int points[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
+    static const size_t beginIndex[] = {55, 48, 39, 34, 28, 19, 16, 14, 8, 1};
+    static const size_t counts[] = { 4, 7, 8, 5, 6, 9, 3, 2, 6, 7 };
+    float y = innerNodeHeight;
+    for (int i = 0; i < 10; ++i) {
+        Label *label = Label::createWithSystemFont(StringUtils::format("%d番", points[i]), "Arial", 12);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        innerNode->addChild(label);
+        label->setPosition(Vec2(5.0f, y - 7.0f));
+        y -= 14.0f;
+
+        div_t ret = div(counts[i], 4);
+        int row = ret.quot + (ret.rem == 0 ? 0 : 1);
+        for (size_t k = 0; k < counts[i]; ++k) {
+            size_t col = k % 4;
+            if (k > 0 && col == 0) {
+                y -= 24.0f;
+            }
+            unsigned idx = beginIndex[i] + k;
+            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            innerNode->addChild(button);
+            button->setScale9Enabled(true);
+            button->setContentSize(Size(66.0f, 20.0f));
+            button->setTitleColor(Color3B::BLACK);
+            button->setTitleFontSize(12);
+            button->setTitleText(points_name[idx]);
+            setButtonUnchecked(button);
+            button->addClickEventListener([this, idx](Ref *sender) {
+                ui::Button *button = (ui::Button *)sender;
+                if (isButtonChecked(button)) {
+                    setButtonUnchecked(button);
+                    _pointsFlag &= ~(1ULL << idx);
+                }
+                else {
+                    setButtonChecked(button);
+                    _pointsFlag |= 1ULL << idx;
+                }
+            });
+
+            button->setPosition(Vec2(gap * (col + 0.5f), y - 12.0f));
+        }
+        y -= 24.0f;
+    }
+
+    ui::ScrollView *scrollView = ui::ScrollView::create();
+    scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
+    scrollView->setBounceEnabled(true);
+    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 300));
+    scrollView->setInnerContainerSize(innerNode->getContentSize());
+    scrollView->setAnchorPoint(Vec2(0.5f, 0.5f));
+    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 110.0f));
+    this->addChild(scrollView);
+
+    scrollView->addChild(innerNode);
 
     _okButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
     this->addChild(_okButton);
@@ -307,7 +369,7 @@ void RecordScene::falseWinCallback(cocos2d::Ref *sender, int index) {
 }
 
 void RecordScene::okCallback(cocos2d::Ref *sender) {
-    _okCallback(_scoreTable);
+    _okCallback(this);
     Director::getInstance()->popScene();
 }
 
