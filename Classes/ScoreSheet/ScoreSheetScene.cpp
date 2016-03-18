@@ -55,11 +55,12 @@ bool ScoreSheetScene::init() {
         Director::getInstance()->popScene();
     });
 
-    ui::Button *button = ui::Button::create();
+    ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(45.0f, 20.0f));
     button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
     button->setTitleText("重置");
     button->setPosition(Vec2(origin.x + visibleSize.width - 23, origin.y + visibleSize.height - 35));
     button->addClickEventListener([this](Ref *) { reset(); });
@@ -100,11 +101,12 @@ bool ScoreSheetScene::init() {
         node->addChild(_nameLabel[i]);
     }
 
-    _lockButton = ui::Button::create();
+    _lockButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     node->addChild(_lockButton);
     _lockButton->setScale9Enabled(true);
     _lockButton->setContentSize(Size(gap, 20.0f));
     _lockButton->setTitleFontSize(12);
+    _lockButton->setTitleColor(Color3B::BLACK);
     _lockButton->setTitleText("锁定");
     _lockButton->setPosition(Vec2(gap * 5.5f, 390));
     _lockButton->addClickEventListener(std::bind(&ScoreSheetScene::lockCallback, this, std::placeholders::_1));
@@ -123,6 +125,10 @@ bool ScoreSheetScene::init() {
 
     label = Label::createWithSystemFont("累计", "Arail", 12);
     label->setPosition(Vec2(gap * 0.5f, 330));
+    node->addChild(label);
+
+    label = Label::createWithSystemFont("备注", "Arail", 12);
+    label->setPosition(Vec2(gap * 5.5f, 330));
     node->addChild(label);
 
     for (int i = 0; i < 4; ++i) {
@@ -145,11 +151,12 @@ bool ScoreSheetScene::init() {
             node->addChild(_scoreLabels[k][i]);
         }
 
-        _recordButton[k] = ui::Button::create();
+        _recordButton[k] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
         node->addChild(_recordButton[k]);
         _recordButton[k]->setScale9Enabled(true);
         _recordButton[k]->setContentSize(Size(gap, 20.0f));
         _recordButton[k]->setTitleFontSize(12);
+        _recordButton[k]->setTitleColor(Color3B::BLACK);
         _recordButton[k]->setTitleText("计分");
         _recordButton[k]->setPosition(Vec2(gap * 5.5f, y));
         _recordButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::recordCallback, this, std::placeholders::_1, k));
