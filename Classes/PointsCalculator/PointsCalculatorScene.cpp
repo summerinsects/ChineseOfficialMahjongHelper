@@ -81,18 +81,15 @@ bool PointsCalculatorScene::init() {
         this->addChild(_prevalentButton[i]);
         _prevalentButton[i]->setScale9Enabled(true);
         _prevalentButton[i]->setContentSize(Size(22.0f, 22.0f));
+        _prevalentButton[i]->setTitleColor(Color3B::BLACK);
+        _prevalentButton[i]->setTitleFontSize(12);
+        _prevalentButton[i]->setTitleText(windName[i]);
         _prevalentButton[i]->setPosition(Vec2(origin.x + 70.0f + i * 50, y - 60));
         _prevalentButton[i]->addClickEventListener([this, i](Ref *) {
             for (int n = 0; n < 4; ++n) {
                 _prevalentButton[n]->setEnabled(n != i);
             }
         });
-
-        Label *label = Label::createWithSystemFont(windName[i], "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
-        _prevalentButton[i]->addChild(label);
-        const Size &size = _prevalentButton[i]->getContentSize();
-        label->setPosition(Vec2(size.width * 0.5f, size.height * 0.5f));
     }
     _prevalentButton[0]->setEnabled(false);
 
@@ -105,18 +102,15 @@ bool PointsCalculatorScene::init() {
         this->addChild(_seatButton[i]);
         _seatButton[i]->setScale9Enabled(true);
         _seatButton[i]->setContentSize(Size(22.0f, 22.0f));
+        _seatButton[i]->setTitleColor(Color3B::BLACK);
+        _seatButton[i]->setTitleFontSize(12);
+        _seatButton[i]->setTitleText(windName[i]);
         _seatButton[i]->setPosition(Vec2(origin.x + 70.0f + i * 50, y - 90));
         _seatButton[i]->addClickEventListener([this, i](Ref *) {
             for (int n = 0; n < 4; ++n) {
                 _seatButton[n]->setEnabled(n != i);
             }
         });
-
-        Label *label = Label::createWithSystemFont(windName[i], "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
-        _seatButton[i]->addChild(label);
-        const Size &size = _seatButton[i]->getContentSize();
-        label->setPosition(Vec2(size.width * 0.5f, size.height * 0.5f));
     }
     _seatButton[0]->setEnabled(false);
 
