@@ -269,6 +269,16 @@ static void writeToJson() {
     }
 }
 
+void ScoreSheetScene::refreshEndTime() {
+    char str[255] = "起止时间：";
+    size_t len = strlen(str);
+    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
+    strcpy(str + len, " -- ");
+    len += 4;
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_endTime));
+    _timeLabel->setString(str);
+}
+
 void ScoreSheetScene::recover() {
     readFromJson();
 
@@ -335,13 +345,7 @@ void ScoreSheetScene::recover() {
         _timeLabel->setString(str);
     }
     else {
-        char str[255] = "起止时间：";
-        size_t len = strlen(str);
-        len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
-        strcpy(str + len, " -- ");
-        len += 4;
-        strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_endTime));
-        _timeLabel->setString(str);
+        refreshEndTime();
     }
 }
 
@@ -440,13 +444,7 @@ void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
         }
         else {
             g_endTime = time(nullptr);
-            char str[255] = "起止时间：";
-            size_t len = strlen(str);
-            len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
-            strcpy(str + len, " -- ");
-            len += 4;
-            strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_endTime));
-            _timeLabel->setString(str);
+            refreshEndTime();
         }
         writeToJson();
     }));

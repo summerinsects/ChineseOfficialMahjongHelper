@@ -24,6 +24,7 @@ private:
     cocos2d::Label *_pointNameLabel[16];
     cocos2d::Label *_timeLabel;
 
+    void refreshEndTime();
     void recover();
     void reset();
     void lockCallback(cocos2d::Ref *sender);
