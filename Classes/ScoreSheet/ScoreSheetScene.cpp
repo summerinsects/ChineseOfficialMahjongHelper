@@ -269,6 +269,13 @@ static void writeToJson() {
     }
 }
 
+void ScoreSheetScene::refreshStartTime() {
+    char str[255] = "开始时间：";
+    size_t len = strlen(str);
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
+    _timeLabel->setString(str);
+}
+
 void ScoreSheetScene::refreshEndTime() {
     char str[255] = "起止时间：";
     size_t len = strlen(str);
@@ -339,10 +346,7 @@ void ScoreSheetScene::recover() {
         _recordButton[g_currentIndex]->setVisible(true);
         _recordButton[g_currentIndex]->setEnabled(true);
 
-        char str[255] = "开始时间：";
-        size_t len = strlen(str);
-        strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
-        _timeLabel->setString(str);
+        refreshStartTime();
     }
     else {
         refreshEndTime();
@@ -405,11 +409,8 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
 
     this->unschedule(schedule_selector(ScoreSheetScene::timeScheduler));
 
-    char str[255] = "开始时间：";
-    size_t len = strlen(str);
     g_startTime = time(nullptr);
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
-    _timeLabel->setString(str);
+    refreshStartTime();
 }
 
 void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
