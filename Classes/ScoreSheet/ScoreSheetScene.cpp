@@ -1,5 +1,7 @@
 ﻿#include "ScoreSheetScene.h"
 #include "RecordScene.h"
+#include "mahjong-algorithm/points_calculator.h"
+
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #define PRId64 "lld"
 #endif
@@ -11,6 +13,7 @@ USING_NS_CC;
 
 static char g_name[4][255];
 static int g_scores[16][4];
+static uint64_t g_pointsFlag[16];
 static int g_currentIndex;
 static time_t g_startTime;
 static time_t g_endTime;
@@ -31,7 +34,7 @@ bool ScoreSheetScene::init() {
     listener->onKeyReleased = CC_CALLBACK_2(Layer::onKeyReleased, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
-    memset(_scores, 0, sizeof(_scores));
+    memset(_totalScores, 0, sizeof(_totalScores));
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -150,8 +153,13 @@ bool ScoreSheetScene::init() {
         _recordButton[k]->setTitleText("计分");
         _recordButton[k]->setPosition(Vec2(gap * 5.5f, y));
         _recordButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::recordCallback, this, std::placeholders::_1, k));
-
+        _recordButton[k]->setEnabled(false);
         _recordButton[k]->setVisible(false);
+
+        _pointNameLabel[k] = Label::createWithSystemFont("", "Arail", 12);
+        _pointNameLabel[k]->setPosition(Vec2(gap * 5.5f, y));
+        node->addChild(_pointNameLabel[k]);
+        _pointNameLabel[k]->setVisible(false);
     }
 
     recover();
@@ -200,6 +208,11 @@ static void readFromJson() {
                 memcpy(g_scores[i], &vec[i][0], sizeof(g_scores[i]));
             }
         }
+        it = json.find("pointsFlag");
+        if (it != json.end()) {
+            auto vec = it->as<std::vector<uint64_t> >();
+            memcpy(g_pointsFlag, &vec[0], sizeof(uint64_t) * vec.size());
+        }
         it = json.find("startTime");
         if (it != json.end()) {
             g_startTime = it->as<time_t>();
@@ -225,12 +238,19 @@ static void writeToJson() {
             free(base64Name);
         }
         json.insert(std::make_pair("name", std::move(nameVec)));
+
         std::vector<std::vector<int> > scoreVec;
         scoreVec.reserve(16);
         for (int k = 0; k < g_currentIndex; ++k) {
             scoreVec.push_back(std::vector<int>({ g_scores[k][0], g_scores[k][1], g_scores[k][2], g_scores[k][3] }));
         }
         json.insert(std::make_pair("record", std::move(scoreVec)));
+
+        std::vector<uint64_t> pointsFlagVec;
+        pointsFlagVec.resize(g_currentIndex);
+        memcpy(&pointsFlagVec[0], g_pointsFlag, sizeof(uint64_t) * g_currentIndex);
+        json.insert(std::make_pair("pointsFlag", std::move(pointsFlagVec)));
+
         json.insert(std::make_pair("startTime", g_startTime));
         json.insert(std::make_pair("endTime", g_endTime));
         std::string str = json.stringfiy();
@@ -262,6 +282,7 @@ void ScoreSheetScene::recover() {
 
     if (empty) {
         memset(g_scores, 0, sizeof(g_scores));
+        memset(g_pointsFlag, 0, sizeof(g_pointsFlag));
         g_currentIndex = 0;
         timeScheduler(0.0f);
         this->schedule(schedule_selector(ScoreSheetScene::timeScheduler), 1.0f);
@@ -278,19 +299,30 @@ void ScoreSheetScene::recover() {
     _lockButton->setEnabled(false);
     _lockButton->setVisible(false);
 
-    memset(_scores, 0, sizeof(_scores));
+    memset(_totalScores, 0, sizeof(_totalScores));
+
     for (int k = 0; k < g_currentIndex; ++k) {
         for (int i = 0; i < 4; ++i) {
             _scoreLabels[k][i]->setString(StringUtils::format("%+d", g_scores[k][i]));
-            _scores[i] += g_scores[k][i];
+            _totalScores[i] += g_scores[k][i];
         }
 
         _recordButton[k]->setVisible(false);
         _recordButton[k]->setEnabled(false);
+
+        if (g_pointsFlag[k] != 0) {
+            for (unsigned n = 0; n < 64; ++n) {
+                if ((1ULL << n) & g_pointsFlag[k]) {
+                    _pointNameLabel[k]->setString(points_name[n]);
+                    _pointNameLabel[k]->setVisible(true);
+                    break;
+                }
+            }
+        }
     }
 
     for (int i = 0; i < 4; ++i) {
-        _totalLabel[i]->setString(StringUtils::format("%+d", _scores[i]));
+        _totalLabel[i]->setString(StringUtils::format("%+d", _totalScores[i]));
     }
 
     if (g_currentIndex < 16) {
@@ -316,9 +348,11 @@ void ScoreSheetScene::recover() {
 void ScoreSheetScene::reset() {
     memset(g_name, 0, sizeof(g_name));
     memset(g_scores, 0, sizeof(g_scores));
+    memset(g_pointsFlag, 0, sizeof(g_pointsFlag));
     g_currentIndex = 0;
 
-    memset(_scores, 0, sizeof(_scores));
+    memset(_totalScores, 0, sizeof(_totalScores));
+
     for (int i = 0; i < 4; ++i) {
         _editBox[i]->setText("");
         _editBox[i]->setVisible(true);
@@ -338,6 +372,7 @@ void ScoreSheetScene::reset() {
         }
         _recordButton[k]->setVisible(false);
         _recordButton[k]->setEnabled(false);
+        _pointNameLabel[k]->setVisible(false);
     }
 }
 
@@ -350,7 +385,7 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
         strncpy(g_name[i], str, sizeof(g_name[i]));
     }
 
-    memset(_scores, 0, sizeof(_scores));
+    memset(_totalScores, 0, sizeof(_totalScores));
 
     for (int i = 0; i < 4; ++i) {
         _editBox[i]->setVisible(false);
@@ -381,12 +416,24 @@ void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
         for (int i = 0; i < 4; ++i) {
             g_scores[index][i] = scores[i];
             _scoreLabels[index][i]->setString(StringUtils::format("%+d", scores[i]));
-            _scores[i] += scores[i];
-            _totalLabel[i]->setString(StringUtils::format("%+d", _scores[i]));
+            _totalScores[i] += scores[i];
+            _totalLabel[i]->setString(StringUtils::format("%+d", _totalScores[i]));
         }
 
         _recordButton[g_currentIndex]->setVisible(false);
         _recordButton[g_currentIndex]->setEnabled(false);
+
+        g_pointsFlag[g_currentIndex] = pointsFlag;
+        if (g_pointsFlag[g_currentIndex] != 0) {
+            for (unsigned n = 0; n < 64; ++n) {
+                if ((1ULL << n) & g_pointsFlag[g_currentIndex]) {
+                    _pointNameLabel[g_currentIndex]->setString(points_name[n]);
+                    _pointNameLabel[g_currentIndex]->setVisible(true);
+                    break;
+                }
+            }
+        }
+
         if (++g_currentIndex < 16) {
             _recordButton[g_currentIndex]->setVisible(true);
             _recordButton[g_currentIndex]->setEnabled(true);

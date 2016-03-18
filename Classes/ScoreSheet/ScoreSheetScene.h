@@ -16,11 +16,12 @@ public:
 private:
     cocos2d::ui::EditBox *_editBox[4];
     cocos2d::Label *_nameLabel[4];
-    int _scores[4];
+    int _totalScores[4];
     cocos2d::ui::Button *_lockButton;
     cocos2d::Label *_totalLabel[4];
     cocos2d::Label *_scoreLabels[16][4];
     cocos2d::ui::Button *_recordButton[16];
+    cocos2d::Label *_pointNameLabel[16];
     cocos2d::Label *_timeLabel;
 
     void recover();
