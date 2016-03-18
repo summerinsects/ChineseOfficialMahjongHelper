@@ -269,6 +269,26 @@ static void writeToJson() {
     }
 }
 
+void ScoreSheetScene::fillRow(int index) {
+    for (int i = 0; i < 4; ++i) {
+        _scoreLabels[index][i]->setString(StringUtils::format("%+d", g_scores[index][i]));
+        _totalScores[i] += g_scores[index][i];
+    }
+
+    _recordButton[index]->setVisible(false);
+    _recordButton[index]->setEnabled(false);
+
+    if (g_pointsFlag[index] != 0) {
+        for (unsigned n = 0; n < 64; ++n) {
+            if ((1ULL << n) & g_pointsFlag[index]) {
+                _pointNameLabel[index]->setString(points_name[n]);
+                _pointNameLabel[index]->setVisible(true);
+                break;
+            }
+        }
+    }
+}
+
 void ScoreSheetScene::refreshStartTime() {
     char str[255] = "开始时间：";
     size_t len = strlen(str);
@@ -319,23 +339,7 @@ void ScoreSheetScene::recover() {
     memset(_totalScores, 0, sizeof(_totalScores));
 
     for (int k = 0; k < g_currentIndex; ++k) {
-        for (int i = 0; i < 4; ++i) {
-            _scoreLabels[k][i]->setString(StringUtils::format("%+d", g_scores[k][i]));
-            _totalScores[i] += g_scores[k][i];
-        }
-
-        _recordButton[k]->setVisible(false);
-        _recordButton[k]->setEnabled(false);
-
-        if (g_pointsFlag[k] != 0) {
-            for (unsigned n = 0; n < 64; ++n) {
-                if ((1ULL << n) & g_pointsFlag[k]) {
-                    _pointNameLabel[k]->setString(points_name[n]);
-                    _pointNameLabel[k]->setVisible(true);
-                    break;
-                }
-            }
-        }
+        fillRow(k);
     }
 
     for (int i = 0; i < 4; ++i) {
@@ -416,27 +420,15 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
 void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
     const char *name[] = { g_name[0], g_name[1], g_name[2], g_name[3] };
     Director::getInstance()->pushScene(RecordScene::createScene(index, name, [this, index](RecordScene *scene) {
-        const int (&scores)[4] = scene->getScoreTable();
-        uint64_t pointsFlag = scene->getPointsFlag();
+        if (index != g_currentIndex) return;
+
+        memcpy(g_scores[index], scene->getScoreTable(), sizeof(g_scores[index]));
+        g_pointsFlag[index] = scene->getPointsFlag();
+
+        fillRow(index);
+
         for (int i = 0; i < 4; ++i) {
-            g_scores[index][i] = scores[i];
-            _scoreLabels[index][i]->setString(StringUtils::format("%+d", scores[i]));
-            _totalScores[i] += scores[i];
             _totalLabel[i]->setString(StringUtils::format("%+d", _totalScores[i]));
-        }
-
-        _recordButton[g_currentIndex]->setVisible(false);
-        _recordButton[g_currentIndex]->setEnabled(false);
-
-        g_pointsFlag[g_currentIndex] = pointsFlag;
-        if (g_pointsFlag[g_currentIndex] != 0) {
-            for (unsigned n = 0; n < 64; ++n) {
-                if ((1ULL << n) & g_pointsFlag[g_currentIndex]) {
-                    _pointNameLabel[g_currentIndex]->setString(points_name[n]);
-                    _pointNameLabel[g_currentIndex]->setVisible(true);
-                    break;
-                }
-            }
         }
 
         if (++g_currentIndex < 16) {

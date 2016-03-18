@@ -24,6 +24,7 @@ private:
     cocos2d::Label *_pointNameLabel[16];
     cocos2d::Label *_timeLabel;
 
+    void fillRow(int index);
     void refreshStartTime();
     void refreshEndTime();
     void recover();
