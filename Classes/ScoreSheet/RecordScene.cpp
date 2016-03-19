@@ -1,5 +1,5 @@
 ﻿#include "RecordScene.h"
-#include "mahjong-algorithm/points_calculator.h"
+#include "../mahjong-algorithm/points_calculator.h"
 
 #pragma execution_character_set("utf-8")
 

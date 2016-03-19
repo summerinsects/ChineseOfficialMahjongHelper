@@ -1,6 +1,6 @@
 ﻿#include "ScoreSheetScene.h"
 #include "RecordScene.h"
-#include "mahjong-algorithm/points_calculator.h"
+#include "../mahjong-algorithm/points_calculator.h"
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #define PRId64 "lld"
