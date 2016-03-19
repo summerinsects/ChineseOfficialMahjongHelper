@@ -110,59 +110,59 @@ bool RecordScene::initWithIndex(int index, const char **name) {
 
         _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);
         this->addChild(_scoreLabel[i]);
-        _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 110));
+        _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 105));
 
         _winButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_winButton[i]);
         _winButton[i]->setScale9Enabled(true);
         _winButton[i]->setContentSize(Size(22.0f, 22.0f));
-        _winButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 140));
+        _winButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 130));
         setButtonUnchecked(_winButton[i]);
         _winButton[i]->addClickEventListener(std::bind(&RecordScene::winCallback, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("和", "Arial", 12);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 140));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 130));
 
         _selfDrawnButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_selfDrawnButton[i]);
         _selfDrawnButton[i]->setScale9Enabled(true);
         _selfDrawnButton[i]->setContentSize(Size(22.0f, 22.0f));
-        _selfDrawnButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 170));
+        _selfDrawnButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 160));
         setButtonUnchecked(_selfDrawnButton[i]);
         _selfDrawnButton[i]->addClickEventListener(std::bind(&RecordScene::selfDrawnCallback, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 170));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 160));
 
         _claimButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_claimButton[i]);
         _claimButton[i]->setScale9Enabled(true);
         _claimButton[i]->setContentSize(Size(22.0f, 22.0f));
-        _claimButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 200));
+        _claimButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 190));
         setButtonUnchecked(_claimButton[i]);
         _claimButton[i]->addClickEventListener(std::bind(&RecordScene::claimCallback, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 200));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 190));
 
         _falseWinButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_falseWinButton[i]);
         _falseWinButton[i]->setScale9Enabled(true);
         _falseWinButton[i]->setContentSize(Size(22.0f, 22.0f));
-        _falseWinButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 230));
+        _falseWinButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 220));
         setButtonUnchecked(_falseWinButton[i]);
         _falseWinButton[i]->addClickEventListener(std::bind(&RecordScene::falseWinCallback, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("错和", "Arial", 12);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 230));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 220));
     }
 
     label = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
