@@ -228,6 +228,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     _okButton->setTitleColor(Color3B::BLACK);
     _okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15));
     _okButton->addClickEventListener(std::bind(&RecordScene::okCallback, this, std::placeholders::_1));
+    _okButton->setEnabled(false);
 
     _winIndex = -1;
     return true;
@@ -267,7 +268,17 @@ void RecordScene::updateScoreLabel() {
         _scoreLabel[i]->setString(StringUtils::format("%+d", _scoreTable[i]));
     }
 
-    _okButton->setEnabled(_scoreTable[0] + _scoreTable[1] + _scoreTable[2] + _scoreTable[3] == 0);
+    if (_scoreTable[0] + _scoreTable[1] + _scoreTable[2] + _scoreTable[3] == 0) {
+        if (_winIndex == -1) {
+            _okButton->setEnabled(_pointsFlag == 0);
+        }
+        else {
+            _okButton->setEnabled(true);
+        }
+    }
+    else {
+        _okButton->setEnabled(false);
+    }
 }
 
 void RecordScene::minusCallback(cocos2d::Ref *sender) {
@@ -411,8 +422,8 @@ void RecordScene::pointsNameCallback(cocos2d::Ref *sender, int index) {
     currentWinScore = std::max(8, currentWinScore);
     if (currentWinScore != prevWinScore) {
         _editBox->setText(StringUtils::format("%d", currentWinScore).c_str());
-        updateScoreLabel();
     }
+    updateScoreLabel();
 }
 
 void RecordScene::okCallback(cocos2d::Ref *sender) {
