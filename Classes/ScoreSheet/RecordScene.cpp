@@ -197,17 +197,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
             button->setTitleFontSize(12);
             button->setTitleText(points_name[idx]);
             setButtonUnchecked(button);
-            button->addClickEventListener([this, idx](Ref *sender) {
-                ui::Button *button = (ui::Button *)sender;
-                if (isButtonChecked(button)) {
-                    setButtonUnchecked(button);
-                    _pointsFlag &= ~(1ULL << idx);
-                }
-                else {
-                    setButtonChecked(button);
-                    _pointsFlag |= 1ULL << idx;
-                }
-            });
+            button->addClickEventListener(std::bind(&RecordScene::pointsNameCallback, this, std::placeholders::_1, idx));
 
             button->setPosition(Vec2(gap * (col + 0.5f), y - 12.0f));
         }
@@ -394,6 +384,31 @@ void RecordScene::falseWinCallback(cocos2d::Ref *sender, int index) {
         setButtonChecked(_falseWinButton[index]);
     }
     updateScoreLabel();
+}
+
+void RecordScene::pointsNameCallback(cocos2d::Ref *sender, int index) {
+    ui::Button *button = (ui::Button *)sender;
+    if (isButtonChecked(button)) {
+        setButtonUnchecked(button);
+        _pointsFlag &= ~(1ULL << index);
+    }
+    else {
+        setButtonChecked(button);
+        _pointsFlag |= 1ULL << index;
+    }
+
+    int prevWinScore = atoi(_editBox->getText());
+    int currentWinScore = 0;
+    for (int n = 0; n < 64; ++n) {
+        if (_pointsFlag & (1ULL << n)) {
+            currentWinScore += points_value_table[n];
+        }
+    }
+    currentWinScore = std::max(8, currentWinScore);
+    if (currentWinScore != prevWinScore) {
+        _editBox->setText(StringUtils::format("%d", currentWinScore).c_str());
+        updateScoreLabel();
+    }
 }
 
 void RecordScene::okCallback(cocos2d::Ref *sender) {

@@ -47,6 +47,7 @@ private:
     void claimCallback(cocos2d::Ref *sender, int index);
     void falseWinCallback(cocos2d::Ref *sender, int index);
 
+    void pointsNameCallback(cocos2d::Ref *sender, int index);
     void okCallback(cocos2d::Ref *sender);
 };
 
