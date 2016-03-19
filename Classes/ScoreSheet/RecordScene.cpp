@@ -77,6 +77,18 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 75, origin.y + visibleSize.height - 50));
 
+    ui::Button *minusButton = ui::Button::create("source_material/stepper_dec_n.png", "source_material/stepper_dec_h.png");
+    this->addChild(minusButton);
+    minusButton->setScale(20.0f / minusButton->getContentSize().height);
+    minusButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 135, origin.y + visibleSize.height - 50));
+    minusButton->addClickEventListener(std::bind(&RecordScene::minusCallback, this, std::placeholders::_1));
+
+    ui::Button *plusButton = ui::Button::create("source_material/stepper_inc_n.png", "source_material/stepper_inc_h.png");
+    this->addChild(plusButton);
+    plusButton->setScale(20.0f / plusButton->getContentSize().height);
+    plusButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40, origin.y + visibleSize.height - 50));
+    plusButton->addClickEventListener(std::bind(&RecordScene::plusCallback, this, std::placeholders::_1));
+
     _drawButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_drawButton);
     _drawButton->setScale9Enabled(true);
@@ -262,6 +274,22 @@ void RecordScene::updateScoreLabel() {
     }
 
     _okButton->setEnabled(_scoreTable[0] + _scoreTable[1] + _scoreTable[2] + _scoreTable[3] == 0);
+}
+
+void RecordScene::minusCallback(cocos2d::Ref *sender) {
+    int winScore = atoi(_editBox->getText());
+    if (winScore > 8) {
+        --winScore;
+        _editBox->setText(StringUtils::format("%d", winScore).c_str());
+        updateScoreLabel();
+    }
+}
+
+void RecordScene::plusCallback(cocos2d::Ref *sender) {
+    int winScore = atoi(_editBox->getText());
+    ++winScore;
+    _editBox->setText(StringUtils::format("%d", winScore).c_str());
+    updateScoreLabel();
 }
 
 void RecordScene::drawCallback(cocos2d::Ref *sender) {

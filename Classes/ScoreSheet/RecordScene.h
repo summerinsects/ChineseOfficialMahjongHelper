@@ -39,6 +39,8 @@ private:
 
     void updateScoreLabel();
 
+    void minusCallback(cocos2d::Ref *sender);
+    void plusCallback(cocos2d::Ref *sender);
     void drawCallback(cocos2d::Ref *sender);
     void winCallback(cocos2d::Ref *sender, int index);
     void selfDrawnCallback(cocos2d::Ref *sender, int index);
