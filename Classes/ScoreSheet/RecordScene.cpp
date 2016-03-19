@@ -269,11 +269,12 @@ void RecordScene::updateScoreLabel() {
     }
 
     if (_scoreTable[0] + _scoreTable[1] + _scoreTable[2] + _scoreTable[3] == 0) {
-        if (_winIndex == -1) {
+        if (isButtonChecked(_drawButton)) {
             _okButton->setEnabled(_pointsFlag == 0);
         }
         else {
-            _okButton->setEnabled(true);
+            bool allZero = std::all_of(std::begin(_scoreTable), std::end(_scoreTable), [](int score) { return score == 0; });
+            _okButton->setEnabled(!allZero);
         }
     }
     else {
