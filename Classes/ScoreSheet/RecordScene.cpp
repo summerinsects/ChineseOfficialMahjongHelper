@@ -68,38 +68,38 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     _editBox->setInputMode(/*ui::EditBox::InputMode::SINGLE_LINE |*/ ui::EditBox::InputMode::NUMERIC);
     _editBox->setFontColor(Color4B(0, 0, 0, 255));
-    _editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 95, origin.y + visibleSize.height - 50));
+    _editBox->setPosition(Vec2(origin.x + 65.0f, origin.y + visibleSize.height - 50));
     _editBox->setDelegate(this);
     _editBox->setText("8");
 
     Label *label = Label::createWithSystemFont("番", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 75, origin.y + visibleSize.height - 50));
+    label->setPosition(Vec2(origin.x + 85.0f, origin.y + visibleSize.height - 50));
 
     ui::Button *minusButton = ui::Button::create("source_material/stepper_dec_n.png", "source_material/stepper_dec_h.png");
     this->addChild(minusButton);
     minusButton->setScale(20.0f / minusButton->getContentSize().height);
-    minusButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 135, origin.y + visibleSize.height - 50));
+    minusButton->setPosition(Vec2(origin.x + 25.0f, origin.y + visibleSize.height - 50));
     minusButton->addClickEventListener(std::bind(&RecordScene::minusCallback, this, std::placeholders::_1));
 
     ui::Button *plusButton = ui::Button::create("source_material/stepper_inc_n.png", "source_material/stepper_inc_h.png");
     this->addChild(plusButton);
     plusButton->setScale(20.0f / plusButton->getContentSize().height);
-    plusButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40, origin.y + visibleSize.height - 50));
+    plusButton->setPosition(Vec2(origin.x + 120.0f, origin.y + visibleSize.height - 50));
     plusButton->addClickEventListener(std::bind(&RecordScene::plusCallback, this, std::placeholders::_1));
 
     _drawButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_drawButton);
     _drawButton->setScale9Enabled(true);
     _drawButton->setContentSize(Size(22.0f, 22.0f));
-    _drawButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 80, origin.y + visibleSize.height - 50));
+    _drawButton->setPosition(Vec2(origin.x + visibleSize.width - 60.0f, origin.y + visibleSize.height - 50));
     _drawButton->addClickEventListener(std::bind(&RecordScene::drawCallback, this, std::placeholders::_1));
 
     label = Label::createWithSystemFont("荒庄", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 95, origin.y + visibleSize.height - 50));
+    label->setPosition(Vec2(origin.x + visibleSize.width - 45.0f, origin.y + visibleSize.height - 50));
 
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
@@ -168,7 +168,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     label = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, origin.y + visibleSize.height - 260));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 260));
 
     ui::Widget *innerNode = ui::Widget::create();
     innerNode->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
