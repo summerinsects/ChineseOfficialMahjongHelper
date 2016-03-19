@@ -101,7 +101,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 95, origin.y + visibleSize.height - 50));
 
-    const float gap = visibleSize.width * 0.25f;
+    const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float x = origin.x + gap * (i + 0.5f);
         _nameLabel[i] = Label::createWithSystemFont(name[i], "Arial", 12);
@@ -165,6 +165,11 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 230));
     }
 
+    label = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, origin.y + visibleSize.height - 260));
+
     ui::Widget *innerNode = ui::Widget::create();
     innerNode->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
     static const float innerNodeHeight = 572.0f;  // 18行 * 24像素 + 10行 * 14像素
@@ -207,10 +212,10 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     ui::ScrollView *scrollView = ui::ScrollView::create();
     scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
     scrollView->setBounceEnabled(true);
-    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 300));
+    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 320));
     scrollView->setInnerContainerSize(innerNode->getContentSize());
-    scrollView->setAnchorPoint(Vec2(0.5f, 0.5f));
-    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 110.0f));
+    scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 120.0f));
     this->addChild(scrollView);
 
     scrollView->addChild(innerNode);
@@ -235,8 +240,7 @@ void RecordScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
 void RecordScene::updateScoreLabel() {
     memset(_scoreTable, 0, sizeof(_scoreTable));
     if (_winIndex != -1) {
-        const char *str = _editBox->getText();
-        int winScore = atoi(str);
+        int winScore = atoi(_editBox->getText());
         if (isButtonChecked(_selfDrawnButton[_winIndex])) {
             for (int i = 0; i < 4; ++i) {
                 _scoreTable[i] = (i == _winIndex) ? (winScore + 8) * 3 : (-8 - winScore);
