@@ -285,6 +285,15 @@ void ScoreSheetScene::fillRow(int index) {
     for (int i = 0; i < 4; ++i) {
         _scoreLabels[index][i]->setString(StringUtils::format("%+d", g_scores[index][i]));
         _totalScores[i] += g_scores[index][i];
+        if (g_scores[index][i] > 0) {
+            _scoreLabels[index][i]->setColor(Color3B::RED);
+        }
+        else if (g_scores[index][i] < 0) {
+            _scoreLabels[index][i]->setColor(Color3B::GREEN);
+        }
+        else {
+            _scoreLabels[index][i]->setColor(Color3B::GRAY);
+        }
     }
 
     _recordButton[index]->setVisible(false);

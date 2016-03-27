@@ -110,6 +110,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         _nameLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
 
         _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);
+        _scoreLabel[i]->setColor(Color3B::GRAY);
         this->addChild(_scoreLabel[i]);
         _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 105));
 
@@ -267,6 +268,15 @@ void RecordScene::updateScoreLabel() {
 
     for (int i = 0; i < 4; ++i) {
         _scoreLabel[i]->setString(StringUtils::format("%+d", _scoreTable[i]));
+        if (_scoreTable[i] > 0) {
+            _scoreLabel[i]->setColor(Color3B::RED);
+        }
+        else if (_scoreTable[i] < 0) {
+            _scoreLabel[i]->setColor(Color3B::GREEN);
+        }
+        else {
+            _scoreLabel[i]->setColor(Color3B::GRAY);
+        }
     }
 
     if (_scoreTable[0] + _scoreTable[1] + _scoreTable[2] + _scoreTable[3] == 0) {
