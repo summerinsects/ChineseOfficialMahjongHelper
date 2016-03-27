@@ -105,6 +105,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     for (int i = 0; i < 4; ++i) {
         const float x = origin.x + gap * (i + 0.5f);
         _nameLabel[i] = Label::createWithSystemFont(name[i], "Arial", 12);
+        _nameLabel[i]->setColor(Color3B::YELLOW);
         this->addChild(_nameLabel[i]);
         _nameLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
 
