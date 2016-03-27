@@ -87,16 +87,19 @@ bool ScoreSheetScene::init() {
     }
 
     Label *label = Label::createWithSystemFont("选手姓名", "Arail", 12);
+    label->setColor(Color3B::YELLOW);
     label->setPosition(Vec2(gap * 0.5f, 390));
     node->addChild(label);
 
     for (int i = 0; i < 4; ++i) {
         _editBox[i] = ui::EditBox::create(Size(gap, 20.0f), ui::Scale9Sprite::create());
         _editBox[i]->setPosition(Vec2(gap * (i + 1.5f), 390));
+        _editBox[i]->setFontColor(Color3B::YELLOW);
         _editBox[i]->setFontSize(12);
         node->addChild(_editBox[i]);
 
         _nameLabel[i] = Label::createWithSystemFont("", "Arail", 12);
+        _nameLabel[i]->setColor(Color3B::YELLOW);
         _nameLabel[i]->setPosition(Vec2(gap * (i + 1.5f), 390));
         node->addChild(_nameLabel[i]);
     }
@@ -124,6 +127,7 @@ bool ScoreSheetScene::init() {
     }
 
     label = Label::createWithSystemFont("累计", "Arail", 12);
+    label->setColor(Color3B::YELLOW);
     label->setPosition(Vec2(gap * 0.5f, 330));
     node->addChild(label);
 
@@ -133,6 +137,7 @@ bool ScoreSheetScene::init() {
 
     for (int i = 0; i < 4; ++i) {
         _totalLabel[i] = Label::createWithSystemFont("0", "Arail", 12);
+        _totalLabel[i]->setColor(Color3B::YELLOW);
         _totalLabel[i]->setPosition(Vec2(gap * (i + 1.5f), 330));
         node->addChild(_totalLabel[i]);
     }
