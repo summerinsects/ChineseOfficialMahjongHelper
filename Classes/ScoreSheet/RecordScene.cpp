@@ -66,7 +66,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     _editBox = ui::EditBox::create(Size(35.0f, 22.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    _editBox->setInputMode(/*ui::EditBox::InputMode::SINGLE_LINE |*/ ui::EditBox::InputMode::NUMERIC);
+    _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
     _editBox->setFontColor(Color4B(0, 0, 0, 255));
     _editBox->setPosition(Vec2(origin.x + 65.0f, origin.y + visibleSize.height - 50));
     _editBox->setDelegate(this);
