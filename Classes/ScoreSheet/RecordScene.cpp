@@ -56,9 +56,9 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         Director::getInstance()->popScene();
     });
 
-    const char *nameText[] = { "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
+    const char *handText[] = { "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
         "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北" };
-    Label *tileLabel = Label::createWithSystemFont(nameText[index], "Arial", 18);
+    Label *tileLabel = Label::createWithSystemFont(handText[index], "Arial", 18);
     this->addChild(tileLabel);
     tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
         origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
