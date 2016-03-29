@@ -83,7 +83,8 @@ bool ScoreSheetScene::init() {
 
     for (int i = 0; i < 21; ++i) {
         const float y = 20.0f * i;
-        node->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y), Color4F::WHITE);
+        node->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y),
+            (i > 0 && i < 16) ? Color4F::GRAY : Color4F::WHITE);
     }
 
     Label *label = Label::createWithSystemFont("选手姓名", "Arail", 12);
@@ -147,6 +148,7 @@ bool ScoreSheetScene::init() {
     for (int k = 0; k < 16; ++k) {
         const float y = 10 + (15 - k) * 20;
         label = Label::createWithSystemFont(handText[k], "Arail", 12);
+        label->setColor(Color3B::GRAY);
         label->setPosition(Vec2(gap * 0.5f, y));
         node->addChild(label);
 
@@ -169,6 +171,7 @@ bool ScoreSheetScene::init() {
         _recordButton[k]->setVisible(false);
 
         _pointNameLabel[k] = Label::createWithSystemFont("", "Arail", 12);
+        _pointNameLabel[k]->setColor(Color3B::GRAY);
         _pointNameLabel[k]->setPosition(Vec2(gap * 5.5f, y));
         node->addChild(_pointNameLabel[k]);
         _pointNameLabel[k]->setVisible(false);
