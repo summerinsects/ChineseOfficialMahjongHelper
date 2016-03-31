@@ -1220,8 +1220,13 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
     if (points_table[NINE_GATES]) {
         points_table[FULL_FLUSH] = 0;
         points_table[CONCEALED_HAND] = 0;
+        --points_table[PUNG_OF_TERMINALS_OR_HONORS];
         points_table[ONE_VOIDED_SUIT] = 0;
         points_table[NO_HONORS] = 0;
+        if (points_table[FULLY_CONCEALED_HAND]) {
+            points_table[FULLY_CONCEALED_HAND] = 0;
+            points_table[SELF_DRAWN] = 1;
+        }
     }
     if (points_table[FOUR_KONGS]) {
         points_table[SINGLE_WAIT] = 0;
