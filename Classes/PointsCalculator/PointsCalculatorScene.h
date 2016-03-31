@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 
+class TilePickWidget;
+
 class PointsCalculatorScene : public cocos2d::Layer {
 public:
     static cocos2d::Scene *createScene();
@@ -17,6 +19,7 @@ public:
 private:
     void calculate();
 
+    TilePickWidget *_tilePicker = nullptr;
     cocos2d::ui::EditBox *_editBox = nullptr;
     cocos2d::ui::Button *_prevalentButton[4];
     cocos2d::ui::Button *_seatButton[4];

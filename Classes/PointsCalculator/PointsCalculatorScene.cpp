@@ -1,6 +1,8 @@
 ﻿#include "PointsCalculatorScene.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
+#include "../widget/TilePickWidget.h"
+
 USING_NS_CC;
 
 Scene *PointsCalculatorScene::createScene() {
@@ -54,12 +56,30 @@ bool PointsCalculatorScene::init() {
         Director::getInstance()->popScene();
     });
 
-    _editBox = ui::EditBox::create(Size(visibleSize.width - 50, 22.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
+    _tilePicker = TilePickWidget::create();
+    const Size &widgetSize = _tilePicker->getContentSize();
+    this->addChild(_tilePicker);
+
+    if (widgetSize.width > visibleSize.width) {
+        float scale = visibleSize.width / widgetSize.width;
+        _tilePicker->setScale(scale);
+        y -= widgetSize.height * scale;
+        _tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 20 + widgetSize.height * scale * 0.5f));
+        y += 20;
+    }
+    else {
+        y -= widgetSize.height;
+        _tilePicker->setPosition(Vec2(origin.x + widgetSize.width * 0.5f, y - 20 + widgetSize.height * 0.5f));
+        y += 20;
+    }
+
+    _editBox = ui::EditBox::create(Size(35.0f, 22.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    _editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
     _editBox->setFontColor(Color4B(0, 0, 0, 255));
-    _editBox->setPosition(Vec2(x - 20, y - 30));
+    _editBox->setPosition(Vec2(origin.x + visibleSize.width - 30, y - 60));
+    _editBox->setPlaceHolder("花牌数");
 
     ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     button->setScale9Enabled(true);
@@ -67,7 +87,7 @@ bool PointsCalculatorScene::init() {
     button->setTitleText("算番");
     button->setTitleColor(Color3B::BLACK);
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 20, y - 30));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 30, y - 90));
     button->addClickEventListener([this](Ref *) { calculate(); });
 
     const char *windName[4] = {"东", "南", "西", "北"};
@@ -275,21 +295,7 @@ bool PointsCalculatorScene::init() {
     lastTileClaimLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     lastTileClaimLabel->setPosition(Vec2(origin.x + 245.0f, y - 150));
 
-    Label *tipsLabel = Label::createWithSystemFont("使用说明：\n"
-        "1.万条饼分别用小写m s p作为后缀。同花色的数牌可以合并用一个后缀。\n"
-        "2.东南西北中发白分别用大写字母ESWNCFP表示。\n"
-        "3.每一组副露（即吃、碰、明杠）用英文[]括起来，每一组暗杠用英文{}括起来。\n"
-        "4.请将所有副露放在最前面，然后是立牌，和牌用英文逗号与手牌分隔开。\n"
-        "5.如果牌数目不对将导致程序闪退！\n"
-        "范例1：{EEEE}{CCCC}{FFFF}{PPPP}N,N\n"
-        "范例2：1112345678999s,9s\n"
-        "范例3：[WWWW][444s]45m678pFF,6m\n",
-        "Arial", 10, Size(visibleSize.width - 10, 0.0f));
-    this->addChild(tipsLabel);
-    tipsLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
-    tipsLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y));
-
-    _pointsAreaBottom = origin.y + tipsLabel->getContentSize().height + 10;
+    _pointsAreaBottom = origin.y + 5;
     _pointsAreaTop = origin.y + y - 170;
 
     return true;
@@ -311,33 +317,24 @@ void PointsCalculatorScene::calculate() {
 
     std::string errorStr;
     do {
-        std::string str = _editBox->getText();
-        std::string::iterator it = std::find(str.begin(), str.end(), ',');
-        if (it == str.end()) {
-            errorStr = "缺少和牌张";
+        int flowerCnt = atoi(_editBox->getText());
+        if (flowerCnt > 8) {
+            errorStr = "花牌数不得超过8";
             break;
         }
-        std::string tilesString(str.begin(), it);
-        std::string winString(it + 1, str.end());
 
         SET sets[5];
-        long set_cnt;
+        long set_cnt = std::copy(_tilePicker->getFixedSets().begin(), _tilePicker->getFixedSets().end(), std::begin(sets))
+            - std::begin(sets);
+
         TILE tiles[13];
-        long tile_cnt;
-        if (!string_to_tiles(tilesString.c_str(), sets, &set_cnt, tiles, &tile_cnt)) {
-            errorStr = "解析牌出错";
-            break;
-        }
+        long tile_cnt = std::copy(_tilePicker->getHandTiles().begin(), _tilePicker->getHandTiles().end(), std::begin(tiles))
+            - std::begin(tiles);
         sort_tiles(tiles, tile_cnt);
 
-        TILE win_tile;
-        const char *p = parse_tiles(winString.c_str(), &win_tile, nullptr);
-        if (*p != '\0') {
-            errorStr = "解析牌出错";
-            break;
-        }
+        TILE win_tile = _tilePicker->getWinTile();
 
-        long points_table[FLOWER_TILES] = { 0 };
+        long points_table[FLOWER_TILES + 1] = { 0 };
         WIN_TYPE win_type = WIN_TYPE_DISCARD;
         if (_selfDrawnButton->isHighlighted()) win_type |= WIN_TYPE_SELF_DRAWN;
         if (_fourthTileButton->isHighlighted()) win_type |= WIN_TYPE_4TH_TILE;
@@ -370,7 +367,9 @@ void PointsCalculatorScene::calculate() {
             break;
         }
 
-        int n = FLOWER_TILES - std::count(std::begin(points_table), std::end(points_table), 0);
+        points += flowerCnt;
+        points_table[FLOWER_TILES] = flowerCnt;
+        int n = FLOWER_TILES + 1 - std::count(std::begin(points_table), std::end(points_table), 0);
         long rows = n / 2 + n % 2;
         Node *innerNode = Node::create();
         float pointsAreaHeight = (FONT_SIZE + 2) * (rows + 2);
@@ -393,8 +392,7 @@ void PointsCalculatorScene::calculate() {
             div_t ret = div(i, 2);
             pointName->setPosition(Vec2(ret.rem == 0 ? 5.0f : visibleSize.width * 0.5f + 5.0f, (FONT_SIZE + 2) * (rows - ret.quot + 2)));
         }
-        str = StringUtils::format("总计：%d番", points);
-        Label *pointTotal = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
+        Label *pointTotal = Label::createWithSystemFont(StringUtils::format("总计：%d番", points), "Arial", FONT_SIZE);
         innerNode->addChild(pointTotal);
         pointTotal->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
         pointTotal->setPosition(Vec2(5.0f, FONT_SIZE + 2));
