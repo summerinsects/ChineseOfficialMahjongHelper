@@ -21,7 +21,7 @@ bool TilePickWidget::init() {
 
     // 14张牌宽度：27 * 14 = 378
     // 加间距：378 + 4 = 382
-    Size tilesSize = Size(382, 39);
+    Size tilesSize = Size(382 + 4, 39 + 4);
     _tilesWidget = ui::Widget::create();
     _tilesWidget->setContentSize(tilesSize);
     this->addChild(_tilesWidget);
@@ -35,7 +35,7 @@ bool TilePickWidget::init() {
     _highlightBox->drawLine(Vec2(27, 39), Vec2(0, 39), Color4F::RED);
     _highlightBox->drawLine(Vec2(0, 39), Vec2(0, 0), Color4F::RED);
     _tilesWidget->addChild(_highlightBox, 2);
-    _highlightBox->setPosition(Vec2(27 * 0.5f, 39 * 0.5f));
+    _highlightBox->setPosition(Vec2(27 * 0.5f + 2, 39 * 0.5f + 2));
 
     // 一个直杠的宽度：39 + 27 * 3 = 120
     // 两个直杠的宽度：120 * 2 = 240
@@ -239,13 +239,13 @@ void TilePickWidget::addOneTile(TILE tile, bool isWinTile) {
     button->setTag(tile);
 
     Vec2 pos;
-    pos.y = 19.5f;
+    pos.y = 19.5f + 2;
     switch (_fixedSets.size()) {
-    default: pos.x = 27 * (tilesCnt + 0.5f); break;
-    case 1: pos.x = 27 * (tilesCnt + 2); break;
-    case 2: pos.x = 27 * (tilesCnt + 3.5f); break;
-    case 3: pos.x = 27 * (tilesCnt + 5); break;
-    case 4: pos.x = 27 * (tilesCnt + 6.5f); break;
+    default: pos.x = 27 * (tilesCnt + 0.5f) + 2; break;
+    case 1: pos.x = 27 * (tilesCnt + 2) + 2; break;
+    case 2: pos.x = 27 * (tilesCnt + 3.5f) + 2; break;
+    case 3: pos.x = 27 * (tilesCnt + 5) + 2; break;
+    case 4: pos.x = 27 * (tilesCnt + 6.5f) + 2; break;
     }
 
     if (!isWinTile) {
