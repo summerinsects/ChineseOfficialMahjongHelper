@@ -123,8 +123,7 @@ static forceinline bool is_pung(TILE tile0, TILE tile1, TILE tile2) {
     return (tile0 == tile1 && tile1 == tile2);
 }
 
-// Notice that tiles in different suit is discontinuous,
-// it is very easy to determine whether a chow can be made up
+// 注意到不同花色的序数牌是不连续的，所以很容易确定是否为顺子
 static forceinline bool is_chow(TILE tile0, TILE tile1, TILE tile2) {
     return (is_numbered_suit_quick(tile0) && tile0 + 1 == tile1 && tile1 + 1 == tile2);
 }

@@ -19,11 +19,11 @@ static bool is_two_numbered_tiles_wait(TILE tile0, TILE tile1, bool (&waiting_ta
     RANK_TYPE rank1 = tile_rank(tile1);
     switch (rank1 - rank0) {
     case 2:
-        // Closed wait: Waiting solely for a tile whose number is "inside" to form a chow
+        // 坎张
         waiting_table[suit0][rank0 + 1] = true;
         return true;
     case 1:
-        // Edge wait or Both sides wait
+        // 两面或者边张
         if (rank0 >= 2) waiting_table[suit0][rank0 - 1] = true;
         if (rank1 <= 8) waiting_table[suit0][rank1 + 1] = true;
         return true;
@@ -35,29 +35,27 @@ static bool is_two_numbered_tiles_wait(TILE tile0, TILE tile1, bool (&waiting_ta
 bool is_basic_type_4_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]) {
     bool ret = false;
 
-    // if 0 1 2 is a completed set, it waits the remain tile for the pair
+    // 如果t0 t1 t2构成一组面子，那么听单钓t3
     if (is_concealed_set_completed(concealed_tiles[0], concealed_tiles[1], concealed_tiles[2])) {
-        // Single wait: Waiting solely for a tile to form a pair
         waiting_table[tile_suit(concealed_tiles[3])][tile_rank(concealed_tiles[3])] = true;
         ret = true;
     }
 
-    // if 1 2 3 is a completed set, it waits the remain tile for the pair
+    // 如果t1 t2 t3构成一组面子，那么听单钓t0
     if (is_concealed_set_completed(concealed_tiles[1], concealed_tiles[2], concealed_tiles[3])) {
-        // Single wait: Waiting solely for a tile to form a pair
         waiting_table[tile_suit(concealed_tiles[0])][tile_rank(concealed_tiles[0])] = true;
         ret = true;
     }
 
-    // if 0 1 is the pair, check 2 3
+    // t0 t1是一对（作为将）
     if (concealed_tiles[0] == concealed_tiles[1]) {
-        // if 2 3 is the pair, this is called two pungs wait
+        // 如果t2 t3也是一对，这是对倒听
         if (concealed_tiles[2] == concealed_tiles[3]) {
             waiting_table[tile_suit(concealed_tiles[2])][tile_rank(concealed_tiles[2])] = true;
             return true;
         }
 
-        // for two numbered tiles, it is possible to wait some other tiles
+        // 如果t2 t3是同花色序数牌，才有可能听附近别的牌
         if (is_suit_equal_quick(concealed_tiles[2], concealed_tiles[3])) {
             if (is_numbered_suit_quick(concealed_tiles[2])) {
                 if (is_two_numbered_tiles_wait(concealed_tiles[2], concealed_tiles[3], waiting_table)) {
@@ -67,8 +65,9 @@ bool is_basic_type_4_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][
         }
     }
 
-    // if 1 2 is the pair, check 0 3
+    // t1 t2是一对（作为将）
     if (concealed_tiles[1] == concealed_tiles[2]) {
+        // 如果t0 t3是同花色序数牌，才有可能听附近别的牌
         if (is_suit_equal_quick(concealed_tiles[0], concealed_tiles[3])) {
             if (is_numbered_suit_quick(concealed_tiles[0])) {
                 if (is_two_numbered_tiles_wait(concealed_tiles[0], concealed_tiles[3], waiting_table)) {
@@ -78,8 +77,9 @@ bool is_basic_type_4_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][
         }
     }
 
-    // if 2 3 is the pair, check 0 1
+    // t2 t3是一对（作为将）
     if (concealed_tiles[2] == concealed_tiles[3]) {
+        // 如果t0 t1是同花色序数牌，才有可能听附近别的牌
         if (is_suit_equal_quick(concealed_tiles[0], concealed_tiles[1])) {
             if (is_numbered_suit_quick(concealed_tiles[0])) {
                 if (is_two_numbered_tiles_wait(concealed_tiles[0], concealed_tiles[1], waiting_table)) {
@@ -109,15 +109,15 @@ static bool is_basic_type_N_wait(const TILE *concealed_tiles, bool (&waiting_tab
         long j = i + 1;
         while (j < _Count) {
             TILE tile_j = concealed_tiles[j];
-            if (tile_j - tile_i >= 3) break;  // It is impossible to make a chow or pung
+            if (tile_j - tile_i >= 3) break;  // 这已经不可能再构成面子了
 
             long k = j + 1;
             while (k < _Count) {
                 TILE tile_k = concealed_tiles[k];
-                if (tile_k - tile_i >= 3) break;  // It is impossible to make a chow or pung
+                if (tile_k - tile_i >= 3) break;  // 这已经不可能再构成面子了
 
                 if (is_concealed_set_completed(tile_i, tile_j, tile_k)) {
-                    // Reduced the completed pung or chow
+                    // 削减面子
                     TILE remains[_Count - 3];
                     for (long n = 0, c = 0; n < _Count; ++n) {
                         if (n == i || n == j || n == k) {
@@ -125,19 +125,19 @@ static bool is_basic_type_N_wait(const TILE *concealed_tiles, bool (&waiting_tab
                         }
                         remains[c++] = concealed_tiles[n];
                     }
-                    // recursive call
+                    // 递归
                     if (_NextStepFunction(remains, waiting_table)) {
                         ret = true;
                     }
                 }
 
-                do ++k; while (k < _Count && concealed_tiles[k] == tile_k);  // quick skip the same case
+                do ++k; while (k < _Count && concealed_tiles[k] == tile_k);  // 快速跳过相同的case
             }
 
-            do ++j; while (j < _Count && concealed_tiles[j] == tile_j);  // quick skip the same case
+            do ++j; while (j < _Count && concealed_tiles[j] == tile_j);  // 快速跳过相同的case
         }
 
-        do ++i; while (i < _Count && concealed_tiles[i] == tile_i);  // quick skip the same case
+        do ++i; while (i < _Count && concealed_tiles[i] == tile_i);  // 快速跳过相同的case
     }
 
     return ret;
@@ -159,7 +159,7 @@ bool get_knitted_straight_missing_tiles(const TILE *concealed_tiles, long cnt, T
     for (int i = 0; i < 6; ++i) {
         if (std::includes(std::begin(standard_knitted_straight[i]), std::end(standard_knitted_straight[i]),
             concealed_tiles, concealed_tiles + cnt)) {
-            matched_seq = standard_knitted_straight[i];  // match a knitted straight
+            matched_seq = standard_knitted_straight[i];  // 匹配一种组合龙
             break;
         }
     }
@@ -167,7 +167,7 @@ bool get_knitted_straight_missing_tiles(const TILE *concealed_tiles, long cnt, T
         return false;
     }
 
-    // statistics the missing tiles
+    // 统计缺失的牌张
     TILE remains[9] = { 0 };
     TILE *it = copy_exclude(matched_seq, matched_seq + 9, concealed_tiles, concealed_tiles + cnt, remains);
     long n = it - remains;
@@ -186,7 +186,7 @@ static bool is_completed_knitted_straight_wait(const TILE *concealed_tiles, bool
     for (long i = 0; i < 6; ++i) {
         if (std::includes(concealed_tiles, concealed_tiles + _Count,
             std::begin(standard_knitted_straight[i]), std::end(standard_knitted_straight[i]))) {
-            matched_seq = standard_knitted_straight[i];  // match a knitted straight
+            matched_seq = standard_knitted_straight[i];  // 匹配一种组合龙
             break;
         }
     }
@@ -194,12 +194,12 @@ static bool is_completed_knitted_straight_wait(const TILE *concealed_tiles, bool
         return false;
     }
 
-    // remove tiles in knitted straight
+    // 剔除组合龙部分
     TILE remains[_Count];
     TILE *it = copy_exclude(concealed_tiles, concealed_tiles + _Count,
         matched_seq, matched_seq + 9, remains);
     long n = it - remains;
-    if (n == _Count - 9) {  // then, check the remaining tiles
+    if (n == _Count - 9) {  // 检查余下的牌张
         return _ReducedCallback(remains, waiting_table);
     }
 
@@ -211,16 +211,16 @@ bool is_basic_type_10_wait(const TILE *concealed_tiles, bool (&waiting_table)[6]
         return true;
     }
 
-    // wait the tile in knitted straight
+    // 听构成组合龙部分
     const TILE *last = concealed_tiles + 10;
-    const TILE *it = std::adjacent_find(concealed_tiles, last);  // find the pair
+    const TILE *it = std::adjacent_find(concealed_tiles, last);  // 找到将牌
     while (it != last) {
         const TILE pair_tile = *it;
         TILE pair[2] = { pair_tile, pair_tile };
-        TILE remains[8];  // 8 tiles except the pair
+        TILE remains[8];  // 10张手牌剔除一对将，余下8张
         copy_exclude(concealed_tiles, last, std::begin(pair), std::end(pair), remains);
 
-        TILE waiting;  // only one missing
+        TILE waiting;  // 必然听一张
         if (get_knitted_straight_missing_tiles(remains, 8, &waiting)) {
             waiting_table[tile_suit(waiting)][tile_rank(waiting)] = true;
             return true;
@@ -266,7 +266,7 @@ bool is_seven_pairs_wait(const TILE (&concealed_tiles)[13], TILE *waiting) {
         }
         else {
             if (single != 0) {
-                return false;  // Only one single tile allowed
+                return false;  // 有不止一张单牌，说明不是七对听牌型
             }
             single = concealed_tiles[i];
         }
@@ -288,12 +288,12 @@ bool is_thirteen_orphans_wait(const TILE (&concealed_tiles)[13], TILE *waiting, 
     TILE temp[13];
     TILE *end = std::unique_copy(concealed_tiles, concealed_tiles + 13, temp);
     long cnt = end - temp;
-    if (cnt == 12) {  // there is already a pair, get the missing tile
+    if (cnt == 12) {  // 已经有一对，听缺少的那一张
         copy_exclude(std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans), temp, end, waiting);
         *waiting_cnt = 1;
         return true;
     }
-    else if (cnt == 13) {  // waiting any of the terminal or honor tiles
+    else if (cnt == 13) {  // 13面听
         memcpy(waiting, standard_thirteen_orphans, sizeof(standard_thirteen_orphans));
         *waiting_cnt = 13;
         return true;
@@ -312,26 +312,27 @@ bool is_thirteen_orphans(const TILE (&concealed_tiles)[13], TILE test_tile) {
 }
 
 bool is_honors_and_knitted_tiles_wait(const TILE (&concealed_tiles)[13], TILE *waiting) {
-    // should not contain pairs
+    // 全不靠不能有对子
     if (std::adjacent_find(concealed_tiles, concealed_tiles + 13) != concealed_tiles + 13) {
         return false;
     }
 
-    const TILE *p = std::find_if(concealed_tiles, concealed_tiles + 13, &is_honor);  // find the first honor tile
-    const long numbered_cnt = p - concealed_tiles;
+    const TILE *p = std::find_if(concealed_tiles, concealed_tiles + 13, &is_honor);  // 找到第一个字牌
+    const long numbered_cnt = p - concealed_tiles;  // 序数牌张数
 
-    // quick return if numbered tiles more than 9 or honor tiles more than 7 (i.e. numbered_cnt less than 6)
+    // 序数牌张数大于9或者小于6必然不可能听全不靠
     if (numbered_cnt > 9 || numbered_cnt < 6) {
         return false;
     }
 
-    // a completed knitted straight contains 9 tiles, and 7 honor tiles, that is 16
-    TILE temp[16] = { 0 };
+    TILE temp[16] = { 0 };  // 一个完整的组合龙是9张牌，加字牌7张，一共是16张
+
+    // 统计组合龙里面缺失的牌张，这一部分是所听牌张
     if (!get_knitted_straight_missing_tiles(concealed_tiles, numbered_cnt, temp)) {
         return false;
     }
 
-    // map the existing honor tiles
+    // 统计已有的字牌
     unsigned winds_table[5] = { 0 };
     unsigned dragons_table[4] = { 0 };
     for (long i = numbered_cnt; i < 13; ++i) {
@@ -345,7 +346,7 @@ bool is_honors_and_knitted_tiles_wait(const TILE (&concealed_tiles)[13], TILE *w
         }
     }
 
-    // statistics the missing winds and dragons
+    // 统计缺失的字牌，这一部分是所听牌张
     long wait_cnt = 9 - numbered_cnt;
     for (int i = 1; i <= 4; ++i) {
         if (winds_table[i] == 0) {
@@ -359,7 +360,7 @@ bool is_honors_and_knitted_tiles_wait(const TILE (&concealed_tiles)[13], TILE *w
         }
     }
 
-    if (wait_cnt == 3) {  // must be 3 tiles wait
+    if (wait_cnt == 3) {  // 必然听3张
         sort_tiles(temp, wait_cnt);
         memcpy(waiting, temp, 3 * sizeof(TILE));
         return true;

@@ -18,7 +18,6 @@ bool is_basic_type_10(const TILE *concealed_tiles, TILE test_tile);
 bool is_basic_type_13_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]);
 bool is_basic_type_13(const TILE *concealed_tiles, TILE test_tile);
 
-// To determine whether wait or win for special type
 bool is_seven_pairs_wait(const TILE (&concealed_tiles)[13], TILE *waiting);
 bool is_seven_pairs(const TILE (&concealed_tiles)[13], TILE test_tile);
 
@@ -28,7 +27,7 @@ bool is_thirteen_orphans(const TILE (&concealed_tiles)[13], TILE test_tile);
 bool is_honors_and_knitted_tiles_wait(const TILE (&concealed_tiles)[13], TILE *waiting);
 bool is_honors_and_knitted_tiles(const TILE (&concealed_tiles)[13], TILE test_tile);
 
-// There are 6 forms of knitted straight,
+// 组合龙只有6种
 // 147m 258s 369p
 // 147m 369s 258p
 // 258m 147s 369p
@@ -44,10 +43,12 @@ static const TILE standard_knitted_straight[6][9] = {
     { 0x13, 0x16, 0x19, 0x22, 0x25, 0x28, 0x31, 0x34, 0x37 },
 };
 
+// 十三幺13面听
 static const TILE standard_thirteen_orphans[13] = {
     0x11, 0x19, 0x21, 0x29, 0x31, 0x39, 0x41, 0x42, 0x43, 0x44, 0x51, 0x52, 0x53
 };
 
+// 九莲宝灯
 static const TILE standard_nine_gates[3][13] = {
     { 0x11, 0x11, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x19, 0x19 },
     { 0x21, 0x21, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x29, 0x29 },
