@@ -211,6 +211,8 @@ void TilePickWidget::reset() {
     _tilesWidget->removeChild(_winTileButton);
     _winTileButton = nullptr;
 
+    _fixedWidget->removeAllChildren();
+
     _chowLessButton->setEnabled(false);
     _chowMidButton->setEnabled(false);
     _chowGreatButton->setEnabled(false);
