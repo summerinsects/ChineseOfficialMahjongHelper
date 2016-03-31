@@ -1313,9 +1313,7 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
         points_table[ONE_VOIDED_SUIT] = 0;
 #endif
     }
-    if (points_table[THREE_KONGS]) {
 
-    }
     if (points_table[ALL_TERMINALS_AND_HONORS]) {
         points_table[ALL_PUNGS] = 0;
         points_table[OUTSIDE_HAND] = 0;
@@ -1359,35 +1357,20 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
         points_table[NO_HONORS] = 0;
     }
 
-    if (points_table[PURE_STRAIGHT]) {
-
-    }
     if (points_table[THREE_SUITED_TERMINAL_CHOWS]) {
         points_table[ALL_CHOWS] = 0;
         points_table[NO_HONORS] = 0;
         points_table[MIXED_DOUBLE_CHOW] = 0;
         points_table[TWO_TERMINAL_CHOWS] = 0;
     }
-    if (points_table[PURE_SHIFTED_CHOWS]) {
-
-    }
     if (points_table[ALL_FIVE]) {
         points_table[ALL_SIMPLES] = 0;
         points_table[NO_HONORS] = 0;
-    }
-    if (points_table[TRIPLE_PUNG]) {
-
-    }
-    if (points_table[THREE_CONCEALED_PUNGS]) {
-
     }
 
     if (points_table[LESSER_HONORS_AND_KNITTED_TILES]) {
         points_table[CONCEALED_HAND] = 0;
         points_table[ALL_TYPES] = 0;
-    }
-    if (points_table[KNITTED_STRAIGHT]) {
-
     }
     if (points_table[UPPER_FOUR]) {
         points_table[NO_HONORS] = 0;
@@ -1401,26 +1384,11 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
 #endif
     }
 
-    if (points_table[MIXED_STRAIGHT]) {
-
-    }
     if (points_table[REVERSIBLE_TILES]) {
         points_table[ONE_VOIDED_SUIT] = 0;
     }
-    if (points_table[MIXED_TRIPLE_CHOW]) {
-
-    }
-    if (points_table[MIXED_SHIFTED_PUNGS]) {
-
-    }
-    if (points_table[CHICKEN_HAND]) {
-
-    }
     if (points_table[LAST_TILE_DRAW]) {
         points_table[SELF_DRAWN] = 0;
-    }
-    if (points_table[LAST_TILE_CLAIM]) {
-
     }
     if (points_table[OUT_WITH_REPLACEMENT_TILE]) {
         points_table[SELF_DRAWN] = 0;
@@ -1432,26 +1400,14 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
         points_table[CONCEALED_KONG] = 0;
     }
 
-    if (points_table[ALL_PUNGS]) {
-
-    }
     if (points_table[HALF_FLUSH]) {
         points_table[ONE_VOIDED_SUIT] = 0;
-    }
-    if (points_table[MIXED_SHIFTED_CHOWS]) {
-
-    }
-    if (points_table[ALL_TYPES]) {
-
     }
     if (points_table[MELDED_HAND]) {
         points_table[SINGLE_WAIT] = 0;
     }
     if (points_table[TWO_DRAGONS_PUNGS]) {
         points_table[DRAGON_PUNG] = 0;
-    }
-    if (points_table[OUTSIDE_HAND]) {
-
     }
 
     if (points_table[FULLY_CONCEALED_HAND]) {
@@ -1460,13 +1416,7 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
     if (points_table[TWO_MELDED_KONGS]) {
         points_table[MELDED_KONG] = 0;
     }
-    if (points_table[LAST_TILE]) {
 
-    }
-
-    if (points_table[DRAGON_PUNG]) {
-
-    }
     if (points_table[PREVALENT_WIND] || points_table[SEAT_WIND]) {
         if (!points_table[BIG_THREE_WINDS] && !points_table[LITTLE_FOUR_WINDS]
             && !points_table[ALL_HONORS] && !points_table[ALL_TERMINALS_AND_HONORS]) {
@@ -1474,63 +1424,11 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
             --points_table[PUNG_OF_TERMINALS_OR_HONORS];
         }
     }
-    if (points_table[CONCEALED_HAND]) {
-
-    }
     if (points_table[ALL_CHOWS]) {
         points_table[NO_HONORS] = 0;
     }
-    if (points_table[TILE_HOG]) {
-
-    }
-    if (points_table[DOUBLE_PUNG]) {
-
-    }
-    if (points_table[TWO_CONCEALED_PUNGS]) {
-
-    }
-    if (points_table[CONCEALED_KONG]) {
-
-    }
     if (points_table[ALL_SIMPLES]) {
         points_table[NO_HONORS] = 0;
-    }
-
-    if (points_table[PURE_DOUBLE_CHOW]) {
-
-    }
-    if (points_table[MIXED_DOUBLE_CHOW]) {
-
-    }
-    if (points_table[SHORT_STRAIGHT]) {
-
-    }
-    if (points_table[TWO_TERMINAL_CHOWS]) {
-
-    }
-    if (points_table[PUNG_OF_TERMINALS_OR_HONORS]) {
-
-    }
-    if (points_table[MELDED_KONG]) {
-
-    }
-    if (points_table[ONE_VOIDED_SUIT]) {
-
-    }
-    if (points_table[NO_HONORS]) {
-
-    }
-    if (points_table[EDGE_WAIT]) {
-
-    }
-    if (points_table[CLOSED_WAIT]) {
-
-    }
-    if (points_table[SINGLE_WAIT]) {
-
-    }
-    if (points_table[SELF_DRAWN]) {
-
     }
 }
 
