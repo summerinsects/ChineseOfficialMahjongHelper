@@ -63,6 +63,7 @@ bool TilePickWidget::init() {
     for (int i = 0; i < 9; ++i) {
         TILE tile = make_tile(TILE_SUIT_CHARACTERS, i + 1);
         _characterButtons[i] = ui::Button::create(imageName[tile]);
+        _characterButtons[i]->setScale(27 / _characterButtons[i]->getContentSize().width);
         tableWidget->addChild(_characterButtons[i]);
         _characterButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 136.5f));
         _characterButtons[i]->addClickEventListener(
@@ -72,6 +73,7 @@ bool TilePickWidget::init() {
     for (int i = 0; i < 9; ++i) {
         TILE tile = make_tile(TILE_SUIT_BAMBOO, i + 1);
         _bambooButtons[i] = ui::Button::create(imageName[tile]);
+        _bambooButtons[i]->setScale(27 / _bambooButtons[i]->getContentSize().width);
         tableWidget->addChild(_bambooButtons[i]);
         _bambooButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 97.5f));
         _bambooButtons[i]->addClickEventListener(
@@ -81,6 +83,7 @@ bool TilePickWidget::init() {
     for (int i = 0; i < 9; ++i) {
         TILE tile = make_tile(TILE_SUIT_DOTS, i + 1);
         _dotsButtons[i] = ui::Button::create(imageName[tile]);
+        _dotsButtons[i]->setScale(27 / _dotsButtons[i]->getContentSize().width);
         tableWidget->addChild(_dotsButtons[i]);
         _dotsButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 58.5f));
         _dotsButtons[i]->addClickEventListener(
@@ -90,6 +93,7 @@ bool TilePickWidget::init() {
     for (int i = 0; i < 4; ++i) {
         TILE tile = make_tile(TILE_SUIT_WINDS, i + 1);
         _honorButtons[i] = ui::Button::create(imageName[tile]);
+        _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
         tableWidget->addChild(_honorButtons[i]);
         _honorButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
         _honorButtons[i]->addClickEventListener(
@@ -99,6 +103,7 @@ bool TilePickWidget::init() {
     for (int i = 4; i < 7; ++i) {
         TILE tile = make_tile(TILE_SUIT_DRAGONS, i - 3);
         _honorButtons[i] = ui::Button::create(imageName[tile]);
+        _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
         tableWidget->addChild(_honorButtons[i]);
         _honorButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
         _honorButtons[i]->addClickEventListener(
@@ -229,6 +234,7 @@ void TilePickWidget::sort() {
 void TilePickWidget::addOneTile(TILE tile, bool isWinTile) {
     unsigned tilesCnt = _tiles.size();
     ui::Button *button = ui::Button::create(imageName[tile]);
+    button->setScale(27 / button->getContentSize().width);
     _tilesWidget->addChild(button);
     button->setTag(tile);
 
@@ -399,6 +405,7 @@ void TilePickWidget::addFixedChowSet(const cocos2d::Vec2 &center, TILE tile, int
 
     for (int i = 0; i < 3; ++i) {
         Sprite *sprite = Sprite::create(image[i]);
+        sprite->setScale(27 / sprite->getContentSize().width);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == 0) {
@@ -430,6 +437,7 @@ void TilePickWidget::addFixedPungSet(const cocos2d::Vec2 &center, TILE tile, int
 
     for (int i = 0; i < 3; ++i) {
         Sprite *sprite = Sprite::create(imageName[tile]);
+        sprite->setScale(27 / sprite->getContentSize().width);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == meldedIdx) {
@@ -470,6 +478,7 @@ void TilePickWidget::addFixedMeldedKongSet(const cocos2d::Vec2 &center, TILE til
 
     for (int i = 0; i < 4; ++i) {
         Sprite *sprite = Sprite::create(imageName[tile]);
+        sprite->setScale(27 / sprite->getContentSize().width);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == meldedIdx) {
@@ -494,6 +503,7 @@ void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, TILE 
 
     for (int i = 0; i < 4; ++i) {
         Sprite *sprite = Sprite::create(image[i]);
+        sprite->setScale(27 / sprite->getContentSize().width);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == 0 || i == 3) {
