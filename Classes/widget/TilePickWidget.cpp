@@ -365,7 +365,7 @@ void TilePickWidget::refreshHandTiles() {
 
     std::vector<TILE> temp;
     temp.swap(_tiles);
-    std::for_each(std::begin(temp), std::end(temp), std::bind(&TilePickWidget::addOneTile, this, std::placeholders::_1, false));
+    std::for_each(temp.begin(), temp.end(), std::bind(&TilePickWidget::addOneTile, this, std::placeholders::_1, false));
     refreshActionButtons();
 }
 
@@ -503,11 +503,11 @@ void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, TILE 
 void TilePickWidget::chowLessCallback(cocos2d::Ref *sender) {
     // XX_
     TILE tile = _tiles[_currentIdx];
-    auto it = std::find(std::begin(_tiles), std::end(_tiles), tile - 2);
+    auto it = std::find(_tiles.begin(), _tiles.end(), tile - 2);
     _tiles.erase(it);
-    it = std::find(std::begin(_tiles), std::end(_tiles), tile - 1);
+    it = std::find(_tiles.begin(), _tiles.end(), tile - 1);
     _tiles.erase(it);
-    it = std::find(std::begin(_tiles), std::end(_tiles), tile);
+    it = std::find(_tiles.begin(), _tiles.end(), tile);
     _tiles.erase(it);
 
     --_handTilesTable[tile - 2];
@@ -526,11 +526,11 @@ void TilePickWidget::chowLessCallback(cocos2d::Ref *sender) {
 void TilePickWidget::chowMidCallback(cocos2d::Ref *sender) {
     // X_X
     TILE tile = _tiles[_currentIdx];
-    auto it = std::find(std::begin(_tiles), std::end(_tiles), tile - 1);
+    auto it = std::find(_tiles.begin(), _tiles.end(), tile - 1);
     _tiles.erase(it);
-    it = std::find(std::begin(_tiles), std::end(_tiles), tile);
+    it = std::find(_tiles.begin(), _tiles.end(), tile);
     _tiles.erase(it);
-    it = std::find(std::begin(_tiles), std::end(_tiles), tile + 1);
+    it = std::find(_tiles.begin(), _tiles.end(), tile + 1);
     _tiles.erase(it);
 
     --_handTilesTable[tile - 1];
@@ -549,11 +549,11 @@ void TilePickWidget::chowMidCallback(cocos2d::Ref *sender) {
 void TilePickWidget::chowGreatCallback(cocos2d::Ref *sender) {
     // _XX
     TILE tile = _tiles[_currentIdx];
-    auto it = std::find(std::begin(_tiles), std::end(_tiles), tile);
+    auto it = std::find(_tiles.begin(), _tiles.end(), tile);
     _tiles.erase(it);
-    it = std::find(std::begin(_tiles), std::end(_tiles), tile + 1);
+    it = std::find(_tiles.begin(), _tiles.end(), tile + 1);
     _tiles.erase(it);
-    it = std::find(std::begin(_tiles), std::end(_tiles), tile + 2);
+    it = std::find(_tiles.begin(), _tiles.end(), tile + 2);
     _tiles.erase(it);
 
     --_handTilesTable[tile];
