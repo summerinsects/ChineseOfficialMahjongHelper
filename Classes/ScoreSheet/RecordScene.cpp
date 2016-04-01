@@ -63,14 +63,15 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
         origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
 
-    _editBox = ui::EditBox::create(Size(35.0f, 22.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
+    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    _editBox->setFontColor(Color4B(0, 0, 0, 255));
+    _editBox->setFontColor(Color4B::BLACK);
+    _editBox->setFontSize(12);
+    _editBox->setText("8");
     _editBox->setPosition(Vec2(origin.x + 65.0f, origin.y + visibleSize.height - 50));
     _editBox->setDelegate(this);
-    _editBox->setText("8");
 
     Label *label = Label::createWithSystemFont("番", "Arial", 12);
     this->addChild(label);
@@ -92,7 +93,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     _drawButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_drawButton);
     _drawButton->setScale9Enabled(true);
-    _drawButton->setContentSize(Size(22.0f, 22.0f));
+    _drawButton->setContentSize(Size(20.0f, 20.0f));
     _drawButton->setPosition(Vec2(origin.x + visibleSize.width - 60.0f, origin.y + visibleSize.height - 50));
     _drawButton->addClickEventListener(std::bind(&RecordScene::drawCallback, this, std::placeholders::_1));
 
@@ -117,7 +118,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
         _winButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_winButton[i]);
         _winButton[i]->setScale9Enabled(true);
-        _winButton[i]->setContentSize(Size(22.0f, 22.0f));
+        _winButton[i]->setContentSize(Size(20.0f, 20.0f));
         _winButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 130));
         setButtonUnchecked(_winButton[i]);
         _winButton[i]->addClickEventListener(std::bind(&RecordScene::winCallback, this, std::placeholders::_1, i));
@@ -130,7 +131,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
         _selfDrawnButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_selfDrawnButton[i]);
         _selfDrawnButton[i]->setScale9Enabled(true);
-        _selfDrawnButton[i]->setContentSize(Size(22.0f, 22.0f));
+        _selfDrawnButton[i]->setContentSize(Size(20.0f, 20.0f));
         _selfDrawnButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 160));
         setButtonUnchecked(_selfDrawnButton[i]);
         _selfDrawnButton[i]->addClickEventListener(std::bind(&RecordScene::selfDrawnCallback, this, std::placeholders::_1, i));
@@ -143,7 +144,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
         _claimButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_claimButton[i]);
         _claimButton[i]->setScale9Enabled(true);
-        _claimButton[i]->setContentSize(Size(22.0f, 22.0f));
+        _claimButton[i]->setContentSize(Size(20.0f, 20.0f));
         _claimButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 190));
         setButtonUnchecked(_claimButton[i]);
         _claimButton[i]->addClickEventListener(std::bind(&RecordScene::claimCallback, this, std::placeholders::_1, i));
@@ -156,7 +157,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
         _falseWinButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
         this->addChild(_falseWinButton[i]);
         _falseWinButton[i]->setScale9Enabled(true);
-        _falseWinButton[i]->setContentSize(Size(22.0f, 22.0f));
+        _falseWinButton[i]->setContentSize(Size(20.0f, 20.0f));
         _falseWinButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 220));
         setButtonUnchecked(_falseWinButton[i]);
         _falseWinButton[i]->addClickEventListener(std::bind(&RecordScene::falseWinCallback, this, std::placeholders::_1, i));

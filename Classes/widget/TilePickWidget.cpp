@@ -112,7 +112,8 @@ bool TilePickWidget::init() {
 
     _chowLessButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _chowLessButton->setScale9Enabled(true);
-    _chowLessButton->setContentSize(Size(40.0f, 25.0f));
+    _chowLessButton->setContentSize(Size(45.0f, 20.0f));
+    _chowLessButton->setTitleFontSize(12);
     _chowLessButton->setTitleText("吃(XX_)");
     _chowLessButton->setTitleColor(Color3B::BLACK);
     this->addChild(_chowLessButton);
@@ -121,7 +122,8 @@ bool TilePickWidget::init() {
 
     _chowMidButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _chowMidButton->setScale9Enabled(true);
-    _chowMidButton->setContentSize(Size(40.0f, 25.0f));
+    _chowMidButton->setContentSize(Size(45.0f, 20.0f));
+    _chowMidButton->setTitleFontSize(12);
     _chowMidButton->setTitleText("吃(X_X)");
     _chowMidButton->setTitleColor(Color3B::BLACK);
     this->addChild(_chowMidButton);
@@ -130,7 +132,8 @@ bool TilePickWidget::init() {
 
     _chowGreatButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _chowGreatButton->setScale9Enabled(true);
-    _chowGreatButton->setContentSize(Size(40.0f, 25.0f));
+    _chowGreatButton->setContentSize(Size(45.0f, 20.0f));
+    _chowGreatButton->setTitleFontSize(12);
     _chowGreatButton->setTitleText("吃(_XX)");
     _chowGreatButton->setTitleColor(Color3B::BLACK);
     this->addChild(_chowGreatButton);
@@ -139,7 +142,8 @@ bool TilePickWidget::init() {
 
     _pungButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _pungButton->setScale9Enabled(true);
-    _pungButton->setContentSize(Size(40.0f, 25.0f));
+    _pungButton->setContentSize(Size(45.0f, 20.0f));
+    _pungButton->setTitleFontSize(12);
     _pungButton->setTitleText("碰");
     _pungButton->setTitleColor(Color3B::BLACK);
     this->addChild(_pungButton);
@@ -148,7 +152,8 @@ bool TilePickWidget::init() {
 
     _meldedKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _meldedKongButton->setScale9Enabled(true);
-    _meldedKongButton->setContentSize(Size(40.0f, 25.0f));
+    _meldedKongButton->setContentSize(Size(45.0f, 20.0f));
+    _meldedKongButton->setTitleFontSize(12);
     _meldedKongButton->setTitleText("明杠");
     _meldedKongButton->setTitleColor(Color3B::BLACK);
     this->addChild(_meldedKongButton);
@@ -157,7 +162,8 @@ bool TilePickWidget::init() {
 
     _concealedKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _concealedKongButton->setScale9Enabled(true);
-    _concealedKongButton->setContentSize(Size(40.0f, 25.0f));
+    _concealedKongButton->setContentSize(Size(45.0f, 20.0f));
+    _concealedKongButton->setTitleFontSize(12);
     _concealedKongButton->setTitleText("暗杠");
     _concealedKongButton->setTitleColor(Color3B::BLACK);
     this->addChild(_concealedKongButton);
@@ -166,7 +172,8 @@ bool TilePickWidget::init() {
 
     ui::Button *sortButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     sortButton->setScale9Enabled(true);
-    sortButton->setContentSize(Size(40.0f, 25.0f));
+    sortButton->setContentSize(Size(45.0f, 20.0f));
+    sortButton->setTitleFontSize(12);
     sortButton->setTitleText("排序");
     sortButton->setTitleColor(Color3B::BLACK);
     this->addChild(sortButton);
@@ -175,7 +182,8 @@ bool TilePickWidget::init() {
 
     ui::Button *clearButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     clearButton->setScale9Enabled(true);
-    clearButton->setContentSize(Size(40.0f, 25.0f));
+    clearButton->setContentSize(Size(45.0f, 20.0f));
+    clearButton->setTitleFontSize(12);
     clearButton->setTitleText("重置");
     clearButton->setTitleColor(Color3B::BLACK);
     this->addChild(clearButton);
