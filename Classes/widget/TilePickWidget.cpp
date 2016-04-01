@@ -231,22 +231,27 @@ void TilePickWidget::sort() {
     refreshHandTiles();
 }
 
+cocos2d::Vec2 TilePickWidget::calcHandTilePos(size_t idx) const {
+    Vec2 pos;
+    pos.y = 19.5f + 2;
+    switch (_fixedSets.size()) {
+    default: pos.x = 27 * (idx + 0.5f) + 2; break;
+    case 1: pos.x = 27 * (idx + 2) + 2; break;
+    case 2: pos.x = 27 * (idx + 3.5f) + 2; break;
+    case 3: pos.x = 27 * (idx + 5) + 2; break;
+    case 4: pos.x = 27 * (idx + 6.5f) + 2; break;
+    }
+    return pos;
+}
+
 void TilePickWidget::addOneTile(TILE tile, bool isWinTile) {
-    unsigned tilesCnt = _tiles.size();
     ui::Button *button = ui::Button::create(imageName[tile]);
     button->setScale(27 / button->getContentSize().width);
     _tilesWidget->addChild(button);
     button->setTag(tile);
 
-    Vec2 pos;
-    pos.y = 19.5f + 2;
-    switch (_fixedSets.size()) {
-    default: pos.x = 27 * (tilesCnt + 0.5f) + 2; break;
-    case 1: pos.x = 27 * (tilesCnt + 2) + 2; break;
-    case 2: pos.x = 27 * (tilesCnt + 3.5f) + 2; break;
-    case 3: pos.x = 27 * (tilesCnt + 5) + 2; break;
-    case 4: pos.x = 27 * (tilesCnt + 6.5f) + 2; break;
-    }
+    size_t tilesCnt = _tiles.size();
+    Vec2 pos = calcHandTilePos(tilesCnt);
 
     if (!isWinTile) {
         button->setPosition(pos);
@@ -268,8 +273,8 @@ void TilePickWidget::addOneTile(TILE tile, bool isWinTile) {
 }
 
 void TilePickWidget::tileTableCallback(cocos2d::Ref *sender, TILE tile) {
-    unsigned tilesCnt = _tiles.size();
-    unsigned cnt = _fixedSets.size() * 3 + tilesCnt;
+    size_t tilesCnt = _tiles.size();
+    size_t cnt = _fixedSets.size() * 3 + tilesCnt;
     if (cnt == 13 && _winTile != 0) {
         return;
     }
@@ -291,7 +296,10 @@ void TilePickWidget::tileTableCallback(cocos2d::Ref *sender, TILE tile) {
 
 void TilePickWidget::refreshActionButtons() {
     if (_currentIdx >= _tiles.size()) {
-        if (_winTileButton != nullptr) {
+        if (_winTileButton == nullptr) {
+            _highlightBox->setPosition(calcHandTilePos(_tiles.size()));
+        }
+        else {
             _highlightBox->setPosition(_winTileButton->getPosition());
         }
 

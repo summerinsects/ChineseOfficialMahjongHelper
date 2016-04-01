@@ -39,10 +39,11 @@ private:
     std::vector<TILE> _tiles;
     std::vector<SET> _fixedSets;
     TILE _winTile;
-    unsigned _currentIdx;
+    size_t _currentIdx;
 
     void reset();
     void sort();
+    cocos2d::Vec2 calcHandTilePos(size_t idx) const;
     void addOneTile(TILE tile, bool isWinTile);
     void tileTableCallback(cocos2d::Ref *sender, TILE tile);
     void refreshActionButtons();
