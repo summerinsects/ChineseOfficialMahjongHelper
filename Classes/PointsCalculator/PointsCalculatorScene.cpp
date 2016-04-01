@@ -75,8 +75,10 @@ bool PointsCalculatorScene::init() {
     infoWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 80));
 
     _pointsAreaNode = Node::create();
-    this->addChild(_pointsAreaNode);
     _pointsAreaNode->setContentSize(Size(visibleSize.width, y - 140));
+    _pointsAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    this->addChild(_pointsAreaNode);
+    _pointsAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + y * 0.5f - 70));
 
     Label *flowerLabel = Label::createWithSystemFont("花牌数", "Arial", 12);
     infoWidget->addChild(flowerLabel);
