@@ -318,6 +318,7 @@ void TilePickWidget::refreshActionButtons() {
             _pungButton->setEnabled(true);
             break;
         default:
+            assert(_handTilesTable[tile] < 3);
             _meldedKongButton->setEnabled(false);
             _concealedKongButton->setEnabled(false);
             _pungButton->setEnabled(false);
@@ -373,6 +374,7 @@ void TilePickWidget::refreshHandTiles() {
 
     std::vector<TILE> temp;
     temp.swap(_tiles);
+    memset(_handTilesTable, 0, sizeof(_handTilesTable));
     std::for_each(temp.begin(), temp.end(), std::bind(&TilePickWidget::addOneTile, this, std::placeholders::_1, false));
     refreshActionButtons();
 }
