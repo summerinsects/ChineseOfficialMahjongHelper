@@ -965,8 +965,14 @@ static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_ta
     }
 }
 
-// 检测大于五、小于五、全大、全中、全小、断幺
+// 检测大于五、小于五、全大、全中、全小
 static void check_tiles_rank_range(const TILE *tiles, long tile_cnt, long (&points_table)[FLOWER_TILES]) {
+#ifdef STRICT_98_RULE
+    if (points_table[SEVEN_PAIRS]) {
+        return;
+    }
+#endif
+
     // 打表
     uint16_t rank_flag = 0;
     for (long i = 0; i < tile_cnt; ++i) {
@@ -976,32 +982,6 @@ static void check_tiles_rank_range(const TILE *tiles, long tile_cnt, long (&poin
         }
         rank_flag |= (1 << tile_rank(tiles[i]));
     }
-
-    // 1111 1110 0000 0011
-    // 检测是否缺少1和9
-    if (!(rank_flag & 0xFE03)) {
-#ifdef STRICT_98_RULE
-        if (points_table[SEVEN_PAIRS]) {
-            points_table[ALL_SIMPLES] = 1;
-            return;
-        }
-#else
-        // 1111 1111 1000 1111
-        // 检测是否缺少2478
-        if (!(rank_flag & 0xFF8F)) {
-            points_table[MIDDLE_TILES] = 1;
-        }
-        else {
-            points_table[ALL_SIMPLES] = 1;
-        }
-#endif
-    }
-
-#ifdef STRICT_98_RULE
-    if (points_table[SEVEN_PAIRS]) {
-        return;
-    }
-#endif
 
     // 1111 1111 1110 0001
     // 检测是否缺少56789
@@ -1013,6 +993,11 @@ static void check_tiles_rank_range(const TILE *tiles, long tile_cnt, long (&poin
     else if (!(rank_flag & 0xFC3F)) {
         // no 6 ?
         points_table[rank_flag & 0x0040 ? UPPER_FOUR : UPPER_TILES] = 1;
+    }
+    // 1111 1111 1000 1111
+    // 检测是否缺少2478
+    else if (!(rank_flag & 0xFF8F)) {
+        points_table[MIDDLE_TILES] = 1;
     }
 }
 
@@ -1065,29 +1050,41 @@ static void check_tiles_rank_by_set(const SET (&sets)[5], long (&points_table)[F
     }
 }
 
-// 检测推不倒、绿一色、清幺九、混幺九
+// 检测断幺、推不倒、绿一色、清幺九、混幺九
 static void check_tiles_traits(const TILE *tiles, long tile_cnt, long (&points_table)[FLOWER_TILES]) {
+    if (!std::any_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
+        points_table[ALL_SIMPLES] = 1;
+    }
+
     if (std::all_of(tiles, tiles + tile_cnt, &is_reversible_tile)) {
         points_table[REVERSIBLE_TILES] = 1;
     }
+
 #ifdef STRICT_98_RULE
     if (points_table[SEVEN_PAIRS]) {
         return;
     }
 #endif
+
     if (std::all_of(tiles, tiles + tile_cnt, &is_green)) {
         points_table[ALL_GREEN] = 1;
     }
 
+    if (points_table[ALL_SIMPLES] != 0) {
+        return;
+    }
+
     if (std::all_of(tiles, tiles + tile_cnt, &is_honor)) {
         points_table[ALL_HONORS] = 1;
+        return;
     }
 
     if (std::all_of(tiles, tiles + tile_cnt, &is_terminal)) {
         points_table[ALL_TERMINALS] = 1;
+        return;
     }
 
-    if (!points_table[ALL_HONORS] && !points_table[ALL_TERMINALS] && std::all_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
+    if (std::all_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
         points_table[ALL_TERMINALS_AND_HONORS] = 1;
     }
 }
@@ -1521,9 +1518,9 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
 
     check_tiles_rank_by_set(sets, points_table);
 
+    check_tiles_suits(tiles, tile_cnt, points_table);
     check_tiles_traits(tiles, tile_cnt, points_table);
     check_tiles_rank_range(tiles, tile_cnt, points_table);
-    check_tiles_suits(tiles, tile_cnt, points_table);
     check_tiles_hog(tiles, tile_cnt, points_table);
     check_edge_closed_single_wait(sets + fixed_cnt, 5 - fixed_cnt, win_tile, points_table);
 
@@ -1555,14 +1552,14 @@ static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN
             && concealed_tiles[10] + 1 == concealed_tiles[12]) {
             points_table[SEVEN_SHIFTED_PAIRS] = 1;
 
-            check_tiles_rank_range(concealed_tiles, 14, points_table);
+            check_tiles_traits(concealed_tiles, 14, points_table);
         }
         else {
             points_table[SEVEN_PAIRS] = 1;
 
+            check_tiles_suits(concealed_tiles, 14, points_table);
             check_tiles_traits(concealed_tiles, 14, points_table);
             check_tiles_rank_range(concealed_tiles, 14, points_table);
-            check_tiles_suits(concealed_tiles, 14, points_table);
             check_tiles_hog(concealed_tiles, 14, points_table);
         }
     }
@@ -1694,9 +1691,9 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
         points_table[CONCEALED_HAND] = 1;
     }
 
+    check_tiles_suits(concealed_tiles, 14, points_table);
     check_tiles_traits(concealed_tiles, 14, points_table);
     check_tiles_rank_range(concealed_tiles, 14, points_table);
-    check_tiles_suits(concealed_tiles, 14, points_table);
     check_tiles_hog(concealed_tiles, 14, points_table);
 
     // 和组合龙范围的牌，不算边坎钓
