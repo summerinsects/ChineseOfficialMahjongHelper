@@ -19,17 +19,17 @@ static inline bool isButtonChecked(ui::Button *button) {
     return button->getTag() == 1;
 }
 
-Scene *RecordScene::createScene(int index, const char **name, const std::function<void (RecordScene *)> &okCallback) {
+Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const std::function<void (RecordScene *)> &okCallback) {
     auto scene = Scene::create();
     auto layer = new (std::nothrow) RecordScene();
-    layer->initWithIndex(index, name);
+    layer->initWithIndex(handIdx, playerNames);
     layer->_okCallback = okCallback;
 
     scene->addChild(layer);
     return scene;
 }
 
-bool RecordScene::initWithIndex(int index, const char **name) {
+bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     if (!Layer::init()) {
         return false;
     }
@@ -58,7 +58,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
 
     const char *handText[] = { "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
         "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北" };
-    Label *tileLabel = Label::createWithSystemFont(handText[index], "Arial", 18);
+    Label *tileLabel = Label::createWithSystemFont(handText[handIdx], "Arial", 18);
     this->addChild(tileLabel);
     tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
         origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
@@ -104,7 +104,7 @@ bool RecordScene::initWithIndex(int index, const char **name) {
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float x = origin.x + gap * (i + 0.5f);
-        _nameLabel[i] = Label::createWithSystemFont(name[i], "Arial", 12);
+        _nameLabel[i] = Label::createWithSystemFont(playerNames[i], "Arial", 12);
         _nameLabel[i]->setColor(Color3B::YELLOW);
         this->addChild(_nameLabel[i]);
         _nameLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
@@ -188,14 +188,12 @@ bool RecordScene::initWithIndex(int index, const char **name) {
         label->setPosition(Vec2(5.0f, y - 7.0f));
         y -= 14.0f;
 
-        div_t ret = div(counts[i], 4);
-        int row = ret.quot + (ret.rem == 0 ? 0 : 1);
         for (size_t k = 0; k < counts[i]; ++k) {
             size_t col = k % 4;
             if (k > 0 && col == 0) {
                 y -= 24.0f;
             }
-            unsigned idx = beginIndex[i] + k;
+            size_t idx = beginIndex[i] + k;
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             innerNode->addChild(button);
             button->setScale9Enabled(true);

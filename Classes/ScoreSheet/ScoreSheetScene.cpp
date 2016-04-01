@@ -14,7 +14,7 @@ USING_NS_CC;
 static char g_name[4][255];
 static int g_scores[16][4];
 static uint64_t g_pointsFlag[16];
-static int g_currentIndex;
+static size_t g_currentIndex;
 static time_t g_startTime;
 static time_t g_endTime;
 
@@ -209,7 +209,7 @@ static void readFromJson() {
             if (vec.size() == 4) {
                 for (int i = 0; i < 4; ++i) {
                     char *str = nullptr;
-                    base64Decode((const unsigned char *)vec[i].c_str(), vec[i].length(), (unsigned char **)&str);
+                    base64Decode((const unsigned char *)vec[i].c_str(), (unsigned)vec[i].length(), (unsigned char **)&str);
                     strncpy(g_name[i], str, sizeof(g_name[i]));
                     free(str);
                 }
@@ -219,7 +219,7 @@ static void readFromJson() {
         if (it != json.end()) {
             auto vec = it->as<std::vector<std::vector<int> > >();
             g_currentIndex = vec.size();
-            for (int i = 0; i < g_currentIndex; ++i) {
+            for (size_t i = 0; i < g_currentIndex; ++i) {
                 memcpy(g_scores[i], &vec[i][0], sizeof(g_scores[i]));
             }
         }
@@ -248,7 +248,7 @@ static void writeToJson() {
         std::vector<std::string> nameVec;
         for (int i = 0; i < 4; ++i) {
             char *base64Name = nullptr;
-            base64Encode((const unsigned char *)g_name[i], strlen(g_name[i]) + 1, &base64Name);
+            base64Encode((const unsigned char *)g_name[i], (unsigned)strlen(g_name[i]) + 1, &base64Name);
             nameVec.push_back(base64Name);
             free(base64Name);
         }
@@ -256,7 +256,7 @@ static void writeToJson() {
 
         std::vector<std::vector<int> > scoreVec;
         scoreVec.reserve(16);
-        for (int k = 0; k < g_currentIndex; ++k) {
+        for (size_t k = 0; k < g_currentIndex; ++k) {
             scoreVec.push_back(std::vector<int>({ g_scores[k][0], g_scores[k][1], g_scores[k][2], g_scores[k][3] }));
         }
         json.insert(std::make_pair("record", std::move(scoreVec)));
@@ -284,29 +284,29 @@ static void writeToJson() {
     }
 }
 
-void ScoreSheetScene::fillRow(int index) {
+void ScoreSheetScene::fillRow(size_t handIdx) {
     for (int i = 0; i < 4; ++i) {
-        _scoreLabels[index][i]->setString(StringUtils::format("%+d", g_scores[index][i]));
-        _totalScores[i] += g_scores[index][i];
-        if (g_scores[index][i] > 0) {
-            _scoreLabels[index][i]->setColor(Color3B::RED);
+        _scoreLabels[handIdx][i]->setString(StringUtils::format("%+d", g_scores[handIdx][i]));
+        _totalScores[i] += g_scores[handIdx][i];
+        if (g_scores[handIdx][i] > 0) {
+            _scoreLabels[handIdx][i]->setColor(Color3B::RED);
         }
-        else if (g_scores[index][i] < 0) {
-            _scoreLabels[index][i]->setColor(Color3B::GREEN);
+        else if (g_scores[handIdx][i] < 0) {
+            _scoreLabels[handIdx][i]->setColor(Color3B::GREEN);
         }
         else {
-            _scoreLabels[index][i]->setColor(Color3B::GRAY);
+            _scoreLabels[handIdx][i]->setColor(Color3B::GRAY);
         }
     }
 
-    _recordButton[index]->setVisible(false);
-    _recordButton[index]->setEnabled(false);
+    _recordButton[handIdx]->setVisible(false);
+    _recordButton[handIdx]->setEnabled(false);
 
-    if (g_pointsFlag[index] != 0) {
+    if (g_pointsFlag[handIdx] != 0) {
         for (unsigned n = 0; n < 64; ++n) {
-            if ((1ULL << n) & g_pointsFlag[index]) {
-                _pointNameLabel[index]->setString(points_name[n]);
-                _pointNameLabel[index]->setVisible(true);
+            if ((1ULL << n) & g_pointsFlag[handIdx]) {
+                _pointNameLabel[handIdx]->setString(points_name[n]);
+                _pointNameLabel[handIdx]->setVisible(true);
                 break;
             }
         }
@@ -362,7 +362,7 @@ void ScoreSheetScene::recover() {
 
     memset(_totalScores, 0, sizeof(_totalScores));
 
-    for (int k = 0; k < g_currentIndex; ++k) {
+    for (size_t k = 0; k < g_currentIndex; ++k) {
         fillRow(k);
     }
 
@@ -441,15 +441,15 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
     refreshStartTime();
 }
 
-void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, int index) {
+void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, size_t handIdx) {
     const char *name[] = { g_name[0], g_name[1], g_name[2], g_name[3] };
-    Director::getInstance()->pushScene(RecordScene::createScene(index, name, [this, index](RecordScene *scene) {
-        if (index != g_currentIndex) return;
+    Director::getInstance()->pushScene(RecordScene::createScene(handIdx, name, [this, handIdx](RecordScene *scene) {
+        if (handIdx != g_currentIndex) return;
 
-        memcpy(g_scores[index], scene->getScoreTable(), sizeof(g_scores[index]));
-        g_pointsFlag[index] = scene->getPointsFlag();
+        memcpy(g_scores[handIdx], scene->getScoreTable(), sizeof(g_scores[handIdx]));
+        g_pointsFlag[handIdx] = scene->getPointsFlag();
 
-        fillRow(index);
+        fillRow(handIdx);
 
         for (int i = 0; i < 4; ++i) {
             _totalLabel[i]->setString(StringUtils::format("%+d", _totalScores[i]));

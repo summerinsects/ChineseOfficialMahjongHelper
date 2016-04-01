@@ -6,9 +6,9 @@
 
 class RecordScene : public cocos2d::Layer, public cocos2d::ui::EditBoxDelegate {
 public:
-    static cocos2d::Scene *createScene(int index, const char **name, const std::function<void (RecordScene *)> &okCallback);
+    static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const std::function<void (RecordScene *)> &okCallback);
 
-    bool initWithIndex(int index, const char **name);
+    bool initWithIndex(size_t handIdx, const char **playerNames);
 
     virtual void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent) override;
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;

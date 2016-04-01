@@ -24,13 +24,13 @@ private:
     cocos2d::Label *_pointNameLabel[16];
     cocos2d::Label *_timeLabel;
 
-    void fillRow(int index);
+    void fillRow(size_t handIdx);
     void refreshStartTime();
     void refreshEndTime();
     void recover();
     void reset();
     void lockCallback(cocos2d::Ref *sender);
-    void recordCallback(cocos2d::Ref *sender, int index);
+    void recordCallback(cocos2d::Ref *sender, size_t handIdx);
     void timeScheduler(float dt);
 };
 
