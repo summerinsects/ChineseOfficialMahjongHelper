@@ -31,8 +31,6 @@ private:
     cocos2d::ui::Button *_lastTileDrawnButton = nullptr;
     cocos2d::ui::Button *_lastTileClaimButton = nullptr;
 
-    float _pointsAreaTop;
-    float _pointsAreaBottom;
     cocos2d::Node *_pointsAreaNode = nullptr;
 };
 
