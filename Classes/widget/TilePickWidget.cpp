@@ -35,7 +35,7 @@ bool TilePickWidget::init() {
     _highlightBox->drawLine(Vec2(27, 39), Vec2(0, 39), Color4F::RED);
     _highlightBox->drawLine(Vec2(0, 39), Vec2(0, 0), Color4F::RED);
     _tilesWidget->addChild(_highlightBox, 2);
-    _highlightBox->setPosition(Vec2(27 * 0.5f + 2, 39 * 0.5f + 2));
+    _highlightBox->setPosition(calcHandTilePos(0));
 
     // 一个直杠的宽度：39 + 27 * 3 = 120
     // 两个直杠的宽度：120 * 2 = 240
