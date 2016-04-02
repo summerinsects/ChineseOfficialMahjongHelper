@@ -266,26 +266,72 @@ void TilePickWidget::addOneTile(TILE tile, bool isWinTile) {
         _tileButtons.push_back(button);
         _tiles.push_back(tile);
         ++_handTilesTable[tile];
+        _currentIdx = tilesCnt + 1;
     }
     else {
+        button->setPosition(Vec2(pos.x + 4, pos.y));
         _winTileButton = button;
         _winTile = tile;
-        _winTileButton->setPosition(Vec2(pos.x + 4, pos.y));
     }
 
     button->addClickEventListener([this, tilesCnt](Ref *) {
         _currentIdx = tilesCnt;
         refreshActionButtons();
     });
-    _currentIdx = tilesCnt;
+}
+
+void TilePickWidget::replaceOneTile(TILE tile, bool isWinTile) {
+    ui::Button *button = ui::Button::create(imageName[tile]);
+    button->setScale(27 / button->getContentSize().width);
+    _tilesWidget->addChild(button);
+    button->setTag(tile);
+
+    TILE prevTile;
+    size_t currentIdx = _currentIdx;
+    if (!isWinTile) {
+        button->setPosition(_tileButtons[_currentIdx]->getPosition());
+        _tilesWidget->removeChild(_tileButtons[_currentIdx]);
+        _tileButtons[_currentIdx] = button;
+
+        prevTile = _tiles[_currentIdx];
+        --_handTilesTable[prevTile];
+
+        _tiles[_currentIdx] = tile;
+        ++_handTilesTable[tile];
+
+        ++_currentIdx;
+    }
+    else {
+        button->setPosition(_winTileButton->getPosition());
+        _tilesWidget->removeChild(_winTileButton);
+        _winTileButton = button;
+
+        prevTile = _winTile;
+        _winTile = tile;
+    }
+
+    button->addClickEventListener([this, currentIdx](Ref *) {
+        _currentIdx = currentIdx;
+        refreshActionButtons();
+    });
+
+    --_totalTilesTable[prevTile];
+    SUIT_TYPE suit = tile_suit(prevTile);
+    RANK_TYPE rank = tile_rank(prevTile);
+    switch (suit) {
+    case TILE_SUIT_CHARACTERS: _characterButtons[rank - 1]->setEnabled(true); break;
+    case TILE_SUIT_BAMBOO: _bambooButtons[rank - 1]->setEnabled(true); break;
+    case TILE_SUIT_DOTS: _dotsButtons[rank - 1]->setEnabled(true); break;
+    case TILE_SUIT_WINDS: _honorButtons[rank - 1]->setEnabled(true); break;
+    case TILE_SUIT_DRAGONS: _honorButtons[rank + 3]->setEnabled(true); break;
+    default: break;
+    }
 }
 
 void TilePickWidget::tileTableCallback(cocos2d::Ref *sender, TILE tile) {
     size_t tilesCnt = _tiles.size();
-    size_t cnt = _fixedSets.size() * 3 + tilesCnt;
-    if (cnt == 13 && _winTile != 0) {
-        return;
-    }
+    size_t maxCnt = 13 - _fixedSets.size() * 3;
+
     if (++_totalTilesTable[tile] >= 4) {
         SUIT_TYPE suit = tile_suit(tile);
         RANK_TYPE rank = tile_rank(tile);
@@ -298,17 +344,39 @@ void TilePickWidget::tileTableCallback(cocos2d::Ref *sender, TILE tile) {
         default: break;
         }
     }
-    addOneTile(tile, cnt == 13);
-    refreshActionButtons();
+
+    if (_currentIdx >= _tiles.size() && _winTileButton == nullptr) {
+        addOneTile(tile, _currentIdx == maxCnt);
+        refreshActionButtons();
+    }
+    else {
+        if (_currentIdx != maxCnt) {
+            TILE prevTile = _tiles[_currentIdx];
+            if (prevTile != tile) {
+                replaceOneTile(tile, false);
+                refreshActionButtons();
+            }
+        }
+        else {
+            TILE prevTile = _winTile;
+            if (prevTile != tile) {
+                replaceOneTile(tile, true);
+                refreshActionButtons();
+            }
+        }
+    }
 }
 
 void TilePickWidget::refreshActionButtons() {
     if (_currentIdx >= _tiles.size()) {
-        if (_winTileButton == nullptr) {
-            _highlightBox->setPosition(calcHandTilePos(_tiles.size()));
+        size_t tilesCnt = _tiles.size();
+        size_t maxCnt = 13 - _fixedSets.size() * 3;
+        Vec2 pos = calcHandTilePos(_tiles.size());
+        if (_currentIdx != maxCnt) {
+            _highlightBox->setPosition(pos);
         }
         else {
-            _highlightBox->setPosition(_winTileButton->getPosition());
+            _highlightBox->setPosition(Vec2(pos.x + 4, pos.y));
         }
 
         _chowLessButton->setEnabled(false);
@@ -380,6 +448,10 @@ void TilePickWidget::refreshAfterAction(int meldedIdx) {
     }
 
     refreshHandTiles();
+    if (_winTileButton != nullptr) {
+        pos = calcHandTilePos(13 - _fixedSets.size() * 3);
+        _winTileButton->setPosition(Vec2(pos.x + 4, pos.y));
+    }
 }
 
 void TilePickWidget::refreshHandTiles() {
