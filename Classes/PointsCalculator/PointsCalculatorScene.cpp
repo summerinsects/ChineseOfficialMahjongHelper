@@ -80,80 +80,12 @@ bool PointsCalculatorScene::init() {
     this->addChild(_pointsAreaNode);
     _pointsAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + y * 0.5f - 70));
 
-    Label *flowerLabel = Label::createWithSystemFont("花牌数", "Arial", 12);
-    infoWidget->addChild(flowerLabel);
-    flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    flowerLabel->setPosition(Vec2(visibleSize.width - 50, 105.0f));
-
-    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
-    infoWidget->addChild(_editBox);
-    _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    _editBox->setFontColor(Color4B::BLACK);
-    _editBox->setFontSize(12);
-    _editBox->setText("0");
-    _editBox->setPosition(Vec2(visibleSize.width - 30, 105.0f));
-
-    ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(35.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("算番");
-    button->setTitleColor(Color3B::BLACK);
-    infoWidget->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 30, 75.0f));
-    button->addClickEventListener([this](Ref *) { calculate(); });
-
-    const char *windName[4] = {"东", "南", "西", "北"};
-
-    Label *prevalentWindLabel = Label::createWithSystemFont("圈风", "Arial", 12);
-    infoWidget->addChild(prevalentWindLabel);
-    prevalentWindLabel->setPosition(Vec2(20.0f, 105.0f));
-
-    for (int i = 0; i < 4; ++i) {
-        _prevalentButton[i] = ui::Button::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png");
-        infoWidget->addChild(_prevalentButton[i]);
-        _prevalentButton[i]->setScale9Enabled(true);
-        _prevalentButton[i]->setContentSize(Size(20.0f, 20.0f));
-        _prevalentButton[i]->setTitleColor(Color3B::BLACK);
-        _prevalentButton[i]->setTitleFontSize(12);
-        _prevalentButton[i]->setTitleText(windName[i]);
-        _prevalentButton[i]->setPosition(Vec2(50.0f + i * 30, 105.0f));
-        _prevalentButton[i]->addClickEventListener([this, i](Ref *) {
-            for (int n = 0; n < 4; ++n) {
-                _prevalentButton[n]->setEnabled(n != i);
-            }
-        });
-    }
-    _prevalentButton[0]->setEnabled(false);
-
-    Label *seatWindLabel = Label::createWithSystemFont("门风", "Arial", 12);
-    infoWidget->addChild(seatWindLabel);
-    seatWindLabel->setPosition(Vec2(20.0f, 75.0f));
-
-    for (int i = 0; i < 4; ++i) {
-        _seatButton[i] = ui::Button::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png");
-        infoWidget->addChild(_seatButton[i]);
-        _seatButton[i]->setScale9Enabled(true);
-        _seatButton[i]->setContentSize(Size(20.0f, 20.0f));
-        _seatButton[i]->setTitleColor(Color3B::BLACK);
-        _seatButton[i]->setTitleFontSize(12);
-        _seatButton[i]->setTitleText(windName[i]);
-        _seatButton[i]->setPosition(Vec2(50.0f + i * 30, 75.0f));
-        _seatButton[i]->addClickEventListener([this, i](Ref *) {
-            for (int n = 0; n < 4; ++n) {
-                _seatButton[n]->setEnabled(n != i);
-            }
-        });
-    }
-    _seatButton[0]->setEnabled(false);
-
     float gapX = (visibleSize.width - 8) * 0.25f;
     _byDiscardButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     infoWidget->addChild(_byDiscardButton);
     _byDiscardButton->setScale9Enabled(true);
     _byDiscardButton->setContentSize(Size(20.0f, 20.0f));
-    _byDiscardButton->setPosition(Vec2(20.0f, 45.0f));
+    _byDiscardButton->setPosition(Vec2(20.0f, 105.0f));
     setButtonChecked(_byDiscardButton);
     _byDiscardButton->addClickEventListener([this](Ref *) {
         if (isButtonChecked(_byDiscardButton)) {
@@ -170,13 +102,13 @@ bool PointsCalculatorScene::init() {
     Label *byDiscardLabel = Label::createWithSystemFont("点和", "Arial", 12);
     infoWidget->addChild(byDiscardLabel);
     byDiscardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    byDiscardLabel->setPosition(Vec2(35.0f, 45.0f));
+    byDiscardLabel->setPosition(Vec2(35.0f, 105.0f));
 
     _selfDrawnButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     infoWidget->addChild(_selfDrawnButton);
     _selfDrawnButton->setScale9Enabled(true);
     _selfDrawnButton->setContentSize(Size(20.0f, 20.0f));
-    _selfDrawnButton->setPosition(Vec2(20.0f + gapX, 45.0f));
+    _selfDrawnButton->setPosition(Vec2(20.0f + gapX, 105.0f));
     setButtonUnchecked(_selfDrawnButton);
     _selfDrawnButton->addClickEventListener([this](Ref *) {
         if (isButtonChecked(_selfDrawnButton)) {
@@ -193,13 +125,13 @@ bool PointsCalculatorScene::init() {
     Label *selfDrawnLabel = Label::createWithSystemFont("自摸", "Arial", 12);
     infoWidget->addChild(selfDrawnLabel);
     selfDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    selfDrawnLabel->setPosition(Vec2(35.0f + gapX, 45.0f));
+    selfDrawnLabel->setPosition(Vec2(35.0f + gapX, 105.0f));
 
     _fourthTileButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     infoWidget->addChild(_fourthTileButton);
     _fourthTileButton->setScale9Enabled(true);
     _fourthTileButton->setContentSize(Size(20.0f, 20.0f));
-    _fourthTileButton->setPosition(Vec2(20.0f + gapX * 2, 45.0f));
+    _fourthTileButton->setPosition(Vec2(20.0f + gapX * 2, 105.0f));
     setButtonUnchecked(_fourthTileButton);
     _fourthTileButton->addClickEventListener([this](Ref *) {
         if (isButtonChecked(_fourthTileButton)) {
@@ -214,13 +146,13 @@ bool PointsCalculatorScene::init() {
     Label *fourthTileLabel = Label::createWithSystemFont("绝张", "Arial", 12);
     infoWidget->addChild(fourthTileLabel);
     fourthTileLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    fourthTileLabel->setPosition(Vec2(35.0f + gapX * 2, 45.0f));
+    fourthTileLabel->setPosition(Vec2(35.0f + gapX * 2, 105.0f));
 
     _replacementButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     infoWidget->addChild(_replacementButton);
     _replacementButton->setScale9Enabled(true);
     _replacementButton->setContentSize(Size(20.0f, 20.0f));
-    _replacementButton->setPosition(Vec2(20.0f, 15.0f));
+    _replacementButton->setPosition(Vec2(20.0f, 75.0f));
     setButtonUnchecked(_replacementButton);
     _replacementButton->addClickEventListener([this](Ref *) {
         if (isButtonChecked(_replacementButton)) {
@@ -236,13 +168,13 @@ bool PointsCalculatorScene::init() {
     Label *replacementLabel = Label::createWithSystemFont("杠开", "Arial", 12);
     infoWidget->addChild(replacementLabel);
     replacementLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    replacementLabel->setPosition(Vec2(35.0f, 15.0f));
+    replacementLabel->setPosition(Vec2(35.0f, 75.0f));
 
     _robKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     infoWidget->addChild(_robKongButton);
     _robKongButton->setScale9Enabled(true);
     _robKongButton->setContentSize(Size(20.0f, 20.0f));
-    _robKongButton->setPosition(Vec2(20.0f + gapX, 15.0f));
+    _robKongButton->setPosition(Vec2(20.0f + gapX, 75.0f));
     setButtonUnchecked(_robKongButton);
     _robKongButton->addClickEventListener([this](Ref *) {
         if (isButtonChecked(_robKongButton)) {
@@ -260,13 +192,13 @@ bool PointsCalculatorScene::init() {
     Label *robKongLabel = Label::createWithSystemFont("抢杠", "Arial", 12);
     infoWidget->addChild(robKongLabel);
     robKongLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    robKongLabel->setPosition(Vec2(35.0f + gapX, 15.0f));
+    robKongLabel->setPosition(Vec2(35.0f + gapX, 75.0f));
 
     _lastTileDrawnButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     infoWidget->addChild(_lastTileDrawnButton);
     _lastTileDrawnButton->setScale9Enabled(true);
     _lastTileDrawnButton->setContentSize(Size(20.0f, 20.0f));
-    _lastTileDrawnButton->setPosition(Vec2(20.0f + gapX * 2, 15.0f));
+    _lastTileDrawnButton->setPosition(Vec2(20.0f + gapX * 2, 75.0f));
     setButtonUnchecked(_lastTileDrawnButton);
     _lastTileDrawnButton->addClickEventListener([this](Ref *) {
         if (isButtonChecked(_lastTileDrawnButton)) {
@@ -284,13 +216,13 @@ bool PointsCalculatorScene::init() {
     Label *lastTileDrawnLabel = Label::createWithSystemFont("妙手", "Arial", 12);
     infoWidget->addChild(lastTileDrawnLabel);
     lastTileDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    lastTileDrawnLabel->setPosition(Vec2(35.0f + gapX * 2, 15.0f));
+    lastTileDrawnLabel->setPosition(Vec2(35.0f + gapX * 2, 75.0f));
 
     _lastTileClaimButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     infoWidget->addChild(_lastTileClaimButton);
     _lastTileClaimButton->setScale9Enabled(true);
     _lastTileClaimButton->setContentSize(Size(20.0f, 20.0f));
-    _lastTileClaimButton->setPosition(Vec2(20.0f + gapX * 3, 15.0f));
+    _lastTileClaimButton->setPosition(Vec2(20.0f + gapX * 3, 75.0f));
     setButtonUnchecked(_lastTileClaimButton);
     _lastTileClaimButton->addClickEventListener([this](Ref *) {
         if (isButtonChecked(_lastTileClaimButton)) {
@@ -308,7 +240,75 @@ bool PointsCalculatorScene::init() {
     Label *lastTileClaimLabel = Label::createWithSystemFont("海底", "Arial", 12);
     infoWidget->addChild(lastTileClaimLabel);
     lastTileClaimLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    lastTileClaimLabel->setPosition(Vec2(35.0f + gapX * 3, 15.0f));
+    lastTileClaimLabel->setPosition(Vec2(35.0f + gapX * 3, 75.0f));
+
+    const char *windName[4] = { "东", "南", "西", "北" };
+
+    Label *prevalentWindLabel = Label::createWithSystemFont("圈风", "Arial", 12);
+    infoWidget->addChild(prevalentWindLabel);
+    prevalentWindLabel->setPosition(Vec2(20.0f, 45.0f));
+
+    for (int i = 0; i < 4; ++i) {
+        _prevalentButton[i] = ui::Button::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png");
+        infoWidget->addChild(_prevalentButton[i]);
+        _prevalentButton[i]->setScale9Enabled(true);
+        _prevalentButton[i]->setContentSize(Size(20.0f, 20.0f));
+        _prevalentButton[i]->setTitleColor(Color3B::BLACK);
+        _prevalentButton[i]->setTitleFontSize(12);
+        _prevalentButton[i]->setTitleText(windName[i]);
+        _prevalentButton[i]->setPosition(Vec2(50.0f + i * 30, 45.0f));
+        _prevalentButton[i]->addClickEventListener([this, i](Ref *) {
+            for (int n = 0; n < 4; ++n) {
+                _prevalentButton[n]->setEnabled(n != i);
+            }
+        });
+    }
+    _prevalentButton[0]->setEnabled(false);
+
+    Label *seatWindLabel = Label::createWithSystemFont("门风", "Arial", 12);
+    infoWidget->addChild(seatWindLabel);
+    seatWindLabel->setPosition(Vec2(20.0f, 15.0f));
+
+    for (int i = 0; i < 4; ++i) {
+        _seatButton[i] = ui::Button::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png");
+        infoWidget->addChild(_seatButton[i]);
+        _seatButton[i]->setScale9Enabled(true);
+        _seatButton[i]->setContentSize(Size(20.0f, 20.0f));
+        _seatButton[i]->setTitleColor(Color3B::BLACK);
+        _seatButton[i]->setTitleFontSize(12);
+        _seatButton[i]->setTitleText(windName[i]);
+        _seatButton[i]->setPosition(Vec2(50.0f + i * 30, 15.0f));
+        _seatButton[i]->addClickEventListener([this, i](Ref *) {
+            for (int n = 0; n < 4; ++n) {
+                _seatButton[n]->setEnabled(n != i);
+            }
+        });
+    }
+    _seatButton[0]->setEnabled(false);
+
+    Label *flowerLabel = Label::createWithSystemFont("花牌数", "Arial", 12);
+    infoWidget->addChild(flowerLabel);
+    flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+    flowerLabel->setPosition(Vec2(visibleSize.width - 50, 45.0f));
+
+    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
+    infoWidget->addChild(_editBox);
+    _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+    _editBox->setFontColor(Color4B::BLACK);
+    _editBox->setFontSize(12);
+    _editBox->setText("0");
+    _editBox->setPosition(Vec2(visibleSize.width - 30, 45.0f));
+
+    ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("算番");
+    button->setTitleColor(Color3B::BLACK);
+    infoWidget->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 30, 15.0f));
+    button->addClickEventListener([this](Ref *) { calculate(); });
 
     return true;
 }
