@@ -62,7 +62,8 @@ enum POINT_TYPE {
     OUTSIDE_HAND, FULLY_CONCEALED_HAND, TWO_MELDED_KONGS, LAST_TILE,
     DRAGON_PUNG, PREVALENT_WIND, SEAT_WIND, CONCEALED_HAND, ALL_CHOWS, TILE_HOG, DOUBLE_PUNG, TWO_CONCEALED_PUNGS, CONCEALED_KONG, ALL_SIMPLES,
     PURE_DOUBLE_CHOW, MIXED_DOUBLE_CHOW, SHORT_STRAIGHT, TWO_TERMINAL_CHOWS, PUNG_OF_TERMINALS_OR_HONORS, MELDED_KONG, ONE_VOIDED_SUIT, NO_HONORS, EDGE_WAIT, CLOSED_WAIT, SINGLE_WAIT, SELF_DRAWN,
-    FLOWER_TILES
+    FLOWER_TILES,
+    POINT_TYPE_COUNT
 };
 
 enum class WIND_TYPE {
@@ -82,8 +83,8 @@ typedef uint8_t WIN_TYPE;
 #define ERROR_WRONG_TILES_COUNT -1
 #define ERROR_NOT_WIN -2
 
-int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed_tiles, long concealed_cnt, TILE win_tile, WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long *points_table);
-
+int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed_tiles, long concealed_cnt, TILE win_tile,
+    WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]);
 
 #if 0
 
@@ -130,7 +131,7 @@ static const char *points_name[] = {
 
 #endif
 
-static const int points_value_table[FLOWER_TILES + 1] = {
+static const int points_value_table[POINT_TYPE_COUNT] = {
     0,
     88, 88, 88, 88, 88, 88, 88,
     64, 64, 64, 64, 64, 64,

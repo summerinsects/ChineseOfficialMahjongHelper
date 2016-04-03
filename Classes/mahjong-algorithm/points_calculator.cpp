@@ -399,7 +399,7 @@ static POINT_TYPE *pairwise_test_chows(const SET (&chows_sets)[_Size], POINT_TYP
 }
 
 // 4组顺子算番
-static void calculate_4_chows(const SET chow_sets[4], long (&points_table)[FLOWER_TILES]) {
+static void calculate_4_chows(const SET chow_sets[4], long (&points_table)[POINT_TYPE_COUNT]) {
     // 复制并排序
     SET sets[4];
     memcpy(sets, chow_sets, sizeof(sets));
@@ -463,7 +463,7 @@ static void calculate_4_chows(const SET chow_sets[4], long (&points_table)[FLOWE
 }
 
 // 3组顺子算番
-static void calculate_3_chows(const SET chow_sets[3], long (&points_table)[FLOWER_TILES]) {
+static void calculate_3_chows(const SET chow_sets[3], long (&points_table)[POINT_TYPE_COUNT]) {
     // 复制并排序
     SET sets[3];
     memcpy(sets, chow_sets, sizeof(sets));
@@ -490,7 +490,7 @@ static void calculate_3_chows(const SET chow_sets[3], long (&points_table)[FLOWE
 }
 
 // 2组顺子算番
-static void calculate_2_chows(const SET chow_sets[2], long (&points_table)[FLOWER_TILES]) {
+static void calculate_2_chows(const SET chow_sets[2], long (&points_table)[POINT_TYPE_COUNT]) {
     const SET *sets = chow_sets;
     POINT_TYPE points;
     if ((points = get_2_chows_points(sets[0].mid_tile, sets[1].mid_tile)) != NONE) {
@@ -499,7 +499,7 @@ static void calculate_2_chows(const SET chow_sets[2], long (&points_table)[FLOWE
 }
 
 // 刻子（杠）算番
-static void calculate_kongs(const SET *pung_sets, long pung_cnt, long (&points_table)[FLOWER_TILES]) {
+static void calculate_kongs(const SET *pung_sets, long pung_cnt, long (&points_table)[POINT_TYPE_COUNT]) {
     // 统计明杠 暗杠 明刻 暗刻
     int melded_kong_cnt = 0;
     int concealed_kong_cnt = 0;
@@ -664,7 +664,7 @@ static void calculate_kongs(const SET *pung_sets, long pung_cnt, long (&points_t
 }
 
 // 4组刻子算番
-static void calculate_4_pungs(const SET pung_sets[4], long (&points_table)[FLOWER_TILES]) {
+static void calculate_4_pungs(const SET pung_sets[4], long (&points_table)[POINT_TYPE_COUNT]) {
     SET sets[4];
     memcpy(sets, pung_sets, sizeof(sets));
     std::sort(std::begin(sets), std::end(sets), [](const SET &set1, const SET &set2) {
@@ -749,7 +749,7 @@ static void calculate_4_pungs(const SET pung_sets[4], long (&points_table)[FLOWE
 }
 
 // 3组刻子算番
-static void calculate_3_pungs(const SET pung_sets[3], long (&points_table)[FLOWER_TILES]) {
+static void calculate_3_pungs(const SET pung_sets[3], long (&points_table)[POINT_TYPE_COUNT]) {
     SET sets[3];
     memcpy(sets, pung_sets, sizeof(sets));
     std::sort(std::begin(sets), std::end(sets), [](const SET &set1, const SET &set2) {
@@ -786,7 +786,7 @@ static void calculate_3_pungs(const SET pung_sets[3], long (&points_table)[FLOWE
 }
 
 // 2组刻子算番
-static void calculate_2_pungs(const SET pung_sets[2], long (&points_table)[FLOWER_TILES]) {
+static void calculate_2_pungs(const SET pung_sets[2], long (&points_table)[POINT_TYPE_COUNT]) {
     const SET *sets = pung_sets;
 
     calculate_kongs(sets, 2, points_table);
@@ -805,7 +805,7 @@ static void calculate_2_pungs(const SET pung_sets[2], long (&points_table)[FLOWE
 }
 
 // 1组刻子算番
-static void calculate_1_pung(const SET &pung_set, long (&points_table)[FLOWER_TILES]) {
+static void calculate_1_pung(const SET &pung_set, long (&points_table)[POINT_TYPE_COUNT]) {
     calculate_kongs(&pung_set, 1, points_table);
     POINT_TYPE points = get_1_pung_points(pung_set.mid_tile);
     if (points != NONE) {
@@ -880,7 +880,7 @@ static bool is_three_suited_terminal_chows(const SET (&chow_sets)[4], const SET 
 }
 
 // 检测不求人、全求人
-static void check_melded_or_concealed_hand(const SET (&sets)[5], long fixed_cnt, bool self_drawn, long (&points_table)[FLOWER_TILES]) {
+static void check_melded_or_concealed_hand(const SET (&sets)[5], long fixed_cnt, bool self_drawn, long (&points_table)[POINT_TYPE_COUNT]) {
     long melded_cnt = 0;
     for (long i = 0; i < fixed_cnt; ++i) {
         if (sets[i].is_melded) {
@@ -900,7 +900,7 @@ static void check_melded_or_concealed_hand(const SET (&sets)[5], long fixed_cnt,
 }
 
 // 检测平和、小三元、小四喜
-static void check_pair_tile(TILE pair_tile, long chow_cnt, long (&points_table)[FLOWER_TILES]) {
+static void check_pair_tile(TILE pair_tile, long chow_cnt, long (&points_table)[POINT_TYPE_COUNT]) {
     if (chow_cnt == 4) {
         if (is_numbered_suit_quick(pair_tile)) {
             points_table[ALL_CHOWS] = 1;
@@ -923,7 +923,7 @@ static void check_pair_tile(TILE pair_tile, long chow_cnt, long (&points_table)[
 }
 
 // 检测序数牌和字牌
-static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_table)[FLOWER_TILES]) {
+static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_table)[POINT_TYPE_COUNT]) {
     bool has_characters = false;
     bool has_bamboo = false;
     bool has_dots = false;
@@ -966,7 +966,7 @@ static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_ta
 }
 
 // 检测大于五、小于五、全大、全中、全小
-static void check_tiles_rank_range(const TILE *tiles, long tile_cnt, long (&points_table)[FLOWER_TILES]) {
+static void check_tiles_rank_range(const TILE *tiles, long tile_cnt, long (&points_table)[POINT_TYPE_COUNT]) {
 #ifdef STRICT_98_RULE
     if (points_table[SEVEN_PAIRS]) {
         return;
@@ -1002,7 +1002,7 @@ static void check_tiles_rank_range(const TILE *tiles, long tile_cnt, long (&poin
 }
 
 // 检测全带幺、全带五、全双刻
-static void check_tiles_rank_by_set(const SET (&sets)[5], long (&points_table)[FLOWER_TILES]) {
+static void check_tiles_rank_by_set(const SET (&sets)[5], long (&points_table)[POINT_TYPE_COUNT]) {
     int terminal_cnt = 0;
     int honor_cnt = 0;
     int _5_cnt = 0;
@@ -1051,7 +1051,7 @@ static void check_tiles_rank_by_set(const SET (&sets)[5], long (&points_table)[F
 }
 
 // 检测断幺、推不倒、绿一色、清幺九、混幺九
-static void check_tiles_traits(const TILE *tiles, long tile_cnt, long (&points_table)[FLOWER_TILES]) {
+static void check_tiles_traits(const TILE *tiles, long tile_cnt, long (&points_table)[POINT_TYPE_COUNT]) {
     if (!std::any_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
         points_table[ALL_SIMPLES] = 1;
     }
@@ -1090,7 +1090,7 @@ static void check_tiles_traits(const TILE *tiles, long tile_cnt, long (&points_t
 }
 
 // 检测四归一
-static void check_tiles_hog(const TILE *tiles, long tile_cnt, long (&points_table)[FLOWER_TILES]) {
+static void check_tiles_hog(const TILE *tiles, long tile_cnt, long (&points_table)[POINT_TYPE_COUNT]) {
     long kong_cnt = tile_cnt - 14;
     int cnt_table[0x54] = { 0 };
     for (long i = 0; i < tile_cnt; ++i) {
@@ -1101,7 +1101,7 @@ static void check_tiles_hog(const TILE *tiles, long tile_cnt, long (&points_tabl
 }
 
 // 检测边坎钓
-static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cnt, TILE win_tile, long (&points_table)[FLOWER_TILES]) {
+static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cnt, TILE win_tile, long (&points_table)[POINT_TYPE_COUNT]) {
     TILE concealed_tiles[14];
     long concealed_tile_cnt;
     recovery_tiles_from_sets(concealed_sets, set_cnt, concealed_tiles, &concealed_tile_cnt);
@@ -1182,7 +1182,7 @@ static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cn
 }
 
 // 检测圈风刻、门风刻
-static void check_wind_pungs(const SET &sets, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[FLOWER_TILES]) {
+static void check_wind_pungs(const SET &sets, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
     if (sets.set_type == SET_TYPE::PUNG || sets.set_type == SET_TYPE::KONG) {
         RANK_TYPE delta = sets.mid_tile - 0x41;
         if (delta == (int)prevalent_wind - (int)WIND_TYPE::EAST) {
@@ -1195,7 +1195,7 @@ static void check_wind_pungs(const SET &sets, WIND_TYPE prevalent_wind, WIND_TYP
 }
 
 // 统一校正
-static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
+static void correction_points_table(long (&points_table)[POINT_TYPE_COUNT]) {
     if (points_table[BIG_FOUR_WINDS]) {
         points_table[BIG_THREE_WINDS] = 0;
         points_table[ALL_PUNGS] = 0;
@@ -1429,7 +1429,7 @@ static void correction_points_table(long (&points_table)[FLOWER_TILES]) {
     }
 }
 
-static void check_win_type(WIN_TYPE win_type, long (&points_table)[FLOWER_TILES]) {
+static void check_win_type(WIN_TYPE win_type, long (&points_table)[POINT_TYPE_COUNT]) {
     if (win_type & WIN_TYPE_4TH_TILE) {
         points_table[LAST_TILE] = 1;
     }
@@ -1445,7 +1445,7 @@ static void check_win_type(WIN_TYPE win_type, long (&points_table)[FLOWER_TILES]
 }
 
 static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TILE win_tile, WIN_TYPE win_type,
-    WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[FLOWER_TILES]) {
+    WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
     SET pair_set;
     SET chow_sets[4];
     SET pung_sets[4];
@@ -1535,7 +1535,7 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
     }
 }
 
-static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN_TYPE win_type, long (&points_table)[FLOWER_TILES]) {
+static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN_TYPE win_type, long (&points_table)[POINT_TYPE_COUNT]) {
     if (concealed_tiles[0] == concealed_tiles[1]
         && concealed_tiles[2] == concealed_tiles[3]
         && concealed_tiles[4] == concealed_tiles[5]
@@ -1606,7 +1606,7 @@ static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN
 }
 
 static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, const TILE *concealed_tiles, long concealed_cnt,
-    TILE win_tile, WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[FLOWER_TILES]) {
+    TILE win_tile, WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
     assert(concealed_cnt == 14 || concealed_cnt == 11);
     const TILE *matched_seq = nullptr;
     for (int i = 0; i < 6; ++i) {
@@ -1721,7 +1721,7 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
     return true;
 }
 
-static int get_points_by_table(const long (&points_table)[FLOWER_TILES]) {
+static int get_points_by_table(const long (&points_table)[POINT_TYPE_COUNT]) {
     int points = 0;
     for (int i = 1; i < FLOWER_TILES; ++i) {
         if (points_table[i] == 0) {
@@ -1922,7 +1922,8 @@ bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
     return true;
 }
 
-int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed_tiles, long concealed_cnt, TILE win_tile, WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long *points_table) {
+int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed_tiles, long concealed_cnt, TILE win_tile, WIN_TYPE win_type,
+    WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
 
     assert(concealed_tiles != nullptr);
     assert(concealed_cnt > 0);
@@ -1966,7 +1967,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
         std::sort(&_separation_sets[i][fixed_cnt], &_separation_sets[i][4], &set_cmp);
     }
 
-    long points_tables[MAX_SEPARAION_CNT][FLOWER_TILES] = { 0 };
+    long points_tables[MAX_SEPARAION_CNT][POINT_TYPE_COUNT] = { 0 };
     int max_points = 0;
     long max_idx = -1;
 
@@ -2046,8 +2047,6 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
         return ERROR_NOT_WIN;
     }
 
-    if (points_table != nullptr) {
-        memcpy(points_table, points_tables[max_idx], sizeof(points_tables[max_idx]));
-    }
+    std::copy(std::begin(points_tables[max_idx]), std::end(points_tables[max_idx]), std::begin(points_table));
     return max_points;
 }

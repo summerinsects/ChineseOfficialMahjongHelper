@@ -81,7 +81,7 @@ void test_points(const char *str, const char *win_str, WIN_TYPE win_type, WIND_T
     TILE win_tile;
     parse_tiles(win_str, &win_tile, nullptr);
 
-    long points_table[FLOWER_TILES] = { 0 };
+    long points_table[POINT_TYPE_COUNT] = { 0 };
     puts("----------------");
     printf("%s %s\n", str, win_str);
     int points = calculate_points(sets, set_cnt, tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);

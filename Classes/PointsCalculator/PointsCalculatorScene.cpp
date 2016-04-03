@@ -341,7 +341,7 @@ void PointsCalculatorScene::calculate() {
 
         TILE win_tile = _tilePicker->getWinTile();
 
-        long points_table[FLOWER_TILES + 1] = { 0 };
+        long points_table[POINT_TYPE_COUNT] = { 0 };
         WIN_TYPE win_type = WIN_TYPE_DISCARD;
         if (_selfDrawnButton->isHighlighted()) win_type |= WIN_TYPE_SELF_DRAWN;
         if (_fourthTileButton->isHighlighted()) win_type |= WIN_TYPE_4TH_TILE;
@@ -376,7 +376,7 @@ void PointsCalculatorScene::calculate() {
 
         points += flowerCnt;
         points_table[FLOWER_TILES] = flowerCnt;
-        int n = FLOWER_TILES + 1 - std::count(std::begin(points_table), std::end(points_table), 0);
+        long n = POINT_TYPE_COUNT - std::count(std::begin(points_table), std::end(points_table), 0);
         long rows = n / 2 + n % 2;
         Node *innerNode = Node::create();
         float pointsAreaHeight = (FONT_SIZE + 2) * (rows + 2);
