@@ -283,8 +283,7 @@ void RecordScene::updateScoreLabel() {
             _okButton->setEnabled(_pointsFlag == 0);
         }
         else {
-            bool allZero = std::all_of(std::begin(_scoreTable), std::end(_scoreTable), [](int score) { return score == 0; });
-            _okButton->setEnabled(!allZero);
+            _okButton->setEnabled(std::any_of(std::begin(_scoreTable), std::end(_scoreTable), [](int score) { return score != 0; }));
         }
     }
     else {
