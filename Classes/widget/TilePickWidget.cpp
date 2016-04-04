@@ -263,7 +263,6 @@ void TilePickWidget::addOneTile(TILE tile, bool isWinTile) {
     ui::Button *button = ui::Button::create(imageName[tile]);
     button->setScale(27 / button->getContentSize().width);
     _tilesWidget->addChild(button);
-    button->setTag(tile);
 
     size_t tilesCnt = _tiles.size();
     Vec2 pos = calcHandTilePos(tilesCnt);
@@ -294,7 +293,6 @@ void TilePickWidget::replaceOneTile(TILE tile, bool isWinTile) {
     ui::Button *button = ui::Button::create(imageName[tile]);
     button->setScale(27 / button->getContentSize().width);
     _tilesWidget->addChild(button);
-    button->setTag(tile);
 
     TILE prevTile;
     size_t currentIdx = _currentIdx;
