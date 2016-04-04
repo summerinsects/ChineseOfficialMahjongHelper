@@ -665,6 +665,13 @@ static void calculate_kongs(const SET *pung_sets, long pung_cnt, long (&points_t
             points_table[ALL_PUNGS] = 1;
         }
     }
+
+    for (long i = 0; i < pung_cnt; ++i) {
+        POINT_TYPE points = get_1_pung_points(pung_sets[i].mid_tile);
+        if (points != NONE) {
+            ++points_table[points];
+        }
+    }
 }
 
 // 4组刻子算番
@@ -678,19 +685,6 @@ static void calculate_4_pungs(const SET pung_sets[4], long (&points_table)[POINT
     calculate_kongs(sets, 4, points_table);
 
     POINT_TYPE points;
-    if ((points = get_1_pung_points(sets[0].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[1].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[2].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[3].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-
     if ((points = get_4_pungs_points(sets[0].mid_tile, sets[1].mid_tile, sets[2].mid_tile, sets[3].mid_tile)) != NONE) {
         points_table[points] = 1;
         return;
@@ -763,16 +757,6 @@ static void calculate_3_pungs(const SET pung_sets[3], long (&points_table)[POINT
     calculate_kongs(sets, 3, points_table);
 
     POINT_TYPE points;
-    if ((points = get_1_pung_points(sets[0].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[1].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[2].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-
     if ((points = get_3_pungs_points(sets[0].mid_tile, sets[1].mid_tile, sets[2].mid_tile)) != NONE) {
         points_table[points] = 1;
         return;
@@ -791,19 +775,9 @@ static void calculate_3_pungs(const SET pung_sets[3], long (&points_table)[POINT
 
 // 2组刻子算番
 static void calculate_2_pungs(const SET pung_sets[2], long (&points_table)[POINT_TYPE_COUNT]) {
-    const SET *sets = pung_sets;
-
-    calculate_kongs(sets, 2, points_table);
-
-    POINT_TYPE points;
-    if ((points = get_1_pung_points(sets[0].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[1].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-
-    if ((points = get_2_pungs_points(sets[0].mid_tile, sets[1].mid_tile)) != NONE) {
+    calculate_kongs(pung_sets, 2, points_table);
+    POINT_TYPE points = get_2_pungs_points(pung_sets[0].mid_tile, pung_sets[1].mid_tile);
+    if (points != NONE) {
         ++points_table[points];
     }
 }
@@ -811,10 +785,6 @@ static void calculate_2_pungs(const SET pung_sets[2], long (&points_table)[POINT
 // 1组刻子算番
 static void calculate_1_pung(const SET &pung_set, long (&points_table)[POINT_TYPE_COUNT]) {
     calculate_kongs(&pung_set, 1, points_table);
-    POINT_TYPE points = get_1_pung_points(pung_set.mid_tile);
-    if (points != NONE) {
-        ++points_table[points];
-    }
 }
 
 // 九莲宝灯
