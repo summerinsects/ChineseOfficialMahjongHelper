@@ -46,6 +46,7 @@ private:
     cocos2d::Vec2 calcHandTilePos(size_t idx) const;
     void addOneTile(TILE tile, bool isWinTile);
     void replaceOneTile(TILE tile, bool isWinTile);
+    void refreshTilesTableButton(TILE tile);
     void tileTableCallback(cocos2d::Ref *sender, TILE tile);
     void refreshActionButtons();
     void refreshAfterAction(int meldedIdx);

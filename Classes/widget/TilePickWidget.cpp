@@ -314,16 +314,18 @@ void TilePickWidget::replaceOneTile(TILE tile, bool isWinTile) {
         _currentIdx = currentIdx;
         refreshActionButtons();
     });
+}
 
-    --_totalTilesTable[prevTile];
-    SUIT_TYPE suit = tile_suit(prevTile);
-    RANK_TYPE rank = tile_rank(prevTile);
+void TilePickWidget::refreshTilesTableButton(TILE tile) {
+    int n = _totalTilesTable[tile];
+    SUIT_TYPE suit = tile_suit(tile);
+    RANK_TYPE rank = tile_rank(tile);
     switch (suit) {
-    case TILE_SUIT_CHARACTERS: _characterButtons[rank - 1]->setEnabled(true); break;
-    case TILE_SUIT_BAMBOO: _bambooButtons[rank - 1]->setEnabled(true); break;
-    case TILE_SUIT_DOTS: _dotsButtons[rank - 1]->setEnabled(true); break;
-    case TILE_SUIT_WINDS: _honorButtons[rank - 1]->setEnabled(true); break;
-    case TILE_SUIT_DRAGONS: _honorButtons[rank + 3]->setEnabled(true); break;
+    case TILE_SUIT_CHARACTERS: _characterButtons[rank - 1]->setEnabled(n < 4); break;
+    case TILE_SUIT_BAMBOO: _bambooButtons[rank - 1]->setEnabled(n < 4); break;
+    case TILE_SUIT_DOTS: _dotsButtons[rank - 1]->setEnabled(n < 4); break;
+    case TILE_SUIT_WINDS: _honorButtons[rank - 1]->setEnabled(n < 4); break;
+    case TILE_SUIT_DRAGONS: _honorButtons[rank + 3]->setEnabled(n < 4); break;
     default: break;
     }
 }
@@ -332,28 +334,25 @@ void TilePickWidget::tileTableCallback(cocos2d::Ref *sender, TILE tile) {
     size_t tilesCnt = _tiles.size();
     size_t maxCnt = 13 - _fixedSets.size() * 3;
 
-    if (++_totalTilesTable[tile] >= 4) {
-        SUIT_TYPE suit = tile_suit(tile);
-        RANK_TYPE rank = tile_rank(tile);
-        switch (suit) {
-        case TILE_SUIT_CHARACTERS: _characterButtons[rank - 1]->setEnabled(false); break;
-        case TILE_SUIT_BAMBOO: _bambooButtons[rank - 1]->setEnabled(false); break;
-        case TILE_SUIT_DOTS: _dotsButtons[rank - 1]->setEnabled(false); break;
-        case TILE_SUIT_WINDS: _honorButtons[rank - 1]->setEnabled(false); break;
-        case TILE_SUIT_DRAGONS: _honorButtons[rank + 3]->setEnabled(false); break;
-        default: break;
-        }
-    }
-
     if (_currentIdx >= _tiles.size() && _winTileButton == nullptr) {
         addOneTile(tile, _currentIdx == maxCnt);
         refreshActionButtons();
+        ++_totalTilesTable[tile];
+        refreshTilesTableButton(tile);
     }
     else {
-        if (_currentIdx != maxCnt) {
+        if (_currentIdx < _tiles.size()) {
             TILE prevTile = _tiles[_currentIdx];
             if (prevTile != tile) {
                 replaceOneTile(tile, false);
+                refreshActionButtons();
+                ++_totalTilesTable[tile];
+                refreshTilesTableButton(tile);
+                --_totalTilesTable[prevTile];
+                refreshTilesTableButton(prevTile);
+            }
+            else {
+                ++_currentIdx;
                 refreshActionButtons();
             }
         }
@@ -362,6 +361,10 @@ void TilePickWidget::tileTableCallback(cocos2d::Ref *sender, TILE tile) {
             if (prevTile != tile) {
                 replaceOneTile(tile, true);
                 refreshActionButtons();
+                ++_totalTilesTable[tile];
+                refreshTilesTableButton(tile);
+                --_totalTilesTable[prevTile];
+                refreshTilesTableButton(prevTile);
             }
         }
     }
@@ -464,6 +467,14 @@ void TilePickWidget::refreshHandTiles() {
     temp.swap(_tiles);
     memset(_handTilesTable, 0, sizeof(_handTilesTable));
     std::for_each(temp.begin(), temp.end(), std::bind(&TilePickWidget::addOneTile, this, std::placeholders::_1, false));
+
+    if (_winTileButton != nullptr && _tiles.size() + _fixedSets.size() * 3 < 13) {
+        addOneTile(_winTile, false);
+        _winTile = 0;
+        _tilesWidget->removeChild(_winTileButton);
+        _winTileButton = nullptr;
+    }
+
     refreshActionButtons();
 }
 
