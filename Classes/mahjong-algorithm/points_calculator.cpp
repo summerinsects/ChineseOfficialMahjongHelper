@@ -678,6 +678,19 @@ static void calculate_4_pungs(const SET pung_sets[4], long (&points_table)[POINT
     calculate_kongs(sets, 4, points_table);
 
     POINT_TYPE points;
+    if ((points = get_1_pung_points(sets[0].mid_tile)) != NONE) {
+        ++points_table[points];
+    }
+    if ((points = get_1_pung_points(sets[1].mid_tile)) != NONE) {
+        ++points_table[points];
+    }
+    if ((points = get_1_pung_points(sets[2].mid_tile)) != NONE) {
+        ++points_table[points];
+    }
+    if ((points = get_1_pung_points(sets[3].mid_tile)) != NONE) {
+        ++points_table[points];
+    }
+
     if ((points = get_4_pungs_points(sets[0].mid_tile, sets[1].mid_tile, sets[2].mid_tile, sets[3].mid_tile)) != NONE) {
         points_table[points] = 1;
         return;
@@ -737,19 +750,6 @@ static void calculate_4_pungs(const SET pung_sets[4], long (&points_table)[POINT
             ++points_table[points];
         }
     }
-
-    if ((points = get_1_pung_points(sets[0].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[1].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[2].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[3].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
 }
 
 // 3组刻子算番
@@ -763,6 +763,16 @@ static void calculate_3_pungs(const SET pung_sets[3], long (&points_table)[POINT
     calculate_kongs(sets, 3, points_table);
 
     POINT_TYPE points;
+    if ((points = get_1_pung_points(sets[0].mid_tile)) != NONE) {
+        ++points_table[points];
+    }
+    if ((points = get_1_pung_points(sets[1].mid_tile)) != NONE) {
+        ++points_table[points];
+    }
+    if ((points = get_1_pung_points(sets[2].mid_tile)) != NONE) {
+        ++points_table[points];
+    }
+
     if ((points = get_3_pungs_points(sets[0].mid_tile, sets[1].mid_tile, sets[2].mid_tile)) != NONE) {
         points_table[points] = 1;
         return;
@@ -777,16 +787,6 @@ static void calculate_3_pungs(const SET pung_sets[3], long (&points_table)[POINT
     if ((points = get_2_pungs_points(sets[1].mid_tile, sets[2].mid_tile)) != NONE) {
         ++points_table[points];
     }
-
-    if ((points = get_1_pung_points(sets[0].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[1].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-    if ((points = get_1_pung_points(sets[2].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
 }
 
 // 2组刻子算番
@@ -796,14 +796,14 @@ static void calculate_2_pungs(const SET pung_sets[2], long (&points_table)[POINT
     calculate_kongs(sets, 2, points_table);
 
     POINT_TYPE points;
-    if ((points = get_2_pungs_points(sets[0].mid_tile, sets[1].mid_tile)) != NONE) {
-        ++points_table[points];
-    }
-
     if ((points = get_1_pung_points(sets[0].mid_tile)) != NONE) {
         ++points_table[points];
     }
     if ((points = get_1_pung_points(sets[1].mid_tile)) != NONE) {
+        ++points_table[points];
+    }
+
+    if ((points = get_2_pungs_points(sets[0].mid_tile, sets[1].mid_tile)) != NONE) {
         ++points_table[points];
     }
 }
