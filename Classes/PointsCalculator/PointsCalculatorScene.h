@@ -17,6 +17,16 @@ public:
     CREATE_FUNC(PointsCalculatorScene);
 
 private:
+    void onByDiscardButton(cocos2d::Ref *sender);
+    void onSelfDrawnButton(cocos2d::Ref *sender);
+    void onFourthTileButton(cocos2d::Ref *sender);
+    void onRobKongButton(cocos2d::Ref *sender);
+    void onReplacementButton(cocos2d::Ref *sender);
+    void onLastTileButton(cocos2d::Ref *sender);
+
+    void onFixedSetsChanged(TilePickWidget *sender);
+    void onWinTileChanged(TilePickWidget *sender);
+
     void calculate();
 
     TilePickWidget *_tilePicker = nullptr;
@@ -28,10 +38,12 @@ private:
     cocos2d::ui::Button *_fourthTileButton = nullptr;
     cocos2d::ui::Button *_robKongButton = nullptr;
     cocos2d::ui::Button *_replacementButton = nullptr;
-    cocos2d::ui::Button *_lastTileDrawnButton = nullptr;
-    cocos2d::ui::Button *_lastTileClaimButton = nullptr;
+    cocos2d::ui::Button *_lastTileButton = nullptr;
 
     cocos2d::Node *_pointsAreaNode = nullptr;
+
+    bool _maybeFourthTile = false;
+    bool _hasKong = false;
 };
 
 #endif

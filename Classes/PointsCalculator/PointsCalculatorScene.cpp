@@ -56,6 +56,8 @@ bool PointsCalculatorScene::init() {
     _tilePicker = TilePickWidget::create();
     const Size &widgetSize = _tilePicker->getContentSize();
     this->addChild(_tilePicker);
+    _tilePicker->setFixedSetsChangedCallback(std::bind(&PointsCalculatorScene::onFixedSetsChanged, this, std::placeholders::_1));
+    _tilePicker->setWinTileChangedCallback(std::bind(&PointsCalculatorScene::onWinTileChanged, this, std::placeholders::_1));
 
     float y = origin.y + visibleSize.height - 5;
     if (widgetSize.width > visibleSize.width) {
@@ -87,17 +89,7 @@ bool PointsCalculatorScene::init() {
     _byDiscardButton->setContentSize(Size(20.0f, 20.0f));
     _byDiscardButton->setPosition(Vec2(20.0f, 105.0f));
     setButtonChecked(_byDiscardButton);
-    _byDiscardButton->addClickEventListener([this](Ref *) {
-        if (isButtonChecked(_byDiscardButton)) {
-            setButtonUnchecked(_byDiscardButton);
-        }
-        else {
-            setButtonChecked(_byDiscardButton);
-            setButtonUnchecked(_selfDrawnButton);
-            setButtonUnchecked(_replacementButton);
-            setButtonUnchecked(_lastTileDrawnButton);
-        }
-    });
+    _byDiscardButton->addClickEventListener(std::bind(&PointsCalculatorScene::onByDiscardButton, this, std::placeholders::_1));
 
     Label *byDiscardLabel = Label::createWithSystemFont("点和", "Arial", 12);
     infoWidget->addChild(byDiscardLabel);
@@ -110,137 +102,67 @@ bool PointsCalculatorScene::init() {
     _selfDrawnButton->setContentSize(Size(20.0f, 20.0f));
     _selfDrawnButton->setPosition(Vec2(20.0f + gapX, 105.0f));
     setButtonUnchecked(_selfDrawnButton);
-    _selfDrawnButton->addClickEventListener([this](Ref *) {
-        if (isButtonChecked(_selfDrawnButton)) {
-            setButtonUnchecked(_selfDrawnButton);
-        }
-        else {
-            setButtonChecked(_selfDrawnButton);
-            setButtonUnchecked(_byDiscardButton);
-            setButtonUnchecked(_robKongButton);
-            setButtonUnchecked(_lastTileClaimButton);
-        }
-    });
+    _selfDrawnButton->addClickEventListener(std::bind(&PointsCalculatorScene::onSelfDrawnButton, this, std::placeholders::_1));
 
     Label *selfDrawnLabel = Label::createWithSystemFont("自摸", "Arial", 12);
     infoWidget->addChild(selfDrawnLabel);
     selfDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     selfDrawnLabel->setPosition(Vec2(35.0f + gapX, 105.0f));
 
-    _fourthTileButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    _fourthTileButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
     infoWidget->addChild(_fourthTileButton);
     _fourthTileButton->setScale9Enabled(true);
     _fourthTileButton->setContentSize(Size(20.0f, 20.0f));
     _fourthTileButton->setPosition(Vec2(20.0f + gapX * 2, 105.0f));
     setButtonUnchecked(_fourthTileButton);
-    _fourthTileButton->addClickEventListener([this](Ref *) {
-        if (isButtonChecked(_fourthTileButton)) {
-            setButtonUnchecked(_fourthTileButton);
-        }
-        else {
-            setButtonChecked(_fourthTileButton);
-            setButtonUnchecked(_robKongButton);
-        }
-    });
+    _fourthTileButton->setEnabled(false);
+    _fourthTileButton->addClickEventListener(std::bind(&PointsCalculatorScene::onFourthTileButton, this, std::placeholders::_1));
 
     Label *fourthTileLabel = Label::createWithSystemFont("绝张", "Arial", 12);
     infoWidget->addChild(fourthTileLabel);
     fourthTileLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     fourthTileLabel->setPosition(Vec2(35.0f + gapX * 2, 105.0f));
 
-    _replacementButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    _replacementButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
     infoWidget->addChild(_replacementButton);
     _replacementButton->setScale9Enabled(true);
     _replacementButton->setContentSize(Size(20.0f, 20.0f));
     _replacementButton->setPosition(Vec2(20.0f, 75.0f));
     setButtonUnchecked(_replacementButton);
-    _replacementButton->addClickEventListener([this](Ref *) {
-        if (isButtonChecked(_replacementButton)) {
-            setButtonUnchecked(_replacementButton);
-        }
-        else {
-            setButtonChecked(_replacementButton);
-            setButtonUnchecked(_robKongButton);
-            setButtonUnchecked(_lastTileClaimButton);
-        }
-    });
+    _replacementButton->setEnabled(false);
+    _replacementButton->addClickEventListener(std::bind(&PointsCalculatorScene::onReplacementButton, this, std::placeholders::_1));
 
     Label *replacementLabel = Label::createWithSystemFont("杠开", "Arial", 12);
     infoWidget->addChild(replacementLabel);
     replacementLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     replacementLabel->setPosition(Vec2(35.0f, 75.0f));
 
-    _robKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    _robKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
     infoWidget->addChild(_robKongButton);
     _robKongButton->setScale9Enabled(true);
     _robKongButton->setContentSize(Size(20.0f, 20.0f));
     _robKongButton->setPosition(Vec2(20.0f + gapX, 75.0f));
     setButtonUnchecked(_robKongButton);
-    _robKongButton->addClickEventListener([this](Ref *) {
-        if (isButtonChecked(_robKongButton)) {
-            setButtonUnchecked(_robKongButton);
-        }
-        else {
-            setButtonChecked(_robKongButton);
-            setButtonUnchecked(_selfDrawnButton);
-            setButtonUnchecked(_fourthTileButton);
-            setButtonUnchecked(_replacementButton);
-            setButtonUnchecked(_lastTileDrawnButton);
-        }
-    });
+    _robKongButton->setEnabled(false);
+    _robKongButton->addClickEventListener(std::bind(&PointsCalculatorScene::onRobKongButton, this, std::placeholders::_1));
 
     Label *robKongLabel = Label::createWithSystemFont("抢杠", "Arial", 12);
     infoWidget->addChild(robKongLabel);
     robKongLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     robKongLabel->setPosition(Vec2(35.0f + gapX, 75.0f));
 
-    _lastTileDrawnButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    infoWidget->addChild(_lastTileDrawnButton);
-    _lastTileDrawnButton->setScale9Enabled(true);
-    _lastTileDrawnButton->setContentSize(Size(20.0f, 20.0f));
-    _lastTileDrawnButton->setPosition(Vec2(20.0f + gapX * 2, 75.0f));
-    setButtonUnchecked(_lastTileDrawnButton);
-    _lastTileDrawnButton->addClickEventListener([this](Ref *) {
-        if (isButtonChecked(_lastTileDrawnButton)) {
-            setButtonUnchecked(_lastTileDrawnButton);
-        }
-        else {
-            setButtonChecked(_lastTileDrawnButton);
-            setButtonUnchecked(_byDiscardButton);
-            setButtonUnchecked(_selfDrawnButton);
-            setButtonUnchecked(_robKongButton);
-            setButtonUnchecked(_lastTileClaimButton);
-        }
-    });
+    _lastTileButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
+    infoWidget->addChild(_lastTileButton);
+    _lastTileButton->setScale9Enabled(true);
+    _lastTileButton->setContentSize(Size(20.0f, 20.0f));
+    _lastTileButton->setPosition(Vec2(20.0f + gapX * 2, 75.0f));
+    setButtonUnchecked(_lastTileButton);
+    _lastTileButton->addClickEventListener(std::bind(&PointsCalculatorScene::onLastTileButton, this, std::placeholders::_1));
 
-    Label *lastTileDrawnLabel = Label::createWithSystemFont("妙手", "Arial", 12);
+    Label *lastTileDrawnLabel = Label::createWithSystemFont("海底", "Arial", 12);
     infoWidget->addChild(lastTileDrawnLabel);
     lastTileDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     lastTileDrawnLabel->setPosition(Vec2(35.0f + gapX * 2, 75.0f));
-
-    _lastTileClaimButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    infoWidget->addChild(_lastTileClaimButton);
-    _lastTileClaimButton->setScale9Enabled(true);
-    _lastTileClaimButton->setContentSize(Size(20.0f, 20.0f));
-    _lastTileClaimButton->setPosition(Vec2(20.0f + gapX * 3, 75.0f));
-    setButtonUnchecked(_lastTileClaimButton);
-    _lastTileClaimButton->addClickEventListener([this](Ref *) {
-        if (isButtonChecked(_lastTileClaimButton)) {
-            setButtonUnchecked(_lastTileClaimButton);
-        }
-        else {
-            setButtonChecked(_lastTileClaimButton);
-            setButtonUnchecked(_byDiscardButton);
-            setButtonUnchecked(_selfDrawnButton);
-            setButtonUnchecked(_replacementButton);
-            setButtonUnchecked(_lastTileDrawnButton);
-        }
-    });
-
-    Label *lastTileClaimLabel = Label::createWithSystemFont("海底", "Arial", 12);
-    infoWidget->addChild(lastTileClaimLabel);
-    lastTileClaimLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    lastTileClaimLabel->setPosition(Vec2(35.0f + gapX * 3, 75.0f));
 
     const char *windName[4] = { "东", "南", "西", "北" };
 
@@ -313,6 +235,126 @@ bool PointsCalculatorScene::init() {
     return true;
 }
 
+void PointsCalculatorScene::onByDiscardButton(cocos2d::Ref *sender) {
+    if (!isButtonChecked(_byDiscardButton)) {
+        setButtonChecked(_byDiscardButton);
+        setButtonUnchecked(_selfDrawnButton);
+
+        setButtonUnchecked(_replacementButton);
+        _replacementButton->setEnabled(false);
+
+        setButtonUnchecked(_fourthTileButton);
+        _fourthTileButton->setEnabled(_maybeFourthTile);
+
+        setButtonUnchecked(_robKongButton);
+        _robKongButton->setEnabled(_maybeFourthTile);
+    }
+    else {
+        setButtonChecked(_byDiscardButton);
+    }
+}
+
+void PointsCalculatorScene::onSelfDrawnButton(cocos2d::Ref *sender) {
+    if (!isButtonChecked(_selfDrawnButton)) {
+        setButtonChecked(_selfDrawnButton);
+        setButtonUnchecked(_byDiscardButton);
+
+        setButtonUnchecked(_robKongButton);
+        _robKongButton->setEnabled(false);
+
+        setButtonUnchecked(_replacementButton);
+        _replacementButton->setEnabled(_hasKong);
+    }
+    else {
+        setButtonChecked(_selfDrawnButton);
+    }
+}
+
+void PointsCalculatorScene::onFourthTileButton(cocos2d::Ref *sender) {
+    if (isButtonChecked(_fourthTileButton)) {
+        setButtonUnchecked(_fourthTileButton);
+        setButtonUnchecked(_robKongButton);
+        _robKongButton->setEnabled(isButtonChecked(_byDiscardButton));
+    }
+    else {
+        setButtonChecked(_fourthTileButton);
+        setButtonUnchecked(_robKongButton);
+        _robKongButton->setEnabled(false);
+    }
+}
+
+void PointsCalculatorScene::onRobKongButton(cocos2d::Ref *sender) {
+    if (isButtonChecked(_robKongButton)) {
+        setButtonUnchecked(_robKongButton);
+        setButtonUnchecked(_fourthTileButton);
+        _fourthTileButton->setEnabled(isButtonChecked(_byDiscardButton));
+    }
+    else {
+        setButtonChecked(_robKongButton);
+        setButtonUnchecked(_fourthTileButton);
+        _fourthTileButton->setEnabled(false);
+    }
+}
+
+void PointsCalculatorScene::onReplacementButton(cocos2d::Ref *sender) {
+    if (isButtonChecked(_replacementButton)) {
+        setButtonUnchecked(_replacementButton);
+    }
+    else {
+        setButtonChecked(_replacementButton);
+    }
+}
+
+void PointsCalculatorScene::onLastTileButton(cocos2d::Ref *sender) {
+    if (isButtonChecked(_lastTileButton)) {
+        setButtonUnchecked(_lastTileButton);
+    }
+    else {
+        setButtonChecked(_lastTileButton);
+    }
+}
+
+void PointsCalculatorScene::onFixedSetsChanged(TilePickWidget *sender) {
+    bool prevValue = _hasKong;
+    const std::vector<SET> &fixedSets = sender->getFixedSets();
+    auto it = std::find_if(fixedSets.begin(), fixedSets.end(), [](const SET &s) { return s.set_type == SET_TYPE::KONG; });
+    _hasKong = it != fixedSets.end();
+    if (prevValue != _hasKong) {
+        if (isButtonChecked(_selfDrawnButton)) {
+            _replacementButton->setEnabled(_hasKong);
+        }
+    }
+}
+
+void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
+    bool prevValue = _maybeFourthTile;
+    TILE winTile = sender->getWinTile();
+    if (winTile != 0) {
+        _maybeFourthTile = true;
+        const std::vector<TILE> &handTiles = sender->getHandTiles();
+        if (handTiles.end() != std::find(handTiles.begin(), handTiles.end(), winTile)) {
+            _maybeFourthTile = false;
+        }
+        if (_maybeFourthTile) {
+            const std::vector<SET> &fixedSets = sender->getFixedSets();
+            if (fixedSets.end()
+                != std::find_if(fixedSets.begin(), fixedSets.end(), std::bind(&is_set_contains_tile, std::placeholders::_1, winTile))) {
+                _maybeFourthTile = false;
+            }
+        }
+    }
+    else {
+        _maybeFourthTile = false;
+    }
+
+    if (_maybeFourthTile != prevValue) {
+        _fourthTileButton->setEnabled(true);
+        if (isButtonChecked(_byDiscardButton)) {
+            _robKongButton->setEnabled(true);
+        }
+    }
+}
+
 #define FONT_SIZE 14
 
 void PointsCalculatorScene::calculate() {
@@ -347,8 +389,7 @@ void PointsCalculatorScene::calculate() {
         if (_fourthTileButton->isHighlighted()) win_type |= WIN_TYPE_4TH_TILE;
         if (_robKongButton->isHighlighted()) win_type |= WIN_TYPE_ABOUT_KONG;
         if (_replacementButton->isHighlighted()) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
-        if (_lastTileDrawnButton->isHighlighted()) win_type |= (WIN_TYPE_WALL_LAST | WIN_TYPE_SELF_DRAWN);
-        if (_lastTileClaimButton->isHighlighted()) win_type |= WIN_TYPE_WALL_LAST;
+        if (_lastTileButton->isHighlighted()) win_type |= WIN_TYPE_WALL_LAST;
 
         WIND_TYPE prevalent_wind = WIND_TYPE::EAST, seat_wind = WIND_TYPE::EAST;
         for (int i = 0; i < 4; ++i) {
