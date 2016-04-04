@@ -232,6 +232,13 @@ void TilePickWidget::reset() {
     _pungButton->setEnabled(false);
     _meldedKongButton->setEnabled(false);
     _concealedKongButton->setEnabled(false);
+
+    if (_fixedSetsChangedCallback) {
+        _fixedSetsChangedCallback(this);
+    }
+    if (_winTileChangedCallback) {
+        _winTileChangedCallback(this);
+    }
 }
 
 void TilePickWidget::sort() {
@@ -272,6 +279,9 @@ void TilePickWidget::addOneTile(TILE tile, bool isWinTile) {
         button->setPosition(Vec2(pos.x + 4, pos.y));
         _winTileButton = button;
         _winTile = tile;
+        if (_winTileChangedCallback) {
+            _winTileChangedCallback(this);
+        }
     }
 
     button->addClickEventListener([this, tilesCnt](Ref *) {
@@ -308,6 +318,9 @@ void TilePickWidget::replaceOneTile(TILE tile, bool isWinTile) {
 
         prevTile = _winTile;
         _winTile = tile;
+        if (_winTileChangedCallback) {
+            _winTileChangedCallback(this);
+        }
     }
 
     button->addClickEventListener([this, currentIdx](Ref *) {
@@ -455,6 +468,10 @@ void TilePickWidget::refreshAfterAction(int meldedIdx) {
         pos = calcHandTilePos(13 - _fixedSets.size() * 3);
         _winTileButton->setPosition(Vec2(pos.x + 4, pos.y));
     }
+
+    if (_fixedSetsChangedCallback) {
+        _fixedSetsChangedCallback(this);
+    }
 }
 
 void TilePickWidget::refreshHandTiles() {
@@ -473,6 +490,9 @@ void TilePickWidget::refreshHandTiles() {
         _winTile = 0;
         _tilesWidget->removeChild(_winTileButton);
         _winTileButton = nullptr;
+        if (_winTileChangedCallback) {
+            _winTileChangedCallback(this);
+        }
     }
 
     refreshActionButtons();

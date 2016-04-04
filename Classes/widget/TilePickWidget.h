@@ -13,6 +13,14 @@ public:
     const std::vector<SET> &getFixedSets() const { return _fixedSets; }
     TILE getWinTile() const { return _winTile; }
 
+    void setFixedSetsChangedCallback(const std::function<void (TilePickWidget *)> &callback) {
+        _fixedSetsChangedCallback = callback;
+    }
+
+    void setWinTileChangedCallback(const std::function<void (TilePickWidget *)> &callback) {
+        _winTileChangedCallback = callback;
+    }
+
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
@@ -40,6 +48,9 @@ private:
     std::vector<SET> _fixedSets;
     TILE _winTile;
     size_t _currentIdx;
+
+    std::function<void (TilePickWidget *)> _fixedSetsChangedCallback;
+    std::function<void (TilePickWidget *)> _winTileChangedCallback;
 
     void reset();
     void sort();
