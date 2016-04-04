@@ -12,6 +12,8 @@
 #define forceinline inline
 #endif
 
+namespace mahjong {
+
 typedef uint8_t SUIT_TYPE;
 typedef uint8_t RANK_TYPE;
 
@@ -130,6 +132,8 @@ static forceinline bool is_chow(TILE tile0, TILE tile1, TILE tile2) {
 
 bool forceinline is_concealed_set_completed(TILE tile0, TILE tile1, TILE tile2) {
     return is_chow(tile0, tile1, tile2) || is_pung(tile0, tile1, tile2);
+}
+
 }
 
 #endif

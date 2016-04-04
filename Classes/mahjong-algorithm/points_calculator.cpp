@@ -7,6 +7,8 @@
 
 //#define STRICT_98_RULE
 
+namespace mahjong {
+
 static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SET (*output_sets)[5], long *separation_cnt) {
     if (tile_cnt == 2 && tiles[0] == tiles[1]) {  // 划分成功
         // 这2张作为将
@@ -2023,4 +2025,6 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
 
     std::copy(std::begin(points_tables[max_idx]), std::end(points_tables[max_idx]), std::begin(points_table));
     return max_points;
+}
+
 }

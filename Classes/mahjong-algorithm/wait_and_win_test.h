@@ -3,6 +3,8 @@
 
 #include "tile.h"
 
+namespace mahjong {
+
 bool is_basic_type_1_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]);
 bool is_basic_type_1(const TILE *concealed_tiles, TILE test_tile);
 
@@ -69,6 +71,8 @@ _OutputIterator copy_exclude(_InputIterator1 src_first, _InputIterator1 src_last
         ++src_first;
     }
     return dest;
+}
+
 }
 
 #endif

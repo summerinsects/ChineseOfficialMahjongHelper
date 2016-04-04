@@ -201,7 +201,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
             button->setContentSize(Size(66.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
-            button->setTitleText(points_name[idx]);
+            button->setTitleText(mahjong::points_name[idx]);
             setButtonUnchecked(button);
             button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1, idx));
 
@@ -426,7 +426,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
     int currentWinScore = 0;
     for (int n = 0; n < 64; ++n) {
         if (_pointsFlag & (1ULL << n)) {
-            currentWinScore += points_value_table[n];
+            currentWinScore += mahjong::points_value_table[n];
         }
     }
     currentWinScore = std::max(8, currentWinScore);

@@ -61,7 +61,7 @@ bool TilePickWidget::init() {
     this->setContentSize(Size(tilesSize.width, tilesSize.height + fixedSize.height + tableSize.height + 8));
 
     for (int i = 0; i < 9; ++i) {
-        TILE tile = make_tile(TILE_SUIT_CHARACTERS, i + 1);
+        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, i + 1);
         _characterButtons[i] = ui::Button::create(imageName[tile]);
         _characterButtons[i]->setScale(27 / _characterButtons[i]->getContentSize().width);
         tableWidget->addChild(_characterButtons[i]);
@@ -71,7 +71,7 @@ bool TilePickWidget::init() {
     }
 
     for (int i = 0; i < 9; ++i) {
-        TILE tile = make_tile(TILE_SUIT_BAMBOO, i + 1);
+        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_BAMBOO, i + 1);
         _bambooButtons[i] = ui::Button::create(imageName[tile]);
         _bambooButtons[i]->setScale(27 / _bambooButtons[i]->getContentSize().width);
         tableWidget->addChild(_bambooButtons[i]);
@@ -81,7 +81,7 @@ bool TilePickWidget::init() {
     }
 
     for (int i = 0; i < 9; ++i) {
-        TILE tile = make_tile(TILE_SUIT_DOTS, i + 1);
+        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DOTS, i + 1);
         _dotsButtons[i] = ui::Button::create(imageName[tile]);
         _dotsButtons[i]->setScale(27 / _dotsButtons[i]->getContentSize().width);
         tableWidget->addChild(_dotsButtons[i]);
@@ -91,7 +91,7 @@ bool TilePickWidget::init() {
     }
 
     for (int i = 0; i < 4; ++i) {
-        TILE tile = make_tile(TILE_SUIT_WINDS, i + 1);
+        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_WINDS, i + 1);
         _honorButtons[i] = ui::Button::create(imageName[tile]);
         _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
         tableWidget->addChild(_honorButtons[i]);
@@ -101,7 +101,7 @@ bool TilePickWidget::init() {
     }
 
     for (int i = 4; i < 7; ++i) {
-        TILE tile = make_tile(TILE_SUIT_DRAGONS, i - 3);
+        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DRAGONS, i - 3);
         _honorButtons[i] = ui::Button::create(imageName[tile]);
         _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
         tableWidget->addChild(_honorButtons[i]);
@@ -259,7 +259,7 @@ cocos2d::Vec2 TilePickWidget::calcHandTilePos(size_t idx) const {
     return pos;
 }
 
-void TilePickWidget::addOneTile(TILE tile, bool isWinTile) {
+void TilePickWidget::addOneTile(mahjong::TILE tile, bool isWinTile) {
     ui::Button *button = ui::Button::create(imageName[tile]);
     button->setScale(27 / button->getContentSize().width);
     _tilesWidget->addChild(button);
@@ -289,12 +289,12 @@ void TilePickWidget::addOneTile(TILE tile, bool isWinTile) {
     });
 }
 
-void TilePickWidget::replaceOneTile(TILE tile, bool isWinTile) {
+void TilePickWidget::replaceOneTile(mahjong::TILE tile, bool isWinTile) {
     ui::Button *button = ui::Button::create(imageName[tile]);
     button->setScale(27 / button->getContentSize().width);
     _tilesWidget->addChild(button);
 
-    TILE prevTile;
+    mahjong::TILE prevTile;
     size_t currentIdx = _currentIdx;
     if (!isWinTile) {
         button->setPosition(_tileButtons[_currentIdx]->getPosition());
@@ -327,10 +327,10 @@ void TilePickWidget::replaceOneTile(TILE tile, bool isWinTile) {
     });
 }
 
-void TilePickWidget::refreshTilesTableButton(TILE tile) {
+void TilePickWidget::refreshTilesTableButton(mahjong::TILE tile) {
     int n = _totalTilesTable[tile];
-    SUIT_TYPE suit = tile_suit(tile);
-    RANK_TYPE rank = tile_rank(tile);
+    mahjong::SUIT_TYPE suit = mahjong::tile_suit(tile);
+    mahjong::RANK_TYPE rank = mahjong::tile_rank(tile);
     switch (suit) {
     case TILE_SUIT_CHARACTERS: _characterButtons[rank - 1]->setEnabled(n < 4); break;
     case TILE_SUIT_BAMBOO: _bambooButtons[rank - 1]->setEnabled(n < 4); break;
@@ -341,7 +341,7 @@ void TilePickWidget::refreshTilesTableButton(TILE tile) {
     }
 }
 
-void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, TILE tile) {
+void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile) {
     size_t maxCnt = 13 - _fixedSets.size() * 3;
 
     if (_currentIdx >= _tiles.size() && _winTileButton == nullptr) {
@@ -352,7 +352,7 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, TILE tile) {
     }
     else {
         if (_currentIdx < _tiles.size()) {
-            TILE prevTile = _tiles[_currentIdx];
+            mahjong::TILE prevTile = _tiles[_currentIdx];
             if (prevTile != tile) {
                 replaceOneTile(tile, false);
                 refreshActionButtons();
@@ -367,7 +367,7 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, TILE tile) {
             }
         }
         else {
-            TILE prevTile = _winTile;
+            mahjong::TILE prevTile = _winTile;
             if (prevTile != tile) {
                 replaceOneTile(tile, true);
                 refreshActionButtons();
@@ -401,7 +401,7 @@ void TilePickWidget::refreshActionButtons() {
     else {
         _highlightBox->setPosition(_tileButtons[_currentIdx]->getPosition());
 
-        TILE tile = _tiles[_currentIdx];
+        mahjong::TILE tile = _tiles[_currentIdx];
         switch (_handTilesTable[tile]) {
         case 4:
             _meldedKongButton->setEnabled(true);
@@ -420,7 +420,7 @@ void TilePickWidget::refreshActionButtons() {
             _pungButton->setEnabled(false);
         }
 
-        if (!is_honor(tile)) {
+        if (!mahjong::is_honor(tile)) {
             _chowLessButton->setEnabled(_handTilesTable[tile - 2] > 0 && _handTilesTable[tile - 1]);
             _chowMidButton->setEnabled(_handTilesTable[tile - 1] > 0 && _handTilesTable[tile + 1]);
             _chowGreatButton->setEnabled(_handTilesTable[tile + 1] > 0 && _handTilesTable[tile + 2]);
@@ -444,11 +444,11 @@ void TilePickWidget::refreshAfterAction(int meldedIdx) {
     default: return;
     }
 
-    const SET &set = _fixedSets.back();
+    const mahjong::SET &set = _fixedSets.back();
     switch (set.set_type) {
-    case SET_TYPE::CHOW: addFixedChowSet(pos, set.mid_tile, meldedIdx); break;
-    case SET_TYPE::PUNG: addFixedPungSet(pos, set.mid_tile, meldedIdx); break;
-    case SET_TYPE::KONG:
+    case mahjong::SET_TYPE::CHOW: addFixedChowSet(pos, set.mid_tile, meldedIdx); break;
+    case mahjong::SET_TYPE::PUNG: addFixedPungSet(pos, set.mid_tile, meldedIdx); break;
+    case mahjong::SET_TYPE::KONG:
         if (set.is_melded) {
             addFixedMeldedKongSet(pos, set.mid_tile, meldedIdx);
         }
@@ -476,7 +476,7 @@ void TilePickWidget::refreshHandTiles() {
         _tileButtons.pop_back();
     }
 
-    std::vector<TILE> temp;
+    std::vector<mahjong::TILE> temp;
     temp.swap(_tiles);
     memset(_handTilesTable, 0, sizeof(_handTilesTable));
     std::for_each(temp.begin(), temp.end(), std::bind(&TilePickWidget::addOneTile, this, std::placeholders::_1, false));
@@ -494,7 +494,7 @@ void TilePickWidget::refreshHandTiles() {
     refreshActionButtons();
 }
 
-void TilePickWidget::addFixedChowSet(const cocos2d::Vec2 &center, TILE tile, int meldedIdx) {
+void TilePickWidget::addFixedChowSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx) {
     // 一张牌的尺寸：27 * 39
     const char *image[3];
     switch (meldedIdx) {
@@ -531,7 +531,7 @@ void TilePickWidget::addFixedChowSet(const cocos2d::Vec2 &center, TILE tile, int
     }
 }
 
-void TilePickWidget::addFixedPungSet(const cocos2d::Vec2 &center, TILE tile, int meldedIdx) {
+void TilePickWidget::addFixedPungSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx) {
     // 一张牌的尺寸：27 * 39
     Vec2 pos[3];
     switch (meldedIdx) {
@@ -563,7 +563,7 @@ void TilePickWidget::addFixedPungSet(const cocos2d::Vec2 &center, TILE tile, int
     }
 }
 
-void TilePickWidget::addFixedMeldedKongSet(const cocos2d::Vec2 &center, TILE tile, int meldedIdx) {
+void TilePickWidget::addFixedMeldedKongSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx) {
     // 一张牌的尺寸：27 * 39
     Vec2 pos[4];
     switch (meldedIdx) {
@@ -604,7 +604,7 @@ void TilePickWidget::addFixedMeldedKongSet(const cocos2d::Vec2 &center, TILE til
     }
 }
 
-void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, TILE tile) {
+void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, mahjong::TILE tile) {
     // 一张牌的尺寸：27 * 39
     const char *image[4];
     image[0] = imageName[0x53];
@@ -631,7 +631,7 @@ void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, TILE 
 
 void TilePickWidget::onChowLessButton(cocos2d::Ref *sender) {
     // XX_
-    TILE tile = _tiles[_currentIdx];
+    mahjong::TILE tile = _tiles[_currentIdx];
     auto it = std::find(_tiles.begin(), _tiles.end(), tile - 2);
     _tiles.erase(it);
     it = std::find(_tiles.begin(), _tiles.end(), tile - 1);
@@ -643,10 +643,10 @@ void TilePickWidget::onChowLessButton(cocos2d::Ref *sender) {
     --_handTilesTable[tile - 1];
     --_handTilesTable[tile];
 
-    SET set;
+    mahjong::SET set;
     set.is_melded = true;
     set.mid_tile = tile - 1;
-    set.set_type = SET_TYPE::CHOW;
+    set.set_type = mahjong::SET_TYPE::CHOW;
     _fixedSets.push_back(set);
 
     refreshAfterAction(2);
@@ -654,7 +654,7 @@ void TilePickWidget::onChowLessButton(cocos2d::Ref *sender) {
 
 void TilePickWidget::onChowMidButton(cocos2d::Ref *sender) {
     // X_X
-    TILE tile = _tiles[_currentIdx];
+    mahjong::TILE tile = _tiles[_currentIdx];
     auto it = std::find(_tiles.begin(), _tiles.end(), tile - 1);
     _tiles.erase(it);
     it = std::find(_tiles.begin(), _tiles.end(), tile);
@@ -666,10 +666,10 @@ void TilePickWidget::onChowMidButton(cocos2d::Ref *sender) {
     --_handTilesTable[tile];
     --_handTilesTable[tile + 1];
 
-    SET set;
+    mahjong::SET set;
     set.is_melded = true;
     set.mid_tile = tile;
-    set.set_type = SET_TYPE::CHOW;
+    set.set_type = mahjong::SET_TYPE::CHOW;
     _fixedSets.push_back(set);
 
     refreshAfterAction(1);
@@ -677,7 +677,7 @@ void TilePickWidget::onChowMidButton(cocos2d::Ref *sender) {
 
 void TilePickWidget::onChowGreatButton(cocos2d::Ref *sender) {
     // _XX
-    TILE tile = _tiles[_currentIdx];
+    mahjong::TILE tile = _tiles[_currentIdx];
     auto it = std::find(_tiles.begin(), _tiles.end(), tile);
     _tiles.erase(it);
     it = std::find(_tiles.begin(), _tiles.end(), tile + 1);
@@ -689,10 +689,10 @@ void TilePickWidget::onChowGreatButton(cocos2d::Ref *sender) {
     --_handTilesTable[tile + 1];
     --_handTilesTable[tile + 2];
 
-    SET set;
+    mahjong::SET set;
     set.is_melded = true;
     set.mid_tile = tile + 1;
-    set.set_type = SET_TYPE::CHOW;
+    set.set_type = mahjong::SET_TYPE::CHOW;
     _fixedSets.push_back(set);
 
     refreshAfterAction(0);
@@ -700,8 +700,8 @@ void TilePickWidget::onChowGreatButton(cocos2d::Ref *sender) {
 
 void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
     int meldedIdx = 2;
-    TILE tile = _tiles[_currentIdx];
-    std::vector<TILE>::iterator it[3];
+    mahjong::TILE tile = _tiles[_currentIdx];
+    std::vector<mahjong::TILE>::iterator it[3];
     it[0] = std::find(_tiles.begin(), _tiles.end(), tile);
     it[1] = std::find(it[0] + 1, _tiles.end(), tile);
     it[2] = std::find(it[1] + 1, _tiles.end(), tile);
@@ -714,10 +714,10 @@ void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
 
     _handTilesTable[tile] -= 3;
 
-    SET set;
+    mahjong::SET set;
     set.is_melded = true;
     set.mid_tile = tile;
-    set.set_type = SET_TYPE::PUNG;
+    set.set_type = mahjong::SET_TYPE::PUNG;
     _fixedSets.push_back(set);
 
     refreshAfterAction(meldedIdx);
@@ -725,8 +725,8 @@ void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
 
 void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
     int meldedIdx = 0;
-    TILE tile = _tiles[_currentIdx];
-    std::vector<TILE>::iterator it[4];
+    mahjong::TILE tile = _tiles[_currentIdx];
+    std::vector<mahjong::TILE>::iterator it[4];
     it[0] = std::find(_tiles.begin(), _tiles.end(), tile);
     it[1] = std::find(it[0] + 1, _tiles.end(), tile);
     it[2] = std::find(it[1] + 1, _tiles.end(), tile);
@@ -740,18 +740,18 @@ void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
 
     _handTilesTable[tile] -= 4;
 
-    SET set;
+    mahjong::SET set;
     set.is_melded = true;
     set.mid_tile = tile;
-    set.set_type = SET_TYPE::KONG;
+    set.set_type = mahjong::SET_TYPE::KONG;
     _fixedSets.push_back(set);
 
     refreshAfterAction(meldedIdx);
 }
 
 void TilePickWidget::onConcealedKongButton(cocos2d::Ref *sender) {
-    TILE tile = _tiles[_currentIdx];
-    std::vector<TILE>::iterator it[4];
+    mahjong::TILE tile = _tiles[_currentIdx];
+    std::vector<mahjong::TILE>::iterator it[4];
     it[0] = std::find(_tiles.begin(), _tiles.end(), tile);
     it[1] = std::find(it[0] + 1, _tiles.end(), tile);
     it[2] = std::find(it[1] + 1, _tiles.end(), tile);
@@ -762,10 +762,10 @@ void TilePickWidget::onConcealedKongButton(cocos2d::Ref *sender) {
 
     _handTilesTable[tile] -= 4;
 
-    SET set;
+    mahjong::SET set;
     set.is_melded = false;
     set.mid_tile = tile;
-    set.set_type = SET_TYPE::KONG;
+    set.set_type = mahjong::SET_TYPE::KONG;
     _fixedSets.push_back(set);
 
     refreshAfterAction(0);

@@ -305,7 +305,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     if (g_pointsFlag[handIdx] != 0) {
         for (unsigned n = 0; n < 64; ++n) {
             if ((1ULL << n) & g_pointsFlag[handIdx]) {
-                _pointNameLabel[handIdx]->setString(points_name[n]);
+                _pointNameLabel[handIdx]->setString(mahjong::points_name[n]);
                 _pointNameLabel[handIdx]->setVisible(true);
                 break;
             }

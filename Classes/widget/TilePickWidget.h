@@ -9,9 +9,9 @@ class TilePickWidget : public cocos2d::ui::Widget {
 public:
     CREATE_FUNC(TilePickWidget);
 
-    const std::vector<TILE> &getHandTiles() const { return _tiles; }
-    const std::vector<SET> &getFixedSets() const { return _fixedSets; }
-    TILE getWinTile() const { return _winTile; }
+    const std::vector<mahjong::TILE> &getHandTiles() const { return _tiles; }
+    const std::vector<mahjong::SET> &getFixedSets() const { return _fixedSets; }
+    mahjong::TILE getWinTile() const { return _winTile; }
 
     void setFixedSetsChangedCallback(const std::function<void (TilePickWidget *)> &callback) {
         _fixedSetsChangedCallback = callback;
@@ -44,9 +44,9 @@ private:
 
     int _totalTilesTable[0x54];
     int _handTilesTable[0x54];
-    std::vector<TILE> _tiles;
-    std::vector<SET> _fixedSets;
-    TILE _winTile;
+    std::vector<mahjong::TILE> _tiles;
+    std::vector<mahjong::SET> _fixedSets;
+    mahjong::TILE _winTile;
     size_t _currentIdx;
 
     std::function<void (TilePickWidget *)> _fixedSetsChangedCallback;
@@ -55,17 +55,17 @@ private:
     void reset();
     void sort();
     cocos2d::Vec2 calcHandTilePos(size_t idx) const;
-    void addOneTile(TILE tile, bool isWinTile);
-    void replaceOneTile(TILE tile, bool isWinTile);
-    void refreshTilesTableButton(TILE tile);
-    void onTileTableButton(cocos2d::Ref *sender, TILE tile);
+    void addOneTile(mahjong::TILE tile, bool isWinTile);
+    void replaceOneTile(mahjong::TILE tile, bool isWinTile);
+    void refreshTilesTableButton(mahjong::TILE tile);
+    void onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile);
     void refreshActionButtons();
     void refreshAfterAction(int meldedIdx);
     void refreshHandTiles();
-    void addFixedChowSet(const cocos2d::Vec2 &center, TILE tile, int meldedIdx);
-    void addFixedPungSet(const cocos2d::Vec2 &center, TILE tile, int meldedIdx);
-    void addFixedMeldedKongSet(const cocos2d::Vec2 &center, TILE tile, int meldedIdx);
-    void addFixedConcealedKongSet(const cocos2d::Vec2 &center, TILE tile);
+    void addFixedChowSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx);
+    void addFixedPungSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx);
+    void addFixedMeldedKongSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx);
+    void addFixedConcealedKongSet(const cocos2d::Vec2 &center, mahjong::TILE tile);
     void onChowLessButton(cocos2d::Ref *sender);
     void onChowMidButton(cocos2d::Ref *sender);
     void onChowGreatButton(cocos2d::Ref *sender);

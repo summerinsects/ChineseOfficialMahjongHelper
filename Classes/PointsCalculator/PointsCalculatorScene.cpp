@@ -316,8 +316,8 @@ void PointsCalculatorScene::onLastTileButton(cocos2d::Ref *sender) {
 
 void PointsCalculatorScene::onFixedSetsChanged(TilePickWidget *sender) {
     bool prevValue = _hasKong;
-    const std::vector<SET> &fixedSets = sender->getFixedSets();
-    auto it = std::find_if(fixedSets.begin(), fixedSets.end(), [](const SET &s) { return s.set_type == SET_TYPE::KONG; });
+    const std::vector<mahjong::SET> &fixedSets = sender->getFixedSets();
+    auto it = std::find_if(fixedSets.begin(), fixedSets.end(), [](const mahjong::SET &s) { return s.set_type == mahjong::SET_TYPE::KONG; });
     _hasKong = it != fixedSets.end();
     if (prevValue != _hasKong) {
         if (isButtonChecked(_selfDrawnButton)) {
@@ -328,17 +328,17 @@ void PointsCalculatorScene::onFixedSetsChanged(TilePickWidget *sender) {
 
 void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
     bool prevValue = _maybeFourthTile;
-    TILE winTile = sender->getWinTile();
+    mahjong::TILE winTile = sender->getWinTile();
     if (winTile != 0) {
         _maybeFourthTile = true;
-        const std::vector<TILE> &handTiles = sender->getHandTiles();
+        const std::vector<mahjong::TILE> &handTiles = sender->getHandTiles();
         if (handTiles.end() != std::find(handTiles.begin(), handTiles.end(), winTile)) {
             _maybeFourthTile = false;
         }
         if (_maybeFourthTile) {
-            const std::vector<SET> &fixedSets = sender->getFixedSets();
+            const std::vector<mahjong::SET> &fixedSets = sender->getFixedSets();
             if (fixedSets.end()
-                != std::find_if(fixedSets.begin(), fixedSets.end(), std::bind(&is_set_contains_tile, std::placeholders::_1, winTile))) {
+                != std::find_if(fixedSets.begin(), fixedSets.end(), std::bind(&mahjong::is_set_contains_tile, std::placeholders::_1, winTile))) {
                 _maybeFourthTile = false;
             }
         }
@@ -372,35 +372,35 @@ void PointsCalculatorScene::calculate() {
             break;
         }
 
-        SET sets[5];
+        mahjong::SET sets[5];
         long set_cnt = std::copy(_tilePicker->getFixedSets().begin(), _tilePicker->getFixedSets().end(), std::begin(sets))
             - std::begin(sets);
 
-        TILE tiles[13];
+        mahjong::TILE tiles[13];
         long tile_cnt = std::copy(_tilePicker->getHandTiles().begin(), _tilePicker->getHandTiles().end(), std::begin(tiles))
             - std::begin(tiles);
-        sort_tiles(tiles, tile_cnt);
+        mahjong::sort_tiles(tiles, tile_cnt);
 
-        TILE win_tile = _tilePicker->getWinTile();
+        mahjong::TILE win_tile = _tilePicker->getWinTile();
 
-        long points_table[POINT_TYPE_COUNT] = { 0 };
-        WIN_TYPE win_type = WIN_TYPE_DISCARD;
+        long points_table[mahjong::POINT_TYPE_COUNT] = { 0 };
+        mahjong::WIN_TYPE win_type = WIN_TYPE_DISCARD;
         if (_selfDrawnButton->isHighlighted()) win_type |= WIN_TYPE_SELF_DRAWN;
         if (_fourthTileButton->isHighlighted()) win_type |= WIN_TYPE_4TH_TILE;
         if (_robKongButton->isHighlighted()) win_type |= WIN_TYPE_ABOUT_KONG;
         if (_replacementButton->isHighlighted()) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
         if (_lastTileButton->isHighlighted()) win_type |= WIN_TYPE_WALL_LAST;
 
-        WIND_TYPE prevalent_wind = WIND_TYPE::EAST, seat_wind = WIND_TYPE::EAST;
+        mahjong::WIND_TYPE prevalent_wind = mahjong::WIND_TYPE::EAST, seat_wind = mahjong::WIND_TYPE::EAST;
         for (int i = 0; i < 4; ++i) {
             if (!_prevalentButton[i]->isEnabled()) {
-                prevalent_wind = static_cast<WIND_TYPE>(static_cast<int>(WIND_TYPE::EAST) + i);
+                prevalent_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + i);
                 break;
             }
         }
         for (int i = 0; i < 4; ++i) {
             if (!_seatButton[i]->isEnabled()) {
-                seat_wind = static_cast<WIND_TYPE>(static_cast<int>(WIND_TYPE::EAST) + i);
+                seat_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + i);
                 break;
             }
         }
@@ -416,8 +416,8 @@ void PointsCalculatorScene::calculate() {
         }
 
         points += flowerCnt;
-        points_table[FLOWER_TILES] = flowerCnt;
-        long n = POINT_TYPE_COUNT - std::count(std::begin(points_table), std::end(points_table), 0);
+        points_table[mahjong::FLOWER_TILES] = flowerCnt;
+        long n = mahjong::POINT_TYPE_COUNT - std::count(std::begin(points_table), std::end(points_table), 0);
         long rows = n / 2 + n % 2;
         Node *innerNode = Node::create();
         float pointsAreaHeight = (FONT_SIZE + 2) * (rows + 2);
@@ -428,10 +428,10 @@ void PointsCalculatorScene::calculate() {
 
             std::string str;
             if (points_table[j] == 1) {
-                str = StringUtils::format("%s %d\n", points_name[j], points_value_table[j]);
+                str = StringUtils::format("%s %d\n", mahjong::points_name[j], mahjong::points_value_table[j]);
             }
             else {
-                str = StringUtils::format("%s %d*%ld\n", points_name[j], points_value_table[j], points_table[j]);
+                str = StringUtils::format("%s %d*%ld\n", mahjong::points_name[j], mahjong::points_value_table[j], points_table[j]);
             }
 
             Label *pointName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);

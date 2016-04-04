@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <string.h>
 
+namespace mahjong {
+
 bool is_basic_type_1_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]) {
     waiting_table[tile_suit(concealed_tiles[0])][tile_rank(concealed_tiles[0])] = true;
     return true;
@@ -374,4 +376,6 @@ bool is_honors_and_knitted_tiles(const TILE (&concealed_tiles)[13], TILE test_ti
         return (std::find(std::begin(waiting), std::end(waiting), test_tile) != std::end(waiting));
     }
     return false;
+}
+    
 }
