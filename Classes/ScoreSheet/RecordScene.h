@@ -39,16 +39,16 @@ private:
 
     void updateScoreLabel();
 
-    void minusCallback(cocos2d::Ref *sender);
-    void plusCallback(cocos2d::Ref *sender);
-    void drawCallback(cocos2d::Ref *sender);
-    void winCallback(cocos2d::Ref *sender, int index);
-    void selfDrawnCallback(cocos2d::Ref *sender, int index);
-    void claimCallback(cocos2d::Ref *sender, int index);
-    void falseWinCallback(cocos2d::Ref *sender, int index);
+    void onMinusButton(cocos2d::Ref *sender);
+    void onPlusButton(cocos2d::Ref *sender);
+    void onDrawButton(cocos2d::Ref *sender);
+    void onWinButton(cocos2d::Ref *sender, int index);
+    void onSelfDrawnButton(cocos2d::Ref *sender, int index);
+    void onClaimButton(cocos2d::Ref *sender, int index);
+    void onFalseWinButton(cocos2d::Ref *sender, int index);
 
-    void pointsNameCallback(cocos2d::Ref *sender, int index);
-    void okCallback(cocos2d::Ref *sender);
+    void onPointsNameButton(cocos2d::Ref *sender, int index);
+    void onOkButton(cocos2d::Ref *sender);
 };
 
 #endif

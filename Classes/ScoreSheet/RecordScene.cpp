@@ -82,20 +82,20 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     this->addChild(minusButton);
     minusButton->setScale(20.0f / minusButton->getContentSize().height);
     minusButton->setPosition(Vec2(origin.x + 25.0f, origin.y + visibleSize.height - 50));
-    minusButton->addClickEventListener(std::bind(&RecordScene::minusCallback, this, std::placeholders::_1));
+    minusButton->addClickEventListener(std::bind(&RecordScene::onMinusButton, this, std::placeholders::_1));
 
     ui::Button *plusButton = ui::Button::create("source_material/stepper_inc_n.png", "source_material/stepper_inc_h.png");
     this->addChild(plusButton);
     plusButton->setScale(20.0f / plusButton->getContentSize().height);
     plusButton->setPosition(Vec2(origin.x + 120.0f, origin.y + visibleSize.height - 50));
-    plusButton->addClickEventListener(std::bind(&RecordScene::plusCallback, this, std::placeholders::_1));
+    plusButton->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1));
 
     _drawButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(_drawButton);
     _drawButton->setScale9Enabled(true);
     _drawButton->setContentSize(Size(20.0f, 20.0f));
     _drawButton->setPosition(Vec2(origin.x + visibleSize.width - 60.0f, origin.y + visibleSize.height - 50));
-    _drawButton->addClickEventListener(std::bind(&RecordScene::drawCallback, this, std::placeholders::_1));
+    _drawButton->addClickEventListener(std::bind(&RecordScene::onDrawButton, this, std::placeholders::_1));
 
     label = Label::createWithSystemFont("荒庄", "Arial", 12);
     this->addChild(label);
@@ -121,7 +121,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
         _winButton[i]->setContentSize(Size(20.0f, 20.0f));
         _winButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 130));
         setButtonUnchecked(_winButton[i]);
-        _winButton[i]->addClickEventListener(std::bind(&RecordScene::winCallback, this, std::placeholders::_1, i));
+        _winButton[i]->addClickEventListener(std::bind(&RecordScene::onWinButton, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("和", "Arial", 12);
         this->addChild(label);
@@ -134,7 +134,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
         _selfDrawnButton[i]->setContentSize(Size(20.0f, 20.0f));
         _selfDrawnButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 160));
         setButtonUnchecked(_selfDrawnButton[i]);
-        _selfDrawnButton[i]->addClickEventListener(std::bind(&RecordScene::selfDrawnCallback, this, std::placeholders::_1, i));
+        _selfDrawnButton[i]->addClickEventListener(std::bind(&RecordScene::onSelfDrawnButton, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         this->addChild(label);
@@ -147,7 +147,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
         _claimButton[i]->setContentSize(Size(20.0f, 20.0f));
         _claimButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 190));
         setButtonUnchecked(_claimButton[i]);
-        _claimButton[i]->addClickEventListener(std::bind(&RecordScene::claimCallback, this, std::placeholders::_1, i));
+        _claimButton[i]->addClickEventListener(std::bind(&RecordScene::onClaimButton, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
         this->addChild(label);
@@ -160,7 +160,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
         _falseWinButton[i]->setContentSize(Size(20.0f, 20.0f));
         _falseWinButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 220));
         setButtonUnchecked(_falseWinButton[i]);
-        _falseWinButton[i]->addClickEventListener(std::bind(&RecordScene::falseWinCallback, this, std::placeholders::_1, i));
+        _falseWinButton[i]->addClickEventListener(std::bind(&RecordScene::onFalseWinButton, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("错和", "Arial", 12);
         this->addChild(label);
@@ -203,7 +203,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
             button->setTitleFontSize(12);
             button->setTitleText(points_name[idx]);
             setButtonUnchecked(button);
-            button->addClickEventListener(std::bind(&RecordScene::pointsNameCallback, this, std::placeholders::_1, idx));
+            button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1, idx));
 
             button->setPosition(Vec2(gap * (col + 0.5f), y - 12.0f));
         }
@@ -228,7 +228,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     _okButton->setTitleText("确定");
     _okButton->setTitleColor(Color3B::BLACK);
     _okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15));
-    _okButton->addClickEventListener(std::bind(&RecordScene::okCallback, this, std::placeholders::_1));
+    _okButton->addClickEventListener(std::bind(&RecordScene::onOkButton, this, std::placeholders::_1));
     _okButton->setEnabled(false);
 
     _winIndex = -1;
@@ -291,7 +291,7 @@ void RecordScene::updateScoreLabel() {
     }
 }
 
-void RecordScene::minusCallback(cocos2d::Ref *sender) {
+void RecordScene::onMinusButton(cocos2d::Ref *sender) {
     int winScore = atoi(_editBox->getText());
     if (winScore > 8) {
         --winScore;
@@ -300,14 +300,14 @@ void RecordScene::minusCallback(cocos2d::Ref *sender) {
     }
 }
 
-void RecordScene::plusCallback(cocos2d::Ref *sender) {
+void RecordScene::onPlusButton(cocos2d::Ref *sender) {
     int winScore = atoi(_editBox->getText());
     ++winScore;
     _editBox->setText(StringUtils::format("%d", winScore).c_str());
     updateScoreLabel();
 }
 
-void RecordScene::drawCallback(cocos2d::Ref *sender) {
+void RecordScene::onDrawButton(cocos2d::Ref *sender) {
     _winIndex = -1;
     if (isButtonChecked(_drawButton)) {
         setButtonUnchecked(_drawButton);
@@ -336,7 +336,7 @@ void RecordScene::drawCallback(cocos2d::Ref *sender) {
     updateScoreLabel();
 }
 
-void RecordScene::winCallback(cocos2d::Ref *sender, int index) {
+void RecordScene::onWinButton(cocos2d::Ref *sender, int index) {
     setButtonChecked(_winButton[index]);
     if (_winIndex == index) return;
 
@@ -364,7 +364,7 @@ void RecordScene::winCallback(cocos2d::Ref *sender, int index) {
     updateScoreLabel();
 }
 
-void RecordScene::selfDrawnCallback(cocos2d::Ref *sender, int index) {
+void RecordScene::onSelfDrawnButton(cocos2d::Ref *sender, int index) {
     if (_winIndex == -1) return;
 
     if (isButtonChecked(_selfDrawnButton[index])) {
@@ -383,7 +383,7 @@ void RecordScene::selfDrawnCallback(cocos2d::Ref *sender, int index) {
     updateScoreLabel();
 }
 
-void RecordScene::claimCallback(cocos2d::Ref *sender, int index) {
+void RecordScene::onClaimButton(cocos2d::Ref *sender, int index) {
     if (_winIndex == -1) return;
 
     if (isButtonChecked(_claimButton[index])) {
@@ -401,7 +401,7 @@ void RecordScene::claimCallback(cocos2d::Ref *sender, int index) {
     updateScoreLabel();
 }
 
-void RecordScene::falseWinCallback(cocos2d::Ref *sender, int index) {
+void RecordScene::onFalseWinButton(cocos2d::Ref *sender, int index) {
     if (isButtonChecked(_falseWinButton[index])) {
         setButtonUnchecked(_falseWinButton[index]);
     }
@@ -411,7 +411,7 @@ void RecordScene::falseWinCallback(cocos2d::Ref *sender, int index) {
     updateScoreLabel();
 }
 
-void RecordScene::pointsNameCallback(cocos2d::Ref *sender, int index) {
+void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
     ui::Button *button = (ui::Button *)sender;
     if (isButtonChecked(button)) {
         setButtonUnchecked(button);
@@ -436,7 +436,7 @@ void RecordScene::pointsNameCallback(cocos2d::Ref *sender, int index) {
     updateScoreLabel();
 }
 
-void RecordScene::okCallback(cocos2d::Ref *sender) {
+void RecordScene::onOkButton(cocos2d::Ref *sender) {
     _okCallback(this);
     Director::getInstance()->popScene();
 }

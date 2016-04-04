@@ -58,7 +58,7 @@ private:
     void addOneTile(TILE tile, bool isWinTile);
     void replaceOneTile(TILE tile, bool isWinTile);
     void refreshTilesTableButton(TILE tile);
-    void tileTableCallback(cocos2d::Ref *sender, TILE tile);
+    void onTileTableButton(cocos2d::Ref *sender, TILE tile);
     void refreshActionButtons();
     void refreshAfterAction(int meldedIdx);
     void refreshHandTiles();
@@ -66,12 +66,12 @@ private:
     void addFixedPungSet(const cocos2d::Vec2 &center, TILE tile, int meldedIdx);
     void addFixedMeldedKongSet(const cocos2d::Vec2 &center, TILE tile, int meldedIdx);
     void addFixedConcealedKongSet(const cocos2d::Vec2 &center, TILE tile);
-    void chowLessCallback(cocos2d::Ref *sender);
-    void chowMidCallback(cocos2d::Ref *sender);
-    void chowGreatCallback(cocos2d::Ref *sender);
-    void pungCallback(cocos2d::Ref *sender);
-    void meldedKongCallback(cocos2d::Ref *sender);
-    void concealedKongCallback(cocos2d::Ref *sender);
+    void onChowLessButton(cocos2d::Ref *sender);
+    void onChowMidButton(cocos2d::Ref *sender);
+    void onChowGreatButton(cocos2d::Ref *sender);
+    void onPungButton(cocos2d::Ref *sender);
+    void onMeldedKongButton(cocos2d::Ref *sender);
+    void onConcealedKongButton(cocos2d::Ref *sender);
 };
 
 #endif

@@ -113,7 +113,7 @@ bool ScoreSheetScene::init() {
     _lockButton->setTitleColor(Color3B::BLACK);
     _lockButton->setTitleText("锁定");
     _lockButton->setPosition(Vec2(gap * 5.5f, 390));
-    _lockButton->addClickEventListener(std::bind(&ScoreSheetScene::lockCallback, this, std::placeholders::_1));
+    _lockButton->addClickEventListener(std::bind(&ScoreSheetScene::onLockButton, this, std::placeholders::_1));
 
     const char *row0Text[] = {"开局座位", "东", "南", "西", "北"};
     const char *row1Text[] = {"每圈座位", "东南北西", "南东西北", "西北东南", "北西南东"};
@@ -166,7 +166,7 @@ bool ScoreSheetScene::init() {
         _recordButton[k]->setTitleColor(Color3B::BLACK);
         _recordButton[k]->setTitleText("计分");
         _recordButton[k]->setPosition(Vec2(gap * 5.5f, y));
-        _recordButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::recordCallback, this, std::placeholders::_1, k));
+        _recordButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::onRecordButton, this, std::placeholders::_1, k));
         _recordButton[k]->setEnabled(false);
         _recordButton[k]->setVisible(false);
 
@@ -345,8 +345,8 @@ void ScoreSheetScene::recover() {
         memset(g_scores, 0, sizeof(g_scores));
         memset(g_pointsFlag, 0, sizeof(g_pointsFlag));
         g_currentIndex = 0;
-        timeScheduler(0.0f);
-        this->schedule(schedule_selector(ScoreSheetScene::timeScheduler), 1.0f);
+        onTimeScheduler(0.0f);
+        this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
         return;
     }
 
@@ -399,8 +399,8 @@ void ScoreSheetScene::reset() {
 
     _lockButton->setEnabled(true);
     _lockButton->setVisible(true);
-    timeScheduler(0.0f);
-    this->schedule(schedule_selector(ScoreSheetScene::timeScheduler), 1.0f);
+    onTimeScheduler(0.0f);
+    this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
 
     for (int k = 0; k < 16; ++k) {
         for (int i = 0; i < 4; ++i) {
@@ -412,7 +412,7 @@ void ScoreSheetScene::reset() {
     }
 }
 
-void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
+void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
     for (int i = 0; i < 4; ++i) {
         const char *str = _editBox[i]->getText();
         if (str[0] == '\0') {
@@ -435,13 +435,13 @@ void ScoreSheetScene::lockCallback(cocos2d::Ref *sender) {
     _lockButton->setEnabled(false);
     _lockButton->setVisible(false);
 
-    this->unschedule(schedule_selector(ScoreSheetScene::timeScheduler));
+    this->unschedule(schedule_selector(ScoreSheetScene::onTimeScheduler));
 
     g_startTime = time(nullptr);
     refreshStartTime();
 }
 
-void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, size_t handIdx) {
+void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
     const char *name[] = { g_name[0], g_name[1], g_name[2], g_name[3] };
     Director::getInstance()->pushScene(RecordScene::createScene(handIdx, name, [this, handIdx](RecordScene *scene) {
         if (handIdx != g_currentIndex) return;
@@ -467,7 +467,7 @@ void ScoreSheetScene::recordCallback(cocos2d::Ref *sender, size_t handIdx) {
     }));
 }
 
-void ScoreSheetScene::timeScheduler(float dt) {
+void ScoreSheetScene::onTimeScheduler(float dt) {
     char str[255] = "当前时间：";
     size_t len = strlen(str);
     time_t t = time(nullptr);

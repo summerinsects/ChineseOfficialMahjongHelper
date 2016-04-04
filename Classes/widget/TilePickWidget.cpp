@@ -67,7 +67,7 @@ bool TilePickWidget::init() {
         tableWidget->addChild(_characterButtons[i]);
         _characterButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 136.5f));
         _characterButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::tileTableCallback, this, std::placeholders::_1, tile));
+            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
     for (int i = 0; i < 9; ++i) {
@@ -77,7 +77,7 @@ bool TilePickWidget::init() {
         tableWidget->addChild(_bambooButtons[i]);
         _bambooButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 97.5f));
         _bambooButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::tileTableCallback, this, std::placeholders::_1, tile));
+            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
     for (int i = 0; i < 9; ++i) {
@@ -87,7 +87,7 @@ bool TilePickWidget::init() {
         tableWidget->addChild(_dotsButtons[i]);
         _dotsButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 58.5f));
         _dotsButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::tileTableCallback, this, std::placeholders::_1, tile));
+            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
     for (int i = 0; i < 4; ++i) {
@@ -97,7 +97,7 @@ bool TilePickWidget::init() {
         tableWidget->addChild(_honorButtons[i]);
         _honorButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
         _honorButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::tileTableCallback, this, std::placeholders::_1, tile));
+            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
     for (int i = 4; i < 7; ++i) {
@@ -107,7 +107,7 @@ bool TilePickWidget::init() {
         tableWidget->addChild(_honorButtons[i]);
         _honorButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
         _honorButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::tileTableCallback, this, std::placeholders::_1, tile));
+            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
     _chowLessButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
@@ -118,7 +118,7 @@ bool TilePickWidget::init() {
     _chowLessButton->setTitleColor(Color3B::BLACK);
     this->addChild(_chowLessButton);
     _chowLessButton->setPosition(Vec2(tilesSize.width - 90, tableBottom + 140));
-    _chowLessButton->addClickEventListener(std::bind(&TilePickWidget::chowLessCallback, this, std::placeholders::_1));
+    _chowLessButton->addClickEventListener(std::bind(&TilePickWidget::onChowLessButton, this, std::placeholders::_1));
 
     _chowMidButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _chowMidButton->setScale9Enabled(true);
@@ -128,7 +128,7 @@ bool TilePickWidget::init() {
     _chowMidButton->setTitleColor(Color3B::BLACK);
     this->addChild(_chowMidButton);
     _chowMidButton->setPosition(Vec2(tilesSize.width - 90, tableBottom + 100));
-    _chowMidButton->addClickEventListener(std::bind(&TilePickWidget::chowMidCallback, this, std::placeholders::_1));
+    _chowMidButton->addClickEventListener(std::bind(&TilePickWidget::onChowMidButton, this, std::placeholders::_1));
 
     _chowGreatButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _chowGreatButton->setScale9Enabled(true);
@@ -138,7 +138,7 @@ bool TilePickWidget::init() {
     _chowGreatButton->setTitleColor(Color3B::BLACK);
     this->addChild(_chowGreatButton);
     _chowGreatButton->setPosition(Vec2(tilesSize.width - 90, tableBottom + 60));
-    _chowGreatButton->addClickEventListener(std::bind(&TilePickWidget::chowGreatCallback, this, std::placeholders::_1));
+    _chowGreatButton->addClickEventListener(std::bind(&TilePickWidget::onChowGreatButton, this, std::placeholders::_1));
 
     _pungButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _pungButton->setScale9Enabled(true);
@@ -148,7 +148,7 @@ bool TilePickWidget::init() {
     _pungButton->setTitleColor(Color3B::BLACK);
     this->addChild(_pungButton);
     _pungButton->setPosition(Vec2(tilesSize.width - 40, tableBottom + 140));
-    _pungButton->addClickEventListener(std::bind(&TilePickWidget::pungCallback, this, std::placeholders::_1));
+    _pungButton->addClickEventListener(std::bind(&TilePickWidget::onPungButton, this, std::placeholders::_1));
 
     _meldedKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _meldedKongButton->setScale9Enabled(true);
@@ -158,7 +158,7 @@ bool TilePickWidget::init() {
     _meldedKongButton->setTitleColor(Color3B::BLACK);
     this->addChild(_meldedKongButton);
     _meldedKongButton->setPosition(Vec2(tilesSize.width - 40, tableBottom + 100));
-    _meldedKongButton->addClickEventListener(std::bind(&TilePickWidget::meldedKongCallback, this, std::placeholders::_1));
+    _meldedKongButton->addClickEventListener(std::bind(&TilePickWidget::onMeldedKongButton, this, std::placeholders::_1));
 
     _concealedKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _concealedKongButton->setScale9Enabled(true);
@@ -168,7 +168,7 @@ bool TilePickWidget::init() {
     _concealedKongButton->setTitleColor(Color3B::BLACK);
     this->addChild(_concealedKongButton);
     _concealedKongButton->setPosition(Vec2(tilesSize.width - 40, tableBottom + 60));
-    _concealedKongButton->addClickEventListener(std::bind(&TilePickWidget::concealedKongCallback, this, std::placeholders::_1));
+    _concealedKongButton->addClickEventListener(std::bind(&TilePickWidget::onConcealedKongButton, this, std::placeholders::_1));
 
     ui::Button *sortButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     sortButton->setScale9Enabled(true);
@@ -343,7 +343,7 @@ void TilePickWidget::refreshTilesTableButton(TILE tile) {
     }
 }
 
-void TilePickWidget::tileTableCallback(cocos2d::Ref *sender, TILE tile) {
+void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, TILE tile) {
     size_t tilesCnt = _tiles.size();
     size_t maxCnt = 13 - _fixedSets.size() * 3;
 
@@ -633,7 +633,7 @@ void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, TILE 
     }
 }
 
-void TilePickWidget::chowLessCallback(cocos2d::Ref *sender) {
+void TilePickWidget::onChowLessButton(cocos2d::Ref *sender) {
     // XX_
     TILE tile = _tiles[_currentIdx];
     auto it = std::find(_tiles.begin(), _tiles.end(), tile - 2);
@@ -656,7 +656,7 @@ void TilePickWidget::chowLessCallback(cocos2d::Ref *sender) {
     refreshAfterAction(2);
 }
 
-void TilePickWidget::chowMidCallback(cocos2d::Ref *sender) {
+void TilePickWidget::onChowMidButton(cocos2d::Ref *sender) {
     // X_X
     TILE tile = _tiles[_currentIdx];
     auto it = std::find(_tiles.begin(), _tiles.end(), tile - 1);
@@ -679,7 +679,7 @@ void TilePickWidget::chowMidCallback(cocos2d::Ref *sender) {
     refreshAfterAction(1);
 }
 
-void TilePickWidget::chowGreatCallback(cocos2d::Ref *sender) {
+void TilePickWidget::onChowGreatButton(cocos2d::Ref *sender) {
     // _XX
     TILE tile = _tiles[_currentIdx];
     auto it = std::find(_tiles.begin(), _tiles.end(), tile);
@@ -702,7 +702,7 @@ void TilePickWidget::chowGreatCallback(cocos2d::Ref *sender) {
     refreshAfterAction(0);
 }
 
-void TilePickWidget::pungCallback(cocos2d::Ref *sender) {
+void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
     int meldedIdx = 2;
     TILE tile = _tiles[_currentIdx];
     std::vector<TILE>::iterator it[3];
@@ -727,7 +727,7 @@ void TilePickWidget::pungCallback(cocos2d::Ref *sender) {
     refreshAfterAction(meldedIdx);
 }
 
-void TilePickWidget::meldedKongCallback(cocos2d::Ref *sender) {
+void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
     int meldedIdx = 0;
     TILE tile = _tiles[_currentIdx];
     std::vector<TILE>::iterator it[4];
@@ -753,7 +753,7 @@ void TilePickWidget::meldedKongCallback(cocos2d::Ref *sender) {
     refreshAfterAction(meldedIdx);
 }
 
-void TilePickWidget::concealedKongCallback(cocos2d::Ref *sender) {
+void TilePickWidget::onConcealedKongButton(cocos2d::Ref *sender) {
     TILE tile = _tiles[_currentIdx];
     std::vector<TILE>::iterator it[4];
     it[0] = std::find(_tiles.begin(), _tiles.end(), tile);

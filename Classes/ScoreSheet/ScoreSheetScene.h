@@ -29,9 +29,9 @@ private:
     void refreshEndTime();
     void recover();
     void reset();
-    void lockCallback(cocos2d::Ref *sender);
-    void recordCallback(cocos2d::Ref *sender, size_t handIdx);
-    void timeScheduler(float dt);
+    void onLockButton(cocos2d::Ref *sender);
+    void onRecordButton(cocos2d::Ref *sender, size_t handIdx);
+    void onTimeScheduler(float dt);
 };
 
 #endif // __SCORE_SHEET_SCENE_H__
