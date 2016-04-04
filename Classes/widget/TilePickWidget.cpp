@@ -344,7 +344,6 @@ void TilePickWidget::refreshTilesTableButton(TILE tile) {
 }
 
 void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, TILE tile) {
-    size_t tilesCnt = _tiles.size();
     size_t maxCnt = 13 - _fixedSets.size() * 3;
 
     if (_currentIdx >= _tiles.size() && _winTileButton == nullptr) {
@@ -385,7 +384,6 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, TILE tile) {
 
 void TilePickWidget::refreshActionButtons() {
     if (_currentIdx >= _tiles.size()) {
-        size_t tilesCnt = _tiles.size();
         size_t maxCnt = 13 - _fixedSets.size() * 3;
         Vec2 pos = calcHandTilePos(_tiles.size());
         if (_currentIdx != maxCnt) {
