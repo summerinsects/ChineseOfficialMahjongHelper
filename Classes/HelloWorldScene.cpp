@@ -25,22 +25,24 @@ bool HelloWorld::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    ui::Button *button = ui::Button::create();
+    ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(75.0, 32.0f));
-    button->setTitleFontSize(24);
+    button->setTitleFontSize(22);
+    button->setTitleColor(Color3B::BLACK);
     button->setTitleText("算番器");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 20));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(PointsCalculatorScene::createScene());
     });
 
-    button = ui::Button::create();
+    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(75.0, 32.0f));
-    button->setTitleFontSize(24);
+    button->setTitleFontSize(22);
+    button->setTitleColor(Color3B::BLACK);
     button->setTitleText("计分器");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
     button->addClickEventListener([](Ref *) {
