@@ -1,6 +1,7 @@
 ﻿#include "HelloWorldScene.h"
 #include "PointsCalculator/PointsCalculatorScene.h"
 #include "ScoreSheet/ScoreSheetScene.h"
+#include "ScoreTable/ScoreTable.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -32,7 +33,7 @@ bool HelloWorld::init() {
     button->setTitleFontSize(22);
     button->setTitleColor(Color3B::BLACK);
     button->setTitleText("算番器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 20));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 40));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(PointsCalculatorScene::createScene());
     });
@@ -44,9 +45,21 @@ bool HelloWorld::init() {
     button->setTitleFontSize(22);
     button->setTitleColor(Color3B::BLACK);
     button->setTitleText("计分器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(ScoreSheetScene::createScene());
+    });
+
+    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(75.0, 32.0f));
+    button->setTitleFontSize(22);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("番种表");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 40));
+    button->addClickEventListener([](Ref *) {
+        Director::getInstance()->pushScene(ScoreTableScene::createScene());
     });
 
     return true;

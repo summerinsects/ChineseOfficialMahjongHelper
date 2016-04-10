@@ -22,6 +22,9 @@
     <Filter Include="src\widget">
       <UniqueIdentifier>{2f551755-0a71-4dde-9a7d-314583535ec8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ScoreTable">
+      <UniqueIdentifier>{c45dcad3-107b-4c78-a709-2ca8c957501f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -50,6 +53,12 @@
     </ClCompile>
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp">
       <Filter>src\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ScoreTable\ScoreTable.cpp">
+      <Filter>src\ScoreTable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ScoreTable\ScoreDefinition.cpp">
+      <Filter>src\ScoreTable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +91,12 @@
     </ClInclude>
     <ClInclude Include="..\Classes\widget\TilePickWidget.h">
       <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScoreTable\ScoreTable.h">
+      <Filter>src\ScoreTable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScoreTable\ScoreDefinition.h">
+      <Filter>src\ScoreTable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
