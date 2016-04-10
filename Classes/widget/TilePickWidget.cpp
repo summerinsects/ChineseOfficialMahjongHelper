@@ -607,10 +607,10 @@ void TilePickWidget::addFixedMeldedKongSet(const cocos2d::Vec2 &center, mahjong:
 void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, mahjong::TILE tile) {
     // 一张牌的尺寸：27 * 39
     const char *image[4];
-    image[0] = imageName[0x53];
+    image[0] = "tiles/bg.png";
     image[1] = imageName[tile];
     image[2] = imageName[tile];
-    image[3] = imageName[0x53];
+    image[3] = "tiles/bg.png";
 
     Vec2 pos[4];
     pos[0] = Vec2(center.x - 40.5f, center.y);
@@ -623,9 +623,6 @@ void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, mahjo
         sprite->setScale(27 / sprite->getContentSize().width);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
-        if (i == 0 || i == 3) {
-            sprite->setColor(Color3B::RED);
-        }
     }
 }
 
