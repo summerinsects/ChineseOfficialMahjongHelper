@@ -1171,7 +1171,7 @@ static void check_wind_pungs(const SET &sets, WIND_TYPE prevalent_wind, WIND_TYP
 }
 
 // 统一校正
-static void correction_points_table(long (&points_table)[POINT_TYPE_COUNT]) {
+static void correction_points_table(long (&points_table)[POINT_TYPE_COUNT], bool prevalent_eq_seat) {
     if (points_table[BIG_FOUR_WINDS]) {
         points_table[BIG_THREE_WINDS] = 0;
         points_table[ALL_PUNGS] = 0;
@@ -1352,6 +1352,10 @@ static void correction_points_table(long (&points_table)[POINT_TYPE_COUNT]) {
         points_table[NO_HONORS] = 0;
     }
     if (points_table[BIG_THREE_WINDS]) {
+        if (!points_table[ALL_HONORS] && !points_table[ALL_TERMINALS_AND_HONORS]) {
+            assert(points_table[PUNG_OF_TERMINALS_OR_HONORS] >= 3);
+            points_table[PUNG_OF_TERMINALS_OR_HONORS] -= 3;
+        }
 #ifdef STRICT_98_RULE
         points_table[ONE_VOIDED_SUIT] = 0;
 #endif
@@ -1390,8 +1394,15 @@ static void correction_points_table(long (&points_table)[POINT_TYPE_COUNT]) {
         points_table[MELDED_KONG] = 0;
     }
 
-    if (points_table[PREVALENT_WIND] || points_table[SEAT_WIND]) {
+    if (points_table[PREVALENT_WIND]) {
         if (!points_table[BIG_THREE_WINDS] && !points_table[LITTLE_FOUR_WINDS]
+            && !points_table[ALL_HONORS] && !points_table[ALL_TERMINALS_AND_HONORS]) {
+            assert(points_table[PUNG_OF_TERMINALS_OR_HONORS] > 0);
+            --points_table[PUNG_OF_TERMINALS_OR_HONORS];
+        }
+    }
+    if (points_table[SEAT_WIND]) {
+        if (!prevalent_eq_seat && !points_table[BIG_THREE_WINDS] && !points_table[LITTLE_FOUR_WINDS]
             && !points_table[ALL_HONORS] && !points_table[ALL_TERMINALS_AND_HONORS]) {
             assert(points_table[PUNG_OF_TERMINALS_OR_HONORS] > 0);
             --points_table[PUNG_OF_TERMINALS_OR_HONORS];
@@ -1504,7 +1515,7 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
         check_wind_pungs(sets[i], prevalent_wind, seat_wind, points_table);
     }
 
-    correction_points_table(points_table);
+    correction_points_table(points_table, prevalent_wind == seat_wind);
 
     if (std::all_of(std::begin(points_table), std::end(points_table), [](int p) { return p == 0; })) {
         points_table[CHICKEN_HAND] = 1;
@@ -1577,7 +1588,7 @@ static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN
     }
 
     check_win_type(win_type, points_table);
-    correction_points_table(points_table);
+    correction_points_table(points_table, false);
     return true;
 }
 
@@ -1693,7 +1704,7 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
 
     check_wind_pungs(fourth_set, prevalent_wind, seat_wind, points_table);
 
-    correction_points_table(points_table);
+    correction_points_table(points_table, prevalent_wind == seat_wind);
     return true;
 }
 
