@@ -1,13 +1,12 @@
 ﻿#include "ScoreSheetScene.h"
 #include "RecordScene.h"
+#include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #define PRId64 "lld"
 #endif
 #include "../wheels/cppJSON.hpp"
-
-#pragma execution_character_set("utf-8")
 
 USING_NS_CC;
 
@@ -143,11 +142,9 @@ bool ScoreSheetScene::init() {
         node->addChild(_totalLabel[i]);
     }
 
-    const char *handText[] = { "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
-        "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北"};
     for (int k = 0; k < 16; ++k) {
         const float y = 10 + (15 - k) * 20;
-        label = Label::createWithSystemFont(handText[k], "Arail", 12);
+        label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
         label->setColor(Color3B::GRAY);
         label->setPosition(Vec2(gap * 0.5f, y));
         node->addChild(label);

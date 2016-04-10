@@ -1,16 +1,8 @@
 ﻿#include "TilePickWidget.h"
+#include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
 USING_NS_CC;
-
-static const char *imageName[] = {
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-    "", "tiles/m1.png", "tiles/m2.png", "tiles/m3.png", "tiles/m4.png", "tiles/m5.png", "tiles/m6.png", "tiles/m7.png", "tiles/m8.png", "tiles/m9.png", "", "", "", "", "", "",
-    "", "tiles/s1.png", "tiles/s2.png", "tiles/s3.png", "tiles/s4.png", "tiles/s5.png", "tiles/s6.png", "tiles/s7.png", "tiles/s8.png", "tiles/s9.png", "", "", "", "", "", "",
-    "", "tiles/p1.png", "tiles/p2.png", "tiles/p3.png", "tiles/p4.png", "tiles/p5.png", "tiles/p6.png", "tiles/p7.png", "tiles/p8.png", "tiles/p9.png", "", "", "", "", "", "",
-    "", "tiles/w1.png", "tiles/w2.png", "tiles/w3.png", "tiles/w4.png", "", "", "", "", "", "", "", "", "", "", "",
-    "", "tiles/d1.png", "tiles/d2.png", "tiles/d3.png", "", "", "", "", "", "", "", "", "", "", "", "",
-};
 
 bool TilePickWidget::init() {
     if (!ui::Widget::init()) {
@@ -62,7 +54,7 @@ bool TilePickWidget::init() {
 
     for (int i = 0; i < 9; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, i + 1);
-        _characterButtons[i] = ui::Button::create(imageName[tile]);
+        _characterButtons[i] = ui::Button::create(tilesImageName[tile]);
         _characterButtons[i]->setScale(27 / _characterButtons[i]->getContentSize().width);
         tableWidget->addChild(_characterButtons[i]);
         _characterButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 136.5f));
@@ -72,7 +64,7 @@ bool TilePickWidget::init() {
 
     for (int i = 0; i < 9; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_BAMBOO, i + 1);
-        _bambooButtons[i] = ui::Button::create(imageName[tile]);
+        _bambooButtons[i] = ui::Button::create(tilesImageName[tile]);
         _bambooButtons[i]->setScale(27 / _bambooButtons[i]->getContentSize().width);
         tableWidget->addChild(_bambooButtons[i]);
         _bambooButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 97.5f));
@@ -82,7 +74,7 @@ bool TilePickWidget::init() {
 
     for (int i = 0; i < 9; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DOTS, i + 1);
-        _dotsButtons[i] = ui::Button::create(imageName[tile]);
+        _dotsButtons[i] = ui::Button::create(tilesImageName[tile]);
         _dotsButtons[i]->setScale(27 / _dotsButtons[i]->getContentSize().width);
         tableWidget->addChild(_dotsButtons[i]);
         _dotsButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 58.5f));
@@ -92,7 +84,7 @@ bool TilePickWidget::init() {
 
     for (int i = 0; i < 4; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_WINDS, i + 1);
-        _honorButtons[i] = ui::Button::create(imageName[tile]);
+        _honorButtons[i] = ui::Button::create(tilesImageName[tile]);
         _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
         tableWidget->addChild(_honorButtons[i]);
         _honorButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
@@ -102,7 +94,7 @@ bool TilePickWidget::init() {
 
     for (int i = 4; i < 7; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DRAGONS, i - 3);
-        _honorButtons[i] = ui::Button::create(imageName[tile]);
+        _honorButtons[i] = ui::Button::create(tilesImageName[tile]);
         _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
         tableWidget->addChild(_honorButtons[i]);
         _honorButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
@@ -260,7 +252,7 @@ cocos2d::Vec2 TilePickWidget::calcHandTilePos(size_t idx) const {
 }
 
 void TilePickWidget::addOneTile(mahjong::TILE tile, bool isWinTile) {
-    ui::Button *button = ui::Button::create(imageName[tile]);
+    ui::Button *button = ui::Button::create(tilesImageName[tile]);
     button->setScale(27 / button->getContentSize().width);
     _tilesWidget->addChild(button);
 
@@ -290,7 +282,7 @@ void TilePickWidget::addOneTile(mahjong::TILE tile, bool isWinTile) {
 }
 
 void TilePickWidget::replaceOneTile(mahjong::TILE tile, bool isWinTile) {
-    ui::Button *button = ui::Button::create(imageName[tile]);
+    ui::Button *button = ui::Button::create(tilesImageName[tile]);
     button->setScale(27 / button->getContentSize().width);
     _tilesWidget->addChild(button);
 
@@ -499,19 +491,19 @@ void TilePickWidget::addFixedChowSet(const cocos2d::Vec2 &center, mahjong::TILE 
     const char *image[3];
     switch (meldedIdx) {
     default:
-        image[0] = imageName[tile - 1];
-        image[1] = imageName[tile];
-        image[2] = imageName[tile + 1];
+        image[0] = tilesImageName[tile - 1];
+        image[1] = tilesImageName[tile];
+        image[2] = tilesImageName[tile + 1];
         break;
     case 1:
-        image[0] = imageName[tile];
-        image[1] = imageName[tile - 1];
-        image[2] = imageName[tile + 1];
+        image[0] = tilesImageName[tile];
+        image[1] = tilesImageName[tile - 1];
+        image[2] = tilesImageName[tile + 1];
         break;
     case 2:
-        image[0] = imageName[tile + 1];
-        image[1] = imageName[tile - 1];
-        image[2] = imageName[tile];
+        image[0] = tilesImageName[tile + 1];
+        image[1] = tilesImageName[tile - 1];
+        image[2] = tilesImageName[tile];
         break;
     }
 
@@ -553,7 +545,7 @@ void TilePickWidget::addFixedPungSet(const cocos2d::Vec2 &center, mahjong::TILE 
     }
 
     for (int i = 0; i < 3; ++i) {
-        Sprite *sprite = Sprite::create(imageName[tile]);
+        Sprite *sprite = Sprite::create(tilesImageName[tile]);
         sprite->setScale(27 / sprite->getContentSize().width);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
@@ -594,7 +586,7 @@ void TilePickWidget::addFixedMeldedKongSet(const cocos2d::Vec2 &center, mahjong:
     }
 
     for (int i = 0; i < 4; ++i) {
-        Sprite *sprite = Sprite::create(imageName[tile]);
+        Sprite *sprite = Sprite::create(tilesImageName[tile]);
         sprite->setScale(27 / sprite->getContentSize().width);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
@@ -608,8 +600,8 @@ void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, mahjo
     // 一张牌的尺寸：27 * 39
     const char *image[4];
     image[0] = "tiles/bg.png";
-    image[1] = imageName[tile];
-    image[2] = imageName[tile];
+    image[1] = tilesImageName[tile];
+    image[2] = tilesImageName[tile];
     image[3] = "tiles/bg.png";
 
     Vec2 pos[4];

@@ -1,4 +1,5 @@
 ﻿#include "PointsCalculatorScene.h"
+#include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
 #include "../widget/TilePickWidget.h"
@@ -10,20 +11,6 @@ Scene *PointsCalculatorScene::createScene() {
     auto layer = PointsCalculatorScene::create();
     scene->addChild(layer);
     return scene;
-}
-
-static inline void setButtonChecked(ui::Button *button) {
-    button->setHighlighted(true);
-    button->setTag(1);
-}
-
-static inline void setButtonUnchecked(ui::Button *button) {
-    button->setTag(0);
-    button->setHighlighted(false);
-}
-
-static inline bool isButtonChecked(ui::Button *button) {
-    return button->getTag() == 1;
 }
 
 bool PointsCalculatorScene::init() {
