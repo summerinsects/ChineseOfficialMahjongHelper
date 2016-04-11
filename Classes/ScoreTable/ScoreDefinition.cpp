@@ -63,15 +63,17 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
 
     std::string::size_type pos = text.find('[');
     while (pos != std::string::npos) {
-        sscanf(text.c_str() + pos + 1, "%[^]]", tilesStr);
-        if (mahjong::parse_tiles(tilesStr, tiles, &tilesCnt) != nullptr) {
-            char *p = imgStr;
+        const char *str = text.c_str();
+        int readLen;
+        if (sscanf(str + pos + 1, "%[^]]%n", tilesStr, &readLen) != EOF && str[pos + readLen + 1] == ']'
+            && mahjong::parse_tiles(tilesStr, tiles, &tilesCnt) != nullptr) {
+            size_t totalWriteLen = 0;
             for (long i = 0; i < tilesCnt; ++i) {
-                int n = snprintf(p, sizeof(imgStr) - (p - imgStr), "<img src=\"%s\" width=\"%d\" height=\"%d\"/>", tilesImageName[tiles[i]], (int)(27 * scale), (int)(39 * scale));
-                p += n;
+                int writeLen = snprintf(imgStr + totalWriteLen , sizeof(imgStr) - totalWriteLen, "<img src=\"%s\" width=\"%d\" height=\"%d\"/>", tilesImageName[tiles[i]], (int)(27 * scale), (int)(39 * scale));
+                totalWriteLen += writeLen;
             }
-            text.replace(pos, text.find(']', pos) - pos + 1, imgStr);
-            pos = text.find('[', pos + (p - imgStr));
+            text.replace(pos, readLen + 2, imgStr);
+            pos = text.find('[', pos + totalWriteLen);
         }
         else {
             pos = text.find('[', pos + 1);
