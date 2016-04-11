@@ -179,11 +179,10 @@ $RECYCLE.BIN/
 /proj.android/.cproject
 /proj.android/.project
 /proj.android/.settings
-/proj.ios_mac/cocos2dx-wheels.xcodeproj/project.xcworkspace
-/proj.ios_mac/cocos2dx-wheels.xcodeproj/xcuserdata
+/proj.ios_mac/ChineseOfficialMahjongHelper.xcodeproj/project.xcworkspace
+/proj.ios_mac/ChineseOfficialMahjongHelper.xcodeproj/xcuserdata
 !/proj.ios_mac/ios/Prefix.pch
+!/proj.ios_mac/mac/Prefix.pch
 /proj.linux
 /proj.win8.1-universal
 /proj.wp8-xaml
-proj.ios_mac/ChineseOfficialMahjongHelper.xcodeproj/xcuserdata
-proj.ios_mac/ChineseOfficialMahjongHelper.xcodeproj/project.xcworkspace
