@@ -30,7 +30,7 @@ bool HelloWorld::init() {
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(75.0, 32.0f));
-    button->setTitleFontSize(22);
+    button->setTitleFontSize(20);
     button->setTitleColor(Color3B::BLACK);
     button->setTitleText("算番器");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 40));
@@ -42,7 +42,7 @@ bool HelloWorld::init() {
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(75.0, 32.0f));
-    button->setTitleFontSize(22);
+    button->setTitleFontSize(20);
     button->setTitleColor(Color3B::BLACK);
     button->setTitleText("计分器");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
@@ -54,7 +54,7 @@ bool HelloWorld::init() {
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(75.0, 32.0f));
-    button->setTitleFontSize(22);
+    button->setTitleFontSize(20);
     button->setTitleColor(Color3B::BLACK);
     button->setTitleText("番种表");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 40));
