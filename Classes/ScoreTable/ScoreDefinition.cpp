@@ -6,6 +6,35 @@ USING_NS_CC;
 
 static std::vector<std::string> g_vec;
 
+static void replaceTilesToImage(std::string &text, float scale) {
+    char tilesStr[128];
+    mahjong::TILE tiles[14];
+    long tilesCnt;
+    char imgStr[1024];
+
+    std::string::size_type pos = text.find('[');
+    while (pos != std::string::npos) {
+        const char *str = text.c_str();
+        int readLen;
+        if (sscanf(str + pos + 1, "%[^]]%n", tilesStr, &readLen) != EOF
+            && str[pos + readLen + 1] == ']'
+            && mahjong::parse_tiles(tilesStr, tiles, &tilesCnt) != nullptr) {
+            size_t totalWriteLen = 0;
+            for (long i = 0; i < tilesCnt; ++i) {
+                int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
+                    "<img src=\"%s\" width=\"%d\" height=\"%d\"/>", tilesImageName[tiles[i]],
+                    (int)(27 * scale), (int)(39 * scale));
+                totalWriteLen += writeLen;
+            }
+            text.replace(pos, readLen + 2, imgStr);
+            pos = text.find('[', pos + totalWriteLen);
+        }
+        else {
+            pos = text.find('[', pos + 1);
+        }
+    }
+}
+
 Scene *ScoreDefinitionScene::createScene(size_t idx) {
     if (g_vec.empty()) {
         ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
@@ -55,30 +84,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     if (maxWidth < 25) {
         scale = maxWidth / 27;
     }
-
-    char tilesStr[128];
-    mahjong::TILE tiles[14];
-    long tilesCnt;
-    char imgStr[1024];
-
-    std::string::size_type pos = text.find('[');
-    while (pos != std::string::npos) {
-        const char *str = text.c_str();
-        int readLen;
-        if (sscanf(str + pos + 1, "%[^]]%n", tilesStr, &readLen) != EOF && str[pos + readLen + 1] == ']'
-            && mahjong::parse_tiles(tilesStr, tiles, &tilesCnt) != nullptr) {
-            size_t totalWriteLen = 0;
-            for (long i = 0; i < tilesCnt; ++i) {
-                int writeLen = snprintf(imgStr + totalWriteLen , sizeof(imgStr) - totalWriteLen, "<img src=\"%s\" width=\"%d\" height=\"%d\"/>", tilesImageName[tiles[i]], (int)(27 * scale), (int)(39 * scale));
-                totalWriteLen += writeLen;
-            }
-            text.replace(pos, readLen + 2, imgStr);
-            pos = text.find('[', pos + totalWriteLen);
-        }
-        else {
-            pos = text.find('[', pos + 1);
-        }
-    }
+    replaceTilesToImage(text, scale);
 
     ui::RichText *richText = ui::RichText::createWithXML(text);
     richText->setContentSize(Size(visibleSize.width - 10, 0));
