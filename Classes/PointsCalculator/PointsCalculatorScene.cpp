@@ -25,7 +25,7 @@ bool PointsCalculatorScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Label *tileLabel = Label::createWithSystemFont("国标麻将算番器", "Arial", 24);
+    Label *tileLabel = Label::createWithSystemFont("国标麻将算番器", "Arial", 20);
     this->addChild(tileLabel);
     tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 12));
 

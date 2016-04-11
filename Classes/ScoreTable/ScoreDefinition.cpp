@@ -33,7 +33,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Label *tileLabel = Label::createWithSystemFont(mahjong::points_name[idx], "Arial", 24);
+    Label *tileLabel = Label::createWithSystemFont(mahjong::points_name[idx], "Arial", 20);
     this->addChild(tileLabel);
     tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
         origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
