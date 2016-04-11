@@ -30,13 +30,11 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    ui::Button *backBtn = ui::Button::create();
+    ui::Button *backBtn = ui::Button::create("source_material/btn_left_white.png", "source_material/btn_left_blue.png");
     this->addChild(backBtn);
     backBtn->setScale9Enabled(true);
-    backBtn->setContentSize(Size(45, 20));
-    backBtn->setTitleFontSize(16);
-    backBtn->setTitleText("返回");
-    backBtn->setPosition(Vec2(origin.x + 15, origin.y + visibleSize.height - 10));
+    backBtn->setScale(24 / backBtn->getContentSize().width);
+    backBtn->setPosition(Vec2(origin.x + 12, origin.y + visibleSize.height - 12));
     backBtn->addClickEventListener([](Ref *) {
         Director::getInstance()->popScene();
     });
