@@ -1,18 +1,15 @@
 ﻿#ifndef _POINTS_CALCULATOR_SCENE_H_
 #define _POINTS_CALCULATOR_SCENE_H_
 
-#include "cocos2d.h"
-#include "ui/CocosGUI.h"
+#include "../BaseLayer.h"
 
 class TilePickWidget;
 
-class PointsCalculatorScene : public cocos2d::Layer {
+class PointsCalculatorScene : public BaseLayer {
 public:
     static cocos2d::Scene *createScene();
 
     virtual bool init() override;
-
-    virtual void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent) override;
 
     CREATE_FUNC(PointsCalculatorScene);
 

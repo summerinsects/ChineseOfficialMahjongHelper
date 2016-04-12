@@ -14,29 +14,12 @@ Scene *PointsCalculatorScene::createScene() {
 }
 
 bool PointsCalculatorScene::init() {
-    if (!Layer::init()) {
+    if (!BaseLayer::initWithTitle("国标麻将算番器")) {
         return false;
     }
 
-    auto listener = EventListenerKeyboard::create();
-    listener->onKeyReleased = CC_CALLBACK_2(Layer::onKeyReleased, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    Label *tileLabel = Label::createWithSystemFont("国标麻将算番器", "Arial", 20);
-    this->addChild(tileLabel);
-    tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 12));
-
-    ui::Button *backBtn = ui::Button::create("source_material/btn_left_white.png", "source_material/btn_left_blue.png");
-    this->addChild(backBtn);
-    backBtn->setScale9Enabled(true);
-    backBtn->setScale(24 / backBtn->getContentSize().width);
-    backBtn->setPosition(Vec2(origin.x + 12, origin.y + visibleSize.height - 12));
-    backBtn->addClickEventListener([](Ref *) {
-        Director::getInstance()->popScene();
-    });
 
     _tilePicker = TilePickWidget::create();
     const Size &widgetSize = _tilePicker->getContentSize();
@@ -44,7 +27,7 @@ bool PointsCalculatorScene::init() {
     _tilePicker->setFixedSetsChangedCallback(std::bind(&PointsCalculatorScene::onFixedSetsChanged, this, std::placeholders::_1));
     _tilePicker->setWinTileChangedCallback(std::bind(&PointsCalculatorScene::onWinTileChanged, this, std::placeholders::_1));
 
-    float y = origin.y + visibleSize.height - 5;
+    float y = origin.y + visibleSize.height - 10;
     if (widgetSize.width > visibleSize.width) {
         float scale = visibleSize.width / widgetSize.width;
         _tilePicker->setScale(scale);
@@ -455,10 +438,4 @@ void PointsCalculatorScene::calculate() {
     Label *errorLabel = Label::createWithSystemFont(errorStr, "Arial", FONT_SIZE);
     _pointsAreaNode->addChild(errorLabel);
     errorLabel->setPosition(pos);
-}
-
-void PointsCalculatorScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
-    if (keyCode == EventKeyboard::KeyCode::KEY_BACK) {
-        Director::getInstance()->popScene();
-    }
 }

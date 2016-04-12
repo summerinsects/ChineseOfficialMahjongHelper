@@ -51,30 +51,12 @@ Scene *ScoreDefinitionScene::createScene(size_t idx) {
 }
 
 bool ScoreDefinitionScene::initWithIndex(size_t idx) {
-    if (!Layer::init()) {
+    if (!BaseLayer::initWithTitle(mahjong::points_name[idx])) {
         return false;
     }
 
-    auto listener = EventListenerKeyboard::create();
-    listener->onKeyReleased = CC_CALLBACK_2(Layer::onKeyReleased, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    Label *tileLabel = Label::createWithSystemFont(mahjong::points_name[idx], "Arial", 20);
-    this->addChild(tileLabel);
-    tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
-        origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
-
-    ui::Button *backBtn = ui::Button::create("source_material/btn_left_white.png", "source_material/btn_left_blue.png");
-    this->addChild(backBtn);
-    backBtn->setScale9Enabled(true);
-    backBtn->setScale(24 / backBtn->getContentSize().width);
-    backBtn->setPosition(Vec2(origin.x + 12, origin.y + visibleSize.height - 12));
-    backBtn->addClickEventListener([](Ref *) {
-        Director::getInstance()->popScene();
-    });
 
     std::string &text = g_vec[idx];
     float scale = 1.0f;
@@ -92,10 +74,4 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     this->addChild(richText);
     richText->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 40));
     return true;
-}
-
-void ScoreDefinitionScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
-    if (keyCode == EventKeyboard::KeyCode::KEY_BACK) {
-        Director::getInstance()->popScene();
-    }
 }

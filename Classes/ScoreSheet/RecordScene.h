@@ -1,16 +1,14 @@
 ﻿#ifndef _RECORD_SCENE_H_
 #define _RECORD_SCENE_H_
 
-#include "cocos2d.h"
-#include "ui/CocosGUI.h"
+#include "../BaseLayer.h"
 
-class RecordScene : public cocos2d::Layer, public cocos2d::ui::EditBoxDelegate {
+class RecordScene : public BaseLayer, public cocos2d::ui::EditBoxDelegate {
 public:
     static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const std::function<void (RecordScene *)> &okCallback);
 
     bool initWithIndex(size_t handIdx, const char **playerNames);
 
-    virtual void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent) override;
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
 
     const int (&getScoreTable() const)[4] {

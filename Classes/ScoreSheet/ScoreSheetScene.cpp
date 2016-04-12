@@ -25,32 +25,14 @@ Scene *ScoreSheetScene::createScene() {
 }
 
 bool ScoreSheetScene::init() {
-    if (!Layer::init()) {
+    if (!BaseLayer::initWithTitle("国标麻将记分器")) {
         return false;
     }
-
-    auto listener = EventListenerKeyboard::create();
-    listener->onKeyReleased = CC_CALLBACK_2(Layer::onKeyReleased, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     memset(_totalScores, 0, sizeof(_totalScores));
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    Label *tileLabel = Label::createWithSystemFont("国标麻将记分器", "Arial", 20);
-    this->addChild(tileLabel);
-    tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
-        origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
-
-    ui::Button *backBtn = ui::Button::create("source_material/btn_left_white.png", "source_material/btn_left_blue.png");
-    this->addChild(backBtn);
-    backBtn->setScale9Enabled(true);
-    backBtn->setScale(24 / backBtn->getContentSize().width);
-    backBtn->setPosition(Vec2(origin.x + 12, origin.y + visibleSize.height - 12));
-    backBtn->addClickEventListener([](Ref *) {
-        Director::getInstance()->popScene();
-    });
 
     ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(button);
@@ -174,12 +156,6 @@ bool ScoreSheetScene::init() {
 
     recover();
     return true;
-}
-
-void ScoreSheetScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
-    if (keyCode == EventKeyboard::KeyCode::KEY_BACK) {
-        Director::getInstance()->popScene();
-    }
 }
 
 static void readFromJson() {

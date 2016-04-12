@@ -15,7 +15,7 @@ Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const 
 }
 
 bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
-    if (!Layer::init()) {
+    if (!BaseLayer::initWithTitle(handNameText[handIdx])) {
         return false;
     }
 
@@ -23,26 +23,8 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     memset(_scoreTable, 0, sizeof(_scoreTable));
     _pointsFlag = 0;
 
-    auto listener = EventListenerKeyboard::create();
-    listener->onKeyReleased = CC_CALLBACK_2(Layer::onKeyReleased, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    ui::Button *backBtn = ui::Button::create("source_material/btn_left_white.png", "source_material/btn_left_blue.png");
-    this->addChild(backBtn);
-    backBtn->setScale9Enabled(true);
-    backBtn->setScale(24 / backBtn->getContentSize().width);
-    backBtn->setPosition(Vec2(origin.x + 12, origin.y + visibleSize.height - 12));
-    backBtn->addClickEventListener([](Ref *) {
-        Director::getInstance()->popScene();
-    });
-
-    Label *tileLabel = Label::createWithSystemFont(handNameText[handIdx], "Arial", 18);
-    this->addChild(tileLabel);
-    tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
-        origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
 
     _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
     this->addChild(_editBox);
@@ -420,10 +402,4 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
 void RecordScene::onOkButton(cocos2d::Ref *sender) {
     _okCallback(this);
     Director::getInstance()->popScene();
-}
-
-void RecordScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
-    if (keyCode == EventKeyboard::KeyCode::KEY_BACK) {
-        Director::getInstance()->popScene();
-    }
 }

@@ -12,30 +12,12 @@ Scene *ScoreTableScene::createScene() {
 }
 
 bool ScoreTableScene::init() {
-    if (!Layer::init()) {
+    if (!BaseLayer::initWithTitle("国标麻将番种表")) {
         return false;
     }
 
-    auto listener = EventListenerKeyboard::create();
-    listener->onKeyReleased = CC_CALLBACK_2(Layer::onKeyReleased, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    Label *tileLabel = Label::createWithSystemFont("国标麻将番种表", "Arial", 20);
-    this->addChild(tileLabel);
-    tileLabel->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
-        origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
-
-    ui::Button *backBtn = ui::Button::create("source_material/btn_left_white.png", "source_material/btn_left_blue.png");
-    this->addChild(backBtn);
-    backBtn->setScale9Enabled(true);
-    backBtn->setScale(24 / backBtn->getContentSize().width);
-    backBtn->setPosition(Vec2(origin.x + 12, origin.y + visibleSize.height - 12));
-    backBtn->addClickEventListener([](Ref *) {
-        Director::getInstance()->popScene();
-    });
 
     ui::Widget *innerNode = ui::Widget::create();
     innerNode->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
@@ -79,19 +61,13 @@ bool ScoreTableScene::init() {
     ui::ScrollView *scrollView = ui::ScrollView::create();
     scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
     scrollView->setBounceEnabled(true);
-    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 32));
+    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 35));
     scrollView->setInnerContainerSize(innerNode->getContentSize());
     scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 12.0f));
+    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     this->addChild(scrollView);
 
     scrollView->addChild(innerNode);
 
     return true;
-}
-
-void ScoreTableScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
-    if (keyCode == EventKeyboard::KeyCode::KEY_BACK) {
-        Director::getInstance()->popScene();
-    }
 }
