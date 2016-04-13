@@ -11,6 +11,19 @@ Scene *ScoreTableScene::createScene() {
     return scene;
 }
 
+static cocos2d::ui::Button *createPointButton(size_t idx) {
+    ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(66.0f, 20.0f));
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleFontSize(12);
+    button->setTitleText(mahjong::points_name[idx]);
+    button->addClickEventListener([idx](Ref *) {
+        Director::getInstance()->pushScene(ScoreDefinitionScene::createScene(idx));
+    });
+    return button;
+}
+
 bool ScoreTableScene::init() {
     if (!BaseLayer::initWithTitle("国标麻将番种表")) {
         return false;
@@ -42,17 +55,8 @@ bool ScoreTableScene::init() {
                 y -= 24.0f;
             }
             size_t idx = beginIndex[i] + k;
-            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            ui::Button *button = createPointButton(idx);
             innerNode->addChild(button);
-            button->setScale9Enabled(true);
-            button->setContentSize(Size(66.0f, 20.0f));
-            button->setTitleColor(Color3B::BLACK);
-            button->setTitleFontSize(12);
-            button->setTitleText(mahjong::points_name[idx]);
-            button->addClickEventListener([idx](Ref *) {
-                Director::getInstance()->pushScene(ScoreDefinitionScene::createScene(idx));
-            });
-
             button->setPosition(Vec2(gap * (col + 0.5f), y - 12.0f));
         }
         y -= 24.0f;
