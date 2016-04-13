@@ -26,7 +26,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
+    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/textField_bg.png"));
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
@@ -394,7 +394,9 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
     }
     currentWinScore = std::max(8, currentWinScore);
     if (currentWinScore != prevWinScore) {
-        _editBox->setText(StringUtils::format("%d", currentWinScore).c_str());
+        char str[16];
+        snprintf(str, sizeof(str), "%d", currentWinScore);
+        _editBox->setText(str);
     }
     updateScoreLabel();
 }
