@@ -23,13 +23,17 @@
 		1FE04AE11C94682A008401EA /* RecordScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADA1C94682A008401EA /* RecordScene.cpp */; };
 		1FE04AE21C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
 		1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
+		1FE2A3EB1CBB30D1008C45C5 /* ScoreDefinition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* ScoreDefinition.cpp */; };
+		1FE2A3EC1CBB30D1008C45C5 /* ScoreDefinition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* ScoreDefinition.cpp */; };
+		1FE2A3ED1CBB30D1008C45C5 /* ScoreTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* ScoreTable.cpp */; };
+		1FE2A3EE1CBB30D1008C45C5 /* ScoreTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* ScoreTable.cpp */; };
+		1FE2A3F81CBB32D6008C45C5 /* score_definition.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FE2A3F71CBB32D6008C45C5 /* score_definition.xml */; };
+		1FE2A3F91CBB32D6008C45C5 /* score_definition.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FE2A3F71CBB32D6008C45C5 /* score_definition.xml */; };
 		1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */; };
 		1FE5CFDE1CAE029200A5C38B /* TilePickWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */; };
 		1FE5D0481CAE046300A5C38B /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = 1FE5D0471CAE046300A5C38B /* tiles */; };
 		1FE5D0491CAE046300A5C38B /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = 1FE5D0471CAE046300A5C38B /* tiles */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
-		3EACC98F19EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
-		3EACC99019EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
 		46880B7B19C43A67006E1F66 /* CloseNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7619C43A67006E1F66 /* CloseNormal.png */; };
 		46880B7C19C43A67006E1F66 /* CloseNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7619C43A67006E1F66 /* CloseNormal.png */; };
 		46880B7D19C43A67006E1F66 /* CloseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7719C43A67006E1F66 /* CloseSelected.png */; };
@@ -131,6 +135,8 @@
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* ChineseOfficialMahjongHelper-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ChineseOfficialMahjongHelper-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		1F6A373D1CBDD3C9001617E6 /* BaseLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseLayer.h; sourceTree = "<group>"; };
+		1F6A373E1CBDD3C9001617E6 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		1FDD943C1C8337140031BC38 /* points_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = points_calculator.cpp; sourceTree = "<group>"; };
 		1FDD943D1C8337140031BC38 /* points_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = points_calculator.h; sourceTree = "<group>"; };
 		1FDD943E1C8337140031BC38 /* tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tile.h; sourceTree = "<group>"; };
@@ -143,11 +149,15 @@
 		1FE04ADB1C94682A008401EA /* RecordScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordScene.h; sourceTree = "<group>"; };
 		1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScoreSheetScene.cpp; sourceTree = "<group>"; };
 		1FE04ADD1C94682A008401EA /* ScoreSheetScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreSheetScene.h; sourceTree = "<group>"; };
+		1FE2A3E71CBB30D1008C45C5 /* ScoreDefinition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScoreDefinition.cpp; sourceTree = "<group>"; };
+		1FE2A3E81CBB30D1008C45C5 /* ScoreDefinition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreDefinition.h; sourceTree = "<group>"; };
+		1FE2A3E91CBB30D1008C45C5 /* ScoreTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScoreTable.cpp; sourceTree = "<group>"; };
+		1FE2A3EA1CBB30D1008C45C5 /* ScoreTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreTable.h; sourceTree = "<group>"; };
+		1FE2A3F71CBB32D6008C45C5 /* score_definition.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = score_definition.xml; sourceTree = "<group>"; };
 		1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilePickWidget.cpp; sourceTree = "<group>"; };
 		1FE5CFDC1CAE029200A5C38B /* TilePickWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilePickWidget.h; sourceTree = "<group>"; };
 		1FE5D0471CAE046300A5C38B /* tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tiles; sourceTree = "<group>"; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		3EACC98E19EE6D4300EB3C5E /* res */ = {isa = PBXFileReference; lastKnownFileType = folder; path = res; sourceTree = "<group>"; };
 		46880B7619C43A67006E1F66 /* CloseNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CloseNormal.png; sourceTree = "<group>"; };
 		46880B7719C43A67006E1F66 /* CloseSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CloseSelected.png; sourceTree = "<group>"; };
 		46880B7A19C43A67006E1F66 /* HelloWorld.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HelloWorld.png; sourceTree = "<group>"; };
@@ -312,6 +322,17 @@
 			path = ScoreSheet;
 			sourceTree = "<group>";
 		};
+		1FE2A3E61CBB30D1008C45C5 /* ScoreTable */ = {
+			isa = PBXGroup;
+			children = (
+				1FE2A3E71CBB30D1008C45C5 /* ScoreDefinition.cpp */,
+				1FE2A3E81CBB30D1008C45C5 /* ScoreDefinition.h */,
+				1FE2A3E91CBB30D1008C45C5 /* ScoreTable.cpp */,
+				1FE2A3EA1CBB30D1008C45C5 /* ScoreTable.h */,
+			);
+			path = ScoreTable;
+			sourceTree = "<group>";
+		};
 		1FE5CFDA1CAE029200A5C38B /* widget */ = {
 			isa = PBXGroup;
 			children = (
@@ -368,7 +389,7 @@
 				46880B7719C43A67006E1F66 /* CloseSelected.png */,
 				521A8EA819F11F5000D177D7 /* fonts */,
 				46880B7A19C43A67006E1F66 /* HelloWorld.png */,
-				3EACC98E19EE6D4300EB3C5E /* res */,
+				1FE2A3F71CBB32D6008C45C5 /* score_definition.xml */,
 				1FDD950D1C8338700031BC38 /* source_material */,
 				1FE5D0471CAE046300A5C38B /* tiles */,
 			);
@@ -381,11 +402,14 @@
 			children = (
 				46880B8419C43A87006E1F66 /* AppDelegate.cpp */,
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
+				1F6A373D1CBDD3C9001617E6 /* BaseLayer.h */,
+				1F6A373E1CBDD3C9001617E6 /* common.h */,
 				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
 				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
 				1FDD943B1C8337140031BC38 /* mahjong-algorithm */,
 				1FE04AD61C94682A008401EA /* PointsCalculator */,
 				1FE04AD91C94682A008401EA /* ScoreSheet */,
+				1FE2A3E61CBB30D1008C45C5 /* ScoreTable */,
 				1FE5CFDA1CAE029200A5C38B /* widget */,
 			);
 			name = Classes;
@@ -542,6 +566,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5087E78117EB970100C73F5D /* Icon-120.png in Resources */,
+				1FE2A3F81CBB32D6008C45C5 /* score_definition.xml in Resources */,
 				5087E78617EB970100C73F5D /* Icon-76.png in Resources */,
 				5087E77F17EB970100C73F5D /* Default@2x.png in Resources */,
 				50EF629917ECD46A001EB2F8 /* Icon-100.png in Resources */,
@@ -558,7 +583,6 @@
 				50EF62A217ECD613001EB2F8 /* Icon-29.png in Resources */,
 				50EF629617ECD46A001EB2F8 /* Icon-40.png in Resources */,
 				5087E78217EB970100C73F5D /* Icon-144.png in Resources */,
-				3EACC98F19EE6D4300EB3C5E /* res in Resources */,
 				50EF629817ECD46A001EB2F8 /* Icon-80.png in Resources */,
 				5087E78417EB970100C73F5D /* Icon-57.png in Resources */,
 				5087E77E17EB970100C73F5D /* Default.png in Resources */,
@@ -575,11 +599,11 @@
 			files = (
 				46880B8219C43A67006E1F66 /* HelloWorld.png in Resources */,
 				503AE0F817EB97AB00D1A890 /* Icon.icns in Resources */,
-				3EACC99019EE6D4300EB3C5E /* res in Resources */,
 				521A8EAA19F11F5000D177D7 /* fonts in Resources */,
 				46880B7C19C43A67006E1F66 /* CloseNormal.png in Resources */,
 				46880B7E19C43A67006E1F66 /* CloseSelected.png in Resources */,
 				1FE5D0491CAE046300A5C38B /* tiles in Resources */,
+				1FE2A3F91CBB32D6008C45C5 /* score_definition.xml in Resources */,
 				1FDD950F1C8338700031BC38 /* source_material in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -592,6 +616,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1FDD94431C8337140031BC38 /* points_calculator.cpp in Sources */,
+				1FE2A3ED1CBB30D1008C45C5 /* ScoreTable.cpp in Sources */,
 				1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				1FDD94451C8337140031BC38 /* wait_and_win_test.cpp in Sources */,
@@ -600,6 +625,7 @@
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
 				1FE04AE01C94682A008401EA /* RecordScene.cpp in Sources */,
+				1FE2A3EB1CBB30D1008C45C5 /* ScoreDefinition.cpp in Sources */,
 				1FE04ADE1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */,
 				1FE04AE21C94682A008401EA /* ScoreSheetScene.cpp in Sources */,
 			);
@@ -610,6 +636,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1FDD94441C8337140031BC38 /* points_calculator.cpp in Sources */,
+				1FE2A3EE1CBB30D1008C45C5 /* ScoreTable.cpp in Sources */,
+				1FE2A3EC1CBB30D1008C45C5 /* ScoreDefinition.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,
 				1FE04ADF1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */,
