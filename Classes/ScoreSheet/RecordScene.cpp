@@ -393,7 +393,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
         }
     }
     currentWinScore = std::max(8, currentWinScore);
-    if (currentWinScore != prevWinScore) {
+    if (currentWinScore > prevWinScore) {
         char str[16];
         snprintf(str, sizeof(str), "%d", currentWinScore);
         _editBox->setText(str);
