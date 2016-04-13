@@ -64,8 +64,8 @@ bool ScoreTableScene::init() {
 
     ui::ScrollView *scrollView = ui::ScrollView::create();
     scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    scrollView->setBounceEnabled(true);
     scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 35));
+    scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
     scrollView->setInnerContainerSize(innerNode->getContentSize());
     scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));

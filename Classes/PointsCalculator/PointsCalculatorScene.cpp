@@ -421,7 +421,7 @@ void PointsCalculatorScene::calculate() {
         else {
             ui::ScrollView *scrollView = ui::ScrollView::create();
             scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-            scrollView->setBounceEnabled(true);
+            scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
             scrollView->setContentSize(pointsAreaSize);
             scrollView->setInnerContainerSize(innerNode->getContentSize());
             scrollView->addChild(innerNode);

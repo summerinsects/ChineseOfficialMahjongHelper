@@ -175,7 +175,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
 
     ui::ScrollView *scrollView = ui::ScrollView::create();
     scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    scrollView->setBounceEnabled(true);
+    scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
     scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 320));
     scrollView->setInnerContainerSize(innerNode->getContentSize());
     scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
