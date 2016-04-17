@@ -14,6 +14,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/mahjong-algorithm/points_calculator.cpp \
                    ../../Classes/mahjong-algorithm/wait_and_win_test.cpp \
                    ../../Classes/PointsCalculator/PointsCalculatorScene.cpp \
+                   ../../Classes/ScoreSheet/HistoryScene.cpp \
                    ../../Classes/ScoreSheet/RecordScene.cpp \
                    ../../Classes/ScoreSheet/ScoreSheetScene.cpp \
                    ../../Classes/ScoreTable/ScoreDefinition.cpp \
