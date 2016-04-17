@@ -1,6 +1,7 @@
 ﻿#include "ScoreSheetScene.h"
 #include "Record.h"
 #include "RecordScene.h"
+#include "HistoryScene.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
@@ -34,6 +35,7 @@ bool ScoreSheetScene::init() {
     button->setTitleText("历史记录");
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 12));
     button->addClickEventListener([this](Ref *) {
+        Director::getInstance()->pushScene(HistoryScene::createScene());
     });
 
     button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -369,6 +371,7 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
         else {
             g_currentRecord.endTime = time(nullptr);
             refreshEndTime();
+            HistoryScene::addRecord(g_currentRecord);
         }
         writeToJson();
     }));

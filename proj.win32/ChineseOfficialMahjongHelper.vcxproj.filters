@@ -60,6 +60,9 @@
     <ClCompile Include="..\Classes\ScoreTable\ScoreDefinition.cpp">
       <Filter>src\ScoreTable</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp">
+      <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -103,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\BaseLayer.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScoreSheet\HistoryScene.h">
+      <Filter>src\ScoreSheet</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\ScoreSheet\Record.h">
       <Filter>src\ScoreSheet</Filter>
