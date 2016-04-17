@@ -1,21 +1,12 @@
 ﻿#include "ScoreSheetScene.h"
+#include "Record.h"
 #include "RecordScene.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
-#define PRId64 "lld"
-#endif
-#include "../wheels/cppJSON.hpp"
-
 USING_NS_CC;
 
-static char g_name[4][255];
-static int g_scores[16][4];
-static uint64_t g_pointsFlag[16];
-static size_t g_currentIndex;
-static time_t g_startTime;
-static time_t g_endTime;
+static Record g_currentRecord;
 
 Scene *ScoreSheetScene::createScene() {
     auto scene = Scene::create();
@@ -37,11 +28,22 @@ bool ScoreSheetScene::init() {
     ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(45.0f, 20.0f));
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("历史记录");
+    button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 12));
+    button->addClickEventListener([this](Ref *) {
+    });
+
+    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleColor(Color3B::BLACK);
     button->setTitleText("重置");
-    button->setPosition(Vec2(origin.x + visibleSize.width - 23, origin.y + visibleSize.height - 35));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 35));
     button->addClickEventListener([this](Ref *) { reset(); });
 
     _timeLabel = Label::createWithSystemFont("当前时间", "Arial", 12);
@@ -159,54 +161,14 @@ bool ScoreSheetScene::init() {
 }
 
 static void readFromJson() {
-    char str[1024] = "";
-    std::string path = FileUtils::getInstance()->getWritablePath();
-    path.append("record.json");
-    FILE *file = fopen(path.c_str(), "rb");
-    if (file == nullptr) {
-        return;
-    }
-
-    fread(str, 1, sizeof(str), file);
-    CCLOG("%s", str);
-    fclose(file);
-
+    std::string fileName = FileUtils::getInstance()->getWritablePath();
+    fileName.append("record.json");
+    std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
+    CCLOG("%s", str.c_str());
     try {
         jw::cppJSON json;
-        json.Parse(str);
-        jw::cppJSON::iterator it = json.find("name");
-        if (it != json.end()) {
-            auto vec = it->as<std::vector<std::string> >();
-            if (vec.size() == 4) {
-                for (int i = 0; i < 4; ++i) {
-                    char *str = nullptr;
-                    base64Decode((const unsigned char *)vec[i].c_str(), (unsigned)vec[i].length(), (unsigned char **)&str);
-                    strncpy(g_name[i], str, sizeof(g_name[i]));
-                    free(str);
-                }
-            }
-        }
-        it = json.find("record");
-        if (it != json.end()) {
-            auto vec = it->as<std::vector<std::vector<int> > >();
-            g_currentIndex = vec.size();
-            for (size_t i = 0; i < g_currentIndex; ++i) {
-                memcpy(g_scores[i], &vec[i][0], sizeof(g_scores[i]));
-            }
-        }
-        it = json.find("pointsFlag");
-        if (it != json.end()) {
-            auto vec = it->as<std::vector<uint64_t> >();
-            memcpy(g_pointsFlag, &vec[0], sizeof(uint64_t) * vec.size());
-        }
-        it = json.find("startTime");
-        if (it != json.end()) {
-            g_startTime = it->as<time_t>();
-        }
-        it = json.find("endTime");
-        if (it != json.end()) {
-            g_endTime = it->as<time_t>();
-        }
+        json.Parse(str.c_str());
+        fromJson(&g_currentRecord, json);
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
@@ -216,29 +178,8 @@ static void readFromJson() {
 static void writeToJson() {
     try {
         jw::cppJSON json(jw::cppJSON::ValueType::Object);
-        std::vector<std::string> nameVec;
-        for (int i = 0; i < 4; ++i) {
-            char *base64Name = nullptr;
-            base64Encode((const unsigned char *)g_name[i], (unsigned)strlen(g_name[i]) + 1, &base64Name);
-            nameVec.push_back(base64Name);
-            free(base64Name);
-        }
-        json.insert(std::make_pair("name", std::move(nameVec)));
+        toJson(g_currentRecord, &json);
 
-        std::vector<std::vector<int> > scoreVec;
-        scoreVec.reserve(16);
-        for (size_t k = 0; k < g_currentIndex; ++k) {
-            scoreVec.push_back(std::vector<int>({ g_scores[k][0], g_scores[k][1], g_scores[k][2], g_scores[k][3] }));
-        }
-        json.insert(std::make_pair("record", std::move(scoreVec)));
-
-        std::vector<uint64_t> pointsFlagVec;
-        pointsFlagVec.resize(g_currentIndex);
-        memcpy(&pointsFlagVec[0], g_pointsFlag, sizeof(uint64_t) * g_currentIndex);
-        json.insert(std::make_pair("pointsFlag", std::move(pointsFlagVec)));
-
-        json.insert(std::make_pair("startTime", g_startTime));
-        json.insert(std::make_pair("endTime", g_endTime));
         std::string str = json.stringfiy();
         CCLOG("%s", str.c_str());
 
@@ -257,12 +198,12 @@ static void writeToJson() {
 
 void ScoreSheetScene::fillRow(size_t handIdx) {
     for (int i = 0; i < 4; ++i) {
-        _scoreLabels[handIdx][i]->setString(StringUtils::format("%+d", g_scores[handIdx][i]));
-        _totalScores[i] += g_scores[handIdx][i];
-        if (g_scores[handIdx][i] > 0) {
+        _scoreLabels[handIdx][i]->setString(StringUtils::format("%+d", g_currentRecord.scores[handIdx][i]));
+        _totalScores[i] += g_currentRecord.scores[handIdx][i];
+        if (g_currentRecord.scores[handIdx][i] > 0) {
             _scoreLabels[handIdx][i]->setColor(Color3B::RED);
         }
-        else if (g_scores[handIdx][i] < 0) {
+        else if (g_currentRecord.scores[handIdx][i] < 0) {
             _scoreLabels[handIdx][i]->setColor(Color3B::GREEN);
         }
         else {
@@ -273,9 +214,9 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
 
-    if (g_pointsFlag[handIdx] != 0) {
+    if (g_currentRecord.pointsFlag[handIdx] != 0) {
         for (unsigned n = 0; n < 64; ++n) {
-            if ((1ULL << n) & g_pointsFlag[handIdx]) {
+            if ((1ULL << n) & g_currentRecord.pointsFlag[handIdx]) {
                 _pointNameLabel[handIdx]->setString(mahjong::points_name[n]);
                 _pointNameLabel[handIdx]->setVisible(true);
                 break;
@@ -287,17 +228,17 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 void ScoreSheetScene::refreshStartTime() {
     char str[255] = "开始时间：";
     size_t len = strlen(str);
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.startTime));
     _timeLabel->setString(str);
 }
 
 void ScoreSheetScene::refreshEndTime() {
     char str[255] = "起止时间：";
     size_t len = strlen(str);
-    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_startTime));
+    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.startTime));
     strcpy(str + len, " -- ");
     len += 4;
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_endTime));
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.endTime));
     _timeLabel->setString(str);
 }
 
@@ -306,16 +247,14 @@ void ScoreSheetScene::recover() {
 
     bool empty = false;
     for (int i = 0; i < 4; ++i) {
-        if (g_name[i][0] == '\0') {
+        if (g_currentRecord.name[i][0] == '\0') {
             empty = true;
             break;
         }
     }
 
     if (empty) {
-        memset(g_scores, 0, sizeof(g_scores));
-        memset(g_pointsFlag, 0, sizeof(g_pointsFlag));
-        g_currentIndex = 0;
+        memset(&g_currentRecord, 0, sizeof(g_currentRecord));
         onTimeScheduler(0.0f);
         this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
         return;
@@ -324,7 +263,7 @@ void ScoreSheetScene::recover() {
     for (int i = 0; i < 4; ++i) {
         _editBox[i]->setVisible(false);
         _editBox[i]->setEnabled(false);
-        _nameLabel[i]->setString(g_name[i]);
+        _nameLabel[i]->setString(g_currentRecord.name[i]);
         _nameLabel[i]->setVisible(true);
     }
 
@@ -333,7 +272,7 @@ void ScoreSheetScene::recover() {
 
     memset(_totalScores, 0, sizeof(_totalScores));
 
-    for (size_t k = 0; k < g_currentIndex; ++k) {
+    for (size_t k = 0; k < g_currentRecord.currentIndex; ++k) {
         fillRow(k);
     }
 
@@ -341,9 +280,9 @@ void ScoreSheetScene::recover() {
         _totalLabel[i]->setString(StringUtils::format("%+d", _totalScores[i]));
     }
 
-    if (g_currentIndex < 16) {
-        _recordButton[g_currentIndex]->setVisible(true);
-        _recordButton[g_currentIndex]->setEnabled(true);
+    if (g_currentRecord.currentIndex < 16) {
+        _recordButton[g_currentRecord.currentIndex]->setVisible(true);
+        _recordButton[g_currentRecord.currentIndex]->setEnabled(true);
 
         refreshStartTime();
     }
@@ -353,10 +292,7 @@ void ScoreSheetScene::recover() {
 }
 
 void ScoreSheetScene::reset() {
-    memset(g_name, 0, sizeof(g_name));
-    memset(g_scores, 0, sizeof(g_scores));
-    memset(g_pointsFlag, 0, sizeof(g_pointsFlag));
-    g_currentIndex = 0;
+    memset(&g_currentRecord, 0, sizeof(g_currentRecord));
 
     memset(_totalScores, 0, sizeof(_totalScores));
 
@@ -389,7 +325,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
         if (str[0] == '\0') {
             return;
         }
-        strncpy(g_name[i], str, sizeof(g_name[i]));
+        strncpy(g_currentRecord.name[i], str, sizeof(g_currentRecord.name[i]));
     }
 
     memset(_totalScores, 0, sizeof(_totalScores));
@@ -398,7 +334,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
         _editBox[i]->setVisible(false);
         _editBox[i]->setEnabled(false);
         _nameLabel[i]->setVisible(true);
-        _nameLabel[i]->setString(g_name[i]);
+        _nameLabel[i]->setString(g_currentRecord.name[i]);
     }
 
     _recordButton[0]->setVisible(true);
@@ -408,17 +344,17 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
 
     this->unschedule(schedule_selector(ScoreSheetScene::onTimeScheduler));
 
-    g_startTime = time(nullptr);
+    g_currentRecord.startTime = time(nullptr);
     refreshStartTime();
 }
 
 void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
-    const char *name[] = { g_name[0], g_name[1], g_name[2], g_name[3] };
+    const char *name[] = { g_currentRecord.name[0], g_currentRecord.name[1], g_currentRecord.name[2], g_currentRecord.name[3] };
     Director::getInstance()->pushScene(RecordScene::createScene(handIdx, name, [this, handIdx](RecordScene *scene) {
-        if (handIdx != g_currentIndex) return;
+        if (handIdx != g_currentRecord.currentIndex) return;
 
-        memcpy(g_scores[handIdx], scene->getScoreTable(), sizeof(g_scores[handIdx]));
-        g_pointsFlag[handIdx] = scene->getPointsFlag();
+        memcpy(g_currentRecord.scores[handIdx], scene->getScoreTable(), sizeof(g_currentRecord.scores[handIdx]));
+        g_currentRecord.pointsFlag[handIdx] = scene->getPointsFlag();
 
         fillRow(handIdx);
 
@@ -426,12 +362,12 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
             _totalLabel[i]->setString(StringUtils::format("%+d", _totalScores[i]));
         }
 
-        if (++g_currentIndex < 16) {
-            _recordButton[g_currentIndex]->setVisible(true);
-            _recordButton[g_currentIndex]->setEnabled(true);
+        if (++g_currentRecord.currentIndex < 16) {
+            _recordButton[g_currentRecord.currentIndex]->setVisible(true);
+            _recordButton[g_currentRecord.currentIndex]->setEnabled(true);
         }
         else {
-            g_endTime = time(nullptr);
+            g_currentRecord.endTime = time(nullptr);
             refreshEndTime();
         }
         writeToJson();

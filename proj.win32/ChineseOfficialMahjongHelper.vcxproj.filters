@@ -104,6 +104,9 @@
     <ClInclude Include="..\Classes\BaseLayer.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\ScoreSheet\Record.h">
+      <Filter>src\ScoreSheet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">

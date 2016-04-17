@@ -165,6 +165,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\wait_and_win_test.h" />
     <ClInclude Include="..\Classes\PointsCalculator\PointsCalculatorScene.h" />
+    <ClInclude Include="..\Classes\ScoreSheet\Record.h" />
     <ClInclude Include="..\Classes\ScoreSheet\RecordScene.h" />
     <ClInclude Include="..\Classes\ScoreSheet\ScoreSheetScene.h" />
     <ClInclude Include="..\Classes\ScoreTable\ScoreDefinition.h" />
