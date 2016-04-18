@@ -105,7 +105,8 @@ bool HistoryScene::init() {
 
     ui::Widget *innerNode = ui::Widget::create();
     innerNode->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
-    const float innerNodeHeight = g_records.size() * 40;
+    const float scrollHeight = visibleSize.height - 35;
+    const float innerNodeHeight = std::max<float>(g_records.size() * 40, scrollHeight);
     innerNode->setContentSize(Size(visibleSize.width, innerNodeHeight));
 
     float y = innerNodeHeight - 20;
@@ -118,7 +119,7 @@ bool HistoryScene::init() {
 
     ui::ScrollView *scrollView = ui::ScrollView::create();
     scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 35));
+    scrollView->setContentSize(Size(visibleSize.width, scrollHeight));
     scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
     scrollView->setInnerContainerSize(innerNode->getContentSize());
     scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
