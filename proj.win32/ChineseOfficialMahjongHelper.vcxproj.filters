@@ -25,6 +25,9 @@
     <Filter Include="src\ScoreTable">
       <UniqueIdentifier>{c45dcad3-107b-4c78-a709-2ca8c957501f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Other">
+      <UniqueIdentifier>{70992fc8-7be4-4c25-907b-0ae6ce812762}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -62,6 +65,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp">
       <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Other\OtherScene.cpp">
+      <Filter>src\Other</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\ScoreSheet\Record.h">
       <Filter>src\ScoreSheet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Other\OtherScene.h">
+      <Filter>src\Other</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

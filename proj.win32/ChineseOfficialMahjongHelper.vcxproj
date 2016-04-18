@@ -148,6 +148,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\points_calculator.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\wait_and_win_test.cpp" />
+    <ClCompile Include="..\Classes\Other\OtherScene.cpp" />
     <ClCompile Include="..\Classes\PointsCalculator\PointsCalculatorScene.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp" />
@@ -165,6 +166,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\mahjong-algorithm\points_calculator.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\wait_and_win_test.h" />
+    <ClInclude Include="..\Classes\Other\OtherScene.h" />
     <ClInclude Include="..\Classes\PointsCalculator\PointsCalculatorScene.h" />
     <ClInclude Include="..\Classes\ScoreSheet\HistoryScene.h" />
     <ClInclude Include="..\Classes\ScoreSheet\Record.h" />
