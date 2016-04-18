@@ -377,23 +377,34 @@ static POINT_TYPE *pairwise_test_chows(const SET (&chows_sets)[_Size], POINT_TYP
         }
     }
 
-    bool used_flag[_Size] = { false };
+    // 套算一次原则：
+    // 如果有尚未组合过的一副牌，只可同已组合过的相应的一副牌套算一次
+    //
+    // 不得相同原则：
+    // 凡已经合过某一番种的牌，不能再同其他一副牌组成相同的番种计分
+    //
+    // 根据套算一次原则，234567s234567p，只能计为“喜相逢*2 连六*1”或者“喜相逢*1 连六*2”，而不是“喜相逢*2 连六*2”
+    // 根据以上两点，234s223344567p，只能计为：”喜相逢、一般高、连六“，而不是“喜相逢*2、连六”
+    unsigned used_flag[_Size] = { 0 };
     for (int i = 0; i < _Size; ++i) {
         for (int j = 0; j < _Size; ++j) {
             if (i == j) {
                 continue;
             }
 
-            // 套算一次原则：
-            // 如有尚未组合过的一副牌,只可同已组合过的相应一副牌套算一次
+            // 套算一次原则
             if (used_flag[i] && used_flag[j]) {
                 continue;
             }
             if (all_points[i][j] != NONE) {
-                used_flag[i] = true;
-                used_flag[j] = true;
-                *selected_points = all_points[i][j];
-                ++selected_points;
+                // 不得相同原则
+                int idx = all_points[i][j] - PURE_DOUBLE_CHOW;
+                if ((used_flag[i] & (1 << idx)) == 0 && (used_flag[j] & (1 << idx)) == 0) {
+                    used_flag[i] |= (1 << (all_points[i][j] - PURE_DOUBLE_CHOW));
+                    used_flag[j] |= (1 << (all_points[i][j] - PURE_DOUBLE_CHOW));
+                    *selected_points = all_points[i][j];
+                    ++selected_points;
+                }
             }
         }
     }
