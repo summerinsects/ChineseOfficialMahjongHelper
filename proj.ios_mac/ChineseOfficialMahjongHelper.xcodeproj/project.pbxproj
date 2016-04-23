@@ -13,6 +13,8 @@
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
+		1FBC7B501CCB4CD100A782A4 /* other.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FBC7B4F1CCB4CD100A782A4 /* other.xml */; };
+		1FBC7B511CCB4CD100A782A4 /* other.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FBC7B4F1CCB4CD100A782A4 /* other.xml */; };
 		1FCC3C021CC47200001C9555 /* HistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */; };
 		1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */; };
 		1FDD94431C8337140031BC38 /* points_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* points_calculator.cpp */; };
@@ -143,6 +145,7 @@
 		1F6A373E1CBDD3C9001617E6 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OtherScene.cpp; sourceTree = "<group>"; };
 		1F764BEA1CC5DB1F00844DAF /* OtherScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OtherScene.h; sourceTree = "<group>"; };
+		1FBC7B4F1CCB4CD100A782A4 /* other.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = other.xml; sourceTree = "<group>"; };
 		1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HistoryScene.cpp; sourceTree = "<group>"; };
 		1FCC3C001CC47200001C9555 /* HistoryScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HistoryScene.h; sourceTree = "<group>"; };
 		1FCC3C011CC47200001C9555 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Record.h; sourceTree = "<group>"; };
@@ -410,6 +413,7 @@
 				46880B7719C43A67006E1F66 /* CloseSelected.png */,
 				521A8EA819F11F5000D177D7 /* fonts */,
 				46880B7A19C43A67006E1F66 /* HelloWorld.png */,
+				1FBC7B4F1CCB4CD100A782A4 /* other.xml */,
 				1FE2A3F71CBB32D6008C45C5 /* score_definition.xml */,
 				1FDD950D1C8338700031BC38 /* source_material */,
 				1FE5D0471CAE046300A5C38B /* tiles */,
@@ -593,6 +597,7 @@
 				5087E77F17EB970100C73F5D /* Default@2x.png in Resources */,
 				50EF629917ECD46A001EB2F8 /* Icon-100.png in Resources */,
 				5087E78317EB970100C73F5D /* Icon-152.png in Resources */,
+				1FBC7B501CCB4CD100A782A4 /* other.xml in Resources */,
 				46880B8119C43A67006E1F66 /* HelloWorld.png in Resources */,
 				46880B7D19C43A67006E1F66 /* CloseSelected.png in Resources */,
 				5087E77D17EB970100C73F5D /* Default-568h@2x.png in Resources */,
@@ -626,6 +631,7 @@
 				46880B7E19C43A67006E1F66 /* CloseSelected.png in Resources */,
 				1FE5D0491CAE046300A5C38B /* tiles in Resources */,
 				1FE2A3F91CBB32D6008C45C5 /* score_definition.xml in Resources */,
+				1FBC7B511CCB4CD100A782A4 /* other.xml in Resources */,
 				1FDD950F1C8338700031BC38 /* source_material in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
