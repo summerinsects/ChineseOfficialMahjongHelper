@@ -62,16 +62,34 @@ static void saveRecords() {
     }
 }
 
-static ui::Button *createRecordButton(const Record &record, float width) {
+static ui::Widget *createRecordWidget(size_t idx, float width) {
+    ui::Widget *widget = ui::Widget::create();
+    widget->setContentSize(Size(width, 36.0f));
+
     ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     button->setScale9Enabled(true);
-    button->setContentSize(Size(width, 36.0f));
+    button->setContentSize(Size(40.0f, 20.0f));
     button->setTitleColor(Color3B::BLACK);
     button->setTitleFontSize(12);
-    button->addClickEventListener([record](Ref *) {
+    button->setTitleText("删除");
+    button->addClickEventListener([idx](Ref *) {
+    });
+    widget->addChild(button);
+    button->setPosition(Vec2(width - 22.0f, 18.0f));
+
+    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(40.0f, 20.0f));
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleFontSize(12);
+    button->setTitleText("查看");
+    button->addClickEventListener([idx](Ref *) {
         Director::getInstance()->popScene();
     });
+    widget->addChild(button);
+    button->setPosition(Vec2(width - 66.0f, 18.0f));
 
+    const Record &record = g_records[idx];
     int scores[4] = { 0 };
     for (int i = 0; i < 16; ++i) {
         scores[0] += record.scores[i][0];
@@ -89,8 +107,11 @@ static ui::Button *createRecordButton(const Record &record, float width) {
 
     snprintf(str + len, sizeof(str) - len, "\n[%s(%+d) %s(%+d) %s(%+d) %s(%+d)]",
         record.name[0], scores[0], record.name[1], scores[1], record.name[2], scores[2], record.name[3], scores[3]);
-    button->setTitleText(str);
-    return button;
+    Label *label = Label::createWithSystemFont(str, "Arail", 10);
+    widget->addChild(label);
+    label->setPosition(Vec2((width - 88.0f) * 0.5f, 18.0f));
+
+    return widget;
 }
 
 bool HistoryScene::init() {
@@ -111,9 +132,9 @@ bool HistoryScene::init() {
 
     float y = innerNodeHeight - 20;
     for (std::vector<Record>::size_type i = 0; i < g_records.size(); ++i) {
-        ui::Button *button = createRecordButton(g_records[i], visibleSize.width);
-        innerNode->addChild(button);
-        button->setPosition(Vec2(visibleSize.width * 0.5f, y));
+        ui::Widget *widget = createRecordWidget(i, visibleSize.width);
+        innerNode->addChild(widget);
+        widget->setPosition(Vec2(visibleSize.width * 0.5f, y));
         y -= 40;
     }
 
