@@ -1473,7 +1473,7 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
 
     // 点和的明刻
     if ((win_type & WIN_TYPE_SELF_DRAWN) == 0) {
-        if (std::none_of(chow_sets, chow_sets + chow_cnt, [win_tile](const SET &chow_set, TILE tile) {
+        if (std::none_of(chow_sets, chow_sets + chow_cnt, [win_tile](const SET &chow_set) {
             return (chow_set.mid_tile - 1 == win_tile || chow_set.mid_tile == win_tile || chow_set.mid_tile + 1 == win_tile);
         })) {
             for (long i = 0; i < pung_cnt; ++i) {
