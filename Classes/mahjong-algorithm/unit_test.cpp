@@ -5,6 +5,8 @@
 #include <iostream>
 #include <assert.h>
 
+using namespace mahjong;
+
 void test_wait(const char *str) {
     TILE tiles[13];
     long tile_cnt;
