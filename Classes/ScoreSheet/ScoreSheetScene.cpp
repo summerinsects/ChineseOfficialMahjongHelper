@@ -9,6 +9,42 @@ USING_NS_CC;
 
 static Record g_currentRecord;
 
+static void readFromJson() {
+    std::string fileName = FileUtils::getInstance()->getWritablePath();
+    fileName.append("record.json");
+    std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
+    CCLOG("%s", str.c_str());
+    try {
+        jw::cppJSON json;
+        json.Parse(str.c_str());
+        fromJson(&g_currentRecord, json);
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+    }
+}
+
+static void writeToJson() {
+    try {
+        jw::cppJSON json(jw::cppJSON::ValueType::Object);
+        toJson(g_currentRecord, &json);
+
+        std::string str = json.stringfiy();
+        CCLOG("%s", str.c_str());
+
+        std::string path = FileUtils::getInstance()->getWritablePath();
+        path.append("record.json");
+        FILE *file = fopen(path.c_str(), "wb");
+        if (file != nullptr) {
+            fwrite(str.c_str(), 1, str.length(), file);
+            fclose(file);
+        }
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+    }
+}
+
 Scene *ScoreSheetScene::createScene() {
     auto scene = Scene::create();
     auto layer = ScoreSheetScene::create();
@@ -35,7 +71,13 @@ bool ScoreSheetScene::init() {
     button->setTitleText("历史记录");
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 12));
     button->addClickEventListener([this](Ref *) {
-        Director::getInstance()->pushScene(HistoryScene::createScene());
+        Director::getInstance()->pushScene(HistoryScene::createScene([this](const Record &record) {
+            if (g_currentRecord.currentIndex == 16) {
+                CCLOG("currentIndex == 16");
+                memcpy(&g_currentRecord, &record, sizeof(g_currentRecord));
+                recover();
+            }
+        }));
     });
 
     button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -158,44 +200,9 @@ bool ScoreSheetScene::init() {
         _pointNameLabel[k]->setVisible(false);
     }
 
+    readFromJson();
     recover();
     return true;
-}
-
-static void readFromJson() {
-    std::string fileName = FileUtils::getInstance()->getWritablePath();
-    fileName.append("record.json");
-    std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
-    CCLOG("%s", str.c_str());
-    try {
-        jw::cppJSON json;
-        json.Parse(str.c_str());
-        fromJson(&g_currentRecord, json);
-    }
-    catch (std::exception &e) {
-        CCLOG("%s %s", __FUNCTION__, e.what());
-    }
-}
-
-static void writeToJson() {
-    try {
-        jw::cppJSON json(jw::cppJSON::ValueType::Object);
-        toJson(g_currentRecord, &json);
-
-        std::string str = json.stringfiy();
-        CCLOG("%s", str.c_str());
-
-        std::string path = FileUtils::getInstance()->getWritablePath();
-        path.append("record.json");
-        FILE *file = fopen(path.c_str(), "wb");
-        if (file != nullptr) {
-            fwrite(str.c_str(), 1, str.length(), file);
-            fclose(file);
-        }
-    }
-    catch (std::exception &e) {
-        CCLOG("%s %s", __FUNCTION__, e.what());
-    }
 }
 
 void ScoreSheetScene::fillRow(size_t handIdx) {
@@ -216,14 +223,19 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
 
+    bool pointsNameVisible = false;
     if (g_currentRecord.pointsFlag[handIdx] != 0) {
         for (unsigned n = 0; n < 64; ++n) {
             if ((1ULL << n) & g_currentRecord.pointsFlag[handIdx]) {
                 _pointNameLabel[handIdx]->setString(mahjong::points_name[n]);
                 _pointNameLabel[handIdx]->setVisible(true);
+                pointsNameVisible = true;
                 break;
             }
         }
+    }
+    if (!pointsNameVisible) {
+        _pointNameLabel[handIdx]->setVisible(false);
     }
 }
 
@@ -245,8 +257,6 @@ void ScoreSheetScene::refreshEndTime() {
 }
 
 void ScoreSheetScene::recover() {
-    readFromJson();
-
     bool empty = false;
     for (int i = 0; i < 4; ++i) {
         if (g_currentRecord.name[i][0] == '\0') {

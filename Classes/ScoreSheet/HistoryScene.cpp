@@ -7,9 +7,10 @@ USING_NS_CC;
 
 static std::vector<Record> g_records;
 
-Scene *HistoryScene::createScene() {
+Scene *HistoryScene::createScene(const std::function<void (const Record &)> &viewCallback) {
     auto scene = Scene::create();
     auto layer = HistoryScene::create();
+    layer->_viewCallback = viewCallback;
     scene->addChild(layer);
     return scene;
 }
@@ -62,7 +63,7 @@ static void saveRecords() {
     }
 }
 
-static ui::Widget *createRecordWidget(size_t idx, float width) {
+ui::Widget *HistoryScene::createRecordWidget(size_t idx, float width) {
     ui::Widget *widget = ui::Widget::create();
     widget->setContentSize(Size(width, 36.0f));
 
@@ -83,7 +84,8 @@ static ui::Widget *createRecordWidget(size_t idx, float width) {
     button->setTitleColor(Color3B::BLACK);
     button->setTitleFontSize(12);
     button->setTitleText("查看");
-    button->addClickEventListener([idx](Ref *) {
+    button->addClickEventListener([this, idx](Ref *) {
+        _viewCallback(g_records[idx]);
         Director::getInstance()->popScene();
     });
     widget->addChild(button);
