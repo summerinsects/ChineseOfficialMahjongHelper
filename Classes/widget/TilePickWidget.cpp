@@ -452,6 +452,10 @@ void TilePickWidget::refreshAfterAction(int meldedIdx) {
     }
 
     refreshHandTiles();
+    if (_currentIdx > _tiles.size()) {
+        _currentIdx = _tiles.size();
+    }
+
     if (_winTileButton != nullptr) {
         pos = calcHandTilePos(13 - _fixedSets.size() * 3);
         _winTileButton->setPosition(Vec2(pos.x + 4, pos.y));
