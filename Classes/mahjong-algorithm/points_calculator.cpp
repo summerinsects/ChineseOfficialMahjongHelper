@@ -594,12 +594,12 @@ static void calculate_kongs(const SET *pung_sets, long pung_cnt, long (&points_t
             }
             break;
         case 1:  // 明暗杠
-//#ifdef STRICT_98_RULE
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+            points_table[CONCEALED_KONG_AND_MELDED_KONG] = 1;
+#else
             points_table[MELDED_KONG] = 1;
             points_table[CONCEALED_KONG] = 1;
-//#else
-//            points_table[CONCEALED_KONG_AND_MELDED_KONG] = 1;
-//#endif
+#endif
             switch (concealed_pung_cnt) {  // 暗刻的个数
             case 0: break;
             case 1: points_table[TWO_CONCEALED_PUNGS] = 1; break;

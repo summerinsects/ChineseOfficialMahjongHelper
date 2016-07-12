@@ -227,7 +227,13 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     if (g_currentRecord.pointsFlag[handIdx] != 0) {
         for (unsigned n = 0; n < 64; ++n) {
             if ((1ULL << n) & g_currentRecord.pointsFlag[handIdx]) {
-                _pointNameLabel[handIdx]->setString(mahjong::points_name[n]);
+                unsigned idx = n;
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+                if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+                    ++idx;
+                }
+#endif
+                _pointNameLabel[handIdx]->setString(mahjong::points_name[idx]);
                 _pointNameLabel[handIdx]->setVisible(true);
                 pointsNameVisible = true;
                 break;

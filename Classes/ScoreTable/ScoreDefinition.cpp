@@ -58,6 +58,12 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+    if (idx > mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+        --idx;
+    }
+#endif
+
     std::string &text = g_vec[idx];
     float scale = 1.0f;
     float maxWidth = (visibleSize.width - 10) / 18;

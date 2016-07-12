@@ -38,7 +38,12 @@ bool ScoreTableScene::init() {
     innerNode->setContentSize(Size(visibleSize.width, innerNodeHeight));
 
     static const int points[] = { 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
-    static const size_t beginIndex[] = { 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
+    static const size_t beginIndex[] =
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+    { 70, 60, 56, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
+#else
+    { 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
+#endif
     static const size_t counts[] = { 13, 10, 4, 7, 8, 5, 6, 9, 3, 2, 6, 7 };
     float y = innerNodeHeight;
     const float gap = (visibleSize.width - 4.0f) * 0.25f;

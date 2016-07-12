@@ -142,7 +142,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     innerNode->setContentSize(Size(visibleSize.width, innerNodeHeight));
 
     static const int points[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
-    static const size_t beginIndex[] = {55, 48, 39, 34, 28, 19, 16, 14, 8, 1};
+    static const size_t beginIndex[] =
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+    { 56, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
+#else
+    { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
+#endif
     static const size_t counts[] = { 4, 7, 8, 5, 6, 9, 3, 2, 6, 7 };
     float y = innerNodeHeight;
     for (int i = 0; i < 10; ++i) {
@@ -375,6 +380,11 @@ void RecordScene::onFalseWinButton(cocos2d::Ref *sender, int index) {
 }
 
 void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+    if (index > mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+        --index;
+    }
+#endif
     ui::Button *button = (ui::Button *)sender;
     if (isButtonChecked(button)) {
         setButtonUnchecked(button);
@@ -389,7 +399,13 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
     int currentWinScore = 0;
     for (int n = 0; n < 64; ++n) {
         if (_pointsFlag & (1ULL << n)) {
-            currentWinScore += mahjong::points_value_table[n];
+            unsigned idx = n;
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+            if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+                ++idx;
+            }
+#endif
+            currentWinScore += mahjong::points_value_table[idx];
         }
     }
     currentWinScore = std::max(8, currentWinScore);
