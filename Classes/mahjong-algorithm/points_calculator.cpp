@@ -1097,10 +1097,14 @@ static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cn
 
     bool waiting_table[6][10] = { { 0 } };
     long waiting_cnt = 0;
+    TILE waiting_seven_pairs = 0;
 
     switch (set_cnt) {
     case 5:
         is_basic_type_13_wait(concealed_tiles, waiting_table);
+        if (is_seven_pairs_wait((const TILE (&)[13])concealed_tiles, &waiting_seven_pairs)) {
+            ++waiting_cnt;
+        }
         break;
     case 4:
         is_basic_type_10_wait(concealed_tiles, waiting_table);
@@ -1125,6 +1129,7 @@ static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cn
         }
     }
 
+    // 听牌数大于1张，或者是全求人，不计边坎钓
     if (waiting_cnt != 1 || points_table[MELDED_HAND]) {
         return;
     }
