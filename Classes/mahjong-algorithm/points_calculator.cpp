@@ -1103,7 +1103,7 @@ static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cn
     case 5:
         is_basic_type_13_wait(concealed_tiles, waiting_table);
         if (is_seven_pairs_wait((const TILE (&)[13])concealed_tiles, &waiting_seven_pairs)) {
-            ++waiting_cnt;
+            waiting_table[tile_suit(waiting_seven_pairs)][tile_rank(waiting_seven_pairs)] = true;
         }
         break;
     case 4:
