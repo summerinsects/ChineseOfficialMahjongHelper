@@ -46,6 +46,7 @@ Scene *ScoreDefinitionScene::createScene(size_t idx) {
     auto scene = Scene::create();
     auto layer = new (std::nothrow) ScoreDefinitionScene();
     layer->initWithIndex(idx);
+    layer->autorelease();
 
     scene->addChild(layer);
     return scene;
@@ -79,10 +80,6 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     webView->loadHTMLString(text, "");
     this->addChild(webView);
     webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
-
-    _onExitTransitionDidStartCallback = [this, webView]() {
-        this->removeChild(webView);
-    };
 #else
     ui::RichText *richText = ui::RichText::createWithXML(text);
     richText->setContentSize(Size(visibleSize.width - 10, 0));

@@ -9,6 +9,7 @@ Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const 
     auto layer = new (std::nothrow) RecordScene();
     layer->initWithIndex(handIdx, playerNames);
     layer->_okCallback = okCallback;
+    layer->autorelease();
 
     scene->addChild(layer);
     return scene;
