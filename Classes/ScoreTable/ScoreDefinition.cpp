@@ -1,4 +1,5 @@
 ﻿#include "ScoreDefinition.h"
+#include "ui/UIWebView.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
@@ -22,8 +23,8 @@ static void replaceTilesToImage(std::string &text, float scale) {
             size_t totalWriteLen = 0;
             for (long i = 0; i < tilesCnt; ++i) {
                 int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
-                    "<img src=\"%s\" width=\"%d\" height=\"%d\"/>", tilesImageName[tiles[i]],
-                    (int)(27 * scale), (int)(39 * scale));
+                    "<img src=\"%s\" width=\"%d\" height=\"%d\"/>",
+                    tilesImageName[tiles[i]], (int)(27 * scale), (int)(39 * scale));
                 totalWriteLen += writeLen;
             }
             text.replace(pos, readLen + 2, imgStr);
@@ -72,6 +73,17 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     }
     replaceTilesToImage(text, scale);
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
+    experimental::ui::WebView *webView = experimental::ui::WebView::create();
+    webView->setContentSize(Size(visibleSize.width, visibleSize.height - 40));
+    webView->loadHTMLString(text, "");
+    this->addChild(webView);
+    webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
+
+    _onExitTransitionDidStartCallback = [this, webView]() {
+        this->removeChild(webView);
+    };
+#else
     ui::RichText *richText = ui::RichText::createWithXML(text);
     richText->setContentSize(Size(visibleSize.width - 10, 0));
     richText->ignoreContentAdaptWithSize(false);
@@ -79,5 +91,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     richText->formatText();
     this->addChild(richText);
     richText->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 40));
+#endif
+
     return true;
 }
