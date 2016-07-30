@@ -21,7 +21,12 @@ bool HelloWorld::init() {
     }
 
     auto listener = EventListenerKeyboard::create();
-    listener->onKeyReleased = CC_CALLBACK_2(Layer::onKeyReleased, this);
+    listener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* unused_event) {
+        Director::getInstance()->end();
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+        exit(0);
+#endif
+    };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -76,12 +81,4 @@ bool HelloWorld::init() {
     });
 
     return true;
-}
-
-void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* unused_event) {
-    Director::getInstance()->end();
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
 }

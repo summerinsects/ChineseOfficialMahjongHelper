@@ -12,7 +12,11 @@ public:
         }
 
         auto listener = cocos2d::EventListenerKeyboard::create();
-        listener->onKeyReleased = CC_CALLBACK_2(cocos2d::Layer::onKeyReleased, this);
+        listener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent) {
+            if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_BACK) {
+                cocos2d::Director::getInstance()->popScene();
+            }
+        };
         _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
         cocos2d::Size visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
@@ -33,12 +37,6 @@ public:
         });
 
         return true;
-    }
-
-    virtual void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent) override final {
-        if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_BACK) {
-            cocos2d::Director::getInstance()->popScene();
-        }
     }
 
 private:
