@@ -76,10 +76,10 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
-    webView->setContentSize(Size(visibleSize.width, visibleSize.height - 40));
+    webView->setContentSize(Size(visibleSize.width, visibleSize.height - 35));
     webView->loadHTMLString(text, "");
     this->addChild(webView);
-    webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
+    webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
 #else
     ui::RichText *richText = ui::RichText::createWithXML(text);
     richText->setContentSize(Size(visibleSize.width - 10, 0));
@@ -87,7 +87,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     richText->setVerticalSpace(2);
     richText->formatText();
     this->addChild(richText);
-    richText->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 40));
+    richText->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 40.0f));
 #endif
 
     return true;
