@@ -1931,23 +1931,12 @@ bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
 
 int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed_tiles, long concealed_cnt, TILE win_tile, WIN_TYPE win_type,
     WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
-
-    assert(concealed_tiles != nullptr);
-    assert(concealed_cnt > 0);
-
     if (fixed_set == nullptr) {
         fixed_cnt = 0;
     }
 
-    //switch (fixed_cnt) {
-    //case 0: if (concealed_cnt != 13) return false; break;
-    //case 1: if (concealed_cnt != 10) return false; break;
-    //case 2: if (concealed_cnt != 7) return false; break;
-    //case 3: if (concealed_cnt != 4) return false; break;
-    //case 4: if (concealed_cnt != 1) return false; break;
-    //default: return false;
-    //}
-    if (fixed_cnt < 0 || fixed_cnt > 4 || fixed_cnt * 3 + concealed_cnt != 13) {
+    if (concealed_tiles == nullptr || concealed_cnt <= 0 || fixed_cnt < 0 || fixed_cnt > 4
+        || fixed_cnt * 3 + concealed_cnt != 13) {
         return ERROR_WRONG_TILES_COUNT;
     }
 
