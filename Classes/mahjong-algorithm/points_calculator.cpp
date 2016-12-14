@@ -1448,6 +1448,12 @@ static void check_win_type(WIN_TYPE win_type, long (&points_table)[POINT_TYPE_CO
     }
 }
 
+static bool is_win_tile_in_concealed_chow_sets(const SET *chow_sets, long chow_cnt, TILE win_tile) {
+    return std::any_of(chow_sets, chow_sets + chow_cnt, [win_tile](const SET &chow_set) {
+        return !chow_set.is_melded && (chow_set.mid_tile - 1 == win_tile || chow_set.mid_tile == win_tile || chow_set.mid_tile + 1 == win_tile);
+    });
+}
+
 static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TILE win_tile, WIN_TYPE win_type,
     WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
     SET pair_set;
@@ -1479,9 +1485,7 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
 
     // 点和的明刻
     if ((win_type & WIN_TYPE_SELF_DRAWN) == 0) {
-        if (std::none_of(chow_sets, chow_sets + chow_cnt, [win_tile](const SET &chow_set) {
-            return (chow_set.mid_tile - 1 == win_tile || chow_set.mid_tile == win_tile || chow_set.mid_tile + 1 == win_tile);
-        })) {
+        if (!is_win_tile_in_concealed_chow_sets(chow_sets, chow_cnt, win_tile)) {
             for (long i = 0; i < pung_cnt; ++i) {
                 if (pung_sets[i].mid_tile == win_tile && !pung_sets[i].is_melded) {
                     pung_sets[i].is_melded = true;
