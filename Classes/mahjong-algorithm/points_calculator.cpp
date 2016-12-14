@@ -1247,6 +1247,10 @@ static void correction_points_table(long (&points_table)[POINT_TYPE_COUNT], bool
     }
     if (points_table[LITTLE_FOUR_WINDS]) {
         points_table[BIG_THREE_WINDS] = 0;
+        // 小四喜的第四组牌如果是19的刻子，则是混幺九；如果是箭刻则是字一色；这两种都是不计幺九刻的
+        // 如果是顺子或者2-8的刻子，则不存在多余的幺九刻
+        // 所以这里将幺九刻置为0
+        points_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
     }
     if (points_table[LITTLE_THREE_DRAGONS]) {
         points_table[TWO_DRAGONS_PUNGS] = 0;
