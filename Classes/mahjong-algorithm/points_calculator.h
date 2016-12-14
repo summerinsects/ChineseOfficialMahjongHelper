@@ -51,6 +51,7 @@ static const char *stringify_table[] = {
 
 const char *parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt);
 bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *concealed_tiles, long *concealed_cnt);
+void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *tile_cnt);
 
 enum POINT_TYPE {
     NONE = 0,

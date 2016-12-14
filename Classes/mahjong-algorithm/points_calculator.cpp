@@ -95,7 +95,8 @@ static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SET
     return ret;
 }
 
-static void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *tile_cnt) {
+// 从一组一组的牌恢复成一张一张的牌
+void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *tile_cnt) {
     assert(tiles != nullptr && tile_cnt != nullptr);
     *tile_cnt = 0;
     for (int i = 0; i < set_cnt; ++i) {
