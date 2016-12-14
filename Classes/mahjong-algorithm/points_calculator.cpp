@@ -1240,6 +1240,7 @@ static void correction_points_table(long (&points_table)[POINT_TYPE_COUNT], bool
         points_table[OUTSIDE_HAND] = 0;
         points_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
         points_table[NO_HONORS] = 0;
+        points_table[DOUBLE_PUNG] = 0;  // 通行计法不计双同刻
 #ifdef STRICT_98_RULE
         points_table[TRIPLE_PUNG] = 0;
         points_table[DOUBLE_PUNG] = 0;
