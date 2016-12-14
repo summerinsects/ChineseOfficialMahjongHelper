@@ -1696,11 +1696,13 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
     }
 
     check_win_type(win_type, points_table);
-    if (win_type & WIN_TYPE_SELF_DRAWN) {
-        points_table[FULLY_CONCEALED_HAND] = 1;
-    }
-    else {
-        points_table[CONCEALED_HAND] = 1;
+    if (remain_cnt == 5) {
+        if (win_type & WIN_TYPE_SELF_DRAWN) {
+            points_table[FULLY_CONCEALED_HAND] = 1;
+        }
+        else {
+            points_table[CONCEALED_HAND] = 1;
+        }
     }
 
     check_tiles_suits(concealed_tiles, 14, points_table);
@@ -1996,7 +1998,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
     }
     else if (fixed_cnt == 1 && _separation_cnt == 0) {
         // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_points(_separation_sets[0][0], _concealed_tiles, 14,
+        if (calculate_knitted_straight_in_basic_type_points(_separation_sets[0][0], _concealed_tiles, 11,
             win_tile, win_type, prevalent_wind, seat_wind, points_tables[0])) {
             int current_points = get_points_by_table(points_tables[0]);
             if (current_points > max_points) {
