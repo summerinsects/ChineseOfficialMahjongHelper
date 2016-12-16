@@ -715,6 +715,7 @@ static void calculate_kongs(const SET *pung_sets, long pung_cnt, long (&points_t
         }
     }
 
+    // 逐组刻子的番（箭刻、幺九刻）
     for (long i = 0; i < pung_cnt; ++i) {
         POINT_TYPE points = get_1_pung_points(pung_sets[i].mid_tile);
         if (points != NONE) {
@@ -1793,7 +1794,7 @@ static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN
         }
     }
 
-    // 圈风刻、门风刻没必要检测了
+    // 圈风刻、门风刻没必要检测了，这些特殊和型都没有面子
     // 统一校正一些不计的
     correction_points_table(points_table, false);
     return true;
@@ -1891,7 +1892,7 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
 
     // 检测门（五门齐的门）
     check_tiles_suits(concealed_tiles, 14, points_table);
-    // 特性和数牌的范围不用检测了
+    // 特性和数牌的范围不用检测了，绝对不可能是有断幺、推不倒、绿一色、字一色、清幺九、混幺九
     // 检测四归一
     check_tiles_hog(concealed_tiles, 14, points_table);
 
