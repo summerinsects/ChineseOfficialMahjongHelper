@@ -973,45 +973,40 @@ static void check_pair_tile(TILE pair_tile, long chow_cnt, long (&points_table)[
 
 // 检测门（五门齐的门）
 static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_table)[POINT_TYPE_COUNT]) {
-    bool has_characters = false;
-    bool has_bamboo = false;
-    bool has_dots = false;
-    bool has_winds = false;
-    bool has_dragons = false;
+    // 打表标记有哪些花色
+    uint8_t suit_flag = 0;
     for (long i = 0; i < tile_cnt; ++i) {
-        SUIT_TYPE suit = tile_suit(tiles[i]);
-        switch (suit) {
-        case TILE_SUIT_CHARACTERS: has_characters = true; break;
-        case TILE_SUIT_BAMBOO: has_bamboo = true; break;
-        case TILE_SUIT_DOTS: has_dots = true; break;
-        case TILE_SUIT_WINDS: has_winds = true; break;
-        case TILE_SUIT_DRAGONS: has_dragons = true; break;
-        }
+        suit_flag |= (1 << tile_suit(tiles[i]));
     }
 
-    if (has_characters && has_bamboo && has_dots && has_winds && has_dragons) {
+    // 0011 1110
+    if (suit_flag == UINT8_C(0x3E)) {
         points_table[ALL_TYPES] = 1;  // 五门齐
         return;
     }
 
-    if (!has_winds && !has_dragons) {
+    // 1111 0001
+    if (!(suit_flag & UINT8_C(0xF1))) {
         points_table[NO_HONORS] = 1;  // 无字
     }
 
-    if (!has_characters) {
+    // 1111 1101
+    if (!(suit_flag & UINT8_C(0xFD))) {
         ++points_table[ONE_VOIDED_SUIT];  // 缺一门（万）
     }
-    if (!has_bamboo) {
+    // 1111 1011
+    if (!(suit_flag & UINT8_C(0xFB))) {
         ++points_table[ONE_VOIDED_SUIT];  // 缺一门（条）
     }
-    if (!has_dots) {
+    // 1111 0111
+    if (!(suit_flag & UINT8_C(0xF7))) {
         ++points_table[ONE_VOIDED_SUIT];  // 缺一门（饼）
     }
 
     // 当缺2门时，根据有字和无字，修正为混一色和清一色
     if (points_table[ONE_VOIDED_SUIT] == 2) {
         points_table[ONE_VOIDED_SUIT] = 0;
-        points_table[points_table[NO_HONORS] == 0 ? HALF_FLUSH : FULL_FLUSH] = 1;
+        points_table[suit_flag & UINT8_C(0xF1) ? HALF_FLUSH : FULL_FLUSH] = 1;
     }
 }
 
@@ -1027,29 +1022,29 @@ static void check_tiles_rank_range(const TILE *tiles, long tile_cnt, long (&poin
     uint16_t rank_flag = 0;
     for (long i = 0; i < tile_cnt; ++i) {
         SUIT_TYPE suit = tile_suit(tiles[i]);
-        if (suit == TILE_SUIT_WINDS || suit == TILE_SUIT_DRAGONS) {
-            return;  // 不允许字牌
+        if (!is_numbered_suit_quick(tiles[i])) {
+            return;
         }
         rank_flag |= (1 << tile_rank(tiles[i]));
     }
 
     // 1111 1111 1110 0001
     // 检测是否只包含1234
-    if (!(rank_flag & 0xFFE1)) {
+    if (!(rank_flag & UINT16_C(0xFFE1))) {
         // 包含4为小于五，否则为全小
-        points_table[rank_flag & 0x0010 ? LOWER_FOUR : LOWER_TILES] = 1;
+        points_table[rank_flag & UINT16_C(0x0010) ? LOWER_FOUR : LOWER_TILES] = 1;
         return;
     }
     // 1111 1100 0011 1111
     // 检测是否只包含6789
-    if (!(rank_flag & 0xFC3F)) {
+    if (!(rank_flag & UINT16_C(0xFC3F))) {
         // 包含6为大于五，否则为全大
-        points_table[rank_flag & 0x0040 ? UPPER_FOUR : UPPER_TILES] = 1;
+        points_table[rank_flag & UINT16_C(0x0040) ? UPPER_FOUR : UPPER_TILES] = 1;
         return;
     }
     // 1111 1111 1000 1111
     // 检测是否只包含456
-    if (!(rank_flag & 0xFF8F)) {
+    if (!(rank_flag & UINT16_C(0xFF8F))) {
         // 全中
         points_table[MIDDLE_TILES] = 1;
     }
