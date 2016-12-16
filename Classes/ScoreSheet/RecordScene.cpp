@@ -135,7 +135,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     label = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 260));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 250));
+
+    label = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。", "Arial", 10);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 270));
 
     ui::Widget *innerNode = ui::Widget::create();
     innerNode->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
@@ -182,10 +187,10 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     ui::ScrollView *scrollView = ui::ScrollView::create();
     scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
     scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
-    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 320));
+    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 330));
     scrollView->setInnerContainerSize(innerNode->getContentSize());
     scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 120.0f));
+    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 125.0f));
     this->addChild(scrollView);
 
     scrollView->addChild(innerNode);
