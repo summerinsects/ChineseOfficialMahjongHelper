@@ -1874,14 +1874,12 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
         }
     }
     else {
-        POINT_TYPE points = get_1_pung_points(fourth_set.mid_tile);
-        if (points != NONE) {
-            ++points_table[points];
-        }
+        calculate_1_pung(fourth_set, points_table);
     }
 
     check_win_type(win_type, points_table);
-    if (remain_cnt == 5) {
+    // 暗杠不影响门前清
+    if (remain_cnt == 5 || (fourth_set.set_type == SET_TYPE::KONG && !fourth_set.is_melded)) {
         if (win_type & WIN_TYPE_SELF_DRAWN) {
             points_table[FULLY_CONCEALED_HAND] = 1;
         }
@@ -1890,11 +1888,20 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
         }
     }
 
+    TILE tiles[15];  // 第四组可能为杠，所以最多为15张
+    long tile_cnt = concealed_cnt;
+    memcpy(tiles, concealed_tiles, sizeof(TILE) * concealed_cnt);
+    if (remain_cnt == 2) {  // 只余下两张的，说明有一组吃碰杠的面子，将这组恢复成牌
+        long temp_cnt;
+        recovery_tiles_from_sets(&fourth_set, 1, tiles + 11, &temp_cnt);
+        tile_cnt += temp_cnt;
+    }
+
     // 检测门（五门齐的门）
-    check_tiles_suits(concealed_tiles, 14, points_table);
+    check_tiles_suits(tiles, tile_cnt, points_table);
     // 特性和数牌的范围不用检测了，绝对不可能是有断幺、推不倒、绿一色、字一色、清幺九、混幺九
     // 检测四归一
-    check_tiles_hog(concealed_tiles, 14, points_table);
+    check_tiles_hog(tiles, tile_cnt, points_table);
 
     // 和牌张是组合龙范围的牌，不计边坎钓
     if (std::find(matched_seq, matched_seq + 9, win_tile) == matched_seq + 9) {
