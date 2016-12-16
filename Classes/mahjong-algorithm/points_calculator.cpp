@@ -1050,40 +1050,55 @@ static void check_tiles_rank_range(const TILE *tiles, long tile_cnt, long (&poin
     }
 }
 
+// 判断一组牌是否包含数牌19
+static bool is_set_contains_terminal_tile(const SET &set) {
+    if (!is_numbered_suit_quick(set.mid_tile)) {
+        return false;
+    }
+    RANK_TYPE rank = tile_rank(set.mid_tile);
+    if (set.set_type == SET_TYPE::CHOW) {
+        return (rank == 2 || rank == 8);
+    }
+    else {
+        return (rank == 1 || rank == 9);
+    }
+}
+
+// 判断一组牌是否包含数牌5
+static bool is_set_contains_5(const SET &set) {
+    if (!is_numbered_suit_quick(set.mid_tile)) {
+        return false;
+    }
+    RANK_TYPE rank = tile_rank(set.mid_tile);
+    if (set.set_type == SET_TYPE::CHOW) {
+        return (rank >= 4 && rank <= 6);
+    }
+    else {
+        return rank == 5;
+    }
+}
+
 // 检测全带幺、全带五、全双刻
 static void check_tiles_rank_by_set(const SET (&sets)[5], long (&points_table)[POINT_TYPE_COUNT]) {
     // 统计包含数牌19、字牌、5、双数牌的组数
     int terminal_cnt = 0;
     int honor_cnt = 0;
     int _5_cnt = 0;
-    int even_cnt = 0;
+    int even_pung_cnt = 0;
     for (long i = 0; i < 5; ++i) {
-        if (is_set_contains_tile(sets[i], 0x11) ||
-            is_set_contains_tile(sets[i], 0x19) ||
-            is_set_contains_tile(sets[i], 0x21) ||
-            is_set_contains_tile(sets[i], 0x29) ||
-            is_set_contains_tile(sets[i], 0x31) ||
-            is_set_contains_tile(sets[i], 0x39)) {
+        if (is_set_contains_terminal_tile(sets[i])) {
             ++terminal_cnt;  // 数牌19
         }
-        else if (sets[i].set_type == SET_TYPE::PUNG ||
-                 sets[i].set_type == SET_TYPE::KONG ||
-                 sets[i].set_type == SET_TYPE::PAIR) {
-            if (is_honor(sets[i].mid_tile)) {
-                ++honor_cnt;  // 字牌
-            }
+        else if (sets[i].set_type != SET_TYPE::CHOW
+            && is_honor(sets[i].mid_tile)) {
+            ++honor_cnt;  // 字牌
         }
-        else if (is_set_contains_tile(sets[i], 0x15) ||
-            is_set_contains_tile(sets[i], 0x25) ||
-            is_set_contains_tile(sets[i], 0x35)) {
+        else if (is_set_contains_5(sets[i])) {
             ++_5_cnt;  // 5
         }
-        else if (sets[i].set_type == SET_TYPE::PUNG ||
-            sets[i].set_type == SET_TYPE::KONG ||
-            sets[i].set_type == SET_TYPE::PAIR) {
-            if (is_numbered_suit_quick(sets[i].mid_tile) && sets[i].mid_tile % 2 == 0) {
-                ++even_cnt;  // 双数牌
-            }
+        else if (sets[i].set_type != SET_TYPE::CHOW
+            && is_numbered_suit_quick(sets[i].mid_tile) && (sets[i].mid_tile & 1) == 0) {
+            ++even_pung_cnt;  // 双数牌刻子
         }
     }
 
@@ -1098,7 +1113,7 @@ static void check_tiles_rank_by_set(const SET (&sets)[5], long (&points_table)[P
         return;
     }
     // 全双刻
-    if (even_cnt == 5) {
+    if (even_pung_cnt == 5) {
         points_table[ALL_EVEN_PUNGS] = 1;
     }
 }
