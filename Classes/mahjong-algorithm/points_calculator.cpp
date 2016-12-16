@@ -971,6 +971,14 @@ static void check_pair_tile(TILE pair_tile, long chow_cnt, long (&points_table)[
     }
 }
 
+#ifndef UINT8_C
+#define UINT8_C(x)   (x)
+#endif
+
+#ifndef UINT16_C
+#define UINT16_C(x)  (x)
+#endif
+
 // 检测门（五门齐的门）
 static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_table)[POINT_TYPE_COUNT]) {
     // 打表标记有哪些花色
