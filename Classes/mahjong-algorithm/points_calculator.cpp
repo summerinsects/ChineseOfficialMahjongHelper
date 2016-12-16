@@ -2133,7 +2133,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
         std::sort(&_separation_sets[i][fixed_cnt], &_separation_sets[i][4], &set_cmp);
     }
 
-    long points_tables[MAX_SEPARAION_CNT][POINT_TYPE_COUNT] = { 0 };
+    long points_tables[MAX_SEPARAION_CNT][POINT_TYPE_COUNT] = { { 0 } };
     int max_points = 0;
     long max_idx = -1;
 
