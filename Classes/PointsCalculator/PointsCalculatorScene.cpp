@@ -353,121 +353,121 @@ void PointsCalculatorScene::calculate() {
     const Size &pointsAreaSize = _pointsAreaNode->getContentSize();
     Vec2 pos(pointsAreaSize.width * 0.5f, pointsAreaSize.height * 0.5f);
 
-        int flowerCnt = atoi(_editBox->getText());
-        if (flowerCnt > 8) {
-            Label *errorLabel = Label::createWithSystemFont("花牌数合法的范围为0~8", "Arial", 12);
-            errorLabel->setColor(Color3B::BLACK);
-            AlertLayer::showWithNode("算番", errorLabel, nullptr, nullptr);
-            return;
+    int flowerCnt = atoi(_editBox->getText());
+    if (flowerCnt > 8) {
+        Label *errorLabel = Label::createWithSystemFont("花牌数合法的范围为0~8", "Arial", 12);
+        errorLabel->setColor(Color3B::BLACK);
+        AlertLayer::showWithNode("算番", errorLabel, nullptr, nullptr);
+        return;
+    }
+
+    // 获取副露
+    mahjong::SET sets[5];
+    long set_cnt = std::copy(_tilePicker->getFixedSets().begin(), _tilePicker->getFixedSets().end(), std::begin(sets))
+        - std::begin(sets);
+
+    // 获取立牌
+    mahjong::TILE tiles[13];
+    long tile_cnt = std::copy(_tilePicker->getHandTiles().begin(), _tilePicker->getHandTiles().end(), std::begin(tiles))
+        - std::begin(tiles);
+    mahjong::sort_tiles(tiles, tile_cnt);
+
+    // 获取和牌张
+    mahjong::TILE win_tile = _tilePicker->getWinTile();
+
+    long points_table[mahjong::POINT_TYPE_COUNT] = { 0 };
+
+    // 获取绝张、杠开、抢杠、海底信息
+    mahjong::WIN_TYPE win_type = WIN_TYPE_DISCARD;
+    if (_selfDrawnButton->isHighlighted()) win_type |= WIN_TYPE_SELF_DRAWN;
+    if (_fourthTileButton->isHighlighted()) win_type |= WIN_TYPE_4TH_TILE;
+    if (_robKongButton->isHighlighted()) win_type |= WIN_TYPE_ABOUT_KONG;
+    if (_replacementButton->isHighlighted()) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
+    if (_lastTileButton->isHighlighted()) win_type |= WIN_TYPE_WALL_LAST;
+
+    // 获取圈风门风
+    mahjong::WIND_TYPE prevalent_wind = mahjong::WIND_TYPE::EAST, seat_wind = mahjong::WIND_TYPE::EAST;
+    for (int i = 0; i < 4; ++i) {
+        if (!_prevalentButton[i]->isEnabled()) {
+            prevalent_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + i);
+            break;
         }
-
-        // 获取副露
-        mahjong::SET sets[5];
-        long set_cnt = std::copy(_tilePicker->getFixedSets().begin(), _tilePicker->getFixedSets().end(), std::begin(sets))
-            - std::begin(sets);
-
-        // 获取立牌
-        mahjong::TILE tiles[13];
-        long tile_cnt = std::copy(_tilePicker->getHandTiles().begin(), _tilePicker->getHandTiles().end(), std::begin(tiles))
-            - std::begin(tiles);
-        mahjong::sort_tiles(tiles, tile_cnt);
-
-        // 获取和牌张
-        mahjong::TILE win_tile = _tilePicker->getWinTile();
-
-        long points_table[mahjong::POINT_TYPE_COUNT] = { 0 };
-
-        // 获取绝张、杠开、抢杠、海底信息
-        mahjong::WIN_TYPE win_type = WIN_TYPE_DISCARD;
-        if (_selfDrawnButton->isHighlighted()) win_type |= WIN_TYPE_SELF_DRAWN;
-        if (_fourthTileButton->isHighlighted()) win_type |= WIN_TYPE_4TH_TILE;
-        if (_robKongButton->isHighlighted()) win_type |= WIN_TYPE_ABOUT_KONG;
-        if (_replacementButton->isHighlighted()) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
-        if (_lastTileButton->isHighlighted()) win_type |= WIN_TYPE_WALL_LAST;
-
-        // 获取圈风门风
-        mahjong::WIND_TYPE prevalent_wind = mahjong::WIND_TYPE::EAST, seat_wind = mahjong::WIND_TYPE::EAST;
-        for (int i = 0; i < 4; ++i) {
-            if (!_prevalentButton[i]->isEnabled()) {
-                prevalent_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + i);
-                break;
-            }
+    }
+    for (int i = 0; i < 4; ++i) {
+        if (!_seatButton[i]->isEnabled()) {
+            seat_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + i);
+            break;
         }
-        for (int i = 0; i < 4; ++i) {
-            if (!_seatButton[i]->isEnabled()) {
-                seat_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + i);
-                break;
-            }
-        }
+    }
 
-        // 算番
-        int points = calculate_points(sets, set_cnt, tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);
-        if (points == ERROR_NOT_WIN) {
-            Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", FONT_SIZE);
-            _pointsAreaNode->addChild(errorLabel);
-            errorLabel->setPosition(pos);
-            return;
-        }
-        if (points == ERROR_WRONG_TILES_COUNT) {
-            Label *errorLabel = Label::createWithSystemFont("牌张数错误", "Arial", 12);
-            errorLabel->setColor(Color3B::BLACK);
-            AlertLayer::showWithNode("算番", errorLabel, nullptr, nullptr);
-            return;
-        }
+    // 算番
+    int points = calculate_points(sets, set_cnt, tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);
+    if (points == ERROR_NOT_WIN) {
+        Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", FONT_SIZE);
+        _pointsAreaNode->addChild(errorLabel);
+        errorLabel->setPosition(pos);
+        return;
+    }
+    if (points == ERROR_WRONG_TILES_COUNT) {
+        Label *errorLabel = Label::createWithSystemFont("牌张数错误", "Arial", 12);
+        errorLabel->setColor(Color3B::BLACK);
+        AlertLayer::showWithNode("算番", errorLabel, nullptr, nullptr);
+        return;
+    }
 
-        // 加花牌
-        points += flowerCnt;
-        points_table[mahjong::FLOWER_TILES] = flowerCnt;
+    // 加花牌
+    points += flowerCnt;
+    points_table[mahjong::FLOWER_TILES] = flowerCnt;
 
-        // 有n个番种，每行排2个
-        long n = mahjong::POINT_TYPE_COUNT - std::count(std::begin(points_table), std::end(points_table), 0);
-        long rows = (n >> 1) + (n & 1);  // 需要这么多行
+    // 有n个番种，每行排2个
+    long n = mahjong::POINT_TYPE_COUNT - std::count(std::begin(points_table), std::end(points_table), 0);
+    long rows = (n >> 1) + (n & 1);  // 需要这么多行
 
-        // 排列
-        Node *innerNode = Node::create();
-        float pointsAreaHeight = (FONT_SIZE + 2) * (rows + 2);  // 每行间隔2像素，留空1行，另一行给“总计”用
-        innerNode->setContentSize(Size(visibleSize.width, pointsAreaHeight));
+    // 排列
+    Node *innerNode = Node::create();
+    float pointsAreaHeight = (FONT_SIZE + 2) * (rows + 2);  // 每行间隔2像素，留空1行，另一行给“总计”用
+    innerNode->setContentSize(Size(visibleSize.width, pointsAreaHeight));
 
-        for (int i = 0, j = 0; i < n; ++i) {
-            while (points_table[++j] == 0) continue;
+    for (int i = 0, j = 0; i < n; ++i) {
+        while (points_table[++j] == 0) continue;
 
-            std::string str;
-            if (points_table[j] == 1) {
-                str = StringUtils::format("%s %d\n", mahjong::points_name[j], mahjong::points_value_table[j]);
-            }
-            else {
-                str = StringUtils::format("%s %dx%ld\n", mahjong::points_name[j], mahjong::points_value_table[j], points_table[j]);
-            }
-
-            // 创建label，每行排2个
-            Label *pointName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
-            innerNode->addChild(pointName);
-            pointName->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-            div_t ret = div(i, 2);
-            pointName->setPosition(Vec2(ret.rem == 0 ? 5.0f : visibleSize.width * 0.5f + 5.0f, (FONT_SIZE + 2) * (rows - ret.quot + 2)));
-        }
-
-        Label *pointTotal = Label::createWithSystemFont(StringUtils::format("总计：%d番", points), "Arial", FONT_SIZE);
-        innerNode->addChild(pointTotal);
-        pointTotal->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-        pointTotal->setPosition(Vec2(5.0f, FONT_SIZE + 2));
-
-        // 超出高度就使用ScrollView
-        if (pointsAreaHeight <= pointsAreaSize.height) {
-            _pointsAreaNode->addChild(innerNode);
-            innerNode->setAnchorPoint(Vec2(0.5f, 0.5f));
-            innerNode->setPosition(pos);
+        std::string str;
+        if (points_table[j] == 1) {
+            str = StringUtils::format("%s %d\n", mahjong::points_name[j], mahjong::points_value_table[j]);
         }
         else {
-            ui::ScrollView *scrollView = ui::ScrollView::create();
-            scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-            scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
-            scrollView->setContentSize(pointsAreaSize);
-            scrollView->setInnerContainerSize(innerNode->getContentSize());
-            scrollView->addChild(innerNode);
-
-            _pointsAreaNode->addChild(scrollView);
-            scrollView->setAnchorPoint(Vec2(0.5f, 0.5f));
-            scrollView->setPosition(pos);
+            str = StringUtils::format("%s %dx%ld\n", mahjong::points_name[j], mahjong::points_value_table[j], points_table[j]);
         }
+
+        // 创建label，每行排2个
+        Label *pointName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
+        innerNode->addChild(pointName);
+        pointName->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+        div_t ret = div(i, 2);
+        pointName->setPosition(Vec2(ret.rem == 0 ? 5.0f : visibleSize.width * 0.5f + 5.0f, (FONT_SIZE + 2) * (rows - ret.quot + 2)));
+    }
+
+    Label *pointTotal = Label::createWithSystemFont(StringUtils::format("总计：%d番", points), "Arial", FONT_SIZE);
+    innerNode->addChild(pointTotal);
+    pointTotal->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+    pointTotal->setPosition(Vec2(5.0f, FONT_SIZE + 2));
+
+    // 超出高度就使用ScrollView
+    if (pointsAreaHeight <= pointsAreaSize.height) {
+        _pointsAreaNode->addChild(innerNode);
+        innerNode->setAnchorPoint(Vec2(0.5f, 0.5f));
+        innerNode->setPosition(pos);
+    }
+    else {
+        ui::ScrollView *scrollView = ui::ScrollView::create();
+        scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
+        scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
+        scrollView->setContentSize(pointsAreaSize);
+        scrollView->setInnerContainerSize(innerNode->getContentSize());
+        scrollView->addChild(innerNode);
+
+        _pointsAreaNode->addChild(scrollView);
+        scrollView->setAnchorPoint(Vec2(0.5f, 0.5f));
+        scrollView->setPosition(pos);
+    }
 }
