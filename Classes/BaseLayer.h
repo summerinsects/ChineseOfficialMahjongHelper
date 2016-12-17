@@ -11,9 +11,11 @@ public:
             return false;
         }
 
+        // 背景色
         cocos2d::LayerColor *background = cocos2d::LayerColor::create(cocos2d::Color4B(32, 37, 40, 255));
         this->addChild(background, -100);
 
+        // 监听返回键
         auto listener = cocos2d::EventListenerKeyboard::create();
         listener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent) {
             if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_BACK) {
@@ -25,11 +27,13 @@ public:
         cocos2d::Size visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
         cocos2d::Vec2 origin = cocos2d::Director::getInstance()->getVisibleOrigin();
 
+        // 标题
         cocos2d::Label *tileLabel = cocos2d::Label::createWithSystemFont(title, "Arial", 20);
         this->addChild(tileLabel);
         tileLabel->setPosition(cocos2d::Vec2(origin.x + visibleSize.width * 0.5f,
             origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
 
+        // 返回按钮
         cocos2d::ui::Button *backBtn = cocos2d::ui::Button::create("source_material/btn_left_white.png", "source_material/btn_left_blue.png");
         this->addChild(backBtn);
         backBtn->setScale9Enabled(true);
