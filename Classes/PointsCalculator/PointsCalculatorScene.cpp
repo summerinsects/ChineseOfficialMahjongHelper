@@ -399,7 +399,7 @@ void PointsCalculatorScene::calculate() {
                 str = StringUtils::format("%s %d\n", mahjong::points_name[j], mahjong::points_value_table[j]);
             }
             else {
-                str = StringUtils::format("%s %d*%ld\n", mahjong::points_name[j], mahjong::points_value_table[j], points_table[j]);
+                str = StringUtils::format("%s %dx%ld\n", mahjong::points_name[j], mahjong::points_value_table[j], points_table[j]);
             }
 
             Label *pointName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
