@@ -91,10 +91,7 @@ bool ScoreSheetScene::init() {
     button->setTitleColor(Color3B::BLACK);
     button->setTitleText("重置");
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 35));
-    button->addClickEventListener([this](Ref *) {
-        AlertLayer::showWithMessage("重置", "重置会清空当前已记录的信息，未打满北风北的记录将会丢失，确定要这样做吗？",
-            std::bind(&ScoreSheetScene::reset, this), nullptr);
-    });
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
 
     // 追分计算按钮
     button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -482,6 +479,23 @@ void ScoreSheetScene::onTimeScheduler(float dt) {
     _timeLabel->setString(str);
 }
 
+void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
+    for (int i = 0; i < 4; ++i) {
+        if (g_currentRecord.name[i][0] == '\0') {
+            reset();
+            return;
+        }
+    }
+
+    if (g_currentRecord.currentIndex == 16) {
+        reset();
+        return;
+    }
+
+    AlertLayer::showWithMessage("重置", "重置操作会清空当前已记录的信息，未打满北风北的记录将会丢失，确定要这样做吗？",
+        std::bind(&ScoreSheetScene::reset, this), nullptr);
+}
+
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     ui::EditBox *editBox = ui::EditBox::create(Size(100.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
@@ -493,27 +507,36 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
 
     AlertLayer::showWithNode("追分计算", editBox, [editBox]() {
         int score = atoi(editBox->getText());
-        std::string msg = StringUtils::format("分差%d，", score);
-        if (score <= 0) {
-            msg.append("无须追分");
+        std::string msg;
+        msg.reserve(128);
+        if (score == 0) {
+            msg = "平分";
         }
         else {
+            if (score < 0) {
+                score = -score;
+                msg.append(StringUtils::format("领先%d分，对手超分需：", score));
+            }
+            else {
+                msg.append(StringUtils::format("落后%d分，超分需：", score));
+            }
+
             int d1 = score - 32;
             if (d1 < 8) {
-                msg.append("须任意和牌");
+                msg.append("任意和牌");
             }
             else {
                 int d2 = d1 >> 1;
                 if (d2 < 8) {
-                    msg.append(StringUtils::format("须任意自摸或对点，旁点%d番", d1 + 1));
+                    msg.append(StringUtils::format("任意自摸或对点，旁点至少%d番", d1 + 1));
                 }
                 else {
                     int d4 = d2 >> 1;
                     if (d4 < 8) {
-                        msg.append(StringUtils::format("须任意自摸，对点%d番，旁点%d番", d2 + 1, d1 + 1));
+                        msg.append(StringUtils::format("任意自摸，对点至少%d番，旁点至少%d番", d2 + 1, d1 + 1));
                     }
                     else {
-                        msg.append(StringUtils::format("须自摸%d番，对点%d番，旁点%d番", d4 + 1, d2 + 1, d1 + 1));
+                        msg.append(StringUtils::format("自摸至少%d番，对点至少%d番，旁点至少%d番", d4 + 1, d2 + 1, d1 + 1));
                     }
                 }
             }
