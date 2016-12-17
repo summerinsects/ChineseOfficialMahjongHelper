@@ -11,6 +11,9 @@ public:
             return false;
         }
 
+        cocos2d::LayerColor *background = cocos2d::LayerColor::create(cocos2d::Color4B(32, 37, 40, 255));
+        this->addChild(background, -100);
+
         auto listener = cocos2d::EventListenerKeyboard::create();
         listener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent) {
             if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_BACK) {

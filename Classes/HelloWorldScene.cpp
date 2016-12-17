@@ -20,6 +20,9 @@ bool HelloWorld::init() {
         return false;
     }
 
+    cocos2d::LayerColor *background = cocos2d::LayerColor::create(cocos2d::Color4B(32, 37, 40, 255));
+    this->addChild(background, -100);
+
     auto listener = EventListenerKeyboard::create();
     listener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* unused_event) {
         Director::getInstance()->end();
