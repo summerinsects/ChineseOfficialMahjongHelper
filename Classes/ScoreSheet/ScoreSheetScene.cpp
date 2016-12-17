@@ -63,6 +63,7 @@ bool ScoreSheetScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    // 历史记录按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(button);
     button->setScale9Enabled(true);
@@ -81,6 +82,7 @@ bool ScoreSheetScene::init() {
         }));
     });
 
+    // 重置按钮
     button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(button);
     button->setScale9Enabled(true);
@@ -91,6 +93,7 @@ bool ScoreSheetScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 35));
     button->addClickEventListener([this](Ref *) { reset(); });
 
+    // 追分计算按钮
     button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     this->addChild(button);
     button->setScale9Enabled(true);
@@ -101,33 +104,39 @@ bool ScoreSheetScene::init() {
     button->setPosition(Vec2(origin.x + 28, origin.y + visibleSize.height - 40));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
 
+    // 时间label
     _timeLabel = Label::createWithSystemFont("当前时间", "Arial", 12);
     this->addChild(_timeLabel);
     _timeLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     _timeLabel->setPosition(Vec2(origin.x + 5, (origin.y + visibleSize.height - 430) * 0.5f - 10));
 
+    // 用来绘制表格线的根结点
     DrawNode *node = DrawNode::create();
     this->addChild(node);
     node->setPosition(Vec2(origin.x, (origin.y + visibleSize.height - 430) * 0.5f));
 
-    const float gap = visibleSize.width / 6;
+    const float gap = visibleSize.width / 6;  // 分成6份
 
+    // 5条竖线
     for (int i = 0; i < 5; ++i) {
         const float x = gap * (i + 1);
         node->drawLine(Vec2(x, 0.0f), Vec2(x, 400.0f), Color4F::WHITE);
     }
 
+    // 21条横线
     for (int i = 0; i < 21; ++i) {
         const float y = 20.0f * i;
         node->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y),
             (i > 0 && i < 16) ? Color4F::GRAY : Color4F::WHITE);
     }
 
+    // 第1栏：选手姓名
     Label *label = Label::createWithSystemFont("选手姓名", "Arail", 12);
     label->setColor(Color3B::YELLOW);
     label->setPosition(Vec2(gap * 0.5f, 390));
     node->addChild(label);
 
+    // 4个输入框及同位置的label
     for (int i = 0; i < 4; ++i) {
         _editBox[i] = ui::EditBox::create(Size(gap, 20.0f), ui::Scale9Sprite::create());
         _editBox[i]->setPosition(Vec2(gap * (i + 1.5f), 390));
@@ -151,6 +160,7 @@ bool ScoreSheetScene::init() {
     _lockButton->setPosition(Vec2(gap * 5.5f, 390));
     _lockButton->addClickEventListener(std::bind(&ScoreSheetScene::onLockButton, this, std::placeholders::_1));
 
+    // 第2、3栏：座位
     const char *row0Text[] = {"开局座位", "东", "南", "西", "北"};
     const char *row1Text[] = {"每圈座位", "东南北西", "南东西北", "西北东南", "北西南东"};
     for (int i = 0; i < 5; ++i) {
@@ -163,6 +173,7 @@ bool ScoreSheetScene::init() {
         node->addChild(label);
     }
 
+    // 第4栏：累计
     label = Label::createWithSystemFont("累计", "Arail", 12);
     label->setColor(Color3B::YELLOW);
     label->setPosition(Vec2(gap * 0.5f, 330));
@@ -179,19 +190,24 @@ bool ScoreSheetScene::init() {
         node->addChild(_totalLabel[i]);
     }
 
+    // 第5~20栏，东风东~北风北的计分
     for (int k = 0; k < 16; ++k) {
         const float y = 10 + (15 - k) * 20;
+
+        // 东风东~北风北名字
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
         label->setColor(Color3B::GRAY);
         label->setPosition(Vec2(gap * 0.5f, y));
         node->addChild(label);
 
+        // 四位选手得分
         for (int i = 0; i < 4; ++i) {
             _scoreLabels[k][i] = Label::createWithSystemFont("", "Arail", 12);
             _scoreLabels[k][i]->setPosition(Vec2(gap * (i + 1.5f), y));
             node->addChild(_scoreLabels[k][i]);
         }
 
+        // 计分按钮
         _recordButton[k] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
         node->addChild(_recordButton[k]);
         _recordButton[k]->setScale9Enabled(true);
@@ -204,6 +220,7 @@ bool ScoreSheetScene::init() {
         _recordButton[k]->setEnabled(false);
         _recordButton[k]->setVisible(false);
 
+        // 备注的番种label
         _pointNameLabel[k] = Label::createWithSystemFont("", "Arail", 12);
         _pointNameLabel[k]->setColor(Color3B::GRAY);
         _pointNameLabel[k]->setPosition(Vec2(gap * 5.5f, y));
@@ -211,15 +228,17 @@ bool ScoreSheetScene::init() {
         _pointNameLabel[k]->setVisible(false);
     }
 
+    // 从json中读，并恢复界面数据
     readFromJson();
     recover();
     return true;
 }
 
 void ScoreSheetScene::fillRow(size_t handIdx) {
+    // 填入这一盘四位选手的得分
     for (int i = 0; i < 4; ++i) {
         _scoreLabels[handIdx][i]->setString(StringUtils::format("%+d", g_currentRecord.scores[handIdx][i]));
-        _totalScores[i] += g_currentRecord.scores[handIdx][i];
+        _totalScores[i] += g_currentRecord.scores[handIdx][i];  // 更新总分
         if (g_currentRecord.scores[handIdx][i] > 0) {
             _scoreLabels[handIdx][i]->setColor(Color3B::RED);
         }
@@ -231,9 +250,11 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
         }
     }
 
+    // 禁用并隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
 
+    // 选取标记的最大番种显示出来
     bool pointsNameVisible = false;
     if (g_currentRecord.pointsFlag[handIdx] != 0) {
         for (unsigned n = 0; n < 64; ++n) {
@@ -274,6 +295,7 @@ void ScoreSheetScene::refreshEndTime() {
 }
 
 void ScoreSheetScene::recover() {
+    // 选手名字是否为空
     bool empty = false;
     for (int i = 0; i < 4; ++i) {
         if (g_currentRecord.name[i][0] == '\0') {
@@ -282,6 +304,7 @@ void ScoreSheetScene::recover() {
         }
     }
 
+    // 有选手名字为空，则清空数据
     if (empty) {
         memset(&g_currentRecord, 0, sizeof(g_currentRecord));
         onTimeScheduler(0.0f);
@@ -289,6 +312,7 @@ void ScoreSheetScene::recover() {
         return;
     }
 
+    // 禁用和隐藏名字输入框，显示名字的label
     for (int i = 0; i < 4; ++i) {
         _editBox[i]->setVisible(false);
         _editBox[i]->setEnabled(false);
@@ -296,19 +320,24 @@ void ScoreSheetScene::recover() {
         _nameLabel[i]->setVisible(true);
     }
 
+    // 禁用和隐藏锁定按钮
     _lockButton->setEnabled(false);
     _lockButton->setVisible(false);
 
+    // 初始化总分
     memset(_totalScores, 0, sizeof(_totalScores));
 
+    // 逐行填入数据
     for (size_t k = 0; k < g_currentRecord.currentIndex; ++k) {
         fillRow(k);
     }
 
+    // 刷新总分label
     for (int i = 0; i < 4; ++i) {
         _totalLabel[i]->setString(StringUtils::format("%+d", _totalScores[i]));
     }
 
+    // 如果不是北风北，则显示下一行的计分按钮
     if (g_currentRecord.currentIndex < 16) {
         _recordButton[g_currentRecord.currentIndex]->setVisible(true);
         _recordButton[g_currentRecord.currentIndex]->setEnabled(true);
@@ -383,15 +412,19 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
     Director::getInstance()->pushScene(RecordScene::createScene(handIdx, name, [this, handIdx](RecordScene *scene) {
         if (handIdx != g_currentRecord.currentIndex) return;
 
+        // 将计分面板的数据更新到当前数据中
         memcpy(g_currentRecord.scores[handIdx], scene->getScoreTable(), sizeof(g_currentRecord.scores[handIdx]));
         g_currentRecord.pointsFlag[handIdx] = scene->getPointsFlag();
 
+        // 填入当前行
         fillRow(handIdx);
 
+        // 更新总分
         for (int i = 0; i < 4; ++i) {
             _totalLabel[i]->setString(StringUtils::format("%+d", _totalScores[i]));
         }
 
+        // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
         if (++g_currentRecord.currentIndex < 16) {
             _recordButton[g_currentRecord.currentIndex]->setVisible(true);
             _recordButton[g_currentRecord.currentIndex]->setEnabled(true);
