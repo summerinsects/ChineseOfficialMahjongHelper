@@ -999,16 +999,16 @@ static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_ta
         points_table[NO_HONORS] = 1;  // 无字
     }
 
-    // 1111 1101
-    if (!(suit_flag & UINT8_C(0xFD))) {
+    // 1100 0011
+    if (!(suit_flag & UINT8_C(0xC3))) {
         ++points_table[ONE_VOIDED_SUIT];  // 缺一门（万）
     }
-    // 1111 1011
-    if (!(suit_flag & UINT8_C(0xFB))) {
+    // 1100 0101
+    if (!(suit_flag & UINT8_C(0xC5))) {
         ++points_table[ONE_VOIDED_SUIT];  // 缺一门（条）
     }
-    // 1111 0111
-    if (!(suit_flag & UINT8_C(0xF7))) {
+    // 1100 1001
+    if (!(suit_flag & UINT8_C(0xC9))) {
         ++points_table[ONE_VOIDED_SUIT];  // 缺一门（饼）
     }
 
@@ -1030,7 +1030,6 @@ static void check_tiles_rank_range(const TILE *tiles, long tile_cnt, long (&poin
     // 打表标记有哪些数
     uint16_t rank_flag = 0;
     for (long i = 0; i < tile_cnt; ++i) {
-        SUIT_TYPE suit = tile_suit(tiles[i]);
         if (!is_numbered_suit_quick(tiles[i])) {
             return;
         }
