@@ -19,6 +19,7 @@ private:
     cocos2d::Label *_totalLabel[4];
     cocos2d::Label *_scoreLabels[16][4];
     cocos2d::ui::Button *_recordButton[16];
+    cocos2d::ui::Button *_detailButton[16];
     cocos2d::Label *_pointNameLabel[16];
     cocos2d::Label *_timeLabel;
 
@@ -29,6 +30,7 @@ private:
     void reset();
     void onLockButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender, size_t handIdx);
+    void onDetailButton(cocos2d::Ref *sender, size_t handIdx);
     void onTimeScheduler(float dt);
     void onPursuitButton(cocos2d::Ref *sender);
 };

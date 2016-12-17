@@ -229,6 +229,17 @@ bool ScoreSheetScene::init() {
         _pointNameLabel[k]->setPosition(Vec2(gap * 5.5f, y));
         node->addChild(_pointNameLabel[k]);
         _pointNameLabel[k]->setVisible(false);
+
+        // 查看详情按钮
+        _detailButton[k] = ui::Button::create();
+        node->addChild(_detailButton[k]);
+        _detailButton[k]->setScale9Enabled(true);
+        _detailButton[k]->setContentSize(Size(gap, 20.0f));
+        _detailButton[k]->setTitleFontSize(12);
+        _detailButton[k]->setPosition(Vec2(gap * 5.5f, y));
+        _detailButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1, k));
+        _detailButton[k]->setEnabled(false);
+        _detailButton[k]->setVisible(false);
     }
 
     // 从json中读，并恢复界面数据
@@ -256,6 +267,9 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     // 禁用并隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
+
+    _detailButton[handIdx]->setVisible(true);
+    _detailButton[handIdx]->setEnabled(true);
 
     // 选取标记的最大番种显示出来
     bool pointsNameVisible = false;
@@ -439,6 +453,25 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
         }
         writeToJson();
     }));
+}
+
+void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
+    std::string str;
+    if (g_currentRecord.pointsFlag[handIdx] != 0) {
+        for (unsigned n = 0; n < 64; ++n) {
+            if ((1ULL << n) & g_currentRecord.pointsFlag[handIdx]) {
+                unsigned idx = n;
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+                if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+                    ++idx;
+                }
+#endif
+                str.append(mahjong::points_name[idx]);
+                str.append("\n");
+            }
+        }
+        AlertLayer::showWithMessage(handNameText[handIdx], str, nullptr, nullptr);
+    }
 }
 
 void ScoreSheetScene::onTimeScheduler(float dt) {
