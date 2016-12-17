@@ -91,7 +91,10 @@ bool ScoreSheetScene::init() {
     button->setTitleColor(Color3B::BLACK);
     button->setTitleText("重置");
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 35));
-    button->addClickEventListener([this](Ref *) { reset(); });
+    button->addClickEventListener([this](Ref *) {
+        AlertLayer::showWithMessage("重置", "重置会清空当前已记录的信息，未打满北风北的记录将会丢失，确定要这样做吗？",
+            std::bind(&ScoreSheetScene::reset, this), nullptr);
+    });
 
     // 追分计算按钮
     button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
