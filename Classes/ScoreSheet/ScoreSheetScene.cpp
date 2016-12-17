@@ -2,6 +2,7 @@
 #include "Record.h"
 #include "RecordScene.h"
 #include "HistoryScene.h"
+#include "../widget/AlertLayer.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
@@ -89,6 +90,16 @@ bool ScoreSheetScene::init() {
     button->setTitleText("重置");
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 35));
     button->addClickEventListener([this](Ref *) { reset(); });
+
+    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("追分计算");
+    button->setPosition(Vec2(origin.x + 28, origin.y + visibleSize.height - 40));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
 
     _timeLabel = Label::createWithSystemFont("当前时间", "Arial", 12);
     this->addChild(_timeLabel);
@@ -341,6 +352,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
     for (int i = 0; i < 4; ++i) {
         const char *str = _editBox[i]->getText();
         if (str[0] == '\0') {
+            AlertLayer::showWithMessage("锁定", "请先录入四位参赛选手姓名", nullptr, nullptr);
             return;
         }
         strncpy(g_currentRecord.name[i], str, sizeof(g_currentRecord.name[i]));
@@ -399,4 +411,44 @@ void ScoreSheetScene::onTimeScheduler(float dt) {
     time_t t = time(nullptr);
     strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&t));
     _timeLabel->setString(str);
+}
+
+void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
+    ui::EditBox *editBox = ui::EditBox::create(Size(100.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setPlaceholderFontColor(Color4B::GRAY);
+    editBox->setPlaceHolder("输入分差");
+
+    AlertLayer::showWithNode("追分计算", editBox, [editBox]() {
+        int score = atoi(editBox->getText());
+        std::string msg = StringUtils::format("分差%d，", score);
+        if (score <= 0) {
+            msg.append("无须追分");
+        }
+        else {
+            int d1 = score - 32;
+            if (d1 < 8) {
+                msg.append("须任意和牌");
+            }
+            else {
+                int d2 = d1 >> 1;
+                if (d2 < 8) {
+                    msg.append(StringUtils::format("须任意自摸或对点，旁点%d番", d1 + 1));
+                }
+                else {
+                    int d4 = d2 >> 1;
+                    if (d4 < 8) {
+                        msg.append(StringUtils::format("须任意自摸，对点%d番，旁点%d番", d2 + 1, d1 + 1));
+                    }
+                    else {
+                        msg.append(StringUtils::format("须自摸%d番，对点%d番，旁点%d番", d4 + 1, d2 + 1, d1 + 1));
+                    }
+                }
+            }
+        }
+        AlertLayer::showWithMessage("追分计算", msg, nullptr, nullptr);
+    }, nullptr);
 }
