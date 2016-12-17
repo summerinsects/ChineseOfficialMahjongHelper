@@ -41,6 +41,7 @@ private:
 
     bool _maybeFourthTile = false;
     bool _hasKong = false;
+    bool _maybeRobKong = false;
 };
 
 #endif

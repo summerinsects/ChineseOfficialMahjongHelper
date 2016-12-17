@@ -231,7 +231,7 @@ void PointsCalculatorScene::onByDiscardButton(cocos2d::Ref *sender) {
         _fourthTileButton->setEnabled(_maybeFourthTile);
 
         setButtonUnchecked(_robKongButton);
-        _robKongButton->setEnabled(_maybeFourthTile);
+        _robKongButton->setEnabled(_maybeRobKong);
     }
     else {
         setButtonChecked(_byDiscardButton);
@@ -260,7 +260,7 @@ void PointsCalculatorScene::onFourthTileButton(cocos2d::Ref *sender) {
     if (isButtonChecked(_fourthTileButton)) {
         setButtonUnchecked(_fourthTileButton);
         setButtonUnchecked(_robKongButton);
-        _robKongButton->setEnabled(isButtonChecked(_byDiscardButton));
+        _robKongButton->setEnabled(_maybeRobKong && isButtonChecked(_byDiscardButton));
     }
     else {
         setButtonChecked(_fourthTileButton);
@@ -274,7 +274,7 @@ void PointsCalculatorScene::onRobKongButton(cocos2d::Ref *sender) {
     if (isButtonChecked(_robKongButton)) {
         setButtonUnchecked(_robKongButton);
         setButtonUnchecked(_fourthTileButton);
-        _fourthTileButton->setEnabled(isButtonChecked(_byDiscardButton));
+        _fourthTileButton->setEnabled(_maybeFourthTile && isButtonChecked(_byDiscardButton));
     }
     else {
         setButtonChecked(_robKongButton);
@@ -303,45 +303,38 @@ void PointsCalculatorScene::onLastTileButton(cocos2d::Ref *sender) {
 
 void PointsCalculatorScene::onFixedSetsChanged(TilePickWidget *sender) {
     // 当副露不包含杠的时候，杠开是禁用状态
-    bool prevValue = _hasKong;
     const std::vector<mahjong::SET> &fixedSets = sender->getFixedSets();
     auto it = std::find_if(fixedSets.begin(), fixedSets.end(), [](const mahjong::SET &s) { return s.set_type == mahjong::SET_TYPE::KONG; });
-    _hasKong = it != fixedSets.end();
-    if (prevValue != _hasKong) {
-        if (isButtonChecked(_selfDrawnButton)) {
-            _replacementButton->setEnabled(_hasKong);
-        }
+    _hasKong = (it != fixedSets.end());
+    if (isButtonChecked(_selfDrawnButton)) {
+        _replacementButton->setEnabled(_hasKong);
     }
 }
 
 void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
     // 当立牌中有和牌张时，绝张是禁用状态
-    bool prevValue = _maybeFourthTile;
+    _maybeFourthTile = false;
     mahjong::TILE winTile = sender->getWinTile();
     if (winTile != 0) {
-        _maybeFourthTile = true;
+        // 立牌中有和牌张时，不可能是绝张和抢杠
         const std::vector<mahjong::TILE> &handTiles = sender->getHandTiles();
-        if (handTiles.end() != std::find(handTiles.begin(), handTiles.end(), winTile)) {
-            _maybeFourthTile = false;
-        }
+        auto it = std::find(handTiles.begin(), handTiles.end(), winTile);
+        _maybeFourthTile = (it == handTiles.end());
+
         if (_maybeFourthTile) {
+            // 当副露中有和牌张是，不可能是抢杠
             const std::vector<mahjong::SET> &fixedSets = sender->getFixedSets();
-            if (fixedSets.end()
-                != std::find_if(fixedSets.begin(), fixedSets.end(), std::bind(&mahjong::is_set_contains_tile, std::placeholders::_1, winTile))) {
-                _maybeFourthTile = false;
-            }
+            auto it = std::find_if(fixedSets.begin(), fixedSets.end(),
+                std::bind(&mahjong::is_set_contains_tile, std::placeholders::_1, winTile));
+            _maybeRobKong = (it == fixedSets.end());
         }
-    }
-    else {
-        _maybeFourthTile = false;
+        else {
+            _maybeRobKong = false;
+        }
     }
 
-    if (_maybeFourthTile != prevValue) {
-        _fourthTileButton->setEnabled(true);
-        if (isButtonChecked(_byDiscardButton)) {
-            _robKongButton->setEnabled(true);
-        }
-    }
+    _fourthTileButton->setEnabled(_maybeFourthTile);
+    _robKongButton->setEnabled(_maybeRobKong && isButtonChecked(_byDiscardButton));
 }
 
 #define FONT_SIZE 14
