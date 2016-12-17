@@ -37,14 +37,14 @@ bool ScoreTableScene::init() {
     static const float innerNodeHeight = 768.0f;  // 25行 * 24像素 + 12行 * 14像素
     innerNode->setContentSize(Size(visibleSize.width, innerNodeHeight));
 
-    static const int points[] = { 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
+    static const int points[] = { 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };  // 番种
     static const size_t beginIndex[] =
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
     { 70, 60, 56, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 #else
     { 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 #endif
-    static const size_t counts[] = { 13, 10, 4, 7, 8, 5, 6, 9, 3, 2, 6, 7 };
+    static const size_t counts[] = { 13, 10, 4, 7, 8, 5, 6, 9, 3, 2, 6, 7 };  // 各档次番种的个数
     float y = innerNodeHeight;
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 12; ++i) {
@@ -54,6 +54,7 @@ bool ScoreTableScene::init() {
         label->setPosition(Vec2(5.0f, y - 7.0f));
         y -= 14.0f;
 
+        // 每行排4个番种
         for (size_t k = 0; k < counts[i]; ++k) {
             size_t col = k % 4;
             if (k > 0 && col == 0) {
@@ -67,6 +68,7 @@ bool ScoreTableScene::init() {
         y -= 24.0f;
     }
 
+    // ScrollView
     ui::ScrollView *scrollView = ui::ScrollView::create();
     scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
     scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 35));
