@@ -348,9 +348,7 @@ void PointsCalculatorScene::calculate() {
 
     int flowerCnt = atoi(_editBox->getText());
     if (flowerCnt > 8) {
-        Label *errorLabel = Label::createWithSystemFont("花牌数合法的范围为0~8", "Arial", 12);
-        errorLabel->setColor(Color3B::BLACK);
-        AlertLayer::showWithNode("算番", errorLabel, nullptr, nullptr);
+        AlertLayer::showWithMessage("算番", "花牌数的范围为0~8", nullptr, nullptr);
         return;
     }
 
@@ -402,9 +400,7 @@ void PointsCalculatorScene::calculate() {
         return;
     }
     if (points == ERROR_WRONG_TILES_COUNT) {
-        Label *errorLabel = Label::createWithSystemFont("牌张数错误", "Arial", 12);
-        errorLabel->setColor(Color3B::BLACK);
-        AlertLayer::showWithNode("算番", errorLabel, nullptr, nullptr);
+        AlertLayer::showWithMessage("算番", "牌张数错误", nullptr, nullptr);
         return;
     }
 
