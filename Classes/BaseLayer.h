@@ -17,8 +17,9 @@ public:
 
         // 监听返回键
         auto listener = cocos2d::EventListenerKeyboard::create();
-        listener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *unusedEvent) {
+        listener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event) {
             if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_BACK) {
+                event->stopPropagation();
                 cocos2d::Director::getInstance()->popScene();
             }
         };

@@ -38,8 +38,9 @@ bool AlertLayer::initWithTitle(const std::string &title, cocos2d::Node *node, co
 
     // 监听返回键
     EventListenerKeyboard *keyboardListener = EventListenerKeyboard::create();
-    keyboardListener->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
+    keyboardListener->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event *event) {
         if (keyCode == EventKeyboard::KeyCode::KEY_BACK) {
+            event->stopPropagation();
             onCancelButton(nullptr);
         }
     };
@@ -98,7 +99,7 @@ bool AlertLayer::initWithTitle(const std::string &title, cocos2d::Node *node, co
     // 触摸监听，点击background以外的部分按按下取消键处理
     EventListenerTouchOneByOne *touchListener = EventListenerTouchOneByOne::create();
     touchListener->setSwallowTouches(true);
-    touchListener->onTouchBegan = [this, background](Touch *touch, Event *) {
+    touchListener->onTouchBegan = [this, background](Touch *touch, Event *event) {
         Vec2 pos = this->convertTouchToNodeSpace(touch);
         if (background->getBoundingBox().containsPoint(pos)) {
             return true;
