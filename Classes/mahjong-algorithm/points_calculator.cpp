@@ -1793,6 +1793,7 @@ static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN
         }
     }
 
+    check_win_type(win_type, points_table);
     // 圈风刻、门风刻没必要检测了，这些特殊和型都没有面子
     // 统一校正一些不计的
     correction_points_table(points_table, false);
