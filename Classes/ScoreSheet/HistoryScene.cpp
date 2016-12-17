@@ -1,5 +1,6 @@
 ﻿#include "HistoryScene.h"
 #include "Record.h"
+#include "../widget/AlertLayer.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -73,7 +74,14 @@ ui::Widget *HistoryScene::createRecordWidget(size_t idx, float width) {
     button->setTitleColor(Color3B::BLACK);
     button->setTitleFontSize(12);
     button->setTitleText("删除");
-    button->addClickEventListener([idx](Ref *) {
+    button->addClickEventListener([this, idx](Ref *) {
+        AlertLayer::showWithMessage("删除记录", "删除后无法找回，确认删除？", [this, idx]() {
+            g_records.erase(g_records.begin() + idx);
+            saveRecords();
+            std::function<void (const Record &)> viewCallback = std::move(_viewCallback);
+            Director::getInstance()->popScene();
+            Director::getInstance()->pushScene(HistoryScene::createScene(viewCallback));
+        }, nullptr);
     });
     widget->addChild(button);
     button->setPosition(Vec2(width - 22.0f, 18.0f));
