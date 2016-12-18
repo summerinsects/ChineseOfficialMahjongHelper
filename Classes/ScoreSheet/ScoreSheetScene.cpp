@@ -613,44 +613,48 @@ static void showPursuitWithDelta(int delta) {
 }
 
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
-    ui::Widget *rootWidget = ui::Widget::create();
-    rootWidget->setContentSize(Size(150.0f, 200.0f));
+    ui::Widget *rootWidget;
 
-    Label *label = Label::createWithSystemFont("快捷选择", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    rootWidget->addChild(label);
-    label->setPosition(Vec2(75.0f, 190.0f));
+    if (g_currentRecord.current_index < 16) {
+        rootWidget = ui::Widget::create();
+        rootWidget->setContentSize(Size(150.0f, 200.0f));
 
-    static std::pair<int, int> pairwise[6] = {
-        std::make_pair(0, 1), std::make_pair(0, 2), std::make_pair(0, 3),
-        std::make_pair(1, 2), std::make_pair(1, 3), std::make_pair(2, 3),
-    };
+        Label *label = Label::createWithSystemFont("快捷选择", "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        rootWidget->addChild(label);
+        label->setPosition(Vec2(75.0f, 190.0f));
 
-    for (int i = 0; i < 6; ++i) {
-        int delta = _totalScores[pairwise[i].first] - _totalScores[pairwise[i].second];
+        static std::pair<int, int> pairwise[6] = {
+            std::make_pair(0, 1), std::make_pair(0, 2), std::make_pair(0, 3),
+            std::make_pair(1, 2), std::make_pair(1, 3), std::make_pair(2, 3),
+        };
 
-        ui::Button *button = ui::Button::create("source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png");
-        button->setScale9Enabled(true);
-        button->setContentSize(Size(150.0f, 20.0f));
-        button->setTitleFontSize(12);
-        if (delta > 0) {
-            button->setTitleText(StringUtils::format("%s领先%s%d分",
-                g_currentRecord.name[pairwise[i].first], g_currentRecord.name[pairwise[i].second], delta));
+        for (int i = 0; i < 6; ++i) {
+            int delta = _totalScores[pairwise[i].first] - _totalScores[pairwise[i].second];
+
+            ui::Button *button = ui::Button::create("source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png");
+            button->setScale9Enabled(true);
+            button->setContentSize(Size(150.0f, 20.0f));
+            button->setTitleFontSize(12);
+            if (delta > 0) {
+                button->setTitleText(StringUtils::format("%s领先%s%d分",
+                    g_currentRecord.name[pairwise[i].first], g_currentRecord.name[pairwise[i].second], delta));
+            }
+            else if (delta < 0) {
+                delta = -delta;
+                button->setTitleText(StringUtils::format("%s落后%s%d分",
+                    g_currentRecord.name[pairwise[i].first], g_currentRecord.name[pairwise[i].second], delta));
+            }
+            else {
+                button->setTitleText(StringUtils::format("%s与%s平分",
+                    g_currentRecord.name[pairwise[i].first], g_currentRecord.name[pairwise[i].second]));
+            }
+            rootWidget->addChild(button);
+            button->setPosition(Vec2(75.0f, 170.0f - i * 25.0f));
+            button->addClickEventListener([delta](Ref *) {
+                showPursuitWithDelta(delta);
+            });
         }
-        else if (delta < 0) {
-            delta = -delta;
-            button->setTitleText(StringUtils::format("%s落后%s%d分",
-                g_currentRecord.name[pairwise[i].first], g_currentRecord.name[pairwise[i].second], delta));
-        }
-        else {
-            button->setTitleText(StringUtils::format("%s与%s平分",
-                g_currentRecord.name[pairwise[i].first], g_currentRecord.name[pairwise[i].second]));
-        }
-        rootWidget->addChild(button);
-        button->setPosition(Vec2(75.0f, 170.0f - i * 25.0f));
-        button->addClickEventListener([delta](Ref *) {
-            showPursuitWithDelta(delta);
-        });
     }
 
     ui::EditBox *editBox = ui::EditBox::create(Size(100.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
@@ -660,8 +664,14 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入分差");
-    rootWidget->addChild(editBox);
-    editBox->setPosition(Vec2(75.0f, 10.0f));
+
+    if (g_currentRecord.current_index < 16) {
+        rootWidget->addChild(editBox);
+        editBox->setPosition(Vec2(75.0f, 10.0f));
+    }
+    else {
+        rootWidget = editBox;
+    }
 
     AlertLayer::showWithNode("追分计算", rootWidget, [editBox]() {
         int delta = atoi(editBox->getText());
