@@ -272,9 +272,15 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     _detailButton[handIdx]->setVisible(true);
     _detailButton[handIdx]->setEnabled(true);
 
-    // 选取标记的最大番种显示出来
     bool pointsNameVisible = false;
-    uint64_t pointsFlag = g_currentRecord.detail[handIdx].points_flag;
+    if (detail.score == 0) {
+        _pointNameLabel[handIdx]->setString("荒庄");
+        _pointNameLabel[handIdx]->setVisible(true);
+        pointsNameVisible = true;
+    }
+
+    // 选取标记的最大番种显示出来
+    uint64_t pointsFlag = detail.points_flag;
     if (pointsFlag != 0) {
         for (unsigned n = 0; n < 64; ++n) {
             if ((1ULL << n) & pointsFlag) {
