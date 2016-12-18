@@ -324,9 +324,9 @@ void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
     mahjong::TILE winTile = sender->getWinTile();
     if (winTile != 0) {
         // 立牌中有和牌张时，不可能是绝张和抢杠
-        const std::vector<mahjong::TILE> &handTiles = sender->getHandTiles();
-        auto it = std::find(handTiles.begin(), handTiles.end(), winTile);
-        _maybeFourthTile = (it == handTiles.end());
+        const std::vector<mahjong::TILE> &standingTiles = sender->getStandingTiles();
+        auto it = std::find(standingTiles.begin(), standingTiles.end(), winTile);
+        _maybeFourthTile = (it == standingTiles.end());
 
         if (_maybeFourthTile) {
             // 当副露中有和牌张是，不可能是抢杠
@@ -361,15 +361,15 @@ void PointsCalculatorScene::calculate() {
     }
 
     // 获取副露
-    mahjong::SET sets[5];
-    long set_cnt = std::copy(_tilePicker->getFixedSets().begin(), _tilePicker->getFixedSets().end(), std::begin(sets))
-        - std::begin(sets);
+    mahjong::SET fixed_sets[5];
+    long set_cnt = std::copy(_tilePicker->getFixedSets().begin(), _tilePicker->getFixedSets().end(), std::begin(fixed_sets))
+        - std::begin(fixed_sets);
 
     // 获取立牌
-    mahjong::TILE tiles[13];
-    long tile_cnt = std::copy(_tilePicker->getHandTiles().begin(), _tilePicker->getHandTiles().end(), std::begin(tiles))
-        - std::begin(tiles);
-    mahjong::sort_tiles(tiles, tile_cnt);
+    mahjong::TILE standing_tiles[13];
+    long tile_cnt = std::copy(_tilePicker->getStandingTiles().begin(), _tilePicker->getStandingTiles().end(), std::begin(standing_tiles))
+        - std::begin(standing_tiles);
+    mahjong::sort_tiles(standing_tiles, tile_cnt);
 
     // 获取和牌张
     mahjong::TILE win_tile = _tilePicker->getWinTile();
@@ -400,7 +400,7 @@ void PointsCalculatorScene::calculate() {
     }
 
     // 算番
-    int points = calculate_points(sets, set_cnt, tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);
+    int points = calculate_points(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);
     if (points == ERROR_NOT_WIN) {
         Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", FONT_SIZE);
         _pointsAreaNode->addChild(errorLabel);

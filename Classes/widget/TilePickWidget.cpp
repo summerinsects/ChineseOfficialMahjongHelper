@@ -14,11 +14,12 @@ bool TilePickWidget::init() {
     // 14张牌宽度：27 * 14 = 378
     // 加间距：378 + 4 = 382
     Size tilesSize = Size(382 + 4, 39 + 4);
-    _tilesWidget = ui::Widget::create();
-    _tilesWidget->setContentSize(tilesSize);
-    this->addChild(_tilesWidget);
-    _tilesWidget->setPosition(Vec2(tilesSize.width * 0.5f, tilesSize.height * 0.5f));
+    _standingWidget = ui::Widget::create();
+    _standingWidget->setContentSize(tilesSize);
+    this->addChild(_standingWidget);
+    _standingWidget->setPosition(Vec2(tilesSize.width * 0.5f, tilesSize.height * 0.5f));
 
+    // 高亮方框
     _highlightBox = DrawNode::create();
     _highlightBox->setContentSize(Size(27, 39));
     _highlightBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
@@ -26,8 +27,7 @@ bool TilePickWidget::init() {
     _highlightBox->drawLine(Vec2(27, 0), Vec2(27, 39), Color4F::RED);
     _highlightBox->drawLine(Vec2(27, 39), Vec2(0, 39), Color4F::RED);
     _highlightBox->drawLine(Vec2(0, 39), Vec2(0, 0), Color4F::RED);
-    _tilesWidget->addChild(_highlightBox, 2);
-    _highlightBox->setPosition(calcHandTilePos(0));
+    _standingWidget->addChild(_highlightBox, 2);
 
     // 一个直杠的宽度：39 + 27 * 3 = 120
     // 两个直杠的宽度：120 * 2 = 240
@@ -52,6 +52,7 @@ bool TilePickWidget::init() {
 
     this->setContentSize(Size(tilesSize.width, tilesSize.height + fixedSize.height + tableSize.height + 8));
 
+    // 万
     for (int i = 0; i < 9; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, i + 1);
         _characterButtons[i] = ui::Button::create(tilesImageName[tile]);
@@ -62,6 +63,7 @@ bool TilePickWidget::init() {
             std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
+    // 条
     for (int i = 0; i < 9; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_BAMBOO, i + 1);
         _bambooButtons[i] = ui::Button::create(tilesImageName[tile]);
@@ -72,6 +74,7 @@ bool TilePickWidget::init() {
             std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
+    // 饼
     for (int i = 0; i < 9; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DOTS, i + 1);
         _dotsButtons[i] = ui::Button::create(tilesImageName[tile]);
@@ -82,6 +85,7 @@ bool TilePickWidget::init() {
             std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
+    // 风
     for (int i = 0; i < 4; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_WINDS, i + 1);
         _honorButtons[i] = ui::Button::create(tilesImageName[tile]);
@@ -92,6 +96,7 @@ bool TilePickWidget::init() {
             std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
+    // 箭
     for (int i = 4; i < 7; ++i) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DRAGONS, i - 3);
         _honorButtons[i] = ui::Button::create(tilesImageName[tile]);
@@ -102,6 +107,7 @@ bool TilePickWidget::init() {
             std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
+    // 吃(XX_) 为12吃3这种类型
     _chowLessButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _chowLessButton->setScale9Enabled(true);
     _chowLessButton->setContentSize(Size(45.0f, 20.0f));
@@ -112,6 +118,7 @@ bool TilePickWidget::init() {
     _chowLessButton->setPosition(Vec2(tilesSize.width - 90, tableBottom + 140));
     _chowLessButton->addClickEventListener(std::bind(&TilePickWidget::onChowLessButton, this, std::placeholders::_1));
 
+    // 吃(X_X) 为13吃2这种类型
     _chowMidButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _chowMidButton->setScale9Enabled(true);
     _chowMidButton->setContentSize(Size(45.0f, 20.0f));
@@ -122,6 +129,7 @@ bool TilePickWidget::init() {
     _chowMidButton->setPosition(Vec2(tilesSize.width - 90, tableBottom + 100));
     _chowMidButton->addClickEventListener(std::bind(&TilePickWidget::onChowMidButton, this, std::placeholders::_1));
 
+    // 吃(_XX) 为23吃1这种类型
     _chowGreatButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _chowGreatButton->setScale9Enabled(true);
     _chowGreatButton->setContentSize(Size(45.0f, 20.0f));
@@ -132,6 +140,7 @@ bool TilePickWidget::init() {
     _chowGreatButton->setPosition(Vec2(tilesSize.width - 90, tableBottom + 60));
     _chowGreatButton->addClickEventListener(std::bind(&TilePickWidget::onChowGreatButton, this, std::placeholders::_1));
 
+    // 碰
     _pungButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _pungButton->setScale9Enabled(true);
     _pungButton->setContentSize(Size(45.0f, 20.0f));
@@ -142,6 +151,7 @@ bool TilePickWidget::init() {
     _pungButton->setPosition(Vec2(tilesSize.width - 40, tableBottom + 140));
     _pungButton->addClickEventListener(std::bind(&TilePickWidget::onPungButton, this, std::placeholders::_1));
 
+    // 明杠
     _meldedKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _meldedKongButton->setScale9Enabled(true);
     _meldedKongButton->setContentSize(Size(45.0f, 20.0f));
@@ -152,6 +162,7 @@ bool TilePickWidget::init() {
     _meldedKongButton->setPosition(Vec2(tilesSize.width - 40, tableBottom + 100));
     _meldedKongButton->addClickEventListener(std::bind(&TilePickWidget::onMeldedKongButton, this, std::placeholders::_1));
 
+    // 暗杠
     _concealedKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     _concealedKongButton->setScale9Enabled(true);
     _concealedKongButton->setContentSize(Size(45.0f, 20.0f));
@@ -162,6 +173,7 @@ bool TilePickWidget::init() {
     _concealedKongButton->setPosition(Vec2(tilesSize.width - 40, tableBottom + 60));
     _concealedKongButton->addClickEventListener(std::bind(&TilePickWidget::onConcealedKongButton, this, std::placeholders::_1));
 
+    // 排序
     ui::Button *sortButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     sortButton->setScale9Enabled(true);
     sortButton->setContentSize(Size(45.0f, 20.0f));
@@ -172,6 +184,7 @@ bool TilePickWidget::init() {
     sortButton->setPosition(Vec2(tilesSize.width - 90, tableBottom + 20));
     sortButton->addClickEventListener([this](Ref *) { sort(); });
 
+    // 重置
     ui::Button *clearButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     clearButton->setScale9Enabled(true);
     clearButton->setContentSize(Size(45.0f, 20.0f));
@@ -182,7 +195,7 @@ bool TilePickWidget::init() {
     clearButton->setPosition(Vec2(tilesSize.width - 40, tableBottom + 20));
     clearButton->addClickEventListener([this](Ref *) { reset(); });
 
-    _tiles.reserve(13);
+    _standingTiles.reserve(13);
     _fixedSets.reserve(4);
     _winTileButton = nullptr;
 
@@ -192,11 +205,15 @@ bool TilePickWidget::init() {
 }
 
 void TilePickWidget::reset() {
+    // 清空数据
     memset(_totalTilesTable, 0, sizeof(_totalTilesTable));
-    memset(_handTilesTable, 0, sizeof(_handTilesTable));
+    memset(_standingTilesTable, 0, sizeof(_standingTilesTable));
     _winTile = 0;
     _currentIdx = 0;
+    _standingTiles.clear();
+    _fixedSets.clear();
 
+    // 所有牌按钮都启用
     for (int i = 0; i < 9; ++i) {
         _characterButtons[i]->setEnabled(true);
         _bambooButtons[i]->setEnabled(true);
@@ -206,18 +223,19 @@ void TilePickWidget::reset() {
         _honorButtons[i]->setEnabled(true);
     }
 
-    _tiles.clear();
-    _fixedSets.clear();
-
-    while (!_tileButtons.empty()) {
-        _tilesWidget->removeChild(_tileButtons.back());
-        _tileButtons.pop_back();
+    // 清除之前的残留的立牌
+    while (!_standingTileButtons.empty()) {
+        _standingWidget->removeChild(_standingTileButtons.back());
+        _standingTileButtons.pop_back();
     }
-    _tilesWidget->removeChild(_winTileButton);
+    _standingWidget->removeChild(_winTileButton);
     _winTileButton = nullptr;
+    _highlightBox->setPosition(calcStandingTilePos(0));
 
+    // 清除之前残留的副露
     _fixedWidget->removeAllChildren();
 
+    // 禁用吃碰杠按钮
     _chowLessButton->setEnabled(false);
     _chowMidButton->setEnabled(false);
     _chowGreatButton->setEnabled(false);
@@ -225,6 +243,7 @@ void TilePickWidget::reset() {
     _meldedKongButton->setEnabled(false);
     _concealedKongButton->setEnabled(false);
 
+    // 回调
     if (_fixedSetsChangedCallback) {
         _fixedSetsChangedCallback(this);
     }
@@ -234,11 +253,11 @@ void TilePickWidget::reset() {
 }
 
 void TilePickWidget::sort() {
-    std::sort(_tiles.begin(), _tiles.end());
-    refreshHandTiles();
+    std::sort(_standingTiles.begin(), _standingTiles.end());
+    refreshStandingTiles();
 }
 
-cocos2d::Vec2 TilePickWidget::calcHandTilePos(size_t idx) const {
+cocos2d::Vec2 TilePickWidget::calcStandingTilePos(size_t idx) const {
     Vec2 pos;
     pos.y = 19.5f + 2;
     switch (_fixedSets.size()) {
@@ -251,23 +270,24 @@ cocos2d::Vec2 TilePickWidget::calcHandTilePos(size_t idx) const {
     return pos;
 }
 
+// 添加一张牌
 void TilePickWidget::addOneTile(mahjong::TILE tile, bool isWinTile) {
     ui::Button *button = ui::Button::create(tilesImageName[tile]);
     button->setScale(27 / button->getContentSize().width);
-    _tilesWidget->addChild(button);
+    _standingWidget->addChild(button);
 
-    size_t tilesCnt = _tiles.size();
-    Vec2 pos = calcHandTilePos(tilesCnt);
+    size_t tilesCnt = _standingTiles.size();
+    Vec2 pos = calcStandingTilePos(tilesCnt);
 
     if (!isWinTile) {
         button->setPosition(pos);
-        _tileButtons.push_back(button);
-        _tiles.push_back(tile);
-        ++_handTilesTable[tile];
+        _standingTileButtons.push_back(button);
+        _standingTiles.push_back(tile);
+        ++_standingTilesTable[tile];
         _currentIdx = tilesCnt + 1;
     }
     else {
-        button->setPosition(Vec2(pos.x + 4, pos.y));
+        button->setPosition(Vec2(pos.x + 4, pos.y));  // 和牌张与立牌间隔4像素
         _winTileButton = button;
         _winTile = tile;
         if (_winTileChangedCallback) {
@@ -281,29 +301,30 @@ void TilePickWidget::addOneTile(mahjong::TILE tile, bool isWinTile) {
     });
 }
 
+// 替换一张牌
 void TilePickWidget::replaceOneTile(mahjong::TILE tile, bool isWinTile) {
     ui::Button *button = ui::Button::create(tilesImageName[tile]);
     button->setScale(27 / button->getContentSize().width);
-    _tilesWidget->addChild(button);
+    _standingWidget->addChild(button);
 
     mahjong::TILE prevTile;
     size_t currentIdx = _currentIdx;
     if (!isWinTile) {
-        button->setPosition(_tileButtons[_currentIdx]->getPosition());
-        _tilesWidget->removeChild(_tileButtons[_currentIdx]);
-        _tileButtons[_currentIdx] = button;
+        button->setPosition(_standingTileButtons[_currentIdx]->getPosition());
+        _standingWidget->removeChild(_standingTileButtons[_currentIdx]);
+        _standingTileButtons[_currentIdx] = button;
 
-        prevTile = _tiles[_currentIdx];
-        --_handTilesTable[prevTile];
+        prevTile = _standingTiles[_currentIdx];
+        --_standingTilesTable[prevTile];
 
-        _tiles[_currentIdx] = tile;
-        ++_handTilesTable[tile];
+        _standingTiles[_currentIdx] = tile;
+        ++_standingTilesTable[tile];
 
         ++_currentIdx;
     }
     else {
         button->setPosition(_winTileButton->getPosition());
-        _tilesWidget->removeChild(_winTileButton);
+        _standingWidget->removeChild(_winTileButton);
         _winTileButton = button;
 
         prevTile = _winTile;
@@ -319,7 +340,9 @@ void TilePickWidget::replaceOneTile(mahjong::TILE tile, bool isWinTile) {
     });
 }
 
+// 刷新选牌按钮
 void TilePickWidget::refreshTilesTableButton(mahjong::TILE tile) {
+    // 如果某张牌已经使用了4张，那就禁用相应按钮
     int n = _totalTilesTable[tile];
     mahjong::SUIT_TYPE suit = mahjong::tile_suit(tile);
     mahjong::RANK_TYPE rank = mahjong::tile_rank(tile);
@@ -334,18 +357,17 @@ void TilePickWidget::refreshTilesTableButton(mahjong::TILE tile) {
 }
 
 void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile) {
-    size_t maxCnt = 13 - _fixedSets.size() * 3;
-
-    if (_currentIdx >= _tiles.size() && _winTileButton == nullptr) {
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值
+    if (_currentIdx >= _standingTiles.size() && _winTileButton == nullptr) {  // 新增牌
         addOneTile(tile, _currentIdx == maxCnt);
         refreshActionButtons();
         ++_totalTilesTable[tile];
         refreshTilesTableButton(tile);
     }
-    else {
-        if (_currentIdx < _tiles.size()) {
-            mahjong::TILE prevTile = _tiles[_currentIdx];
-            if (prevTile != tile) {
+    else {  // 修改牌
+        if (_currentIdx < _standingTiles.size()) {  // 修改立牌
+            mahjong::TILE prevTile = _standingTiles[_currentIdx];  // 此位置之前的牌
+            if (prevTile != tile) {  // 新选的牌与之前的牌不同，更新相关信息
                 replaceOneTile(tile, false);
                 refreshActionButtons();
                 ++_totalTilesTable[tile];
@@ -353,12 +375,12 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile)
                 --_totalTilesTable[prevTile];
                 refreshTilesTableButton(prevTile);
             }
-            else {
+            else {  // 否则直接移动到下一张牌位置
                 ++_currentIdx;
                 refreshActionButtons();
             }
         }
-        else {
+        else {  // 修改和牌
             mahjong::TILE prevTile = _winTile;
             if (prevTile != tile) {
                 replaceOneTile(tile, true);
@@ -373,9 +395,10 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile)
 }
 
 void TilePickWidget::refreshActionButtons() {
-    if (_currentIdx >= _tiles.size()) {
-        size_t maxCnt = 13 - _fixedSets.size() * 3;
-        Vec2 pos = calcHandTilePos(_tiles.size());
+    if (_currentIdx >= _standingTiles.size()) {  // 当前下标超过立牌数量
+        size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值
+        // 当前下标不为立牌数最大值时，高亮的是下一张牌位置，否则高亮的是和牌位置
+        Vec2 pos = calcStandingTilePos(_standingTiles.size());
         if (_currentIdx != maxCnt) {
             _highlightBox->setPosition(pos);
         }
@@ -383,6 +406,7 @@ void TilePickWidget::refreshActionButtons() {
             _highlightBox->setPosition(Vec2(pos.x + 4, pos.y));
         }
 
+        // 禁用吃碰杠
         _chowLessButton->setEnabled(false);
         _chowMidButton->setEnabled(false);
         _chowGreatButton->setEnabled(false);
@@ -391,10 +415,11 @@ void TilePickWidget::refreshActionButtons() {
         _concealedKongButton->setEnabled(false);
     }
     else {
-        _highlightBox->setPosition(_tileButtons[_currentIdx]->getPosition());
+        _highlightBox->setPosition(_standingTileButtons[_currentIdx]->getPosition());
 
-        mahjong::TILE tile = _tiles[_currentIdx];
-        switch (_handTilesTable[tile]) {
+        // 根据立牌中有没有相关一些牌，决定吃碰杠按钮的启用与禁用
+        mahjong::TILE tile = _standingTiles[_currentIdx];
+        switch (_standingTilesTable[tile]) {
         case 4:
             _meldedKongButton->setEnabled(true);
             _concealedKongButton->setEnabled(true);
@@ -406,16 +431,16 @@ void TilePickWidget::refreshActionButtons() {
             _pungButton->setEnabled(true);
             break;
         default:
-            assert(_handTilesTable[tile] < 3);
+            assert(_standingTilesTable[tile] < 3);
             _meldedKongButton->setEnabled(false);
             _concealedKongButton->setEnabled(false);
             _pungButton->setEnabled(false);
         }
 
         if (!mahjong::is_honor(tile)) {
-            _chowLessButton->setEnabled(_handTilesTable[tile - 2] > 0 && _handTilesTable[tile - 1]);
-            _chowMidButton->setEnabled(_handTilesTable[tile - 1] > 0 && _handTilesTable[tile + 1]);
-            _chowGreatButton->setEnabled(_handTilesTable[tile + 1] > 0 && _handTilesTable[tile + 2]);
+            _chowLessButton->setEnabled(_standingTilesTable[tile - 2] > 0 && _standingTilesTable[tile - 1]);
+            _chowMidButton->setEnabled(_standingTilesTable[tile - 1] > 0 && _standingTilesTable[tile + 1]);
+            _chowGreatButton->setEnabled(_standingTilesTable[tile + 1] > 0 && _standingTilesTable[tile + 2]);
         }
         else {
             _chowLessButton->setEnabled(false);
@@ -425,7 +450,9 @@ void TilePickWidget::refreshActionButtons() {
     }
 }
 
+// 吃碰杠后的刷新
 void TilePickWidget::refreshAfterAction(int meldedIdx) {
+    // 计算新增这组副露的位置
     const Size &fixedSize = _fixedWidget->getContentSize();
     Vec2 pos = Vec2(fixedSize.width * 0.25f, fixedSize.height * 0.25f);
     switch (_fixedSets.size()) {
@@ -436,6 +463,7 @@ void TilePickWidget::refreshAfterAction(int meldedIdx) {
     default: return;
     }
 
+    // 增加一组副露
     const mahjong::SET &set = _fixedSets.back();
     switch (set.set_type) {
     case mahjong::SET_TYPE::CHOW: addFixedChowSet(pos, set.mid_tile, meldedIdx); break;
@@ -451,36 +479,43 @@ void TilePickWidget::refreshAfterAction(int meldedIdx) {
     default: return;
     }
 
-    refreshHandTiles();
-    if (_currentIdx > _tiles.size()) {
-        _currentIdx = _tiles.size();
+    // 刷新立牌
+    refreshStandingTiles();
+    if (_currentIdx > _standingTiles.size()) {
+        _currentIdx = _standingTiles.size();
     }
 
+    // 刷新和牌
     if (_winTileButton != nullptr) {
-        pos = calcHandTilePos(13 - _fixedSets.size() * 3);
+        pos = calcStandingTilePos(13 - _fixedSets.size() * 3);
         _winTileButton->setPosition(Vec2(pos.x + 4, pos.y));
     }
 
+    // 回调
     if (_fixedSetsChangedCallback) {
         _fixedSetsChangedCallback(this);
     }
 }
 
-void TilePickWidget::refreshHandTiles() {
-    while (!_tileButtons.empty()) {
-        _tilesWidget->removeChild(_tileButtons.back());
-        _tileButtons.pop_back();
+// 刷新立牌
+void TilePickWidget::refreshStandingTiles() {
+    // 移除所有的立牌
+    while (!_standingTileButtons.empty()) {
+        _standingWidget->removeChild(_standingTileButtons.back());
+        _standingTileButtons.pop_back();
     }
 
+    // 重新一张一张添加立牌
     std::vector<mahjong::TILE> temp;
-    temp.swap(_tiles);
-    memset(_handTilesTable, 0, sizeof(_handTilesTable));
+    temp.swap(_standingTiles);  // 这里要保存一下旧的数据，因为addOneTile会在standingTiles添加
+    memset(_standingTilesTable, 0, sizeof(_standingTilesTable));
     std::for_each(temp.begin(), temp.end(), std::bind(&TilePickWidget::addOneTile, this, std::placeholders::_1, false));
 
-    if (_winTileButton != nullptr && _tiles.size() + _fixedSets.size() * 3 < 13) {
+    // 如果之前有和牌，并且现在总手牌换算不是13张（这种情况发生在选了杠之后），将和牌作为普通立牌添加
+    if (_winTileButton != nullptr && _standingTiles.size() + _fixedSets.size() * 3 < 13) {
         addOneTile(_winTile, false);
         _winTile = 0;
-        _tilesWidget->removeChild(_winTileButton);
+        _standingWidget->removeChild(_winTileButton);
         _winTileButton = nullptr;
         if (_winTileChangedCallback) {
             _winTileChangedCallback(this);
@@ -490,6 +525,7 @@ void TilePickWidget::refreshHandTiles() {
     refreshActionButtons();
 }
 
+// 添加一组吃
 void TilePickWidget::addFixedChowSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx) {
     // 一张牌的尺寸：27 * 39
     const char *image[3];
@@ -527,8 +563,9 @@ void TilePickWidget::addFixedChowSet(const cocos2d::Vec2 &center, mahjong::TILE 
     }
 }
 
+// 添加一组碰
 void TilePickWidget::addFixedPungSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx) {
-    // 一张牌的尺寸：27 * 39
+    // 一张牌的尺寸：27 * 39，横放一张
     Vec2 pos[3];
     switch (meldedIdx) {
     default:
@@ -559,8 +596,9 @@ void TilePickWidget::addFixedPungSet(const cocos2d::Vec2 &center, mahjong::TILE 
     }
 }
 
+// 添加一组明杠
 void TilePickWidget::addFixedMeldedKongSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx) {
-    // 一张牌的尺寸：27 * 39
+    // 一张牌的尺寸：27 * 39，横放一张
     Vec2 pos[4];
     switch (meldedIdx) {
     default:
@@ -600,8 +638,9 @@ void TilePickWidget::addFixedMeldedKongSet(const cocos2d::Vec2 &center, mahjong:
     }
 }
 
+// 添加一组暗杠
 void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, mahjong::TILE tile) {
-    // 一张牌的尺寸：27 * 39
+    // 一张牌的尺寸：27 * 39，横放一张
     const char *image[4];
     image[0] = "tiles/bg.png";
     image[1] = tilesImageName[tile];
@@ -623,18 +662,18 @@ void TilePickWidget::addFixedConcealedKongSet(const cocos2d::Vec2 &center, mahjo
 }
 
 void TilePickWidget::onChowLessButton(cocos2d::Ref *sender) {
-    // XX_
-    mahjong::TILE tile = _tiles[_currentIdx];
-    auto it = std::find(_tiles.begin(), _tiles.end(), tile - 2);
-    _tiles.erase(it);
-    it = std::find(_tiles.begin(), _tiles.end(), tile - 1);
-    _tiles.erase(it);
-    it = std::find(_tiles.begin(), _tiles.end(), tile);
-    _tiles.erase(it);
+    // XX_ 12吃3
+    mahjong::TILE tile = _standingTiles[_currentIdx];
+    auto it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - 2);
+    _standingTiles.erase(it);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - 1);
+    _standingTiles.erase(it);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
+    _standingTiles.erase(it);
 
-    --_handTilesTable[tile - 2];
-    --_handTilesTable[tile - 1];
-    --_handTilesTable[tile];
+    --_standingTilesTable[tile - 2];
+    --_standingTilesTable[tile - 1];
+    --_standingTilesTable[tile];
 
     mahjong::SET set;
     set.is_melded = true;
@@ -642,22 +681,22 @@ void TilePickWidget::onChowLessButton(cocos2d::Ref *sender) {
     set.set_type = mahjong::SET_TYPE::CHOW;
     _fixedSets.push_back(set);
 
-    refreshAfterAction(2);
+    refreshAfterAction(2);  // 下标2为需要横放的
 }
 
 void TilePickWidget::onChowMidButton(cocos2d::Ref *sender) {
-    // X_X
-    mahjong::TILE tile = _tiles[_currentIdx];
-    auto it = std::find(_tiles.begin(), _tiles.end(), tile - 1);
-    _tiles.erase(it);
-    it = std::find(_tiles.begin(), _tiles.end(), tile);
-    _tiles.erase(it);
-    it = std::find(_tiles.begin(), _tiles.end(), tile + 1);
-    _tiles.erase(it);
+    // X_X 13吃2
+    mahjong::TILE tile = _standingTiles[_currentIdx];
+    auto it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - 1);
+    _standingTiles.erase(it);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
+    _standingTiles.erase(it);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile + 1);
+    _standingTiles.erase(it);
 
-    --_handTilesTable[tile - 1];
-    --_handTilesTable[tile];
-    --_handTilesTable[tile + 1];
+    --_standingTilesTable[tile - 1];
+    --_standingTilesTable[tile];
+    --_standingTilesTable[tile + 1];
 
     mahjong::SET set;
     set.is_melded = true;
@@ -665,22 +704,22 @@ void TilePickWidget::onChowMidButton(cocos2d::Ref *sender) {
     set.set_type = mahjong::SET_TYPE::CHOW;
     _fixedSets.push_back(set);
 
-    refreshAfterAction(1);
+    refreshAfterAction(1);  // 下标1为需要横放的
 }
 
 void TilePickWidget::onChowGreatButton(cocos2d::Ref *sender) {
-    // _XX
-    mahjong::TILE tile = _tiles[_currentIdx];
-    auto it = std::find(_tiles.begin(), _tiles.end(), tile);
-    _tiles.erase(it);
-    it = std::find(_tiles.begin(), _tiles.end(), tile + 1);
-    _tiles.erase(it);
-    it = std::find(_tiles.begin(), _tiles.end(), tile + 2);
-    _tiles.erase(it);
+    // _XX 23吃1
+    mahjong::TILE tile = _standingTiles[_currentIdx];
+    auto it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
+    _standingTiles.erase(it);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile + 1);
+    _standingTiles.erase(it);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile + 2);
+    _standingTiles.erase(it);
 
-    --_handTilesTable[tile];
-    --_handTilesTable[tile + 1];
-    --_handTilesTable[tile + 2];
+    --_standingTilesTable[tile];
+    --_standingTilesTable[tile + 1];
+    --_standingTilesTable[tile + 2];
 
     mahjong::SET set;
     set.is_melded = true;
@@ -688,24 +727,24 @@ void TilePickWidget::onChowGreatButton(cocos2d::Ref *sender) {
     set.set_type = mahjong::SET_TYPE::CHOW;
     _fixedSets.push_back(set);
 
-    refreshAfterAction(0);
+    refreshAfterAction(0);  // 下标0为需要横放的
 }
 
 void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
     int meldedIdx = 2;
-    mahjong::TILE tile = _tiles[_currentIdx];
+    mahjong::TILE tile = _standingTiles[_currentIdx];
     std::vector<mahjong::TILE>::iterator it[3];
-    it[0] = std::find(_tiles.begin(), _tiles.end(), tile);
-    it[1] = std::find(it[0] + 1, _tiles.end(), tile);
-    it[2] = std::find(it[1] + 1, _tiles.end(), tile);
+    it[0] = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
+    it[1] = std::find(it[0] + 1, _standingTiles.end(), tile);
+    it[2] = std::find(it[1] + 1, _standingTiles.end(), tile);
     for (int i = 3; i-- > 0; ) {
-        if (it[i] - _tiles.begin() == _currentIdx) {
+        if (it[i] - _standingTiles.begin() == _currentIdx) {
             meldedIdx = i;
         }
-        _tiles.erase(it[i]);
+        _standingTiles.erase(it[i]);
     }
 
-    _handTilesTable[tile] -= 3;
+    _standingTilesTable[tile] -= 3;
 
     mahjong::SET set;
     set.is_melded = true;
@@ -718,20 +757,20 @@ void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
 
 void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
     int meldedIdx = 0;
-    mahjong::TILE tile = _tiles[_currentIdx];
+    mahjong::TILE tile = _standingTiles[_currentIdx];
     std::vector<mahjong::TILE>::iterator it[4];
-    it[0] = std::find(_tiles.begin(), _tiles.end(), tile);
-    it[1] = std::find(it[0] + 1, _tiles.end(), tile);
-    it[2] = std::find(it[1] + 1, _tiles.end(), tile);
-    it[3] = std::find(it[2] + 1, _tiles.end(), tile);
+    it[0] = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
+    it[1] = std::find(it[0] + 1, _standingTiles.end(), tile);
+    it[2] = std::find(it[1] + 1, _standingTiles.end(), tile);
+    it[3] = std::find(it[2] + 1, _standingTiles.end(), tile);
     for (int i = 4; i-- > 0; ) {
-        if (it[i] - _tiles.begin() == _currentIdx) {
+        if (it[i] - _standingTiles.begin() == _currentIdx) {
             meldedIdx = i;
         }
-        _tiles.erase(it[i]);
+        _standingTiles.erase(it[i]);
     }
 
-    _handTilesTable[tile] -= 4;
+    _standingTilesTable[tile] -= 4;
 
     mahjong::SET set;
     set.is_melded = true;
@@ -743,17 +782,17 @@ void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
 }
 
 void TilePickWidget::onConcealedKongButton(cocos2d::Ref *sender) {
-    mahjong::TILE tile = _tiles[_currentIdx];
+    mahjong::TILE tile = _standingTiles[_currentIdx];
     std::vector<mahjong::TILE>::iterator it[4];
-    it[0] = std::find(_tiles.begin(), _tiles.end(), tile);
-    it[1] = std::find(it[0] + 1, _tiles.end(), tile);
-    it[2] = std::find(it[1] + 1, _tiles.end(), tile);
-    it[3] = std::find(it[2] + 1, _tiles.end(), tile);
+    it[0] = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
+    it[1] = std::find(it[0] + 1, _standingTiles.end(), tile);
+    it[2] = std::find(it[1] + 1, _standingTiles.end(), tile);
+    it[3] = std::find(it[2] + 1, _standingTiles.end(), tile);
     for (int i = 4; i-- > 0; ) {
-        _tiles.erase(it[i]);
+        _standingTiles.erase(it[i]);
     }
 
-    _handTilesTable[tile] -= 4;
+    _standingTilesTable[tile] -= 4;
 
     mahjong::SET set;
     set.is_melded = false;

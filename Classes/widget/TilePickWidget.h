@@ -9,7 +9,7 @@ class TilePickWidget : public cocos2d::ui::Widget {
 public:
     CREATE_FUNC(TilePickWidget);
 
-    const std::vector<mahjong::TILE> &getHandTiles() const { return _tiles; }
+    const std::vector<mahjong::TILE> &getStandingTiles() const { return _standingTiles; }
     const std::vector<mahjong::SET> &getFixedSets() const { return _fixedSets; }
     mahjong::TILE getWinTile() const { return _winTile; }
 
@@ -37,14 +37,14 @@ private:
     cocos2d::ui::Button *_concealedKongButton;
 
     cocos2d::ui::Widget *_fixedWidget;
-    cocos2d::ui::Widget *_tilesWidget;
-    std::vector<cocos2d::ui::Button *> _tileButtons;
+    cocos2d::ui::Widget *_standingWidget;
+    std::vector<cocos2d::ui::Button *> _standingTileButtons;
     cocos2d::ui::Button *_winTileButton;
     cocos2d::DrawNode *_highlightBox;
 
     int _totalTilesTable[0x54];
-    int _handTilesTable[0x54];
-    std::vector<mahjong::TILE> _tiles;
+    int _standingTilesTable[0x54];
+    std::vector<mahjong::TILE> _standingTiles;
     std::vector<mahjong::SET> _fixedSets;
     mahjong::TILE _winTile;
     size_t _currentIdx;
@@ -54,14 +54,14 @@ private:
 
     void reset();
     void sort();
-    cocos2d::Vec2 calcHandTilePos(size_t idx) const;
+    cocos2d::Vec2 calcStandingTilePos(size_t idx) const;
     void addOneTile(mahjong::TILE tile, bool isWinTile);
     void replaceOneTile(mahjong::TILE tile, bool isWinTile);
     void refreshTilesTableButton(mahjong::TILE tile);
     void onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile);
     void refreshActionButtons();
     void refreshAfterAction(int meldedIdx);
-    void refreshHandTiles();
+    void refreshStandingTiles();
     void addFixedChowSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx);
     void addFixedPungSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx);
     void addFixedMeldedKongSet(const cocos2d::Vec2 &center, mahjong::TILE tile, int meldedIdx);
