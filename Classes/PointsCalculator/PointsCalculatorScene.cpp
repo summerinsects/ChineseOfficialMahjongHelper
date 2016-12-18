@@ -231,7 +231,7 @@ void PointsCalculatorScene::onByDiscardButton(cocos2d::Ref *sender) {
         _fourthTileButton->setEnabled(_maybeFourthTile);
 
         setButtonUnchecked(_robKongButton);
-        _robKongButton->setEnabled(_maybeRobKong);
+        _robKongButton->setEnabled(_maybeRobKong && !isButtonChecked(_lastTileButton));
     }
     else {
         setButtonChecked(_byDiscardButton);
@@ -260,7 +260,8 @@ void PointsCalculatorScene::onFourthTileButton(cocos2d::Ref *sender) {
     if (isButtonChecked(_fourthTileButton)) {
         setButtonUnchecked(_fourthTileButton);
         setButtonUnchecked(_robKongButton);
-        _robKongButton->setEnabled(_maybeRobKong && isButtonChecked(_byDiscardButton));
+        _robKongButton->setEnabled(_maybeRobKong
+            && isButtonChecked(_byDiscardButton) && !isButtonChecked(_lastTileButton));
     }
     else {
         setButtonChecked(_fourthTileButton);
@@ -270,16 +271,18 @@ void PointsCalculatorScene::onFourthTileButton(cocos2d::Ref *sender) {
 }
 
 void PointsCalculatorScene::onRobKongButton(cocos2d::Ref *sender) {
-    // 抢杠与绝张互斥
+    // 抢杠与绝张、海底互斥
     if (isButtonChecked(_robKongButton)) {
         setButtonUnchecked(_robKongButton);
         setButtonUnchecked(_fourthTileButton);
         _fourthTileButton->setEnabled(_maybeFourthTile && isButtonChecked(_byDiscardButton));
+        _lastTileButton->setEnabled(true);
     }
     else {
         setButtonChecked(_robKongButton);
         setButtonUnchecked(_fourthTileButton);
         _fourthTileButton->setEnabled(false);
+        _lastTileButton->setEnabled(false);
     }
 }
 
@@ -293,11 +296,15 @@ void PointsCalculatorScene::onReplacementButton(cocos2d::Ref *sender) {
 }
 
 void PointsCalculatorScene::onLastTileButton(cocos2d::Ref *sender) {
+    // 海底与抢杠互斥
     if (isButtonChecked(_lastTileButton)) {
         setButtonUnchecked(_lastTileButton);
+        _robKongButton->setEnabled(_maybeRobKong
+            && isButtonChecked(_byDiscardButton) && !isButtonChecked(_lastTileButton));
     }
     else {
         setButtonChecked(_lastTileButton);
+        _robKongButton->setEnabled(false);
     }
 }
 
@@ -334,7 +341,8 @@ void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
     }
 
     _fourthTileButton->setEnabled(_maybeFourthTile);
-    _robKongButton->setEnabled(_maybeRobKong && isButtonChecked(_byDiscardButton));
+    _robKongButton->setEnabled(_maybeRobKong
+        && isButtonChecked(_byDiscardButton) && !isButtonChecked(_lastTileButton));
 }
 
 #define FONT_SIZE 14
@@ -370,11 +378,11 @@ void PointsCalculatorScene::calculate() {
 
     // 获取绝张、杠开、抢杠、海底信息
     mahjong::WIN_TYPE win_type = WIN_TYPE_DISCARD;
-    if (_selfDrawnButton->isHighlighted()) win_type |= WIN_TYPE_SELF_DRAWN;
-    if (_fourthTileButton->isHighlighted()) win_type |= WIN_TYPE_4TH_TILE;
-    if (_robKongButton->isHighlighted()) win_type |= WIN_TYPE_ABOUT_KONG;
-    if (_replacementButton->isHighlighted()) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
-    if (_lastTileButton->isHighlighted()) win_type |= WIN_TYPE_WALL_LAST;
+    if (isButtonChecked(_selfDrawnButton)) win_type |= WIN_TYPE_SELF_DRAWN;
+    if (isButtonChecked(_fourthTileButton)) win_type |= WIN_TYPE_4TH_TILE;
+    if (isButtonChecked(_robKongButton)) win_type |= WIN_TYPE_ABOUT_KONG;
+    if (isButtonChecked(_replacementButton)) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
+    if (isButtonChecked(_lastTileButton)) win_type |= WIN_TYPE_WALL_LAST;
 
     // 获取圈风门风
     mahjong::WIND_TYPE prevalent_wind = mahjong::WIND_TYPE::EAST, seat_wind = mahjong::WIND_TYPE::EAST;
