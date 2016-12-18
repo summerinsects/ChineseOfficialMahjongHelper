@@ -249,6 +249,9 @@ void PointsCalculatorScene::onSelfDrawnButton(cocos2d::Ref *sender) {
 
         setButtonUnchecked(_replacementButton);
         _replacementButton->setEnabled(_hasKong);
+
+        _lastTileButton->setEnabled(true);
+        setButtonUnchecked(_lastTileButton);
     }
     else {
         setButtonChecked(_selfDrawnButton);
@@ -316,13 +319,26 @@ void PointsCalculatorScene::onFixedSetsChanged(TilePickWidget *sender) {
     if (isButtonChecked(_selfDrawnButton)) {
         _replacementButton->setEnabled(_hasKong);
     }
+    else {
+        setButtonUnchecked(_replacementButton);
+        _replacementButton->setEnabled(false);
+    }
 }
 
 void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
     // 当立牌中有和牌张时，绝张是禁用状态
     _maybeFourthTile = false;
+    _maybeRobKong = false;
     mahjong::TILE winTile = sender->getWinTile();
-    if (winTile != 0) {
+    if (winTile == 0) {
+        setButtonUnchecked(_fourthTileButton);
+        _fourthTileButton->setEnabled(false);
+        setButtonUnchecked(_robKongButton);
+        _robKongButton->setEnabled(false);
+        setButtonUnchecked(_lastTileButton);
+        _lastTileButton->setEnabled(true);
+    }
+    else {
         // 立牌中有和牌张时，不可能是绝张和抢杠
         const std::vector<mahjong::TILE> &standingTiles = sender->getStandingTiles();
         auto it = std::find(standingTiles.begin(), standingTiles.end(), winTile);
@@ -338,11 +354,11 @@ void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
         else {
             _maybeRobKong = false;
         }
-    }
 
-    _fourthTileButton->setEnabled(_maybeFourthTile);
-    _robKongButton->setEnabled(_maybeRobKong
-        && isButtonChecked(_byDiscardButton) && !isButtonChecked(_lastTileButton));
+        _fourthTileButton->setEnabled(_maybeFourthTile);
+        _robKongButton->setEnabled(_maybeRobKong
+            && isButtonChecked(_byDiscardButton) && !isButtonChecked(_lastTileButton));
+    }
 }
 
 #define FONT_SIZE 14
