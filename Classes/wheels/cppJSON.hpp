@@ -1627,7 +1627,8 @@ namespace jw {
             }
         private:
             static inline typename TargetType::value_type _make_value(const _JsonType &j) {
-                return typename TargetType::value_type(typename TargetType::key_type(j._key.begin(), j._key.end()),
+                // 这里用构造第一个参数如果用typename TargetType::key_type(j._key.begin(), j._key.end())会有问题
+                return typename TargetType::value_type(typename TargetType::key_type(j._key.c_str()),
                     AsImpl<_JsonType, typename TargetType::mapped_type>::invoke(j));
             }
         };
