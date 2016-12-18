@@ -853,15 +853,15 @@ static void calculate_1_pung(const SET &pung_set, long (&points_table)[POINT_TYP
 // 九莲宝灯
 static bool is_nine_gates(const TILE tiles[14], TILE win_tile) {
     // 选去除和牌张
-    TILE hand_tiles[13];
-    copy_exclude(tiles, tiles + 14, &win_tile, (&win_tile) + 1, hand_tiles);
-    sort_tiles(hand_tiles, 13);
+    TILE standing_tiles[13];
+    copy_exclude(tiles, tiles + 14, &win_tile, (&win_tile) + 1, standing_tiles);
+    sort_tiles(standing_tiles, 13);
 
     // 与标准九莲宝灯比较
-    switch (hand_tiles[0]) {
-    case 0x11: return (memcmp(hand_tiles, standard_nine_gates[0], sizeof(hand_tiles)) == 0);
-    case 0x21: return (memcmp(hand_tiles, standard_nine_gates[1], sizeof(hand_tiles)) == 0);
-    case 0x31: return (memcmp(hand_tiles, standard_nine_gates[2], sizeof(hand_tiles)) == 0);
+    switch (standing_tiles[0]) {
+    case 0x11: return (memcmp(standing_tiles, standard_nine_gates[0], sizeof(standing_tiles)) == 0);
+    case 0x21: return (memcmp(standing_tiles, standard_nine_gates[1], sizeof(standing_tiles)) == 0);
+    case 0x31: return (memcmp(standing_tiles, standard_nine_gates[2], sizeof(standing_tiles)) == 0);
     default: return false;
     }
 }
@@ -1185,11 +1185,11 @@ static void check_tiles_hog(const TILE *tiles, long tile_cnt, long (&points_tabl
 // 检测边坎钓
 static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cnt, TILE win_tile, long (&points_table)[POINT_TYPE_COUNT]) {
     // 恢复成一张一张的牌
-    TILE concealed_tiles[14];
+    TILE standing_tiles[14];
     long concealed_tile_cnt;
-    recovery_tiles_from_sets(concealed_sets, set_cnt, concealed_tiles, &concealed_tile_cnt);
-    sort_tiles(concealed_tiles, concealed_tile_cnt);
-    copy_exclude(concealed_tiles, concealed_tiles + concealed_tile_cnt, &win_tile, (&win_tile) + 1, concealed_tiles);
+    recovery_tiles_from_sets(concealed_sets, set_cnt, standing_tiles, &concealed_tile_cnt);
+    sort_tiles(standing_tiles, concealed_tile_cnt);
+    copy_exclude(standing_tiles, standing_tiles + concealed_tile_cnt, &win_tile, (&win_tile) + 1, standing_tiles);
 
     bool waiting_table[6][10] = { { 0 } };
     long waiting_cnt = 0;
@@ -1197,20 +1197,20 @@ static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cn
 
     switch (set_cnt) {  // 暗组数
     case 5:  // 13张手牌基本和型听牌
-        is_basic_type_13_wait(concealed_tiles, waiting_table);
+        is_basic_type_13_wait(standing_tiles, waiting_table);
         // 判断是否为七对听牌
-        if (is_seven_pairs_wait((const TILE (&)[13])concealed_tiles, &waiting_seven_pairs)) {
+        if (is_seven_pairs_wait((const TILE (&)[13])standing_tiles, &waiting_seven_pairs)) {
             waiting_table[tile_suit(waiting_seven_pairs)][tile_rank(waiting_seven_pairs)] = true;
         }
         break;
     case 4:  // 10张手牌基本和型听牌
-        is_basic_type_10_wait(concealed_tiles, waiting_table);
+        is_basic_type_10_wait(standing_tiles, waiting_table);
         break;
     case 3:  // 7张手牌基本和型听牌
-        is_basic_type_7_wait(concealed_tiles, waiting_table);
+        is_basic_type_7_wait(standing_tiles, waiting_table);
         break;
     case 2:  // 4张手牌基本和型听牌
-        is_basic_type_4_wait(concealed_tiles, waiting_table);
+        is_basic_type_4_wait(standing_tiles, waiting_table);
         break;
     case 1:  // 1张手牌基本和型听牌
         waiting_table[tile_suit(win_tile)][tile_rank(win_tile)] = true;
@@ -1719,48 +1719,48 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
 }
 
 // 特殊和型算番
-static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN_TYPE win_type, long (&points_table)[POINT_TYPE_COUNT]) {
+static bool calculate_special_type_points(const TILE (&standing_tiles)[14], WIN_TYPE win_type, long (&points_table)[POINT_TYPE_COUNT]) {
     // 七对
-    if (concealed_tiles[0] == concealed_tiles[1]
-        && concealed_tiles[2] == concealed_tiles[3]
-        && concealed_tiles[4] == concealed_tiles[5]
-        && concealed_tiles[6] == concealed_tiles[7]
-        && concealed_tiles[8] == concealed_tiles[9]
-        && concealed_tiles[10] == concealed_tiles[11]
-        && concealed_tiles[12] == concealed_tiles[13]) {
+    if (standing_tiles[0] == standing_tiles[1]
+        && standing_tiles[2] == standing_tiles[3]
+        && standing_tiles[4] == standing_tiles[5]
+        && standing_tiles[6] == standing_tiles[7]
+        && standing_tiles[8] == standing_tiles[9]
+        && standing_tiles[10] == standing_tiles[11]
+        && standing_tiles[12] == standing_tiles[13]) {
 
-        if (concealed_tiles[0] + 1 == concealed_tiles[2]
-            && concealed_tiles[2] + 1 == concealed_tiles[4]
-            && concealed_tiles[4] + 1 == concealed_tiles[6]
-            && concealed_tiles[6] + 1 == concealed_tiles[8]
-            && concealed_tiles[8] + 1 == concealed_tiles[10]
-            && concealed_tiles[10] + 1 == concealed_tiles[12]) {
+        if (standing_tiles[0] + 1 == standing_tiles[2]
+            && standing_tiles[2] + 1 == standing_tiles[4]
+            && standing_tiles[4] + 1 == standing_tiles[6]
+            && standing_tiles[6] + 1 == standing_tiles[8]
+            && standing_tiles[8] + 1 == standing_tiles[10]
+            && standing_tiles[10] + 1 == standing_tiles[12]) {
             // 连七对
             points_table[SEVEN_SHIFTED_PAIRS] = 1;
-            check_tiles_traits(concealed_tiles, 14, points_table);
+            check_tiles_traits(standing_tiles, 14, points_table);
         }
         else {
             // 普通七对
             points_table[SEVEN_PAIRS] = 1;
 
             // 检测门（五门齐的门）
-            check_tiles_suits(concealed_tiles, 14, points_table);
+            check_tiles_suits(standing_tiles, 14, points_table);
             // 检测特性（断幺、推不倒、绿一色、字一色、清幺九、混幺九）
-            check_tiles_traits(concealed_tiles, 14, points_table);
+            check_tiles_traits(standing_tiles, 14, points_table);
             // 检测数牌的范围（大于五、小于五、全大、全中、全小）
-            check_tiles_rank_range(concealed_tiles, 14, points_table);
+            check_tiles_rank_range(standing_tiles, 14, points_table);
             // 检测四归一
-            check_tiles_hog(concealed_tiles, 14, points_table);
+            check_tiles_hog(standing_tiles, 14, points_table);
         }
     }
     // 十三幺
-    else if (std::includes(std::begin(concealed_tiles), std::end(concealed_tiles),
+    else if (std::includes(std::begin(standing_tiles), std::end(standing_tiles),
         std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans))) {
         points_table[THIRTEEN_ORPHANS] = 1;
     }
     else {  // 全不靠/七星不靠
-        const TILE *it = std::find_if(std::begin(concealed_tiles), std::end(concealed_tiles), &is_honor);
-        long numbered_cnt = it - concealed_tiles;
+        const TILE *it = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
+        long numbered_cnt = it - standing_tiles;
         // 序数牌张数大于9或者小于7必然不可能是全不靠
         if (numbered_cnt > 9 || numbered_cnt < 7) {
             return false;
@@ -1769,7 +1769,7 @@ static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN
         const TILE *matched_seq = nullptr;
         for (int i = 0; i < 6; ++i) {
             if (std::includes(std::begin(standard_knitted_straight[i]), std::end(standard_knitted_straight[i]),
-                std::begin(concealed_tiles), it)) {
+                std::begin(standing_tiles), it)) {
                 matched_seq = standard_knitted_straight[i];  // 匹配到一个组合龙
                 break;
             }
@@ -1780,11 +1780,11 @@ static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN
         }
 
         // standard_thirteen_orphans + 6是字牌，即ESWNCFP
-        if (numbered_cnt == 7 && memcmp(standard_thirteen_orphans + 6, concealed_tiles + 7, 7 * sizeof(TILE)) == 0) {
+        if (numbered_cnt == 7 && memcmp(standard_thirteen_orphans + 6, standing_tiles + 7, 7 * sizeof(TILE)) == 0) {
             // 七种字牌齐，为七星不靠
             points_table[GREATER_HONORS_AND_KNITTED_TILES] = 1;
         }
-        else if (std::includes(standard_thirteen_orphans + 6, standard_thirteen_orphans + 13, it, std::end(concealed_tiles))) {
+        else if (std::includes(standard_thirteen_orphans + 6, standard_thirteen_orphans + 13, it, std::end(standing_tiles))) {
             // 全不靠
             points_table[LESSER_HONORS_AND_KNITTED_TILES] = 1;
             if (numbered_cnt == 9) {  // 有9张数牌，为带组合龙的全不靠
@@ -1801,12 +1801,12 @@ static bool calculate_special_type_points(const TILE (&concealed_tiles)[14], WIN
 }
 
 // “组合龙+面子+将”和型算番
-static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, const TILE *concealed_tiles, long concealed_cnt,
+static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, const TILE *standing_tiles, long standing_cnt,
     TILE win_tile, WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
-    assert(concealed_cnt == 14 || concealed_cnt == 11);
+    assert(standing_cnt == 14 || standing_cnt == 11);
     const TILE *matched_seq = nullptr;
     for (int i = 0; i < 6; ++i) {
-        if (std::includes(concealed_tiles, concealed_tiles + concealed_cnt,
+        if (std::includes(standing_tiles, standing_tiles + standing_cnt,
             std::begin(standard_knitted_straight[i]), std::end(standard_knitted_straight[i]))) {
             matched_seq = standard_knitted_straight[i];  // 匹配到一个组合龙
             break;
@@ -1821,7 +1821,7 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
 
     // 去掉整个组合龙后，还有5张或者2张牌
     TILE remains[5];
-    TILE *end = copy_exclude(concealed_tiles, concealed_tiles + concealed_cnt, matched_seq, matched_seq + 9, remains);
+    TILE *end = copy_exclude(standing_tiles, standing_tiles + standing_cnt, matched_seq, matched_seq + 9, remains);
     long remain_cnt = end - remains;
     if (remain_cnt == 5) {  // 如果第4组面子是手上的，那么手牌去除组合龙后会剩下14-9=5张，这5张包含一组面子和一对将
         TILE *it = std::adjacent_find(std::begin(remains), std::end(remains));  // 将牌
@@ -1889,8 +1889,8 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
     }
 
     TILE tiles[15];  // 第四组可能为杠，所以最多为15张
-    long tile_cnt = concealed_cnt;
-    memcpy(tiles, concealed_tiles, sizeof(TILE) * concealed_cnt);
+    long tile_cnt = standing_cnt;
+    memcpy(tiles, standing_tiles, sizeof(TILE) * standing_cnt);
     if (remain_cnt == 2) {  // 只余下两张的，说明有一组吃碰杠的面子，将这组恢复成牌
         long temp_cnt;
         recovery_tiles_from_sets(&fourth_set, 1, tiles + 11, &temp_cnt);
@@ -2009,7 +2009,7 @@ end:
     return p;
 }
 
-bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *concealed_tiles, long *concealed_cnt) {
+bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *standing_tiles, long *standing_cnt) {
     SET sets[5];
     long set_cnt = 0;
     bool has_fixed_set = false, is_concealed_kong = false;
@@ -2122,33 +2122,33 @@ bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
     if (fixed_set_cnt != nullptr) {
         *fixed_set_cnt = set_cnt;
     }
-    memcpy(concealed_tiles, tiles, tile_cnt * sizeof(TILE));
-    if (concealed_cnt != nullptr) {
-        *concealed_cnt = tile_cnt;
+    memcpy(standing_tiles, tiles, tile_cnt * sizeof(TILE));
+    if (standing_cnt != nullptr) {
+        *standing_cnt = tile_cnt;
     }
 
     return true;
 }
 
-int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed_tiles, long concealed_cnt, TILE win_tile, WIN_TYPE win_type,
+int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile, WIN_TYPE win_type,
     WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
     if (fixed_set == nullptr) {
         fixed_cnt = 0;
     }
 
-    if (concealed_tiles == nullptr || concealed_cnt <= 0 || fixed_cnt < 0 || fixed_cnt > 4
-        || fixed_cnt * 3 + concealed_cnt != 13) {
+    if (standing_tiles == nullptr || standing_cnt <= 0 || fixed_cnt < 0 || fixed_cnt > 4
+        || fixed_cnt * 3 + standing_cnt != 13) {
         return ERROR_WRONG_TILES_COUNT;
     }
 
-    TILE _concealed_tiles[14];
+    TILE _standing_tiles[14];
     SET _separation_sets[MAX_SEPARAION_CNT][5];
     long _separation_cnt;
 
     // 合并得到14张牌
-    memcpy(_concealed_tiles, concealed_tiles, sizeof(TILE) * concealed_cnt);
-    _concealed_tiles[concealed_cnt] = win_tile;
-    sort_tiles(_concealed_tiles, concealed_cnt + 1);
+    memcpy(_standing_tiles, standing_tiles, sizeof(TILE) * standing_cnt);
+    _standing_tiles[standing_cnt] = win_tile;
+    sort_tiles(_standing_tiles, standing_cnt + 1);
 
     memcpy(_separation_sets[0], fixed_set, fixed_cnt * sizeof(SET));
     for (long i = 0; i < fixed_cnt; ++i) {
@@ -2158,7 +2158,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
     }
 
     _separation_cnt = 0;
-    seperate_N(_concealed_tiles, concealed_cnt + 1, fixed_cnt, _separation_sets, &_separation_cnt);
+    seperate_N(_standing_tiles, standing_cnt + 1, fixed_cnt, _separation_sets, &_separation_cnt);
 
     for (long i = 0; i < _separation_cnt; ++i) {
         std::sort(&_separation_sets[i][fixed_cnt], &_separation_sets[i][4], &set_cmp);
@@ -2169,7 +2169,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
     long max_idx = -1;
 
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_points(_separation_sets[_separation_cnt][0], _concealed_tiles, 14,
+        if (calculate_knitted_straight_in_basic_type_points(_separation_sets[_separation_cnt][0], _standing_tiles, 14,
             win_tile, win_type, prevalent_wind, seat_wind, points_tables[_separation_cnt])) {
             int current_points = get_points_by_table(points_tables[_separation_cnt]);
             if (current_points > max_points) {
@@ -2178,7 +2178,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
             }
             printf("points = %d\n\n", current_points);
         }
-        else if (calculate_special_type_points(_concealed_tiles, win_type, points_tables[_separation_cnt])) {
+        else if (calculate_special_type_points(_standing_tiles, win_type, points_tables[_separation_cnt])) {
             int current_points = get_points_by_table(points_tables[_separation_cnt]);
             if (current_points > max_points) {
                 max_points = current_points;
@@ -2192,7 +2192,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed
     }
     else if (fixed_cnt == 1 && _separation_cnt == 0) {
         // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_points(_separation_sets[0][0], _concealed_tiles, 11,
+        if (calculate_knitted_straight_in_basic_type_points(_separation_sets[0][0], _standing_tiles, 11,
             win_tile, win_type, prevalent_wind, seat_wind, points_tables[0])) {
             int current_points = get_points_by_table(points_tables[0]);
             if (current_points > max_points) {

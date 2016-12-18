@@ -50,7 +50,7 @@ static const char *stringify_table[] = {
 };
 
 const char *parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt);
-bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *concealed_tiles, long *concealed_cnt);
+bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *standing_tiles, long *standing_cnt);
 void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *tile_cnt);
 
 enum POINT_TYPE {
@@ -91,7 +91,7 @@ typedef uint8_t WIN_TYPE;
 #define ERROR_WRONG_TILES_COUNT -1
 #define ERROR_NOT_WIN -2
 
-int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *concealed_tiles, long concealed_cnt, TILE win_tile,
+int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile,
     WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]);
 
 #if 0
