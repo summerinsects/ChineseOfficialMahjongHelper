@@ -422,9 +422,20 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
+    modifyRecord(handIdx);
+}
+
+void ScoreSheetScene::modifyRecord(size_t handIdx) {
     const char *name[] = { g_currentRecord.name[0], g_currentRecord.name[1], g_currentRecord.name[2], g_currentRecord.name[3] };
     Director::getInstance()->pushScene(RecordScene::createScene(handIdx, name, [this, handIdx](RecordScene *scene) {
-        if (handIdx != g_currentRecord.currentIndex) return;
+        bool isModify = (handIdx != g_currentRecord.currentIndex);
+
+        // 更新数据时，要先删除原来的记录
+        if (isModify) {
+            for (int i = 0; i < 4; ++i) {
+                _totalScores[i] -= g_currentRecord.scores[handIdx][i];
+            }
+        }
 
         // 将计分面板的数据更新到当前数据中
         memcpy(g_currentRecord.scores[handIdx], scene->getScoreTable(), sizeof(g_currentRecord.scores[handIdx]));
@@ -438,22 +449,27 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
             _totalLabel[i]->setString(StringUtils::format("%+d", _totalScores[i]));
         }
 
-        // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
-        if (++g_currentRecord.currentIndex < 16) {
-            _recordButton[g_currentRecord.currentIndex]->setVisible(true);
-            _recordButton[g_currentRecord.currentIndex]->setEnabled(true);
+        if (isModify) {
+            HistoryScene::modifyRecord(g_currentRecord);
         }
         else {
-            g_currentRecord.endTime = time(nullptr);
-            refreshEndTime();
-            HistoryScene::addRecord(g_currentRecord);
+            // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
+            if (++g_currentRecord.currentIndex < 16) {
+                _recordButton[g_currentRecord.currentIndex]->setVisible(true);
+                _recordButton[g_currentRecord.currentIndex]->setEnabled(true);
+            }
+            else {
+                g_currentRecord.endTime = time(nullptr);
+                refreshEndTime();
+                HistoryScene::addRecord(g_currentRecord);
+            }
         }
         writeToJson();
     }));
 }
 
 void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
-    std::string str;
+    std::string message, str;
     if (g_currentRecord.pointsFlag[handIdx] != 0) {
         for (unsigned n = 0; n < 64; ++n) {
             if ((1ULL << n) & g_currentRecord.pointsFlag[handIdx]) {
@@ -463,12 +479,24 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
                     ++idx;
                 }
 #endif
+                if (!str.empty()) {
+                    str.append("、");
+                }
                 str.append(mahjong::points_name[idx]);
-                str.append("\n");
             }
         }
-        AlertLayer::showWithMessage(handNameText[handIdx], str, nullptr, nullptr);
     }
+
+    if (!str.empty()) {
+        message = "该盘和出的番种有：";
+        message.append(str);
+    }
+    else {
+        message = "该盘未标记和牌番种";
+    }
+    message.append("\n是否需要修改这盘的记录？");
+    AlertLayer::showWithMessage(handNameText[handIdx], message,
+        std::bind(&ScoreSheetScene::modifyRecord, this, handIdx), nullptr);
 }
 
 void ScoreSheetScene::onTimeScheduler(float dt) {

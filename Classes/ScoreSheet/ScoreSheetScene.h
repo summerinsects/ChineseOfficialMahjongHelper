@@ -31,6 +31,7 @@ private:
     void onLockButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender, size_t handIdx);
     void onDetailButton(cocos2d::Ref *sender, size_t handIdx);
+    void modifyRecord(size_t handIdx);
     void onTimeScheduler(float dt);
     void onResetButton(cocos2d::Ref *sender);
     void onPursuitButton(cocos2d::Ref *sender);
