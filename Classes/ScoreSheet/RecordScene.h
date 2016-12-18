@@ -2,22 +2,17 @@
 #define _RECORD_SCENE_H_
 
 #include "../BaseLayer.h"
+#include "Record.h"
 
 class RecordScene : public BaseLayer, public cocos2d::ui::EditBoxDelegate {
 public:
-    static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const std::function<void (RecordScene *)> &okCallback);
+    static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const Record::Detail &detail, const std::function<void (const Record::Detail &)> &okCallback);
 
-    bool initWithIndex(size_t handIdx, const char **playerNames);
+    bool initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail &detail);
 
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
 
-    const int (&getScoreTable() const)[4] {
-        return _scoreTable;
-    }
-
-    uint64_t getPointsFlag() const {
-        return _pointsFlag;
-    }
+    const Record::Detail &getDetail() const { return _detail; }
 
 private:
     cocos2d::ui::EditBox *_editBox;
@@ -31,10 +26,10 @@ private:
     cocos2d::ui::Button *_okButton;
 
     int _winIndex;
-    int _scoreTable[4];
-    uint64_t _pointsFlag;
-    std::function<void (RecordScene *)> _okCallback;
+    Record::Detail _detail;
+    std::function<void (const Record::Detail &)> _okCallback;
 
+    void refresh();
     void updateScoreLabel();
 
     void onMinusButton(cocos2d::Ref *sender);

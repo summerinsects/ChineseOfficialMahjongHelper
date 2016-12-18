@@ -74,7 +74,7 @@ bool ScoreSheetScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 12));
     button->addClickEventListener([this](Ref *) {
         Director::getInstance()->pushScene(HistoryScene::createScene([this](const Record &record) {
-            if (g_currentRecord.currentIndex == 16) {
+            if (g_currentRecord.current_index == 16) {
                 CCLOG("currentIndex == 16");
                 memcpy(&g_currentRecord, &record, sizeof(g_currentRecord));
                 recover();
@@ -246,14 +246,18 @@ bool ScoreSheetScene::init() {
 }
 
 void ScoreSheetScene::fillRow(size_t handIdx) {
+    int scoreTable[4];
+    const Record::Detail &detail = g_currentRecord.detail[handIdx];
+    translateDetailToScoreTable(detail, scoreTable);
+
     // 填入这一盘四位选手的得分
     for (int i = 0; i < 4; ++i) {
-        _scoreLabels[handIdx][i]->setString(StringUtils::format("%+d", g_currentRecord.scores[handIdx][i]));
-        _totalScores[i] += g_currentRecord.scores[handIdx][i];  // 更新总分
-        if (g_currentRecord.scores[handIdx][i] > 0) {
+        _scoreLabels[handIdx][i]->setString(StringUtils::format("%+d", scoreTable[i]));
+        _totalScores[i] += scoreTable[i];  // 更新总分
+        if (scoreTable[i] > 0) {
             _scoreLabels[handIdx][i]->setColor(Color3B::RED);
         }
-        else if (g_currentRecord.scores[handIdx][i] < 0) {
+        else if (scoreTable[i] < 0) {
             _scoreLabels[handIdx][i]->setColor(Color3B::GREEN);
         }
         else {
@@ -270,9 +274,10 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 
     // 选取标记的最大番种显示出来
     bool pointsNameVisible = false;
-    if (g_currentRecord.pointsFlag[handIdx] != 0) {
+    uint64_t pointsFlag = g_currentRecord.detail[handIdx].points_flag;
+    if (pointsFlag != 0) {
         for (unsigned n = 0; n < 64; ++n) {
-            if ((1ULL << n) & g_currentRecord.pointsFlag[handIdx]) {
+            if ((1ULL << n) & pointsFlag) {
                 unsigned idx = n;
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
                 if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
@@ -294,17 +299,17 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 void ScoreSheetScene::refreshStartTime() {
     char str[255] = "开始时间：";
     size_t len = strlen(str);
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.startTime));
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.start_time));
     _timeLabel->setString(str);
 }
 
 void ScoreSheetScene::refreshEndTime() {
     char str[255] = "起止时间：";
     size_t len = strlen(str);
-    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.startTime));
+    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.start_time));
     strcpy(str + len, " -- ");
     len += 4;
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.endTime));
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.end_time));
     _timeLabel->setString(str);
 }
 
@@ -342,7 +347,7 @@ void ScoreSheetScene::recover() {
     memset(_totalScores, 0, sizeof(_totalScores));
 
     // 逐行填入数据
-    for (size_t k = 0; k < g_currentRecord.currentIndex; ++k) {
+    for (size_t k = 0; k < g_currentRecord.current_index; ++k) {
         fillRow(k);
     }
 
@@ -352,9 +357,9 @@ void ScoreSheetScene::recover() {
     }
 
     // 如果不是北风北，则显示下一行的计分按钮
-    if (g_currentRecord.currentIndex < 16) {
-        _recordButton[g_currentRecord.currentIndex]->setVisible(true);
-        _recordButton[g_currentRecord.currentIndex]->setEnabled(true);
+    if (g_currentRecord.current_index < 16) {
+        _recordButton[g_currentRecord.current_index]->setVisible(true);
+        _recordButton[g_currentRecord.current_index]->setEnabled(true);
 
         refreshStartTime();
     }
@@ -417,7 +422,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
 
     this->unschedule(schedule_selector(ScoreSheetScene::onTimeScheduler));
 
-    g_currentRecord.startTime = time(nullptr);
+    g_currentRecord.start_time = time(nullptr);
     refreshStartTime();
 }
 
@@ -427,19 +432,21 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
 
 void ScoreSheetScene::modifyRecord(size_t handIdx) {
     const char *name[] = { g_currentRecord.name[0], g_currentRecord.name[1], g_currentRecord.name[2], g_currentRecord.name[3] };
-    Director::getInstance()->pushScene(RecordScene::createScene(handIdx, name, [this, handIdx](RecordScene *scene) {
-        bool isModify = (handIdx != g_currentRecord.currentIndex);
+    Director::getInstance()->pushScene(RecordScene::createScene(handIdx, name, g_currentRecord.detail[handIdx],
+        [this, handIdx](const Record::Detail &detail) {
+        bool isModify = (handIdx != g_currentRecord.current_index);
 
         // 更新数据时，要先删除原来的记录
         if (isModify) {
+            int scores[4];
+            translateDetailToScoreTable(g_currentRecord.detail[handIdx], scores);
             for (int i = 0; i < 4; ++i) {
-                _totalScores[i] -= g_currentRecord.scores[handIdx][i];
+                _totalScores[i] -= scores[i];
             }
         }
 
         // 将计分面板的数据更新到当前数据中
-        memcpy(g_currentRecord.scores[handIdx], scene->getScoreTable(), sizeof(g_currentRecord.scores[handIdx]));
-        g_currentRecord.pointsFlag[handIdx] = scene->getPointsFlag();
+        memcpy(&g_currentRecord.detail[handIdx], &detail, sizeof(Record::Detail));
 
         // 填入当前行
         fillRow(handIdx);
@@ -454,12 +461,12 @@ void ScoreSheetScene::modifyRecord(size_t handIdx) {
         }
         else {
             // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
-            if (++g_currentRecord.currentIndex < 16) {
-                _recordButton[g_currentRecord.currentIndex]->setVisible(true);
-                _recordButton[g_currentRecord.currentIndex]->setEnabled(true);
+            if (++g_currentRecord.current_index < 16) {
+                _recordButton[g_currentRecord.current_index]->setVisible(true);
+                _recordButton[g_currentRecord.current_index]->setEnabled(true);
             }
             else {
-                g_currentRecord.endTime = time(nullptr);
+                g_currentRecord.end_time = time(nullptr);
                 refreshEndTime();
                 HistoryScene::addRecord(g_currentRecord);
             }
@@ -469,33 +476,70 @@ void ScoreSheetScene::modifyRecord(size_t handIdx) {
 }
 
 void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
-    std::string message, str;
-    if (g_currentRecord.pointsFlag[handIdx] != 0) {
-        for (unsigned n = 0; n < 64; ++n) {
-            if ((1ULL << n) & g_currentRecord.pointsFlag[handIdx]) {
-                unsigned idx = n;
+    std::string message = handNameText[handIdx], str;
+    const Record::Detail &detail = g_currentRecord.detail[handIdx];
+    if (detail.score == 0) {
+        message.append("荒庄。\n");
+    }
+    else {
+        int wc = detail.win_claim;
+        int winIndex = (wc & 0x80) ? 3 : (wc & 0x40) ? 2 : (wc & 0x20) ? 1 : (wc & 0x10) ? 0 : -1;
+        int claimIndex = (wc & 0x8) ? 3 : (wc & 0x4) ? 2 : (wc & 0x2) ? 1 : (wc & 0x1) ? 0 : -1;
+        if (winIndex == claimIndex) {
+            message.append(g_currentRecord.name[winIndex]);
+            message.append(StringUtils::format("自摸%d番。\n", detail.score));
+        }
+        else {
+            message.append(g_currentRecord.name[winIndex]);
+            message.append(StringUtils::format("和%d番，由", detail.score));
+            message.append(g_currentRecord.name[claimIndex]);
+            message.append("放炮。\n");
+        }
+
+        uint64_t pointsFlag = detail.points_flag;
+        if (pointsFlag != 0) {
+            for (unsigned n = 0; n < 64; ++n) {
+                if ((1ULL << n) & pointsFlag) {
+                    unsigned idx = n;
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
-                if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
-                    ++idx;
-                }
+                    if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+                        ++idx;
+                    }
 #endif
-                if (!str.empty()) {
-                    str.append("、");
+                    if (!str.empty()) {
+                        str.append("、");
+                    }
+                    str.append(mahjong::points_name[idx]);
                 }
-                str.append(mahjong::points_name[idx]);
             }
+        }
+
+        if (!str.empty()) {
+            message.append("和出番种：");
+            message.append(str);
+            message.append("。\n");
         }
     }
 
-    if (!str.empty()) {
-        message = "该盘和出的番种有：";
+    if (detail.false_win != 0) {
+        str.clear();
+        for (int i = 0; i < 4; ++i) {
+            if (detail.false_win & (1 << i)) {
+                if (!str.empty()) {
+                    str.append("、");
+                }
+                str.append(g_currentRecord.name[i]);
+            }
+        }
         message.append(str);
+        message.append("错和。\n");
     }
-    else {
-        message = "该盘未标记和牌番种";
-    }
+
     message.append("\n是否需要修改这盘的记录？");
-    AlertLayer::showWithMessage(handNameText[handIdx], message,
+
+    str = handNameText[handIdx];
+    str.append("详情");
+    AlertLayer::showWithMessage(str, message,
         std::bind(&ScoreSheetScene::modifyRecord, this, handIdx), nullptr);
 }
 
@@ -515,7 +559,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         }
     }
 
-    if (g_currentRecord.currentIndex == 16) {
+    if (g_currentRecord.current_index == 16) {
         reset();
         return;
     }

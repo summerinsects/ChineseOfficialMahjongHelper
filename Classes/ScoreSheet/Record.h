@@ -1,4 +1,4 @@
-#ifndef __RECORD_H__
+﻿#ifndef __RECORD_H__
 #define __RECORD_H__
 
 #include <stddef.h>
@@ -8,11 +8,15 @@
 
 struct Record {
     char name[4][255];
-    int scores[16][4];
-    uint64_t pointsFlag[16];
-    size_t currentIndex;
-    time_t startTime;
-    time_t endTime;
+    struct Detail {
+        uint8_t win_claim;
+        uint8_t false_win;
+        uint32_t score;
+        uint64_t points_flag;
+    } detail[16];
+    size_t current_index;
+    time_t start_time;
+    time_t end_time;
 };
 
 static bool operator==(const Record &left, const Record &right) {
@@ -25,59 +29,80 @@ static bool operator==(const Record &left, const Record &right) {
 #include "../wheels/cppJSON.hpp"
 
 static void fromJson(Record *record, const jw::cppJSON &json) {
-    jw::cppJSON::const_iterator it = json.find("name");
-    if (it != json.end()) {
-        auto vec = it->as<std::vector<std::string> >();
-        if (vec.size() == 4) {
-            for (int i = 0; i < 4; ++i) {
-                strncpy(record->name[i], vec[i].c_str(), vec[i].length());
-            }
+    memset(record, 0, sizeof(Record));
+    auto name = json.getValueByKeyNoThrow<std::vector<std::string> >("name");
+    if (name.size() == 4) {
+        for (int i = 0; i < 4; ++i) {
+            strncpy(record->name[i], name[i].c_str(), name[i].length());
         }
     }
-    it = json.find("record");
-    if (it != json.end()) {
-        auto vec = it->as<std::vector<std::vector<int> > >();
-        record->currentIndex = vec.size();
-        for (size_t i = 0; i < record->currentIndex; ++i) {
-            memcpy(record->scores[i], &vec[i][0], sizeof(record->scores[i]));
-        }
+
+    auto detail = json.getValueByKeyNoThrow<std::vector<std::unordered_map<std::string, uint64_t> > >("detail");
+    record->current_index = detail.size();
+    for (size_t i = 0; i < record->current_index; ++i) {
+        std::unordered_map<std::string, uint64_t> temp = std::move(detail[i]);
+        record->detail[i].win_claim = temp["win_claim"];
+        record->detail[i].false_win = temp["false_win"];
+        record->detail[i].score = temp["score"];
+        record->detail[i].points_flag = temp["points_flag"];
     }
-    it = json.find("points_flag");
-    if (it != json.end()) {
-        auto vec = it->as<std::vector<uint64_t> >();
-        memcpy(record->pointsFlag, &vec[0], sizeof(uint64_t) * vec.size());
-    }
-    it = json.find("start_time");
-    if (it != json.end()) {
-        record->startTime = it->as<time_t>();
-    }
-    it = json.find("end_time");
-    if (it != json.end()) {
-        record->endTime = it->as<time_t>();
-    }
+
+    record->start_time = json.getValueByKeyNoThrow<time_t>("start_time");
+    record->end_time = json.getValueByKeyNoThrow<time_t>("end_time");
 }
 
 static void toJson(const Record &record, jw::cppJSON *json) {
-    std::vector<std::string> nameVec;
+    std::vector<std::string> name;
     for (int i = 0; i < 4; ++i) {
-        nameVec.push_back(std::string(record.name[i]));
+        name.push_back(std::string(record.name[i]));
     }
-    json->insert(std::make_pair("name", std::move(nameVec)));
+    json->insert(std::make_pair("name", std::move(name)));
 
-    std::vector<std::vector<int> > scoreVec;
-    scoreVec.reserve(16);
-    for (size_t k = 0; k < record.currentIndex; ++k) {
-        scoreVec.push_back(std::vector<int>({ record.scores[k][0], record.scores[k][1], record.scores[k][2], record.scores[k][3] }));
+    std::vector<std::unordered_map<std::string, uint64_t> > detail;
+    detail.reserve(16);
+    for (size_t i = 0; i < record.current_index; ++i) {
+        std::unordered_map<std::string, uint64_t> temp;
+        temp.insert(std::make_pair("win_claim", record.detail[i].win_claim));
+        temp.insert(std::make_pair("false_win", record.detail[i].false_win));
+        temp.insert(std::make_pair("score", record.detail[i].score));
+        temp.insert(std::make_pair("points_flag", record.detail[i].points_flag));
+        detail.push_back(std::move(temp));
     }
-    json->insert(std::make_pair("record", std::move(scoreVec)));
+    json->insert(std::make_pair("detail", std::move(detail)));
 
-    std::vector<uint64_t> pointsFlagVec;
-    pointsFlagVec.resize(record.currentIndex);
-    memcpy(&pointsFlagVec[0], record.pointsFlag, sizeof(uint64_t) * record.currentIndex);
-    json->insert(std::make_pair("points_flag", std::move(pointsFlagVec)));
+    json->insert(std::make_pair("start_time", record.start_time));
+    json->insert(std::make_pair("end_time", record.end_time));
+}
 
-    json->insert(std::make_pair("start_time", record.startTime));
-    json->insert(std::make_pair("end_time", record.endTime));
+static void translateDetailToScoreTable(const Record::Detail &detail, int(&scoreTable)[4]) {
+    memset(scoreTable, 0, sizeof(scoreTable));
+    int winScore = detail.score;
+    if (winScore >= 8 && !!(detail.win_claim & 0xF0)) {
+        uint8_t wc = detail.win_claim;
+        int winIndex = (wc & 0x80) ? 3 : (wc & 0x40) ? 2 : (wc & 0x20) ? 1 : (wc & 0x10) ? 0 : -1;
+        int claimIndex = (wc & 0x8) ? 3 : (wc & 0x4) ? 2 : (wc & 0x2) ? 1 : (wc & 0x1) ? 0 : -1;
+        if (winIndex == claimIndex) {  // 自摸
+            for (int i = 0; i < 4; ++i) {
+                scoreTable[i] = (i == winIndex) ? (winScore + 8) * 3 : (-8 - winScore);
+            }
+        }
+        else {  // 点炮
+            for (int i = 0; i < 4; ++i) {
+                scoreTable[i] = (i == winIndex) ? (winScore + 24) : (i == claimIndex ? (-8 - winScore) : -8);
+            }
+        }
+    }
+
+    // 检查错和
+    for (int i = 0; i < 4; ++i) {
+        if (detail.false_win & (1 << i)) {
+            scoreTable[i] -= 30;
+            for (int j = 0; j < 4; ++j) {
+                if (j == i) continue;
+                scoreTable[j] += 10;
+            }
+        }
+    }
 }
 
 #endif

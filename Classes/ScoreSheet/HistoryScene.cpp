@@ -102,18 +102,20 @@ ui::Widget *HistoryScene::createRecordWidget(size_t idx, float width) {
     const Record &record = g_records[idx];
     int scores[4] = { 0 };
     for (int i = 0; i < 16; ++i) {
-        scores[0] += record.scores[i][0];
-        scores[1] += record.scores[i][1];
-        scores[2] += record.scores[i][2];
-        scores[3] += record.scores[i][3];
+        int s[4];
+        translateDetailToScoreTable(record.detail[i], s);
+        scores[0] += s[0];
+        scores[1] += s[1];
+        scores[2] += s[2];
+        scores[3] += s[3];
     }
 
     char str[255];
     size_t len = 0;
-    len += strftime(str, sizeof(str), "%Y-%m-%d %H:%M", localtime(&record.startTime));
+    len += strftime(str, sizeof(str), "%Y-%m-%d %H:%M", localtime(&record.start_time));
     strcpy(str + len, " -- ");
     len += 4;
-    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&record.endTime));
+    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&record.end_time));
 
     snprintf(str + len, sizeof(str) - len, "\n[%s(%+d) %s(%+d) %s(%+d) %s(%+d)]",
         record.name[0], scores[0], record.name[1], scores[1], record.name[2], scores[2], record.name[3], scores[3]);
@@ -166,6 +168,27 @@ void HistoryScene::addRecord(const Record &record) {
     lazyLoadRecords();
     if (g_records.end() == std::find(g_records.begin(), g_records.end(), record)) {
         g_records.push_back(record);
+        saveRecords();
+    }
+}
+
+void HistoryScene::modifyRecord(const Record &record) {
+    lazyLoadRecords();
+    auto it = std::find_if(g_records.begin(), g_records.end(), [&record](const Record &r) {
+        return (r.start_time == record.start_time
+            && r.end_time == record.end_time
+            && strncmp(r.name[0], record.name[0], 255) == 0
+            && strncmp(r.name[1], record.name[1], 255) == 0
+            && strncmp(r.name[2], record.name[2], 255) == 0
+            && strncmp(r.name[3], record.name[3], 255) == 0);
+    });
+
+    if (it == g_records.end()) {
+        g_records.push_back(record);
+        saveRecords();
+    }
+    else {
+        memcpy(&*it, &record, sizeof(Record));
         saveRecords();
     }
 }

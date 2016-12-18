@@ -14,6 +14,7 @@ public:
     CREATE_FUNC(HistoryScene);
 
     static void addRecord(const Record &record);
+    static void modifyRecord(const Record &record);
 
 private:
     cocos2d::ui::Widget *createRecordWidget(size_t idx, float width);

@@ -1,13 +1,14 @@
 ﻿#include "RecordScene.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
+#include "../widget/AlertLayer.h"
 
 USING_NS_CC;
 
-Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const std::function<void (RecordScene *)> &okCallback) {
+Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const Record::Detail &detail, const std::function<void (const Record::Detail &)> &okCallback) {
     auto scene = Scene::create();
     auto layer = new (std::nothrow) RecordScene();
-    layer->initWithIndex(handIdx, playerNames);
+    layer->initWithIndex(handIdx, playerNames, detail);
     layer->_okCallback = okCallback;
     layer->autorelease();
 
@@ -15,14 +16,13 @@ Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const 
     return scene;
 }
 
-bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
+bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail &detail) {
     if (!BaseLayer::initWithTitle(handNameText[handIdx])) {
         return false;
     }
 
     _winIndex = -1;
-    memset(_scoreTable, 0, sizeof(_scoreTable));
-    _pointsFlag = 0;
+    memcpy(&_detail, &detail, sizeof(_detail));
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -195,6 +195,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
             button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1, idx));
 
             button->setPosition(Vec2(gap * (col + 0.5f), y - 12.0f));
+
+            if (_detail.points_flag & (1ULL << idx)) {
+                setButtonChecked(button);
+            }
+            else {
+                setButtonUnchecked(button);
+            }
         }
         y -= 24.0f;
     }
@@ -222,7 +229,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames) {
     _okButton->addClickEventListener(std::bind(&RecordScene::onOkButton, this, std::placeholders::_1));
     _okButton->setEnabled(false);
 
-    _winIndex = -1;
+    refresh();
     return true;
 }
 
@@ -230,40 +237,120 @@ void RecordScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
     updateScoreLabel();
 }
 
+void RecordScene::refresh() {
+    int wc = _detail.win_claim;
+    if (_detail.score >= 8) {
+        char str[32];
+        snprintf(str, sizeof(str), "%d", _detail.score);
+        _editBox->setText(str);
+    }
+
+    _winIndex = (wc & 0x80) ? 3 : (wc & 0x40) ? 2 : (wc & 0x20) ? 1 : (wc & 0x10) ? 0 : -1;
+    if (_winIndex != -1) {  // 有人和牌
+        int claimIndex = (wc & 0x8) ? 3 : (wc & 0x4) ? 2 : (wc & 0x2) ? 1 : (wc & 0x1) ? 0 : -1;  // 点炮者
+        for (int i = 0; i < 4; ++i) {
+            if (i != _winIndex) {
+                setButtonUnchecked(_winButton[i]);
+            }
+            else {
+                setButtonChecked(_winButton[i]);
+            }
+        }
+
+        if (_winIndex == claimIndex) {  // 自摸
+            for (int i = 0; i < 4; ++i) {
+                if (i != _winIndex) {
+                    setButtonUnchecked(_selfDrawnButton[i]);
+                    _selfDrawnButton[i]->setEnabled(false);
+                }
+                else {
+                    _selfDrawnButton[i]->setEnabled(true);
+                    setButtonChecked(_selfDrawnButton[i]);
+                }
+                setButtonUnchecked(_claimButton[i]);
+                _claimButton[i]->setEnabled(false);
+            }
+        }
+        else {  // 点炮
+            for (int i = 0; i < 4; ++i) {
+                if (i != _winIndex) {
+                    _claimButton[i]->setEnabled(true);
+                    if (i != claimIndex) {
+                        setButtonUnchecked(_claimButton[i]);
+                    }
+                    else {
+                        setButtonChecked(_claimButton[i]);
+                    }
+                }
+                else {
+                    setButtonUnchecked(_claimButton[i]);
+                    _claimButton[i]->setEnabled(false);
+                }
+            }
+        }
+    }
+
+    // 错和
+    if (_detail.false_win != 0) {
+        for (int i = 0; i < 4; ++i) {
+            if (_detail.false_win & (1 << i)) {
+                setButtonChecked(_falseWinButton[i]);
+            }
+            else {
+                setButtonUnchecked(_falseWinButton[i]);
+            }
+        }
+    }
+
+    updateScoreLabel();
+}
+
 void RecordScene::updateScoreLabel() {
-    memset(_scoreTable, 0, sizeof(_scoreTable));
-    if (_winIndex != -1) {
+    _detail.win_claim = 0;
+    int claimIndex = -1;
+    if (_winIndex != -1) {  // 有人和牌
         int winScore = atoi(_editBox->getText());  // 获取输入框里所填番数
-        if (isButtonChecked(_selfDrawnButton[_winIndex])) {  // 自摸的情况算各家得分
+        _detail.score = std::max(8, winScore);
+        if (isButtonChecked(_selfDrawnButton[_winIndex])) {  // 勾选了自摸
+            claimIndex = _winIndex;
+        }
+        else {
             for (int i = 0; i < 4; ++i) {
-                _scoreTable[i] = (i == _winIndex) ? (winScore + 8) * 3 : (-8 - winScore);
+                if (i != _winIndex && isButtonChecked(_claimButton[i])) {  // 勾选了点炮
+                    claimIndex = i;
+                    break;
+                }
             }
         }
-        else {  // 点和的情况算各家得分
-            for (int i = 0; i < 4; ++i) {
-                _scoreTable[i] = (i == _winIndex) ? (winScore + 24) : (isButtonChecked(_claimButton[i]) ? (-8 - winScore) : -8);
-            }
+
+        // 记录和牌和点炮
+        _detail.win_claim = (1 << (_winIndex + 4));
+        if (claimIndex != -1) {
+            _detail.win_claim |= (1 << claimIndex);
         }
+    }
+    else {  // 荒庄
+        _detail.score = 0;
     }
 
     // 检查是否有错和
+    _detail.false_win = 0;
     for (int i = 0; i < 4; ++i) {
         if (isButtonChecked(_falseWinButton[i])) {
-            _scoreTable[i] -= 30;
-            for (int j = 0; j < 4; ++j) {
-                if (j == i) continue;
-                _scoreTable[j] += 10;
-            }
+            _detail.false_win |= (1 << i);
         }
     }
 
+    int scoreTable[4];
+    translateDetailToScoreTable(_detail, scoreTable);
+
     // 正负0分使用不同颜色
     for (int i = 0; i < 4; ++i) {
-        _scoreLabel[i]->setString(StringUtils::format("%+d", _scoreTable[i]));
-        if (_scoreTable[i] > 0) {
+        _scoreLabel[i]->setString(StringUtils::format("%+d", scoreTable[i]));
+        if (scoreTable[i] > 0) {
             _scoreLabel[i]->setColor(Color3B::RED);
         }
-        else if (_scoreTable[i] < 0) {
+        else if (scoreTable[i] < 0) {
             _scoreLabel[i]->setColor(Color3B::GREEN);
         }
         else {
@@ -272,15 +359,16 @@ void RecordScene::updateScoreLabel() {
     }
 
     // 四位选手的总分加起来和为0
-    if (_scoreTable[0] + _scoreTable[1] + _scoreTable[2] + _scoreTable[3] == 0) {
+    if (scoreTable[0] + scoreTable[1] + scoreTable[2] + scoreTable[3] == 0) {
         if (isButtonChecked(_drawButton)) {  // 荒庄
-            _okButton->setEnabled(_pointsFlag == 0);
+            _okButton->setEnabled(true);
         }
-        else {  // 不荒庄，那么四位选手的得分一定没有为0的
-            _okButton->setEnabled(std::any_of(std::begin(_scoreTable), std::end(_scoreTable), [](int score) { return score != 0; }));
+        else {
+            _okButton->setEnabled(std::any_of(std::begin(_winButton), std::end(_winButton), &isButtonChecked));
         }
     }
     else {
+        // 四位选手的总分加起来和不为0说明还没有选择是自摸还是点炮
         _okButton->setEnabled(false);
     }
 }
@@ -418,18 +506,18 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
     ui::Button *button = (ui::Button *)sender;
     if (isButtonChecked(button)) {
         setButtonUnchecked(button);
-        _pointsFlag &= ~(1ULL << index);
+        _detail.points_flag &= ~(1ULL << index);
     }
     else {
         setButtonChecked(button);
-        _pointsFlag |= 1ULL << index;
+        _detail.points_flag |= 1ULL << index;
     }
 
     // 增加番数
     int prevWinScore = atoi(_editBox->getText());
     int currentWinScore = 0;
     for (int n = 0; n < 64; ++n) {
-        if (_pointsFlag & (1ULL << n)) {
+        if (_detail.points_flag & (1ULL << n)) {
             unsigned idx = n;
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
             if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
@@ -449,6 +537,15 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
 }
 
 void RecordScene::onOkButton(cocos2d::Ref *sender) {
-    _okCallback(this);
+    if (isButtonChecked(_drawButton) && _detail.points_flag != 0) {
+        AlertLayer::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", [this]() {
+            _detail.points_flag = 0;
+            _okCallback(_detail);
+            Director::getInstance()->popScene();
+        }, nullptr);
+        return;
+    }
+
+    _okCallback(_detail);
     Director::getInstance()->popScene();
 }
