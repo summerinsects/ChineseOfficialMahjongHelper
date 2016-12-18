@@ -104,6 +104,7 @@ bool AlertLayer::initWithTitle(const std::string &title, cocos2d::Node *node, co
         if (background->getBoundingBox().containsPoint(pos)) {
             return true;
         }
+        event->stopPropagation();
         onCancelButton(nullptr);
         return true;
     };
