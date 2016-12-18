@@ -306,14 +306,11 @@ void RecordScene::onDrawButton(cocos2d::Ref *sender) {
     _winIndex = -1;
     if (isButtonChecked(_drawButton)) {
         setButtonUnchecked(_drawButton);
-        // 启用所有人的和、自摸、点炮，将得分重置为0
+        // 启用所有人的和、自摸、点炮
         for (int i = 0; i < 4; ++i) {
             _winButton[i]->setEnabled(true);
             _selfDrawnButton[i]->setEnabled(true);
             _claimButton[i]->setEnabled(true);
-            setButtonUnchecked(_falseWinButton[i]);
-            _falseWinButton[i]->setEnabled(true);
-            _scoreLabel[i]->setString("+0");
         }
     }
     else {
@@ -326,8 +323,6 @@ void RecordScene::onDrawButton(cocos2d::Ref *sender) {
             _selfDrawnButton[i]->setEnabled(false);
             setButtonUnchecked(_claimButton[i]);
             _claimButton[i]->setEnabled(false);
-            setButtonUnchecked(_falseWinButton[i]);
-            _falseWinButton[i]->setEnabled(true);
         }
     }
     updateScoreLabel();
