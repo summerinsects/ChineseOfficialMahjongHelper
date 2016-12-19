@@ -438,9 +438,9 @@ void TilePickWidget::refreshActionButtons() {
         }
 
         if (!mahjong::is_honor(tile)) {
-            _chowLessButton->setEnabled(_standingTilesTable[tile - 2] > 0 && _standingTilesTable[tile - 1]);
-            _chowMidButton->setEnabled(_standingTilesTable[tile - 1] > 0 && _standingTilesTable[tile + 1]);
-            _chowGreatButton->setEnabled(_standingTilesTable[tile + 1] > 0 && _standingTilesTable[tile + 2]);
+            _chowLessButton->setEnabled(_standingTilesTable[tile - 2] > 0 && _standingTilesTable[tile - 1] > 0);
+            _chowMidButton->setEnabled(_standingTilesTable[tile - 1] > 0 && _standingTilesTable[tile + 1] > 0);
+            _chowGreatButton->setEnabled(_standingTilesTable[tile + 1] > 0 && _standingTilesTable[tile + 2] > 0);
         }
         else {
             _chowLessButton->setEnabled(false);
