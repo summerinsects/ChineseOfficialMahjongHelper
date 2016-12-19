@@ -604,13 +604,16 @@ static void showPursuitWithDelta(int delta) {
 }
 
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
-    ui::Widget *rootWidget;
+    const char (&name)[4][255] = g_currentRecord.name;
+    ui::Widget *rootWidget = nullptr;
 
-    if (g_currentRecord.current_index < 16) {
+    // 当当前一局比赛未结束时，显示快捷分差按钮
+    if (std::none_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })
+        && g_currentRecord.current_index < 16) {
         rootWidget = ui::Widget::create();
         rootWidget->setContentSize(Size(150.0f, 200.0f));
 
-        Label *label = Label::createWithSystemFont("快捷选择", "Arial", 12);
+        Label *label = Label::createWithSystemFont("快捷选择当前局面分差", "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootWidget->addChild(label);
         label->setPosition(Vec2(75.0f, 190.0f));
@@ -628,17 +631,14 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
             button->setContentSize(Size(150.0f, 20.0f));
             button->setTitleFontSize(12);
             if (delta > 0) {
-                button->setTitleText(StringUtils::format("%s领先%s%d分",
-                    g_currentRecord.name[pairwise[i].first], g_currentRecord.name[pairwise[i].second], delta));
+                button->setTitleText(StringUtils::format("%s领先%s%d分", name[pairwise[i].first], name[pairwise[i].second], delta));
             }
             else if (delta < 0) {
                 delta = -delta;
-                button->setTitleText(StringUtils::format("%s落后%s%d分",
-                    g_currentRecord.name[pairwise[i].first], g_currentRecord.name[pairwise[i].second], delta));
+                button->setTitleText(StringUtils::format("%s落后%s%d分", name[pairwise[i].first], name[pairwise[i].second], delta));
             }
             else {
-                button->setTitleText(StringUtils::format("%s与%s平分",
-                    g_currentRecord.name[pairwise[i].first], g_currentRecord.name[pairwise[i].second]));
+                button->setTitleText(StringUtils::format("%s与%s平分", name[pairwise[i].first], name[pairwise[i].second]));
             }
             rootWidget->addChild(button);
             button->setPosition(Vec2(75.0f, 170.0f - i * 25.0f));
@@ -648,15 +648,16 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
         }
     }
 
+    // 自定义分差输入
     ui::EditBox *editBox = ui::EditBox::create(Size(100.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
-    editBox->setPlaceHolder("输入分差");
+    editBox->setPlaceHolder("输入任意分差");
 
-    if (g_currentRecord.current_index < 16) {
+    if (rootWidget != nullptr) {
         rootWidget->addChild(editBox);
         editBox->setPosition(Vec2(75.0f, 10.0f));
     }
