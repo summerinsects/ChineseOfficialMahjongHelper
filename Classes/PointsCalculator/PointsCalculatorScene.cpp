@@ -314,8 +314,7 @@ void PointsCalculatorScene::onLastTileButton(cocos2d::Ref *sender) {
 void PointsCalculatorScene::onFixedSetsChanged(TilePickWidget *sender) {
     // 当副露不包含杠的时候，杠开是禁用状态
     const std::vector<mahjong::SET> &fixedSets = sender->getFixedSets();
-    auto it = std::find_if(fixedSets.begin(), fixedSets.end(), [](const mahjong::SET &s) { return s.set_type == mahjong::SET_TYPE::KONG; });
-    _hasKong = (it != fixedSets.end());
+    _hasKong = std::any_of(fixedSets.begin(), fixedSets.end(), [](const mahjong::SET &s) { return s.set_type == mahjong::SET_TYPE::KONG; });
     if (isButtonChecked(_selfDrawnButton)) {
         _replacementButton->setEnabled(_hasKong);
     }
@@ -347,9 +346,8 @@ void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
         if (_maybeFourthTile) {
             // 当副露中有和牌张是，不可能是抢杠
             const std::vector<mahjong::SET> &fixedSets = sender->getFixedSets();
-            auto it = std::find_if(fixedSets.begin(), fixedSets.end(),
+            _maybeRobKong = std::none_of(fixedSets.begin(), fixedSets.end(),
                 std::bind(&mahjong::is_set_contains_tile, std::placeholders::_1, winTile));
-            _maybeRobKong = (it == fixedSets.end());
         }
         else {
             _maybeRobKong = false;

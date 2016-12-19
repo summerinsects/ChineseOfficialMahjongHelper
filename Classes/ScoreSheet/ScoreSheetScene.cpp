@@ -320,17 +320,9 @@ void ScoreSheetScene::refreshEndTime() {
 }
 
 void ScoreSheetScene::recover() {
-    // 选手名字是否为空
-    bool empty = false;
-    for (int i = 0; i < 4; ++i) {
-        if (g_currentRecord.name[i][0] == '\0') {
-            empty = true;
-            break;
-        }
-    }
-
     // 有选手名字为空，则清空数据
-    if (empty) {
+    const char (&name)[4][255] = g_currentRecord.name;
+    if (std::any_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })) {
         memset(&g_currentRecord, 0, sizeof(g_currentRecord));
         onTimeScheduler(0.0f);
         this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
@@ -341,7 +333,7 @@ void ScoreSheetScene::recover() {
     for (int i = 0; i < 4; ++i) {
         _editBox[i]->setVisible(false);
         _editBox[i]->setEnabled(false);
-        _nameLabel[i]->setString(g_currentRecord.name[i]);
+        _nameLabel[i]->setString(name[i]);
         _nameLabel[i]->setVisible(true);
     }
 
@@ -558,11 +550,10 @@ void ScoreSheetScene::onTimeScheduler(float dt) {
 }
 
 void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
-    for (int i = 0; i < 4; ++i) {
-        if (g_currentRecord.name[i][0] == '\0') {
-            reset();
-            return;
-        }
+    const char (&name)[4][255] = g_currentRecord.name;
+    if (std::any_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })) {
+        reset();
+        return;
     }
 
     if (g_currentRecord.current_index == 16) {
