@@ -3,6 +3,7 @@
 #include "RecordScene.h"
 #include "HistoryScene.h"
 #include "../widget/AlertLayer.h"
+#include "../widget/CWEditBoxDelegate.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
@@ -665,7 +666,16 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
         rootWidget = editBox;
     }
 
-    AlertLayer::showWithNode("追分计算", rootWidget, [editBox]() {
+    // EditBox的代理
+    std::shared_ptr<cw::EditBoxDelegate> delegate = std::make_shared<cw::EditBoxDelegate>(
+        [](ui::EditBox *editBox) {
+        int delta = atoi(editBox->getText());
+        showPursuitWithDelta(delta);
+    });
+    editBox->setDelegate(delegate.get());
+
+    // 使这个代理随AlertLayer一起析构
+    AlertLayer::showWithNode("追分计算", rootWidget, [editBox, delegate]() {
         int delta = atoi(editBox->getText());
         showPursuitWithDelta(delta);
     }, nullptr);
