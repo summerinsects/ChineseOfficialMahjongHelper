@@ -30,14 +30,14 @@ static bool operator==(const Record &left, const Record &right) {
 
 static void fromJson(Record *record, const jw::cppJSON &json) {
     memset(record, 0, sizeof(Record));
-    auto name = json.getValueByKeyNoThrow<std::vector<std::string> >("name");
+    auto name = json.GetValueByKeyNoThrow<std::vector<std::string> >("name");
     if (name.size() == 4) {
         for (int i = 0; i < 4; ++i) {
             strncpy(record->name[i], name[i].c_str(), name[i].length());
         }
     }
 
-    auto detail = json.getValueByKeyNoThrow<std::vector<std::unordered_map<std::string, uint64_t> > >("detail");
+    auto detail = json.GetValueByKeyNoThrow<std::vector<std::unordered_map<std::string, uint64_t> > >("detail");
     record->current_index = detail.size();
     for (size_t i = 0; i < record->current_index; ++i) {
         std::unordered_map<std::string, uint64_t> temp = std::move(detail[i]);
@@ -47,8 +47,8 @@ static void fromJson(Record *record, const jw::cppJSON &json) {
         record->detail[i].points_flag = temp["points_flag"];
     }
 
-    record->start_time = json.getValueByKeyNoThrow<time_t>("start_time");
-    record->end_time = json.getValueByKeyNoThrow<time_t>("end_time");
+    record->start_time = json.GetValueByKeyNoThrow<time_t>("start_time");
+    record->end_time = json.GetValueByKeyNoThrow<time_t>("end_time");
 }
 
 static void toJson(const Record &record, jw::cppJSON *json) {

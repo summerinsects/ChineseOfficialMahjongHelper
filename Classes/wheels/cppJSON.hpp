@@ -168,7 +168,7 @@ namespace jw {
         BasicJSON<_Integer, _Float, _Traits, _Alloc>() { reset(); }
         ~BasicJSON<_Integer, _Float, _Traits, _Alloc>() { clear(); }
 
-        ValueType getValueType() const { return _valueType; }
+        ValueType GetValueType() const { return _valueType; }
         const StringType &key() const { return _key; }
 
         inline bool Parse(const char *src) { return ParseWithOpts(src, nullptr, false); }
@@ -595,7 +595,7 @@ namespace jw {
             return ptr != nullptr ? const_iterator(ptr) : end();
         }
 
-        template <class _T, class _String> inline _T getValueByKey(const _String &key) const {
+        template <class _T, class _String> inline _T GetValueByKey(const _String &key) const {
             typedef typename std::conditional<std::is_array<_String>::value,
                 const typename std::remove_extent<_String>::type *,
                 typename std::remove_cv<_String>::type>::type FixedCStringType;
@@ -613,9 +613,9 @@ namespace jw {
             return ptr->as<_T>();
         }
 
-        template <class _T, class _String> inline _T getValueByKeyNoThrow(const _String &key) const {
+        template <class _T, class _String> inline _T GetValueByKeyNoThrow(const _String &key) const {
             try {
-                return getValueByKey<_T, _String>(key);
+                return GetValueByKey<_T, _String>(key);
             }
             catch (...) {
                 return _T();
