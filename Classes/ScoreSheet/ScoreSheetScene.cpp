@@ -237,7 +237,6 @@ bool ScoreSheetScene::init() {
         _detailButton[k]->setPosition(Vec2(gap * 5.5f, y));
         _detailButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1, k));
         _detailButton[k]->setEnabled(false);
-        _detailButton[k]->setVisible(false);
     }
 
     // 从json中读，并恢复界面数据
@@ -270,7 +269,6 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
 
-    _detailButton[handIdx]->setVisible(true);
     _detailButton[handIdx]->setEnabled(true);
 
     bool pointsNameVisible = false;
@@ -392,6 +390,7 @@ void ScoreSheetScene::reset() {
         _recordButton[k]->setVisible(false);
         _recordButton[k]->setEnabled(false);
         _pointNameLabel[k]->setVisible(false);
+        _detailButton[k]->setEnabled(false);
     }
 }
 
