@@ -15,17 +15,18 @@ public:
     const Record::Detail &getDetail() const { return _detail; }
 
 private:
-    cocos2d::ui::EditBox *_editBox;
-    cocos2d::ui::Button *_drawButton;
+    cocos2d::ui::EditBox *_editBox = nullptr;
+    cocos2d::ui::CheckBox *_drawBox = nullptr;
     cocos2d::Label *_nameLabel[4];
-    cocos2d::ui::Button *_winButton[4];
-    cocos2d::ui::Button *_selfDrawnButton[4];
-    cocos2d::ui::Button *_claimButton[4];
-    cocos2d::ui::Button *_falseWinButton[4];
+    cocos2d::ui::RadioButtonGroup *_winGroup = nullptr;
+    cocos2d::ui::RadioButtonGroup *_claimGroup = nullptr;
+    cocos2d::Label *_byDiscardLabel[4];
+    cocos2d::Label *_selfDrawnLabel[4];
+    cocos2d::ui::CheckBox *_falseWinBox[4];
     cocos2d::Label *_scoreLabel[4];
-    cocos2d::ui::Button *_okButton;
+    cocos2d::ui::Button *_okButton = nullptr;
 
-    int _winIndex;
+    int _winIndex = -1;
     Record::Detail _detail;
     std::function<void (const Record::Detail &)> _okCallback;
 
@@ -34,11 +35,10 @@ private:
 
     void onMinusButton(cocos2d::Ref *sender);
     void onPlusButton(cocos2d::Ref *sender);
-    void onDrawButton(cocos2d::Ref *sender);
-    void onWinButton(cocos2d::Ref *sender, int index);
-    void onSelfDrawnButton(cocos2d::Ref *sender, int index);
-    void onClaimButton(cocos2d::Ref *sender, int index);
-    void onFalseWinButton(cocos2d::Ref *sender, int index);
+    void onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
+    void onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
+    void onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
+    void onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
     void onPointsNameButton(cocos2d::Ref *sender, int index);
     void onOkButton(cocos2d::Ref *sender);

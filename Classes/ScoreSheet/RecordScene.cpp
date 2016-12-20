@@ -57,17 +57,28 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     plusButton->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1));
 
     // 荒庄
-    _drawButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    this->addChild(_drawButton);
-    _drawButton->setScale9Enabled(true);
-    _drawButton->setContentSize(Size(20.0f, 20.0f));
-    _drawButton->setPosition(Vec2(origin.x + visibleSize.width - 60.0f, origin.y + visibleSize.height - 50));
-    _drawButton->addClickEventListener(std::bind(&RecordScene::onDrawButton, this, std::placeholders::_1));
+    _drawBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    this->addChild(_drawBox);
+    _drawBox->setZoomScale(0.0f);
+    _drawBox->ignoreContentAdaptWithSize(false);
+    _drawBox->setContentSize(Size(20.0f, 20.0f));
+    _drawBox->setPosition(Vec2(origin.x + visibleSize.width - 60.0f, origin.y + visibleSize.height - 50));
+    _drawBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("荒庄", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + visibleSize.width - 45.0f, origin.y + visibleSize.height - 50));
+
+    _winGroup = ui::RadioButtonGroup::create();
+    _winGroup->setAllowedNoSelection(true);
+    this->addChild(_winGroup);
+    _winGroup->addEventListener(std::bind(&RecordScene::onWinGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+    _claimGroup = ui::RadioButtonGroup::create();
+    _claimGroup->setAllowedNoSelection(true);
+    this->addChild(_claimGroup);
+    _claimGroup->addEventListener(std::bind(&RecordScene::onClaimGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
@@ -86,72 +97,69 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 105));
 
         // 和
-        _winButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
-        this->addChild(_winButton[i]);
-        _winButton[i]->setScale9Enabled(true);
-        _winButton[i]->setContentSize(Size(20.0f, 20.0f));
-        _winButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 130));
-        setButtonUnchecked(_winButton[i]);
-        _winButton[i]->addClickEventListener(std::bind(&RecordScene::onWinButton, this, std::placeholders::_1, i));
+        ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
+            "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        this->addChild(button);
+        button->setZoomScale(0.0f);
+        button->ignoreContentAdaptWithSize(false);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 130));
+        _winGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("和", "Arial", 12);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 130));
 
-        // 自摸
-        _selfDrawnButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
-        this->addChild(_selfDrawnButton[i]);
-        _selfDrawnButton[i]->setScale9Enabled(true);
-        _selfDrawnButton[i]->setContentSize(Size(20.0f, 20.0f));
-        _selfDrawnButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 160));
-        setButtonUnchecked(_selfDrawnButton[i]);
-        _selfDrawnButton[i]->addClickEventListener(std::bind(&RecordScene::onSelfDrawnButton, this, std::placeholders::_1, i));
+        // 点炮或自摸
+        button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
+            "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        this->addChild(button);
+        button->setZoomScale(0.0f);
+        button->ignoreContentAdaptWithSize(false);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 160));
+        _claimGroup->addRadioButton(button);
+
+        label = Label::createWithSystemFont("点炮", "Arial", 12);
+        this->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 160));
+        _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 160));
-
-        // 点炮
-        _claimButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
-        this->addChild(_claimButton[i]);
-        _claimButton[i]->setScale9Enabled(true);
-        _claimButton[i]->setContentSize(Size(20.0f, 20.0f));
-        _claimButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 190));
-        setButtonUnchecked(_claimButton[i]);
-        _claimButton[i]->addClickEventListener(std::bind(&RecordScene::onClaimButton, this, std::placeholders::_1, i));
-
-        label = Label::createWithSystemFont("点炮", "Arial", 12);
-        this->addChild(label);
-        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 190));
+        _selfDrawnLabel[i] = label;
+        label->setVisible(false);
 
         // 错和
-        _falseWinButton[i] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
-        this->addChild(_falseWinButton[i]);
-        _falseWinButton[i]->setScale9Enabled(true);
-        _falseWinButton[i]->setContentSize(Size(20.0f, 20.0f));
-        _falseWinButton[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 220));
-        setButtonUnchecked(_falseWinButton[i]);
-        _falseWinButton[i]->addClickEventListener(std::bind(&RecordScene::onFalseWinButton, this, std::placeholders::_1, i));
+        _falseWinBox[i] = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
+            "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        this->addChild(_falseWinBox[i]);
+        _falseWinBox[i]->setZoomScale(0.0f);
+        _falseWinBox[i]->ignoreContentAdaptWithSize(false);
+        _falseWinBox[i]->setContentSize(Size(20.0f, 20.0f));
+        _falseWinBox[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 190));
+        _falseWinBox[i]->addEventListener(std::bind(&RecordScene::onFalseWinBox, this, std::placeholders::_1, std::placeholders::_2));
 
         label = Label::createWithSystemFont("错和", "Arial", 12);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 220));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 190));
     }
 
     // 说明
     label = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 250));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 220));
 
     label = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。", "Arial", 10);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 270));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 240));
 
     // ScrollView内部结点
     ui::Widget *innerNode = ui::Widget::create();
@@ -210,10 +218,10 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     ui::ScrollView *scrollView = ui::ScrollView::create();
     scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
     scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
-    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 330));
+    scrollView->setContentSize(Size(visibleSize.width, visibleSize.height - 300));
     scrollView->setInnerContainerSize(innerNode->getContentSize());
     scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 125.0f));
+    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 110.0f));
     this->addChild(scrollView);
 
     scrollView->addChild(innerNode);
@@ -244,61 +252,24 @@ void RecordScene::refresh() {
         snprintf(str, sizeof(str), "%d", _detail.score);
         _editBox->setText(str);
     }
+    else if (_detail.score == 0) {
+        _drawBox->setSelected(true);
+        onDrawBox(_drawBox, ui::CheckBox::EventType::SELECTED);
+    }
 
     _winIndex = (wc & 0x80) ? 3 : (wc & 0x40) ? 2 : (wc & 0x20) ? 1 : (wc & 0x10) ? 0 : -1;
     if (_winIndex != -1) {  // 有人和牌
         int claimIndex = (wc & 0x8) ? 3 : (wc & 0x4) ? 2 : (wc & 0x2) ? 1 : (wc & 0x1) ? 0 : -1;  // 点炮者
-        for (int i = 0; i < 4; ++i) {
-            if (i != _winIndex) {
-                setButtonUnchecked(_winButton[i]);
-            }
-            else {
-                setButtonChecked(_winButton[i]);
-            }
-        }
-
-        if (_winIndex == claimIndex) {  // 自摸
-            for (int i = 0; i < 4; ++i) {
-                if (i != _winIndex) {
-                    setButtonUnchecked(_selfDrawnButton[i]);
-                    _selfDrawnButton[i]->setEnabled(false);
-                }
-                else {
-                    _selfDrawnButton[i]->setEnabled(true);
-                    setButtonChecked(_selfDrawnButton[i]);
-                }
-                setButtonUnchecked(_claimButton[i]);
-                _claimButton[i]->setEnabled(false);
-            }
-        }
-        else {  // 点炮
-            for (int i = 0; i < 4; ++i) {
-                if (i != _winIndex) {
-                    _claimButton[i]->setEnabled(true);
-                    if (i != claimIndex) {
-                        setButtonUnchecked(_claimButton[i]);
-                    }
-                    else {
-                        setButtonChecked(_claimButton[i]);
-                    }
-                }
-                else {
-                    setButtonUnchecked(_claimButton[i]);
-                    _claimButton[i]->setEnabled(false);
-                }
-            }
+        _winGroup->setSelectedButton(_winIndex);
+        if (claimIndex != -1) {
+            _claimGroup->setSelectedButton(claimIndex);
         }
     }
 
     // 错和
     if (_detail.false_win != 0) {
         for (int i = 0; i < 4; ++i) {
-            if (_detail.false_win & (1 << i)) {
-                setButtonChecked(_falseWinButton[i]);
-            }
-            else {
-                setButtonUnchecked(_falseWinButton[i]);
-            }
+            _falseWinBox[i]->setSelected(!!(_detail.false_win & (1 << i)));
         }
     }
 
@@ -311,17 +282,7 @@ void RecordScene::updateScoreLabel() {
     if (_winIndex != -1) {  // 有人和牌
         int winScore = atoi(_editBox->getText());  // 获取输入框里所填番数
         _detail.score = std::max(8, winScore);
-        if (isButtonChecked(_selfDrawnButton[_winIndex])) {  // 勾选了自摸
-            claimIndex = _winIndex;
-        }
-        else {
-            for (int i = 0; i < 4; ++i) {
-                if (i != _winIndex && isButtonChecked(_claimButton[i])) {  // 勾选了点炮
-                    claimIndex = i;
-                    break;
-                }
-            }
-        }
+        claimIndex = _claimGroup->getSelectedButtonIndex();
 
         // 记录和牌和点炮
         _detail.win_claim = (1 << (_winIndex + 4));
@@ -336,7 +297,7 @@ void RecordScene::updateScoreLabel() {
     // 检查是否有错和
     _detail.false_win = 0;
     for (int i = 0; i < 4; ++i) {
-        if (isButtonChecked(_falseWinButton[i])) {
+        if (_falseWinBox[i]->isSelected()) {
             _detail.false_win |= (1 << i);
         }
     }
@@ -360,11 +321,11 @@ void RecordScene::updateScoreLabel() {
 
     // 四位选手的总分加起来和为0
     if (scoreTable[0] + scoreTable[1] + scoreTable[2] + scoreTable[3] == 0) {
-        if (isButtonChecked(_drawButton)) {  // 荒庄
+        if (_drawBox->isSelected()) {  // 荒庄
             _okButton->setEnabled(true);
         }
         else {
-            _okButton->setEnabled(std::any_of(std::begin(_winButton), std::end(_winButton), &isButtonChecked));
+            _okButton->setEnabled(_winGroup->getSelectedButtonIndex() != -1);
         }
     }
     else {
@@ -389,110 +350,61 @@ void RecordScene::onPlusButton(cocos2d::Ref *sender) {
     updateScoreLabel();
 }
 
-void RecordScene::onDrawButton(cocos2d::Ref *sender) {
-    // 荒庄
-    _winIndex = -1;
-    if (isButtonChecked(_drawButton)) {
-        setButtonUnchecked(_drawButton);
-        // 启用所有人的和、自摸、点炮
+void RecordScene::onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+    if (event == ui::CheckBox::EventType::SELECTED) {
+        _winIndex = -1;
+        // 禁用所有人的和、自摸/点炮，启用错和
         for (int i = 0; i < 4; ++i) {
-            _winButton[i]->setEnabled(true);
-            _selfDrawnButton[i]->setEnabled(true);
-            _claimButton[i]->setEnabled(true);
+            ui::RadioButton *button = _winGroup->getRadioButtonByIndex(i);
+            button->setEnabled(false);
+            button = _claimGroup->getRadioButtonByIndex(i);
+            button->setEnabled(false);
+            _falseWinBox[i]->setEnabled(true);
         }
+
     }
     else {
-        setButtonChecked(_drawButton);
-        // 禁用所有人的和、自摸、点炮
+        _winIndex = _winGroup->getSelectedButtonIndex();
+        // 启用所有人的和、自摸/点炮、错和
         for (int i = 0; i < 4; ++i) {
-            setButtonUnchecked(_winButton[i]);
-            _winButton[i]->setEnabled(false);
-            setButtonUnchecked(_selfDrawnButton[i]);
-            _selfDrawnButton[i]->setEnabled(false);
-            setButtonUnchecked(_claimButton[i]);
-            _claimButton[i]->setEnabled(false);
+            ui::RadioButton *button = _winGroup->getRadioButtonByIndex(i);
+            button->setEnabled(true);
+            button = _claimGroup->getRadioButtonByIndex(i);
+            button->setEnabled(true);
+            _falseWinBox[i]->setEnabled(i != _winIndex);
         }
+
     }
     updateScoreLabel();
 }
 
-void RecordScene::onWinButton(cocos2d::Ref *sender, int index) {
-    setButtonChecked(_winButton[index]);
-    if (_winIndex == index) return;
-
+void RecordScene::onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
     _winIndex = index;
     for (int i = 0; i < 4; ++i) {
         if (i == index) {
-            // 和的选手，启用自摸，禁用点炮、错和
-            setButtonChecked(_winButton[i]);
-            setButtonUnchecked(_selfDrawnButton[i]);
-            _selfDrawnButton[i]->setEnabled(true);
-            setButtonUnchecked(_claimButton[i]);
-            _claimButton[i]->setEnabled(false);
-            setButtonUnchecked(_falseWinButton[i]);
-            _falseWinButton[i]->setEnabled(false);
+            // 和的选手，显示自摸，禁用错和
+            _byDiscardLabel[i]->setVisible(false);
+            _selfDrawnLabel[i]->setVisible(true);
+            _falseWinBox[i]->setSelected(false);
+            _falseWinBox[i]->setEnabled(false);
         }
         else {
-            // 没和的选手，禁用和、自摸，启用点炮、错和
-            setButtonUnchecked(_winButton[i]);
-            setButtonUnchecked(_selfDrawnButton[i]);
-            _selfDrawnButton[i]->setEnabled(false);
-            setButtonUnchecked(_claimButton[i]);
-            _claimButton[i]->setEnabled(true);
-            setButtonUnchecked(_falseWinButton[i]);
-            _falseWinButton[i]->setEnabled(true);
+            // 未和的选手，显示点炮，启用错和
+            _byDiscardLabel[i]->setVisible(true);
+            _selfDrawnLabel[i]->setVisible(false);
+            _falseWinBox[i]->setSelected(false);
+            _falseWinBox[i]->setEnabled(true);
         }
     }
     updateScoreLabel();
 }
 
-void RecordScene::onSelfDrawnButton(cocos2d::Ref *sender, int index) {
+void RecordScene::onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
     if (_winIndex == -1) return;
-
-    if (isButtonChecked(_selfDrawnButton[index])) {  // 取消自摸
-        setButtonUnchecked(_selfDrawnButton[index]);
-        // 启用其他三位选手的点炮
-        for (int i = 0; i < 4; ++i) {
-            _claimButton[i]->setEnabled(index != i);
-        }
-    }
-    else {  // 选中自摸
-        setButtonChecked(_selfDrawnButton[index]);
-        // 禁用所有人的点炮
-        for (int i = 0; i < 4; ++i) {
-            setButtonUnchecked(_claimButton[i]);
-            _claimButton[i]->setEnabled(false);
-        }
-    }
     updateScoreLabel();
 }
 
-void RecordScene::onClaimButton(cocos2d::Ref *sender, int index) {
-    if (_winIndex == -1) return;
-
-    if (isButtonChecked(_claimButton[index])) {  // 取消点炮
-        // 启用其他三位选手的点炮
-        for (int i = 0; i < 4; ++i) {
-            _claimButton[i]->setEnabled(_winIndex != i);
-        }
-        setButtonUnchecked(_claimButton[index]);
-    }
-    else {  // 点炮
-        for (int i = 0; i < 4; ++i) {
-            _claimButton[i]->setEnabled(index == i);
-        }
-        setButtonChecked(_claimButton[index]);
-    }
-    updateScoreLabel();
-}
-
-void RecordScene::onFalseWinButton(cocos2d::Ref *sender, int index) {
-    if (isButtonChecked(_falseWinButton[index])) {
-        setButtonUnchecked(_falseWinButton[index]);
-    }
-    else {
-        setButtonChecked(_falseWinButton[index]);
-    }
+void RecordScene::onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     updateScoreLabel();
 }
 
@@ -540,7 +452,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
 }
 
 void RecordScene::onOkButton(cocos2d::Ref *sender) {
-    if (isButtonChecked(_drawButton) && _detail.points_flag != 0) {
+    if (_drawBox->isSelected() && _detail.points_flag != 0) {
         AlertLayer::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", [this]() {
             _detail.points_flag = 0;
             _okCallback(_detail);
