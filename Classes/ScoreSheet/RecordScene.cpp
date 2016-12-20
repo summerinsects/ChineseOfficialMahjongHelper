@@ -5,7 +5,7 @@
 
 USING_NS_CC;
 
-Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const Record::Detail &detail, const std::function<void (const Record::Detail &)> &okCallback) {
+Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback) {
     auto scene = Scene::create();
     auto layer = new (std::nothrow) RecordScene();
     layer->initWithIndex(handIdx, playerNames, detail);
@@ -16,13 +16,18 @@ Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const 
     return scene;
 }
 
-bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail &detail) {
+bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail) {
     if (!BaseLayer::initWithTitle(handNameText[handIdx])) {
         return false;
     }
 
     _winIndex = -1;
-    memcpy(&_detail, &detail, sizeof(_detail));
+    if (detail != nullptr) {
+        memcpy(&_detail, detail, sizeof(_detail));
+    }
+    else {
+        memset(&_detail, 0, sizeof(_detail));
+    }
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -237,7 +242,9 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     _okButton->addClickEventListener(std::bind(&RecordScene::onOkButton, this, std::placeholders::_1));
     _okButton->setEnabled(false);
 
-    refresh();
+    if (detail != nullptr) {
+        refresh();
+    }
     return true;
 }
 
@@ -251,10 +258,6 @@ void RecordScene::refresh() {
         char str[32];
         snprintf(str, sizeof(str), "%d", _detail.score);
         _editBox->setText(str);
-    }
-    else if (_detail.score == 0) {
-        _drawBox->setSelected(true);
-        onDrawBox(_drawBox, ui::CheckBox::EventType::SELECTED);
     }
 
     _winIndex = (wc & 0x80) ? 3 : (wc & 0x40) ? 2 : (wc & 0x20) ? 1 : (wc & 0x10) ? 0 : -1;
@@ -273,7 +276,13 @@ void RecordScene::refresh() {
         }
     }
 
-    updateScoreLabel();
+    if (_detail.score == 0) {
+        _drawBox->setSelected(true);
+        onDrawBox(_drawBox, ui::CheckBox::EventType::SELECTED);
+    }
+    else {
+        updateScoreLabel();
+    }
 }
 
 void RecordScene::updateScoreLabel() {

@@ -6,9 +6,9 @@
 
 class RecordScene : public BaseLayer, public cocos2d::ui::EditBoxDelegate {
 public:
-    static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const Record::Detail &detail, const std::function<void (const Record::Detail &)> &okCallback);
+    static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback);
 
-    bool initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail &detail);
+    bool initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail);
 
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
 

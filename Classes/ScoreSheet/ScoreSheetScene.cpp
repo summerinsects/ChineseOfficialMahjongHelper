@@ -425,12 +425,12 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
-    modifyRecord(handIdx);
+    editRecord(handIdx, false);
 }
 
-void ScoreSheetScene::modifyRecord(size_t handIdx) {
+void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
     const char *name[] = { g_currentRecord.name[0], g_currentRecord.name[1], g_currentRecord.name[2], g_currentRecord.name[3] };
-    Director::getInstance()->pushScene(RecordScene::createScene(handIdx, name, g_currentRecord.detail[handIdx],
+    auto scene = RecordScene::createScene(handIdx, name, modify ? &g_currentRecord.detail[handIdx] : nullptr,
         [this, handIdx](const Record::Detail &detail) {
         bool isModify = (handIdx != g_currentRecord.current_index);
 
@@ -470,7 +470,8 @@ void ScoreSheetScene::modifyRecord(size_t handIdx) {
             }
         }
         writeToJson();
-    }));
+    });
+    Director::getInstance()->pushScene(scene);
 }
 
 void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
@@ -538,7 +539,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     str = handNameText[handIdx];
     str.append("详情");
     AlertLayer::showWithMessage(str, message,
-        std::bind(&ScoreSheetScene::modifyRecord, this, handIdx), nullptr);
+        std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
 }
 
 void ScoreSheetScene::onTimeScheduler(float dt) {
