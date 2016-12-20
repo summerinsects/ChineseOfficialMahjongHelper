@@ -191,17 +191,17 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
             button->setTitleText(mahjong::points_name[idx]);
-            setButtonUnchecked(button);
             button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1, idx));
-
             button->setPosition(Vec2(gap * (col + 0.5f), y - 12.0f));
 
-            if (_detail.points_flag & (1ULL << idx)) {
-                setButtonChecked(button);
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+            if (idx > mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+                --idx;
             }
-            else {
-                setButtonUnchecked(button);
-            }
+#endif
+            bool selected = !!(_detail.points_flag & (1ULL << idx));
+            button->setHighlighted(selected);
+            button->setUserData((void *)selected);
         }
         y -= 24.0f;
     }
@@ -504,12 +504,15 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
 #endif
     // 标记/取消标记番种
     ui::Button *button = (ui::Button *)sender;
-    if (isButtonChecked(button)) {
-        setButtonUnchecked(button);
+    bool selected = !!button->getUserData();
+    if (selected) {
+        button->setHighlighted(false);
+        button->setUserData((void *)false);
         _detail.points_flag &= ~(1ULL << index);
     }
     else {
-        setButtonChecked(button);
+        button->setHighlighted(true);
+        button->setUserData((void *)true);
         _detail.points_flag |= 1ULL << index;
     }
 
