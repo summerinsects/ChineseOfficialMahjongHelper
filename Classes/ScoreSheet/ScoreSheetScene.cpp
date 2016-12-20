@@ -566,7 +566,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         std::bind(&ScoreSheetScene::reset, this), nullptr);
 }
 
-static void showPursuitWithDelta(int delta) {
+static void showPursuit(int delta) {
     std::string msg;
     msg.reserve(128);
     if (delta == 0) {
@@ -644,7 +644,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
             rootWidget->addChild(button);
             button->setPosition(Vec2(75.0f, 170.0f - i * 25.0f));
             button->addClickEventListener([delta](Ref *) {
-                showPursuitWithDelta(delta);
+                showPursuit(delta);
             });
         }
     }
@@ -669,14 +669,20 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     // EditBox的代理
     std::shared_ptr<cw::EditBoxDelegate> delegate = std::make_shared<cw::EditBoxDelegate>(
         [](ui::EditBox *editBox) {
-        int delta = atoi(editBox->getText());
-        showPursuitWithDelta(delta);
+        const char *text = editBox->getText();
+        if (*text != '\0') {
+            int delta = atoi(text);
+            showPursuit(delta);
+        }
     });
     editBox->setDelegate(delegate.get());
 
     // 使这个代理随AlertLayer一起析构
     AlertLayer::showWithNode("追分计算", rootWidget, [editBox, delegate]() {
-        int delta = atoi(editBox->getText());
-        showPursuitWithDelta(delta);
+        const char *text = editBox->getText();
+        if (*text != '\0') {
+            int delta = atoi(text);
+            showPursuit(delta);
+        }
     }, nullptr);
 }
