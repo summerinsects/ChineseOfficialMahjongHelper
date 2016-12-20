@@ -1,5 +1,4 @@
 ﻿#include "PointsCalculatorScene.h"
-#include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
 #include "../widget/TilePickWidget.h"
@@ -55,15 +54,20 @@ bool PointsCalculatorScene::init() {
     this->addChild(_pointsAreaNode);
     _pointsAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + y * 0.5f - 70));
 
+    // 点和与自摸互斥
+    _winTypeGroup = ui::RadioButtonGroup::create();
+    infoWidget->addChild(_winTypeGroup);
+    _winTypeGroup->addEventListener(std::bind(&PointsCalculatorScene::onWinTypeGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
     // 点和
     float gapX = (visibleSize.width - 8) * 0.25f;
-    _byDiscardButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    infoWidget->addChild(_byDiscardButton);
-    _byDiscardButton->setScale9Enabled(true);
-    _byDiscardButton->setContentSize(Size(20.0f, 20.0f));
-    _byDiscardButton->setPosition(Vec2(20.0f, 105.0f));
-    setButtonChecked(_byDiscardButton);
-    _byDiscardButton->addClickEventListener(std::bind(&PointsCalculatorScene::onByDiscardButton, this, std::placeholders::_1));
+    ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    infoWidget->addChild(radioButton);
+    radioButton->setZoomScale(0.0f);
+    radioButton->ignoreContentAdaptWithSize(false);
+    radioButton->setContentSize(Size(20.0f, 20.0f));
+    radioButton->setPosition(Vec2(20.0f, 105.0f));
+    _winTypeGroup->addRadioButton(radioButton);
 
     Label *byDiscardLabel = Label::createWithSystemFont("点和", "Arial", 12);
     infoWidget->addChild(byDiscardLabel);
@@ -71,13 +75,13 @@ bool PointsCalculatorScene::init() {
     byDiscardLabel->setPosition(Vec2(35.0f, 105.0f));
 
     // 自摸
-    _selfDrawnButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    infoWidget->addChild(_selfDrawnButton);
-    _selfDrawnButton->setScale9Enabled(true);
-    _selfDrawnButton->setContentSize(Size(20.0f, 20.0f));
-    _selfDrawnButton->setPosition(Vec2(20.0f + gapX, 105.0f));
-    setButtonUnchecked(_selfDrawnButton);
-    _selfDrawnButton->addClickEventListener(std::bind(&PointsCalculatorScene::onSelfDrawnButton, this, std::placeholders::_1));
+    radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    infoWidget->addChild(radioButton);
+    radioButton->setZoomScale(0.0f);
+    radioButton->ignoreContentAdaptWithSize(false);
+    radioButton->setContentSize(Size(20.0f, 20.0f));
+    radioButton->setPosition(Vec2(20.0f + gapX, 105.0f));
+    _winTypeGroup->addRadioButton(radioButton);
 
     Label *selfDrawnLabel = Label::createWithSystemFont("自摸", "Arial", 12);
     infoWidget->addChild(selfDrawnLabel);
@@ -85,14 +89,14 @@ bool PointsCalculatorScene::init() {
     selfDrawnLabel->setPosition(Vec2(35.0f + gapX, 105.0f));
 
     // 绝张
-    _fourthTileButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
-    infoWidget->addChild(_fourthTileButton);
-    _fourthTileButton->setScale9Enabled(true);
-    _fourthTileButton->setContentSize(Size(20.0f, 20.0f));
-    _fourthTileButton->setPosition(Vec2(20.0f + gapX * 2, 105.0f));
-    setButtonUnchecked(_fourthTileButton);
-    _fourthTileButton->setEnabled(false);
-    _fourthTileButton->addClickEventListener(std::bind(&PointsCalculatorScene::onFourthTileButton, this, std::placeholders::_1));
+    _fourthTileBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+    infoWidget->addChild(_fourthTileBox);
+    _fourthTileBox->setZoomScale(0.0f);
+    _fourthTileBox->ignoreContentAdaptWithSize(false);
+    _fourthTileBox->setContentSize(Size(20.0f, 20.0f));
+    _fourthTileBox->setPosition(Vec2(20.0f + gapX * 2, 105.0f));
+    _fourthTileBox->setEnabled(false);
+    _fourthTileBox->addEventListener(std::bind(&PointsCalculatorScene::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
     Label *fourthTileLabel = Label::createWithSystemFont("绝张", "Arial", 12);
     infoWidget->addChild(fourthTileLabel);
@@ -100,14 +104,14 @@ bool PointsCalculatorScene::init() {
     fourthTileLabel->setPosition(Vec2(35.0f + gapX * 2, 105.0f));
 
     // 杠开
-    _replacementButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
-    infoWidget->addChild(_replacementButton);
-    _replacementButton->setScale9Enabled(true);
-    _replacementButton->setContentSize(Size(20.0f, 20.0f));
-    _replacementButton->setPosition(Vec2(20.0f, 75.0f));
-    setButtonUnchecked(_replacementButton);
-    _replacementButton->setEnabled(false);
-    _replacementButton->addClickEventListener(std::bind(&PointsCalculatorScene::onReplacementButton, this, std::placeholders::_1));
+    _replacementBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+    infoWidget->addChild(_replacementBox);
+    _replacementBox->setZoomScale(0.0f);
+    _replacementBox->ignoreContentAdaptWithSize(false);
+    _replacementBox->setContentSize(Size(20.0f, 20.0f));
+    _replacementBox->setPosition(Vec2(20.0f, 75.0f));
+    _replacementBox->setEnabled(false);
+    _replacementBox->addEventListener(std::bind(&PointsCalculatorScene::onReplacementBox, this, std::placeholders::_1, std::placeholders::_2));
 
     Label *replacementLabel = Label::createWithSystemFont("杠开", "Arial", 12);
     infoWidget->addChild(replacementLabel);
@@ -115,14 +119,14 @@ bool PointsCalculatorScene::init() {
     replacementLabel->setPosition(Vec2(35.0f, 75.0f));
 
     // 抢杠
-    _robKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
-    infoWidget->addChild(_robKongButton);
-    _robKongButton->setScale9Enabled(true);
-    _robKongButton->setContentSize(Size(20.0f, 20.0f));
-    _robKongButton->setPosition(Vec2(20.0f + gapX, 75.0f));
-    setButtonUnchecked(_robKongButton);
-    _robKongButton->setEnabled(false);
-    _robKongButton->addClickEventListener(std::bind(&PointsCalculatorScene::onRobKongButton, this, std::placeholders::_1));
+    _robKongBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+    infoWidget->addChild(_robKongBox);
+    _robKongBox->setZoomScale(0.0f);
+    _robKongBox->ignoreContentAdaptWithSize(false);
+    _robKongBox->setContentSize(Size(20.0f, 20.0f));
+    _robKongBox->setPosition(Vec2(20.0f + gapX, 75.0f));
+    _robKongBox->setEnabled(false);
+    _robKongBox->addEventListener(std::bind(&PointsCalculatorScene::onRobKongBox, this, std::placeholders::_1, std::placeholders::_2));
 
     Label *robKongLabel = Label::createWithSystemFont("抢杠", "Arial", 12);
     infoWidget->addChild(robKongLabel);
@@ -130,13 +134,13 @@ bool PointsCalculatorScene::init() {
     robKongLabel->setPosition(Vec2(35.0f + gapX, 75.0f));
 
     // 海底
-    _lastTileButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
-    infoWidget->addChild(_lastTileButton);
-    _lastTileButton->setScale9Enabled(true);
-    _lastTileButton->setContentSize(Size(20.0f, 20.0f));
-    _lastTileButton->setPosition(Vec2(20.0f + gapX * 2, 75.0f));
-    setButtonUnchecked(_lastTileButton);
-    _lastTileButton->addClickEventListener(std::bind(&PointsCalculatorScene::onLastTileButton, this, std::placeholders::_1));
+    _lastTileBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+    infoWidget->addChild(_lastTileBox);
+    _lastTileBox->setZoomScale(0.0f);
+    _lastTileBox->ignoreContentAdaptWithSize(false);
+    _lastTileBox->setContentSize(Size(20.0f, 20.0f));
+    _lastTileBox->setPosition(Vec2(20.0f + gapX * 2, 75.0f));
+    _lastTileBox->addEventListener(std::bind(&PointsCalculatorScene::onLastTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
     Label *lastTileDrawnLabel = Label::createWithSystemFont("海底", "Arial", 12);
     infoWidget->addChild(lastTileDrawnLabel);
@@ -150,44 +154,46 @@ bool PointsCalculatorScene::init() {
     infoWidget->addChild(prevalentWindLabel);
     prevalentWindLabel->setPosition(Vec2(20.0f, 45.0f));
 
+    _prevalentWindGroup = ui::RadioButtonGroup::create();
+    infoWidget->addChild(_prevalentWindGroup);
+
     for (int i = 0; i < 4; ++i) {
-        _prevalentButton[i] = ui::Button::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png");
-        infoWidget->addChild(_prevalentButton[i]);
-        _prevalentButton[i]->setScale9Enabled(true);
-        _prevalentButton[i]->setContentSize(Size(20.0f, 20.0f));
-        _prevalentButton[i]->setTitleColor(Color3B::BLACK);
-        _prevalentButton[i]->setTitleFontSize(12);
-        _prevalentButton[i]->setTitleText(windName[i]);
-        _prevalentButton[i]->setPosition(Vec2(50.0f + i * 30, 45.0f));
-        _prevalentButton[i]->addClickEventListener([this, i](Ref *) {
-            for (int n = 0; n < 4; ++n) {
-                _prevalentButton[n]->setEnabled(n != i);
-            }
-        });
+        ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        button->setZoomScale(0.0f);
+        button->ignoreContentAdaptWithSize(false);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setPosition(Vec2(50.0f + i * 30, 45.0f));
+        infoWidget->addChild(button);
+        _prevalentWindGroup->addRadioButton(button);
+
+        Label *label = Label::createWithSystemFont(windName[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        button->addChild(label);
+        label->setPosition(Vec2(10.0f, 10.0f));
     }
-    _prevalentButton[0]->setEnabled(false);
 
     // 门风
     Label *seatWindLabel = Label::createWithSystemFont("门风", "Arial", 12);
     infoWidget->addChild(seatWindLabel);
     seatWindLabel->setPosition(Vec2(20.0f, 15.0f));
 
+    _seatWindGroup = ui::RadioButtonGroup::create();
+    infoWidget->addChild(_seatWindGroup);
+
     for (int i = 0; i < 4; ++i) {
-        _seatButton[i] = ui::Button::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png");
-        infoWidget->addChild(_seatButton[i]);
-        _seatButton[i]->setScale9Enabled(true);
-        _seatButton[i]->setContentSize(Size(20.0f, 20.0f));
-        _seatButton[i]->setTitleColor(Color3B::BLACK);
-        _seatButton[i]->setTitleFontSize(12);
-        _seatButton[i]->setTitleText(windName[i]);
-        _seatButton[i]->setPosition(Vec2(50.0f + i * 30, 15.0f));
-        _seatButton[i]->addClickEventListener([this, i](Ref *) {
-            for (int n = 0; n < 4; ++n) {
-                _seatButton[n]->setEnabled(n != i);
-            }
-        });
+        ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        button->setZoomScale(0.0f);
+        button->ignoreContentAdaptWithSize(false);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setPosition(Vec2(50.0f + i * 30, 15.0f));
+        infoWidget->addChild(button);
+        _seatWindGroup->addRadioButton(button);
+
+        Label *label = Label::createWithSystemFont(windName[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        button->addChild(label);
+        label->setPosition(Vec2(10.0f, 10.0f));
     }
-    _seatButton[0]->setEnabled(false);
 
     // 花牌数
     Label *flowerLabel = Label::createWithSystemFont("花牌数", "Arial", 12);
@@ -218,96 +224,59 @@ bool PointsCalculatorScene::init() {
     return true;
 }
 
-void PointsCalculatorScene::onByDiscardButton(cocos2d::Ref *sender) {
-    // 点和与自摸、杠开互斥
-    if (!isButtonChecked(_byDiscardButton)) {
-        setButtonChecked(_byDiscardButton);
-        setButtonUnchecked(_selfDrawnButton);
-
-        setButtonUnchecked(_replacementButton);
-        _replacementButton->setEnabled(false);
-
-        setButtonUnchecked(_fourthTileButton);
-        _fourthTileButton->setEnabled(_maybeFourthTile);
-
-        setButtonUnchecked(_robKongButton);
-        _robKongButton->setEnabled(_maybeRobKong && !isButtonChecked(_lastTileButton));
+void PointsCalculatorScene::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
+    if (index == 0) {  // 点和
+        _fourthTileBox->setEnabled(_maybeFourthTile && !_robKongBox->isSelected());
+        _replacementBox->setEnabled(false);
+        _robKongBox->setEnabled(_maybeRobKong && !_fourthTileBox->isSelected() && !_lastTileBox->isSelected());
+        _lastTileBox->setEnabled(!_robKongBox->isSelected());
     }
-    else {
-        setButtonChecked(_byDiscardButton);
+    else {  // 自摸
+        _fourthTileBox->setEnabled(_maybeFourthTile);
+        _replacementBox->setEnabled(_hasKong);
+        _robKongBox->setEnabled(false);
+        _lastTileBox->setEnabled(true);
     }
 }
 
-void PointsCalculatorScene::onSelfDrawnButton(cocos2d::Ref *sender) {
-    // 自摸与点和、抢杠互斥
-    if (!isButtonChecked(_selfDrawnButton)) {
-        setButtonChecked(_selfDrawnButton);
-        setButtonUnchecked(_byDiscardButton);
-
-        setButtonUnchecked(_robKongButton);
-        _robKongButton->setEnabled(false);
-
-        setButtonUnchecked(_replacementButton);
-        _replacementButton->setEnabled(_hasKong);
-
-        _lastTileButton->setEnabled(true);
-        setButtonUnchecked(_lastTileButton);
-    }
-    else {
-        setButtonChecked(_selfDrawnButton);
-    }
-}
-
-void PointsCalculatorScene::onFourthTileButton(cocos2d::Ref *sender) {
+void PointsCalculatorScene::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 绝张与抢杠互斥
-    if (isButtonChecked(_fourthTileButton)) {
-        setButtonUnchecked(_fourthTileButton);
-        setButtonUnchecked(_robKongButton);
-        _robKongButton->setEnabled(_maybeRobKong
-            && isButtonChecked(_byDiscardButton) && !isButtonChecked(_lastTileButton));
+    if (event == ui::CheckBox::EventType::SELECTED) {
+        _robKongBox->setEnabled(false);
     }
     else {
-        setButtonChecked(_fourthTileButton);
-        setButtonUnchecked(_robKongButton);
-        _robKongButton->setEnabled(false);
+        _robKongBox->setEnabled(_maybeRobKong
+            && _winTypeGroup->getSelectedButtonIndex() == 0
+            && !_lastTileBox->isSelected());
     }
 }
 
-void PointsCalculatorScene::onRobKongButton(cocos2d::Ref *sender) {
+void PointsCalculatorScene::onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 抢杠与绝张、海底互斥
-    if (isButtonChecked(_robKongButton)) {
-        setButtonUnchecked(_robKongButton);
-        setButtonUnchecked(_fourthTileButton);
-        _fourthTileButton->setEnabled(_maybeFourthTile && isButtonChecked(_byDiscardButton));
-        _lastTileButton->setEnabled(true);
+    if (event == ui::CheckBox::EventType::SELECTED) {
+        _fourthTileBox->setEnabled(false);
+        _lastTileBox->setEnabled(false);
     }
     else {
-        setButtonChecked(_robKongButton);
-        setButtonUnchecked(_fourthTileButton);
-        _fourthTileButton->setEnabled(false);
-        _lastTileButton->setEnabled(false);
+        _fourthTileBox->setEnabled(_maybeFourthTile);
+        _lastTileBox->setEnabled(true);
     }
 }
 
-void PointsCalculatorScene::onReplacementButton(cocos2d::Ref *sender) {
-    if (isButtonChecked(_replacementButton)) {
-        setButtonUnchecked(_replacementButton);
-    }
-    else {
-        setButtonChecked(_replacementButton);
+void PointsCalculatorScene::onReplacementBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+    if (event == ui::CheckBox::EventType::UNSELECTED) {
+
     }
 }
 
-void PointsCalculatorScene::onLastTileButton(cocos2d::Ref *sender) {
+void PointsCalculatorScene::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 海底与抢杠互斥
-    if (isButtonChecked(_lastTileButton)) {
-        setButtonUnchecked(_lastTileButton);
-        _robKongButton->setEnabled(_maybeRobKong
-            && isButtonChecked(_byDiscardButton) && !isButtonChecked(_lastTileButton));
+    if (event == ui::CheckBox::EventType::SELECTED) {
+        _robKongBox->setEnabled(false);
     }
     else {
-        setButtonChecked(_lastTileButton);
-        _robKongButton->setEnabled(false);
+        _robKongBox->setEnabled(_maybeRobKong && _winTypeGroup->getSelectedButtonIndex() == 0
+            && !_fourthTileBox->isSelected());
     }
 }
 
@@ -315,12 +284,11 @@ void PointsCalculatorScene::onFixedSetsChanged(TilePickWidget *sender) {
     // 当副露不包含杠的时候，杠开是禁用状态
     const std::vector<mahjong::SET> &fixedSets = sender->getFixedSets();
     _hasKong = std::any_of(fixedSets.begin(), fixedSets.end(), [](const mahjong::SET &s) { return s.set_type == mahjong::SET_TYPE::KONG; });
-    if (isButtonChecked(_selfDrawnButton)) {
-        _replacementButton->setEnabled(_hasKong);
+    if (_winTypeGroup->getSelectedButtonIndex() == 1) {
+        _replacementBox->setEnabled(_hasKong);
     }
     else {
-        setButtonUnchecked(_replacementButton);
-        _replacementButton->setEnabled(false);
+        _replacementBox->setEnabled(false);
     }
 }
 
@@ -330,12 +298,9 @@ void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
     _maybeRobKong = false;
     mahjong::TILE winTile = sender->getWinTile();
     if (winTile == 0) {
-        setButtonUnchecked(_fourthTileButton);
-        _fourthTileButton->setEnabled(false);
-        setButtonUnchecked(_robKongButton);
-        _robKongButton->setEnabled(false);
-        setButtonUnchecked(_lastTileButton);
-        _lastTileButton->setEnabled(true);
+        _fourthTileBox->setEnabled(false);
+        _robKongBox->setEnabled(false);
+        _lastTileBox->setEnabled(true);
     }
     else {
         // 立牌中有和牌张时，不可能是绝张和抢杠
@@ -353,9 +318,12 @@ void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
             _maybeRobKong = false;
         }
 
-        _fourthTileButton->setEnabled(_maybeFourthTile);
-        _robKongButton->setEnabled(_maybeRobKong
-            && isButtonChecked(_byDiscardButton) && !isButtonChecked(_lastTileButton));
+        _fourthTileBox->setEnabled(_maybeFourthTile && !_robKongBox->isSelected());
+        _robKongBox->setEnabled(_maybeRobKong
+            && _winTypeGroup->getSelectedButtonIndex() == 0
+            && !_lastTileBox->isSelected()
+            && !_fourthTileBox->isSelected());
+        _lastTileBox->setEnabled(!_robKongBox->isSelected());
     }
 }
 
@@ -392,26 +360,15 @@ void PointsCalculatorScene::calculate() {
 
     // 获取绝张、杠开、抢杠、海底信息
     mahjong::WIN_TYPE win_type = WIN_TYPE_DISCARD;
-    if (isButtonChecked(_selfDrawnButton)) win_type |= WIN_TYPE_SELF_DRAWN;
-    if (isButtonChecked(_fourthTileButton)) win_type |= WIN_TYPE_4TH_TILE;
-    if (isButtonChecked(_robKongButton)) win_type |= WIN_TYPE_ABOUT_KONG;
-    if (isButtonChecked(_replacementButton)) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
-    if (isButtonChecked(_lastTileButton)) win_type |= WIN_TYPE_WALL_LAST;
+    if (_winTypeGroup->getSelectedButtonIndex() == 1) win_type |= WIN_TYPE_SELF_DRAWN;
+    if (_fourthTileBox->isEnabled() && _fourthTileBox->isSelected()) win_type |= WIN_TYPE_4TH_TILE;
+    if (_robKongBox->isEnabled() && _robKongBox->isSelected()) win_type |= WIN_TYPE_ABOUT_KONG;
+    if (_replacementBox->isEnabled() && _replacementBox->isSelected()) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
+    if (_lastTileBox->isEnabled() && _lastTileBox->isSelected()) win_type |= WIN_TYPE_WALL_LAST;
 
     // 获取圈风门风
-    mahjong::WIND_TYPE prevalent_wind = mahjong::WIND_TYPE::EAST, seat_wind = mahjong::WIND_TYPE::EAST;
-    for (int i = 0; i < 4; ++i) {
-        if (!_prevalentButton[i]->isEnabled()) {
-            prevalent_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + i);
-            break;
-        }
-    }
-    for (int i = 0; i < 4; ++i) {
-        if (!_seatButton[i]->isEnabled()) {
-            seat_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + i);
-            break;
-        }
-    }
+    mahjong::WIND_TYPE prevalent_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + _prevalentWindGroup->getSelectedButtonIndex());
+    mahjong::WIND_TYPE seat_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + _seatWindGroup->getSelectedButtonIndex());
 
     // 算番
     int points = calculate_points(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);

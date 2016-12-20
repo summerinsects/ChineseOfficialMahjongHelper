@@ -18,18 +18,4 @@ static const char *tilesImageName[] = {
 static const char *handNameText[] = { "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
     "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北"};
 
-static inline void setButtonChecked(cocos2d::ui::Button *button) {
-    button->setHighlighted(true);
-    button->setTag(1);
-}
-
-static inline void setButtonUnchecked(cocos2d::ui::Button *button) {
-    button->setTag(0);
-    button->setHighlighted(false);
-}
-
-static inline bool isButtonChecked(cocos2d::ui::Button *button) {
-    return button->getTag() == 1;
-}
-
 #endif
