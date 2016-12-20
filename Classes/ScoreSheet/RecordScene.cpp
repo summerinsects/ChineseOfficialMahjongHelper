@@ -33,7 +33,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 番数输入框
-    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
+    _editBox = ui::EditBox::create(Size(34.0f, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
@@ -43,23 +43,25 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     _editBox->setPosition(Vec2(origin.x + 65.0f, origin.y + visibleSize.height - 50));
     _editBox->setDelegate(this);
 
-    Label *label = Label::createWithSystemFont("番", "Arial", 12);
-    this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 85.0f, origin.y + visibleSize.height - 50));
-
     // +-按钮
     ui::Button *minusButton = ui::Button::create("source_material/stepper_dec_n.png", "source_material/stepper_dec_h.png");
     this->addChild(minusButton);
     minusButton->setScale(20.0f / minusButton->getContentSize().height);
-    minusButton->setPosition(Vec2(origin.x + 25.0f, origin.y + visibleSize.height - 50));
+    minusButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+    minusButton->setPosition(Vec2(origin.x + 48.0f, origin.y + visibleSize.height - 50));
     minusButton->addClickEventListener(std::bind(&RecordScene::onMinusButton, this, std::placeholders::_1));
 
     ui::Button *plusButton = ui::Button::create("source_material/stepper_inc_n.png", "source_material/stepper_inc_h.png");
     this->addChild(plusButton);
     plusButton->setScale(20.0f / plusButton->getContentSize().height);
-    plusButton->setPosition(Vec2(origin.x + 120.0f, origin.y + visibleSize.height - 50));
+    plusButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    plusButton->setPosition(Vec2(origin.x + 82.0f, origin.y + visibleSize.height - 50));
     plusButton->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1));
+
+    Label *label = Label::createWithSystemFont("番", "Arial", 12);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 120.0f, origin.y + visibleSize.height - 50));
 
     // 荒庄
     _drawBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
