@@ -9,6 +9,13 @@
 
 USING_NS_CC;
 
+static void adjustSystemFontSize(cocos2d::Label *label, float width) {
+    const Size &size = label->getContentSize();
+    if (size.width > width) {
+        label->setSystemFontSize(floorf(label->getSystemFontSize() * width / size.width));
+    }
+}
+
 static Record g_currentRecord;
 
 static void readFromJson() {
@@ -117,6 +124,7 @@ bool ScoreSheetScene::init() {
     node->setPosition(Vec2(origin.x, (origin.y + visibleSize.height - 430) * 0.5f));
 
     const float gap = visibleSize.width / 6;  // 分成6份
+    _cellWidth = gap;
 
     // 5条竖线
     for (int i = 0; i < 5; ++i) {
@@ -136,6 +144,7 @@ bool ScoreSheetScene::init() {
     label->setColor(Color3B::YELLOW);
     label->setPosition(Vec2(gap * 0.5f, 390));
     node->addChild(label);
+    adjustSystemFontSize(label, gap - 4);
 
     // 4个输入框及同位置的label
     for (int i = 0; i < 4; ++i) {
@@ -168,10 +177,12 @@ bool ScoreSheetScene::init() {
         label = Label::createWithSystemFont(row0Text[i], "Arail", 12);
         label->setPosition(Vec2(gap * (i + 0.5f), 370));
         node->addChild(label);
+        adjustSystemFontSize(label, gap - 4);
 
         label = Label::createWithSystemFont(row1Text[i], "Arail", 12);
         label->setPosition(Vec2(gap * (i + 0.5f), 350));
         node->addChild(label);
+        adjustSystemFontSize(label, gap - 4);
     }
 
     // 第4栏：累计
@@ -179,10 +190,12 @@ bool ScoreSheetScene::init() {
     label->setColor(Color3B::YELLOW);
     label->setPosition(Vec2(gap * 0.5f, 330));
     node->addChild(label);
+    adjustSystemFontSize(label, gap - 4);
 
     label = Label::createWithSystemFont("备注", "Arail", 12);
     label->setPosition(Vec2(gap * 5.5f, 330));
     node->addChild(label);
+    adjustSystemFontSize(label, gap - 4);
 
     for (int i = 0; i < 4; ++i) {
         _totalLabel[i] = Label::createWithSystemFont("+0", "Arail", 12);
@@ -200,6 +213,7 @@ bool ScoreSheetScene::init() {
         label->setColor(Color3B::GRAY);
         label->setPosition(Vec2(gap * 0.5f, y));
         node->addChild(label);
+        adjustSystemFontSize(label, gap - 4);
 
         // 四位选手得分
         for (int i = 0; i < 4; ++i) {
@@ -268,17 +282,18 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     // 禁用并隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
-
     _detailButton[handIdx]->setEnabled(true);
 
+    Label *label = _pointNameLabel[handIdx];
     bool pointsNameVisible = false;
     if (detail.score == 0) {
-        _pointNameLabel[handIdx]->setString("荒庄");
-        _pointNameLabel[handIdx]->setVisible(true);
+        label->setString("荒庄");
+        label->setVisible(true);
         pointsNameVisible = true;
     }
 
     // 选取标记的最大番种显示出来
+
     uint64_t pointsFlag = detail.points_flag;
     if (pointsFlag != 0) {
         for (unsigned n = 0; n < 64; ++n) {
@@ -289,15 +304,19 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
                     ++idx;
                 }
 #endif
-                _pointNameLabel[handIdx]->setString(mahjong::points_name[idx]);
-                _pointNameLabel[handIdx]->setVisible(true);
+                label->setString(mahjong::points_name[idx]);
+                label->setVisible(true);
                 pointsNameVisible = true;
                 break;
             }
         }
     }
     if (!pointsNameVisible) {
-        _pointNameLabel[handIdx]->setVisible(false);
+        label->setVisible(false);
+    }
+    else {
+        label->setSystemFontSize(12);
+        adjustSystemFontSize(label, _cellWidth - 4);
     }
 }
 
@@ -411,6 +430,8 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
         _editBox[i]->setEnabled(false);
         _nameLabel[i]->setVisible(true);
         _nameLabel[i]->setString(g_currentRecord.name[i]);
+        _nameLabel[i]->setSystemFontSize(12);
+        adjustSystemFontSize(_nameLabel[i], _cellWidth - 4);
     }
 
     _recordButton[0]->setVisible(true);

@@ -12,6 +12,7 @@ public:
     CREATE_FUNC(ScoreSheetScene);
 
 private:
+    float _cellWidth = 0.0f;
     cocos2d::ui::EditBox *_editBox[4];
     cocos2d::Label *_nameLabel[4];
     int _totalScores[4];
