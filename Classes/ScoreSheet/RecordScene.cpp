@@ -33,7 +33,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 番数输入框
-    _editBox = ui::EditBox::create(Size(34.0f, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
+    _editBox = ui::EditBox::create(Size(34.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);

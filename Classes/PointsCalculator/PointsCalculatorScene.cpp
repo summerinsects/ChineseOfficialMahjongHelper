@@ -201,7 +201,7 @@ bool PointsCalculatorScene::init() {
     flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     flowerLabel->setPosition(Vec2(visibleSize.width - 50, 45.0f));
 
-    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/tabbar_background1.png"));
+    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     infoWidget->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
