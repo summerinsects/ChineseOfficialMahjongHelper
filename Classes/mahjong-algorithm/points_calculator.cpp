@@ -5,6 +5,12 @@
 #include <stddef.h>
 #include <string.h>
 
+#if 0
+#define LOG(fmt_, ...) printf(fmt_, ##__VA_ARGS__)
+#else
+#define LOG(...) do { } while (0)
+#endif
+
 //#define STRICT_98_RULE
 
 namespace mahjong {
@@ -1937,10 +1943,10 @@ static int get_points_by_table(const long (&points_table)[POINT_TYPE_COUNT]) {
         }
         points += points_value_table[i] * points_table[i];
         if (points_table[i] == 1) {
-            printf("%s %d\n", points_name[i], points_value_table[i]);
+            LOG("%s %d\n", points_name[i], points_value_table[i]);
         }
         else {
-            printf("%s %d*%ld\n", points_name[i], points_value_table[i], points_table[i]);
+            LOG("%s %d*%ld\n", points_name[i], points_value_table[i], points_table[i]);
         }
     }
     return points;
@@ -2176,7 +2182,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *standing_
                 max_points = current_points;
                 max_idx = _separation_cnt;
             }
-            printf("points = %d\n\n", current_points);
+            LOG("points = %d\n\n", current_points);
         }
         else if (calculate_special_type_points(_standing_tiles, win_type, points_tables[_separation_cnt])) {
             int current_points = get_points_by_table(points_tables[_separation_cnt]);
@@ -2184,7 +2190,7 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *standing_
                 max_points = current_points;
                 max_idx = _separation_cnt;
             }
-            printf("points = %d\n\n", current_points);
+            LOG("points = %d\n\n", current_points);
             if (points_tables[_separation_cnt][SEVEN_SHIFTED_PAIRS]) {
                 _separation_cnt = 0;
             }
@@ -2199,12 +2205,13 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *standing_
                 max_points = current_points;
                 max_idx = _separation_cnt;
             }
-            printf("points = %d\n\n", current_points);
+            LOG("points = %d\n\n", current_points);
         }
     }
 
     // 遍历各种划分方式，分别算番，找出最大的番的划分方式
     for (long i = 0; i < _separation_cnt; ++i) {
+#if 0  // Debug
         for (int j = 0; j < 5; ++j) {
             //printf("[%d %s %x]", _separation_sets[i][j].is_melded,
             //    set_type_name[(int)_separation_sets[i][j].set_type], _separation_sets[i][j].mid_tile);
@@ -2231,14 +2238,14 @@ int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *standing_
             }
         }
         puts("");
-
+#endif
         calculate_basic_type_points(_separation_sets[i], fixed_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_tables[i]);
         int current_points = get_points_by_table(points_tables[i]);
         if (current_points > max_points) {
             max_points = current_points;
             max_idx = i;
         }
-        printf("points = %d\n\n", current_points);
+        LOG("points = %d\n\n", current_points);
     }
     if (max_idx == -1) {
         return ERROR_NOT_WIN;
