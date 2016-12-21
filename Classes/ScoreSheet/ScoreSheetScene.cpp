@@ -9,13 +9,6 @@
 
 USING_NS_CC;
 
-static void adjustSystemFontSize(cocos2d::Label *label, float width) {
-    const Size &size = label->getContentSize();
-    if (size.width > width) {
-        label->setSystemFontSize(floorf(label->getSystemFontSize() * width / size.width));
-    }
-}
-
 static Record g_currentRecord;
 
 static void readFromJson() {

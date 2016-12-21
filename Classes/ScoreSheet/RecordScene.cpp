@@ -92,10 +92,11 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         const float x = origin.x + gap * (i + 0.5f);
 
         // 名字
-        _nameLabel[i] = Label::createWithSystemFont(playerNames[i], "Arial", 12);
-        _nameLabel[i]->setColor(Color3B::YELLOW);
-        this->addChild(_nameLabel[i]);
-        _nameLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
+        Label *nameLabel = Label::createWithSystemFont(playerNames[i], "Arial", 12);
+        nameLabel->setColor(Color3B::YELLOW);
+        this->addChild(nameLabel);
+        nameLabel->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
+        adjustSystemFontSize(nameLabel, gap);
 
         // 得分
         _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);

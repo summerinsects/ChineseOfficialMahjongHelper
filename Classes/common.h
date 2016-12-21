@@ -18,4 +18,12 @@ static const char *tilesImageName[] = {
 static const char *handNameText[] = { "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
     "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北"};
 
+static void adjustSystemFontSize(cocos2d::Label *label, float width) {
+    const cocos2d::Size &size = label->getContentSize();
+    if (size.width > width) {
+        float s = floorf(label->getSystemFontSize() * width / size.width);
+        label->setSystemFontSize(s > FLT_EPSILON ? s : 1);
+    }
+}
+
 #endif

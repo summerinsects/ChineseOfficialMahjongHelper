@@ -17,7 +17,6 @@ public:
 private:
     cocos2d::ui::EditBox *_editBox = nullptr;
     cocos2d::ui::CheckBox *_drawBox = nullptr;
-    cocos2d::Label *_nameLabel[4];
     cocos2d::ui::RadioButtonGroup *_winGroup = nullptr;
     cocos2d::ui::RadioButtonGroup *_claimGroup = nullptr;
     cocos2d::Label *_byDiscardLabel[4];
