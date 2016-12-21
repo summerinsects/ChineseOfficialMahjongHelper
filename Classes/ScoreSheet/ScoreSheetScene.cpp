@@ -137,7 +137,7 @@ bool ScoreSheetScene::init() {
     label->setColor(Color3B::YELLOW);
     label->setPosition(Vec2(gap * 0.5f, 390));
     node->addChild(label);
-    adjustSystemFontSize(label, gap - 4);
+    scaleLabelToFitWidth(label, gap - 4);
 
     // 4个输入框及同位置的label
     for (int i = 0; i < 4; ++i) {
@@ -173,12 +173,12 @@ bool ScoreSheetScene::init() {
         label = Label::createWithSystemFont(row0Text[i], "Arail", 12);
         label->setPosition(Vec2(gap * (i + 0.5f), 370));
         node->addChild(label);
-        adjustSystemFontSize(label, gap - 4);
+        scaleLabelToFitWidth(label, gap - 4);
 
         label = Label::createWithSystemFont(row1Text[i], "Arail", 12);
         label->setPosition(Vec2(gap * (i + 0.5f), 350));
         node->addChild(label);
-        adjustSystemFontSize(label, gap - 4);
+        scaleLabelToFitWidth(label, gap - 4);
     }
 
     // 第4栏：累计
@@ -186,12 +186,12 @@ bool ScoreSheetScene::init() {
     label->setColor(Color3B::YELLOW);
     label->setPosition(Vec2(gap * 0.5f, 330));
     node->addChild(label);
-    adjustSystemFontSize(label, gap - 4);
+    scaleLabelToFitWidth(label, gap - 4);
 
     label = Label::createWithSystemFont("备注", "Arail", 12);
     label->setPosition(Vec2(gap * 5.5f, 330));
     node->addChild(label);
-    adjustSystemFontSize(label, gap - 4);
+    scaleLabelToFitWidth(label, gap - 4);
 
     for (int i = 0; i < 4; ++i) {
         _totalLabel[i] = Label::createWithSystemFont("+0", "Arail", 12);
@@ -209,7 +209,7 @@ bool ScoreSheetScene::init() {
         label->setColor(Color3B::GRAY);
         label->setPosition(Vec2(gap * 0.5f, y));
         node->addChild(label);
-        adjustSystemFontSize(label, gap - 4);
+        scaleLabelToFitWidth(label, gap - 4);
 
         // 四位选手得分
         for (int i = 0; i < 4; ++i) {
@@ -311,8 +311,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
         label->setVisible(false);
     }
     else {
-        label->setSystemFontSize(12);
-        adjustSystemFontSize(label, _cellWidth - 4);
+        scaleLabelToFitWidth(label, _cellWidth - 4);
     }
 }
 
@@ -349,8 +348,7 @@ void ScoreSheetScene::recover() {
         _editBox[i]->setEnabled(false);
         _nameLabel[i]->setString(name[i]);
         _nameLabel[i]->setVisible(true);
-        _nameLabel[i]->setSystemFontSize(12);
-        adjustSystemFontSize(_nameLabel[i], _cellWidth - 4);
+        scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4);
     }
 
     // 禁用和隐藏锁定按钮
@@ -428,8 +426,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
         _editBox[i]->setEnabled(false);
         _nameLabel[i]->setVisible(true);
         _nameLabel[i]->setString(g_currentRecord.name[i]);
-        _nameLabel[i]->setSystemFontSize(12);
-        adjustSystemFontSize(_nameLabel[i], _cellWidth - 4);
+        scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4);
     }
 
     _recordButton[0]->setVisible(true);
@@ -660,7 +657,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
             else {
                 button->setTitleText(StringUtils::format("%s与%s平分", name[pairwise[i].first], name[pairwise[i].second]));
             }
-            adjustSystemFontSize(button->getTitleRenderer(), 148.0f);
+            scaleLabelToFitWidth(button->getTitleRenderer(), 148.0f);
             rootWidget->addChild(button);
             button->setPosition(Vec2(75.0f, 170.0f - i * 25.0f));
             button->addClickEventListener([delta](Ref *) {

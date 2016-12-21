@@ -96,7 +96,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         nameLabel->setColor(Color3B::YELLOW);
         this->addChild(nameLabel);
         nameLabel->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
-        adjustSystemFontSize(nameLabel, gap);
+        scaleLabelToFitWidth(nameLabel, gap - 4);
 
         // 得分
         _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);
