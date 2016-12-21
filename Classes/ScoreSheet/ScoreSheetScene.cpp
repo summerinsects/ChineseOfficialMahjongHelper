@@ -145,6 +145,9 @@ bool ScoreSheetScene::init() {
         _editBox[i]->setPosition(Vec2(gap * (i + 1.5f), 390));
         _editBox[i]->setFontColor(Color3B::YELLOW);
         _editBox[i]->setFontSize(12);
+        _editBox[i]->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+        _editBox[i]->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+        _editBox[i]->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
         node->addChild(_editBox[i]);
 
         _nameLabel[i] = Label::createWithSystemFont("", "Arail", 12);
