@@ -501,14 +501,16 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
         int winIndex = (wc & 0x80) ? 3 : (wc & 0x40) ? 2 : (wc & 0x20) ? 1 : (wc & 0x10) ? 0 : -1;
         int claimIndex = (wc & 0x8) ? 3 : (wc & 0x4) ? 2 : (wc & 0x2) ? 1 : (wc & 0x1) ? 0 : -1;
         if (winIndex == claimIndex) {
+            message.append("「");
             message.append(g_currentRecord.name[winIndex]);
-            message.append(StringUtils::format("自摸%d番。\n", detail.score));
+            message.append(StringUtils::format("」自摸%d番。\n", detail.score));
         }
         else {
+            message.append("「");
             message.append(g_currentRecord.name[winIndex]);
-            message.append(StringUtils::format("和%d番，由", detail.score));
+            message.append(StringUtils::format("」和%d番，「", detail.score));
             message.append(g_currentRecord.name[claimIndex]);
-            message.append("放炮。\n");
+            message.append("」放炮。\n");
         }
 
         uint64_t pointsFlag = detail.points_flag;
@@ -648,14 +650,14 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
             button->setContentSize(Size(150.0f, 20.0f));
             button->setTitleFontSize(12);
             if (delta > 0) {
-                button->setTitleText(StringUtils::format("%s领先%s%d分", name[pairwise[i].first], name[pairwise[i].second], delta));
+                button->setTitleText(StringUtils::format("「%s」领先「%s」%d分", name[pairwise[i].first], name[pairwise[i].second], delta));
             }
             else if (delta < 0) {
                 delta = -delta;
-                button->setTitleText(StringUtils::format("%s落后%s%d分", name[pairwise[i].first], name[pairwise[i].second], delta));
+                button->setTitleText(StringUtils::format("「%s」落后「%s」%d分", name[pairwise[i].first], name[pairwise[i].second], delta));
             }
             else {
-                button->setTitleText(StringUtils::format("%s与%s平分", name[pairwise[i].first], name[pairwise[i].second]));
+                button->setTitleText(StringUtils::format("「%s」与「%s」平分", name[pairwise[i].first], name[pairwise[i].second]));
             }
             scaleLabelToFitWidth(button->getTitleRenderer(), 148.0f);
             rootWidget->addChild(button);
