@@ -308,7 +308,7 @@ void RecordScene::updateScoreLabel() {
     // 检查是否有错和
     _detail.false_win = 0;
     for (int i = 0; i < 4; ++i) {
-        if (_falseWinBox[i]->isSelected()) {
+        if (_falseWinBox[i]->isEnabled() && _falseWinBox[i]->isSelected()) {
             _detail.false_win |= (1 << i);
         }
     }
@@ -396,14 +396,12 @@ void RecordScene::onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, c
             // 和的选手，显示自摸，禁用错和
             _byDiscardLabel[i]->setVisible(false);
             _selfDrawnLabel[i]->setVisible(true);
-            _falseWinBox[i]->setSelected(false);
             _falseWinBox[i]->setEnabled(false);
         }
         else {
             // 未和的选手，显示点炮，启用错和
             _byDiscardLabel[i]->setVisible(true);
             _selfDrawnLabel[i]->setVisible(false);
-            _falseWinBox[i]->setSelected(false);
             _falseWinBox[i]->setEnabled(true);
         }
     }
