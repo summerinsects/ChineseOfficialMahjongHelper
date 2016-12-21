@@ -349,6 +349,8 @@ void ScoreSheetScene::recover() {
         _editBox[i]->setEnabled(false);
         _nameLabel[i]->setString(name[i]);
         _nameLabel[i]->setVisible(true);
+        _nameLabel[i]->setSystemFontSize(12);
+        adjustSystemFontSize(_nameLabel[i], _cellWidth - 4);
     }
 
     // 禁用和隐藏锁定按钮
@@ -658,6 +660,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
             else {
                 button->setTitleText(StringUtils::format("%s与%s平分", name[pairwise[i].first], name[pairwise[i].second]));
             }
+            adjustSystemFontSize(button->getTitleRenderer(), 148.0f);
             rootWidget->addChild(button);
             button->setPosition(Vec2(75.0f, 170.0f - i * 25.0f));
             button->addClickEventListener([delta](Ref *) {
