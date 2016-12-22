@@ -73,9 +73,18 @@ bool AlertLayer::initWithTitle(const std::string &title, cocos2d::Node *node, co
     background->addChild(line);
     line->setPosition(Vec2(0.0f, 45.0f + nodeSize.height));
 
+#if 0  // for test
+    LayerColor *nodebg = LayerColor::create(Color4B::RED, nodeSize.width, nodeSize.height);
+    background->addChild(nodebg);
+    nodebg->ignoreAnchorPointForPosition(false);
+    nodebg->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    nodebg->setPosition(Vec2(width * 0.5f, 35.0f + nodeSize.height * 0.5f));
+#endif
+
     // 传入的node
     background->addChild(node);
     node->ignoreAnchorPointForPosition(false);
+    node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     node->setPosition(Vec2(width * 0.5f, 35.0f + nodeSize.height * 0.5f));
 
     // 取消按钮
