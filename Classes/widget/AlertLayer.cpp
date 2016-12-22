@@ -11,7 +11,9 @@ void AlertLayer::showWithNode(const std::string &title, cocos2d::Node *node, con
     if (alert != nullptr && alert->initWithTitle(title, node, confirmCallback, cancelCallback)) {
         alert->autorelease();
         Director::getInstance()->getRunningScene()->addChild(alert, 100);
+        return;
     }
+    CC_SAFE_DELETE(alert);
 }
 
 void AlertLayer::showWithMessage(const std::string &title, const std::string &message, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
