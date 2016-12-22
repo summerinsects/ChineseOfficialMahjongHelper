@@ -12,6 +12,22 @@ namespace cw {
         EditBoxDelegate(std::function<void (cocos2d::ui::EditBox *editBox)> &&editBoxReturn)
             : _editBoxReturn(editBoxReturn) { }
 
+        EditBoxDelegate(const EditBoxDelegate &other)
+            : _editBoxReturn(other._editBoxReturn) { }
+
+        EditBoxDelegate(EditBoxDelegate &&other)
+            : _editBoxReturn(std::move(other._editBoxReturn)) { }
+
+        EditBoxDelegate &operator=(const EditBoxDelegate &other) {
+            _editBoxReturn = other._editBoxReturn;
+            return *this;
+        }
+
+        EditBoxDelegate &operator=(EditBoxDelegate &&other) {
+            _editBoxReturn = std::move(other._editBoxReturn);
+            return *this;
+        }
+
         virtual ~EditBoxDelegate() { CCLOG("%s", __FUNCTION__); }
 
     private:
