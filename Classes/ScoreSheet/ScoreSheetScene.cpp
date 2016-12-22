@@ -139,7 +139,7 @@ bool ScoreSheetScene::init() {
     node->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
-    // 4个输入框及同位置的label
+    // 4个用于弹出输入框的AlertLayer及同位置的label
     for (int i = 0; i < 4; ++i) {
         ui::Button *button = ui::Button::create();
         button->setScale9Enabled(true);

@@ -56,7 +56,7 @@ bool AlertLayer::initWithTitle(const std::string &title, cocos2d::Node *node, co
     const Size &nodeSize = node->getContentSize();
     const float height = nodeSize.height + 78.0f;
 
-    // 背影
+    // 背景
     LayerColor *background = LayerColor::create(Color4B::WHITE, width, height);
     this->addChild(background);
     background->ignoreAnchorPointForPosition(false);
