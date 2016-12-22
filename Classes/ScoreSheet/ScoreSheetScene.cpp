@@ -196,6 +196,13 @@ bool ScoreSheetScene::init() {
         _totalLabel[i]->setColor(Color3B::YELLOW);
         _totalLabel[i]->setPosition(Vec2(gap * (i + 1.5f), 330));
         node->addChild(_totalLabel[i]);
+
+        ui::Button *button = ui::Button::create();
+        button->setScale9Enabled(true);
+        button->setPosition(Vec2(gap * (i + 1.5f), 330));
+        button->setContentSize(Size(gap, 20.0f));
+        node->addChild(button);
+        button->addClickEventListener(std::bind(&ScoreSheetScene::onScoreButton, this, std::placeholders::_1, i));
     }
 
     // 第5~20栏，东风东~北风北的计分
@@ -728,4 +735,44 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
             showPursuit(delta);
         }
     }, nullptr);
+}
+
+void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
+    const char (&name)[4][255] = g_currentRecord.name;
+    if (std::any_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })
+        || g_currentRecord.current_index == 16) {
+        return;
+    }
+
+    static const size_t cmpIdx[][3] = { { 1, 2, 3 }, { 0, 2, 3 }, { 0, 1, 3 }, { 0, 1, 2 } };
+
+    ui::Widget *rootWidget = ui::Widget::create();
+    rootWidget->setContentSize(Size(150.0f, 70.0f));
+
+    for (int i = 0; i < 3; ++i) {
+        size_t dst = cmpIdx[idx][i];
+        int delta = _totalScores[idx] - _totalScores[dst];
+
+        ui::Button *button = ui::Button::create("source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png");
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(150.0f, 20.0f));
+        button->setTitleFontSize(12);
+        if (delta > 0) {
+            button->setTitleText(StringUtils::format("领先「%s」%d分", name[dst], delta));
+        }
+        else if (delta < 0) {
+            button->setTitleText(StringUtils::format("落后「%s」%d分", name[dst], -delta));
+        }
+        else {
+            button->setTitleText(StringUtils::format("与「%s」平分", name[dst]));
+        }
+        scaleLabelToFitWidth(button->getTitleRenderer(), 148.0f);
+        rootWidget->addChild(button);
+        button->setPosition(Vec2(75.0f, 60.0f - i * 25.0f));
+        button->addClickEventListener([delta](Ref *) {
+            showPursuit(-delta);
+        });
+    }
+
+    AlertLayer::showWithNode(name[idx], rootWidget, nullptr, nullptr);
 }

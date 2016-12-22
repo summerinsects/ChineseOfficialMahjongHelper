@@ -37,6 +37,7 @@ private:
     void onTimeScheduler(float dt);
     void onResetButton(cocos2d::Ref *sender);
     void onPursuitButton(cocos2d::Ref *sender);
+    void onScoreButton(cocos2d::Ref *sender, size_t idx);
 };
 
 #endif // __SCORE_SHEET_SCENE_H__
