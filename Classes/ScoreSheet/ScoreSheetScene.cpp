@@ -141,14 +141,12 @@ bool ScoreSheetScene::init() {
 
     // 4个输入框及同位置的label
     for (int i = 0; i < 4; ++i) {
-        _editBox[i] = ui::EditBox::create(Size(gap, 20.0f), ui::Scale9Sprite::create());
-        _editBox[i]->setPosition(Vec2(gap * (i + 1.5f), 390));
-        _editBox[i]->setFontColor(Color3B::YELLOW);
-        _editBox[i]->setFontSize(12);
-        _editBox[i]->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-        _editBox[i]->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-        _editBox[i]->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-        node->addChild(_editBox[i]);
+        ui::Button *button = ui::Button::create();
+        button->setScale9Enabled(true);
+        button->setPosition(Vec2(gap * (i + 1.5f), 390));
+        button->setContentSize(Size(gap, 20.0f));
+        node->addChild(button);
+        button->addClickEventListener(std::bind(&ScoreSheetScene::onNameButton, this, std::placeholders::_1, i));
 
         _nameLabel[i] = Label::createWithSystemFont("", "Arail", 12);
         _nameLabel[i]->setColor(Color3B::YELLOW);
@@ -344,8 +342,6 @@ void ScoreSheetScene::recover() {
 
     // 禁用和隐藏名字输入框，显示名字的label
     for (int i = 0; i < 4; ++i) {
-        _editBox[i]->setVisible(false);
-        _editBox[i]->setEnabled(false);
         _nameLabel[i]->setString(name[i]);
         _nameLabel[i]->setVisible(true);
         scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4);
@@ -386,9 +382,6 @@ void ScoreSheetScene::reset() {
     memset(_totalScores, 0, sizeof(_totalScores));
 
     for (int i = 0; i < 4; ++i) {
-        _editBox[i]->setText("");
-        _editBox[i]->setVisible(true);
-        _editBox[i]->setEnabled(true);
         _nameLabel[i]->setVisible(false);
         _totalLabel[i]->setString("+0");
     }
@@ -409,21 +402,52 @@ void ScoreSheetScene::reset() {
     }
 }
 
-void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
-    for (int i = 0; i < 4; ++i) {
-        const char *str = _editBox[i]->getText();
-        if (str[0] == '\0') {
-            AlertLayer::showWithMessage("锁定", "请先录入四位参赛选手姓名", nullptr, nullptr);
-            return;
+void ScoreSheetScene::onNameButton(cocos2d::Ref *sender, size_t idx) {
+    if (_lockButton->isVisible() && _lockButton->isEnabled()) {
+        editName(idx);
+    }
+    else {
+        AlertLayer::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？",
+            std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
+    }
+}
+
+void ScoreSheetScene::editName(size_t idx) {
+    ui::EditBox *editBox = ui::EditBox::create(Size(120.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setFontColor(Color3B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setText(g_currentRecord.name[idx]);
+    editBox->setPlaceholderFontColor(Color4B::GRAY);
+    editBox->setPlaceHolder("输入选手姓名");
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+
+    const char *wind[] = { "东", "南", "西", "北" };
+    char title[64];
+    snprintf(title, sizeof(title), "开局座位「%s」", wind[idx]);
+    AlertLayer::showWithNode(title, editBox, [this, editBox, idx]() {
+        const char *text = editBox->getText();
+        if (*text != '\0') {
+            strncpy(g_currentRecord.name[idx], text, 255);
+            _nameLabel[idx]->setVisible(true);
+            _nameLabel[idx]->setString(text);
+            scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4);
         }
-        strncpy(g_currentRecord.name[i], str, sizeof(g_currentRecord.name[i]));
+    }, nullptr);
+    editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
+}
+
+void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
+    const char (&name)[4][255] = g_currentRecord.name;
+    if (std::any_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })) {
+        AlertLayer::showWithMessage("锁定", "请先录入四位参赛选手姓名", nullptr, nullptr);
+        return;
     }
 
     memset(_totalScores, 0, sizeof(_totalScores));
 
     for (int i = 0; i < 4; ++i) {
-        _editBox[i]->setVisible(false);
-        _editBox[i]->setEnabled(false);
         _nameLabel[i]->setVisible(true);
         _nameLabel[i]->setString(g_currentRecord.name[i]);
         scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4);

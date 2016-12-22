@@ -13,7 +13,6 @@ public:
 
 private:
     float _cellWidth = 0.0f;
-    cocos2d::ui::EditBox *_editBox[4];
     cocos2d::Label *_nameLabel[4];
     int _totalScores[4];
     cocos2d::ui::Button *_lockButton = nullptr;
@@ -29,6 +28,8 @@ private:
     void refreshEndTime();
     void recover();
     void reset();
+    void onNameButton(cocos2d::Ref *sender, size_t idx);
+    void editName(size_t idx);
     void onLockButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender, size_t handIdx);
     void onDetailButton(cocos2d::Ref *sender, size_t handIdx);
