@@ -21,6 +21,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/ScoreTable/ScoreDefinition.cpp \
                    ../../Classes/ScoreTable/ScoreTable.cpp \
                    ../../Classes/widget/AlertLayer.cpp \
+                   ../../Classes/widget/CWTableView.cpp \
                    ../../Classes/widget/TilePickWidget.cpp \
                    ../../Classes/AppDelegate.cpp \
                    ../../Classes/HelloWorldScene.cpp

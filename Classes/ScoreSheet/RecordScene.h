@@ -4,6 +4,11 @@
 #include "../BaseLayer.h"
 #include "Record.h"
 
+namespace cw {
+    class TableViewCell;
+    class TableView;
+}
+
 class RecordScene : public BaseLayer, public cocos2d::ui::EditBoxDelegate {
 public:
     static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback);
@@ -28,6 +33,9 @@ private:
     int _winIndex = -1;
     Record::Detail _detail;
     std::function<void (const Record::Detail &)> _okCallback;
+
+    cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx);
+    cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
 
     void refresh();
     void updateScoreLabel();

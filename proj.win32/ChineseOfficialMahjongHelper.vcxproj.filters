@@ -72,6 +72,9 @@
     <ClCompile Include="..\Classes\widget\AlertLayer.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\widget\CWTableView.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -126,6 +129,9 @@
       <Filter>src\Other</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\AlertLayer.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\CWTableView.h">
       <Filter>src\widget</Filter>
     </ClInclude>
   </ItemGroup>
