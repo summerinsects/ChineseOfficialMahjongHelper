@@ -79,11 +79,15 @@ bool ScoreSheetScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 12));
     button->addClickEventListener([this](Ref *) {
         Director::getInstance()->pushScene(HistoryScene::createScene([this](const Record &record) {
-            if (g_currentRecord.current_index == 16) {
-                CCLOG("currentIndex == 16");
+            const char (&name)[4][255] = g_currentRecord.name;
+            if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)
+                || g_currentRecord.current_index == 16) {
                 memcpy(&g_currentRecord, &record, sizeof(g_currentRecord));
                 recover();
+                return true;
             }
+            AlertLayer::showWithMessage("提示", "当前一局尚未完成时不支持查看历史记录", nullptr, nullptr);
+            return false;
         }));
     });
 

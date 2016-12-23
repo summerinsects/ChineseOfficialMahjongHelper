@@ -1,6 +1,7 @@
 ﻿#include "HistoryScene.h"
 #include "Record.h"
 #include "../widget/AlertLayer.h"
+#include "../widget/CWTableView.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -8,7 +9,7 @@ USING_NS_CC;
 
 static std::vector<Record> g_records;
 
-Scene *HistoryScene::createScene(const std::function<void (const Record &)> &viewCallback) {
+Scene *HistoryScene::createScene(const std::function<bool (const Record &)> &viewCallback) {
     auto scene = Scene::create();
     auto layer = HistoryScene::create();
     layer->_viewCallback = viewCallback;
@@ -64,40 +65,99 @@ static void saveRecords() {
     }
 }
 
-ui::Widget *HistoryScene::createRecordWidget(size_t idx, float width) {
-    ui::Widget *widget = ui::Widget::create();
-    widget->setContentSize(Size(width, 36.0f));
+bool HistoryScene::init() {
+    if (!BaseLayer::initWithTitle("历史记录")) {
+        return false;
+    }
 
-    ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(40.0f, 20.0f));
-    button->setTitleColor(Color3B::BLACK);
-    button->setTitleFontSize(12);
-    button->setTitleText("删除");
-    button->addClickEventListener([this, idx](Ref *) {
-        AlertLayer::showWithMessage("删除记录", "删除后无法找回，确认删除？", [this, idx]() {
-            g_records.erase(g_records.begin() + idx);
-            saveRecords();
-            std::function<void (const Record &)> viewCallback = std::move(_viewCallback);
-            Director::getInstance()->popScene();
-            Director::getInstance()->pushScene(HistoryScene::createScene(viewCallback));
-        }, nullptr);
-    });
-    widget->addChild(button);
-    button->setPosition(Vec2(width - 22.0f, 18.0f));
+    lazyLoadRecords();
 
-    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(40.0f, 20.0f));
-    button->setTitleColor(Color3B::BLACK);
-    button->setTitleFontSize(12);
-    button->setTitleText("查看");
-    button->addClickEventListener([this, idx](Ref *) {
-        _viewCallback(g_records[idx]);
-        Director::getInstance()->popScene();
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    _tableView = cw::TableView::create();
+    _tableView->setContentSize(Size(visibleSize.width * 0.95f, visibleSize.height - 35));
+    _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param) {
+        switch (type) {
+        case cw::TableView::CallbackType::CELL_SIZE: {
+            auto p = (cw::TableView::CellSizeParam *)param;
+            p->size = Size(0, 70);
+            return 0;
+        }
+        case cw::TableView::CallbackType::CELL_AT_INDEX:
+            return (intptr_t)tableCellAtIndex(table, param);
+        case cw::TableView::CallbackType::NUMBER_OF_CELLS:
+            return (intptr_t)g_records.size();
+        }
+        return 0;
     });
-    widget->addChild(button);
-    button->setPosition(Vec2(width - 66.0f, 18.0f));
+
+    _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
+    _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
+
+    _tableView->setScrollBarPositionFromCorner(Vec2(10, 10));
+    _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
+    _tableView->reloadData();
+    this->addChild(_tableView);
+
+    return true;
+}
+
+cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
+    typedef cw::TableViewCellEx<Label *, ui::Button *, ui::Button *> CustomCell;
+    CustomCell *cell = (CustomCell *)table->dequeueCell();
+
+    if (cell == nullptr) {
+        cell = CustomCell::create();
+
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        const float width = visibleSize.width * 0.95f;
+
+        CustomCell::ExtDataType &ext = cell->getExtData();
+        Label *&label = std::get<0>(ext);
+        ui::Button *&delBtn = std::get<1>(ext);
+        ui::Button *&viewBtn = std::get<2>(ext);
+
+        Sprite *sprite = Sprite::create("source_material/btn_square_disabled.png");
+        cell->addChild(sprite);
+        sprite->setPosition(Vec2(width * 0.5f, 35.0f));
+        sprite->setScaleX(width / sprite->getContentSize().width);
+        sprite->setScaleY(65 / sprite->getContentSize().height);
+
+        label = Label::createWithSystemFont("", "Arail", 10);
+        cell->addChild(label);
+        label->setPosition(Vec2(2.0f, 35.0f));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+
+        delBtn = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        delBtn->setScale9Enabled(true);
+        delBtn->setContentSize(Size(40.0f, 20.0f));
+        delBtn->setTitleColor(Color3B::BLACK);
+        delBtn->setTitleFontSize(12);
+        delBtn->setTitleText("删除");
+        delBtn->addClickEventListener(std::bind(&HistoryScene::onDeleteButton, this, std::placeholders::_1));
+        cell->addChild(delBtn);
+        delBtn->setPosition(Vec2(width - 22.0f, 35.0f));
+
+        viewBtn = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        viewBtn->setScale9Enabled(true);
+        viewBtn->setContentSize(Size(40.0f, 20.0f));
+        viewBtn->setTitleColor(Color3B::BLACK);
+        viewBtn->setTitleFontSize(12);
+        viewBtn->setTitleText("查看");
+        viewBtn->addClickEventListener(std::bind(&HistoryScene::onViewButton, this, std::placeholders::_1));
+        cell->addChild(viewBtn);
+        viewBtn->setPosition(Vec2(width - 66.0f, 35.0f));
+    }
+
+    const CustomCell::ExtDataType &ext = cell->getExtData();
+    Label *label = std::get<0>(ext);
+    ui::Button *delBtn = std::get<1>(ext);
+    ui::Button *viewBtn = std::get<2>(ext);
+
+    delBtn->setTag(idx);
+    viewBtn->setTag(idx);
 
     const Record &record = g_records[idx];
     int scores[4] = { 0 };
@@ -113,55 +173,35 @@ ui::Widget *HistoryScene::createRecordWidget(size_t idx, float width) {
     char str[255];
     size_t len = 0;
     len += strftime(str, sizeof(str), "%Y-%m-%d %H:%M", localtime(&record.start_time));
-    strcpy(str + len, " -- ");
-    len += 4;
-    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&record.end_time));
+    if (record.end_time != 0) {
+        strcpy(str + len, " -- ");
+        len += 4;
+        len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&record.end_time));
+    }
 
-    snprintf(str + len, sizeof(str) - len, "\n[%s(%+d) %s(%+d) %s(%+d) %s(%+d)]",
+    snprintf(str + len, sizeof(str) - len, "\n%s(%+d)\n%s(%+d)\n%s(%+d)\n%s(%+d)",
         record.name[0], scores[0], record.name[1], scores[1], record.name[2], scores[2], record.name[3], scores[3]);
-    Label *label = Label::createWithSystemFont(str, "Arail", 10);
-    widget->addChild(label);
-    label->setPosition(Vec2((width - 88.0f) * 0.5f, 18.0f));
+    label->setString(str);
 
-    return widget;
+    return cell;
 }
 
-bool HistoryScene::init() {
-    if (!BaseLayer::initWithTitle("历史记录")) {
-        return false;
+void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
+    ui::Button *button = (ui::Button *)sender;
+    size_t idx = button->getTag();
+    AlertLayer::showWithMessage("删除记录", "删除后无法找回，确认删除？", [this, idx]() {
+        g_records.erase(g_records.begin() + idx);
+        saveRecords();
+        _tableView->reloadData();
+    }, nullptr);
+}
+
+void HistoryScene::onViewButton(cocos2d::Ref *sender) {
+    ui::Button *button = (ui::Button *)sender;
+    size_t idx = button->getTag();
+    if (_viewCallback(g_records[idx])) {
+        Director::getInstance()->popScene();
     }
-
-    lazyLoadRecords();
-
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    ui::Widget *innerNode = ui::Widget::create();
-    innerNode->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
-    const float scrollHeight = visibleSize.height - 35;
-    const float innerNodeHeight = std::max<float>(g_records.size() * 40, scrollHeight);
-    innerNode->setContentSize(Size(visibleSize.width, innerNodeHeight));
-
-    float y = innerNodeHeight - 20;
-    for (std::vector<Record>::size_type i = 0; i < g_records.size(); ++i) {
-        ui::Widget *widget = createRecordWidget(i, visibleSize.width);
-        innerNode->addChild(widget);
-        widget->setPosition(Vec2(visibleSize.width * 0.5f, y));
-        y -= 40;
-    }
-
-    ui::ScrollView *scrollView = ui::ScrollView::create();
-    scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    scrollView->setContentSize(Size(visibleSize.width, scrollHeight));
-    scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
-    scrollView->setInnerContainerSize(innerNode->getContentSize());
-    scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
-    this->addChild(scrollView);
-
-    scrollView->addChild(innerNode);
-
-    return true;
 }
 
 void HistoryScene::addRecord(const Record &record) {
@@ -176,19 +216,14 @@ void HistoryScene::modifyRecord(const Record &record) {
     lazyLoadRecords();
     auto it = std::find_if(g_records.begin(), g_records.end(), [&record](const Record &r) {
         return (r.start_time == record.start_time
-            && r.end_time == record.end_time
-            && strncmp(r.name[0], record.name[0], 255) == 0
-            && strncmp(r.name[1], record.name[1], 255) == 0
-            && strncmp(r.name[2], record.name[2], 255) == 0
-            && strncmp(r.name[3], record.name[3], 255) == 0);
+            && r.end_time == record.end_time);
     });
 
     if (it == g_records.end()) {
         g_records.push_back(record);
-        saveRecords();
     }
     else {
         memcpy(&*it, &record, sizeof(Record));
-        saveRecords();
     }
+    saveRecords();
 }

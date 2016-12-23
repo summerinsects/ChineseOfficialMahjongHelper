@@ -3,11 +3,16 @@
 
 #include "../BaseLayer.h"
 
+namespace cw {
+    class TableViewCell;
+    class TableView;
+}
+
 struct Record;
 
 class HistoryScene : public BaseLayer {
 public:
-    static cocos2d::Scene *createScene(const std::function<void (const Record &)> &viewCallback);
+    static cocos2d::Scene *createScene(const std::function<bool (const Record &)> &viewCallback);
 
     virtual bool init() override;
 
@@ -17,9 +22,12 @@ public:
     static void modifyRecord(const Record &record);
 
 private:
-    cocos2d::ui::Widget *createRecordWidget(size_t idx, float width);
+    cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
+    void onDeleteButton(cocos2d::Ref *sender);
+    void onViewButton(cocos2d::Ref *sender);
 
-    std::function<void (const Record &)> _viewCallback;
+    cw::TableView *_tableView = nullptr;
+    std::function<bool (const Record &)> _viewCallback;
 };
 
 #endif
