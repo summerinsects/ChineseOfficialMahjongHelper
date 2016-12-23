@@ -389,6 +389,7 @@ void ScoreSheetScene::recover() {
 
 void ScoreSheetScene::reset() {
     memset(&g_currentRecord, 0, sizeof(g_currentRecord));
+    writeToJson();
 
     memset(_totalScores, 0, sizeof(_totalScores));
 
