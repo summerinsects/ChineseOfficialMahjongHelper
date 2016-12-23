@@ -11,6 +11,10 @@ USING_NS_CC;
 
 static Record g_currentRecord;
 
+static inline bool isCStringEmpty(const char *str) {
+    return *str == '\0';
+}
+
 static void readFromJson() {
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("record.json");
@@ -340,7 +344,7 @@ void ScoreSheetScene::refreshEndTime() {
 void ScoreSheetScene::recover() {
     // 有选手名字为空，则清空数据
     const char (&name)[4][255] = g_currentRecord.name;
-    if (std::any_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })) {
+    if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)) {
         memset(&g_currentRecord, 0, sizeof(g_currentRecord));
         onTimeScheduler(0.0f);
         this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
@@ -447,7 +451,7 @@ void ScoreSheetScene::editName(size_t idx) {
 
 void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
     const char (&name)[4][255] = g_currentRecord.name;
-    if (std::any_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })) {
+    if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)) {
         AlertLayer::showWithMessage("锁定", "请先录入四位参赛选手姓名", nullptr, nullptr);
         return;
     }
@@ -601,7 +605,7 @@ void ScoreSheetScene::onTimeScheduler(float dt) {
 
 void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
     const char (&name)[4][255] = g_currentRecord.name;
-    if (std::any_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })) {
+    if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)) {
         reset();
         return;
     }
@@ -658,7 +662,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     ui::Widget *rootWidget = nullptr;
 
     // 当当前一局比赛未结束时，显示快捷分差按钮
-    if (std::none_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })
+    if (std::none_of(std::begin(name), std::end(name), &isCStringEmpty)
         && g_currentRecord.current_index < 16) {
         rootWidget = ui::Widget::create();
         rootWidget->setContentSize(Size(150.0f, 200.0f));
@@ -739,7 +743,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
 
 void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
     const char (&name)[4][255] = g_currentRecord.name;
-    if (std::any_of(std::begin(name), std::end(name), [](const char *str) { return *str == '\0'; })
+    if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)
         || g_currentRecord.current_index == 16) {
         return;
     }
