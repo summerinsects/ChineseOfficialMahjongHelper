@@ -83,7 +83,12 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
         buttons.reserve(13);
         for (size_t k = 0; k < 13; ++k) {
             size_t idx0 = eachLevelBeginIndex[idx] + k;
-            ui::Button *button = createPointButton(idx0);
+            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            button->setScale9Enabled(true);
+            button->setContentSize(Size(66.0f, 20.0f));
+            button->setTitleColor(Color3B::BLACK);
+            button->setTitleFontSize(12);
+
             cell->addChild(button);
             buttons.push_back(button);
         }
