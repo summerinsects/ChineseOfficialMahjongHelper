@@ -252,6 +252,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             button->setContentSize(Size(66.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
+            button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1));
 
             cell->addChild(button);
             buttons.push_back(button);
@@ -262,9 +263,9 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
 
-    CustomCell::ExtDataType &ext = cell->getExtData();
-    Label *&label = std::get<0>(ext);
-    std::vector<ui::Button *> &buttons = std::get<1>(ext);
+    const CustomCell::ExtDataType &ext = cell->getExtData();
+    Label *label = std::get<0>(ext);
+    const std::vector<ui::Button *> &buttons = std::get<1>(ext);
 
     label->setString(StringUtils::format("%d番", pointsLevel[idx]));
     label->setPosition(Vec2(5.0f, y - 7.0f));
@@ -274,7 +275,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
         button->setTitleText(mahjong::points_name[idx0]);
-        button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1, idx0));
+        button->setTag(idx0);
         button->setVisible(true);
         button->setEnabled(true);
 
@@ -469,14 +470,15 @@ void RecordScene::onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::Eve
     updateScoreLabel();
 }
 
-void RecordScene::onPointsNameButton(cocos2d::Ref *sender, int index) {
+void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
+    ui::Button *button = (ui::Button *)sender;
+    int index = button->getTag();
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
     if (index > mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
         --index;
     }
 #endif
     // 标记/取消标记番种
-    ui::Button *button = (ui::Button *)sender;
     bool selected = !!button->getUserData();
     if (selected) {
         button->setHighlighted(false);

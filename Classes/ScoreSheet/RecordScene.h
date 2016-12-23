@@ -47,7 +47,7 @@ private:
     void onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
     void onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
-    void onPointsNameButton(cocos2d::Ref *sender, int index);
+    void onPointsNameButton(cocos2d::Ref *sender);
     void onOkButton(cocos2d::Ref *sender);
 };
 

@@ -88,6 +88,7 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
             button->setContentSize(Size(66.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
+            button->addClickEventListener(std::bind(&ScoreTableScene::onPointsNameButton, this, std::placeholders::_1));
 
             cell->addChild(button);
             buttons.push_back(button);
@@ -98,9 +99,9 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
 
-    CustomCell::ExtDataType &ext = cell->getExtData();
-    Label *&label = std::get<0>(ext);
-    std::vector<ui::Button *> &buttons = std::get<1>(ext);
+    const CustomCell::ExtDataType ext = cell->getExtData();
+    Label *label = std::get<0>(ext);
+    const std::vector<ui::Button *> &buttons = std::get<1>(ext);
 
     label->setString(StringUtils::format("%d番", pointsLevel[idx]));
     label->setPosition(Vec2(5.0f, y - 7.0f));
@@ -110,9 +111,7 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
         size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
         button->setTitleText(mahjong::points_name[idx0]);
-        button->addClickEventListener([idx0](Ref *) {
-            Director::getInstance()->pushScene(ScoreDefinitionScene::createScene(idx0));
-        });
+        button->setTag(idx0);
         button->setVisible(true);
         button->setEnabled(true);
 
@@ -129,4 +128,10 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
     }
 
     return cell;
+}
+
+void ScoreTableScene::onPointsNameButton(cocos2d::Ref *sender) {
+    ui::Button *button = (ui::Button *)sender;
+    size_t idx = button->getTag();
+    Director::getInstance()->pushScene(ScoreDefinitionScene::createScene(idx));
 }

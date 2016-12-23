@@ -19,6 +19,7 @@ public:
 private:
     cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx);
     cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
+    void onPointsNameButton(cocos2d::Ref *sender);
 };
 
 #endif
