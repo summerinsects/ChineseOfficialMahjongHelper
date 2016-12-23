@@ -24,6 +24,7 @@ private:
     cocos2d::Label *_timeLabel = nullptr;
 
     void fillRow(size_t handIdx);
+    void cleanRow(size_t handIdx);
     void refreshStartTime();
     void refreshEndTime();
     void recover();

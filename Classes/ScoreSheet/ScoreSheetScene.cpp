@@ -264,6 +264,16 @@ bool ScoreSheetScene::init() {
     return true;
 }
 
+void ScoreSheetScene::cleanRow(size_t handIdx) {
+    for (int i = 0; i < 4; ++i) {
+        _scoreLabels[handIdx][i]->setString("");
+    }
+    _recordButton[handIdx]->setVisible(false);
+    _recordButton[handIdx]->setEnabled(false);
+    _pointNameLabel[handIdx]->setVisible(false);
+    _detailButton[handIdx]->setEnabled(false);
+}
+
 void ScoreSheetScene::fillRow(size_t handIdx) {
     int scoreTable[4];
     const Record::Detail &detail = g_currentRecord.detail[handIdx];
@@ -366,8 +376,11 @@ void ScoreSheetScene::recover() {
     memset(_totalScores, 0, sizeof(_totalScores));
 
     // 逐行填入数据
-    for (size_t k = 0; k < g_currentRecord.current_index; ++k) {
-        fillRow(k);
+    for (size_t i = 0; i < g_currentRecord.current_index; ++i) {
+        fillRow(i);
+    }
+    for (size_t i = g_currentRecord.current_index; i < 16; ++i) {
+        cleanRow(i);
     }
 
     // 刷新总分label
@@ -403,14 +416,8 @@ void ScoreSheetScene::reset() {
     onTimeScheduler(0.0f);
     this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
 
-    for (int k = 0; k < 16; ++k) {
-        for (int i = 0; i < 4; ++i) {
-            _scoreLabels[k][i]->setString("");
-        }
-        _recordButton[k]->setVisible(false);
-        _recordButton[k]->setEnabled(false);
-        _pointNameLabel[k]->setVisible(false);
-        _detailButton[k]->setEnabled(false);
+    for (int i = 0; i < 16; ++i) {
+        cleanRow(i);
     }
 }
 
