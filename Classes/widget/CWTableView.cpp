@@ -5,8 +5,7 @@ using namespace cocos2d::ui;
 
 namespace cw {
     TableView::TableView()
-    : _touchedCell(nullptr)
-    , _vordering(VerticalFillOrder::BOTTOM_UP)
+    : _vordering(VerticalFillOrder::BOTTOM_UP)
     , _oldDirection(Direction::NONE)
     , _isUsedCellsDirty(false) {
 
@@ -50,8 +49,8 @@ namespace cw {
         }
     }
 
-    void TableView::setTableViewCellCallback(const ccTableViewCellCallback &callback) {
-        _tableViewCellCallback = callback;
+    void TableView::setTableViewCellWillRecycleCallback(const ccTableViewCellWillRecycleCallback &callback) {
+        _tableViewCellWillRecycleCallback = callback;
     }
 
     void TableView::setTableViewCallback(const ccTableViewCallback &callback) {
@@ -91,8 +90,8 @@ namespace cw {
         _oldDirection = Direction::NONE;
 
         for (const auto &cell : _cellsUsed) {
-            if (_tableViewCellCallback) {
-                _tableViewCellCallback(this, cell, CellEventType::WILL_RECYCLE);
+            if (_tableViewCellWillRecycleCallback) {
+                _tableViewCellWillRecycleCallback(this, cell);
             }
 
             _cellsFreed.pushBack(cell);
@@ -119,8 +118,8 @@ namespace cw {
         _oldDirection = _direction;
 
         for (const auto &cell : _cellsUsed) {
-            if (_tableViewCellCallback) {
-                _tableViewCellCallback(this, cell, CellEventType::WILL_RECYCLE);
+            if (_tableViewCellWillRecycleCallback) {
+                _tableViewCellWillRecycleCallback(this, cell);
             }
 
             _cellsFreed.pushBack(cell);
@@ -340,8 +339,8 @@ namespace cw {
     }
 
     void TableView::_moveCellOutOfSight(TableViewCell *cell) {
-        if (_tableViewCellCallback) {
-            _tableViewCellCallback(this, cell, CellEventType::WILL_RECYCLE);
+        if (_tableViewCellWillRecycleCallback) {
+            _tableViewCellWillRecycleCallback(this, cell);
         }
 
         _cellsFreed.pushBack(cell);
@@ -479,73 +478,6 @@ namespace cw {
             if (_indices.find(i) == _indices.end()) {
                 this->updateCellAtIndex(i);
             }
-        }
-    }
-
-    void TableView::onTouchEnded(Touch *pTouch, Event *pEvent) {
-        if (!this->isVisible()) {
-            return;
-        }
-
-        if (_touchedCell != nullptr) {
-            Rect bb = this->getBoundingBox();
-            bb.origin = _parent->convertToWorldSpace(bb.origin);
-
-            if (bb.containsPoint(pTouch->getLocation())) {
-                if (_tableViewCellCallback) {
-                    _tableViewCellCallback(this, _touchedCell, CellEventType::UNHIGHLIGHT);
-                    _tableViewCellCallback(this, _touchedCell, CellEventType::TOUCHED);
-                }
-            }
-
-            _touchedCell = nullptr;
-        }
-
-        ScrollView::onTouchEnded(pTouch, pEvent);
-    }
-
-    bool TableView::onTouchBegan(Touch *pTouch, Event *pEvent) {
-        if (!this->isVisible()) {
-            return false;
-        }
-
-        bool touchResult = ScrollView::onTouchBegan(pTouch, pEvent);
-
-        Vec2 point = this->_innerContainer->convertTouchToNodeSpace(pTouch);
-        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0);
-        long index = this->_indexFromOffset(point, cellsCount);
-        _touchedCell = (index == CC_INVALID_INDEX ? nullptr :  this->cellAtIndex(index));
-
-        if (_touchedCell != nullptr) {
-            if (_tableViewCellCallback) {
-                _tableViewCellCallback(this, _touchedCell, CellEventType::HIGHLIGHT);
-            }
-        }
-
-        return touchResult;
-    }
-
-    void TableView::onTouchMoved(Touch *pTouch, Event *pEvent) {
-        ScrollView::onTouchMoved(pTouch, pEvent);
-
-        if (_touchedCell != nullptr) {
-            if (_tableViewCellCallback) {
-                _tableViewCellCallback(this, _touchedCell, CellEventType::UNHIGHLIGHT);
-            }
-
-            _touchedCell = nullptr;
-        }
-    }
-
-    void TableView::onTouchCancelled(Touch *pTouch, Event *pEvent) {
-        ScrollView::onTouchCancelled(pTouch, pEvent);
-
-        if (_touchedCell != nullptr) {
-            if (_tableViewCellCallback) {
-                _tableViewCellCallback(this, _touchedCell, CellEventType::UNHIGHLIGHT);
-            }
-
-            _touchedCell = nullptr;
         }
     }
 

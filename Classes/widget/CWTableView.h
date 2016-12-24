@@ -64,13 +64,7 @@ namespace cw {
             BOTTOM_UP
         };
 
-        enum class CellEventType {
-            TOUCHED,
-            HIGHLIGHT,
-            UNHIGHLIGHT,
-            WILL_RECYCLE
-        };
-        typedef std::function<void (TableView *table, TableViewCell *cell, CellEventType)> ccTableViewCellCallback;
+        typedef std::function<void (TableView *table, TableViewCell *cell)> ccTableViewCellWillRecycleCallback;
 
         enum class CallbackType {
             CELL_SIZE,  // param for pointer to CellSizeParam
@@ -100,7 +94,7 @@ namespace cw {
         static TableView *create();
         virtual bool init() override;
 
-        void setTableViewCellCallback(const ccTableViewCellCallback &callback);
+        void setTableViewCellWillRecycleCallback(const ccTableViewCellWillRecycleCallback &callback);
         void setTableViewCallback(const ccTableViewCallback &callback);
 
         /**
@@ -150,12 +144,6 @@ namespace cw {
 
         virtual void setDirection(cocos2d::ui::ScrollView::Direction dir) override;
 
-        //handle touch event
-        virtual bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unusedEvent) override;
-        virtual void onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *unusedEvent) override;
-        virtual void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *unusedEvent) override;
-        virtual void onTouchCancelled(cocos2d::Touch *touch, cocos2d::Event *unusedEvent) override;
-
         cocos2d::Vec2 maxContainerOffset();
         cocos2d::Vec2 minContainerOffset();
 
@@ -176,7 +164,6 @@ namespace cw {
         void _updateCellPositions(ssize_t cellsCount);
         void _scrollViewDidScroll(ssize_t cellsCount);
 
-        TableViewCell *_touchedCell;
         /**
          * vertical direction of cell filling
          */
@@ -201,7 +188,7 @@ namespace cw {
          */
         cocos2d::Vector<TableViewCell *> _cellsFreed;
 
-        ccTableViewCellCallback _tableViewCellCallback;
+        ccTableViewCellWillRecycleCallback _tableViewCellWillRecycleCallback;
         ccTableViewCallback _tableViewCallback;
 
         cocos2d::ui::ScrollView::Direction _oldDirection;
