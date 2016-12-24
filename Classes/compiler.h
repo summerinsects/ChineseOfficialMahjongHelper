@@ -69,7 +69,7 @@
 
 // deprecated
 #ifndef DEPRECATED
-#if (defined(__clang__) && __has_attribute(__deprecated__)) || (defined(__GNUC__) && (__GNUC__ >= 3))
+#if defined(__clang__) || (defined(__GNUC__) && (__GNUC__ >= 3))
 #define DEPRECATED __attribute__((__deprecated__))
 #elif defined(_MSC_VER)  && (_MSC_VER >= 1300)
 #define DEPRECATED __declspec(deprecated)
