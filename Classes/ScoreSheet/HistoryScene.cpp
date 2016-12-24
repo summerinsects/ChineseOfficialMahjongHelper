@@ -19,7 +19,7 @@ Scene *HistoryScene::createScene(const std::function<bool (const Record &)> &vie
     return scene;
 }
 
-static void loadRecords() {
+static void loadRecords(std::vector<Record> &records) {
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
     std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
@@ -28,9 +28,9 @@ static void loadRecords() {
         jw::cppJSON json;
         json.Parse(str.c_str());
 
-        g_records.clear();
-        g_records.reserve(json.size());
-        std::transform(json.begin(), json.end(), std::back_inserter(g_records), [](const jw::cppJSON &json) {
+        records.clear();
+        records.reserve(json.size());
+        std::transform(json.begin(), json.end(), std::back_inserter(records), [](const jw::cppJSON &json) {
             Record record;
             fromJson(&record, json);
             return record;
@@ -41,14 +41,14 @@ static void loadRecords() {
     }
 }
 
-static void saveRecords() {
+static void saveRecords(const std::vector<Record> &records) {
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
     FILE *file = fopen(fileName.c_str(), "wb");
     if (file != nullptr) {
         try {
             jw::cppJSON json(jw::cppJSON::ValueType::Array);
-            std::transform(g_records.begin(), g_records.end(), std::back_inserter(json), [](const Record &record) {
+            std::transform(records.begin(), records.end(), std::back_inserter(json), [](const Record &record) {
                 jw::cppJSON json(jw::cppJSON::ValueType::Object);
                 toJson(record, &json);
                 return json;
@@ -65,15 +65,20 @@ static void saveRecords() {
 
 static void loadRecordsAsync(const std::function<void ()> &callback) {
     std::thread thread([callback]() {
-        loadRecords();
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread(callback);
+        std::vector<Record> temp;
+        loadRecords(temp);
+        Director::getInstance()->getScheduler()->performFunctionInCocosThread([callback, temp]() mutable {
+            g_records.swap(temp);
+            callback();
+        });
     });
     thread.detach();
 }
 
 static void saveRecordsAsync(const std::function<void ()> &callback) {
-    std::thread thread([callback](){
-        saveRecords();
+    std::vector<Record> temp = g_records;
+    std::thread thread([callback, temp](){
+        saveRecords(temp);
         Director::getInstance()->getScheduler()->performFunctionInCocosThread(callback);
     });
     thread.detach();
@@ -114,6 +119,8 @@ bool HistoryScene::init() {
     this->addChild(_tableView);
 
     if (UNLIKELY(g_records.empty())) {
+        _tableView->setEnabled(false);
+
         Sprite *sprite = Sprite::create("source_material/loading_black.png");
         this->addChild(sprite);
         sprite->setScale(40 / sprite->getContentSize().width);
@@ -124,6 +131,7 @@ bool HistoryScene::init() {
         loadRecordsAsync([thiz, sprite]() {
             if (LIKELY(thiz->getParent() != nullptr)) {
                 sprite->removeFromParent();
+                thiz->_tableView->setEnabled(true);
                 thiz->_tableView->reloadData();
             }
         });
@@ -239,7 +247,7 @@ void HistoryScene::onViewButton(cocos2d::Ref *sender) {
 static void addRecord(const Record &record) {
     if (g_records.end() == std::find(g_records.begin(), g_records.end(), record)) {
         g_records.push_back(record);
-        saveRecords();
+        saveRecordsAsync([]{});
     }
 }
 
@@ -266,7 +274,7 @@ static void modifyRecord(const Record &record) {
     else {
         memcpy(&*it, &record, sizeof(Record));
     }
-    saveRecords();
+    saveRecordsAsync([]{});
 }
 
 void HistoryScene::modifyRecord(const Record &record) {
