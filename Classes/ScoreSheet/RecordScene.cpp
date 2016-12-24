@@ -244,8 +244,8 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
 
-        buttons.reserve(13);
-        for (size_t k = 0; k < 13; ++k) {
+        buttons.reserve(9);
+        for (size_t k = 0; k < 9; ++k) {
             size_t idx0 = eachLevelBeginIndex[idx] + k;
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
@@ -295,7 +295,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         button->setUserData((void *)selected);
     }
 
-    for (size_t k = eachLevelCounts[idx]; k < 13; ++k) {
+    for (size_t k = eachLevelCounts[idx]; k < 9; ++k) {
         buttons[k]->setVisible(false);
         buttons[k]->setEnabled(false);
     }
