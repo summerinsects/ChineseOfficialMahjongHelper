@@ -2,6 +2,7 @@
 #include "ui/UIWebView.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
+#include "../compiler.h"
 #include <thread>
 
 USING_NS_CC;
@@ -52,8 +53,19 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
         return false;
     }
 
-    if (g_vec.empty()) {
+    if (LIKELY(!g_vec.empty())) {
+        createContentView(idx);
+    }
+    else {
         Size visibleSize = Director::getInstance()->getVisibleSize();
+        Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+        Sprite *sprite = Sprite::create("source_material/loading_black.png");
+        this->addChild(sprite);
+        sprite->setScale(40 / sprite->getContentSize().width);
+        sprite->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
+        sprite->runAction(RepeatForever::create(RotateBy::create(0.5f, 180.0f)));
+
         float scale = 1.0f;
         float maxWidth = (visibleSize.width - 10) / 18;
         if (maxWidth < 25) {
@@ -61,7 +73,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
         }
 
         auto thiz = RefPtr<ScoreDefinitionScene>(this);
-        std::thread thread([thiz, idx, scale]() {
+        std::thread thread([thiz, idx, scale, sprite]() {
             ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
             g_vec.reserve(valueVec.size());
             std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_vec),
@@ -69,17 +81,16 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
             std::for_each(g_vec.begin(), g_vec.end(),
                 std::bind(&replaceTilesToImage, std::placeholders::_1, scale));
 
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx]() {
-                if (thiz->isRunning()) {
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, sprite]() {
+                if (LIKELY(thiz->getParent() != nullptr)) {
+                    sprite->removeFromParent();
                     thiz->createContentView(idx);
                 }
             });
         });
         thread.detach();
     }
-    else {
-        createContentView(idx);
-    }
+
     return true;
 }
 

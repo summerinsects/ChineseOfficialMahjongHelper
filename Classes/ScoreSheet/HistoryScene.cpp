@@ -2,6 +2,7 @@
 #include "Record.h"
 #include "../widget/AlertLayer.h"
 #include "../widget/CWTableView.h"
+#include "../compiler.h"
 #include <thread>
 
 #pragma execution_character_set("utf-8")
@@ -112,12 +113,21 @@ bool HistoryScene::init() {
     _tableView->reloadData();
     this->addChild(_tableView);
 
-    auto thiz = RefPtr<HistoryScene>(this);
-    loadRecordsAsync([thiz]() {
-        if (thiz->isRunning()) {
-            thiz->_tableView->reloadData();
-        }
-    });
+    if (UNLIKELY(g_records.empty())) {
+        Sprite *sprite = Sprite::create("source_material/loading_black.png");
+        this->addChild(sprite);
+        sprite->setScale(40 / sprite->getContentSize().width);
+        sprite->setPosition(_tableView->getPosition());
+        sprite->runAction(RepeatForever::create(RotateBy::create(0.5f, 180.0f)));
+
+        auto thiz = RefPtr<HistoryScene>(this);
+        loadRecordsAsync([thiz, sprite]() {
+            if (LIKELY(thiz->getParent() != nullptr)) {
+                sprite->removeFromParent();
+                thiz->_tableView->reloadData();
+            }
+        });
+    }
 
     return true;
 }
@@ -211,7 +221,7 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         g_records.erase(g_records.begin() + idx);
         auto thiz = RefPtr<HistoryScene>(this);
         saveRecordsAsync([thiz]() {
-            if (thiz->isRunning()) {
+            if (LIKELY(thiz->getParent() != nullptr)) {
                 thiz->_tableView->reloadData();
             }
         });
