@@ -34,7 +34,7 @@ bool ScoreTableScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 35));
+    tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 35));
     tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param) {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
@@ -83,7 +83,7 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
             size_t idx0 = eachLevelBeginIndex[idx] + k;
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
-            button->setContentSize(Size(66.0f, 20.0f));
+            button->setContentSize(Size(65.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
             button->addClickEventListener(std::bind(&ScoreTableScene::onPointsNameButton, this, std::placeholders::_1));
@@ -96,7 +96,7 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
     const size_t currentLevelCount = eachLevelCounts[idx];
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float gap = (visibleSize.width - 4.0f) * 0.25f;
+    const float gap = (visibleSize.width - 10.0f) * 0.25f;
     size_t totalRows = computeRowsAlign4(currentLevelCount);
 
     const CustomCell::ExtDataType ext = cell->getExtData();
