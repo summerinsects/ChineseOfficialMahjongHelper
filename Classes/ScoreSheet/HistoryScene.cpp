@@ -93,7 +93,7 @@ bool HistoryScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     _tableView = cw::TableView::create();
-    _tableView->setContentSize(Size(visibleSize.width * 0.95f, visibleSize.height - 35));
+    _tableView->setContentSize(Size(visibleSize.width - 10.0f, visibleSize.height - 35));
     _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param) {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
@@ -148,7 +148,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         cell = CustomCell::create();
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = visibleSize.width * 0.95f;
+        const float width = visibleSize.width - 10.0f;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&label = std::get<0>(ext);
