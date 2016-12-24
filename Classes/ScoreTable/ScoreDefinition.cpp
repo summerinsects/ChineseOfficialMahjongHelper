@@ -2,6 +2,7 @@
 #include "ui/UIWebView.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
+#include <thread>
 
 USING_NS_CC;
 
@@ -37,12 +38,6 @@ static void replaceTilesToImage(std::string &text, float scale) {
 }
 
 Scene *ScoreDefinitionScene::createScene(size_t idx) {
-    if (g_vec.empty()) {
-        ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
-        g_vec.reserve(valueVec.size());
-        std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_vec), std::bind(&Value::asString, std::placeholders::_1));
-    }
-
     auto scene = Scene::create();
     auto layer = new (std::nothrow) ScoreDefinitionScene();
     layer->initWithIndex(idx);
@@ -57,6 +52,23 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
         return false;
     }
 
+    if (g_vec.empty()) {
+        std::thread thread([this, idx]() {
+            ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
+            g_vec.reserve(valueVec.size());
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_vec), std::bind(&Value::asString, std::placeholders::_1));
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread(
+                std::bind(&ScoreDefinitionScene::createContentView, this, idx));
+        });
+        thread.detach();
+    }
+    else {
+        createContentView(idx);
+    }
+    return true;
+}
+
+void ScoreDefinitionScene::createContentView(size_t idx) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -89,6 +101,4 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     this->addChild(richText);
     richText->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 40.0f));
 #endif
-
-    return true;
 }

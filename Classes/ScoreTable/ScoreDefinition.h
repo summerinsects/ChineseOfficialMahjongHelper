@@ -8,6 +8,9 @@ public:
     static cocos2d::Scene *createScene(size_t idx);
 
     bool initWithIndex(size_t idx);
+
+private:
+    void createContentView(size_t idx);
 };
 
 #endif
