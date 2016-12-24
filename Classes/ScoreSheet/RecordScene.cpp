@@ -17,6 +17,19 @@ Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const 
     return scene;
 }
 
+static const int pointsLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
+static const size_t eachLevelBeginIndex[] =
+#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+{ 56, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
+#else
+{ 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
+#endif
+static const size_t eachLevelCounts[] = { 4, 7, 8, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
+
+static inline size_t computeRowsAlign4(size_t cnt) {
+    return (cnt >> 2) + !!(cnt & 0x3);
+}
+
 bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail) {
     if (!BaseLayer::initWithTitle(handNameText[handIdx])) {
         return false;
@@ -176,7 +189,9 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
             auto p = (cw::TableView::CellSizeParam *)param;
-            p->size = tableCellSizeForIndex(table, p->idx);
+            size_t cnt = eachLevelCounts[p->idx];
+            float height = computeRowsAlign4(cnt) * 25.0f;
+            p->size = Size(0, height + 15.0f);
             return 0;
         }
         case cw::TableView::CallbackType::CELL_AT_INDEX:
@@ -213,24 +228,8 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     return true;
 }
 
-static const int pointsLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
-static const size_t eachLevelBeginIndex[] =
-#if HAS_CONCEALED_KONG_AND_MELDED_KONG
-{ 56, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
-#else
-{ 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
-#endif
-static const size_t eachLevelCounts[] = { 4, 7, 8, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
-
-cocos2d::Size RecordScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
-    size_t cnt = eachLevelCounts[idx];
-
-    float height = ((cnt >> 2) + !!(cnt & 0x3)) * 24.0f;  // 每行排4个
-    return Size(0, height + 14.0f);
-}
-
 cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *, std::vector<ui::Button *> > CustomCell;
+    typedef cw::TableViewCellEx<Label *, ui::Button *[9]> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
@@ -238,13 +237,12 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&label = std::get<0>(ext);
-        std::vector<ui::Button *> &buttons = std::get<1>(ext);
+        ui::Button *(&buttons)[9] = std::get<1>(ext);
 
         label = Label::createWithSystemFont("1番", "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
 
-        buttons.reserve(9);
         for (size_t k = 0; k < 9; ++k) {
             size_t idx0 = eachLevelBeginIndex[idx] + k;
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -255,23 +253,24 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1));
 
             cell->addChild(button);
-            buttons.push_back(button);
+            buttons[k] = button;
         }
     }
 
-    float y = tableCellSizeForIndex(table, idx).height;
+    const size_t currentLevelCount = eachLevelCounts[idx];
+
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
+    size_t totalRows = computeRowsAlign4(currentLevelCount);
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
-    const std::vector<ui::Button *> &buttons = std::get<1>(ext);
+    ui::Button *const (&buttons)[9] = std::get<1>(ext);
 
     label->setString(StringUtils::format("%d番", pointsLevel[idx]));
-    label->setPosition(Vec2(5.0f, y - 7.0f));
-    y -= 14.0f;
+    label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
-    for (size_t k = 0; k < eachLevelCounts[idx]; ++k) {
+    for (size_t k = 0; k < currentLevelCount; ++k) {
         size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
         button->setTitleText(mahjong::points_name[idx0]);
@@ -279,11 +278,9 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         button->setVisible(true);
         button->setEnabled(true);
 
-        size_t col = k % 4;
-        if (k > 0 && col == 0) {
-            y -= 24.0f;
-        }
-        button->setPosition(Vec2(gap * (col + 0.5f), y - 12.0f));
+        size_t col = k & 0x3;
+        size_t row = k >> 2;
+        button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
         if (idx0 > mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
@@ -295,7 +292,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         button->setUserData((void *)selected);
     }
 
-    for (size_t k = eachLevelCounts[idx]; k < 9; ++k) {
+    for (size_t k = currentLevelCount; k < 9; ++k) {
         buttons[k]->setVisible(false);
         buttons[k]->setEnabled(false);
     }

@@ -34,7 +34,6 @@ private:
     Record::Detail _detail;
     std::function<void (const Record::Detail &)> _okCallback;
 
-    cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx);
     cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
 
     void refresh();
