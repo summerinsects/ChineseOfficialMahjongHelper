@@ -112,7 +112,7 @@ bool HistoryScene::init() {
     _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    _tableView->setScrollBarPositionFromCorner(Vec2(10, 10));
+    _tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
     _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     _tableView->reloadData();

@@ -205,7 +205,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    tableView->setScrollBarPositionFromCorner(Vec2(10, 10));
+    tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 110.0f));
     tableView->reloadData();
