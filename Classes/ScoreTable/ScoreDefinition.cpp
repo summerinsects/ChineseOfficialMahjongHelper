@@ -53,12 +53,27 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     }
 
     if (g_vec.empty()) {
-        std::thread thread([this, idx]() {
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        float scale = 1.0f;
+        float maxWidth = (visibleSize.width - 10) / 18;
+        if (maxWidth < 25) {
+            scale = maxWidth / 27;
+        }
+
+        auto thiz = RefPtr<ScoreDefinitionScene>(this);
+        std::thread thread([thiz, idx, scale]() {
             ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
             g_vec.reserve(valueVec.size());
-            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_vec), std::bind(&Value::asString, std::placeholders::_1));
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread(
-                std::bind(&ScoreDefinitionScene::createContentView, this, idx));
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_vec),
+                std::bind(&Value::asString, std::placeholders::_1));
+            std::for_each(g_vec.begin(), g_vec.end(),
+                std::bind(&replaceTilesToImage, std::placeholders::_1, scale));
+
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx]() {
+                if (thiz->isRunning()) {
+                    thiz->createContentView(idx);
+                }
+            });
         });
         thread.detach();
     }
@@ -78,13 +93,7 @@ void ScoreDefinitionScene::createContentView(size_t idx) {
     }
 #endif
 
-    std::string &text = g_vec[idx];
-    float scale = 1.0f;
-    float maxWidth = (visibleSize.width - 10) / 18;
-    if (maxWidth < 25) {
-        scale = maxWidth / 27;
-    }
-    replaceTilesToImage(text, scale);
+    const std::string &text = g_vec[idx];
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
