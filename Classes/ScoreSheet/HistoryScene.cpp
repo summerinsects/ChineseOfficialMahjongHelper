@@ -2,6 +2,7 @@
 #include "Record.h"
 #include "../widget/AlertLayer.h"
 #include "../widget/CWTableView.h"
+#include <thread>
 
 #pragma execution_character_set("utf-8")
 
@@ -17,11 +18,7 @@ Scene *HistoryScene::createScene(const std::function<bool (const Record &)> &vie
     return scene;
 }
 
-static void lazyLoadRecords() {
-    if (!g_records.empty()) {
-        return;
-    }
-
+static void loadRecords() {
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
     std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
@@ -65,12 +62,26 @@ static void saveRecords() {
     }
 }
 
+static void loadRecordsAsync(const std::function<void ()> &callback) {
+    std::thread thread([callback]() {
+        loadRecords();
+        Director::getInstance()->getScheduler()->performFunctionInCocosThread(callback);
+    });
+    thread.detach();
+}
+
+static void saveRecordsAsync(const std::function<void ()> &callback) {
+    std::thread thread([callback](){
+        saveRecords();
+        Director::getInstance()->getScheduler()->performFunctionInCocosThread(callback);
+    });
+    thread.detach();
+}
+
 bool HistoryScene::init() {
     if (!BaseLayer::initWithTitle("历史记录")) {
         return false;
     }
-
-    lazyLoadRecords();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -100,6 +111,13 @@ bool HistoryScene::init() {
     _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     _tableView->reloadData();
     this->addChild(_tableView);
+
+    auto thiz = RefPtr<HistoryScene>(this);
+    loadRecordsAsync([thiz]() {
+        if (thiz->isRunning()) {
+            thiz->_tableView->reloadData();
+        }
+    });
 
     return true;
 }
@@ -191,8 +209,12 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     size_t idx = button->getTag();
     AlertLayer::showWithMessage("删除记录", "删除后无法找回，确认删除？", [this, idx]() {
         g_records.erase(g_records.begin() + idx);
-        saveRecords();
-        _tableView->reloadData();
+        auto thiz = RefPtr<HistoryScene>(this);
+        saveRecordsAsync([thiz]() {
+            if (thiz->isRunning()) {
+                thiz->_tableView->reloadData();
+            }
+        });
     }, nullptr);
 }
 
@@ -204,16 +226,25 @@ void HistoryScene::onViewButton(cocos2d::Ref *sender) {
     }
 }
 
-void HistoryScene::addRecord(const Record &record) {
-    lazyLoadRecords();
+static void addRecord(const Record &record) {
     if (g_records.end() == std::find(g_records.begin(), g_records.end(), record)) {
         g_records.push_back(record);
         saveRecords();
     }
 }
 
-void HistoryScene::modifyRecord(const Record &record) {
-    lazyLoadRecords();
+void HistoryScene::addRecord(const Record &record) {
+    if (g_records.empty()) {
+        loadRecordsAsync([record]{
+            ::addRecord(record);
+        });
+    }
+    else {
+        ::addRecord(record);
+    }
+}
+
+static void modifyRecord(const Record &record) {
     auto it = std::find_if(g_records.begin(), g_records.end(), [&record](const Record &r) {
         return (r.start_time == record.start_time
             && r.end_time == record.end_time);
@@ -226,4 +257,15 @@ void HistoryScene::modifyRecord(const Record &record) {
         memcpy(&*it, &record, sizeof(Record));
     }
     saveRecords();
+}
+
+void HistoryScene::modifyRecord(const Record &record) {
+    if (g_records.empty()) {
+        loadRecordsAsync([record]{
+            ::modifyRecord(record);
+        });
+    }
+    else {
+        ::modifyRecord(record);
+    }
 }
