@@ -35,7 +35,7 @@ bool ScoreTableScene::init() {
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 35));
-    tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param) {
+    tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param)->intptr_t {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
             auto p = (cw::TableView::CellSizeParam *)param;

@@ -13,6 +13,8 @@
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		1F2D25871E076FC20071ADE2 /* AlertLayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertLayer.cpp */; };
 		1F2D25881E076FC20071ADE2 /* AlertLayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertLayer.cpp */; };
+		1F4192741E10A10200CDC47D /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4192721E10A10200CDC47D /* CWTableView.cpp */; };
+		1F4192751E10A10200CDC47D /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4192721E10A10200CDC47D /* CWTableView.cpp */; };
 		1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1FBC7B501CCB4CD100A782A4 /* other.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FBC7B4F1CCB4CD100A782A4 /* other.xml */; };
@@ -145,6 +147,8 @@
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1F2D25851E076FC20071ADE2 /* AlertLayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertLayer.cpp; sourceTree = "<group>"; };
 		1F2D25861E076FC20071ADE2 /* AlertLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertLayer.h; sourceTree = "<group>"; };
+		1F4192721E10A10200CDC47D /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
+		1F4192731E10A10200CDC47D /* CWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWTableView.h; sourceTree = "<group>"; };
 		1F6A373D1CBDD3C9001617E6 /* BaseLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseLayer.h; sourceTree = "<group>"; };
 		1F6A373E1CBDD3C9001617E6 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OtherScene.cpp; sourceTree = "<group>"; };
@@ -366,6 +370,8 @@
 			children = (
 				1F2D25851E076FC20071ADE2 /* AlertLayer.cpp */,
 				1F2D25861E076FC20071ADE2 /* AlertLayer.h */,
+				1F4192721E10A10200CDC47D /* CWTableView.cpp */,
+				1F4192731E10A10200CDC47D /* CWTableView.h */,
 				1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */,
 				1FE5CFDC1CAE029200A5C38B /* TilePickWidget.h */,
 			);
@@ -658,6 +664,7 @@
 				1FDD94451C8337140031BC38 /* wait_and_win_test.cpp in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
+				1F4192741E10A10200CDC47D /* CWTableView.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
 				1FCC3C021CC47200001C9555 /* HistoryScene.cpp in Sources */,
@@ -677,6 +684,7 @@
 				1FE2A3EE1CBB30D1008C45C5 /* ScoreTable.cpp in Sources */,
 				1FE2A3EC1CBB30D1008C45C5 /* ScoreDefinition.cpp in Sources */,
 				1F2D25881E076FC20071ADE2 /* AlertLayer.cpp in Sources */,
+				1F4192751E10A10200CDC47D /* CWTableView.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,
 				1FE04ADF1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */,

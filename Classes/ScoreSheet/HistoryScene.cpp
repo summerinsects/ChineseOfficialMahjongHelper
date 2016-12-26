@@ -94,7 +94,7 @@ bool HistoryScene::init() {
 
     _tableView = cw::TableView::create();
     _tableView->setContentSize(Size(visibleSize.width - 10.0f, visibleSize.height - 35));
-    _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param) {
+    _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param)->intptr_t {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
             auto p = (cw::TableView::CellSizeParam *)param;
