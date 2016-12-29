@@ -430,8 +430,14 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *sender, size_t idx) {
         editName(idx);
     }
     else {
-        AlertLayer::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？",
-            std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
+        if (g_currentRecord.current_index < 16) {
+            AlertLayer::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？",
+                std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
+        }
+        else {
+            AlertLayer::showWithMessage("提示", "对局已经结束，是否要修改选手姓名？",
+                std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
+        }
     }
 }
 
