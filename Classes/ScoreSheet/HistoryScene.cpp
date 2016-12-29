@@ -4,6 +4,7 @@
 #include "../widget/CWTableView.h"
 #include "../compiler.h"
 #include <thread>
+#include <mutex>
 
 #pragma execution_character_set("utf-8")
 
@@ -63,10 +64,16 @@ static void saveRecords(const std::vector<Record> &records) {
     }
 }
 
+static std::mutex g_mutex;
+
 static void loadRecordsAsync(const std::function<void ()> &callback) {
     std::thread thread([callback]() {
         std::vector<Record> temp;
-        loadRecords(temp);
+        {
+            std::lock_guard<std::mutex> guard(g_mutex);
+            (void)guard;
+            loadRecords(temp);
+        }
         Director::getInstance()->getScheduler()->performFunctionInCocosThread([callback, temp]() mutable {
             g_records.swap(temp);
             callback();
@@ -78,7 +85,11 @@ static void loadRecordsAsync(const std::function<void ()> &callback) {
 static void saveRecordsAsync(const std::function<void ()> &callback) {
     std::vector<Record> temp = g_records;
     std::thread thread([callback, temp](){
-        saveRecords(temp);
+        {
+            std::lock_guard<std::mutex> guard(g_mutex);
+            (void)guard;
+            saveRecords(temp);
+        }
         Director::getInstance()->getScheduler()->performFunctionInCocosThread(callback);
     });
     thread.detach();
