@@ -105,7 +105,7 @@ namespace cw {
         _indices.clear();
         _cellsUsed.clear();
 
-        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0);
+        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
         this->_updateCellPositions(cellsCount);
         this->_updateContentSize(cellsCount);
         if (cellsCount > 0) {
@@ -133,7 +133,7 @@ namespace cw {
         _indices.clear();
         _cellsUsed.clear();
 
-        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0);
+        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
         this->_updateCellPositions(cellsCount);
         this->_updateContentSize(cellsCount);
         if (cellsCount > 0) {
@@ -158,7 +158,7 @@ namespace cw {
         if (idx == CC_INVALID_INDEX) {
             return;
         }
-        ssize_t countOfItems = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0);
+        ssize_t countOfItems = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
         if (0 == countOfItems || idx > countOfItems-1) {
             return;
         }
@@ -167,7 +167,7 @@ namespace cw {
         if (cell != nullptr) {
             this->_moveCellOutOfSight(cell);
         }
-        cell = (TableViewCell *)_tableViewCallback(this, CallbackType::CELL_AT_INDEX, idx);
+        cell = (TableViewCell *)_tableViewCallback(this, CallbackType::CELL_AT_INDEX, idx, 0);
         this->_setIndexForCell(idx, cell);
         this->_addCellIfNecessary(cell);
     }
@@ -177,7 +177,7 @@ namespace cw {
             return;
         }
 
-        ssize_t countOfItems = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0);
+        ssize_t countOfItems = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
         if (0 == countOfItems || idx > countOfItems-1) {
             return;
         }
@@ -195,7 +195,7 @@ namespace cw {
         }
 
         //insert a new cell
-        cell = (TableViewCell *)_tableViewCallback(this, CallbackType::CELL_AT_INDEX, idx);
+        cell = (TableViewCell *)_tableViewCallback(this, CallbackType::CELL_AT_INDEX, idx, 0);
         this->_setIndexForCell(idx, cell);
         this->_addCellIfNecessary(cell);
 
@@ -208,7 +208,7 @@ namespace cw {
             return;
         }
 
-        ssize_t countOfItems = (size_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0);
+        ssize_t countOfItems = (size_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
         if (0 == countOfItems || idx + 1 > countOfItems) {
             return;
         }
@@ -280,10 +280,8 @@ namespace cw {
     Vec2 TableView::_offsetFromIndex(ssize_t index) {
         Vec2 offset = this->__offsetFromIndex(index);
 
-        CellSizeParam param;
-        param.idx = index;
-        _tableViewCallback(this, CallbackType::CELL_SIZE, (intptr_t)&param);
-        const Size &cellSize = param.size;
+        Size cellSize;
+        _tableViewCallback(this, CallbackType::CELL_SIZE, index, (intptr_t)&cellSize);
         if (_vordering == VerticalFillOrder::TOP_DOWN) {
             offset.y = _innerContainer->getContentSize().height - offset.y - cellSize.height;
         }
@@ -369,10 +367,7 @@ namespace cw {
             Size cellSize;
             for (ssize_t i = 0; i < cellsCount; ++i) {
                 _cellsPositions[i] = currentPos;
-                CellSizeParam param;
-                param.idx = i;
-                _tableViewCallback(this, CallbackType::CELL_SIZE, (intptr_t)&param);
-                cellSize = param.size;
+                _tableViewCallback(this, CallbackType::CELL_SIZE, i, (intptr_t)&cellSize);
                 currentPos += (_direction == Direction::HORIZONTAL ? cellSize.width : cellSize.height);
             }
             _cellsPositions[cellsCount] = currentPos;//1 extra value allows us to get right/bottom of the last cell
@@ -483,7 +478,7 @@ namespace cw {
 
     void TableView::moveInnerContainer(const Vec2& deltaMove, bool canStartBounceBack) {
         ScrollView::moveInnerContainer(deltaMove, canStartBounceBack);
-        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0);
+        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
         _scrollViewDidScroll(cellsCount);
     }
 }

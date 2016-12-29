@@ -67,16 +67,12 @@ namespace cw {
         typedef std::function<void (TableView *table, TableViewCell *cell)> ccTableViewCellWillRecycleCallback;
 
         enum class CallbackType {
-            CELL_SIZE,  // param for pointer to CellSizeParam
-            CELL_AT_INDEX,  // param for pointer to idx, returns TableViewCell*
-            NUMBER_OF_CELLS, // param for pointer to idx return size_t
+            CELL_SIZE,  // param1 is for idx, param2 is for pointer to Size
+            CELL_AT_INDEX,  // param1 is for idx, param2 is unused, returns TableViewCell*
+            NUMBER_OF_CELLS, // params are unused, returns size_t
         };
 
-        struct CellSizeParam {
-            ssize_t idx;
-            cocos2d::Size size;
-        };
-        typedef std::function<intptr_t (TableView *table, CallbackType, intptr_t param)> ccTableViewCallback;
+        typedef std::function<intptr_t (TableView *table, CallbackType, intptr_t param1, intptr_t param2)> ccTableViewCallback;
 
         /**
          * Default constructor
