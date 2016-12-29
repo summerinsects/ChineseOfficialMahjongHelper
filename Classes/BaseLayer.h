@@ -32,7 +32,7 @@ public:
         cocos2d::Label *tileLabel = cocos2d::Label::createWithSystemFont(title, "Arial", 20);
         this->addChild(tileLabel);
         tileLabel->setPosition(cocos2d::Vec2(origin.x + visibleSize.width * 0.5f,
-            origin.y + visibleSize.height - tileLabel->getContentSize().height * 0.5f));
+            origin.y + visibleSize.height - 15));
 
         // 返回按钮
         cocos2d::ui::Button *backBtn = cocos2d::ui::Button::create("source_material/btn_left_white.png", "source_material/btn_left_blue.png");
