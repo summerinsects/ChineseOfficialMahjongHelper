@@ -600,7 +600,9 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
                 if (!str.empty()) {
                     str.append("、");
                 }
+                str.append("「");
                 str.append(g_currentRecord.name[i]);
+                str.append("」");
             }
         }
         message.append(str);
