@@ -491,6 +491,8 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
 
     g_currentRecord.start_time = time(nullptr);
     refreshStartTime();
+
+    writeToJson();
 }
 
 void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
