@@ -24,7 +24,7 @@ static const size_t eachLevelBeginIndex[] =
 #else
 { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 #endif
-static const size_t eachLevelCounts[] = { 4, 7, 8, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
+static const size_t eachLevelCounts[] = { 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
 
 static inline size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
