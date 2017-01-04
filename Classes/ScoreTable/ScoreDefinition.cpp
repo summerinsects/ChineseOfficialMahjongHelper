@@ -7,7 +7,7 @@
 
 USING_NS_CC;
 
-static std::vector<std::string> g_vec;
+static std::vector<std::string> g_definitions;
 
 static void replaceTilesToImage(std::string &text, float scale) {
     char tilesStr[128];
@@ -53,7 +53,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
         return false;
     }
 
-    if (LIKELY(!g_vec.empty())) {
+    if (LIKELY(!g_definitions.empty())) {
         createContentView(idx);
     }
     else {
@@ -75,10 +75,10 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
         auto thiz = RefPtr<ScoreDefinitionScene>(this);
         std::thread thread([thiz, idx, scale, sprite]() {
             ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
-            g_vec.reserve(valueVec.size());
-            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_vec),
+            g_definitions.reserve(valueVec.size());
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions),
                 std::bind(&Value::asString, std::placeholders::_1));
-            std::for_each(g_vec.begin(), g_vec.end(),
+            std::for_each(g_definitions.begin(), g_definitions.end(),
                 std::bind(&replaceTilesToImage, std::placeholders::_1, scale));
 
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, sprite]() {
@@ -104,7 +104,7 @@ void ScoreDefinitionScene::createContentView(size_t idx) {
     }
 #endif
 
-    const std::string &text = g_vec[idx];
+    const std::string &text = g_definitions[idx];
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
     experimental::ui::WebView *webView = experimental::ui::WebView::create();

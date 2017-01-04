@@ -243,7 +243,6 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         cell->addChild(label);
 
         for (size_t k = 0; k < 9; ++k) {
-            size_t idx0 = eachLevelBeginIndex[idx] + k;
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
             button->setContentSize(Size(65.0f, 20.0f));
