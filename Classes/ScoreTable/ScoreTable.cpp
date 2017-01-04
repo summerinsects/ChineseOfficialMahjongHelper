@@ -33,8 +33,31 @@ bool ScoreTableScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    Label *label = Label::createWithSystemFont("基本计分原则", "Arial", 12);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    this->addChild(label);
+    label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 40));
+
+    for (size_t i = 0; i < 5; ++i) {
+        ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(90.0f, 20.0f));
+        button->setTitleColor(Color3B::BLACK);
+        button->setTitleFontSize(12);
+        button->setTitleText(principle_title[i]);
+        button->setTag(100 + i);
+        button->addClickEventListener(std::bind(&ScoreTableScene::onPointsNameButton, this, std::placeholders::_1));
+
+        this->addChild(button);
+
+        size_t col = i & 0x1;
+        size_t row = i >> 1;
+        button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f + col * visibleSize.width * 0.5f,
+            origin.y + visibleSize.height - 65 - row * 30));
+    }
+
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 35));
+    tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 160));
     tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
@@ -56,7 +79,7 @@ bool ScoreTableScene::init() {
 
     tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 75.0f));
     tableView->reloadData();
     this->addChild(tableView);
 

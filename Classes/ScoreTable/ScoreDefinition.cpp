@@ -7,6 +7,7 @@
 
 USING_NS_CC;
 
+static std::vector<std::string> g_principles;
 static std::vector<std::string> g_definitions;
 
 static void replaceTilesToImage(std::string &text, float scale) {
@@ -49,11 +50,12 @@ Scene *ScoreDefinitionScene::createScene(size_t idx) {
 }
 
 bool ScoreDefinitionScene::initWithIndex(size_t idx) {
-    if (!BaseLayer::initWithTitle(mahjong::points_name[idx])) {
+    const char *title = idx < 100 ? mahjong::points_name[idx] : principle_title[idx - 100];
+    if (!BaseLayer::initWithTitle(title)) {
         return false;
     }
 
-    if (LIKELY(!g_definitions.empty())) {
+    if (LIKELY(!g_definitions.empty() && !g_principles.empty())) {
         createContentView(idx);
     }
     else {
@@ -76,10 +78,19 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
         std::thread thread([thiz, idx, scale, sprite]() {
             ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
             g_definitions.reserve(valueVec.size());
-            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions),
-                std::bind(&Value::asString, std::placeholders::_1));
-            std::for_each(g_definitions.begin(), g_definitions.end(),
-                std::bind(&replaceTilesToImage, std::placeholders::_1, scale));
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions), [scale](const Value &value) {
+                std::string ret = value.asString();
+                replaceTilesToImage(ret, scale);
+                return std::move(ret);
+            });
+
+            valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_principles.xml");
+            g_principles.reserve(valueVec.size());
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_principles), [scale](const Value &value) {
+                std::string ret = value.asString();
+                replaceTilesToImage(ret, scale);
+                return std::move(ret);
+            });
 
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, sprite]() {
                 if (LIKELY(thiz->getParent() != nullptr)) {
@@ -104,7 +115,7 @@ void ScoreDefinitionScene::createContentView(size_t idx) {
     }
 #endif
 
-    const std::string &text = g_definitions[idx];
+    const std::string &text = idx < 99 ? g_definitions[idx] : g_principles[idx - 99];
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
