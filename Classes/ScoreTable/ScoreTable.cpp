@@ -57,7 +57,7 @@ bool ScoreTableScene::init() {
     }
 
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 160));
+    tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 150));
     tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
@@ -79,7 +79,7 @@ bool ScoreTableScene::init() {
 
     tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 75.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 70.0f));
     tableView->reloadData();
     this->addChild(tableView);
 
