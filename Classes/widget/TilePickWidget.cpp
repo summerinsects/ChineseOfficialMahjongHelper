@@ -448,6 +448,10 @@ void TilePickWidget::refreshActionButtons() {
             _chowGreatButton->setEnabled(false);
         }
     }
+
+    if (_winTileChangedCallback) {
+        _winTileChangedCallback(this);
+    }
 }
 
 // 吃碰杠后的刷新
