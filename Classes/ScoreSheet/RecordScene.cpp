@@ -48,7 +48,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
         textColor = Color3B::WHITE;
         nameColor = Color3B::YELLOW;
-        scoreColor = Color3B::GRAY;
+        scoreColor = Color3B(208, 208, 208);
         normalImage = "source_material/btn_square_normal.png";
         selectedImage = "source_material/btn_square_highlighted.png";
     }
@@ -392,22 +392,29 @@ void RecordScene::updateScoreLabel() {
     int scoreTable[4];
     translateDetailToScoreTable(_detail, scoreTable);
 
+    Color3B posColor, negColor, zeroColor;
+    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        posColor = Color3B(255, 68, 51);
+        negColor = Color3B(51, 158, 40);
+        zeroColor = Color3B(208, 208, 208);
+    }
+    else {
+        posColor = Color3B(224, 45, 45);
+        negColor = Color3B(37, 153, 14);
+        zeroColor = Color3B(80, 80, 80);
+    }
+
     // 正负0分使用不同颜色
     for (int i = 0; i < 4; ++i) {
         _scoreLabel[i]->setString(StringUtils::format("%+d", scoreTable[i]));
         if (scoreTable[i] > 0) {
-            _scoreLabel[i]->setColor(Color3B::RED);
+            _scoreLabel[i]->setColor(posColor);
         }
         else if (scoreTable[i] < 0) {
-            _scoreLabel[i]->setColor(Color3B::GREEN);
+            _scoreLabel[i]->setColor(negColor);
         }
         else {
-            if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-                _scoreLabel[i]->setColor(Color3B::GRAY);
-            }
-            else {
-                _scoreLabel[i]->setColor(Color3B(80, 80, 80));
-            }
+            _scoreLabel[i]->setColor(zeroColor);
         }
     }
 

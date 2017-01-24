@@ -75,8 +75,8 @@ bool ScoreSheetScene::init() {
         textColor2 = Color3B::BLACK;
         lineColor = Color4F::WHITE;
         nameColor = Color3B::YELLOW;
-        scoreColor = Color3B::GRAY;
-        scoreColorF = Color4F::GRAY;
+        scoreColor = Color3B(208, 208, 208);
+        scoreColorF = Color4F(scoreColor);
     }
     else {
         normalImage = "source_material/btn_square_highlighted.png";
@@ -311,23 +311,30 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     const Record::Detail &detail = g_currentRecord.detail[handIdx];
     translateDetailToScoreTable(detail, scoreTable);
 
+    Color3B posColor, negColor, zeroColor;
+    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        posColor = Color3B(255, 68, 51);
+        negColor = Color3B(51, 158, 40);
+        zeroColor = Color3B(208, 208, 208);
+    }
+    else {
+        posColor = Color3B(224, 45, 45);
+        negColor = Color3B(37, 153, 14);
+        zeroColor = Color3B(80, 80, 80);
+    }
+
     // 填入这一盘四位选手的得分
     for (int i = 0; i < 4; ++i) {
         _scoreLabels[handIdx][i]->setString(StringUtils::format("%+d", scoreTable[i]));
         _totalScores[i] += scoreTable[i];  // 更新总分
         if (scoreTable[i] > 0) {
-            _scoreLabels[handIdx][i]->setColor(Color3B::RED);
+            _scoreLabels[handIdx][i]->setColor(posColor);
         }
         else if (scoreTable[i] < 0) {
-            _scoreLabels[handIdx][i]->setColor(Color3B::GREEN);
+            _scoreLabels[handIdx][i]->setColor(negColor);
         }
         else {
-            if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-                _scoreLabels[handIdx][i]->setColor(Color3B::GRAY);
-            }
-            else {
-                _scoreLabels[handIdx][i]->setColor(Color3B(80, 80, 80));
-            }
+            _scoreLabels[handIdx][i]->setColor(zeroColor);
         }
     }
 
