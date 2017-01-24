@@ -164,7 +164,7 @@ static const int points_value_table[POINT_TYPE_COUNT] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1
 };
-    
+
 }
 
 #endif

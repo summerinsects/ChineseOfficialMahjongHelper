@@ -377,5 +377,5 @@ bool is_honors_and_knitted_tiles(const TILE (&concealed_tiles)[13], TILE test_ti
     }
     return false;
 }
-    
+
 }
