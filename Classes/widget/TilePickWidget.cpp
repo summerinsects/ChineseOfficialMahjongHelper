@@ -296,6 +296,10 @@ void TilePickWidget::setData(const mahjong::SET fixedSets[5], long setCnt, const
         }
     }
 
+    if (_fixedSetsChangedCallback) {
+        _fixedSetsChangedCallback(this);
+    }
+
     for (long i = 0; i < tileCnt; ++i) {
         mahjong::TILE tile = standingTiles[i];
         addOneTile(tile, false);
