@@ -15,7 +15,7 @@ public:
 
         // 背景色
         cocos2d::LayerColor *background = cocos2d::LayerColor::create(
-            nightMode ? cocos2d::Color4B(32, 37, 40, 255) : cocos2d::Color4B(240, 240, 240, 255));
+            nightMode ? cocos2d::Color4B(32, 37, 40, 255) : cocos2d::Color4B(245, 245, 245, 255));
         this->addChild(background, -100);
 
         // 监听返回键

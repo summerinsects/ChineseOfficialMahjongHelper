@@ -30,7 +30,7 @@ bool HelloWorld::init() {
         textColor = Color3B::BLACK;
     }
     else {
-        bgColor = Color4B(240, 240, 240, 255);
+        bgColor = Color4B(245, 245, 245, 255);
         normalImage = "source_material/btn_square_highlighted.png";
         selectedImage = "source_material/btn_square_selected.png";
         textColor = Color3B::WHITE;
