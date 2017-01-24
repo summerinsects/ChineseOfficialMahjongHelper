@@ -439,12 +439,15 @@ void PointsCalculatorScene::parseInput(const char *input) {
             break;
         }
 
-        if (tile_cnt <= 0 || set_cnt < 0 || set_cnt > 4 || set_cnt * 3 + tile_cnt != 13) {
-            errorStr = "牌张数错误";
+        if (int ret = mahjong::check_calculator_input(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile)) {
+            switch (ret) {
+            case ERROR_WRONG_TILES_COUNT: errorStr = "牌张数错误"; break;
+            case ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = "同一种牌最多只能使用4枚"; break;
+            default: break;
+            }
+            break;
         }
-        else {
-            _tilePicker->setData(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile);
-        }
+        _tilePicker->setData(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile);
     } while (0);
 
     if (errorStr != nullptr) {
@@ -507,6 +510,10 @@ void PointsCalculatorScene::calculate() {
     }
     if (points == ERROR_WRONG_TILES_COUNT) {
         AlertLayer::showWithMessage("算番", "牌张数错误", nullptr, nullptr);
+        return;
+    }
+    if (points == ERROR_TILE_COUNT_GREATER_THAN_4) {
+        AlertLayer::showWithMessage("算番", "同一种牌最多只能使用4枚", nullptr, nullptr);
         return;
     }
 

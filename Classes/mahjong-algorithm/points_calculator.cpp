@@ -2136,15 +2136,50 @@ bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
     return true;
 }
 
+int check_calculator_input(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile) {
+    // 将每一次副露当作3张牌来算，那么总张数=13
+    if (standing_tiles == nullptr || standing_cnt <= 0 || fixed_cnt < 0 || fixed_cnt > 4
+        || fixed_cnt * 3 + standing_cnt != 13) {
+        return ERROR_WRONG_TILES_COUNT;
+    }
+
+    // 将副露恢复成牌
+    TILE tiles[18];
+    long tile_cnt = 0;
+    if (fixed_cnt == 0) {
+        memcpy(tiles, standing_tiles, 13 * sizeof(TILE));
+        tiles[13] = win_tile;
+        tile_cnt = 14;
+    }
+    else {
+        recovery_tiles_from_sets(fixed_set, fixed_cnt, tiles, &tile_cnt);
+        memcpy(tiles + tile_cnt, standing_tiles, standing_cnt * sizeof(TILE));
+        tiles[tile_cnt] = win_tile;
+        ++tile_cnt;
+    }
+
+    // 打表
+    int cnt_table[0x54] = { 0 };
+    for (long i = 0; i < tile_cnt; ++i) {
+        ++cnt_table[tiles[i]];
+    }
+
+    // 如果某张牌超过4
+    if (std::any_of(std::begin(cnt_table), std::end(cnt_table), [](int cnt) { return cnt > 4; })) {
+        return ERROR_TILE_COUNT_GREATER_THAN_4;
+    }
+
+    return 0;
+}
+
 int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile, WIN_TYPE win_type,
     WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
     if (fixed_set == nullptr) {
         fixed_cnt = 0;
     }
 
-    if (standing_tiles == nullptr || standing_cnt <= 0 || fixed_cnt < 0 || fixed_cnt > 4
-        || fixed_cnt * 3 + standing_cnt != 13) {
-        return ERROR_WRONG_TILES_COUNT;
+    if (int ret = check_calculator_input(fixed_set, fixed_cnt, standing_tiles, standing_cnt, win_tile)) {
+        return ret;
     }
 
     TILE _standing_tiles[14];
