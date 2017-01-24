@@ -41,9 +41,9 @@ static void fromJson(Record *record, const jw::cppJSON &json) {
     record->current_index = detail.size();
     for (size_t i = 0; i < record->current_index; ++i) {
         std::unordered_map<std::string, uint64_t> temp = std::move(detail[i]);
-        record->detail[i].win_claim = temp["win_claim"];
-        record->detail[i].false_win = temp["false_win"];
-        record->detail[i].score = temp["score"];
+        record->detail[i].win_claim = static_cast<uint8_t>(temp["win_claim"]);
+        record->detail[i].false_win = static_cast<uint8_t>(temp["false_win"]);
+        record->detail[i].score = static_cast<uint32_t>(temp["score"]);
         record->detail[i].points_flag = temp["points_flag"];
     }
 

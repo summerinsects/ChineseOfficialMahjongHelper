@@ -202,8 +202,8 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
     ui::Button *delBtn = std::get<1>(ext);
     ui::Button *viewBtn = std::get<2>(ext);
 
-    delBtn->setTag(idx);
-    viewBtn->setTag(idx);
+    delBtn->setTag(static_cast<int>(idx));
+    viewBtn->setTag(static_cast<int>(idx));
 
     const Record &record = g_records[idx];
     int scores[4] = { 0 };
