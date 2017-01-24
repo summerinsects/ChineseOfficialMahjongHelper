@@ -21,6 +21,8 @@ public:
         _winTileChangedCallback = callback;
     }
 
+    void setData(const mahjong::SET fixedSets[5], long setCnt, const mahjong::TILE standingTiles[13], long tileCnt, mahjong::TILE winTile);
+
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
@@ -55,9 +57,11 @@ private:
     void reset();
     void sort();
     cocos2d::Vec2 calcStandingTilePos(size_t idx) const;
+    cocos2d::Vec2 calcFixedSetPos(size_t idx) const;
     void addOneTile(mahjong::TILE tile, bool isWinTile);
     void replaceOneTile(mahjong::TILE tile, bool isWinTile);
     void refreshTilesTableButton(mahjong::TILE tile);
+    void refreshAllTilesTableButton();
     void onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile);
     void refreshActionButtons();
     void refreshAfterAction(int meldedIdx);

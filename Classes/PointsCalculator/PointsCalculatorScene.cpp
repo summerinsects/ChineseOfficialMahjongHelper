@@ -216,6 +216,17 @@ bool PointsCalculatorScene::init() {
         label->setPosition(Vec2(10.0f, 10.0f));
     }
 
+    // 直接输入
+    ui::Button *button = ui::Button::create(normalImage, selectedImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("直接输入");
+    button->setTitleColor(Color3B::BLACK);
+    infoWidget->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 40, 90.0f));
+    button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
+
     // 花牌数
     Label *flowerLabel = Label::createWithSystemFont("花牌数", "Arial", 12);
     flowerLabel->setColor(textColor);
@@ -346,6 +357,100 @@ void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
             && !_lastTileBox->isSelected()
             && !_fourthTileBox->isSelected());
         _lastTileBox->setEnabled(!_robKongBox->isSelected());
+    }
+}
+
+void PointsCalculatorScene::showInputAlert(const char *prevInput) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float width = visibleSize.width * 0.8f;
+
+    ui::Widget *rootWidget = ui::Widget::create();
+
+    Label *label = Label::createWithSystemFont("使用说明：\n"
+        "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，同花色的数牌可合并用一个后缀。\n"
+        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。\n"
+        "3.每一组副露（即吃、碰、明杠）用英文[]，每一组暗杠用英文{}。\n"
+        "4.请将所有副露放在最前面，然后是立牌，和牌用英文逗号,与手牌分隔开。\n"
+        "范例1：{EEEE}{CCCC}{FFFF}{PPPP}N,N\n"
+        "范例2：1112345678999s,9s\n"
+        "范例3：[WWWW][444s]45m678pFF,6m\n", "Arial", 10);
+    label->setColor(Color3B::BLACK);
+    label->setDimensions(width, 0);
+    rootWidget->addChild(label);
+
+    // 输入手牌
+    ui::EditBox *editBox = ui::EditBox::create(Size(width - 10, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setPlaceholderFontColor(Color4B::GRAY);
+    editBox->setPlaceHolder("输入手牌");
+    if (prevInput != nullptr) {
+        editBox->setText(prevInput);
+    }
+
+    rootWidget->addChild(editBox);
+
+    const Size &labelSize = label->getContentSize();
+    rootWidget->setContentSize(Size(width, labelSize.height + 30));
+    editBox->setPosition(Vec2(width * 0.5f, 10));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
+
+    AlertLayer::showWithNode("直接输入牌", rootWidget, [this, editBox]() {
+        parseInput(editBox->getText());
+    }, nullptr);
+}
+
+void PointsCalculatorScene::parseInput(const char *input) {
+    const char *errorStr = nullptr;
+    const std::string str = input;
+
+    do {
+        if (int n = 0 || sscanf(input, "%*[1-9mpsESWNCFP,[]{}]%n", &n) != 1 || n != str.length()) {
+            errorStr = "无法解析输入的文本";
+            break;
+        }
+
+        std::string::const_iterator it = std::find(str.begin(), str.end(), ',');
+        if (it == str.end()) {
+            errorStr = "缺少和牌张";
+            break;
+        }
+
+        std::string tilesString(str.begin(), it);
+        std::string winString(it + 1, str.end());
+
+        mahjong::SET fixed_sets[5];
+        long set_cnt;
+        mahjong::TILE standing_tiles[13];
+        long tile_cnt;
+        mahjong::TILE win_tile;
+
+        if (!mahjong::string_to_tiles(tilesString.c_str(), fixed_sets, &set_cnt, standing_tiles, &tile_cnt)) {
+            errorStr = "无法正确解析输入的文本";
+            break;
+        }
+        mahjong::sort_tiles(standing_tiles, tile_cnt);
+
+        const char *p = mahjong::parse_tiles(winString.c_str(), &win_tile, nullptr);
+        if (*p != '\0') {
+            errorStr = "无法正确解析输入的文本";
+            break;
+        }
+
+        if (tile_cnt <= 0 || set_cnt < 0 || set_cnt > 4 || set_cnt * 3 + tile_cnt != 13) {
+            errorStr = "牌张数错误";
+        }
+        else {
+            _tilePicker->setData(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile);
+        }
+    } while (0);
+
+    if (errorStr != nullptr) {
+        AlertLayer::showWithMessage("直接输入牌", errorStr, [this, str]() {
+            showInputAlert(str.c_str());
+        }, nullptr);
     }
 }
 

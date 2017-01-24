@@ -263,6 +263,49 @@ void TilePickWidget::reset() {
     }
 }
 
+void TilePickWidget::setData(const mahjong::SET fixedSets[5], long setCnt, const mahjong::TILE standingTiles[13], long tileCnt, mahjong::TILE winTile) {
+    reset();
+
+    for (long i = 0; i < setCnt; ++i) {
+        _fixedSets.push_back(fixedSets[i]);
+        mahjong::TILE tile = fixedSets[i].mid_tile;
+        Vec2 pos = calcFixedSetPos(_fixedSets.size());
+        switch (fixedSets[i].set_type) {
+            case mahjong::SET_TYPE::CHOW:
+                addFixedChowSet(pos, tile, 0);
+                ++_totalTilesTable[tile - 1];
+                ++_totalTilesTable[tile];
+                ++_totalTilesTable[tile + 1];
+                break;
+            case mahjong::SET_TYPE::PUNG:
+                addFixedPungSet(pos, tile, 0);
+                _totalTilesTable[tile] += 3;
+                break;
+            case mahjong::SET_TYPE::KONG:
+                if (fixedSets[i].is_melded) {
+                    addFixedMeldedKongSet(pos, tile, 0);
+                }
+                else {
+                    addFixedConcealedKongSet(pos, tile);
+                }
+                _totalTilesTable[tile] += 4;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    for (long i = 0; i < tileCnt; ++i) {
+        mahjong::TILE tile = standingTiles[i];
+        addOneTile(tile, false);
+        ++_totalTilesTable[tile];
+    }
+    addOneTile(winTile, true);
+    refreshAllTilesTableButton();
+    refreshActionButtons();
+}
+
 void TilePickWidget::sort() {
     std::sort(_standingTiles.begin(), _standingTiles.end());
     refreshStandingTiles();
@@ -277,6 +320,19 @@ cocos2d::Vec2 TilePickWidget::calcStandingTilePos(size_t idx) const {
     case 2: pos.x = 27 * (idx + 3.5f) + 2; break;
     case 3: pos.x = 27 * (idx + 5) + 2; break;
     case 4: pos.x = 27 * (idx + 6.5f) + 2; break;
+    }
+    return pos;
+}
+
+cocos2d::Vec2 TilePickWidget::calcFixedSetPos(size_t idx) const {
+    const Size &fixedSize = _fixedWidget->getContentSize();
+    Vec2 pos = Vec2(fixedSize.width * 0.25f, fixedSize.height * 0.25f);
+    switch (idx) {
+        case 1: pos.y *= 3; break;
+        case 2: pos.x *= 3; pos.y *= 3; break;
+        case 3: break;
+        case 4: pos.x *= 3; break;
+        default: return Vec2::ZERO;
     }
     return pos;
 }
@@ -364,6 +420,34 @@ void TilePickWidget::refreshTilesTableButton(mahjong::TILE tile) {
     case TILE_SUIT_WINDS: _honorButtons[rank - 1]->setEnabled(n < 4); break;
     case TILE_SUIT_DRAGONS: _honorButtons[rank + 3]->setEnabled(n < 4); break;
     default: break;
+    }
+}
+
+void TilePickWidget::refreshAllTilesTableButton() {
+    for (mahjong::RANK_TYPE rank = 1; rank < 10; ++rank) {
+        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, rank);
+        int n = _totalTilesTable[tile];
+        _characterButtons[rank - 1]->setEnabled(n < 4);
+
+        tile = mahjong::make_tile(TILE_SUIT_BAMBOO, rank);
+        n = _totalTilesTable[tile];
+        _bambooButtons[rank - 1]->setEnabled(n < 4);
+
+        tile = mahjong::make_tile(TILE_SUIT_DOTS, rank);
+        n = _totalTilesTable[tile];
+        _dotsButtons[rank - 1]->setEnabled(n < 4);
+    }
+
+    for (mahjong::RANK_TYPE rank = 1; rank < 5; ++rank) {
+        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_WINDS, rank);
+        int n = _totalTilesTable[tile];
+        _honorButtons[rank - 1]->setEnabled(n < 4);
+    }
+
+    for (mahjong::RANK_TYPE rank = 1; rank < 4; ++rank) {
+        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DRAGONS, rank);
+        int n = _totalTilesTable[tile];
+        _honorButtons[rank + 3]->setEnabled(n < 4);
     }
 }
 
@@ -468,15 +552,7 @@ void TilePickWidget::refreshActionButtons() {
 // 吃碰杠后的刷新
 void TilePickWidget::refreshAfterAction(int meldedIdx) {
     // 计算新增这组副露的位置
-    const Size &fixedSize = _fixedWidget->getContentSize();
-    Vec2 pos = Vec2(fixedSize.width * 0.25f, fixedSize.height * 0.25f);
-    switch (_fixedSets.size()) {
-    case 1: pos.y *= 3; break;
-    case 2: pos.x *= 3; pos.y *= 3; break;
-    case 3: break;
-    case 4: pos.x *= 3; break;
-    default: return;
-    }
+    Vec2 pos = calcFixedSetPos(_fixedSets.size());
 
     // 增加一组副露
     const mahjong::SET &set = _fixedSets.back();
