@@ -407,7 +407,7 @@ void PointsCalculatorScene::parseInput(const char *input) {
     const std::string str = input;
 
     do {
-        if (int n = 0 || sscanf(input, "%*[1-9mpsESWNCFP,[]{}]%n", &n) != 1 || n != str.length()) {
+        if (strspn(input, "123456789mpsESWNCFP[]{},") != str.length()) {
             errorStr = "无法解析输入的文本";
             break;
         }
