@@ -20,7 +20,23 @@ bool HelloWorld::init() {
         return false;
     }
 
-    cocos2d::LayerColor *background = cocos2d::LayerColor::create(cocos2d::Color4B(32, 37, 40, 255));
+    Color4B bgColor;
+    const char *normalImage, *selectedImage;
+    Color3B textColor;
+    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        bgColor = Color4B(32, 37, 40, 255);
+        normalImage = "source_material/btn_square_normal.png";
+        selectedImage = "source_material/btn_square_highlighted.png";
+        textColor = Color3B::BLACK;
+    }
+    else {
+        bgColor = Color4B(240, 240, 240, 255);
+        normalImage = "source_material/btn_square_highlighted.png";
+        selectedImage = "source_material/btn_square_selected.png";
+        textColor = Color3B::WHITE;
+    }
+
+    LayerColor *background = LayerColor::create(bgColor);
     this->addChild(background, -100);
 
     auto listener = EventListenerKeyboard::create();
@@ -35,52 +51,72 @@ bool HelloWorld::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    ui::Button *button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(75.0, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleColor(Color3B::BLACK);
+    button->setTitleColor(textColor);
     button->setTitleText("算番器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 60));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 80));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(PointsCalculatorScene::createScene());
     });
 
-    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(75.0, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleColor(Color3B::BLACK);
+    button->setTitleColor(textColor);
     button->setTitleText("计分器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 20));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 40));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(ScoreSheetScene::createScene());
     });
 
-    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(75.0, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleColor(Color3B::BLACK);
+    button->setTitleColor(textColor);
     button->setTitleText("番种表");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(ScoreTableScene::createScene());
     });
 
-    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(75.0, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleColor(Color3B::BLACK);
+    button->setTitleColor(textColor);
     button->setTitleText("其他");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 60));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 40));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(OtherScene::createScene());
+    });
+
+    button = ui::Button::create(normalImage, selectedImage);
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(75.0, 32.0f));
+    button->setTitleFontSize(20);
+    button->setTitleColor(textColor);
+    button->setTitleText(UserDefault::getInstance()->getBoolForKey("night_mode") ? "日间模式" : "夜间模式");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 80));
+    button->addClickEventListener([](Ref *) {
+        if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+            UserDefault::getInstance()->setBoolForKey("night_mode", false);
+        }
+        else {
+            UserDefault::getInstance()->setBoolForKey("night_mode", true);
+        }
+        UserDefault::getInstance()->flush();
+
+        Director::getInstance()->replaceScene(HelloWorld::createScene());
     });
 
     return true;

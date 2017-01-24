@@ -28,7 +28,13 @@ bool OtherScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    ui::RichText *richText = ui::RichText::createWithXML(g_map.begin()->second);
+    ui::RichText *richText;
+    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        richText = ui::RichText::createWithXML(g_map.begin()->second);
+    }
+    else {
+        richText = ui::RichText::createWithXML("<font face=\"Verdana\" size=\"12\" color=\"#000000\">" + g_map.begin()->second + "</font>");
+    }
     richText->setContentSize(Size(visibleSize.width - 10, 0));
     richText->ignoreContentAdaptWithSize(false);
     richText->setVerticalSpace(2);

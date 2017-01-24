@@ -11,8 +11,11 @@ public:
             return false;
         }
 
+        bool nightMode = cocos2d::UserDefault::getInstance()->getBoolForKey("night_mode");
+
         // 背景色
-        cocos2d::LayerColor *background = cocos2d::LayerColor::create(cocos2d::Color4B(32, 37, 40, 255));
+        cocos2d::LayerColor *background = cocos2d::LayerColor::create(
+            nightMode ? cocos2d::Color4B(32, 37, 40, 255) : cocos2d::Color4B(240, 240, 240, 255));
         this->addChild(background, -100);
 
         // 监听返回键
@@ -28,10 +31,17 @@ public:
         cocos2d::Size visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
         cocos2d::Vec2 origin = cocos2d::Director::getInstance()->getVisibleOrigin();
 
+        // 导航栏
+        if (!nightMode) {
+            cocos2d::LayerColor *navigation = cocos2d::LayerColor::create(cocos2d::Color4B(51, 204, 255, 255), visibleSize.width, 30);
+            this->addChild(navigation);
+            navigation->setPosition(cocos2d::Vec2(origin.x, origin.y + visibleSize.height - 30));
+        }
+
         // 标题
-        cocos2d::Label *tileLabel = cocos2d::Label::createWithSystemFont(title, "Arial", 20);
-        this->addChild(tileLabel);
-        tileLabel->setPosition(cocos2d::Vec2(origin.x + visibleSize.width * 0.5f,
+        cocos2d::Label *titleLabel = cocos2d::Label::createWithSystemFont(title, "Arial", 18);
+        this->addChild(titleLabel);
+        titleLabel->setPosition(cocos2d::Vec2(origin.x + visibleSize.width * 0.5f,
             origin.y + visibleSize.height - 15));
 
         // 返回按钮

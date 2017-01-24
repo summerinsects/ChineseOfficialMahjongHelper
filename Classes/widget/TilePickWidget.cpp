@@ -107,8 +107,19 @@ bool TilePickWidget::init() {
             std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
+    const char *normalImage, *selectedImage;
+    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        normalImage = "source_material/btn_square_normal.png";
+        selectedImage = "source_material/btn_square_highlighted.png";
+    }
+    else {
+        normalImage = "source_material/btn_square_highlighted.png";
+        selectedImage = "source_material/btn_square_selected.png";
+    }
+    const char *disableImage = "source_material/btn_square_disabled.png";
+
     // 吃(XX_) 为12吃3这种类型
-    _chowLessButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    _chowLessButton = ui::Button::create(normalImage, selectedImage, disableImage);
     _chowLessButton->setScale9Enabled(true);
     _chowLessButton->setContentSize(Size(45.0f, 20.0f));
     _chowLessButton->setTitleFontSize(12);
@@ -119,7 +130,7 @@ bool TilePickWidget::init() {
     _chowLessButton->addClickEventListener(std::bind(&TilePickWidget::onChowLessButton, this, std::placeholders::_1));
 
     // 吃(X_X) 为13吃2这种类型
-    _chowMidButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    _chowMidButton = ui::Button::create(normalImage, selectedImage, disableImage);
     _chowMidButton->setScale9Enabled(true);
     _chowMidButton->setContentSize(Size(45.0f, 20.0f));
     _chowMidButton->setTitleFontSize(12);
@@ -130,7 +141,7 @@ bool TilePickWidget::init() {
     _chowMidButton->addClickEventListener(std::bind(&TilePickWidget::onChowMidButton, this, std::placeholders::_1));
 
     // 吃(_XX) 为23吃1这种类型
-    _chowGreatButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    _chowGreatButton = ui::Button::create(normalImage, selectedImage, disableImage);
     _chowGreatButton->setScale9Enabled(true);
     _chowGreatButton->setContentSize(Size(45.0f, 20.0f));
     _chowGreatButton->setTitleFontSize(12);
@@ -141,7 +152,7 @@ bool TilePickWidget::init() {
     _chowGreatButton->addClickEventListener(std::bind(&TilePickWidget::onChowGreatButton, this, std::placeholders::_1));
 
     // 碰
-    _pungButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    _pungButton = ui::Button::create(normalImage, selectedImage, disableImage);
     _pungButton->setScale9Enabled(true);
     _pungButton->setContentSize(Size(45.0f, 20.0f));
     _pungButton->setTitleFontSize(12);
@@ -152,7 +163,7 @@ bool TilePickWidget::init() {
     _pungButton->addClickEventListener(std::bind(&TilePickWidget::onPungButton, this, std::placeholders::_1));
 
     // 明杠
-    _meldedKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    _meldedKongButton = ui::Button::create(normalImage, selectedImage, disableImage);
     _meldedKongButton->setScale9Enabled(true);
     _meldedKongButton->setContentSize(Size(45.0f, 20.0f));
     _meldedKongButton->setTitleFontSize(12);
@@ -163,7 +174,7 @@ bool TilePickWidget::init() {
     _meldedKongButton->addClickEventListener(std::bind(&TilePickWidget::onMeldedKongButton, this, std::placeholders::_1));
 
     // 暗杠
-    _concealedKongButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    _concealedKongButton = ui::Button::create(normalImage, selectedImage, disableImage);
     _concealedKongButton->setScale9Enabled(true);
     _concealedKongButton->setContentSize(Size(45.0f, 20.0f));
     _concealedKongButton->setTitleFontSize(12);
@@ -174,7 +185,7 @@ bool TilePickWidget::init() {
     _concealedKongButton->addClickEventListener(std::bind(&TilePickWidget::onConcealedKongButton, this, std::placeholders::_1));
 
     // 排序
-    ui::Button *sortButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    ui::Button *sortButton = ui::Button::create(normalImage, selectedImage, disableImage);
     sortButton->setScale9Enabled(true);
     sortButton->setContentSize(Size(45.0f, 20.0f));
     sortButton->setTitleFontSize(12);
@@ -185,7 +196,7 @@ bool TilePickWidget::init() {
     sortButton->addClickEventListener([this](Ref *) { sort(); });
 
     // 重置
-    ui::Button *clearButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    ui::Button *clearButton = ui::Button::create(normalImage, selectedImage, disableImage);
     clearButton->setScale9Enabled(true);
     clearButton->setContentSize(Size(45.0f, 20.0f));
     clearButton->setTitleFontSize(12);

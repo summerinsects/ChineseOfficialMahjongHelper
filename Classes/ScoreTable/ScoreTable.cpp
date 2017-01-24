@@ -37,8 +37,11 @@ bool ScoreTableScene::init() {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 40));
+    if (!UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        label->setColor(Color3B::BLACK);
+    }
 
-    for (size_t i = 0; i < 5; ++i) {
+    for (int i = 0; i < 5; ++i) {
         ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
         button->setScale9Enabled(true);
         button->setContentSize(Size(90.0f, 20.0f));
@@ -100,6 +103,9 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
         label = Label::createWithSystemFont("1番", "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
+        if (!UserDefault::getInstance()->getBoolForKey("night_mode")) {
+            label->setColor(Color3B::BLACK);
+        }
 
         for (size_t k = 0; k < 13; ++k) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -131,7 +137,7 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
         size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
         button->setTitleText(mahjong::points_name[idx0]);
-        button->setTag(idx0);
+        button->setTag(static_cast<int>(idx0));
         button->setVisible(true);
         button->setEnabled(true);
         size_t col = k & 0x3;

@@ -65,18 +65,42 @@ bool ScoreSheetScene::init() {
 
     memset(_totalScores, 0, sizeof(_totalScores));
 
+    const char *normalImage, *selectedImage;
+    Color3B textColor, textColor2, nameColor, scoreColor;
+    Color4F lineColor, scoreColorF;
+    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        normalImage = "source_material/btn_square_normal.png";
+        selectedImage = "source_material/btn_square_highlighted.png";
+        textColor = Color3B::WHITE;
+        textColor2 = Color3B::BLACK;
+        lineColor = Color4F::WHITE;
+        nameColor = Color3B::YELLOW;
+        scoreColor = Color3B::GRAY;
+        scoreColorF = Color4F::GRAY;
+    }
+    else {
+        normalImage = "source_material/btn_square_highlighted.png";
+        selectedImage = "source_material/btn_square_selected.png";
+        textColor = Color3B::BLACK;
+        textColor2 = Color3B::WHITE;
+        lineColor = Color4F::BLACK;
+        nameColor = Color3B::ORANGE;
+        scoreColor = Color3B(80, 80, 80);
+        scoreColorF = Color4F(scoreColor);
+    }
+
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 历史记录按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    ui::Button *button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleColor(Color3B::BLACK);
+    button->setTitleColor(textColor2);
     button->setTitleText("历史记录");
-    button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 12));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 45));
     button->addClickEventListener([this](Ref *) {
         Director::getInstance()->pushScene(HistoryScene::createScene([this](const Record &record) {
             const char (&name)[4][255] = g_currentRecord.name;
@@ -92,37 +116,38 @@ bool ScoreSheetScene::init() {
     });
 
     // 重置按钮
-    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleColor(Color3B::BLACK);
+    button->setTitleColor(textColor2);
     button->setTitleText("重置");
-    button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 35));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
 
     // 追分计算按钮
-    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleColor(Color3B::BLACK);
+    button->setTitleColor(textColor2);
     button->setTitleText("追分计算");
-    button->setPosition(Vec2(origin.x + 28, origin.y + visibleSize.height - 40));
+    button->setPosition(Vec2(origin.x + 28, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
 
     // 时间label
     _timeLabel = Label::createWithSystemFont("当前时间", "Arial", 12);
     this->addChild(_timeLabel);
     _timeLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    _timeLabel->setPosition(Vec2(origin.x + 5, (origin.y + visibleSize.height - 430) * 0.5f - 10));
+    _timeLabel->setPosition(Vec2(origin.x + 5, (origin.y + visibleSize.height - 435) * 0.5f - 10));
+    _timeLabel->setColor(textColor);
 
     // 用来绘制表格线的根结点
     DrawNode *node = DrawNode::create();
     this->addChild(node);
-    node->setPosition(Vec2(origin.x, (origin.y + visibleSize.height - 430) * 0.5f));
+    node->setPosition(Vec2(origin.x, (origin.y + visibleSize.height - 435) * 0.5f));
 
     const float gap = visibleSize.width / 6;  // 分成6份
     _cellWidth = gap;
@@ -130,19 +155,19 @@ bool ScoreSheetScene::init() {
     // 5条竖线
     for (int i = 0; i < 5; ++i) {
         const float x = gap * (i + 1);
-        node->drawLine(Vec2(x, 0.0f), Vec2(x, 400.0f), Color4F::WHITE);
+        node->drawLine(Vec2(x, 0.0f), Vec2(x, 400.0f), lineColor);
     }
 
     // 21条横线
     for (int i = 0; i < 21; ++i) {
         const float y = 20.0f * i;
         node->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y),
-            (i > 0 && i < 16) ? Color4F::GRAY : Color4F::WHITE);
+            (i > 0 && i < 16) ? scoreColorF : lineColor);
     }
 
     // 第1栏：选手姓名
     Label *label = Label::createWithSystemFont("选手姓名", "Arail", 12);
-    label->setColor(Color3B::YELLOW);
+    label->setColor(nameColor);
     label->setPosition(Vec2(gap * 0.5f, 390));
     node->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -157,17 +182,17 @@ bool ScoreSheetScene::init() {
         button->addClickEventListener(std::bind(&ScoreSheetScene::onNameButton, this, std::placeholders::_1, i));
 
         _nameLabel[i] = Label::createWithSystemFont("", "Arail", 12);
-        _nameLabel[i]->setColor(Color3B::YELLOW);
+        _nameLabel[i]->setColor(nameColor);
         _nameLabel[i]->setPosition(Vec2(gap * (i + 1.5f), 390));
         node->addChild(_nameLabel[i]);
     }
 
-    _lockButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    _lockButton = ui::Button::create(normalImage, selectedImage);
     node->addChild(_lockButton);
     _lockButton->setScale9Enabled(true);
     _lockButton->setContentSize(Size(gap, 20.0f));
     _lockButton->setTitleFontSize(12);
-    _lockButton->setTitleColor(Color3B::BLACK);
+    _lockButton->setTitleColor(textColor2);
     _lockButton->setTitleText("锁定");
     _lockButton->setPosition(Vec2(gap * 5.5f, 390));
     _lockButton->addClickEventListener(std::bind(&ScoreSheetScene::onLockButton, this, std::placeholders::_1));
@@ -177,11 +202,13 @@ bool ScoreSheetScene::init() {
     const char *row1Text[] = {"每圈座位", "东南北西", "南东西北", "西北东南", "北西南东"};
     for (int i = 0; i < 5; ++i) {
         label = Label::createWithSystemFont(row0Text[i], "Arail", 12);
+        label->setColor(textColor);
         label->setPosition(Vec2(gap * (i + 0.5f), 370));
         node->addChild(label);
         scaleLabelToFitWidth(label, gap - 4);
 
         label = Label::createWithSystemFont(row1Text[i], "Arail", 12);
+        label->setColor(textColor);
         label->setPosition(Vec2(gap * (i + 0.5f), 350));
         node->addChild(label);
         scaleLabelToFitWidth(label, gap - 4);
@@ -189,19 +216,20 @@ bool ScoreSheetScene::init() {
 
     // 第4栏：累计
     label = Label::createWithSystemFont("累计", "Arail", 12);
-    label->setColor(Color3B::YELLOW);
+    label->setColor(nameColor);
     label->setPosition(Vec2(gap * 0.5f, 330));
     node->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     label = Label::createWithSystemFont("备注", "Arail", 12);
+    label->setColor(textColor);
     label->setPosition(Vec2(gap * 5.5f, 330));
     node->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     for (int i = 0; i < 4; ++i) {
         _totalLabel[i] = Label::createWithSystemFont("+0", "Arail", 12);
-        _totalLabel[i]->setColor(Color3B::YELLOW);
+        _totalLabel[i]->setColor(nameColor);
         _totalLabel[i]->setPosition(Vec2(gap * (i + 1.5f), 330));
         node->addChild(_totalLabel[i]);
 
@@ -219,7 +247,7 @@ bool ScoreSheetScene::init() {
 
         // 东风东~北风北名字
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
-        label->setColor(Color3B::GRAY);
+        label->setColor(scoreColor);
         label->setPosition(Vec2(gap * 0.5f, y));
         node->addChild(label);
         scaleLabelToFitWidth(label, gap - 4);
@@ -232,12 +260,12 @@ bool ScoreSheetScene::init() {
         }
 
         // 计分按钮
-        _recordButton[k] = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        _recordButton[k] = ui::Button::create(normalImage, selectedImage);
         node->addChild(_recordButton[k]);
         _recordButton[k]->setScale9Enabled(true);
         _recordButton[k]->setContentSize(Size(gap, 20.0f));
         _recordButton[k]->setTitleFontSize(12);
-        _recordButton[k]->setTitleColor(Color3B::BLACK);
+        _recordButton[k]->setTitleColor(textColor2);
         _recordButton[k]->setTitleText("计分");
         _recordButton[k]->setPosition(Vec2(gap * 5.5f, y));
         _recordButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::onRecordButton, this, std::placeholders::_1, k));
@@ -246,7 +274,7 @@ bool ScoreSheetScene::init() {
 
         // 备注的番种label
         _pointNameLabel[k] = Label::createWithSystemFont("", "Arail", 12);
-        _pointNameLabel[k]->setColor(Color3B::GRAY);
+        _pointNameLabel[k]->setColor(scoreColor);
         _pointNameLabel[k]->setPosition(Vec2(gap * 5.5f, y));
         node->addChild(_pointNameLabel[k]);
         _pointNameLabel[k]->setVisible(false);
@@ -294,7 +322,12 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
             _scoreLabels[handIdx][i]->setColor(Color3B::GREEN);
         }
         else {
-            _scoreLabels[handIdx][i]->setColor(Color3B::GRAY);
+            if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+                _scoreLabels[handIdx][i]->setColor(Color3B::GRAY);
+            }
+            else {
+                _scoreLabels[handIdx][i]->setColor(Color3B(80, 80, 80));
+            }
         }
     }
 

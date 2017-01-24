@@ -43,6 +43,23 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         memset(&_detail, 0, sizeof(_detail));
     }
 
+    Color3B textColor, nameColor, scoreColor;
+    const char *normalImage, *selectedImage;
+    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        textColor = Color3B::WHITE;
+        nameColor = Color3B::YELLOW;
+        scoreColor = Color3B::GRAY;
+        normalImage = "source_material/btn_square_normal.png";
+        selectedImage = "source_material/btn_square_highlighted.png";
+    }
+    else {
+        textColor = Color3B::BLACK;
+        nameColor = Color3B::ORANGE;
+        scoreColor = Color3B(80, 80, 80);
+        normalImage = "source_material/btn_square_highlighted.png";
+        selectedImage = "source_material/btn_square_selected.png";
+    }
+
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -73,6 +90,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     plusButton->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1));
 
     Label *label = Label::createWithSystemFont("番", "Arial", 12);
+    label->setColor(textColor);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 120.0f, origin.y + visibleSize.height - 50));
@@ -87,6 +105,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     _drawBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("荒庄", "Arial", 12);
+    label->setColor(textColor);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + visibleSize.width - 45.0f, origin.y + visibleSize.height - 50));
@@ -107,14 +126,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
         // 名字
         Label *nameLabel = Label::createWithSystemFont(playerNames[i], "Arial", 12);
-        nameLabel->setColor(Color3B::YELLOW);
+        nameLabel->setColor(nameColor);
         this->addChild(nameLabel);
         nameLabel->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
         scaleLabelToFitWidth(nameLabel, gap - 4);
 
         // 得分
         _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);
-        _scoreLabel[i]->setColor(Color3B::GRAY);
+        _scoreLabel[i]->setColor(scoreColor);
         this->addChild(_scoreLabel[i]);
         _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 105));
 
@@ -129,6 +148,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         _winGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("和", "Arial", 12);
+        label->setColor(textColor);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 130));
@@ -144,12 +164,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         _claimGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
+        label->setColor(textColor);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 160));
         _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
+        label->setColor(textColor);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 160));
@@ -167,6 +189,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         _falseWinBox[i]->addEventListener(std::bind(&RecordScene::onFalseWinBox, this, std::placeholders::_1, std::placeholders::_2));
 
         label = Label::createWithSystemFont("错和", "Arial", 12);
+        label->setColor(textColor);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 190));
@@ -174,11 +197,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
     // 说明
     label = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
+    label->setColor(textColor);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 220));
 
     label = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。", "Arial", 10);
+    label->setColor(textColor);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 240));
@@ -211,7 +236,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     this->addChild(tableView);
 
     // 确定按钮
-    _okButton = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png");
+    _okButton = ui::Button::create(normalImage, selectedImage, "source_material/btn_square_disabled.png");
     this->addChild(_okButton);
     _okButton->setScale9Enabled(true);
     _okButton->setContentSize(Size(52.0f, 22.0f));
@@ -241,6 +266,9 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         label = Label::createWithSystemFont("1番", "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
+        if (!UserDefault::getInstance()->getBoolForKey("night_mode")) {
+            label->setColor(Color3B::BLACK);
+        }
 
         for (size_t k = 0; k < 9; ++k) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -272,7 +300,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
         button->setTitleText(mahjong::points_name[idx0]);
-        button->setTag(idx0);
+        button->setTag(static_cast<int>(idx0));
         button->setVisible(true);
         button->setEnabled(true);
 
@@ -374,7 +402,12 @@ void RecordScene::updateScoreLabel() {
             _scoreLabel[i]->setColor(Color3B::GREEN);
         }
         else {
-            _scoreLabel[i]->setColor(Color3B::GRAY);
+            if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+                _scoreLabel[i]->setColor(Color3B::GRAY);
+            }
+            else {
+                _scoreLabel[i]->setColor(Color3B(80, 80, 80));
+            }
         }
     }
 

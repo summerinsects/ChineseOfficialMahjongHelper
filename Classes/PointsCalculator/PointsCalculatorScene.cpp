@@ -18,6 +18,19 @@ bool PointsCalculatorScene::init() {
         return false;
     }
 
+    Color3B textColor;
+    const char *normalImage, *selectedImage;
+    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        textColor = Color3B::WHITE;
+        normalImage = "source_material/btn_square_normal.png";
+        selectedImage = "source_material/btn_square_highlighted.png";
+    }
+    else {
+        textColor = Color3B::BLACK;
+        normalImage = "source_material/btn_square_highlighted.png";
+        selectedImage = "source_material/btn_square_selected.png";
+    }
+
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -34,22 +47,22 @@ bool PointsCalculatorScene::init() {
         float scale = visibleSize.width / widgetSize.width;
         _tilePicker->setScale(scale);
         y -= widgetSize.height * scale;
-        _tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 20 + widgetSize.height * scale * 0.5f));
+        _tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 25 + widgetSize.height * scale * 0.5f));
     }
     else {
         y -= widgetSize.height;
-        _tilePicker->setPosition(Vec2(origin.x + widgetSize.width * 0.5f, y - 20 + widgetSize.height * 0.5f));
+        _tilePicker->setPosition(Vec2(origin.x + widgetSize.width * 0.5f, y - 25 + widgetSize.height * 0.5f));
     }
 
     // 其他信息的相关控件
     ui::Widget *infoWidget = ui::Widget::create();
     infoWidget->setContentSize(Size(visibleSize.width, 120));
     this->addChild(infoWidget);
-    infoWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 80));
+    infoWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 85));
 
     // 番种显示的Node
     _pointsAreaNode = Node::create();
-    _pointsAreaNode->setContentSize(Size(visibleSize.width, y - 140));
+    _pointsAreaNode->setContentSize(Size(visibleSize.width, y - 145));
     _pointsAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     this->addChild(_pointsAreaNode);
     _pointsAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + y * 0.5f - 70));
@@ -70,6 +83,7 @@ bool PointsCalculatorScene::init() {
     _winTypeGroup->addRadioButton(radioButton);
 
     Label *byDiscardLabel = Label::createWithSystemFont("点和", "Arial", 12);
+    byDiscardLabel->setColor(textColor);
     infoWidget->addChild(byDiscardLabel);
     byDiscardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     byDiscardLabel->setPosition(Vec2(35.0f, 105.0f));
@@ -84,6 +98,7 @@ bool PointsCalculatorScene::init() {
     _winTypeGroup->addRadioButton(radioButton);
 
     Label *selfDrawnLabel = Label::createWithSystemFont("自摸", "Arial", 12);
+    selfDrawnLabel->setColor(textColor);
     infoWidget->addChild(selfDrawnLabel);
     selfDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     selfDrawnLabel->setPosition(Vec2(35.0f + gapX, 105.0f));
@@ -99,6 +114,7 @@ bool PointsCalculatorScene::init() {
     _fourthTileBox->addEventListener(std::bind(&PointsCalculatorScene::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
     Label *fourthTileLabel = Label::createWithSystemFont("绝张", "Arial", 12);
+    fourthTileLabel->setColor(textColor);
     infoWidget->addChild(fourthTileLabel);
     fourthTileLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     fourthTileLabel->setPosition(Vec2(35.0f + gapX * 2, 105.0f));
@@ -114,6 +130,7 @@ bool PointsCalculatorScene::init() {
     _replacementBox->addEventListener(std::bind(&PointsCalculatorScene::onReplacementBox, this, std::placeholders::_1, std::placeholders::_2));
 
     Label *replacementLabel = Label::createWithSystemFont("杠开", "Arial", 12);
+    replacementLabel->setColor(textColor);
     infoWidget->addChild(replacementLabel);
     replacementLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     replacementLabel->setPosition(Vec2(35.0f, 75.0f));
@@ -129,6 +146,7 @@ bool PointsCalculatorScene::init() {
     _robKongBox->addEventListener(std::bind(&PointsCalculatorScene::onRobKongBox, this, std::placeholders::_1, std::placeholders::_2));
 
     Label *robKongLabel = Label::createWithSystemFont("抢杠", "Arial", 12);
+    robKongLabel->setColor(textColor);
     infoWidget->addChild(robKongLabel);
     robKongLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     robKongLabel->setPosition(Vec2(35.0f + gapX, 75.0f));
@@ -143,6 +161,7 @@ bool PointsCalculatorScene::init() {
     _lastTileBox->addEventListener(std::bind(&PointsCalculatorScene::onLastTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
     Label *lastTileDrawnLabel = Label::createWithSystemFont("海底", "Arial", 12);
+    lastTileDrawnLabel->setColor(textColor);
     infoWidget->addChild(lastTileDrawnLabel);
     lastTileDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     lastTileDrawnLabel->setPosition(Vec2(35.0f + gapX * 2, 75.0f));
@@ -151,6 +170,7 @@ bool PointsCalculatorScene::init() {
 
     // 圈风
     Label *prevalentWindLabel = Label::createWithSystemFont("圈风", "Arial", 12);
+    prevalentWindLabel->setColor(textColor);
     infoWidget->addChild(prevalentWindLabel);
     prevalentWindLabel->setPosition(Vec2(20.0f, 45.0f));
 
@@ -174,6 +194,7 @@ bool PointsCalculatorScene::init() {
 
     // 门风
     Label *seatWindLabel = Label::createWithSystemFont("门风", "Arial", 12);
+    seatWindLabel->setColor(textColor);
     infoWidget->addChild(seatWindLabel);
     seatWindLabel->setPosition(Vec2(20.0f, 15.0f));
 
@@ -197,6 +218,7 @@ bool PointsCalculatorScene::init() {
 
     // 花牌数
     Label *flowerLabel = Label::createWithSystemFont("花牌数", "Arial", 12);
+    flowerLabel->setColor(textColor);
     infoWidget->addChild(flowerLabel);
     flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     flowerLabel->setPosition(Vec2(visibleSize.width - 50, 45.0f));
@@ -211,7 +233,7 @@ bool PointsCalculatorScene::init() {
     _editBox->setPosition(Vec2(visibleSize.width - 30, 45.0f));
 
     // 番算按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    button = ui::Button::create(normalImage, selectedImage);
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -383,6 +405,8 @@ void PointsCalculatorScene::calculate() {
         return;
     }
 
+    Color3B textColor = UserDefault::getInstance()->getBoolForKey("night_mode") ? Color3B::WHITE : Color3B::BLACK;
+
     // 加花牌
     points += flowerCnt;
     points_table[mahjong::FLOWER_TILES] = flowerCnt;
@@ -401,14 +425,15 @@ void PointsCalculatorScene::calculate() {
 
         std::string str;
         if (points_table[j] == 1) {
-            str = StringUtils::format("%s %d\n", mahjong::points_name[j], mahjong::points_value_table[j]);
+            str = StringUtils::format("%s %d番\n", mahjong::points_name[j], mahjong::points_value_table[j]);
         }
         else {
-            str = StringUtils::format("%s %dx%ld\n", mahjong::points_name[j], mahjong::points_value_table[j], points_table[j]);
+            str = StringUtils::format("%s %d番x%ld\n", mahjong::points_name[j], mahjong::points_value_table[j], points_table[j]);
         }
 
         // 创建label，每行排2个
         Label *pointName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
+        pointName->setColor(textColor);
         innerNode->addChild(pointName);
         pointName->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
         div_t ret = div(i, 2);
@@ -416,6 +441,7 @@ void PointsCalculatorScene::calculate() {
     }
 
     Label *pointTotal = Label::createWithSystemFont(StringUtils::format("总计：%d番", points), "Arial", FONT_SIZE);
+    pointTotal->setColor(textColor);
     innerNode->addChild(pointTotal);
     pointTotal->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
     pointTotal->setPosition(Vec2(5.0f, FONT_SIZE + 2));
