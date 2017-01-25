@@ -41,14 +41,14 @@ bool ScoreTableScene::init() {
         label->setColor(Color3B::BLACK);
     }
 
-    for (int i = 0; i < 5; ++i) {
+    for (size_t i = 0; i < 5; ++i) {
         ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
         button->setScale9Enabled(true);
         button->setContentSize(Size(90.0f, 20.0f));
         button->setTitleColor(Color3B::BLACK);
         button->setTitleFontSize(12);
         button->setTitleText(principle_title[i]);
-        button->setTag(100 + i);
+        button->setUserData(reinterpret_cast<void *>(100 + i));
         button->addClickEventListener(std::bind(&ScoreTableScene::onPointsNameButton, this, std::placeholders::_1));
 
         this->addChild(button);
@@ -137,7 +137,7 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
         size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
         button->setTitleText(mahjong::points_name[idx0]);
-        button->setTag(static_cast<int>(idx0));
+        button->setUserData(reinterpret_cast<void *>(idx0));
         button->setVisible(true);
         button->setEnabled(true);
         size_t col = k & 0x3;
@@ -155,6 +155,6 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
 
 void ScoreTableScene::onPointsNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    size_t idx = button->getTag();
+    size_t idx = reinterpret_cast<size_t>(button->getUserData());
     Director::getInstance()->pushScene(ScoreDefinitionScene::createScene(idx));
 }

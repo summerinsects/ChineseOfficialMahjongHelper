@@ -230,8 +230,8 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
     layerColor[0]->setVisible(!(idx & 1));
     layerColor[1]->setVisible(!!(idx & 1));
 
-    delBtn->setTag(static_cast<int>(idx));
-    viewBtn->setTag(static_cast<int>(idx));
+    delBtn->setUserData(reinterpret_cast<void *>(idx));
+    viewBtn->setUserData(reinterpret_cast<void *>(idx));
 
     const Record &record = g_records[idx];
     int scores[4] = { 0 };
@@ -262,7 +262,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
 
 void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    size_t idx = button->getTag();
+    size_t idx = reinterpret_cast<size_t>(button->getUserData());
     AlertLayer::showWithMessage("删除记录", "删除后无法找回，确认删除？", [this, idx]() {
         g_records.erase(g_records.begin() + idx);
         auto thiz = RefPtr<HistoryScene>(this);
@@ -276,7 +276,7 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
 
 void HistoryScene::onViewButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    size_t idx = button->getTag();
+    size_t idx = reinterpret_cast<size_t>(button->getUserData());
     if (_viewCallback(g_records[idx])) {
         Director::getInstance()->popScene();
     }

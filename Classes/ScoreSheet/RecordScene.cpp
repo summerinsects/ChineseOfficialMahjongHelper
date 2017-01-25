@@ -300,7 +300,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
         button->setTitleText(mahjong::points_name[idx0]);
-        button->setTag(static_cast<int>(idx0));
+        button->setUserData(reinterpret_cast<void *>(idx0));
         button->setVisible(true);
         button->setEnabled(true);
 
@@ -507,7 +507,7 @@ void RecordScene::onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::Eve
 
 void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    int index = button->getTag();
+    size_t index = reinterpret_cast<size_t>(button->getUserData());
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
     if (index > mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
         --index;
