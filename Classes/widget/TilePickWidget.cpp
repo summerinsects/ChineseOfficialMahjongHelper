@@ -184,9 +184,7 @@ bool TilePickWidget::init() {
 
     reset();
 
-    _handTilesWidget->setCurrentIdxChangedCallback([this]() {
-        refreshActionButtons();
-    });
+    _handTilesWidget->setCurrentIdxChangedCallback(std::bind(&TilePickWidget::refreshActionButtons, this));
 
     return true;
 }
@@ -305,8 +303,6 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile)
         refreshTilesTableButton(prevTile);
     }
     refreshTilesTableButton(tile);
-    refreshActionButtons();
-
     if (LIKELY(_winTileChangedCallback)) {
         _winTileChangedCallback();
     }

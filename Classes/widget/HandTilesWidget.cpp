@@ -182,9 +182,6 @@ void HandTilesWidget::onTileButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     _currentIdx = reinterpret_cast<size_t>(button->getUserData());
     refreshHighlightPos();
-    if (_currentIdxChangedCallback) {
-        _currentIdxChangedCallback();
-    }
 }
 
 // 添加一张牌
@@ -273,6 +270,10 @@ void HandTilesWidget::refreshHighlightPos() {
     }
     else {
         _highlightBox->setPosition(Vec2(pos.x + 4, pos.y));
+    }
+
+    if (LIKELY(_currentIdxChangedCallback)) {
+        _currentIdxChangedCallback();
     }
 }
 
