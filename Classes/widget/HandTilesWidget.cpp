@@ -297,6 +297,11 @@ void HandTilesWidget::refreshStandingTiles() {
     if (prevIndex < _currentIdx) {
         _currentIdx = prevIndex;
     }
+
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (_currentIdx > maxCnt) {
+        _currentIdx = maxCnt;
+    }
     refreshHighlightPos();
 }
 
