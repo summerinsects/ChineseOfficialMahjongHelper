@@ -75,6 +75,9 @@
     <ClCompile Include="..\Classes\widget\CWTableView.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -132,6 +135,9 @@
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\CWTableView.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\HandTilesWidget.h">
       <Filter>src\widget</Filter>
     </ClInclude>
   </ItemGroup>

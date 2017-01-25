@@ -157,6 +157,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\ScoreTable\ScoreTable.cpp" />
     <ClCompile Include="..\Classes\widget\AlertLayer.cpp" />
     <ClCompile Include="..\Classes\widget\CWTableView.cpp" />
+    <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp" />
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -178,6 +179,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\ScoreTable\ScoreTable.h" />
     <ClInclude Include="..\Classes\widget\AlertLayer.h" />
     <ClInclude Include="..\Classes\widget\CWTableView.h" />
+    <ClInclude Include="..\Classes\widget\HandTilesWidget.h" />
     <ClInclude Include="..\Classes\widget\TilePickWidget.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>

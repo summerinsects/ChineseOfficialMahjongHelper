@@ -20,8 +20,8 @@ private:
     void onReplacementBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
-    void onFixedSetsChanged(TilePickWidget *sender);
-    void onWinTileChanged(TilePickWidget *sender);
+    void onFixedSetsChanged();
+    void onWinTileChanged();
 
     void showInputAlert(const char *prevInput);
     void parseInput(const char *input);

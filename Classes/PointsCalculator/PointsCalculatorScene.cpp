@@ -2,6 +2,7 @@
 #include "../mahjong-algorithm/points_calculator.h"
 
 #include "../widget/TilePickWidget.h"
+#include "../widget/HandTilesWidget.h"
 #include "../widget/AlertLayer.h"
 
 USING_NS_CC;
@@ -38,13 +39,13 @@ bool PointsCalculatorScene::init() {
     _tilePicker = TilePickWidget::create();
     const Size &widgetSize = _tilePicker->getContentSize();
     this->addChild(_tilePicker);
-    _tilePicker->setFixedSetsChangedCallback(std::bind(&PointsCalculatorScene::onFixedSetsChanged, this, std::placeholders::_1));
-    _tilePicker->setWinTileChangedCallback(std::bind(&PointsCalculatorScene::onWinTileChanged, this, std::placeholders::_1));
+    _tilePicker->setFixedSetsChangedCallback(std::bind(&PointsCalculatorScene::onFixedSetsChanged, this));
+    _tilePicker->setWinTileChangedCallback(std::bind(&PointsCalculatorScene::onWinTileChanged, this));
 
     // 根据情况缩放
     float y = origin.y + visibleSize.height - 10;
-    if (widgetSize.width > visibleSize.width) {
-        float scale = visibleSize.width / widgetSize.width;
+    if (widgetSize.width - 4 > visibleSize.width) {
+        float scale = (visibleSize.width - 4) / widgetSize.width;
         _tilePicker->setScale(scale);
         y -= widgetSize.height * scale;
         _tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 25 + widgetSize.height * scale * 0.5f));
@@ -313,10 +314,9 @@ void PointsCalculatorScene::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::Che
     }
 }
 
-void PointsCalculatorScene::onFixedSetsChanged(TilePickWidget *sender) {
+void PointsCalculatorScene::onFixedSetsChanged() {
     // 当副露不包含杠的时候，杠开是禁用状态
-    const std::vector<mahjong::SET> &fixedSets = sender->getFixedSets();
-    _hasKong = std::any_of(fixedSets.begin(), fixedSets.end(), [](const mahjong::SET &s) { return s.set_type == mahjong::SET_TYPE::KONG; });
+    _hasKong = _tilePicker->getHandTilesWidget()->isFixedSetsContainsKong();
     if (_winTypeGroup->getSelectedButtonIndex() == 1) {
         _replacementBox->setEnabled(_hasKong);
     }
@@ -325,11 +325,11 @@ void PointsCalculatorScene::onFixedSetsChanged(TilePickWidget *sender) {
     }
 }
 
-void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
+void PointsCalculatorScene::onWinTileChanged() {
     // 当立牌中有和牌张时，绝张是禁用状态
     _maybeFourthTile = false;
     _maybeRobKong = false;
-    mahjong::TILE winTile = sender->getWinTile();
+    mahjong::TILE winTile = _tilePicker->getHandTilesWidget()->getWinTile();
     if (winTile == 0) {
         _fourthTileBox->setEnabled(false);
         _robKongBox->setEnabled(false);
@@ -337,15 +337,11 @@ void PointsCalculatorScene::onWinTileChanged(TilePickWidget *sender) {
     }
     else {
         // 立牌中有和牌张时，不可能是绝张和抢杠
-        const std::vector<mahjong::TILE> &standingTiles = sender->getStandingTiles();
-        auto it = std::find(standingTiles.begin(), standingTiles.end(), winTile);
-        _maybeFourthTile = (it == standingTiles.end());
+        _maybeFourthTile = !_tilePicker->getHandTilesWidget()->isStandingTilesContainsWinTile();
 
         if (_maybeFourthTile) {
-            // 当副露中有和牌张是，不可能是抢杠
-            const std::vector<mahjong::SET> &fixedSets = sender->getFixedSets();
-            _maybeRobKong = std::none_of(fixedSets.begin(), fixedSets.end(),
-                std::bind(&mahjong::is_set_contains_tile, std::placeholders::_1, winTile));
+            // 当副露中有和牌张时，不可能是抢杠
+            _maybeRobKong = !_tilePicker->getHandTilesWidget()->isFixedSetsContainsWinTile();
         }
         else {
             _maybeRobKong = false;
@@ -473,17 +469,20 @@ void PointsCalculatorScene::calculate() {
 
     // 获取副露
     mahjong::SET fixed_sets[5];
-    long set_cnt = std::copy(_tilePicker->getFixedSets().begin(), _tilePicker->getFixedSets().end(), std::begin(fixed_sets))
+    const std::vector<mahjong::SET> &fixedSets = _tilePicker->getHandTilesWidget()->getFixedSets();
+    long set_cnt = std::copy(fixedSets.begin(), fixedSets.end(), std::begin(fixed_sets))
         - std::begin(fixed_sets);
 
     // 获取立牌
-    mahjong::TILE standing_tiles[13];
-    long tile_cnt = std::copy(_tilePicker->getStandingTiles().begin(), _tilePicker->getStandingTiles().end(), std::begin(standing_tiles))
+    mahjong::TILE standing_tiles[14];
+    const std::vector<mahjong::TILE> &standingTiles = _tilePicker->getHandTilesWidget()->getStandingTiles();
+    long tile_cnt = std::copy(standingTiles.begin(), standingTiles.end(), std::begin(standing_tiles))
         - std::begin(standing_tiles);
+    --tile_cnt;
     mahjong::sort_tiles(standing_tiles, tile_cnt);
 
     // 获取和牌张
-    mahjong::TILE win_tile = _tilePicker->getWinTile();
+    mahjong::TILE win_tile = _tilePicker->getHandTilesWidget()->getWinTile();
 
     long points_table[mahjong::POINT_TYPE_COUNT] = { 0 };
 
