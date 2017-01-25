@@ -43,7 +43,7 @@ bool HandTilesWidget::init() {
 
     this->setContentSize(Size(tilesSize.width, tilesSize.height + fixedSize.height + 4));
 
-    _standingTiles.reserve(13);
+    _standingTiles.reserve(14);
     _fixedSets.reserve(4);
 
     reset();
@@ -111,10 +111,6 @@ void HandTilesWidget::setData(const mahjong::SET fixedSets[5], long setCnt, cons
 }
 
 mahjong::TILE HandTilesWidget::getWinTile() const {
-    if (_standingTiles.empty()) {
-        return 0;
-    }
-
     size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
     if (_standingTiles.size() < maxCnt) {
         return 0;
@@ -454,6 +450,11 @@ bool HandTilesWidget::canChow_XX() {
         return false;
     }
 
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (_currentIdx == maxCnt) {
+        return false;
+    }
+
     mahjong::TILE tile = _standingTiles[_currentIdx];
     return (!mahjong::is_honor(tile)
         && _standingTilesTable[tile] > 0
@@ -463,6 +464,11 @@ bool HandTilesWidget::canChow_XX() {
 
 bool HandTilesWidget::canChowX_X() {
     if (_currentIdx >= _standingTiles.size()) {
+        return false;
+    }
+
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (_currentIdx == maxCnt) {
         return false;
     }
 
@@ -478,6 +484,11 @@ bool HandTilesWidget::canChowXX_() {
         return false;
     }
 
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (_currentIdx == maxCnt) {
+        return false;
+    }
+
     mahjong::TILE tile = _standingTiles[_currentIdx];
     return (!mahjong::is_honor(tile)
         && _standingTilesTable[tile - 2] > 0
@@ -490,6 +501,11 @@ bool HandTilesWidget::canPung() {
         return false;
     }
 
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (_currentIdx == maxCnt) {
+        return false;
+    }
+
     mahjong::TILE tile = _standingTiles[_currentIdx];
     return (_standingTilesTable[tile] >= 3);
 }
@@ -499,12 +515,22 @@ bool HandTilesWidget::canKong() {
         return false;
     }
 
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (_currentIdx == maxCnt) {
+        return false;
+    }
+
     mahjong::TILE tile = _standingTiles[_currentIdx];
     return (_standingTilesTable[tile] >= 4);
 }
 
 bool HandTilesWidget::makeFixedChow_XXSet() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {
+        return false;
+    }
+
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (UNLIKELY(_currentIdx == maxCnt)) {
         return false;
     }
 
@@ -544,6 +570,11 @@ bool HandTilesWidget::makeFixedChowX_XSet() {
         return false;
     }
 
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (UNLIKELY(_currentIdx == maxCnt)) {
+        return false;
+    }
+
     // X_X 13吃2
     mahjong::TILE tile = _standingTiles[_currentIdx];
     if (UNLIKELY(mahjong::is_honor(tile)
@@ -575,9 +606,13 @@ bool HandTilesWidget::makeFixedChowX_XSet() {
     return true;
 }
 
-
 bool HandTilesWidget::makeFixedChowXX_Set() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {
+        return false;
+    }
+
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (UNLIKELY(_currentIdx == maxCnt)) {
         return false;
     }
 
@@ -617,6 +652,11 @@ bool HandTilesWidget::makeFixedPungSet() {
         return false;
     }
 
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (UNLIKELY(_currentIdx == maxCnt)) {
+        return false;
+    }
+
     mahjong::TILE tile = _standingTiles[_currentIdx];
     if (UNLIKELY(_standingTilesTable[tile] < 3)) {
         return false;
@@ -645,6 +685,11 @@ bool HandTilesWidget::makeFixedPungSet() {
 
 bool HandTilesWidget::makeFixedMeldedKongSet() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {
+        return false;
+    }
+
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (UNLIKELY(_currentIdx == maxCnt)) {
         return false;
     }
 
@@ -678,6 +723,11 @@ bool HandTilesWidget::makeFixedMeldedKongSet() {
 
 bool HandTilesWidget::makeFixedConcealedKongSet() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {
+        return false;
+    }
+
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (UNLIKELY(_currentIdx == maxCnt)) {
         return false;
     }
 
