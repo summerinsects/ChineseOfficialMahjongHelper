@@ -307,9 +307,9 @@ void HandTilesWidget::addFixedChowSet(mahjong::TILE tile, int meldedIdx) {
     const char *image[3];
     switch (meldedIdx) {
     default:
-        image[0] = tilesImageName[tile - 1];
-        image[1] = tilesImageName[tile];
-        image[2] = tilesImageName[tile + 1];
+        image[0] = tilesImageName[tile];
+        image[1] = tilesImageName[tile + 1];
+        image[2] = tilesImageName[tile + 2];
         break;
     case 1:
         image[0] = tilesImageName[tile];
@@ -317,9 +317,9 @@ void HandTilesWidget::addFixedChowSet(mahjong::TILE tile, int meldedIdx) {
         image[2] = tilesImageName[tile + 1];
         break;
     case 2:
-        image[0] = tilesImageName[tile + 1];
+        image[0] = tilesImageName[tile];
         image[1] = tilesImageName[tile - 1];
-        image[2] = tilesImageName[tile];
+        image[2] = tilesImageName[tile - 2];
         break;
     }
 
