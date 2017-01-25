@@ -369,11 +369,11 @@ void PointsCalculatorScene::showInputAlert(const char *prevInput) {
     Label *label = Label::createWithSystemFont("使用说明：\n"
         "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，同花色的数牌可合并用一个后缀。\n"
         "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。\n"
-        "3.每一组副露（即吃、碰、明杠）用英文[]，每一组暗杠用英文{}。\n"
-        "4.请将所有副露放在最前面，然后是立牌，和牌用英文逗号,与手牌分隔开。\n"
-        "范例1：{EEEE}{CCCC}{FFFF}{PPPP}N,N\n"
+        "3.每一组吃、碰、明杠之间用英文空格分隔，每一组暗杠用英文[]。\n"
+        "4.和牌用英文逗号,与手牌分隔开。\n"
+        "范例1：[EEEE][CCCC][FFFF][PPPP]N,N\n"
         "范例2：1112345678999s,9s\n"
-        "范例3：[WWWW][444s]45m678pFF,6m\n", "Arial", 10);
+        "范例3：WWWW 444s 45m678pFF,6m\n", "Arial", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0);
     rootWidget->addChild(label);
@@ -407,7 +407,7 @@ void PointsCalculatorScene::parseInput(const char *input) {
     const std::string str = input;
 
     do {
-        if (strspn(input, "123456789mpsESWNCFP[]{},") != str.length()) {
+        if (strspn(input, "123456789mpsESWNCFP [],") != str.length()) {
             errorStr = "无法解析输入的文本";
             break;
         }
@@ -427,14 +427,13 @@ void PointsCalculatorScene::parseInput(const char *input) {
         long tile_cnt;
         mahjong::TILE win_tile;
 
-        if (!mahjong::string_to_tiles(tilesString.c_str(), fixed_sets, &set_cnt, standing_tiles, &tile_cnt)) {
+        if (mahjong::string_to_tiles(tilesString.c_str(), fixed_sets, &set_cnt, standing_tiles, &tile_cnt)) {
             errorStr = "无法正确解析输入的文本";
             break;
         }
         mahjong::sort_tiles(standing_tiles, tile_cnt);
 
-        const char *p = mahjong::parse_tiles(winString.c_str(), &win_tile, nullptr);
-        if (*p != '\0') {
+        if (mahjong::parse_tiles(winString.c_str(), &win_tile, nullptr) < 0) {
             errorStr = "无法正确解析输入的文本";
             break;
         }

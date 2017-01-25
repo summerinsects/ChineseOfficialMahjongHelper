@@ -1952,11 +1952,9 @@ static int get_points_by_table(const long (&points_table)[POINT_TYPE_COUNT]) {
     return points;
 }
 
-const char *parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt) {
-    //std::regex reg("[1-9]+[mps]|[ESWNCFP]");
-    //if (std::regex_match(str, reg)) {
-    //    std::cout << "cannot parse the string" << std::endl;
-    //    return;
+long parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt) {
+    //if (strspn(str, "123456789mpsESWNCFP") != strlen(str)) {
+    //    return PARSE_ERROR_ILLEGAL_CHARACTER;
     //}
 
     long tile_cnt = 0;
@@ -2006,19 +2004,52 @@ const char *parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt) {
 
 end:
     if (temp_cnt != 0) {
-        puts("Expect m/s/p to finish a series of numbers");
-        return nullptr;
+        return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT;
     }
     if (out_tile_cnt != nullptr) {
         *out_tile_cnt = tile_cnt;
     }
-    return p;
+    return (p - str);
 }
 
-bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *standing_tiles, long *standing_cnt) {
+static long make_fixed_set(const TILE *tiles, long tile_cnt, SET *set) {
+    if (tile_cnt > 0) {
+        if (tile_cnt != 3 && tile_cnt != 4) {
+            return PARSE_ERROR_ILLEGAL_TILE_FOR_FIXED_SET;
+        }
+        if (tile_cnt == 3) {
+            if (tiles[0] + 1 == tiles[1] && tiles[1] + 1 == tiles[2]) {
+                set->mid_tile = tiles[1];
+                set->set_type = SET_TYPE::CHOW;
+                set->is_melded = true;
+            }
+            else if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
+                set->mid_tile = tiles[1];
+                set->set_type = SET_TYPE::PUNG;
+                set->is_melded = true;
+            }
+            else {
+                return PARSE_ERROR_CANNOT_MAKE_FIXED_SET;
+            }
+        }
+        else {
+            if (tiles[0] != tiles[1] || tiles[1] != tiles[2] || tiles[2] != tiles[3]) {
+                return PARSE_ERROR_ILLEGAL_TILE_FOR_FIXED_SET;
+            }
+            set->mid_tile = tiles[0];
+            set->set_type = SET_TYPE::KONG;
+            set->is_melded = true;
+        }
+        set->is_melded = true;
+        return 1;
+    }
+    return 0;
+}
+
+long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *standing_tiles, long *standing_cnt) {
     SET sets[5];
     long set_cnt = 0;
-    bool has_fixed_set = false, is_concealed_kong = false;
+    bool is_concealed_kong = false;
     TILE tiles[14];
     long tile_cnt = 0;
 
@@ -2026,93 +2057,51 @@ bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
     while (char c = *p) {
         const char *q;
         switch (c) {
-        case '[':
+        case ' ': {
+            long ret = make_fixed_set(tiles, tile_cnt, &sets[set_cnt]);
+            if (ret < 0) {
+                return ret;
+            }
+            set_cnt += ret;
             q = ++p;
-            is_concealed_kong = false;
-            has_fixed_set = true;
-            break;
-        case ']':
-            if (!has_fixed_set) {
-                puts("Closing bracket ] does not match");
-                return false;
-            }
-            if (tile_cnt != 3 && tile_cnt != 4) {
-                puts("Only 3 or 4 tiles allowed in a fixed set between [ ]");
-                return false;
-            }
-            if (tile_cnt == 3) {
-                if (is_concealed_kong) {
-                    puts("Concealed kong need 4 same tiles");
-                    return false;
-                }
-                if (tiles[0] + 1 == tiles[1] && tiles[1] + 1 == tiles[2]) {
-                    sets[set_cnt].mid_tile = tiles[1];
-                    sets[set_cnt].set_type = SET_TYPE::CHOW;
-                    sets[set_cnt].is_melded = true;
-                }
-                else if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
-                    sets[set_cnt].mid_tile = tiles[1];
-                    sets[set_cnt].set_type = SET_TYPE::PUNG;
-                    sets[set_cnt].is_melded = true;
-                }
-                else {
-                    puts("Cannot make a chow or pung");
-                    return false;
-                }
-            }
-            else {
-                if (tiles[0] != tiles[1] || tiles[1] != tiles[2] || tiles[2] != tiles[3]) {
-                    puts("Kong need 4 same tiles");
-                }
-                sets[set_cnt].mid_tile = tiles[0];
-                sets[set_cnt].set_type = SET_TYPE::KONG;
-                sets[set_cnt].is_melded = true;
-            }
-            q = ++p;
-            has_fixed_set = false;
-            ++set_cnt;
             tile_cnt = 0;
             break;
-        case '{':
+        }
+        case '[': {
+            long ret = make_fixed_set(tiles, tile_cnt, &sets[set_cnt]);
+            if (ret < 0) {
+                return ret;
+            }
+            set_cnt += ret;
             q = ++p;
             is_concealed_kong = true;
-            has_fixed_set = true;
             break;
-        case '}':
-            if (!has_fixed_set) {
-                puts("Closing bracket } does not match");
-                return false;
-            }
+        }
+        case ']':
             if (!is_concealed_kong) {
-                puts("{} is only for concealed kong");
-                return false;
+                return PARSE_ERROR_ILLEGAL_CHARACTER;
             }
             if (tile_cnt != 4) {
-                puts("Concealed kong need 4 same tiles");
-                return false;
+                return PARSE_ERROR_ILLEGAL_TILE_FOR_FIXED_SET;
             }
             q = ++p;
             sets[set_cnt].mid_tile = tiles[0];
             sets[set_cnt].set_type = SET_TYPE::KONG;
             sets[set_cnt].is_melded = false;
-            has_fixed_set = false;
+            is_concealed_kong = false;
             ++set_cnt;
             tile_cnt = 0;
             break;
-        default:
-            q = parse_tiles(p, tiles, &tile_cnt);
-            if (q == p || q == nullptr) {
-                puts("Unexpect character");
-                return false;
+        default: {
+                long ret = parse_tiles(p, tiles, &tile_cnt);
+                if (ret <= 0) {
+                    return ret;
+                }
+                q = p + ret;
             }
             break;
         }
         p = q;
-    }
-
-    if (has_fixed_set) {
-        puts("Expect closing bracket!");
-        return false;
     }
 
     //for (long i = 0; i < set_cnt; ++i) {
@@ -2133,7 +2122,7 @@ bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
         *standing_cnt = tile_cnt;
     }
 
-    return true;
+    return 0;
 }
 
 int check_calculator_input(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile) {

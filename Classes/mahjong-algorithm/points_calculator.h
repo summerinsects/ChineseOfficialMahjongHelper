@@ -49,8 +49,13 @@ static const char *stringify_table[] = {
     "", "C", "F", "P", "", "", "", "", "", "", "", "", "", "", "", "",
 };
 
-const char *parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt);
-bool string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *standing_tiles, long *standing_cnt);
+#define PARSE_ERROR_ILLEGAL_CHARACTER -1
+#define PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT -2
+#define PARSE_ERROR_ILLEGAL_TILE_FOR_FIXED_SET -3
+#define PARSE_ERROR_CANNOT_MAKE_FIXED_SET -3
+
+long parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt);
+long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *standing_tiles, long *standing_cnt);
 void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *tile_cnt);
 
 enum POINT_TYPE {
