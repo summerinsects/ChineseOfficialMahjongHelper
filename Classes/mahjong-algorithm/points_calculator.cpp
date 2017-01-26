@@ -2018,18 +2018,22 @@ static long make_fixed_set(const TILE *tiles, long tile_cnt, SET *set) {
             return PARSE_ERROR_ILLEGAL_TILE_FOR_FIXED_SET;
         }
         if (tile_cnt == 3) {
-            if (tiles[0] + 1 == tiles[1] && tiles[1] + 1 == tiles[2]) {
-                set->mid_tile = tiles[1];
-                set->set_type = SET_TYPE::CHOW;
-                set->is_melded = true;
-            }
-            else if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
+            if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
                 set->mid_tile = tiles[1];
                 set->set_type = SET_TYPE::PUNG;
                 set->is_melded = true;
             }
             else {
-                return PARSE_ERROR_CANNOT_MAKE_FIXED_SET;
+                TILE temp[3] = { tiles[0], tiles[1], tiles[2] };
+                std::sort(std::begin(temp), std::end(temp));
+                if (temp[0] + 1 == temp[1] && temp[1] + 1 == temp[2]) {
+                    set->mid_tile = temp[1];
+                    set->set_type = SET_TYPE::CHOW;
+                    set->is_melded = true;
+                }
+                else {
+                    return PARSE_ERROR_CANNOT_MAKE_FIXED_SET;
+                }
             }
         }
         else {
