@@ -1952,45 +1952,35 @@ static int get_points_by_table(const long (&points_table)[POINT_TYPE_COUNT]) {
     return points;
 }
 
-long parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt) {
+static long parse_tiles_impl(const char *str, TILE *tiles, long max_cnt, long *out_tile_cnt) {
     //if (strspn(str, "123456789mpsESWNCFP") != strlen(str)) {
     //    return PARSE_ERROR_ILLEGAL_CHARACTER;
     //}
 
     long tile_cnt = 0;
-    TILE temp[14];
-    long temp_cnt = 0;
+
+#define SET_SUIT_FOR_NUMBERED(value_)       \
+    for (long i = tile_cnt; i > 0;) {       \
+        if (tiles[--i] & 0xF0) break;       \
+        tiles[i] |= value_;                 \
+        } (void)0
+
     const char *p = str;
-    for (; temp_cnt < 14 && tile_cnt < 14 && *p != '\0'; ++p) {
+    for (; tile_cnt < max_cnt && *p != '\0'; ++p) {
         char c = *p;
         switch (c) {
-        case '1': temp[temp_cnt++] = 1; break;
-        case '2': temp[temp_cnt++] = 2; break;
-        case '3': temp[temp_cnt++] = 3; break;
-        case '4': temp[temp_cnt++] = 4; break;
-        case '5': temp[temp_cnt++] = 5; break;
-        case '6': temp[temp_cnt++] = 6; break;
-        case '7': temp[temp_cnt++] = 7; break;
-        case '8': temp[temp_cnt++] = 8; break;
-        case '9': temp[temp_cnt++] = 9; break;
-        case 'm':
-            for (long i = 0; i < temp_cnt && tile_cnt < 14; ++i) {
-                tiles[tile_cnt++] = temp[i] | 0x10;
-            }
-            temp_cnt = 0;
-            break;
-        case 's':
-            for (long i = 0; i < temp_cnt && tile_cnt < 14; ++i) {
-                tiles[tile_cnt++] = temp[i] | 0x20;
-            }
-            temp_cnt = 0;
-            break;
-        case 'p':
-            for (long i = 0; i < temp_cnt && tile_cnt < 14; ++i) {
-                tiles[tile_cnt++] = temp[i] | 0x30;
-            }
-            temp_cnt = 0;
-            break;
+        case '1': tiles[tile_cnt++] = 1; break;
+        case '2': tiles[tile_cnt++] = 2; break;
+        case '3': tiles[tile_cnt++] = 3; break;
+        case '4': tiles[tile_cnt++] = 4; break;
+        case '5': tiles[tile_cnt++] = 5; break;
+        case '6': tiles[tile_cnt++] = 6; break;
+        case '7': tiles[tile_cnt++] = 7; break;
+        case '8': tiles[tile_cnt++] = 8; break;
+        case '9': tiles[tile_cnt++] = 9; break;
+        case 'm': SET_SUIT_FOR_NUMBERED(0x10); break;
+        case 's': SET_SUIT_FOR_NUMBERED(0x20); break;
+        case 'p': SET_SUIT_FOR_NUMBERED(0x30); break;
         case 'E': tiles[tile_cnt++] = 0x41; break;
         case 'S': tiles[tile_cnt++] = 0x42; break;
         case 'W': tiles[tile_cnt++] = 0x43; break;
@@ -1998,24 +1988,48 @@ long parse_tiles(const char *str, TILE *tiles, long *out_tile_cnt) {
         case 'C': tiles[tile_cnt++] = 0x51; break;
         case 'F': tiles[tile_cnt++] = 0x52; break;
         case 'P': tiles[tile_cnt++] = 0x53; break;
-        default: goto end;
+        default: goto parse_finish;
         }
     }
 
-end:
-    if (temp_cnt != 0) {
-        return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT;
+parse_finish:
+    if (tile_cnt > 0 && !(tiles[tile_cnt - 1] & 0xF0)) {
+        bool hasSuffix = false;
+        for (; !hasSuffix && *p != '\0'; ++p) {
+            char c = *p;
+            switch (c) {
+            case 'm': SET_SUIT_FOR_NUMBERED(0x10); hasSuffix = true; break;
+            case 's': SET_SUIT_FOR_NUMBERED(0x20); hasSuffix = true; break;
+            case 'p': SET_SUIT_FOR_NUMBERED(0x30); hasSuffix = true; break;
+            default: break;
+            }
+        }
+
+        if (!hasSuffix) {
+            return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT;
+        }
     }
+
+#undef SET_SUIT_FOR_NUMBERED
+
     if (out_tile_cnt != nullptr) {
         *out_tile_cnt = tile_cnt;
     }
     return (p - str);
 }
 
+long parse_tiles(const char *str, TILE *tiles, long max_cnt) {
+    long tile_cnt;
+    if (parse_tiles_impl(str, tiles, max_cnt, &tile_cnt) > 0) {
+        return tile_cnt;
+    }
+    return 0;
+}
+
 static long make_fixed_set(const TILE *tiles, long tile_cnt, SET *set) {
     if (tile_cnt > 0) {
         if (tile_cnt != 3 && tile_cnt != 4) {
-            return PARSE_ERROR_ILLEGAL_TILE_FOR_FIXED_SET;
+            return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_SET;
         }
         if (tile_cnt == 3) {
             if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
@@ -2038,7 +2052,7 @@ static long make_fixed_set(const TILE *tiles, long tile_cnt, SET *set) {
         }
         else {
             if (tiles[0] != tiles[1] || tiles[1] != tiles[2] || tiles[2] != tiles[3]) {
-                return PARSE_ERROR_ILLEGAL_TILE_FOR_FIXED_SET;
+                return PARSE_ERROR_CANNOT_MAKE_FIXED_SET;
             }
             set->mid_tile = tiles[0];
             set->set_type = SET_TYPE::KONG;
@@ -2051,10 +2065,10 @@ static long make_fixed_set(const TILE *tiles, long tile_cnt, SET *set) {
 }
 
 long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *standing_tiles, long *standing_cnt) {
-    SET sets[5];
+    SET sets[4];
     long set_cnt = 0;
     bool is_concealed_kong = false;
-    TILE tiles[14];
+    TILE tiles[13];
     long tile_cnt = 0;
 
     const char *p = str;
@@ -2062,6 +2076,9 @@ long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
         const char *q;
         switch (c) {
         case ' ': {
+            if (set_cnt > 4) {
+                return PARSE_ERROR_TOO_MANY_FIXED_SET;
+            }
             long ret = make_fixed_set(tiles, tile_cnt, &sets[set_cnt]);
             if (ret < 0) {
                 return ret;
@@ -2072,6 +2089,9 @@ long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
             break;
         }
         case '[': {
+            if (set_cnt > 4) {
+                return PARSE_ERROR_TOO_MANY_FIXED_SET;
+            }
             long ret = make_fixed_set(tiles, tile_cnt, &sets[set_cnt]);
             if (ret < 0) {
                 return ret;
@@ -2086,7 +2106,7 @@ long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
                 return PARSE_ERROR_ILLEGAL_CHARACTER;
             }
             if (tile_cnt != 4) {
-                return PARSE_ERROR_ILLEGAL_TILE_FOR_FIXED_SET;
+                return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_SET;
             }
             q = ++p;
             sets[set_cnt].mid_tile = tiles[0];
@@ -2097,7 +2117,7 @@ long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
             tile_cnt = 0;
             break;
         default: {
-                long ret = parse_tiles(p, tiles, &tile_cnt);
+                long ret = parse_tiles_impl(p, tiles, 13, &tile_cnt);
                 if (ret <= 0) {
                     return ret;
                 }
@@ -2126,7 +2146,7 @@ long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
         *standing_cnt = tile_cnt;
     }
 
-    return 0;
+    return PARSE_NO_ERROR;
 }
 
 bool is_standing_tiles_contains_win_tile(const TILE *standing_tiles, long standing_cnt, TILE win_tile) {

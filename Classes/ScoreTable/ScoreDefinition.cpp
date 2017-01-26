@@ -22,7 +22,7 @@ static void replaceTilesToImage(std::string &text, float scale) {
         int readLen;
         if (sscanf(str + pos + 1, "%[^]]%n", tilesStr, &readLen) != EOF
             && str[pos + readLen + 1] == ']'
-            && mahjong::parse_tiles(tilesStr, tiles, &tilesCnt) >= 0) {
+            && (tilesCnt = mahjong::parse_tiles(tilesStr, tiles, 14)) >= 0) {
             size_t totalWriteLen = 0;
             for (long i = 0; i < tilesCnt; ++i) {
                 int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,

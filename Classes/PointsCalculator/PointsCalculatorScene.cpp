@@ -454,18 +454,33 @@ void PointsCalculatorScene::parseInput(const char *input) {
         long tile_cnt;
         mahjong::TILE win_tile;
 
-        if (mahjong::string_to_tiles(tilesString.c_str(), fixed_sets, &set_cnt, standing_tiles, &tile_cnt)) {
-            errorStr = "无法正确解析输入的文本";
+        long ret = mahjong::string_to_tiles(tilesString.c_str(), fixed_sets, &set_cnt, standing_tiles, &tile_cnt);
+        if (ret != PARSE_NO_ERROR) {
+            switch (ret) {
+            case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
+            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = "数字后面需有后缀"; break;
+            case PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_SET: errorStr = "一组副露包含了过多的牌"; break;
+            case PARSE_ERROR_CANNOT_MAKE_FIXED_SET: errorStr = "无法正确解析副露"; break;
+            default: break;
+            }
             break;
         }
         mahjong::sort_tiles(standing_tiles, tile_cnt);
 
-        if (mahjong::parse_tiles(winString.c_str(), &win_tile, nullptr) < 0) {
-            errorStr = "无法正确解析输入的文本";
+        ret = mahjong::parse_tiles(winString.c_str(), &win_tile, 1);
+        if (ret != 1) {
+            switch (ret) {
+            case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
+            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = "数字后面需有后缀"; break;
+            case PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_SET: errorStr = "一组副露包含了过多的牌"; break;
+            case PARSE_ERROR_CANNOT_MAKE_FIXED_SET: errorStr = "无法正确解析副露"; break;
+            default: break;
+            }
             break;
         }
 
-        if (int ret = mahjong::check_calculator_input(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile)) {
+        ret = mahjong::check_calculator_input(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile);
+        if (ret != 0) {
             switch (ret) {
             case ERROR_WRONG_TILES_COUNT: errorStr = "牌张数错误"; break;
             case ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = "同一种牌最多只能使用4枚"; break;
