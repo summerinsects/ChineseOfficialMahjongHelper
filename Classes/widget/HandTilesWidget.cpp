@@ -108,6 +108,7 @@ void HandTilesWidget::setData(const mahjong::SET fixedSets[5], long setCnt, cons
         ++_usedTilesTable[tile];
     }
     addTile(winTile);
+    refreshHighlightPos();
 }
 
 mahjong::TILE HandTilesWidget::getWinTile() const {
