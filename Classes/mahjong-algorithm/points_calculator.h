@@ -91,6 +91,9 @@ typedef uint8_t WIN_TYPE;
 #define WIN_TYPE_ABOUT_KONG 4
 #define WIN_TYPE_WALL_LAST 8
 
+bool is_standing_tiles_contains_win_tile(const TILE *standing_tiles, long standing_cnt, TILE win_tile);
+size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, TILE win_tile);
+
 #define MAX_SEPARAION_CNT 10
 
 #define ERROR_WRONG_TILES_COUNT -1

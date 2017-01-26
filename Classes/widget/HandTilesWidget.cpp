@@ -131,8 +131,8 @@ bool HandTilesWidget::isStandingTilesContainsWinTile() const {
     if (winTile == 0) {
         return false;
     }
-    return std::any_of(_standingTiles.begin(), _standingTiles.end() - 1,
-        [winTile](mahjong::TILE tile) { return tile == winTile; });
+    return mahjong::is_standing_tiles_contains_win_tile(
+        &_standingTiles.front(), _standingTiles.size() - 1, winTile);
 }
 
 size_t HandTilesWidget::countWinTileInFixedSets() const {
@@ -141,31 +141,8 @@ size_t HandTilesWidget::countWinTileInFixedSets() const {
         return 0;
     }
 
-    size_t cnt = 0;
-    for (std::vector<mahjong::SET>::const_iterator it = _fixedSets.begin(); it != _fixedSets.end(); ++it) {
-        switch (it->set_type) {
-        case mahjong::SET_TYPE::CHOW:
-            if (winTile == it->mid_tile - 1
-                || winTile == it->mid_tile
-                || winTile == it->mid_tile + 1) {
-                ++cnt;
-            }
-            break;
-        case mahjong::SET_TYPE::PUNG:
-            if (winTile == it->mid_tile) {
-                cnt += 3;
-            }
-            break;
-        case mahjong::SET_TYPE::KONG:
-            if (winTile == it->mid_tile) {
-                cnt += 4;
-            }
-            break;
-        default:
-            break;
-        }
-    }
-    return cnt;
+    return mahjong::count_win_tile_in_fixed_sets(
+        &_fixedSets.front(), _fixedSets.size(), winTile);
 }
 
 cocos2d::Vec2 HandTilesWidget::calcStandingTilePos(size_t idx) const {

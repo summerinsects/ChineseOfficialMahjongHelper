@@ -2129,6 +2129,40 @@ long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
     return 0;
 }
 
+bool is_standing_tiles_contains_win_tile(const TILE *standing_tiles, long standing_cnt, TILE win_tile) {
+    return std::any_of(standing_tiles, standing_tiles + standing_cnt,
+        [win_tile](TILE tile) { return tile == win_tile; });
+}
+
+size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, TILE win_tile) {
+    size_t cnt = 0;
+    for (long i = 0; i < fixed_cnt; ++i) {
+        const SET &set = fixed_set[i];
+        switch (set.set_type) {
+        case mahjong::SET_TYPE::CHOW:
+            if (win_tile == set.mid_tile - 1
+                || win_tile == set.mid_tile
+                || win_tile == set.mid_tile + 1) {
+                ++cnt;
+            }
+            break;
+        case mahjong::SET_TYPE::PUNG:
+            if (win_tile == set.mid_tile) {
+                cnt += 3;
+            }
+            break;
+        case mahjong::SET_TYPE::KONG:
+            if (win_tile == set.mid_tile) {
+                cnt += 4;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    return cnt;
+}
+
 int check_calculator_input(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile) {
     // 将每一次副露当作3张牌来算，那么总张数=13
     if (standing_tiles == nullptr || standing_cnt <= 0 || fixed_cnt < 0 || fixed_cnt > 4
