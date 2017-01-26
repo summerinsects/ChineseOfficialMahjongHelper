@@ -137,7 +137,7 @@ bool HandTilesWidget::isStandingTilesContainsWinTile() const {
 
 size_t HandTilesWidget::countWinTileInFixedSets() const {
     mahjong::TILE winTile = getWinTile();
-    if (winTile == 0) {
+    if (winTile == 0 || _fixedSets.empty()) {
         return 0;
     }
 

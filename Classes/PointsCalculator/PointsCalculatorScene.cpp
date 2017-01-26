@@ -284,6 +284,7 @@ void PointsCalculatorScene::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton
 void PointsCalculatorScene::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 绝张与抢杠互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
+        // 抢杠：禁用
         _robKongBox->setEnabled(false);
     }
     else {
@@ -303,10 +304,14 @@ void PointsCalculatorScene::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::C
 void PointsCalculatorScene::onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 抢杠与绝张、海底互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
+        // 绝张：禁用
+        // 海底：禁用
         _fourthTileBox->setEnabled(false);
         _lastTileBox->setEnabled(false);
     }
     else {
+        // 绝张：可为绝张
+        // 海底：可用
         _fourthTileBox->setEnabled(_maybeFourthTile);
         _lastTileBox->setEnabled(true);
     }
@@ -315,6 +320,7 @@ void PointsCalculatorScene::onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::Chec
 void PointsCalculatorScene::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 海底与抢杠互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
+        // 抢杠：禁用
         _robKongBox->setEnabled(false);
     }
     else {
@@ -329,9 +335,11 @@ void PointsCalculatorScene::onFixedSetsChanged() {
     // 当副露不包含杠的时候，杠开是禁用状态
     _hasKong = _tilePicker->getHandTilesWidget()->isFixedSetsContainsKong();
     if (_winTypeGroup->getSelectedButtonIndex() == 1) {
+        // 杠开：有杠
         _replacementBox->setEnabled(_hasKong);
     }
     else {
+        // 杠开：禁用
         _replacementBox->setEnabled(false);
     }
 }
@@ -348,9 +356,7 @@ void PointsCalculatorScene::onWinTileChanged() {
     }
 
     // 立牌中不包含和牌张，则可能为绝张
-    if (!_tilePicker->getHandTilesWidget()->isStandingTilesContainsWinTile()) {
-        _maybeFourthTile = true;
-    }
+    _maybeFourthTile = !_tilePicker->getHandTilesWidget()->isStandingTilesContainsWinTile();
 
     // 一定为绝张
     _winTileCountInFixedSets = _tilePicker->getHandTilesWidget()->countWinTileInFixedSets();
@@ -419,6 +425,10 @@ void PointsCalculatorScene::parseInput(const char *input) {
     const std::string str = input;
 
     do {
+        if (str.empty()) {
+            break;
+        }
+
         if (strspn(input, "123456789mpsESWNCFP [],") != str.length()) {
             errorStr = "无法解析输入的文本";
             break;
@@ -427,6 +437,11 @@ void PointsCalculatorScene::parseInput(const char *input) {
         std::string::const_iterator it = std::find(str.begin(), str.end(), ',');
         if (it == str.end()) {
             errorStr = "缺少和牌张";
+            break;
+        }
+
+        if (std::any_of(it + 1, str.end(), [](char ch) { return ch == ','; })) {
+            errorStr = "过多逗号";
             break;
         }
 
