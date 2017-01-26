@@ -784,7 +784,7 @@ bool HandTilesWidget::makeFixedConcealedKongSet() {
     _fixedSets.push_back(set);
 
     // 这里迭代器可以连续使用，因为移除的是同一种牌
-    std::vector<mahjong::TILE>::iterator it = _standingTiles.begin();
+    std::vector<mahjong::TILE>::iterator it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
     it = _standingTiles.erase(it);
     it = std::find(it, _standingTiles.end(), tile);
     it = _standingTiles.erase(it);
