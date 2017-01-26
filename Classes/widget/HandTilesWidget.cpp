@@ -115,7 +115,7 @@ void HandTilesWidget::setData(const mahjong::SET fixedSets[5], long setCnt, cons
 
 mahjong::TILE HandTilesWidget::getWinTile() const {
     size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (_standingTiles.size() < maxCnt) {
+    if (_standingTiles.size() < maxCnt + 1) {
         return 0;
     }
     return _standingTiles.back();
@@ -131,7 +131,7 @@ bool HandTilesWidget::isStandingTilesContainsWinTile() const {
     if (winTile == 0) {
         return false;
     }
-    return std::any_of(_standingTiles.begin(), _standingTiles.end(),
+    return std::any_of(_standingTiles.begin(), _standingTiles.end() - 1,
         [winTile](mahjong::TILE tile) { return tile == winTile; });
 }
 
