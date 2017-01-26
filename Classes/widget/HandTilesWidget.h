@@ -30,7 +30,7 @@ CC_CONSTRUCTOR_ACCESS:
 
 public:
     void reset();
-    void sort();
+    void sortStandingTiles();
     mahjong::TILE putTile(mahjong::TILE tile);
 
     bool canChow_XX();
@@ -68,6 +68,7 @@ private:
     void replaceTile(mahjong::TILE tile);
     void refreshHighlightPos();
     void refreshStandingTiles();
+    void refreshStandingTilesPos();
 
     void onTileButton(cocos2d::Ref *sender);
 

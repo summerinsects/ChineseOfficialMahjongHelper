@@ -142,13 +142,6 @@ bool HandTilesWidget::isFixedSetsContainsWinTile() const {
         std::bind(&mahjong::is_set_contains_tile, std::placeholders::_1, winTile));
 }
 
-void HandTilesWidget::sort() {
-    if (!_standingTiles.empty()) {
-        std::sort(_standingTiles.begin(), _standingTiles.end() - 1);
-        refreshStandingTiles();
-    }
-}
-
 cocos2d::Vec2 HandTilesWidget::calcStandingTilePos(size_t idx) const {
     Vec2 pos;
     pos.y = 19.5f + 2;
@@ -189,6 +182,7 @@ void HandTilesWidget::addTile(mahjong::TILE tile) {
 
     size_t tilesCnt = _standingTiles.size();
     button->setUserData(reinterpret_cast<void *>(tilesCnt));
+    button->setTag(tile);
     button->addClickEventListener(std::bind(&HandTilesWidget::onTileButton, this, std::placeholders::_1));
 
     Vec2 pos = calcStandingTilePos(tilesCnt);
@@ -213,6 +207,7 @@ void HandTilesWidget::replaceTile(mahjong::TILE tile) {
     _standingWidget->addChild(button);
 
     button->setUserData(reinterpret_cast<void *>(_currentIdx));
+    button->setTag(tile);
     button->addClickEventListener(std::bind(&HandTilesWidget::onTileButton, this, std::placeholders::_1));
 
     button->setPosition(_standingTileButtons[_currentIdx]->getPosition());
@@ -259,6 +254,7 @@ mahjong::TILE HandTilesWidget::putTile(mahjong::TILE tile) {
     return prevTile;
 }
 
+// 刷新高亮位置
 void HandTilesWidget::refreshHighlightPos() {
     size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
     Vec2 pos = calcStandingTilePos(_currentIdx);
@@ -276,20 +272,24 @@ void HandTilesWidget::refreshHighlightPos() {
 
 // 刷新立牌
 void HandTilesWidget::refreshStandingTiles() {
-    // 移除所有的立牌
-    while (!_standingTileButtons.empty()) {
-        _standingWidget->removeChild(_standingTileButtons.back());
-        _standingTileButtons.pop_back();
+    // 遍历立牌
+    for (size_t i = 0, cnt = _standingTileButtons.size(); i < cnt; ) {
+        ui::Button *button = _standingTileButtons[i];
+        mahjong::TILE tile = static_cast<mahjong::TILE>(button->getTag());
+        if (i >= _standingTiles.size() || tile != _standingTiles[i]) {  // 已经被删除的
+            _standingWidget->removeChild(button);
+            _standingTileButtons.erase(_standingTileButtons.begin() + i);
+            --cnt;
+        }
+        else {
+            ++i;
+        }
     }
 
+    //assert(_standingTiles.size() == _standingTileButtons.size());
+    refreshStandingTilesPos();
+
     size_t prevIndex = _currentIdx;
-
-    // 重新一张一张添加立牌
-    std::vector<mahjong::TILE> temp;
-    temp.swap(_standingTiles);  // 这里要保存一下旧的数据，因为addTile会在standingTiles添加
-    memset(_standingTilesTable, 0, sizeof(_standingTilesTable));
-    std::for_each(temp.begin(), temp.end(), std::bind(&HandTilesWidget::addTile, this, std::placeholders::_1));
-
     _currentIdx = _standingTiles.size();
     if (prevIndex < _currentIdx) {
         _currentIdx = prevIndex;
@@ -300,6 +300,39 @@ void HandTilesWidget::refreshStandingTiles() {
         _currentIdx = maxCnt;
     }
     refreshHighlightPos();
+}
+
+// 刷新立牌位置
+void HandTilesWidget::refreshStandingTilesPos() {
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+
+    // 重新设置UserData及位置
+    for (size_t i = 0, cnt = _standingTileButtons.size(); i < cnt; ++i) {
+        ui::Button *button = _standingTileButtons[i];
+        button->setUserData(reinterpret_cast<void *>(i));
+
+        Vec2 pos = calcStandingTilePos(i);
+        if (LIKELY(i < maxCnt)) {
+            button->setPosition(pos);
+        }
+        else {
+            button->setPosition(Vec2(pos.x + 4, pos.y));
+        }
+    }
+}
+
+// 排序立牌
+void HandTilesWidget::sortStandingTiles() {
+    if (UNLIKELY(_standingTiles.empty())) {
+        return;
+    }
+
+    std::sort(_standingTiles.begin(), _standingTiles.end() - 1);
+    std::sort(_standingTileButtons.begin(), _standingTileButtons.end() - 1, [](ui::Button *btn1, ui::Button *btn2) {
+        return btn1->getTag() < btn2->getTag();
+    });
+
+    refreshStandingTilesPos();
 }
 
 // 添加一组吃

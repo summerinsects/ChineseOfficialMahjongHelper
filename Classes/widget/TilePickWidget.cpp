@@ -169,7 +169,7 @@ bool TilePickWidget::init() {
     sortButton->setTitleColor(Color3B::BLACK);
     this->addChild(sortButton);
     sortButton->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 20));
-    sortButton->addClickEventListener([this](Ref *) {  _handTilesWidget->sort(); });
+    sortButton->addClickEventListener([this](Ref *) {  sort(); });
 
     // 重置
     ui::Button *clearButton = ui::Button::create(normalImage, selectedImage, disableImage);
@@ -219,7 +219,7 @@ void TilePickWidget::reset() {
 }
 
 void TilePickWidget::sort() {
-    _handTilesWidget->sort();
+    _handTilesWidget->sortStandingTiles();
 
     if (LIKELY(_fixedSetsChangedCallback)) {
         _fixedSetsChangedCallback();
