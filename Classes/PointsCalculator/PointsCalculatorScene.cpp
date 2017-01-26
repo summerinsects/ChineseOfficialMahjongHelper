@@ -128,7 +128,6 @@ bool PointsCalculatorScene::init() {
     _replacementBox->setContentSize(Size(20.0f, 20.0f));
     _replacementBox->setPosition(Vec2(20.0f, 75.0f));
     _replacementBox->setEnabled(false);
-    _replacementBox->addEventListener(std::bind(&PointsCalculatorScene::onReplacementBox, this, std::placeholders::_1, std::placeholders::_2));
 
     Label *replacementLabel = Label::createWithSystemFont("杠开", "Arial", 12);
     replacementLabel->setColor(textColor);
@@ -260,12 +259,21 @@ bool PointsCalculatorScene::init() {
 
 void PointsCalculatorScene::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
     if (index == 0) {  // 点和
+        // 绝张：可为绝张 && 抢杠没选中
+        // 杠开：禁用
+        // 抢杠：可为绝张 && 副露不包含和牌 && 绝张没选中 && 海底没选中
+        // 海底：抢杠没选中
         _fourthTileBox->setEnabled(_maybeFourthTile && !_robKongBox->isSelected());
         _replacementBox->setEnabled(false);
-        _robKongBox->setEnabled(_maybeRobKong && !_fourthTileBox->isSelected() && !_lastTileBox->isSelected());
+        _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
+            && !_fourthTileBox->isSelected() && !_lastTileBox->isSelected());
         _lastTileBox->setEnabled(!_robKongBox->isSelected());
     }
     else {  // 自摸
+        // 绝张：可为绝张
+        // 杠开：有杠
+        // 抢杠：禁用
+        // 海底：可用
         _fourthTileBox->setEnabled(_maybeFourthTile);
         _replacementBox->setEnabled(_hasKong);
         _robKongBox->setEnabled(false);
@@ -279,9 +287,16 @@ void PointsCalculatorScene::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::C
         _robKongBox->setEnabled(false);
     }
     else {
-        _robKongBox->setEnabled(_maybeRobKong
-            && _winTypeGroup->getSelectedButtonIndex() == 0
-            && !_lastTileBox->isSelected());
+        // 一定是绝张，则不允许取消选中绝张
+        if (_maybeFourthTile && _winTileCountInFixedSets == 3) {
+            _fourthTileBox->setSelected(true);
+        }
+        else {
+            // 抢杠：可为绝张 && 副露不包含和牌 && 点和 && 海底没选中
+            _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
+                && _winTypeGroup->getSelectedButtonIndex() == 0
+                && !_lastTileBox->isSelected());
+        }
     }
 }
 
@@ -297,19 +312,15 @@ void PointsCalculatorScene::onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::Chec
     }
 }
 
-void PointsCalculatorScene::onReplacementBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
-    if (event == ui::CheckBox::EventType::UNSELECTED) {
-
-    }
-}
-
 void PointsCalculatorScene::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 海底与抢杠互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
         _robKongBox->setEnabled(false);
     }
     else {
-        _robKongBox->setEnabled(_maybeRobKong && _winTypeGroup->getSelectedButtonIndex() == 0
+        // 抢杠：可为绝张 && 副露不包含和牌 && 点和 && 绝张没选中
+        _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
+            && _winTypeGroup->getSelectedButtonIndex() == 0
             && !_fourthTileBox->isSelected());
     }
 }
@@ -326,33 +337,36 @@ void PointsCalculatorScene::onFixedSetsChanged() {
 }
 
 void PointsCalculatorScene::onWinTileChanged() {
-    // 当立牌中有和牌张时，绝张是禁用状态
     _maybeFourthTile = false;
-    _maybeRobKong = false;
+    _winTileCountInFixedSets = 0;
     mahjong::TILE winTile = _tilePicker->getHandTilesWidget()->getWinTile();
-    if (winTile == 0) {
+    if (winTile == 0) {  // 没有和牌张
         _fourthTileBox->setEnabled(false);
         _robKongBox->setEnabled(false);
         _lastTileBox->setEnabled(true);
     }
     else {
-        // 立牌中有和牌张时，不可能是绝张和抢杠
-        _maybeFourthTile = !_tilePicker->getHandTilesWidget()->isStandingTilesContainsWinTile();
+        _winTileCountInFixedSets = _tilePicker->getHandTilesWidget()->countWinTileInFixedSets();
 
-        if (_maybeFourthTile) {
-            // 当副露中有和牌张时，不可能是抢杠
-            _maybeRobKong = !_tilePicker->getHandTilesWidget()->isFixedSetsContainsWinTile();
-        }
-        else {
-            _maybeRobKong = false;
+        // 立牌中不包含和牌张，则可能为绝张
+        if (!_tilePicker->getHandTilesWidget()->isStandingTilesContainsWinTile()) {
+            _maybeFourthTile = true;
         }
 
+        // 绝张：可为绝张 && 抢杠没选中
+        // 抢杠：可为绝张 && 副露不包含和牌 && 点和 && 绝张没选中 && 海底没选中
+        // 海底：抢杠没选中
         _fourthTileBox->setEnabled(_maybeFourthTile && !_robKongBox->isSelected());
-        _robKongBox->setEnabled(_maybeRobKong
+        _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
             && _winTypeGroup->getSelectedButtonIndex() == 0
             && !_lastTileBox->isSelected()
             && !_fourthTileBox->isSelected());
         _lastTileBox->setEnabled(!_robKongBox->isSelected());
+
+        // 一定为绝张
+        if (_maybeFourthTile && _winTileCountInFixedSets == 3) {
+            _fourthTileBox->setSelected(true);
+        }
     }
 }
 

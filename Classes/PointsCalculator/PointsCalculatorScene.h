@@ -17,7 +17,6 @@ private:
     void onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
     void onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
-    void onReplacementBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
     void onFixedSetsChanged();
@@ -41,7 +40,7 @@ private:
 
     bool _maybeFourthTile = false;
     bool _hasKong = false;
-    bool _maybeRobKong = false;
+    size_t _winTileCountInFixedSets = 0;
 };
 
 #endif

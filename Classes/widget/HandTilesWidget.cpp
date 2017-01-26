@@ -135,13 +135,37 @@ bool HandTilesWidget::isStandingTilesContainsWinTile() const {
         [winTile](mahjong::TILE tile) { return tile == winTile; });
 }
 
-bool HandTilesWidget::isFixedSetsContainsWinTile() const {
+size_t HandTilesWidget::countWinTileInFixedSets() const {
     mahjong::TILE winTile = getWinTile();
     if (winTile == 0) {
-        return false;
+        return 0;
     }
-    return std::any_of(_fixedSets.begin(), _fixedSets.end(),
-        std::bind(&mahjong::is_set_contains_tile, std::placeholders::_1, winTile));
+
+    size_t cnt = 0;
+    for (std::vector<mahjong::SET>::const_iterator it = _fixedSets.begin(); it != _fixedSets.end(); ++it) {
+        switch (it->set_type) {
+        case mahjong::SET_TYPE::CHOW:
+            if (winTile == it->mid_tile - 1
+                || winTile == it->mid_tile
+                || winTile == it->mid_tile + 1) {
+                ++cnt;
+            }
+            break;
+        case mahjong::SET_TYPE::PUNG:
+            if (winTile == it->mid_tile) {
+                cnt += 3;
+            }
+            break;
+        case mahjong::SET_TYPE::KONG:
+            if (winTile == it->mid_tile) {
+                cnt += 4;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    return cnt;
 }
 
 cocos2d::Vec2 HandTilesWidget::calcStandingTilePos(size_t idx) const {

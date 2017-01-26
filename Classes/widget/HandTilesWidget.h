@@ -23,7 +23,7 @@ public:
     mahjong::TILE getWinTile() const;
     bool isFixedSetsContainsKong() const;
     bool isStandingTilesContainsWinTile() const;
-    bool isFixedSetsContainsWinTile() const;
+    size_t countWinTileInFixedSets() const;
 
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
