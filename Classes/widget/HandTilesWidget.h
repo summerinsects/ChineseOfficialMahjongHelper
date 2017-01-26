@@ -72,6 +72,7 @@ private:
 
     void onTileButton(cocos2d::Ref *sender);
 
+    int calcMeldedIdx(int maxIdx) const;
     void addFixedChowSet(mahjong::TILE tile, int meldedIdx);
     void addFixedPungSet(mahjong::TILE tile, int meldedIdx);
     void addFixedMeldedKongSet(mahjong::TILE tile, int meldedIdx);

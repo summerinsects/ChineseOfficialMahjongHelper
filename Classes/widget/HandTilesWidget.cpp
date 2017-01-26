@@ -684,6 +684,26 @@ bool HandTilesWidget::makeFixedChowXX_Set() {
     return true;
 }
 
+int HandTilesWidget::calcMeldedIdx(int maxIdx) const {
+    mahjong::TILE tile = _standingTiles[_currentIdx];
+
+    struct Pred {
+        Pred(mahjong::TILE t) : tile(t) { }
+        mahjong::TILE tile;
+        bool operator()(mahjong::TILE t) { return tile == t; }
+    };
+
+    size_t offset = 0;
+    size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
+    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+        offset = 1;
+    }
+
+    bool leftExsits = std::any_of(_standingTiles.begin(), _standingTiles.begin() + _currentIdx, Pred(tile));
+    bool rightExsits = std::any_of(_standingTiles.begin() + _currentIdx + 1, _standingTiles.end() - offset, Pred(tile));
+    return leftExsits ? (rightExsits ? 1 : maxIdx) : 0;
+}
+
 bool HandTilesWidget::makeFixedPungSet() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
         return false;
@@ -705,16 +725,14 @@ bool HandTilesWidget::makeFixedPungSet() {
     set.mid_tile = tile;
     _fixedSets.push_back(set);
 
-    std::vector<mahjong::TILE>::iterator it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
-    size_t pos = std::distance(it, std::begin(_standingTiles) + _currentIdx);
-    int meldedIdx = (pos < _currentIdx) ? 0 : (pos > _currentIdx) ? 2 : 1;
+    int meldedIdx = calcMeldedIdx(2);
 
     // 这里迭代器可以连续使用，因为移除的是同一种牌
-    it = _standingTiles.erase(it);
-    it = std::find(it, _standingTiles.end(), tile);
-    it = _standingTiles.erase(it);
-    it = std::find(it, _standingTiles.end(), tile);
-    it = _standingTiles.erase(it);
+    std::vector<mahjong::TILE>::iterator it = _standingTiles.begin();
+    for (int i = 0; i < 3; ++i) {
+        it = std::find(it, _standingTiles.end(), tile);
+        it = _standingTiles.erase(it);
+    }
     _standingTilesTable[tile] -= 3;
 
     addFixedPungSet(tile, meldedIdx);
@@ -743,18 +761,14 @@ bool HandTilesWidget::makeFixedMeldedKongSet() {
     set.mid_tile = tile;
     _fixedSets.push_back(set);
 
-    std::vector<mahjong::TILE>::iterator it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
-    size_t pos = std::distance(it, std::begin(_standingTiles) + _currentIdx);
-    int meldedIdx = (pos < _currentIdx) ? 0 : (pos > _currentIdx) ? 3 : 1;
+    int meldedIdx = calcMeldedIdx(3);
 
     // 这里迭代器可以连续使用，因为移除的是同一种牌
-    it = _standingTiles.erase(it);
-    it = std::find(it, _standingTiles.end(), tile);
-    it = _standingTiles.erase(it);
-    it = std::find(it, _standingTiles.end(), tile);
-    it = _standingTiles.erase(it);
-    it = std::find(it, _standingTiles.end(), tile);
-    it = _standingTiles.erase(it);
+    std::vector<mahjong::TILE>::iterator it = _standingTiles.begin();
+    for (int i = 0; i < 4; ++i) {
+        it = std::find(it, _standingTiles.end(), tile);
+        it = _standingTiles.erase(it);
+    }
     _standingTilesTable[tile] -= 4;
 
     addFixedMeldedKongSet(tile, meldedIdx);
@@ -784,14 +798,11 @@ bool HandTilesWidget::makeFixedConcealedKongSet() {
     _fixedSets.push_back(set);
 
     // 这里迭代器可以连续使用，因为移除的是同一种牌
-    std::vector<mahjong::TILE>::iterator it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
-    it = _standingTiles.erase(it);
-    it = std::find(it, _standingTiles.end(), tile);
-    it = _standingTiles.erase(it);
-    it = std::find(it, _standingTiles.end(), tile);
-    it = _standingTiles.erase(it);
-    it = std::find(it, _standingTiles.end(), tile);
-    it = _standingTiles.erase(it);
+    std::vector<mahjong::TILE>::iterator it = _standingTiles.begin();
+    for (int i = 0; i < 4; ++i) {
+        it = std::find(it, _standingTiles.end(), tile);
+        it = _standingTiles.erase(it);
+    }
     _standingTilesTable[tile] -= 4;
 
     addFixedConcealedKongSet(tile);
