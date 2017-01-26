@@ -500,8 +500,11 @@ void PointsCalculatorScene::calculate() {
 
     // 算番
     int points = calculate_points(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);
+
+    Color3B textColor = UserDefault::getInstance()->getBoolForKey("night_mode") ? Color3B::WHITE : Color3B::BLACK;
     if (points == ERROR_NOT_WIN) {
         Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", FONT_SIZE);
+        errorLabel->setColor(textColor);
         _pointsAreaNode->addChild(errorLabel);
         errorLabel->setPosition(pos);
         return;
@@ -514,8 +517,6 @@ void PointsCalculatorScene::calculate() {
         AlertLayer::showWithMessage("算番", "同一种牌最多只能使用4枚", nullptr, nullptr);
         return;
     }
-
-    Color3B textColor = UserDefault::getInstance()->getBoolForKey("night_mode") ? Color3B::WHITE : Color3B::BLACK;
 
     // 加花牌
     points += flowerCnt;
