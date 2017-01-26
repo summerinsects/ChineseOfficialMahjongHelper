@@ -349,9 +349,9 @@ void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
 }
 
 void TilePickWidget::onConcealedKongButton(cocos2d::Ref *sender) {
-    _handTilesWidget->makeFixedConcealedKongSet();
-
-    if (_fixedSetsChangedCallback) {
-        _fixedSetsChangedCallback();
+    if (LIKELY(_handTilesWidget->makeFixedConcealedKongSet()) {
+        if (LIKELY(_fixedSetsChangedCallback)) {
+            _fixedSetsChangedCallback();
+        }
     }
 }

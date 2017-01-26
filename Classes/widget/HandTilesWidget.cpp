@@ -193,7 +193,7 @@ void HandTilesWidget::addTile(mahjong::TILE tile) {
 
     Vec2 pos = calcStandingTilePos(tilesCnt);
     size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (tilesCnt < maxCnt) {
+    if (LIKELY(tilesCnt < maxCnt)) {
         button->setPosition(pos);
         _currentIdx = tilesCnt + 1;
         ++_standingTilesTable[tile];
@@ -262,7 +262,7 @@ mahjong::TILE HandTilesWidget::putTile(mahjong::TILE tile) {
 void HandTilesWidget::refreshHighlightPos() {
     size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
     Vec2 pos = calcStandingTilePos(_currentIdx);
-    if (_currentIdx < maxCnt) {
+    if (LIKELY(_currentIdx < maxCnt)) {
         _highlightBox->setPosition(pos);
     }
     else {
