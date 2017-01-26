@@ -202,17 +202,10 @@ void HandTilesWidget::addTile(mahjong::TILE tile) {
 
 // 替换一张牌
 void HandTilesWidget::replaceTile(mahjong::TILE tile) {
-    ui::Button *button = ui::Button::create(tilesImageName[tile]);
-    button->setScale(27 / button->getContentSize().width);
-    _standingWidget->addChild(button);
-
-    button->setUserData(reinterpret_cast<void *>(_currentIdx));
+    // 直接换button的图
+    ui::Button *button = _standingTileButtons[_currentIdx];
+    button->loadTextureNormal(tilesImageName[tile]);
     button->setTag(tile);
-    button->addClickEventListener(std::bind(&HandTilesWidget::onTileButton, this, std::placeholders::_1));
-
-    button->setPosition(_standingTileButtons[_currentIdx]->getPosition());
-    _standingWidget->removeChild(_standingTileButtons[_currentIdx]);
-    _standingTileButtons[_currentIdx] = button;
 
     size_t maxCnt = 13 - _fixedSets.size() * 3;  // 立牌数最大值（不包括和牌）
     if (_currentIdx < maxCnt) {
