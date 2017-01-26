@@ -244,7 +244,7 @@ void TilePickWidget::setData(const mahjong::SET fixedSets[5], long setCnt, const
 
 // 刷新选牌按钮
 void TilePickWidget::refreshTilesTableButton(mahjong::TILE tile) {
-    // 如果某张牌已经使用了4张，那就禁用相应按钮
+    // 如果某张牌已经使用了4张，就禁用相应按钮
     int n = _handTilesWidget->getUsedTileCount(tile);
     mahjong::SUIT_TYPE suit = mahjong::tile_suit(tile);
     mahjong::RANK_TYPE rank = mahjong::tile_rank(tile);
@@ -259,6 +259,8 @@ void TilePickWidget::refreshTilesTableButton(mahjong::TILE tile) {
 }
 
 void TilePickWidget::refreshAllTilesTableButton() {
+    // 如果某张牌已经使用了4张，就禁用相应按钮
+    // 序数牌都是1-9，放在同一个循环里
     for (mahjong::RANK_TYPE rank = 1; rank < 10; ++rank) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, rank);
         int n = _handTilesWidget->getUsedTileCount(tile);
@@ -273,12 +275,14 @@ void TilePickWidget::refreshAllTilesTableButton() {
         _dotsButtons[rank - 1]->setEnabled(n < 4);
     }
 
+    // 风牌4种
     for (mahjong::RANK_TYPE rank = 1; rank < 5; ++rank) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_WINDS, rank);
         int n = _handTilesWidget->getUsedTileCount(tile);
         _honorButtons[rank - 1]->setEnabled(n < 4);
     }
 
+    // 箭牌3种
     for (mahjong::RANK_TYPE rank = 1; rank < 4; ++rank) {
         mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DRAGONS, rank);
         int n = _handTilesWidget->getUsedTileCount(tile);
@@ -297,7 +301,7 @@ void TilePickWidget::refreshActionButtons() {
 
 void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile) {
     mahjong::TILE prevTile = _handTilesWidget->putTile(tile);
-    if (prevTile != 0) {
+    if (prevTile != 0 && prevTile != tile) {  // 如果是替换牌，则会删了一张旧的牌
         refreshTilesTableButton(prevTile);
     }
     refreshTilesTableButton(tile);
