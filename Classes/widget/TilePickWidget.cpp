@@ -230,8 +230,6 @@ void TilePickWidget::sort() {
 }
 
 void TilePickWidget::setData(const mahjong::SET fixedSets[5], long setCnt, const mahjong::TILE standingTiles[13], long tileCnt, mahjong::TILE winTile) {
-    _handTilesWidget->reset();
-
     _handTilesWidget->setData(fixedSets, setCnt, standingTiles, tileCnt, winTile);
     refreshAllTilesTableButton();
     refreshActionButtons();
