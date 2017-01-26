@@ -344,30 +344,32 @@ void PointsCalculatorScene::onWinTileChanged() {
         _fourthTileBox->setEnabled(false);
         _robKongBox->setEnabled(false);
         _lastTileBox->setEnabled(true);
+        return;
     }
-    else {
-        _winTileCountInFixedSets = _tilePicker->getHandTilesWidget()->countWinTileInFixedSets();
 
-        // 立牌中不包含和牌张，则可能为绝张
-        if (!_tilePicker->getHandTilesWidget()->isStandingTilesContainsWinTile()) {
-            _maybeFourthTile = true;
-        }
-
-        // 绝张：可为绝张 && 抢杠没选中
-        // 抢杠：可为绝张 && 副露不包含和牌 && 点和 && 绝张没选中 && 海底没选中
-        // 海底：抢杠没选中
-        _fourthTileBox->setEnabled(_maybeFourthTile && !_robKongBox->isSelected());
-        _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
-            && _winTypeGroup->getSelectedButtonIndex() == 0
-            && !_lastTileBox->isSelected()
-            && !_fourthTileBox->isSelected());
-        _lastTileBox->setEnabled(!_robKongBox->isSelected());
-
-        // 一定为绝张
-        if (_maybeFourthTile && _winTileCountInFixedSets == 3) {
-            _fourthTileBox->setSelected(true);
-        }
+    // 立牌中不包含和牌张，则可能为绝张
+    if (!_tilePicker->getHandTilesWidget()->isStandingTilesContainsWinTile()) {
+        _maybeFourthTile = true;
     }
+
+    // 一定为绝张
+    _winTileCountInFixedSets = _tilePicker->getHandTilesWidget()->countWinTileInFixedSets();
+    if (_maybeFourthTile && _winTileCountInFixedSets == 3) {
+        _fourthTileBox->setEnabled(true);
+        _robKongBox->setEnabled(false);
+        _fourthTileBox->setSelected(true);
+        return;
+    }
+
+    // 绝张：可为绝张 && 抢杠没选中
+    // 抢杠：可为绝张 && 副露不包含和牌 && 点和 && 绝张没选中 && 海底没选中
+    // 海底：抢杠没选中
+    _fourthTileBox->setEnabled(_maybeFourthTile && !_robKongBox->isSelected());
+    _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
+        && _winTypeGroup->getSelectedButtonIndex() == 0
+        && !_lastTileBox->isSelected()
+        && !_fourthTileBox->isSelected());
+    _lastTileBox->setEnabled(!_robKongBox->isSelected());
 }
 
 void PointsCalculatorScene::showInputAlert(const char *prevInput) {
