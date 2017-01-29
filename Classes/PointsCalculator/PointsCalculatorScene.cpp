@@ -74,7 +74,7 @@ bool PointsCalculatorScene::init() {
     _winTypeGroup->addEventListener(std::bind(&PointsCalculatorScene::onWinTypeGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     // 点和
-    float gapX = (visibleSize.width - 8) * 0.25f;
+    const float gapX = 65;
     ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
     infoWidget->addChild(radioButton);
     radioButton->setZoomScale(0.0f);
@@ -217,6 +217,12 @@ bool PointsCalculatorScene::init() {
     }
 
     // 直接输入
+    label = Label::createWithSystemFont("选牌太麻烦？试试", "Arial", 12);
+    label->setColor(textColor);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+    infoWidget->addChild(label);
+    label->setPosition(Vec2(visibleSize.width - 15, 100.0f));
+
     ui::Button *button = ui::Button::create(normalImage, selectedImage);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -415,7 +421,7 @@ void PointsCalculatorScene::showInputAlert(const char *prevInput) {
     editBox->setPosition(Vec2(width * 0.5f, 10));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
 
-    AlertLayer::showWithNode("直接输入牌", rootWidget, [this, editBox]() {
+    AlertLayer::showWithNode("直接输入", rootWidget, [this, editBox]() {
         parseInput(editBox->getText());
     }, nullptr);
 }
