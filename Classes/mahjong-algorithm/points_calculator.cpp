@@ -20,7 +20,7 @@ struct SEPERATIONS {
     long count;
 };
 
-static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SEPERATIONS *separation) {
+static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_cnt, SEPERATIONS *separation) {
     if (tile_cnt == 2 && tiles[0] == tiles[1]) {  // 划分成功
         SET (&sets)[5] = separation->sets[separation->count];
 
@@ -32,7 +32,7 @@ static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SEP
         // 拷贝一份当前的划分出来的面子，并排序
         SET temp[5];
         memcpy(temp, sets, 5 * sizeof(SET));
-        std::sort(temp + fixed_set_cnt, temp + 4, &set_cmp);
+        std::sort(temp + fixed_cnt, temp + 4, &set_cmp);
 
         // 检查这种划分是否已经存在了
         bool has_found = std::any_of(&separation->sets[0], &separation->sets[separation->count],
@@ -54,9 +54,9 @@ static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SEP
     return false;
 }
 
-static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SEPERATIONS *separation) {
+static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_cnt, SEPERATIONS *separation) {
     if (tile_cnt < 3) {
-        return seperate_2(tiles, tile_cnt, fixed_set_cnt, separation);
+        return seperate_2(tiles, tile_cnt, fixed_cnt, separation);
     }
 
     bool ret = false;
@@ -90,7 +90,7 @@ static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SEP
                         remains[c++] = tiles[n];
                     }
                     // 递归剩下的牌
-                    if (seperate_N(remains, tile_cnt - 3, fixed_set_cnt, separation)) {
+                    if (seperate_N(remains, tile_cnt - 3, fixed_cnt, separation)) {
                         ret = true;  // 划分成功
                     }
                 }
@@ -141,144 +141,144 @@ void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *
 }
 
 // 一色四同顺
-static bool is_quadruple_chow(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2, TILE mid_tile3) {
-    return (mid_tile0 == mid_tile1 && mid_tile0 == mid_tile2 && mid_tile0 == mid_tile3);
+static bool is_quadruple_chow(TILE t0, TILE t1, TILE t2, TILE t3) {
+    return (t0 == t1 && t0 == t2 && t0 == t3);
 }
 
 // 一色四节高
-static bool is_four_pure_shifted_pungs(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2, TILE mid_tile3) {
-    if (is_numbered_suit_quick(mid_tile0)) {
-        return (mid_tile0 + 1 == mid_tile1 && mid_tile1 + 1 == mid_tile2 && mid_tile2 + 1 == mid_tile3);
+static bool is_four_pure_shifted_pungs(TILE t0, TILE t1, TILE t2, TILE t3) {
+    if (is_numbered_suit_quick(t0)) {
+        return (t0 + 1 == t1 && t1 + 1 == t2 && t2 + 1 == t3);
     }
     return false;
 }
 
 // 一色四步高
-static bool is_four_pure_shifted_chows(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2, TILE mid_tile3) {
+static bool is_four_pure_shifted_chows(TILE t0, TILE t1, TILE t2, TILE t3) {
     // 递增2的必然是：123 345 567 789
     // 递增1的最小为：123 234 345 456 最大为：456 567 678 789
-    return ((mid_tile0 + 2 == mid_tile1 && mid_tile1 + 2 == mid_tile2 && mid_tile2 + 2 == mid_tile3)
-        || (mid_tile0 + 1 == mid_tile1 && mid_tile1 + 1 == mid_tile2 && mid_tile2 + 1 == mid_tile3));
+    return ((t0 + 2 == t1 && t1 + 2 == t2 && t2 + 2 == t3)
+        || (t0 + 1 == t1 && t1 + 1 == t2 && t2 + 1 == t3));
 }
 
 // 一色三同顺
-static bool is_pure_triple_chow(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2) {
-    return (mid_tile0 == mid_tile1 && mid_tile0 == mid_tile2);
+static bool is_pure_triple_chow(TILE t0, TILE t1, TILE t2) {
+    return (t0 == t1 && t0 == t2);
 }
 
 // 一色三节高
-static bool is_pure_shifted_pungs(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2) {
-    if (is_numbered_suit_quick(mid_tile0)) {
-        return (mid_tile0 + 1 == mid_tile1 && mid_tile1 + 1 == mid_tile2);
+static bool is_pure_shifted_pungs(TILE t0, TILE t1, TILE t2) {
+    if (is_numbered_suit_quick(t0)) {
+        return (t0 + 1 == t1 && t1 + 1 == t2);
     }
     return false;
 }
 
 // 清龙
-static bool is_pure_straight(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2) {
-    if (tile_rank(mid_tile0) == 2) {
-        return (mid_tile0 + 3 == mid_tile1 && mid_tile1 + 3 == mid_tile2);
+static bool is_pure_straight(TILE t0, TILE t1, TILE t2) {
+    if (tile_rank(t0) == 2) {
+        return (t0 + 3 == t1 && t1 + 3 == t2);
     }
     return false;
 }
 
 // 一色三步高
-static bool is_pure_shifted_chows(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2) {
-    return ((mid_tile0 + 2 == mid_tile1 && mid_tile1 + 2 == mid_tile2)
-        || (mid_tile0 + 1 == mid_tile1 && mid_tile1 + 1 == mid_tile2));
+static bool is_pure_shifted_chows(TILE t0, TILE t1, TILE t2) {
+    return ((t0 + 2 == t1 && t1 + 2 == t2)
+        || (t0 + 1 == t1 && t1 + 1 == t2));
 }
 
 // 花龙
-static bool is_mixed_straight(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2) {
-    SUIT_TYPE suit0 = tile_suit(mid_tile0);
-    SUIT_TYPE suit1 = tile_suit(mid_tile1);
-    SUIT_TYPE suit2 = tile_suit(mid_tile2);
-    if (suit0 != suit1 && suit0 != suit2 && suit1 != suit2) {
-        RANK_TYPE rank0 = tile_rank(mid_tile0);
-        RANK_TYPE rank1 = tile_rank(mid_tile1);
-        RANK_TYPE rank2 = tile_rank(mid_tile2);
-        return ((rank0 == 2 && rank1 == 5 && rank2 == 8)
-            || (rank0 == 2 && rank1 == 8 && rank2 == 5)
-            || (rank0 == 5 && rank1 == 2 && rank2 == 8)
-            || (rank0 == 5 && rank1 == 8 && rank2 == 2)
-            || (rank0 == 8 && rank1 == 2 && rank2 == 5)
-            || (rank0 == 8 && rank1 == 5 && rank2 == 2));
+static bool is_mixed_straight(TILE t0, TILE t1, TILE t2) {
+    SUIT_TYPE s0 = tile_suit(t0);
+    SUIT_TYPE s1 = tile_suit(t1);
+    SUIT_TYPE s2 = tile_suit(t2);
+    if (s0 != s1 && s0 != s2 && s1 != s2) {
+        RANK_TYPE r0 = tile_rank(t0);
+        RANK_TYPE r1 = tile_rank(t1);
+        RANK_TYPE r2 = tile_rank(t2);
+        return ((r0 == 2 && r1 == 5 && r2 == 8)
+            || (r0 == 2 && r1 == 8 && r2 == 5)
+            || (r0 == 5 && r1 == 2 && r2 == 8)
+            || (r0 == 5 && r1 == 8 && r2 == 2)
+            || (r0 == 8 && r1 == 2 && r2 == 5)
+            || (r0 == 8 && r1 == 5 && r2 == 2));
     }
     return false;
 }
 
 // 三色三同顺或者三同刻
-static bool is_mixed_triple_chow_or_pung(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2) {
-    if (!is_numbered_suit_quick(mid_tile0) || !is_numbered_suit_quick(mid_tile1) || !is_numbered_suit_quick(mid_tile2)) {
+static bool is_mixed_triple_chow_or_pung(TILE t0, TILE t1, TILE t2) {
+    if (!is_numbered_suit_quick(t0) || !is_numbered_suit_quick(t1) || !is_numbered_suit_quick(t2)) {
         return false;
     }
-    SUIT_TYPE suit0 = tile_suit(mid_tile0);
-    SUIT_TYPE suit1 = tile_suit(mid_tile1);
-    SUIT_TYPE suit2 = tile_suit(mid_tile2);
-    if (suit0 != suit1 && suit0 != suit2 && suit1 != suit2) {
-        RANK_TYPE rank0 = tile_rank(mid_tile0);
-        RANK_TYPE rank1 = tile_rank(mid_tile1);
-        RANK_TYPE rank2 = tile_rank(mid_tile2);
-        return (rank0 == rank1 && rank0 == rank2);
+    SUIT_TYPE s0 = tile_suit(t0);
+    SUIT_TYPE s1 = tile_suit(t1);
+    SUIT_TYPE s2 = tile_suit(t2);
+    if (s0 != s1 && s0 != s2 && s1 != s2) {
+        RANK_TYPE r0 = tile_rank(t0);
+        RANK_TYPE r1 = tile_rank(t1);
+        RANK_TYPE r2 = tile_rank(t2);
+        return (r0 == r1 && r0 == r2);
     }
     return false;
 }
 
 // 三色三节高或者三色三步高
-static bool is_mixed_shifted_chow_or_pung(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2) {
-    if (!is_numbered_suit_quick(mid_tile0) || !is_numbered_suit_quick(mid_tile1) || !is_numbered_suit_quick(mid_tile2)) {
+static bool is_mixed_shifted_chow_or_pung(TILE t0, TILE t1, TILE t2) {
+    if (!is_numbered_suit_quick(t0) || !is_numbered_suit_quick(t1) || !is_numbered_suit_quick(t2)) {
         return false;
     }
-    SUIT_TYPE suit0 = tile_suit(mid_tile0);
-    SUIT_TYPE suit1 = tile_suit(mid_tile1);
-    SUIT_TYPE suit2 = tile_suit(mid_tile2);
-    if (suit0 != suit1 && suit0 != suit2 && suit1 != suit2) {
-        RANK_TYPE rank0 = tile_rank(mid_tile0);
-        RANK_TYPE rank1 = tile_rank(mid_tile1);
-        RANK_TYPE rank2 = tile_rank(mid_tile2);
-        return ((rank1 + 1 == rank0 && rank0 + 1 == rank2)
-            || (rank2 + 1 == rank0 && rank0 + 1 == rank1)
-            || (rank0 + 1 == rank1 && rank1 + 1 == rank2)
-            || (rank2 + 1 == rank1 && rank1 + 1 == rank0)
-            || (rank0 + 1 == rank2 && rank2 + 1 == rank1)
-            || (rank1 + 1 == rank2 && rank2 + 1 == rank0));
+    SUIT_TYPE s0 = tile_suit(t0);
+    SUIT_TYPE s1 = tile_suit(t1);
+    SUIT_TYPE s2 = tile_suit(t2);
+    if (s0 != s1 && s0 != s2 && s1 != s2) {
+        RANK_TYPE r0 = tile_rank(t0);
+        RANK_TYPE r1 = tile_rank(t1);
+        RANK_TYPE r2 = tile_rank(t2);
+        return ((r1 + 1 == r0 && r0 + 1 == r2)
+            || (r2 + 1 == r0 && r0 + 1 == r1)
+            || (r0 + 1 == r1 && r1 + 1 == r2)
+            || (r2 + 1 == r1 && r1 + 1 == r0)
+            || (r0 + 1 == r2 && r2 + 1 == r1)
+            || (r1 + 1 == r2 && r2 + 1 == r0));
     }
     return false;
 }
 
 // 一般高
-static bool is_pure_double_chow(TILE mid_tile0, TILE mid_tile1) {
-    return mid_tile0 == mid_tile1;
+static bool is_pure_double_chow(TILE t0, TILE t1) {
+    return t0 == t1;
 }
 
 // 喜相逢
-static bool is_mixed_double_chow(TILE mid_tile0, TILE mid_tile1) {
-    return (is_rank_equal_quick(mid_tile0, mid_tile1) && !is_suit_equal_quick(mid_tile0, mid_tile1));
+static bool is_mixed_double_chow(TILE t0, TILE t1) {
+    return (is_rank_equal_quick(t0, t1) && !is_suit_equal_quick(t0, t1));
 }
 
 // 连六
-static bool is_short_straight(TILE mid_tile0, TILE mid_tile1) {
-    return (mid_tile0 + 3 == mid_tile1 || mid_tile1 + 3 == mid_tile0);
+static bool is_short_straight(TILE t0, TILE t1) {
+    return (t0 + 3 == t1 || t1 + 3 == t0);
 }
 
 // 老少副
-static bool is_two_terminal_chows(TILE mid_tile0, TILE mid_tile1) {
-    if (is_suit_equal_quick(mid_tile0, mid_tile1)) {
-        RANK_TYPE rank0 = tile_rank(mid_tile0);
-        RANK_TYPE rank1 = tile_rank(mid_tile1);
-        return ((rank0 == 2 && rank1 == 8) || (rank0 == 8 && rank1 == 2));
+static bool is_two_terminal_chows(TILE t0, TILE t1) {
+    if (is_suit_equal_quick(t0, t1)) {
+        RANK_TYPE r0 = tile_rank(t0);
+        RANK_TYPE r1 = tile_rank(t1);
+        return ((r0 == 2 && r1 == 8) || (r0 == 8 && r1 == 2));
     }
     return false;
 }
 
 // 4组顺子的番
-static POINT_TYPE get_4_chows_points(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2, TILE mid_tile3) {
+static POINT_TYPE get_4_chows_points(TILE t0, TILE t1, TILE t2, TILE t3) {
     // 一色四步高
-    if (is_four_pure_shifted_chows(mid_tile0, mid_tile1, mid_tile2, mid_tile3)) {
+    if (is_four_pure_shifted_chows(t0, t1, t2, t3)) {
         return FOUR_PURE_SHIFTED_CHOWS;
     }
     // 一色四同顺
-    if (is_quadruple_chow(mid_tile0, mid_tile1, mid_tile2, mid_tile3)) {
+    if (is_quadruple_chow(t0, t1, t2, t3)) {
         return QUADRUPLE_CHOW;
     }
     // 以上都没有
@@ -286,29 +286,29 @@ static POINT_TYPE get_4_chows_points(TILE mid_tile0, TILE mid_tile1, TILE mid_ti
 }
 
 // 3组顺子的番
-static POINT_TYPE get_3_chows_points(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2) {
+static POINT_TYPE get_3_chows_points(TILE t0, TILE t1, TILE t2) {
     // 三色三步高
-    if (is_mixed_shifted_chow_or_pung(mid_tile0, mid_tile1, mid_tile2)) {
+    if (is_mixed_shifted_chow_or_pung(t0, t1, t2)) {
         return MIXED_SHIFTED_CHOWS;
     }
     // 三色三同顺
-    if (is_mixed_triple_chow_or_pung(mid_tile0, mid_tile1, mid_tile2)) {
+    if (is_mixed_triple_chow_or_pung(t0, t1, t2)) {
         return MIXED_TRIPLE_CHOW;
     }
     // 花龙
-    if (is_mixed_straight(mid_tile0, mid_tile1, mid_tile2)) {
+    if (is_mixed_straight(t0, t1, t2)) {
         return MIXED_STRAIGHT;
     }
     // 清龙
-    if (is_pure_straight(mid_tile0, mid_tile1, mid_tile2)) {
+    if (is_pure_straight(t0, t1, t2)) {
         return PURE_STRAIGHT;
     }
     // 一色三步高
-    if (is_pure_shifted_chows(mid_tile0, mid_tile1, mid_tile2)) {
+    if (is_pure_shifted_chows(t0, t1, t2)) {
         return PURE_SHIFTED_CHOWS;
     }
     // 一色三同顺
-    if (is_pure_triple_chow(mid_tile0, mid_tile1, mid_tile2)) {
+    if (is_pure_triple_chow(t0, t1, t2)) {
         return PURE_TRIPLE_CHOW;
     }
     // 以上都没有
@@ -316,21 +316,21 @@ static POINT_TYPE get_3_chows_points(TILE mid_tile0, TILE mid_tile1, TILE mid_ti
 }
 
 // 2组顺子的番
-static POINT_TYPE get_2_chows_points(TILE mid_tile0, TILE mid_tile1) {
+static POINT_TYPE get_2_chows_points(TILE t0, TILE t1) {
     // 喜相逢
-    if (is_mixed_double_chow(mid_tile0, mid_tile1)) {
+    if (is_mixed_double_chow(t0, t1)) {
         return MIXED_DOUBLE_CHOW;
     }
     // 连六
-    if (is_short_straight(mid_tile0, mid_tile1)) {
+    if (is_short_straight(t0, t1)) {
         return SHORT_STRAIGHT;
     }
     // 老少副
-    if (is_two_terminal_chows(mid_tile0, mid_tile1)) {
+    if (is_two_terminal_chows(t0, t1)) {
         return TWO_TERMINAL_CHOWS;
     }
     // 一般高
-    if (is_pure_double_chow(mid_tile0, mid_tile1)) {
+    if (is_pure_double_chow(t0, t1)) {
         return PURE_DOUBLE_CHOW;
     }
     // 以上都没有
@@ -338,13 +338,13 @@ static POINT_TYPE get_2_chows_points(TILE mid_tile0, TILE mid_tile1) {
 }
 
 // 4组刻子的番
-static POINT_TYPE get_4_pungs_points(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2, TILE mid_tile3) {
+static POINT_TYPE get_4_pungs_points(TILE t0, TILE t1, TILE t2, TILE t3) {
     // 一色四节高
-    if (is_four_pure_shifted_pungs(mid_tile0, mid_tile1, mid_tile2, mid_tile3)) {
+    if (is_four_pure_shifted_pungs(t0, t1, t2, t3)) {
         return FOUR_PURE_SHIFTED_PUNGS;
     }
     // 大四喜
-    if (is_winds(mid_tile0) && is_winds(mid_tile1) && is_winds(mid_tile2) && is_winds(mid_tile3)) {
+    if (is_winds(t0) && is_winds(t1) && is_winds(t2) && is_winds(t3)) {
         return BIG_FOUR_WINDS;
     }
     // 以上都没有
@@ -352,25 +352,25 @@ static POINT_TYPE get_4_pungs_points(TILE mid_tile0, TILE mid_tile1, TILE mid_ti
 }
 
 // 3组刻子的番
-static POINT_TYPE get_3_pungs_points(TILE mid_tile0, TILE mid_tile1, TILE mid_tile2) {
+static POINT_TYPE get_3_pungs_points(TILE t0, TILE t1, TILE t2) {
     // 三色三节高
-    if (is_mixed_shifted_chow_or_pung(mid_tile0, mid_tile1, mid_tile2)) {
+    if (is_mixed_shifted_chow_or_pung(t0, t1, t2)) {
         return MIXED_SHIFTED_PUNGS;
     }
     // 一色三节高
-    if (is_pure_shifted_pungs(mid_tile0, mid_tile1, mid_tile2)) {
+    if (is_pure_shifted_pungs(t0, t1, t2)) {
         return PURE_SHIFTED_PUNGS;
     }
     // 三同刻
-    if (is_mixed_triple_chow_or_pung(mid_tile0, mid_tile1, mid_tile2)) {
+    if (is_mixed_triple_chow_or_pung(t0, t1, t2)) {
         return TRIPLE_PUNG;
     }
     // 三风刻
-    if (is_winds(mid_tile0) && is_winds(mid_tile1) && is_winds(mid_tile2)) {
+    if (is_winds(t0) && is_winds(t1) && is_winds(t2)) {
         return BIG_THREE_WINDS;
     }
     // 大三元
-    if (is_dragons(mid_tile0) && is_dragons(mid_tile1) && is_dragons(mid_tile2)) {
+    if (is_dragons(t0) && is_dragons(t1) && is_dragons(t2)) {
         return BIG_THREE_DRAGONS;
     }
     // 以上都没有
@@ -378,14 +378,14 @@ static POINT_TYPE get_3_pungs_points(TILE mid_tile0, TILE mid_tile1, TILE mid_ti
 }
 
 // 2组刻子的番
-static POINT_TYPE get_2_pungs_points(TILE mid_tile0, TILE mid_tile1) {
+static POINT_TYPE get_2_pungs_points(TILE t0, TILE t1) {
     // 双同刻
-    if (is_numbered_suit_quick(mid_tile0) && is_numbered_suit_quick(mid_tile1)
-        && is_rank_equal_quick(mid_tile0, mid_tile1)) {
+    if (is_numbered_suit_quick(t0) && is_numbered_suit_quick(t1)
+        && is_rank_equal_quick(t0, t1)) {
         return DOUBLE_PUNG;
     }
     // 双箭刻
-    if (is_dragons(mid_tile0) && is_dragons(mid_tile1)) {
+    if (is_dragons(t0) && is_dragons(t1)) {
         return TWO_DRAGONS_PUNGS;
     }
     // 以上都没有
