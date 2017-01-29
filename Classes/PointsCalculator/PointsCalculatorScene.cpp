@@ -83,11 +83,11 @@ bool PointsCalculatorScene::init() {
     radioButton->setPosition(Vec2(20.0f, 105.0f));
     _winTypeGroup->addRadioButton(radioButton);
 
-    Label *byDiscardLabel = Label::createWithSystemFont("点和", "Arial", 12);
-    byDiscardLabel->setColor(textColor);
-    infoWidget->addChild(byDiscardLabel);
-    byDiscardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    byDiscardLabel->setPosition(Vec2(35.0f, 105.0f));
+    Label *label = Label::createWithSystemFont("点和", "Arial", 12);
+    label->setColor(textColor);
+    infoWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(35.0f, 105.0f));
 
     // 自摸
     radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -98,11 +98,11 @@ bool PointsCalculatorScene::init() {
     radioButton->setPosition(Vec2(20.0f + gapX, 105.0f));
     _winTypeGroup->addRadioButton(radioButton);
 
-    Label *selfDrawnLabel = Label::createWithSystemFont("自摸", "Arial", 12);
-    selfDrawnLabel->setColor(textColor);
-    infoWidget->addChild(selfDrawnLabel);
-    selfDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    selfDrawnLabel->setPosition(Vec2(35.0f + gapX, 105.0f));
+    label = Label::createWithSystemFont("自摸", "Arial", 12);
+    label->setColor(textColor);
+    infoWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(35.0f + gapX, 105.0f));
 
     // 绝张
     _fourthTileBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
@@ -114,11 +114,11 @@ bool PointsCalculatorScene::init() {
     _fourthTileBox->setEnabled(false);
     _fourthTileBox->addEventListener(std::bind(&PointsCalculatorScene::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
-    Label *fourthTileLabel = Label::createWithSystemFont("绝张", "Arial", 12);
-    fourthTileLabel->setColor(textColor);
-    infoWidget->addChild(fourthTileLabel);
-    fourthTileLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    fourthTileLabel->setPosition(Vec2(35.0f + gapX * 2, 105.0f));
+    label = Label::createWithSystemFont("绝张", "Arial", 12);
+    label->setColor(textColor);
+    infoWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(35.0f + gapX * 2, 105.0f));
 
     // 杠开
     _replacementBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
@@ -129,11 +129,11 @@ bool PointsCalculatorScene::init() {
     _replacementBox->setPosition(Vec2(20.0f, 75.0f));
     _replacementBox->setEnabled(false);
 
-    Label *replacementLabel = Label::createWithSystemFont("杠开", "Arial", 12);
-    replacementLabel->setColor(textColor);
-    infoWidget->addChild(replacementLabel);
-    replacementLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    replacementLabel->setPosition(Vec2(35.0f, 75.0f));
+    label = Label::createWithSystemFont("杠开", "Arial", 12);
+    label->setColor(textColor);
+    infoWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(35.0f, 75.0f));
 
     // 抢杠
     _robKongBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
@@ -145,11 +145,11 @@ bool PointsCalculatorScene::init() {
     _robKongBox->setEnabled(false);
     _robKongBox->addEventListener(std::bind(&PointsCalculatorScene::onRobKongBox, this, std::placeholders::_1, std::placeholders::_2));
 
-    Label *robKongLabel = Label::createWithSystemFont("抢杠", "Arial", 12);
-    robKongLabel->setColor(textColor);
-    infoWidget->addChild(robKongLabel);
-    robKongLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    robKongLabel->setPosition(Vec2(35.0f + gapX, 75.0f));
+    label = Label::createWithSystemFont("抢杠", "Arial", 12);
+    label->setColor(textColor);
+    infoWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(35.0f + gapX, 75.0f));
 
     // 海底
     _lastTileBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
@@ -160,19 +160,19 @@ bool PointsCalculatorScene::init() {
     _lastTileBox->setPosition(Vec2(20.0f + gapX * 2, 75.0f));
     _lastTileBox->addEventListener(std::bind(&PointsCalculatorScene::onLastTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
-    Label *lastTileDrawnLabel = Label::createWithSystemFont("海底", "Arial", 12);
-    lastTileDrawnLabel->setColor(textColor);
-    infoWidget->addChild(lastTileDrawnLabel);
-    lastTileDrawnLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    lastTileDrawnLabel->setPosition(Vec2(35.0f + gapX * 2, 75.0f));
+    label = Label::createWithSystemFont("海底", "Arial", 12);
+    label->setColor(textColor);
+    infoWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(35.0f + gapX * 2, 75.0f));
 
     const char *windName[4] = { "东", "南", "西", "北" };
 
     // 圈风
-    Label *prevalentWindLabel = Label::createWithSystemFont("圈风", "Arial", 12);
-    prevalentWindLabel->setColor(textColor);
-    infoWidget->addChild(prevalentWindLabel);
-    prevalentWindLabel->setPosition(Vec2(20.0f, 45.0f));
+    label = Label::createWithSystemFont("圈风", "Arial", 12);
+    label->setColor(textColor);
+    infoWidget->addChild(label);
+    label->setPosition(Vec2(20.0f, 45.0f));
 
     _prevalentWindGroup = ui::RadioButtonGroup::create();
     infoWidget->addChild(_prevalentWindGroup);
@@ -186,17 +186,17 @@ bool PointsCalculatorScene::init() {
         infoWidget->addChild(button);
         _prevalentWindGroup->addRadioButton(button);
 
-        Label *label = Label::createWithSystemFont(windName[i], "Arial", 12);
+        label = Label::createWithSystemFont(windName[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         button->addChild(label);
         label->setPosition(Vec2(10.0f, 10.0f));
     }
 
     // 门风
-    Label *seatWindLabel = Label::createWithSystemFont("门风", "Arial", 12);
-    seatWindLabel->setColor(textColor);
-    infoWidget->addChild(seatWindLabel);
-    seatWindLabel->setPosition(Vec2(20.0f, 15.0f));
+    label = Label::createWithSystemFont("门风", "Arial", 12);
+    label->setColor(textColor);
+    infoWidget->addChild(label);
+    label->setPosition(Vec2(20.0f, 15.0f));
 
     _seatWindGroup = ui::RadioButtonGroup::create();
     infoWidget->addChild(_seatWindGroup);
@@ -210,7 +210,7 @@ bool PointsCalculatorScene::init() {
         infoWidget->addChild(button);
         _seatWindGroup->addRadioButton(button);
 
-        Label *label = Label::createWithSystemFont(windName[i], "Arial", 12);
+        label = Label::createWithSystemFont(windName[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         button->addChild(label);
         label->setPosition(Vec2(10.0f, 10.0f));
@@ -224,15 +224,15 @@ bool PointsCalculatorScene::init() {
     button->setTitleText("直接输入");
     button->setTitleColor(Color3B::BLACK);
     infoWidget->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40, 90.0f));
+    button->setPosition(Vec2(visibleSize.width - 40, 80.0f));
     button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
 
     // 花牌数
-    Label *flowerLabel = Label::createWithSystemFont("花牌数", "Arial", 12);
-    flowerLabel->setColor(textColor);
-    infoWidget->addChild(flowerLabel);
-    flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    flowerLabel->setPosition(Vec2(visibleSize.width - 50, 45.0f));
+    label = Label::createWithSystemFont("花牌数", "Arial", 12);
+    label->setColor(textColor);
+    infoWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+    label->setPosition(Vec2(visibleSize.width - 50, 45.0f));
 
     _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     infoWidget->addChild(_editBox);
