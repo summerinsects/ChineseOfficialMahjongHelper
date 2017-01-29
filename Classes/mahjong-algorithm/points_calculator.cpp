@@ -144,12 +144,12 @@ void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *
 }
 
 // 一色四同顺
-static bool is_quadruple_chow(TILE t0, TILE t1, TILE t2, TILE t3) {
+static forceinline bool is_quadruple_chow(TILE t0, TILE t1, TILE t2, TILE t3) {
     return (t0 == t1 && t0 == t2 && t0 == t3);
 }
 
 // 一色四节高
-static bool is_four_pure_shifted_pungs(TILE t0, TILE t1, TILE t2, TILE t3) {
+static forceinline bool is_four_pure_shifted_pungs(TILE t0, TILE t1, TILE t2, TILE t3) {
     if (is_numbered_suit_quick(t0)) {
         return (t0 + 1 == t1 && t1 + 1 == t2 && t2 + 1 == t3);
     }
@@ -157,7 +157,7 @@ static bool is_four_pure_shifted_pungs(TILE t0, TILE t1, TILE t2, TILE t3) {
 }
 
 // 一色四步高
-static bool is_four_pure_shifted_chows(TILE t0, TILE t1, TILE t2, TILE t3) {
+static forceinline bool is_four_pure_shifted_chows(TILE t0, TILE t1, TILE t2, TILE t3) {
     // 递增2的必然是：123 345 567 789
     // 递增1的最小为：123 234 345 456 最大为：456 567 678 789
     return ((t0 + 2 == t1 && t1 + 2 == t2 && t2 + 2 == t3)
@@ -165,22 +165,22 @@ static bool is_four_pure_shifted_chows(TILE t0, TILE t1, TILE t2, TILE t3) {
 }
 
 // 一色三同顺
-static bool is_pure_triple_chow(TILE t0, TILE t1, TILE t2) {
+static forceinline bool is_pure_triple_chow(TILE t0, TILE t1, TILE t2) {
     return (t0 == t1 && t0 == t2);
 }
 
 // 一色三节高
-static bool is_pure_shifted_pungs(TILE t0, TILE t1, TILE t2) {
+static forceinline bool is_pure_shifted_pungs(TILE t0, TILE t1, TILE t2) {
     return (is_numbered_suit_quick(t0) && t0 + 1 == t1 && t1 + 1 == t2);
 }
 
 // 清龙
-static bool is_pure_straight(TILE t0, TILE t1, TILE t2) {
+static forceinline bool is_pure_straight(TILE t0, TILE t1, TILE t2) {
     return (tile_rank(t0) == 2 && t0 + 3 == t1 && t1 + 3 == t2);
 }
 
 // 一色三步高
-static bool is_pure_shifted_chows(TILE t0, TILE t1, TILE t2) {
+static forceinline bool is_pure_shifted_chows(TILE t0, TILE t1, TILE t2) {
     return ((t0 + 2 == t1 && t1 + 2 == t2) || (t0 + 1 == t1 && t1 + 1 == t2));
 }
 
@@ -243,17 +243,17 @@ static bool is_mixed_shifted_chow_or_pung(TILE t0, TILE t1, TILE t2) {
 }
 
 // 一般高
-static bool is_pure_double_chow(TILE t0, TILE t1) {
+static forceinline bool is_pure_double_chow(TILE t0, TILE t1) {
     return t0 == t1;
 }
 
 // 喜相逢
-static bool is_mixed_double_chow(TILE t0, TILE t1) {
+static forceinline bool is_mixed_double_chow(TILE t0, TILE t1) {
     return (is_rank_equal_quick(t0, t1) && !is_suit_equal_quick(t0, t1));
 }
 
 // 连六
-static bool is_short_straight(TILE t0, TILE t1) {
+static forceinline bool is_short_straight(TILE t0, TILE t1) {
     return (t0 + 3 == t1 || t1 + 3 == t0);
 }
 
@@ -269,6 +269,7 @@ static bool is_two_terminal_chows(TILE t0, TILE t1) {
 
 // 4组顺子的番
 static POINT_TYPE get_4_chows_points(TILE t0, TILE t1, TILE t2, TILE t3) {
+    // 按出现频率顺序
     // 一色四步高
     if (is_four_pure_shifted_chows(t0, t1, t2, t3)) {
         return FOUR_PURE_SHIFTED_CHOWS;
@@ -283,6 +284,7 @@ static POINT_TYPE get_4_chows_points(TILE t0, TILE t1, TILE t2, TILE t3) {
 
 // 3组顺子的番
 static POINT_TYPE get_3_chows_points(TILE t0, TILE t1, TILE t2) {
+    // 按出现频率顺序
     // 三色三步高
     if (is_mixed_shifted_chow_or_pung(t0, t1, t2)) {
         return MIXED_SHIFTED_CHOWS;
@@ -313,6 +315,7 @@ static POINT_TYPE get_3_chows_points(TILE t0, TILE t1, TILE t2) {
 
 // 2组顺子的番
 static POINT_TYPE get_2_chows_points(TILE t0, TILE t1) {
+    // 按出现频率顺序
     // 喜相逢
     if (is_mixed_double_chow(t0, t1)) {
         return MIXED_DOUBLE_CHOW;
@@ -334,27 +337,27 @@ static POINT_TYPE get_2_chows_points(TILE t0, TILE t1) {
 }
 
 // 大四喜
-static bool is_big_four_winds(TILE t0, TILE t1, TILE t2, TILE t3) {
+static forceinline bool is_big_four_winds(TILE t0, TILE t1, TILE t2, TILE t3) {
     return (is_winds(t0) && is_winds(t1) && is_winds(t2) && is_winds(t3));
 }
 
 // 大三元
-static bool is_big_three_dragons(TILE t0, TILE t1, TILE t2) {
+static forceinline bool is_big_three_dragons(TILE t0, TILE t1, TILE t2) {
     return (is_dragons(t0) && is_dragons(t1) && is_dragons(t2));
 }
 
 // 三风刻
-static bool is_big_three_winds(TILE t0, TILE t1, TILE t2) {
+static forceinline bool is_big_three_winds(TILE t0, TILE t1, TILE t2) {
     return (is_winds(t0) && is_winds(t1) && is_winds(t2));
 }
 
 // 双箭刻
-static bool is_two_dragons_pungs(TILE t0, TILE t1) {
+static forceinline bool is_two_dragons_pungs(TILE t0, TILE t1) {
     return (is_winds(t0) && is_winds(t1));
 }
 
 // 双同刻
-static bool is_double_pung(TILE t0, TILE t1) {
+static forceinline bool is_double_pung(TILE t0, TILE t1) {
     return (is_numbered_suit_quick(t0) && is_numbered_suit_quick(t1)
         && is_rank_equal_quick(t0, t1));
 }
@@ -375,6 +378,7 @@ static POINT_TYPE get_4_pungs_points(TILE t0, TILE t1, TILE t2, TILE t3) {
 
 // 3组刻子的番
 static POINT_TYPE get_3_pungs_points(TILE t0, TILE t1, TILE t2) {
+    // 按出现频率顺序
     // 三色三节高
     if (is_mixed_shifted_chow_or_pung(t0, t1, t2)) {
         return MIXED_SHIFTED_PUNGS;
@@ -401,6 +405,7 @@ static POINT_TYPE get_3_pungs_points(TILE t0, TILE t1, TILE t2) {
 
 // 2组刻子的番
 static POINT_TYPE get_2_pungs_points(TILE t0, TILE t1) {
+    // 按出现频率顺序
     // 双同刻
     if (is_double_pung(t0, t1)) {
         return DOUBLE_PUNG;
