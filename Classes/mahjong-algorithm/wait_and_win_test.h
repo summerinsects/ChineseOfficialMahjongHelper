@@ -5,29 +5,31 @@
 
 namespace mahjong {
 
-bool is_basic_type_1_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]);
-bool is_basic_type_1(const TILE *concealed_tiles, TILE test_tile);
+bool is_basic_type_1_wait(const TILE *standing_tiles, bool (&waiting_table)[6][10]);
+bool is_basic_type_1_win(const TILE *standing_tiles, TILE test_tile);
 
-bool is_basic_type_4_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]);
-bool is_basic_type_4(const TILE *concealed_tiles, TILE test_tile);
+bool is_basic_type_4_wait(const TILE *standing_tiles, bool (&waiting_table)[6][10]);
+bool is_basic_type_4_win(const TILE *standing_tiles, TILE test_tile);
 
-bool is_basic_type_7_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]);
-bool is_basic_type_7(const TILE *concealed_tiles, TILE test_tile);
+bool is_basic_type_7_wait(const TILE *standing_tiles, bool (&waiting_table)[6][10]);
+bool is_basic_type_7_win(const TILE *standing_tiles, TILE test_tile);
 
-bool is_basic_type_10_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]);
-bool is_basic_type_10(const TILE *concealed_tiles, TILE test_tile);
+bool is_basic_type_10_wait(const TILE *standing_tiles, bool (&waiting_table)[6][10]);
+bool is_basic_type_10_win(const TILE *standing_tiles, TILE test_tile);
 
-bool is_basic_type_13_wait(const TILE *concealed_tiles, bool (&waiting_table)[6][10]);
-bool is_basic_type_13(const TILE *concealed_tiles, TILE test_tile);
+bool is_basic_type_13_wait(const TILE *standing_tiles, bool (&waiting_table)[6][10]);
+bool is_basic_type_13_win(const TILE *standing_tiles, TILE test_tile);
 
-bool is_seven_pairs_wait(const TILE (&concealed_tiles)[13], TILE *waiting);
-bool is_seven_pairs(const TILE (&concealed_tiles)[13], TILE test_tile);
+bool is_seven_pairs_wait(const TILE (&standing_tiles)[13], TILE *waiting);
+bool is_seven_pairs_win(const TILE (&standing_tiles)[13], TILE test_tile);
 
-bool is_thirteen_orphans_wait(const TILE (&concealed_tiles)[13], TILE *waiting, unsigned *waiting_cnt);
-bool is_thirteen_orphans(const TILE (&concealed_tiles)[13], TILE test_tile);
+bool is_thirteen_orphans_wait(const TILE (&standing_tiles)[13], TILE *waiting, unsigned *waiting_cnt);
+bool is_thirteen_orphans_win(const TILE (&standing_tiles)[13], TILE test_tile);
 
-bool is_honors_and_knitted_tiles_wait(const TILE (&concealed_tiles)[13], TILE *waiting);
-bool is_honors_and_knitted_tiles(const TILE (&concealed_tiles)[13], TILE test_tile);
+bool is_honors_and_knitted_tiles_wait(const TILE (&standing_tiles)[13], TILE *waiting);
+bool is_honors_and_knitted_tiles_win(const TILE (&standing_tiles)[13], TILE test_tile);
+
+
 
 // 组合龙只有6种
 // 147m 258s 369p
