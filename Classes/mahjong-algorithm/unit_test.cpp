@@ -10,7 +10,7 @@ using namespace mahjong;
 void test_wait(const char *str) {
     TILE tiles[13];
     long tile_cnt;
-    parse_tiles(str, tiles, &tile_cnt);
+    tile_cnt = parse_tiles(str, tiles, 13);
 
     std::cout << "----------------" << std::endl;
     puts(str);
@@ -74,19 +74,16 @@ void test_wait(const char *str) {
 }
 
 void test_points(const char *str, const char *win_str, WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind) {
-    SET sets[5];
-    long set_cnt;
-    TILE tiles[13];
-    long tile_cnt;
-    long ret = string_to_tiles(str, sets, &set_cnt, tiles, &tile_cnt);
+    HAND_TILES hand_tiles;
+    long ret = string_to_tiles(str, &hand_tiles);
     if (ret != 0) {
         printf("error at line %d error = %ld\n", __LINE__, ret);
         return;
     }
 
     TILE win_tile;
-    ret = parse_tiles(win_str, &win_tile, nullptr);
-    if (ret < 0) {
+    ret = parse_tiles(win_str, &win_tile, 1);
+    if (ret != 0) {
         printf("error at line %d error = %ld\n", __LINE__, ret);
         return;
     }
@@ -94,7 +91,7 @@ void test_points(const char *str, const char *win_str, WIN_TYPE win_type, WIND_T
     long points_table[POINT_TYPE_COUNT] = { 0 };
     puts("----------------");
     printf("%s %s\n", str, win_str);
-    int points = calculate_points(sets, set_cnt, tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);
+    int points = calculate_points(&hand_tiles, win_tile, win_type, prevalent_wind, seat_wind, points_table);
 
     printf("max points = %d\n\n", points);
     //for (int i = 1; i < FLOWER_TILES; ++i) {

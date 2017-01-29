@@ -18,7 +18,7 @@ public:
     int getUsedTileCount(mahjong::TILE tile) const { return _usedTilesTable[tile]; }
     int getStandingTileCount(mahjong::TILE tile) const { return _standingTilesTable[tile]; }
 
-    void setData(const mahjong::SET fixedSets[5], long setCnt, const mahjong::TILE standingTiles[13], long tileCnt, mahjong::TILE winTile);
+    void setData(const mahjong::HAND_TILES &hand_tiles, mahjong::TILE winTile);
 
     mahjong::TILE getWinTile() const;
     bool isFixedSetsContainsKong() const;

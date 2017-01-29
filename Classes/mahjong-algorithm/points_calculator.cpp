@@ -2064,7 +2064,7 @@ static long make_fixed_set(const TILE *tiles, long tile_cnt, SET *set) {
     return 0;
 }
 
-long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *standing_tiles, long *standing_cnt) {
+long string_to_tiles(const char *str, HAND_TILES *hand_tiles) {
     SET sets[4];
     long set_cnt = 0;
     bool is_concealed_kong = false;
@@ -2135,16 +2135,10 @@ long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE
     //    printf("%x ", tiles[i]);
     //}
     //puts("");
-    if (fixed_sets != nullptr) {
-        memcpy(fixed_sets, sets, set_cnt * sizeof(SET));
-    }
-    if (fixed_set_cnt != nullptr) {
-        *fixed_set_cnt = set_cnt;
-    }
-    memcpy(standing_tiles, tiles, tile_cnt * sizeof(TILE));
-    if (standing_cnt != nullptr) {
-        *standing_cnt = tile_cnt;
-    }
+    memcpy(hand_tiles->fixed_sets, sets, set_cnt * sizeof(SET));
+    hand_tiles->set_count = set_cnt;
+    memcpy(hand_tiles->standing_tiles, tiles, tile_cnt * sizeof(TILE));
+    hand_tiles->tile_count = tile_cnt;
 
     return PARSE_NO_ERROR;
 }
@@ -2183,24 +2177,24 @@ size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, TILE w
     return cnt;
 }
 
-int check_calculator_input(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile) {
+int check_calculator_input(const HAND_TILES *hand_tiles, TILE win_tile) {
     // 将每一次副露当作3张牌来算，那么总张数=13
-    if (standing_tiles == nullptr || standing_cnt <= 0 || fixed_cnt < 0 || fixed_cnt > 4
-        || fixed_cnt * 3 + standing_cnt != 13) {
+    if (hand_tiles->tile_count <= 0 || hand_tiles->set_count < 0 || hand_tiles->set_count > 4
+        || hand_tiles->set_count * 3 + hand_tiles->tile_count != 13) {
         return ERROR_WRONG_TILES_COUNT;
     }
 
     // 将副露恢复成牌
     TILE tiles[18];
     long tile_cnt = 0;
-    if (fixed_cnt == 0) {
-        memcpy(tiles, standing_tiles, 13 * sizeof(TILE));
+    if (hand_tiles->set_count == 0) {
+        memcpy(tiles, hand_tiles->standing_tiles, 13 * sizeof(TILE));
         tiles[13] = win_tile;
         tile_cnt = 14;
     }
     else {
-        recovery_tiles_from_sets(fixed_set, fixed_cnt, tiles, &tile_cnt);
-        memcpy(tiles + tile_cnt, standing_tiles, standing_cnt * sizeof(TILE));
+        recovery_tiles_from_sets(hand_tiles->fixed_sets, hand_tiles->set_count, tiles, &tile_cnt);
+        memcpy(tiles + tile_cnt, hand_tiles->standing_tiles, hand_tiles->tile_count * sizeof(TILE));
         tiles[tile_cnt] = win_tile;
         ++tile_cnt;
     }
@@ -2219,28 +2213,28 @@ int check_calculator_input(const SET *fixed_set, long fixed_cnt, const TILE *sta
     return 0;
 }
 
-int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile, WIN_TYPE win_type,
+int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_type,
     WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
-    if (fixed_set == nullptr) {
-        fixed_cnt = 0;
-    }
 
-    if (int ret = check_calculator_input(fixed_set, fixed_cnt, standing_tiles, standing_cnt, win_tile)) {
+    if (int ret = check_calculator_input(hand_tiles, win_tile)) {
         return ret;
     }
+
+    long fixed_cnt = hand_tiles->set_count;
+    long standing_cnt = hand_tiles->tile_count;
 
     TILE _standing_tiles[14];
     SET _separation_sets[MAX_SEPARAION_CNT][5];
     long _separation_cnt;
 
     // 合并得到14张牌
-    memcpy(_standing_tiles, standing_tiles, sizeof(TILE) * standing_cnt);
+    memcpy(_standing_tiles, hand_tiles->standing_tiles, sizeof(TILE) * standing_cnt);
     _standing_tiles[standing_cnt] = win_tile;
     sort_tiles(_standing_tiles, standing_cnt + 1);
 
-    memcpy(_separation_sets[0], fixed_set, fixed_cnt * sizeof(SET));
+    memcpy(_separation_sets[0], hand_tiles->fixed_sets, fixed_cnt * sizeof(SET));
     for (long i = 0; i < fixed_cnt; ++i) {
-        if (fixed_set[i].set_type != SET_TYPE::KONG) {
+        if (hand_tiles->fixed_sets[i].set_type != SET_TYPE::KONG) {
             _separation_sets[0][i].is_melded = true;
         }
     }

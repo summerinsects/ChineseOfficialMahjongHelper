@@ -49,6 +49,13 @@ static const char *stringify_table[] = {
     "", "C", "F", "P", "", "", "", "", "", "", "", "", "", "", "", "",
 };
 
+struct HAND_TILES {
+    SET fixed_sets[5];
+    long set_count;
+    TILE standing_tiles[13];
+    long tile_count;
+};
+
 #define PARSE_NO_ERROR 0
 #define PARSE_ERROR_ILLEGAL_CHARACTER -1
 #define PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT -2
@@ -57,7 +64,7 @@ static const char *stringify_table[] = {
 #define PARSE_ERROR_TOO_MANY_FIXED_SET -5
 
 long parse_tiles(const char *str, TILE *tiles, long max_cnt);
-long string_to_tiles(const char *str, SET *fixed_sets, long *fixed_set_cnt, TILE *standing_tiles, long *standing_cnt);
+long string_to_tiles(const char *str, HAND_TILES *hand_tiles);
 void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *tile_cnt);
 
 enum POINT_TYPE {
@@ -102,9 +109,9 @@ size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, TILE w
 #define ERROR_TILE_COUNT_GREATER_THAN_4 -2
 #define ERROR_NOT_WIN -3
 
-int check_calculator_input(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile);
+int check_calculator_input(const HAND_TILES *hand_tiles, TILE win_tile);
 
-int calculate_points(const SET *fixed_set, long fixed_cnt, const TILE *standing_tiles, long standing_cnt, TILE win_tile,
+int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile,
     WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]);
 
 #if 0

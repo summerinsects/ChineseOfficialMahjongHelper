@@ -70,14 +70,14 @@ void HandTilesWidget::reset() {
     _fixedWidget->removeAllChildren();
 }
 
-void HandTilesWidget::setData(const mahjong::SET fixedSets[5], long setCnt, const mahjong::TILE standingTiles[13], long tileCnt, mahjong::TILE winTile) {
+void HandTilesWidget::setData(const mahjong::HAND_TILES &hand_tiles, mahjong::TILE winTile) {
     reset();
 
     // 添加副露
-    for (long i = 0; i < setCnt; ++i) {
-        _fixedSets.push_back(fixedSets[i]);
-        mahjong::TILE tile = fixedSets[i].mid_tile;
-        switch (fixedSets[i].set_type) {
+    for (long i = 0; i < hand_tiles.set_count; ++i) {
+        _fixedSets.push_back(hand_tiles.fixed_sets[i]);
+        mahjong::TILE tile = _fixedSets[i].mid_tile;
+        switch (_fixedSets[i].set_type) {
         case mahjong::SET_TYPE::CHOW:
             addFixedChowSet(tile, 0);
             ++_usedTilesTable[tile - 1];
@@ -89,7 +89,7 @@ void HandTilesWidget::setData(const mahjong::SET fixedSets[5], long setCnt, cons
             _usedTilesTable[tile] += 3;
             break;
         case mahjong::SET_TYPE::KONG:
-            if (fixedSets[i].is_melded) {
+            if (_fixedSets[i].is_melded) {
                 addFixedMeldedKongSet(tile, 0);
             }
             else {
@@ -103,8 +103,8 @@ void HandTilesWidget::setData(const mahjong::SET fixedSets[5], long setCnt, cons
     }
 
     // 添加立牌
-    for (long i = 0; i < tileCnt; ++i) {
-        mahjong::TILE tile = standingTiles[i];
+    for (long i = 0; i < hand_tiles.tile_count; ++i) {
+        mahjong::TILE tile = hand_tiles.standing_tiles[i];
         addTile(tile);
         ++_usedTilesTable[tile];
     }

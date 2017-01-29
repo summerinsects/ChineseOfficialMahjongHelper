@@ -448,13 +448,10 @@ void PointsCalculatorScene::parseInput(const char *input) {
         std::string tilesString(str.begin(), it);
         std::string winString(it + 1, str.end());
 
-        mahjong::SET fixed_sets[5];
-        long set_cnt;
-        mahjong::TILE standing_tiles[13];
-        long tile_cnt;
+        mahjong::HAND_TILES hand_tiles;
         mahjong::TILE win_tile;
 
-        long ret = mahjong::string_to_tiles(tilesString.c_str(), fixed_sets, &set_cnt, standing_tiles, &tile_cnt);
+        long ret = mahjong::string_to_tiles(tilesString.c_str(), &hand_tiles);
         if (ret != PARSE_NO_ERROR) {
             switch (ret) {
             case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
@@ -465,7 +462,7 @@ void PointsCalculatorScene::parseInput(const char *input) {
             }
             break;
         }
-        mahjong::sort_tiles(standing_tiles, tile_cnt);
+        mahjong::sort_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count);
 
         ret = mahjong::parse_tiles(winString.c_str(), &win_tile, 1);
         if (ret != 1) {
@@ -479,7 +476,7 @@ void PointsCalculatorScene::parseInput(const char *input) {
             break;
         }
 
-        ret = mahjong::check_calculator_input(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile);
+        ret = mahjong::check_calculator_input(&hand_tiles, win_tile);
         if (ret != 0) {
             switch (ret) {
             case ERROR_WRONG_TILES_COUNT: errorStr = "牌张数错误"; break;
@@ -488,7 +485,7 @@ void PointsCalculatorScene::parseInput(const char *input) {
             }
             break;
         }
-        _tilePicker->setData(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile);
+        _tilePicker->setData(hand_tiles, win_tile);
     } while (0);
 
     if (errorStr != nullptr) {
@@ -513,22 +510,25 @@ void PointsCalculatorScene::calculate() {
         return;
     }
 
-    // 获取副露
-    mahjong::SET fixed_sets[5];
-    const std::vector<mahjong::SET> &fixedSets = _tilePicker->getHandTilesWidget()->getFixedSets();
-    long set_cnt = std::copy(fixedSets.begin(), fixedSets.end(), std::begin(fixed_sets))
-        - std::begin(fixed_sets);
-
-    // 获取立牌
-    mahjong::TILE standing_tiles[14];
-    const std::vector<mahjong::TILE> &standingTiles = _tilePicker->getHandTilesWidget()->getStandingTiles();
-    long tile_cnt = std::copy(standingTiles.begin(), standingTiles.end(), std::begin(standing_tiles))
-        - std::begin(standing_tiles);
-    --tile_cnt;
-    mahjong::sort_tiles(standing_tiles, tile_cnt);
-
     // 获取和牌张
     mahjong::TILE win_tile = _tilePicker->getHandTilesWidget()->getWinTile();
+    if (win_tile == 0) {
+        AlertLayer::showWithMessage("算番", "缺少和牌张", nullptr, nullptr);
+        return;
+    }
+
+    mahjong::HAND_TILES hand_tiles;
+
+    // 获取副露
+    const std::vector<mahjong::SET> &fixedSets = _tilePicker->getHandTilesWidget()->getFixedSets();
+    hand_tiles.set_count = std::copy(fixedSets.begin(), fixedSets.end(), std::begin(hand_tiles.fixed_sets))
+        - std::begin(hand_tiles.fixed_sets);
+
+    // 获取立牌
+    const std::vector<mahjong::TILE> &standingTiles = _tilePicker->getHandTilesWidget()->getStandingTiles();
+    hand_tiles.tile_count = std::copy(standingTiles.begin(), standingTiles.end() - 1, std::begin(hand_tiles.standing_tiles))
+        - std::begin(hand_tiles.standing_tiles);
+    mahjong::sort_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count);
 
     long points_table[mahjong::POINT_TYPE_COUNT] = { 0 };
 
@@ -545,7 +545,7 @@ void PointsCalculatorScene::calculate() {
     mahjong::WIND_TYPE seat_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + _seatWindGroup->getSelectedButtonIndex());
 
     // 算番
-    int points = calculate_points(fixed_sets, set_cnt, standing_tiles, tile_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_table);
+    int points = calculate_points(&hand_tiles, win_tile, win_type, prevalent_wind, seat_wind, points_table);
 
     Color3B textColor = UserDefault::getInstance()->getBoolForKey("night_mode") ? Color3B::WHITE : Color3B::BLACK;
     if (points == ERROR_NOT_WIN) {

@@ -13,7 +13,7 @@ public:
 
     void setFixedSetsChangedCallback(const std::function<void ()> &callback) { _fixedSetsChangedCallback = callback; }
     void setWinTileChangedCallback(const std::function<void ()> &callback) { _winTileChangedCallback = callback; }
-    void setData(const mahjong::SET fixedSets[5], long setCnt, const mahjong::TILE standingTiles[13], long tileCnt, mahjong::TILE winTile);
+    void setData(const mahjong::HAND_TILES &hand_tiles, mahjong::TILE winTile);
 
     const HandTilesWidget *getHandTilesWidget() const { return _handTilesWidget; }
 
