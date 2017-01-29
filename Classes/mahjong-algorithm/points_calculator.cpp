@@ -29,7 +29,7 @@ static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_cnt, SEPERAT
         sets[4].mid_tile = tiles[0];
         sets[4].set_type = SET_TYPE::PAIR;
 
-        // 拷贝一份当前的划分出来的面子，并排序
+        // 拷贝一份当前的划分出来的面子，并排序暗手的面子
         SET temp[5];
         memcpy(temp, sets, 5 * sizeof(SET));
         std::sort(temp + fixed_cnt, temp + 4, &set_cmp);
@@ -84,9 +84,7 @@ static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_cnt, SEPERAT
                     // 削减面子
                     TILE remains[14];
                     for (int n = 0, c = 0; n < tile_cnt; ++n) {
-                        if (n == i || n == j || n == k) {
-                            continue;
-                        }
+                        if (n == i || n == j || n == k) continue;
                         remains[c++] = tiles[n];
                     }
                     // 递归剩下的牌
@@ -94,13 +92,10 @@ static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_cnt, SEPERAT
                         ret = true;  // 划分成功
                     }
                 }
-
                 do ++k; while (k < tile_cnt && tiles[k] == tile_k);  // 快速跳过相同的case
             }
-
             do ++j; while (j < tile_cnt && tiles[j] == tile_j);  // 快速跳过相同的case
         }
-
         do ++i; while (i < tile_cnt && tiles[i] == tile_i);  // 快速跳过相同的case
     }
 
@@ -168,24 +163,17 @@ static bool is_pure_triple_chow(TILE t0, TILE t1, TILE t2) {
 
 // 一色三节高
 static bool is_pure_shifted_pungs(TILE t0, TILE t1, TILE t2) {
-    if (is_numbered_suit_quick(t0)) {
-        return (t0 + 1 == t1 && t1 + 1 == t2);
-    }
-    return false;
+    return (is_numbered_suit_quick(t0) && t0 + 1 == t1 && t1 + 1 == t2);
 }
 
 // 清龙
 static bool is_pure_straight(TILE t0, TILE t1, TILE t2) {
-    if (tile_rank(t0) == 2) {
-        return (t0 + 3 == t1 && t1 + 3 == t2);
-    }
-    return false;
+    return (tile_rank(t0) == 2 && t0 + 3 == t1 && t1 + 3 == t2);
 }
 
 // 一色三步高
 static bool is_pure_shifted_chows(TILE t0, TILE t1, TILE t2) {
-    return ((t0 + 2 == t1 && t1 + 2 == t2)
-        || (t0 + 1 == t1 && t1 + 1 == t2));
+    return ((t0 + 2 == t1 && t1 + 2 == t2) || (t0 + 1 == t1 && t1 + 1 == t2));
 }
 
 // 花龙
@@ -439,13 +427,14 @@ static POINT_TYPE *pairwise_test_chows(const SET (&chows_sets)[_Size], POINT_TYP
             if (used_flag[i] && used_flag[j]) {
                 continue;
             }
-            if (all_points[i][j] != NONE) {
-                int idx = all_points[i][j] - PURE_DOUBLE_CHOW;  // 般逢连老
+            POINT_TYPE pt = all_points[i][j];
+            if (pt != NONE) {
+                int idx = pt - PURE_DOUBLE_CHOW;  // 般逢连老
                 // 不得相同原则，如果i和j都没算过某一种番，则算这种番
                 if ((used_flag[i] & (1 << idx)) == 0 && (used_flag[j] & (1 << idx)) == 0) {
-                    used_flag[i] |= (1 << (all_points[i][j] - PURE_DOUBLE_CHOW));
-                    used_flag[j] |= (1 << (all_points[i][j] - PURE_DOUBLE_CHOW));
-                    *selected_points = all_points[i][j];  // 写入这个番
+                    used_flag[i] |= (1 << (pt - PURE_DOUBLE_CHOW));
+                    used_flag[j] |= (1 << (pt - PURE_DOUBLE_CHOW));
+                    *selected_points = pt;  // 写入这个番
                     ++selected_points;
                 }
             }
@@ -1621,7 +1610,8 @@ static void check_win_type(WIN_TYPE win_type, long (&points_table)[POINT_TYPE_CO
 
 static bool is_win_tile_in_concealed_chow_sets(const SET *chow_sets, long chow_cnt, TILE win_tile) {
     return std::any_of(chow_sets, chow_sets + chow_cnt, [win_tile](const SET &chow_set) {
-        return !chow_set.is_melded && (chow_set.mid_tile - 1 == win_tile || chow_set.mid_tile == win_tile || chow_set.mid_tile + 1 == win_tile);
+        return !chow_set.is_melded
+            && (chow_set.mid_tile - 1 == win_tile || chow_set.mid_tile == win_tile || chow_set.mid_tile + 1 == win_tile);
     });
 }
 
@@ -1725,7 +1715,7 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
     correction_points_table(points_table, prevalent_wind == seat_wind);
 
     // 如果什么番都没有，则计为无番和
-    if (std::all_of(std::begin(points_table), std::end(points_table), [](int p) { return p == 0; })) {
+    if (std::all_of(std::begin(points_table), std::end(points_table), [](long p) { return p == 0; })) {
         points_table[CHICKEN_HAND] = 1;
     }
 }
