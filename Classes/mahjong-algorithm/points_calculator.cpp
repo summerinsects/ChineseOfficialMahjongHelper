@@ -15,43 +15,48 @@
 
 namespace mahjong {
 
-static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SET (*output_sets)[5], long *separation_cnt) {
+struct SEPERATIONS {
+    SET sets[MAX_SEPARAION_CNT + 1][5];
+    long count;
+};
+
+static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SEPERATIONS *separation) {
     if (tile_cnt == 2 && tiles[0] == tiles[1]) {  // 划分成功
+        SET (&sets)[5] = separation->sets[separation->count];
+
         // 这2张作为将
-        output_sets[*separation_cnt][4].is_melded = false;
-        output_sets[*separation_cnt][4].mid_tile = tiles[0];
-        output_sets[*separation_cnt][4].set_type = SET_TYPE::PAIR;
+        sets[4].is_melded = false;
+        sets[4].mid_tile = tiles[0];
+        sets[4].set_type = SET_TYPE::PAIR;
 
         // 拷贝一份当前的划分出来的面子，并排序
         SET temp[5];
-        memcpy(temp, output_sets[*separation_cnt], 5 * sizeof(SET));
+        memcpy(temp, sets, 5 * sizeof(SET));
         std::sort(temp + fixed_set_cnt, temp + 4, &set_cmp);
 
         // 检查这种划分是否已经存在了
-        bool has_found = false;
-        long i = *separation_cnt;
-        while (i--) {
-            if (std::equal(std::begin(temp), std::end(temp), output_sets[i], [](const SET &set1, const SET &set2) {
+        bool has_found = std::any_of(&separation->sets[0], &separation->sets[separation->count],
+            [&temp](const SET (&s)[5]) {
+            return std::equal(std::begin(temp), std::end(temp), s, [](const SET &set1, const SET &set2) {
                 return set1.mid_tile == set2.mid_tile && set1.set_type == set2.set_type;
-            })) {
-                has_found = true;
-                break;
-            }
-        }
+            });
+        });
 
+        // 如果不存在，那么得到一种新的划分
         if (!has_found) {
-            // 如果不存在，那么得到一种新的划分
-            memcpy(output_sets[*separation_cnt + 1], output_sets[*separation_cnt], 5 * sizeof(SET));
-            ++(*separation_cnt);
+            // 这里可能是先划分了一组面子，余下的牌有多种划分形式
+            // 所以需要复制一份到下一个划分，以免前面的面子信息丢失
+            memcpy(separation->sets[separation->count + 1], sets, 5 * sizeof(SET));
+            ++separation->count;
         }
         return true;
     }
     return false;
 }
 
-static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SET (*output_sets)[5], long *separation_cnt) {
+static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SEPERATIONS *separation) {
     if (tile_cnt < 3) {
-        return seperate_2(tiles, tile_cnt, fixed_set_cnt, output_sets, separation_cnt);
+        return seperate_2(tiles, tile_cnt, fixed_set_cnt, separation);
     }
 
     bool ret = false;
@@ -71,9 +76,10 @@ static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SET
 
                 if (is_concealed_set_completed(tile_i, tile_j, tile_k)) {
                     long current = (14 - tile_cnt) / 3;
-                    output_sets[*separation_cnt][current].is_melded = false;
-                    output_sets[*separation_cnt][current].mid_tile = tile_j;
-                    output_sets[*separation_cnt][current].set_type = (tile_i == tile_j) ? SET_TYPE::PUNG : SET_TYPE::CHOW;
+                    SET (&sets)[5] = separation->sets[separation->count];  // 直接在count下标处写
+                    sets[current].is_melded = false;
+                    sets[current].mid_tile = tile_j;
+                    sets[current].set_type = (tile_i == tile_j) ? SET_TYPE::PUNG : SET_TYPE::CHOW;
 
                     // 削减面子
                     TILE remains[14];
@@ -84,8 +90,8 @@ static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_set_cnt, SET
                         remains[c++] = tiles[n];
                     }
                     // 递归剩下的牌
-                    if (seperate_N(remains, tile_cnt - 3, fixed_set_cnt, output_sets, separation_cnt)) {
-                        ret = true;
+                    if (seperate_N(remains, tile_cnt - 3, fixed_set_cnt, separation)) {
+                        ret = true;  // 划分成功
                     }
                 }
 
@@ -2223,27 +2229,26 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_t
     long fixed_cnt = hand_tiles->set_count;
     long standing_cnt = hand_tiles->tile_count;
 
-    TILE _standing_tiles[14];
-    SET _separation_sets[MAX_SEPARAION_CNT][5];
-    long _separation_cnt;
+    TILE standing_tiles[14];
+    SEPERATIONS separation;
 
     // 合并得到14张牌
-    memcpy(_standing_tiles, hand_tiles->standing_tiles, sizeof(TILE) * standing_cnt);
-    _standing_tiles[standing_cnt] = win_tile;
-    sort_tiles(_standing_tiles, standing_cnt + 1);
+    memcpy(standing_tiles, hand_tiles->standing_tiles, sizeof(TILE) * standing_cnt);
+    standing_tiles[standing_cnt] = win_tile;
+    sort_tiles(standing_tiles, standing_cnt + 1);
 
-    memcpy(_separation_sets[0], hand_tiles->fixed_sets, fixed_cnt * sizeof(SET));
-    for (long i = 0; i < fixed_cnt; ++i) {
+    // 预先在0处写入副露的面子
+    separation.count = 0;
+    memcpy(separation.sets[0], hand_tiles->fixed_sets, fixed_cnt * sizeof(SET));
+    for (long i = 0; i < fixed_cnt; ++i) {  // 将不是暗杠的，都标记为明的（明顺、明刻、明杠)
         if (hand_tiles->fixed_sets[i].set_type != SET_TYPE::KONG) {
-            _separation_sets[0][i].is_melded = true;
+            separation.sets[0][i].is_melded = true;
         }
     }
+    seperate_N(standing_tiles, standing_cnt + 1, fixed_cnt, &separation);
 
-    _separation_cnt = 0;
-    seperate_N(_standing_tiles, standing_cnt + 1, fixed_cnt, _separation_sets, &_separation_cnt);
-
-    for (long i = 0; i < _separation_cnt; ++i) {
-        std::sort(&_separation_sets[i][fixed_cnt], &_separation_sets[i][4], &set_cmp);
+    for (long i = 0; i < separation.count; ++i) {
+        std::sort(&separation.sets[i][fixed_cnt], &separation.sets[i][4], &set_cmp);
     }
 
     long points_tables[MAX_SEPARAION_CNT][POINT_TYPE_COUNT] = { { 0 } };
@@ -2251,62 +2256,62 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_t
     long max_idx = -1;
 
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_points(_separation_sets[_separation_cnt][0], _standing_tiles, 14,
-            win_tile, win_type, prevalent_wind, seat_wind, points_tables[_separation_cnt])) {
-            int current_points = get_points_by_table(points_tables[_separation_cnt]);
+        if (calculate_knitted_straight_in_basic_type_points(separation.sets[separation.count][0], standing_tiles, 14,
+            win_tile, win_type, prevalent_wind, seat_wind, points_tables[separation.count])) {
+            int current_points = get_points_by_table(points_tables[separation.count]);
             if (current_points > max_points) {
                 max_points = current_points;
-                max_idx = _separation_cnt;
+                max_idx = separation.count;
             }
             LOG("points = %d\n\n", current_points);
         }
-        else if (calculate_special_type_points(_standing_tiles, win_type, points_tables[_separation_cnt])) {
-            int current_points = get_points_by_table(points_tables[_separation_cnt]);
+        else if (calculate_special_type_points(standing_tiles, win_type, points_tables[separation.count])) {
+            int current_points = get_points_by_table(points_tables[separation.count]);
             if (current_points > max_points) {
                 max_points = current_points;
-                max_idx = _separation_cnt;
+                max_idx = separation.count;
             }
             LOG("points = %d\n\n", current_points);
-            if (points_tables[_separation_cnt][SEVEN_SHIFTED_PAIRS]) {
-                _separation_cnt = 0;
+            if (points_tables[separation.count][SEVEN_SHIFTED_PAIRS]) {
+                separation.count = 0;
             }
         }
     }
-    else if (fixed_cnt == 1 && _separation_cnt == 0) {
+    else if (fixed_cnt == 1 && separation.count == 0) {
         // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_points(_separation_sets[0][0], _standing_tiles, 11,
+        if (calculate_knitted_straight_in_basic_type_points(separation.sets[0][0], standing_tiles, 11,
             win_tile, win_type, prevalent_wind, seat_wind, points_tables[0])) {
             int current_points = get_points_by_table(points_tables[0]);
             if (current_points > max_points) {
                 max_points = current_points;
-                max_idx = _separation_cnt;
+                max_idx = separation.count;
             }
             LOG("points = %d\n\n", current_points);
         }
     }
 
     // 遍历各种划分方式，分别算番，找出最大的番的划分方式
-    for (long i = 0; i < _separation_cnt; ++i) {
+    for (long i = 0; i < separation.count; ++i) {
 #if 0  // Debug
         for (int j = 0; j < 5; ++j) {
             //printf("[%d %s %x]", _separation_sets[i][j].is_melded,
             //    set_type_name[(int)_separation_sets[i][j].set_type], _separation_sets[i][j].mid_tile);
-            TILE mid_tile = _separation_sets[i][j].mid_tile;
-            switch (_separation_sets[i][j].set_type) {
+            TILE mid_tile = separation.sets[i][j].mid_tile;
+            switch (separation.sets[i][j].set_type) {
             case SET_TYPE::CHOW:
-                printf(_separation_sets[i][j].is_melded ? "[%s%s%s]" : "{%s%s%s}",
+                printf(separation.sets[i][j].is_melded ? "[%s%s%s]" : "{%s%s%s}",
                     stringify_table[mid_tile - 1], stringify_table[mid_tile], stringify_table[mid_tile + 1]);
                 break;
             case SET_TYPE::PUNG:
-                printf(_separation_sets[i][j].is_melded ? "[%s%s%s]" : "{%s%s%s}",
+                printf(separation.sets[i][j].is_melded ? "[%s%s%s]" : "{%s%s%s}",
                     stringify_table[mid_tile], stringify_table[mid_tile], stringify_table[mid_tile]);
                 break;
             case SET_TYPE::KONG:
-                printf(_separation_sets[i][j].is_melded ? "[%s%s%s%s]" : "{%s%s%s%s}",
+                printf(separation.sets[i][j].is_melded ? "[%s%s%s%s]" : "{%s%s%s%s}",
                     stringify_table[mid_tile], stringify_table[mid_tile], stringify_table[mid_tile], stringify_table[mid_tile]);
                 break;
             case SET_TYPE::PAIR:
-                printf(_separation_sets[i][j].is_melded ? "[%s%s]" : "{%s%s}",
+                printf(separation.sets[i][j].is_melded ? "[%s%s]" : "{%s%s}",
                     stringify_table[mid_tile], stringify_table[mid_tile]);
                 break;
             default:
@@ -2315,7 +2320,7 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_t
         }
         puts("");
 #endif
-        calculate_basic_type_points(_separation_sets[i], fixed_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_tables[i]);
+        calculate_basic_type_points(separation.sets[i], fixed_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_tables[i]);
         int current_points = get_points_by_table(points_tables[i]);
         if (current_points > max_points) {
             max_points = current_points;
