@@ -11,6 +11,14 @@
 #define LOG(...) do { } while (0)
 #endif
 
+#ifndef UINT8_C
+#define UINT8_C(x)   (x)
+#endif
+
+#ifndef UINT16_C
+#define UINT16_C(x)  (x)
+#endif
+
 //#define STRICT_98_RULE
 
 namespace mahjong {
@@ -325,6 +333,32 @@ static POINT_TYPE get_2_chows_points(TILE t0, TILE t1) {
     return NONE;
 }
 
+// 大四喜
+static bool is_big_four_winds(TILE t0, TILE t1, TILE t2, TILE t3) {
+    return (is_winds(t0) && is_winds(t1) && is_winds(t2) && is_winds(t3));
+}
+
+// 大三元
+static bool is_big_three_dragons(TILE t0, TILE t1, TILE t2) {
+    return (is_dragons(t0) && is_dragons(t1) && is_dragons(t2));
+}
+
+// 三风刻
+static bool is_big_three_winds(TILE t0, TILE t1, TILE t2) {
+    return (is_winds(t0) && is_winds(t1) && is_winds(t2));
+}
+
+// 双箭刻
+static bool is_two_dragons_pungs(TILE t0, TILE t1) {
+    return (is_winds(t0) && is_winds(t1));
+}
+
+// 双同刻
+static bool is_double_pung(TILE t0, TILE t1) {
+    return (is_numbered_suit_quick(t0) && is_numbered_suit_quick(t1)
+        && is_rank_equal_quick(t0, t1));
+}
+
 // 4组刻子的番
 static POINT_TYPE get_4_pungs_points(TILE t0, TILE t1, TILE t2, TILE t3) {
     // 一色四节高
@@ -332,7 +366,7 @@ static POINT_TYPE get_4_pungs_points(TILE t0, TILE t1, TILE t2, TILE t3) {
         return FOUR_PURE_SHIFTED_PUNGS;
     }
     // 大四喜
-    if (is_winds(t0) && is_winds(t1) && is_winds(t2) && is_winds(t3)) {
+    if (is_big_four_winds(t0, t1, t2, t3)) {
         return BIG_FOUR_WINDS;
     }
     // 以上都没有
@@ -354,11 +388,11 @@ static POINT_TYPE get_3_pungs_points(TILE t0, TILE t1, TILE t2) {
         return TRIPLE_PUNG;
     }
     // 三风刻
-    if (is_winds(t0) && is_winds(t1) && is_winds(t2)) {
+    if (is_big_three_winds(t0, t1, t2)) {
         return BIG_THREE_WINDS;
     }
     // 大三元
-    if (is_dragons(t0) && is_dragons(t1) && is_dragons(t2)) {
+    if (is_big_three_dragons(t0, t1, t2)) {
         return BIG_THREE_DRAGONS;
     }
     // 以上都没有
@@ -368,12 +402,11 @@ static POINT_TYPE get_3_pungs_points(TILE t0, TILE t1, TILE t2) {
 // 2组刻子的番
 static POINT_TYPE get_2_pungs_points(TILE t0, TILE t1) {
     // 双同刻
-    if (is_numbered_suit_quick(t0) && is_numbered_suit_quick(t1)
-        && is_rank_equal_quick(t0, t1)) {
+    if (is_double_pung(t0, t1)) {
         return DOUBLE_PUNG;
     }
     // 双箭刻
-    if (is_dragons(t0) && is_dragons(t1)) {
+    if (is_two_dragons_pungs(t0, t1)) {
         return TWO_DRAGONS_PUNGS;
     }
     // 以上都没有
@@ -972,14 +1005,6 @@ static void check_pair_tile(TILE pair_tile, long chow_cnt, long (&points_table)[
         return;
     }
 }
-
-#ifndef UINT8_C
-#define UINT8_C(x)   (x)
-#endif
-
-#ifndef UINT16_C
-#define UINT16_C(x)  (x)
-#endif
 
 // 检测门（五门齐的门）
 static void check_tiles_suits(const TILE *tiles, long tile_cnt, long (&points_table)[POINT_TYPE_COUNT]) {
