@@ -59,6 +59,10 @@ static const TILE standard_nine_gates[3][13] = {
     { 0x31, 0x31, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x39, 0x39 }
 };
 
+int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt);
+int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt);
+int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing_cnt);
+
 template <class _InputIterator1, class _InputIterator2, class _OutputIterator>
 _OutputIterator copy_exclude(_InputIterator1 src_first, _InputIterator1 src_last,
     _InputIterator2 fliter_first, _InputIterator2 fliter_last, _OutputIterator dest) {

@@ -122,9 +122,7 @@ static bool is_basic_type_N_wait(const TILE *standing_tiles, bool (&waiting_tabl
                     // 削减面子
                     TILE remains[_Count - 3];
                     for (long n = 0, c = 0; n < _Count; ++n) {
-                        if (n == i || n == j || n == k) {
-                            continue;
-                        }
+                        if (n == i || n == j || n == k) continue;
                         remains[c++] = standing_tiles[n];
                     }
                     // 递归
@@ -132,13 +130,10 @@ static bool is_basic_type_N_wait(const TILE *standing_tiles, bool (&waiting_tabl
                         ret = true;
                     }
                 }
-
                 do ++k; while (k < _Count && standing_tiles[k] == tile_k);  // 快速跳过相同的case
             }
-
             do ++j; while (j < _Count && standing_tiles[j] == tile_j);  // 快速跳过相同的case
         }
-
         do ++i; while (i < _Count && standing_tiles[i] == tile_i);  // 快速跳过相同的case
     }
 
@@ -376,6 +371,94 @@ bool is_honors_and_knitted_tiles_win(const TILE (&standing_tiles)[13], TILE test
         return (std::find(std::begin(waiting), std::end(waiting), test_tile) != std::end(waiting));
     }
     return false;
+}
+
+int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt) {
+    if (standing_tiles == nullptr || standing_cnt != 13) {
+        return INT_MAX;
+    }
+
+    // 对牌的种类进行打表，并统计对子数
+    int pair_cnt = 0;
+    int cnt_table[0x54] = { 0 };
+    for (long i = 0; i < standing_cnt; ++i) {
+        TILE tile = standing_tiles[i];
+        ++cnt_table[tile];
+        if (cnt_table[tile] == 2) {
+            ++pair_cnt;
+            cnt_table[tile] = 0;
+        }
+    }
+
+    return 6 - pair_cnt;
+}
+
+int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt) {
+    if (standing_tiles == nullptr || standing_cnt != 13) {
+        return INT_MAX;
+    }
+
+    // 对牌的种类进行打表
+    int cnt_table[0x54] = { 0 };
+    for (long i = 0; i < standing_cnt; ++i) {
+        ++cnt_table[standing_tiles[i]];
+    }
+
+    bool has_pair = false;
+    int cnt = 0;
+    for (int i = 0; i < 13; ++i) {
+        int n = cnt_table[standard_thirteen_orphans[i]];
+        if (n > 0) {
+            ++cnt;  // 幺九牌的种类
+            if (n > 1) {
+                has_pair = true;  // 幺九牌对子
+            }
+        }
+    }
+
+    // 当有对子时，上听数为：12-幺九牌的种类
+    // 当没有对子时，上听数为：13-幺九牌的种类
+    return (has_pair ? 12 : 13) - cnt;
+}
+
+static int honors_and_knitted_tiles_wait_step_(const TILE *standing_tiles, long standing_cnt, int which_seq) {
+    if (standing_tiles == nullptr || standing_cnt != 13) {
+        return INT_MAX;
+    }
+
+    // 对牌的种类进行打表
+    int cnt_table[0x54] = { 0 };
+    for (long i = 0; i < standing_cnt; ++i) {
+        ++cnt_table[standing_tiles[i]];
+    }
+
+    int cnt = 0;
+
+    // 统计数牌
+    for (int i = 0; i < 9; ++i) {
+        int n = cnt_table[standard_knitted_straight[which_seq][i]];
+        if (n > 0) {
+            ++cnt;
+        }
+    }
+
+    // 统计字牌
+    for (int i = 6; i < 13; ++i) {
+        int n = cnt_table[standard_thirteen_orphans[i]];
+        if (n > 0) {
+            ++cnt;
+        }
+    }
+
+    return 13 - cnt;
+}
+
+int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing_cnt) {
+    int ret = INT_MAX;
+    for (int i = 0; i < 6; ++i) {
+        ret = std::min(ret, honors_and_knitted_tiles_wait_step_(standing_tiles, standing_cnt, i));        
+    }
+    return ret;
 }
 
 }
