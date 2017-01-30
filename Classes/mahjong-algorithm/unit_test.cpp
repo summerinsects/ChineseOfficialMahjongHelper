@@ -91,7 +91,11 @@ void test_points(const char *str, const char *win_str, WIN_TYPE win_type, WIND_T
     long points_table[POINT_TYPE_COUNT] = { 0 };
     puts("----------------");
     printf("%s %s\n", str, win_str);
-    int points = calculate_points(&hand_tiles, win_tile, win_type, prevalent_wind, seat_wind, points_table);
+    mahjong::EXTRA_CONDITION ext_cond;
+    ext_cond.win_type = win_type;
+    ext_cond.prevalent_wind = prevalent_wind;
+    ext_cond.seat_wind = seat_wind;
+    int points = calculate_points(&hand_tiles, win_tile, &ext_cond, points_table);
 
     printf("max points = %d\n\n", points);
     //for (int i = 1; i < FLOWER_TILES; ++i) {

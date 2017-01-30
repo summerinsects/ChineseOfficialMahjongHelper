@@ -1705,8 +1705,8 @@ static bool is_win_tile_in_concealed_chow_sets(const SET *chow_sets, long chow_c
 }
 
 // 基本和型算番
-static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TILE win_tile, WIN_TYPE win_type,
-    WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
+static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TILE win_tile,
+    const EXTRA_CONDITION *ext_cond, long (&points_table)[POINT_TYPE_COUNT]) {
     SET pair_set;
     SET chow_sets[4];
     SET pung_sets[4];
@@ -1733,10 +1733,10 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
         }
     }
 
-    check_win_type(win_type, points_table);
+    check_win_type(ext_cond->win_type, points_table);
 
     // 点和的牌张，如果不能解释为暗顺中的一张，那么将其解释为刻子，并标记这个刻子为明刻
-    if ((win_type & WIN_TYPE_SELF_DRAWN) == 0) {
+    if ((ext_cond->win_type & WIN_TYPE_SELF_DRAWN) == 0) {
         if (!is_win_tile_in_concealed_chow_sets(chow_sets, chow_cnt, win_tile)) {
             for (long i = 0; i < pung_cnt; ++i) {
                 if (pung_sets[i].mid_tile == win_tile && !pung_sets[i].is_melded) {
@@ -1778,7 +1778,7 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
     }
 
     // 检测不求人、全求人
-    check_melded_or_concealed_hand(sets, fixed_cnt, win_type & WIN_TYPE_SELF_DRAWN, points_table);
+    check_melded_or_concealed_hand(sets, fixed_cnt, ext_cond->win_type & WIN_TYPE_SELF_DRAWN, points_table);
     // 检测将，确定平和、小三元、小四喜
     check_pair_tile(pair_set.mid_tile, chow_cnt, points_table);
     // 检测全带幺、全带五、全双刻
@@ -1797,11 +1797,11 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
 
     // 检测圈风刻、门风刻
     for (int i = 0; i < 5; ++i) {
-        check_wind_pungs(sets[i], prevalent_wind, seat_wind, points_table);
+        check_wind_pungs(sets[i], ext_cond->prevalent_wind, ext_cond->seat_wind, points_table);
     }
 
     // 统一校正一些不计的
-    correction_points_table(points_table, prevalent_wind == seat_wind);
+    correction_points_table(points_table, ext_cond->prevalent_wind == ext_cond->seat_wind);
 
     // 如果什么番都没有，则计为无番和
     if (std::all_of(std::begin(points_table), std::end(points_table), [](long p) { return p == 0; })) {
@@ -1893,7 +1893,7 @@ static bool calculate_special_type_points(const TILE (&standing_tiles)[14], WIN_
 
 // “组合龙+面子+将”和型算番
 static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, const TILE *standing_tiles, long standing_cnt,
-    TILE win_tile, WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
+    TILE win_tile, const EXTRA_CONDITION *ext_cond, long (&points_table)[POINT_TYPE_COUNT]) {
     assert(standing_cnt == 14 || standing_cnt == 11);
     const TILE *matched_seq = nullptr;
     for (int i = 0; i < 6; ++i) {
@@ -1968,10 +1968,10 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
         calculate_1_pung(fourth_set, points_table);
     }
 
-    check_win_type(win_type, points_table);
+    check_win_type(ext_cond->win_type, points_table);
     // 暗杠不影响门前清
     if (remain_cnt == 5 || (fourth_set.set_type == SET_TYPE::KONG && !fourth_set.is_melded)) {
-        if (win_type & WIN_TYPE_SELF_DRAWN) {
+        if (ext_cond->win_type & WIN_TYPE_SELF_DRAWN) {
             points_table[FULLY_CONCEALED_HAND] = 1;
         }
         else {
@@ -2014,9 +2014,9 @@ static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, con
     }
 
     // 检测圈风刻、门风刻
-    check_wind_pungs(fourth_set, prevalent_wind, seat_wind, points_table);
+    check_wind_pungs(fourth_set, ext_cond->prevalent_wind, ext_cond->seat_wind, points_table);
     // 统一校正一些不计的
-    correction_points_table(points_table, prevalent_wind == seat_wind);
+    correction_points_table(points_table, ext_cond->prevalent_wind == ext_cond->seat_wind);
     return true;
 }
 
@@ -2298,9 +2298,7 @@ int check_calculator_input(const HAND_TILES *hand_tiles, TILE win_tile) {
     return 0;
 }
 
-int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_type,
-    WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]) {
-
+int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, const EXTRA_CONDITION *ext_cond, long (&points_table)[POINT_TYPE_COUNT]) {
     if (int ret = check_calculator_input(hand_tiles, win_tile)) {
         return ret;
     }
@@ -2328,7 +2326,7 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_t
 
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
         if (calculate_knitted_straight_in_basic_type_points(separation.sets[separation.count][0], standing_tiles, 14,
-            win_tile, win_type, prevalent_wind, seat_wind, points_tables[separation.count])) {
+            win_tile, ext_cond, points_tables[separation.count])) {
             int current_points = get_points_by_table(points_tables[separation.count]);
             if (current_points > max_points) {
                 max_points = current_points;
@@ -2336,7 +2334,7 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_t
             }
             LOG("points = %d\n\n", current_points);
         }
-        else if (calculate_special_type_points(standing_tiles, win_type, points_tables[separation.count])) {
+        else if (calculate_special_type_points(standing_tiles, ext_cond->win_type, points_tables[separation.count])) {
             int current_points = get_points_by_table(points_tables[separation.count]);
             if (current_points > max_points) {
                 max_points = current_points;
@@ -2351,7 +2349,7 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_t
     else if (fixed_cnt == 1 && separation.count == 0) {
         // 1副露状态，有可能是基本和型组合龙
         if (calculate_knitted_straight_in_basic_type_points(separation.sets[0][0], standing_tiles, 11,
-            win_tile, win_type, prevalent_wind, seat_wind, points_tables[0])) {
+            win_tile, ext_cond, points_tables[0])) {
             int current_points = get_points_by_table(points_tables[0]);
             if (current_points > max_points) {
                 max_points = current_points;
@@ -2391,7 +2389,7 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_t
         }
         puts("");
 #endif
-        calculate_basic_type_points(separation.sets[i], fixed_cnt, win_tile, win_type, prevalent_wind, seat_wind, points_tables[i]);
+        calculate_basic_type_points(separation.sets[i], fixed_cnt, win_tile, ext_cond, points_tables[i]);
         int current_points = get_points_by_table(points_tables[i]);
         if (current_points > max_points) {
             max_points = current_points;

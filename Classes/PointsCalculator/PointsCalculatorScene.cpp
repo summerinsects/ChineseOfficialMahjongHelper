@@ -551,7 +551,11 @@ void PointsCalculatorScene::calculate() {
     mahjong::WIND_TYPE seat_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + _seatWindGroup->getSelectedButtonIndex());
 
     // 算番
-    int points = calculate_points(&hand_tiles, win_tile, win_type, prevalent_wind, seat_wind, points_table);
+    mahjong::EXTRA_CONDITION ext_cond;
+    ext_cond.win_type = win_type;
+    ext_cond.prevalent_wind = prevalent_wind;
+    ext_cond.seat_wind = seat_wind;
+    int points = calculate_points(&hand_tiles, win_tile, &ext_cond, points_table);
 
     Color3B textColor = UserDefault::getInstance()->getBoolForKey("night_mode") ? Color3B::WHITE : Color3B::BLACK;
     if (points == ERROR_NOT_WIN) {

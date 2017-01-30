@@ -106,8 +106,13 @@ size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, TILE w
 
 int check_calculator_input(const HAND_TILES *hand_tiles, TILE win_tile);
 
-int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile,
-    WIN_TYPE win_type, WIND_TYPE prevalent_wind, WIND_TYPE seat_wind, long (&points_table)[POINT_TYPE_COUNT]);
+struct EXTRA_CONDITION {
+    WIN_TYPE win_type;
+    WIND_TYPE prevalent_wind;
+    WIND_TYPE seat_wind;
+};
+
+int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, const EXTRA_CONDITION *ext_cond, long (&points_table)[POINT_TYPE_COUNT]);
 
 #if 0
 
