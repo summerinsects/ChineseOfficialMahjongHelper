@@ -42,7 +42,7 @@
     <ClCompile Include="..\Classes\mahjong-algorithm\points_calculator.cpp">
       <Filter>src\mahjong-algorithm</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\mahjong-algorithm\wait_and_win_test.cpp">
+    <ClCompile Include="..\Classes\mahjong-algorithm\wait_and_win.cpp">
       <Filter>src\mahjong-algorithm</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\PointsCalculator\PointsCalculatorScene.cpp">
@@ -95,7 +95,7 @@
     <ClInclude Include="..\Classes\mahjong-algorithm\points_calculator.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\mahjong-algorithm\wait_and_win_test.h">
+    <ClInclude Include="..\Classes\mahjong-algorithm\wait_and_win.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\PointsCalculator\PointsCalculatorScene.h">

@@ -25,8 +25,8 @@
 		1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */; };
 		1FDD94431C8337140031BC38 /* points_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* points_calculator.cpp */; };
 		1FDD94441C8337140031BC38 /* points_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* points_calculator.cpp */; };
-		1FDD94451C8337140031BC38 /* wait_and_win_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */; };
-		1FDD94461C8337140031BC38 /* wait_and_win_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */; };
+		1FDD94451C8337140031BC38 /* wait_and_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win.cpp */; };
+		1FDD94461C8337140031BC38 /* wait_and_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win.cpp */; };
 		1FDD950E1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
 		1FDD950F1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
 		1FE04ADE1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04AD71C94682A008401EA /* PointsCalculatorScene.cpp */; };
@@ -166,8 +166,8 @@
 		1FDD943C1C8337140031BC38 /* points_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = points_calculator.cpp; sourceTree = "<group>"; };
 		1FDD943D1C8337140031BC38 /* points_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = points_calculator.h; sourceTree = "<group>"; };
 		1FDD943E1C8337140031BC38 /* tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tile.h; sourceTree = "<group>"; };
-		1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wait_and_win_test.cpp; sourceTree = "<group>"; };
-		1FDD94401C8337140031BC38 /* wait_and_win_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wait_and_win_test.h; sourceTree = "<group>"; };
+		1FDD943F1C8337140031BC38 /* wait_and_win.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wait_and_win.cpp; sourceTree = "<group>"; };
+		1FDD94401C8337140031BC38 /* wait_and_win.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wait_and_win.h; sourceTree = "<group>"; };
 		1FDD950D1C8338700031BC38 /* source_material */ = {isa = PBXFileReference; lastKnownFileType = folder; path = source_material; sourceTree = "<group>"; };
 		1FE04AD71C94682A008401EA /* PointsCalculatorScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointsCalculatorScene.cpp; sourceTree = "<group>"; };
 		1FE04AD81C94682A008401EA /* PointsCalculatorScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointsCalculatorScene.h; sourceTree = "<group>"; };
@@ -332,8 +332,8 @@
 				1FDD943C1C8337140031BC38 /* points_calculator.cpp */,
 				1FDD943D1C8337140031BC38 /* points_calculator.h */,
 				1FDD943E1C8337140031BC38 /* tile.h */,
-				1FDD943F1C8337140031BC38 /* wait_and_win_test.cpp */,
-				1FDD94401C8337140031BC38 /* wait_and_win_test.h */,
+				1FDD943F1C8337140031BC38 /* wait_and_win.cpp */,
+				1FDD94401C8337140031BC38 /* wait_and_win.h */,
 			);
 			path = "mahjong-algorithm";
 			sourceTree = "<group>";
@@ -674,7 +674,7 @@
 				1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
 				1F2D25871E076FC20071ADE2 /* AlertLayer.cpp in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
-				1FDD94451C8337140031BC38 /* wait_and_win_test.cpp in Sources */,
+				1FDD94451C8337140031BC38 /* wait_and_win.cpp in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				1F4192741E10A10200CDC47D /* CWTableView.cpp in Sources */,
@@ -704,7 +704,7 @@
 				1FE04ADF1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */,
 				1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				46880B8B19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
-				1FDD94461C8337140031BC38 /* wait_and_win_test.cpp in Sources */,
+				1FDD94461C8337140031BC38 /* wait_and_win.cpp in Sources */,
 				1FE04AE11C94682A008401EA /* RecordScene.cpp in Sources */,
 				1FE5CFDE1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
 				1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */,
