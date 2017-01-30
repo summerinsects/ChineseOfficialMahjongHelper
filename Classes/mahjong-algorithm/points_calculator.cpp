@@ -1276,52 +1276,35 @@ static void check_tiles_hog(const TILE *tiles, long tile_cnt, long (&points_tabl
 
 // 检测边坎钓
 static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cnt, TILE win_tile, long (&points_table)[POINT_TYPE_COUNT]) {
+    // 全求人不计单钓将，也不可能有边张坎张
+    if (points_table[MELDED_HAND]) {
+        return;
+    }
+
     // 恢复成一张一张的牌
     TILE standing_tiles[14];
-    long concealed_tile_cnt;
-    recovery_tiles_from_sets(concealed_sets, set_cnt, standing_tiles, &concealed_tile_cnt);
-    sort_tiles(standing_tiles, concealed_tile_cnt);
-    copy_exclude(standing_tiles, standing_tiles + concealed_tile_cnt, &win_tile, (&win_tile) + 1, standing_tiles);
+    long tile_cnt;
+    recovery_tiles_from_sets(concealed_sets, set_cnt, standing_tiles, &tile_cnt);
+    sort_tiles(standing_tiles, tile_cnt);
+    copy_exclude(standing_tiles, standing_tiles + tile_cnt, &win_tile, (&win_tile) + 1, standing_tiles);
 
-    bool waiting_table[6][10] = { { 0 } };
-    long waiting_cnt = 0;
-    TILE waiting_seven_pairs = 0;
+    bool waiting_table[0x54] = { 0 };
+    is_basic_type_wait(standing_tiles, tile_cnt - 1, waiting_table);
 
-    switch (set_cnt) {  // 暗组数
-    case 5:  // 13张手牌基本和型听牌
-        is_basic_type_13_wait(standing_tiles, waiting_table);
+    if (set_cnt == 5) {
         // 判断是否为七对听牌
-        if (is_seven_pairs_wait((const TILE (&)[13])standing_tiles, &waiting_seven_pairs)) {
-            waiting_table[tile_suit(waiting_seven_pairs)][tile_rank(waiting_seven_pairs)] = true;
+        bool temp_table[0x54] = { 0 };
+        if (is_seven_pairs_wait(standing_tiles, tile_cnt - 1, temp_table)) {
+            std::transform(std::begin(temp_table), std::end(temp_table), std::begin(waiting_table),
+                std::begin(waiting_table), [](bool w, bool t) { return w || t; });
         }
-        break;
-    case 4:  // 10张手牌基本和型听牌
-        is_basic_type_10_wait(standing_tiles, waiting_table);
-        break;
-    case 3:  // 7张手牌基本和型听牌
-        is_basic_type_7_wait(standing_tiles, waiting_table);
-        break;
-    case 2:  // 4张手牌基本和型听牌
-        is_basic_type_4_wait(standing_tiles, waiting_table);
-        break;
-    case 1:  // 1张手牌基本和型听牌
-        waiting_table[tile_suit(win_tile)][tile_rank(win_tile)] = true;
-        break;
-    default:
-        break;
     }
 
     // 统计听牌张数
-    for (int i = 1; i < 6; ++i) {
-        for (int j = 1; j < 10; ++j) {
-            if (waiting_table[i][j]) {
-                ++waiting_cnt;
-            }
-        }
-    }
+    long waiting_cnt = std::count(std::begin(waiting_table), std::end(waiting_table), true);
 
-    // 听牌数大于1张，或者是全求人，不计边坎钓
-    if (waiting_cnt != 1 || points_table[MELDED_HAND]) {
+    // 听牌数大于1张，不计边坎钓
+    if (waiting_cnt != 1) {
         return;
     }
 

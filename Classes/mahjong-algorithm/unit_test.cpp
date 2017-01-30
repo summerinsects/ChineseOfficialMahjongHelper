@@ -15,57 +15,33 @@ void test_wait(const char *str) {
     std::cout << "----------------" << std::endl;
     puts(str);
     bool is_wait = false;
-    bool is_special = false;
+    bool table[0x54] = { false };
+
     if (tile_cnt == 13) {
-        TILE waiting[13];
-        unsigned waiting_cnt;
-        if (is_thirteen_orphans_wait(tiles, waiting, &waiting_cnt)) {
+        if (is_thirteen_orphans_wait(tiles, tile_cnt, table)) {
             is_wait = true;
-            is_special = true;
             puts("thirteen orphans wait:");
-            for (unsigned i = 0; i < waiting_cnt; ++i) {
-                printf("%s ", stringify_table[waiting[i]]);
-            }
-            puts("");
         }
-        else if (is_honors_and_knitted_tiles_wait(tiles, waiting)) {
+        else if (is_honors_and_knitted_tiles_wait(tiles, tile_cnt, table)) {
             is_wait = true;
-            is_special = true;
             puts("honors and knitted tiles wait:");
-            for (unsigned i = 0; i < 3; ++i) {
-                printf("%s ", stringify_table[waiting[i]]);
-            }
-            puts("");
         }
-        else if (is_seven_pairs_wait(tiles, waiting)) {
+        else if (is_seven_pairs_wait(tiles, tile_cnt, table)) {
             is_wait = true;
-            printf("seven pairs wait:\n%s\n", stringify_table[waiting[0]]);
+            printf("seven pairs wait:");
         }
     }
 
-    if (!is_special) {
-        bool (*fn)(const TILE *, bool (&)[6][10]);
-        switch (tile_cnt) {
-        case 13: fn = &is_basic_type_13_wait; break;
-        case 10: fn = &is_basic_type_10_wait; break;
-        case 7: fn = &is_basic_type_7_wait; break;
-        case 4: fn = &is_basic_type_4_wait; break;
-        case 1: fn = &is_basic_type_1_wait; break;
-        default: assert(0); break;
-        }
-
-        bool table[6][10] = { { false } };
-        if ((*fn)(tiles, table)) {
-            is_wait = true;
-            puts("basic type wait:");
-            for (unsigned i = 1; i < 6; ++i) {
-                for (unsigned j = 1; j < 10; ++j)
-                    if (table[i][j])
-                        printf("%s ", stringify_table[make_tile(i, j)]);
-            }
-            puts("");
-        }
+    if (is_basic_type_wait(tiles, tile_cnt, table)) {
+        is_wait = true;
+        puts("basic type wait:");
     }
+
+    for (TILE t = 0x11; t < 0x54; ++t) {
+        if (table[t])
+            printf("%s ", stringify_table[t]);
+    }
+    puts("");
 
     if (!is_wait) {
         puts("not wait!");
