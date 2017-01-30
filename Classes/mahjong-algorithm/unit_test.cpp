@@ -1,5 +1,5 @@
 ﻿#include "tile.h"
-#include "wait_and_win_test.h"
+#include "wait_and_win.h"
 #include "points_calculator.h"
 
 #include <iostream>
@@ -419,5 +419,5 @@ int main(int argc, const char *argv[]) {
     return 0;
 }
 
-#include "wait_and_win_test.cpp"
+#include "wait_and_win.cpp"
 #include "points_calculator.cpp"
