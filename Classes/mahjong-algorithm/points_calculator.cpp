@@ -949,19 +949,21 @@ static void calculate_1_pung(const SET &pung_set, long (&points_table)[POINT_TYP
 }
 
 // 九莲宝灯
-static bool is_nine_gates(const TILE tiles[14], TILE win_tile) {
-    // 选去除和牌张
-    TILE standing_tiles[13];
-    copy_exclude(tiles, tiles + 14, &win_tile, (&win_tile) + 1, standing_tiles);
-    sort_tiles(standing_tiles, 13);
-
-    // 与标准九莲宝灯比较
-    switch (standing_tiles[0]) {
-    case 0x11: return (memcmp(standing_tiles, standard_nine_gates[0], sizeof(standing_tiles)) == 0);
-    case 0x21: return (memcmp(standing_tiles, standard_nine_gates[1], sizeof(standing_tiles)) == 0);
-    case 0x31: return (memcmp(standing_tiles, standard_nine_gates[2], sizeof(standing_tiles)) == 0);
-    default: return false;
+static bool is_nine_gates(const TILE (&tiles)[14], TILE win_tile) {
+    // 对立牌的种类进行打表
+    int cnt_table[0x54] = { 0 };
+    for (long i = 0; i < 14; ++i) {
+        ++cnt_table[tiles[i]];
     }
+    // 去除和牌张
+    --cnt_table[win_tile];
+
+    // 1、9各三枚，2~8各一枚
+#define IS_NINE_GATES(s_) \
+    (cnt_table[0x ## s_ ## 1] == 3 && cnt_table[0x ## s_ ## 9] == 3 \
+    && std::all_of(cnt_table + 0x ## s_ ## 2, cnt_table + 0x ## s_ ## 9, [](int n) { return n == 1; }))
+    return IS_NINE_GATES(1) || IS_NINE_GATES(2) || IS_NINE_GATES(3);
+#undef IS_NINE_GATES
 }
 
 // 一色双龙会
@@ -1728,7 +1730,7 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
 
     // 九莲宝灯
     if (fixed_cnt == 0 && tile_cnt == 14) {
-        if (is_nine_gates(tiles, win_tile)) {
+        if (is_nine_gates((const TILE (&)[14])tiles, win_tile)) {
             points_table[NINE_GATES] = 1;
         }
     }
