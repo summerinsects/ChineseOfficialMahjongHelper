@@ -1809,6 +1809,103 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
     }
 }
 
+// “组合龙+面子+将”和型算番
+static bool calculate_knitted_straight_in_basic_type_points(const HAND_TILES *hand_tiles,
+    TILE win_tile, const EXTRA_CONDITION *ext_cond, long (&points_table)[POINT_TYPE_COUNT]) {
+    long fixed_cnt = hand_tiles->set_count;
+    if (fixed_cnt > 1) {
+        return false;
+    }
+
+    const SET *fixed_sets = hand_tiles->fixed_sets;
+    long standing_cnt = hand_tiles->tile_count;
+
+    // 对立牌和和牌的种类进行打表
+    int cnt_table[0x54] = { 0 };
+    for (long i = 0; i < standing_cnt; ++i) {
+        ++cnt_table[hand_tiles->standing_tiles[i]];
+    }
+    ++cnt_table[win_tile];
+
+    // 匹配组合龙
+    const TILE (*matched_seq)[9] = std::find_if(&standard_knitted_straight[0], &standard_knitted_straight[6],
+        [&cnt_table](const TILE (&seq)[9]) {
+        return std::all_of(std::begin(seq), std::end(seq), [&cnt_table](TILE t) { return cnt_table[t] > 0; });
+    });
+
+    if (matched_seq == &standard_knitted_straight[6]) {
+        return false;
+    }
+
+    // 剔除组合龙
+    std::for_each(std::begin(*matched_seq), std::end(*matched_seq), [&cnt_table](TILE t) { --cnt_table[t]; });
+
+    // 按基本和型划分
+    SEPERATIONS separation;
+    separation.count = 0;
+    SET work_sets[5];
+    memset(work_sets, 0, sizeof(work_sets));
+    if (fixed_cnt == 1) {
+        work_sets[3] = fixed_sets[0];  // 无关第4组是明副露，将其放在3处，这样就与门清状态的划分统一了
+    }
+    seperate_recursively(cnt_table, fixed_cnt + 3, 0, work_sets, &separation);
+    if (separation.count != 1) {
+        return false;
+    }
+
+    SET *temp_set = separation.sets[0];
+
+    points_table[KNITTED_STRAIGHT] = 1;  // 组合龙
+    if (temp_set[3].set_type == SET_TYPE::CHOW) {
+        if (is_numbered_suit_quick(temp_set[4].mid_tile)) {
+            points_table[ALL_CHOWS] = 1;  // 第4组是顺子，将是数牌时，为平和
+        }
+    }
+    else {
+        calculate_1_pung(temp_set[3], points_table);
+    }
+
+    check_win_type(ext_cond->win_type, points_table);
+    // 门前清（暗杠不影响）
+    if (fixed_cnt == 0 || (temp_set[3].set_type == SET_TYPE::KONG && !temp_set[3].is_melded)) {
+        if (ext_cond->win_type & WIN_TYPE_SELF_DRAWN) {
+            points_table[FULLY_CONCEALED_HAND] = 1;
+        }
+        else {
+            points_table[CONCEALED_HAND] = 1;
+        }
+    }
+
+    // 还原牌
+    TILE tiles[15];  // 第四组可能为杠，所以最多为15张
+    memcpy(tiles, matched_seq, 9 * sizeof(TILE));  // 组合龙的部分
+    long tile_cnt;
+    recovery_tiles_from_sets(&temp_set[3], 2, tiles + 9, &tile_cnt);  // 一组面子和一对将
+    tile_cnt += 9;
+
+    // 检测门（五门齐的门）
+    check_tiles_suits(tiles, tile_cnt, points_table);
+    // 特性和数牌的范围不用检测了，绝对不可能是有断幺、推不倒、绿一色、字一色、清幺九、混幺九
+    // 检测四归一
+    check_tiles_hog(tiles, tile_cnt, points_table);
+
+    // 和牌张是组合龙范围的牌，不计边坎钓
+    if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](TILE t) { return t == win_tile; })) {
+        if (fixed_cnt == 0) {
+            check_edge_closed_single_wait(temp_set + 3, 2, win_tile, points_table);
+        }
+        else {
+            points_table[SINGLE_WAIT] = 1;
+        }
+    }
+
+    // 检测圈风刻、门风刻
+    check_wind_pungs(temp_set[3], ext_cond->prevalent_wind, ext_cond->seat_wind, points_table);
+    // 统一校正一些不计的
+    correction_points_table(points_table, ext_cond->prevalent_wind == ext_cond->seat_wind);
+    return true;
+}
+
 // 特殊和型算番
 static bool calculate_special_type_points(const TILE (&standing_tiles)[14], WIN_TYPE win_type, long (&points_table)[POINT_TYPE_COUNT]) {
     // 七对
@@ -1888,135 +1985,6 @@ static bool calculate_special_type_points(const TILE (&standing_tiles)[14], WIN_
     // 圈风刻、门风刻没必要检测了，这些特殊和型都没有面子
     // 统一校正一些不计的
     correction_points_table(points_table, false);
-    return true;
-}
-
-// “组合龙+面子+将”和型算番
-static bool calculate_knitted_straight_in_basic_type_points(SET &fourth_set, const TILE *standing_tiles, long standing_cnt,
-    TILE win_tile, const EXTRA_CONDITION *ext_cond, long (&points_table)[POINT_TYPE_COUNT]) {
-    assert(standing_cnt == 14 || standing_cnt == 11);
-    const TILE *matched_seq = nullptr;
-    for (int i = 0; i < 6; ++i) {
-        if (std::includes(standing_tiles, standing_tiles + standing_cnt,
-            std::begin(standard_knitted_straight[i]), std::end(standard_knitted_straight[i]))) {
-            matched_seq = standard_knitted_straight[i];  // 匹配到一个组合龙
-            break;
-        }
-    }
-
-    if (matched_seq == nullptr) {
-        return false;
-    }
-
-    TILE pair_tile = 0;
-
-    // 去掉整个组合龙后，还有5张或者2张牌
-    TILE remains[5];
-    TILE *end = copy_exclude(standing_tiles, standing_tiles + standing_cnt, matched_seq, matched_seq + 9, remains);
-    long remain_cnt = end - remains;
-    if (remain_cnt == 5) {  // 如果第4组面子是手上的，那么手牌去除组合龙后会剩下14-9=5张，这5张包含一组面子和一对将
-        TILE *it = std::adjacent_find(std::begin(remains), std::end(remains));  // 将牌
-        while (it != std::end(remains)) {
-            pair_tile = *it;  // 记录将（平和判断要用到）
-            TILE pair[2] = { pair_tile, pair_tile };
-            TILE temp[3];  // 去除将牌后余下3张
-            copy_exclude(std::begin(remains), std::end(remains), std::begin(pair), std::end(pair), temp);
-
-            if (is_chow(temp[0], temp[1], temp[2])) {  // 去除将牌后余下3张是顺子
-                fourth_set.is_melded = false;
-                fourth_set.mid_tile = temp[1];
-                fourth_set.set_type = SET_TYPE::CHOW;
-                break;
-            }
-            else if (is_pung(temp[0], temp[1], temp[2])) {  // 去除将牌后余下3张是刻子
-                fourth_set.is_melded = false;
-                fourth_set.mid_tile = temp[1];
-                fourth_set.set_type = SET_TYPE::PUNG;
-                break;
-            }
-
-            // 去除将牌后余下3张不能组成面子
-            do ++it; while (it != std::end(remains) && *it == pair_tile);
-            it = std::adjacent_find(it, std::end(remains));
-            pair_tile = 0;
-        }
-        if (pair_tile == 0) {
-            return false;
-        }
-    }
-    else {
-        // 如果第4组面子是吃碰杠的，那么手牌去除组合龙后会剩下11-9=2张，这2张必然是一对将
-        assert(remain_cnt == 2);
-        if (remains[0] != remains[1]) {
-            return false;
-        }
-        pair_tile = remains[0];
-        if (fourth_set.set_type != SET_TYPE::CHOW
-            && fourth_set.set_type != SET_TYPE::PUNG
-            && fourth_set.set_type != SET_TYPE::KONG) {
-            return false;
-        }
-    }
-
-    points_table[KNITTED_STRAIGHT] = 1;  // 组合龙
-    if (fourth_set.set_type == SET_TYPE::CHOW) {
-        if (is_numbered_suit_quick(pair_tile)) {
-            points_table[ALL_CHOWS] = 1;  // 第4组是顺子，将是数牌时，为平和
-        }
-    }
-    else {
-        calculate_1_pung(fourth_set, points_table);
-    }
-
-    check_win_type(ext_cond->win_type, points_table);
-    // 暗杠不影响门前清
-    if (remain_cnt == 5 || (fourth_set.set_type == SET_TYPE::KONG && !fourth_set.is_melded)) {
-        if (ext_cond->win_type & WIN_TYPE_SELF_DRAWN) {
-            points_table[FULLY_CONCEALED_HAND] = 1;
-        }
-        else {
-            points_table[CONCEALED_HAND] = 1;
-        }
-    }
-
-    TILE tiles[15];  // 第四组可能为杠，所以最多为15张
-    long tile_cnt = standing_cnt;
-    memcpy(tiles, standing_tiles, sizeof(TILE) * standing_cnt);
-    if (remain_cnt == 2) {  // 只余下两张的，说明有一组吃碰杠的面子，将这组恢复成牌
-        long temp_cnt;
-        recovery_tiles_from_sets(&fourth_set, 1, tiles + 11, &temp_cnt);
-        tile_cnt += temp_cnt;
-    }
-
-    // 检测门（五门齐的门）
-    check_tiles_suits(tiles, tile_cnt, points_table);
-    // 特性和数牌的范围不用检测了，绝对不可能是有断幺、推不倒、绿一色、字一色、清幺九、混幺九
-    // 检测四归一
-    check_tiles_hog(tiles, tile_cnt, points_table);
-
-    // 和牌张是组合龙范围的牌，不计边坎钓
-    if (std::find(matched_seq, matched_seq + 9, win_tile) == matched_seq + 9) {
-        if (remain_cnt == 5) {
-            SET sets[2];
-            sets[0].is_melded = fourth_set.is_melded;
-            sets[0].set_type = fourth_set.set_type;
-            sets[0].mid_tile = fourth_set.mid_tile;
-            sets[1].is_melded = false;
-            sets[1].set_type = SET_TYPE::PAIR;
-            sets[1].mid_tile = pair_tile;
-
-            check_edge_closed_single_wait(sets, 2, win_tile, points_table);
-        }
-        else {
-            assert(remain_cnt == 2);
-            points_table[SINGLE_WAIT] = 1;
-        }
-    }
-
-    // 检测圈风刻、门风刻
-    check_wind_pungs(fourth_set, ext_cond->prevalent_wind, ext_cond->seat_wind, points_table);
-    // 统一校正一些不计的
-    correction_points_table(points_table, ext_cond->prevalent_wind == ext_cond->seat_wind);
     return true;
 }
 
@@ -2310,7 +2278,7 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, const EXTRA_CO
     SEPERATIONS separation;
 
     // 合并得到14张牌
-    memcpy(standing_tiles, hand_tiles->standing_tiles, sizeof(TILE) * standing_cnt);
+    memcpy(standing_tiles, hand_tiles->standing_tiles, standing_cnt * sizeof(TILE));
     standing_tiles[standing_cnt] = win_tile;
     sort_tiles(standing_tiles, standing_cnt + 1);
 
@@ -2325,7 +2293,7 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, const EXTRA_CO
     long max_idx = -1;
 
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_points(separation.sets[separation.count][0], standing_tiles, 14,
+        if (calculate_knitted_straight_in_basic_type_points(hand_tiles,
             win_tile, ext_cond, points_tables[separation.count])) {
             int current_points = get_points_by_table(points_tables[separation.count]);
             if (current_points > max_points) {
@@ -2348,7 +2316,7 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, const EXTRA_CO
     }
     else if (fixed_cnt == 1 && separation.count == 0) {
         // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_points(separation.sets[0][0], standing_tiles, 11,
+        if (calculate_knitted_straight_in_basic_type_points(hand_tiles,
             win_tile, ext_cond, points_tables[0])) {
             int current_points = get_points_by_table(points_tables[0]);
             if (current_points > max_points) {
