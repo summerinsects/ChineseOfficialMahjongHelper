@@ -23,91 +23,150 @@
 
 namespace mahjong {
 
+static forceinline bool set_cmp(const SET &set1, const SET &set2) {
+    return ((set1.mid_tile < set2.mid_tile)
+        || (set1.mid_tile == set2.mid_tile && set1.set_type < set2.set_type));
+}
+
+static forceinline bool set_eq(const SET &set1, const SET &set2) {
+    return set1.mid_tile == set2.mid_tile && set1.set_type == set2.set_type;
+}
+
 struct SEPERATIONS {
-    SET sets[MAX_SEPARAION_CNT + 1][5];
+    SET sets[MAX_SEPARAION_CNT][5];
     long count;
 };
 
-static bool seperate_2(const TILE *tiles, long tile_cnt, long fixed_cnt, SEPERATIONS *separation) {
-    if (tile_cnt == 2 && tiles[0] == tiles[1]) {  // 划分成功
-        SET (&sets)[5] = separation->sets[separation->count];
-
-        // 这2张作为将
-        sets[4].is_melded = false;
-        sets[4].mid_tile = tiles[0];
-        sets[4].set_type = SET_TYPE::PAIR;
-
-        // 拷贝一份当前的划分出来的面子，并排序暗手的面子
-        SET temp[5];
-        memcpy(temp, sets, 5 * sizeof(SET));
-        std::sort(temp + fixed_cnt, temp + 4, &set_cmp);
-
-        // 检查这种划分是否已经存在了
-        bool has_found = std::any_of(&separation->sets[0], &separation->sets[separation->count],
-            [&temp](const SET (&s)[5]) {
-            return std::equal(std::begin(temp), std::end(temp), s, [](const SET &set1, const SET &set2) {
-                return set1.mid_tile == set2.mid_tile && set1.set_type == set2.set_type;
-            });
-        });
-
-        // 如果不存在，那么得到一种新的划分
-        if (!has_found) {
-            // 这里可能是先划分了一组面子，余下的牌有多种划分形式
-            // 所以需要复制一份到下一个划分，以免前面的面子信息丢失
-            memcpy(separation->sets[separation->count + 1], sets, 5 * sizeof(SET));
-            ++separation->count;
-        }
-        return true;
+static bool seperate_tail(int (&cnt_table)[0x54], long fixed_cnt, SET (&work_sets)[5], SEPERATIONS *separation) {
+    // 找到未使用的牌
+    int *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n > 0; });
+    // 存在且张数等于2
+    if (it == std::end(cnt_table) || *it != 2) {
+        return false;
     }
-    return false;
+    // 还有其他未使用的牌
+    if (std::any_of(it + 1, std::end(cnt_table), [](int n) { return n > 0; })) {
+        return false;
+    }
+
+    // 这2张作为将
+    work_sets[4].is_melded = false;
+    work_sets[4].mid_tile = static_cast<TILE>(it - std::begin(cnt_table));
+    work_sets[4].set_type = SET_TYPE::PAIR;
+
+    // 拷贝一份当前的划分出来的面子，并排序暗手的面子
+    // 这里不能直接在work_sets上排序，否则会破坏递归外层的数据
+    SET temp[5];
+    memcpy(temp, work_sets, 5 * sizeof(SET));
+    std::sort(temp + fixed_cnt, temp + 4, &set_cmp);
+
+    // 检查这种划分是否已经存在了
+    if (std::none_of(&separation->sets[0], &separation->sets[separation->count],
+        [&temp, fixed_cnt](const SET (&set)[5]) {
+        return std::equal(&set[fixed_cnt], &set[4], &temp[fixed_cnt], &set_eq);
+    })) {
+        memcpy(separation->sets[separation->count], temp, 5 * sizeof(SET));
+        ++separation->count;
+    }
+    else {
+        LOG("same case");
+    }
+
+    return true;
 }
 
-static bool seperate_N(const TILE *tiles, long tile_cnt, long fixed_cnt, SEPERATIONS *separation) {
-    if (tile_cnt < 3) {
-        return seperate_2(tiles, tile_cnt, fixed_cnt, separation);
+static bool is_separation_branch_exist(long fixed_cnt, long step, const SET (&work_sets)[5], const SEPERATIONS *separation) {
+    if (separation->count <= 0) {
+        return false;
+    }
+
+    // std::includes要求有序
+    SET temp[5];
+    memcpy(&temp[fixed_cnt], &work_sets[fixed_cnt], step * sizeof(SET));
+    std::sort(&temp[fixed_cnt], &temp[fixed_cnt + step], &set_cmp);
+
+    // 只需要比较面子是否重复分支，将牌不参与比较，所以下标是4
+    return std::any_of(&separation->sets[0], &separation->sets[separation->count],
+        [&temp, fixed_cnt, step](const SET(&set)[5]) {
+        return std::includes(&set[fixed_cnt], &set[4], &temp[fixed_cnt], &temp[fixed_cnt + step], &set_cmp);
+    });
+}
+
+static bool seperate_recursively(int (&cnt_table)[0x54], long fixed_cnt, long step, SET (&work_sets)[5], SEPERATIONS *separation) {
+    long idx = step + fixed_cnt;
+    if (idx == 4) {  // 4组面子都有了
+        return seperate_tail(cnt_table, fixed_cnt, work_sets, separation);
     }
 
     bool ret = false;
-    long i = 0;
-    while (i < tile_cnt) {
-        TILE tile_i = tiles[i];
 
-        long j = i + 1;
-        while (j < tile_cnt) {
-            TILE tile_j = tiles[j];
-            if (tile_j - tile_i >= 3) break;  // 这已经不可能再构成面子了
-
-            long k = j + 1;
-            while (k < tile_cnt) {
-                TILE tile_k = tiles[k];
-                if (tile_k - tile_i >= 3) break;  // 这已经不可能再构成面子了
-
-                if (is_concealed_set_completed(tile_i, tile_j, tile_k)) {
-                    long current = (14 - tile_cnt) / 3;
-                    SET (&sets)[5] = separation->sets[separation->count];  // 直接在count下标处写
-                    sets[current].is_melded = false;
-                    sets[current].mid_tile = tile_j;
-                    sets[current].set_type = (tile_i == tile_j) ? SET_TYPE::PUNG : SET_TYPE::CHOW;
-
-                    // 削减面子
-                    TILE remains[14];
-                    for (int n = 0, c = 0; n < tile_cnt; ++n) {
-                        if (n == i || n == j || n == k) continue;
-                        remains[c++] = tiles[n];
-                    }
-                    // 递归剩下的牌
-                    if (seperate_N(remains, tile_cnt - 3, fixed_cnt, separation)) {
-                        ret = true;  // 划分成功
-                    }
-                }
-                do ++k; while (k < tile_cnt && tiles[k] == tile_k);  // 快速跳过相同的case
+    // 顺子（只能是序数牌）
+    for (int s = 1; s <= 3; ++s) {
+        TILE t1 = make_tile(s, 1);
+        TILE t9 = make_tile(s, 9);
+        for (TILE t = t1; t <= t9 - 2; ++t) {
+            if (!cnt_table[t] || !cnt_table[t + 1] || !cnt_table[t + 2]) {
+                continue;
             }
-            do ++j; while (j < tile_cnt && tiles[j] == tile_j);  // 快速跳过相同的case
+            // 划分出一组顺子
+            work_sets[idx].is_melded = false;
+            work_sets[idx].mid_tile = t + 1;
+            work_sets[idx].set_type = SET_TYPE::CHOW;
+            if (is_separation_branch_exist(fixed_cnt, step + 1, work_sets, separation)) {
+                continue;
+            }
+
+            // 削减这组顺子，递归
+            --cnt_table[t];
+            --cnt_table[t + 1];
+            --cnt_table[t + 2];
+            if (seperate_recursively(cnt_table, fixed_cnt, step + 1, work_sets, separation)) {
+                ret = true;
+            }
+            ++cnt_table[t];
+            ++cnt_table[t + 1];
+            ++cnt_table[t + 2];
         }
-        do ++i; while (i < tile_cnt && tiles[i] == tile_i);  // 快速跳过相同的case
+    }
+
+    // 刻子
+    for (TILE t = 0x11; t <= 0x53; ++t) {
+        if (cnt_table[t] < 3) {
+            continue;
+        }
+        work_sets[idx].is_melded = false;
+        work_sets[idx].mid_tile = t;
+        work_sets[idx].set_type = SET_TYPE::PUNG;
+        if (is_separation_branch_exist(fixed_cnt, step + 1, work_sets, separation)) {
+            continue;
+        }
+
+        // 削减这组刻子，递归
+        cnt_table[t] -= 3;
+        if (seperate_recursively(cnt_table, fixed_cnt, step + 1, work_sets, separation)) {
+            ret = true;
+        }
+        cnt_table[t] += 3;
     }
 
     return ret;
+}
+
+static bool seperate_win_hand(const TILE *standing_tiles, const SET *fixed_sets, long fixed_cnt, SEPERATIONS *separation) {
+    long standing_cnt = 14 - fixed_cnt * 3;
+
+    // 对立牌的种类进行打表
+    int cnt_table[0x54] = { 0 };
+    for (long i = 0; i < standing_cnt; ++i) {
+        ++cnt_table[standing_tiles[i]];
+    }
+
+    separation->count = 0;
+
+    // 复制副露的面子
+    SET work_sets[5];
+    memcpy(work_sets, fixed_sets, fixed_cnt * sizeof(SET));
+    return seperate_recursively(cnt_table, fixed_cnt, 0, work_sets, separation);
 }
 
 // 从一组一组的牌恢复成一张一张的牌
@@ -1659,7 +1718,7 @@ static void calculate_basic_type_points(const SET (&sets)[5], long fixed_cnt, TI
         case SET_TYPE::PUNG:
         case SET_TYPE::KONG: pung_sets[pung_cnt++] = sets[i]; break;
         case SET_TYPE::PAIR: pair_set = sets[i]; break;
-        default: assert(0); break;
+        default: assert(0); return;
         }
     }
 
@@ -2257,15 +2316,7 @@ int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, WIN_TYPE win_t
     standing_tiles[standing_cnt] = win_tile;
     sort_tiles(standing_tiles, standing_cnt + 1);
 
-    // 预先在0处写入副露的面子
-    separation.count = 0;
-    memcpy(separation.sets[0], hand_tiles->fixed_sets, fixed_cnt * sizeof(SET));
-    for (long i = 0; i < fixed_cnt; ++i) {  // 将不是暗杠的，都标记为明的（明顺、明刻、明杠)
-        if (hand_tiles->fixed_sets[i].set_type != SET_TYPE::KONG) {
-            separation.sets[0][i].is_melded = true;
-        }
-    }
-    seperate_N(standing_tiles, standing_cnt + 1, fixed_cnt, &separation);
+    seperate_win_hand(standing_tiles, hand_tiles->fixed_sets, fixed_cnt, &separation);
 
     for (long i = 0; i < separation.count; ++i) {
         std::sort(&separation.sets[i][fixed_cnt], &separation.sets[i][4], &set_cmp);

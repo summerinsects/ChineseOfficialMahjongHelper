@@ -35,11 +35,6 @@ static bool is_set_contains_tile(const SET &set, TILE tile) {
     }
 }
 
-static forceinline bool set_cmp(const SET &set1, const SET &set2) {
-    return ((set1.mid_tile < set2.mid_tile)
-        || (set1.mid_tile == set2.mid_tile && set1.set_type < set2.set_type));
-}
-
 static const char *stringify_table[] = {
     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "", "", "", "", "", "",
