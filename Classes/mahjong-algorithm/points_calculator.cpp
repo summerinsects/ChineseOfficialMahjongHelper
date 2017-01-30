@@ -1906,6 +1906,13 @@ static bool calculate_knitted_straight_in_basic_type_points(const HAND_TILES *ha
     return true;
 }
 
+// 十三幺
+static bool is_thirteen_orphans(const TILE (&tiles)[14]) {
+    return std::all_of(std::begin(tiles), std::end(tiles), &is_terminal_or_honor)
+        && std::includes(std::begin(tiles), std::end(tiles),
+        std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans));
+}
+
 // 特殊和型算番
 static bool calculate_special_type_points(const TILE (&standing_tiles)[14], WIN_TYPE win_type, long (&points_table)[POINT_TYPE_COUNT]) {
     // 七对
@@ -1942,8 +1949,7 @@ static bool calculate_special_type_points(const TILE (&standing_tiles)[14], WIN_
         }
     }
     // 十三幺
-    else if (std::includes(std::begin(standing_tiles), std::end(standing_tiles),
-        std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans))) {
+    else if (is_thirteen_orphans(standing_tiles)) {
         points_table[THIRTEEN_ORPHANS] = 1;
     }
     else {  // 全不靠/七星不靠
