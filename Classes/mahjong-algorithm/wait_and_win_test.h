@@ -59,6 +59,7 @@ static const TILE standard_nine_gates[3][13] = {
     { 0x31, 0x31, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x39, 0x39 }
 };
 
+int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt);
 int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt);
 int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt);
 int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing_cnt);

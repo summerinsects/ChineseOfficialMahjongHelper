@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <limits>
 
 namespace mahjong {
 
@@ -373,9 +374,13 @@ bool is_honors_and_knitted_tiles_win(const TILE (&standing_tiles)[13], TILE test
     return false;
 }
 
+int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt) {
+    return std::numeric_limits<int>::max();
+}
+
 int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
-        return INT_MAX;
+        return std::numeric_limits<int>::max();
     }
 
     // 对牌的种类进行打表，并统计对子数
@@ -395,7 +400,7 @@ int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt) {
 
 int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
-        return INT_MAX;
+        return std::numeric_limits<int>::max();
     }
 
     // 对牌的种类进行打表
@@ -423,7 +428,7 @@ int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt) {
 
 static int honors_and_knitted_tiles_wait_step_(const TILE *standing_tiles, long standing_cnt, int which_seq) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
-        return INT_MAX;
+        return std::numeric_limits<int>::max();
     }
 
     // 对牌的种类进行打表
@@ -454,7 +459,7 @@ static int honors_and_knitted_tiles_wait_step_(const TILE *standing_tiles, long 
 }
 
 int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing_cnt) {
-    int ret = INT_MAX;
+    int ret = std::numeric_limits<int>::max();
     for (int i = 0; i < 6; ++i) {
         ret = std::min(ret, honors_and_knitted_tiles_wait_step_(standing_tiles, standing_cnt, i));        
     }
