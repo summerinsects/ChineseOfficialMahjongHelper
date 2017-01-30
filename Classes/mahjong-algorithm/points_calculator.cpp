@@ -1913,6 +1913,41 @@ static bool is_thirteen_orphans(const TILE (&tiles)[14]) {
         std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans));
 }
 
+// 全不靠/七星不靠算番
+bool caculate_honors_and_knitted_tiles(const TILE (&standing_tiles)[14], long (&points_table)[POINT_TYPE_COUNT]) {
+    const TILE *it = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
+    long numbered_cnt = it - standing_tiles;
+    // 序数牌张数大于9或者小于7必然不可能是全不靠
+    if (numbered_cnt > 9 || numbered_cnt < 7) {
+        return false;
+    }
+
+    // 匹配组合龙
+    if (std::none_of(&standard_knitted_straight[0], &standard_knitted_straight[6],
+        [&standing_tiles, it](const TILE (&seq)[9]) {
+        return std::includes(std::begin(seq), std::end(seq), std::begin(standing_tiles), it);
+    })) {
+        return false;
+    }
+
+    static const TILE seven_honors[] = { 0x41, 0x42, 0x43, 0x44, 0x51, 0x52, 0x53 };
+    if (numbered_cnt == 7 && std::equal(std::begin(seven_honors), std::end(seven_honors), standing_tiles + 7)) {
+        // 七种字牌齐，为七星不靠
+        points_table[GREATER_HONORS_AND_KNITTED_TILES] = 1;
+        return true;
+    }
+    else if (std::includes(std::begin(seven_honors), std::end(seven_honors), it, std::end(standing_tiles))) {
+        // 全不靠
+        points_table[LESSER_HONORS_AND_KNITTED_TILES] = 1;
+        if (numbered_cnt == 9) {  // 有9张数牌，为带组合龙的全不靠
+            points_table[KNITTED_STRAIGHT] = 1;
+        }
+        return true;
+    }
+
+    return false;
+}
+
 // 特殊和型算番
 static bool calculate_special_type_points(const TILE (&standing_tiles)[14], WIN_TYPE win_type, long (&points_table)[POINT_TYPE_COUNT]) {
     // 七对
@@ -1952,39 +1987,11 @@ static bool calculate_special_type_points(const TILE (&standing_tiles)[14], WIN_
     else if (is_thirteen_orphans(standing_tiles)) {
         points_table[THIRTEEN_ORPHANS] = 1;
     }
-    else {  // 全不靠/七星不靠
-        const TILE *it = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
-        long numbered_cnt = it - standing_tiles;
-        // 序数牌张数大于9或者小于7必然不可能是全不靠
-        if (numbered_cnt > 9 || numbered_cnt < 7) {
-            return false;
-        }
-
-        const TILE *matched_seq = nullptr;
-        for (int i = 0; i < 6; ++i) {
-            if (std::includes(std::begin(standard_knitted_straight[i]), std::end(standard_knitted_straight[i]),
-                std::begin(standing_tiles), it)) {
-                matched_seq = standard_knitted_straight[i];  // 匹配到一个组合龙
-                break;
-            }
-        }
-
-        if (matched_seq == nullptr) {
-            return false;
-        }
-
-        // standard_thirteen_orphans + 6是字牌，即ESWNCFP
-        if (numbered_cnt == 7 && memcmp(standard_thirteen_orphans + 6, standing_tiles + 7, 7 * sizeof(TILE)) == 0) {
-            // 七种字牌齐，为七星不靠
-            points_table[GREATER_HONORS_AND_KNITTED_TILES] = 1;
-        }
-        else if (std::includes(standard_thirteen_orphans + 6, standard_thirteen_orphans + 13, it, std::end(standing_tiles))) {
-            // 全不靠
-            points_table[LESSER_HONORS_AND_KNITTED_TILES] = 1;
-            if (numbered_cnt == 9) {  // 有9张数牌，为带组合龙的全不靠
-                points_table[KNITTED_STRAIGHT] = 1;
-            }
-        }
+    // 全不靠/七星不靠
+    else if (caculate_honors_and_knitted_tiles(standing_tiles, points_table)) {
+    }
+    else {
+        return false;
     }
 
     check_win_type(win_type, points_table);
