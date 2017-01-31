@@ -520,7 +520,11 @@ bool is_knitted_straight_in_basic_type_wait(const TILE *standing_tiles, long sta
         return false;
     }
 
-    return false;
+    // 对立牌的种类进行打表
+    int cnt_table[0x54];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
+
+    return is_knitted_straight_in_basic_type_wait_impl(cnt_table, standing_cnt, waiting_table);
 }
 
 bool is_knitted_straight_in_basic_type_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile) {
