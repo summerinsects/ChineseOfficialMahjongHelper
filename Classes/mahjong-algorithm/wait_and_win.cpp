@@ -358,7 +358,7 @@ int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt, bo
         contributing_table[t] = true;
     });
 
-    if (has_pair) {    // 当有对子时，上听数为：12-幺九牌的种类
+    if (has_pair) {  // 当有对子时，上听数为：12-幺九牌的种类
         // 当有对子时，已有的幺九牌都不需要了
         for (int i = 0; i < 13; ++i) {
             TILE t = standard_thirteen_orphans[i];
@@ -531,7 +531,7 @@ bool is_knitted_straight_in_basic_type_win(const TILE *standing_tiles, long stan
 
 // 全不靠/七星不靠
 
-static int honors_and_knitted_tiles_wait_step_(const TILE *standing_tiles, long standing_cnt, int which_seq, bool (&contributing_table)[0x54]) {
+static int honors_and_knitted_tiles_wait_step_1(const TILE *standing_tiles, long standing_cnt, int which_seq, bool (&contributing_table)[0x54]) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -578,7 +578,7 @@ int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing
 
     // 6种组合龙分别计算
     for (int i = 0; i < 6; ++i) {
-        int st = honors_and_knitted_tiles_wait_step_(standing_tiles, standing_cnt, i, temp_table);
+        int st = honors_and_knitted_tiles_wait_step_1(standing_tiles, standing_cnt, i, temp_table);
         if (st < ret) {
             ret = st;
             memcpy(contributing_table, temp_table, sizeof(contributing_table));
