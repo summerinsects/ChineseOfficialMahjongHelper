@@ -28,7 +28,17 @@ void test_wait(const char *str) {
         }
         else if (is_seven_pairs_wait(tiles, tile_cnt, table)) {
             is_wait = true;
-            printf("seven pairs wait:");
+            puts("seven pairs wait:");
+        }
+        else if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, table)) {
+            is_wait = true;
+            puts("knitted straight in basic type wait:");
+        }
+    }
+    else if (tile_cnt == 10) {
+        if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, table)) {
+            is_wait = true;
+            puts("knitted straight in basic type wait:");
         }
     }
 
