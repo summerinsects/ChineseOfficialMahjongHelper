@@ -105,54 +105,51 @@ static bool seperate_recursively(int (&cnt_table)[0x54], long fixed_cnt, long st
     }
 
     bool ret = false;
+    for (TILE t = 0x11; t <= 0x53; ++t) {
+        if (cnt_table[t] < 1) {
+            continue;
+        }
 
-    // 顺子（只能是序数牌）
-    for (int s = 1; s <= 3; ++s) {
-        TILE t1 = make_tile(s, 1);
-        TILE t9 = make_tile(s, 9);
-        for (TILE t = t1; t <= t9 - 2; ++t) {
-            if (!cnt_table[t] || !cnt_table[t + 1] || !cnt_table[t + 2]) {
-                continue;
-            }
-            // 划分出一组顺子
+        // 刻子
+        if (cnt_table[t] > 2) {
             work_sets[idx].is_melded = false;
-            work_sets[idx].mid_tile = t + 1;
-            work_sets[idx].set_type = SET_TYPE::CHOW;
+            work_sets[idx].mid_tile = t;
+            work_sets[idx].set_type = SET_TYPE::PUNG;
             if (is_separation_branch_exist(fixed_cnt, step + 1, work_sets, separation)) {
                 continue;
             }
 
-            // 削减这组顺子，递归
-            --cnt_table[t];
-            --cnt_table[t + 1];
-            --cnt_table[t + 2];
+            // 削减这组刻子，递归
+            cnt_table[t] -= 3;
             if (seperate_recursively(cnt_table, fixed_cnt, step + 1, work_sets, separation)) {
                 ret = true;
             }
-            ++cnt_table[t];
-            ++cnt_table[t + 1];
-            ++cnt_table[t + 2];
-        }
-    }
-
-    // 刻子
-    for (TILE t = 0x11; t <= 0x53; ++t) {
-        if (cnt_table[t] < 3) {
-            continue;
-        }
-        work_sets[idx].is_melded = false;
-        work_sets[idx].mid_tile = t;
-        work_sets[idx].set_type = SET_TYPE::PUNG;
-        if (is_separation_branch_exist(fixed_cnt, step + 1, work_sets, separation)) {
-            continue;
+            cnt_table[t] += 3;
         }
 
-        // 削减这组刻子，递归
-        cnt_table[t] -= 3;
-        if (seperate_recursively(cnt_table, fixed_cnt, step + 1, work_sets, separation)) {
-            ret = true;
+        // 顺子（只能是序数牌）
+        bool is_numbered = is_numbered_suit(t);
+        if (is_numbered) {
+            if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
+                work_sets[idx].is_melded = false;
+                work_sets[idx].mid_tile = t + 1;
+                work_sets[idx].set_type = SET_TYPE::CHOW;
+                if (is_separation_branch_exist(fixed_cnt, step + 1, work_sets, separation)) {
+                    continue;
+                }
+
+                // 削减这组顺子，递归
+                --cnt_table[t];
+                --cnt_table[t + 1];
+                --cnt_table[t + 2];
+                if (seperate_recursively(cnt_table, fixed_cnt, step + 1, work_sets, separation)) {
+                    ret = true;
+                }
+                ++cnt_table[t];
+                ++cnt_table[t + 1];
+                ++cnt_table[t + 2];
+            }
         }
-        cnt_table[t] += 3;
     }
 
     return ret;

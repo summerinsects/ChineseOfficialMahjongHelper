@@ -100,40 +100,37 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[0x54], long left_cnt
 
     bool ret = false;
 
-    // 顺子（只能是序数牌）
-    for (int s = 1; s <= 3; ++s) {
-        TILE t1 = make_tile(s, 1);
-        TILE t9 = make_tile(s, 9);
-        for (TILE t = t1; t <= t9 - 2; ++t) {
-            if (!cnt_table[t] || !cnt_table[t + 1] || !cnt_table[t + 2]) {
-                continue;
-            }
-
-            // 削减这组顺子，递归
-            --cnt_table[t];
-            --cnt_table[t + 1];
-            --cnt_table[t + 2];
-            if (is_basic_type_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
-                ret = true;
-            }
-            ++cnt_table[t];
-            ++cnt_table[t + 1];
-            ++cnt_table[t + 2];
-        }
-    }
-
-    // 刻子
     for (TILE t = 0x11; t <= 0x53; ++t) {
-        if (cnt_table[t] < 3) {
+        if (cnt_table[t] < 1) {
             continue;
         }
 
-        // 削减这组刻子，递归
-        cnt_table[t] -= 3;
-        if (is_basic_type_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
-            ret = true;
+        // 刻子
+        if (cnt_table[t] > 2) {
+            // 削减这组刻子，递归
+            cnt_table[t] -= 3;
+            if (is_basic_type_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
+                ret = true;
+            }
+            cnt_table[t] += 3;
         }
-        cnt_table[t] += 3;
+
+        // 顺子（只能是序数牌）
+        bool is_numbered = is_numbered_suit(t);
+        if (is_numbered) {
+            if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
+                // 削减这组顺子，递归
+                --cnt_table[t];
+                --cnt_table[t + 1];
+                --cnt_table[t + 2];
+                if (is_basic_type_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
+                    ret = true;
+                }
+                ++cnt_table[t];
+                ++cnt_table[t + 1];
+                ++cnt_table[t + 2];
+            }
+        }
     }
 
     if (!ret) {
