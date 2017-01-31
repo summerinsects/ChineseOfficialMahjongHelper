@@ -12,7 +12,7 @@ static std::vector<std::string> g_definitions;
 
 static void replaceTilesToImage(std::string &text, float scale) {
     char tilesStr[128];
-    mahjong::TILE tiles[14];
+    mahjong::tile_t tiles[14];
     long tilesCnt;
     char imgStr[1024];
 
@@ -110,7 +110,7 @@ void ScoreDefinitionScene::createContentView(size_t idx) {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
-    if (idx > mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+    if (idx > mahjong::fan_t::CONCEALED_KONG_AND_MELDED_KONG) {
         --idx;
     }
 #endif

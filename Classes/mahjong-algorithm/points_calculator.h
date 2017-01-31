@@ -20,10 +20,10 @@ static const char *set_type_name[] = { "NONE", "CHOW", "PUNG", "KONG", "PAIR" };
 struct SET {
     bool is_melded;
     SET_TYPE set_type;
-    TILE mid_tile;
+    tile_t mid_tile;
 };
 
-static bool is_set_contains_tile(const SET &set, TILE tile) {
+static bool is_set_contains_tile(const SET &set, tile_t tile) {
     //assert(set.set_type != SET_TYPE::NONE);
     if (set.set_type == SET_TYPE::CHOW) {
         return (set.mid_tile - 1 == tile
@@ -44,10 +44,10 @@ static const char *stringify_table[] = {
     "", "C", "F", "P", "", "", "", "", "", "", "", "", "", "", "", "",
 };
 
-struct HAND_TILES {
+struct hand_tiles_t {
     SET fixed_sets[5];
     long set_count;
-    TILE standing_tiles[13];
+    tile_t standing_tiles[13];
     long tile_count;
 };
 
@@ -58,12 +58,12 @@ struct HAND_TILES {
 #define PARSE_ERROR_CANNOT_MAKE_FIXED_SET -4
 #define PARSE_ERROR_TOO_MANY_FIXED_SET -5
 
-long parse_tiles(const char *str, TILE *tiles, long max_cnt);
-long string_to_tiles(const char *str, HAND_TILES *hand_tiles);
-void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *tile_cnt);
-bool map_hand_tiles(const HAND_TILES *hand_tiles, int (&cnt_table)[0x54]);
+long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
+long string_to_tiles(const char *str, hand_tiles_t *hand_tiles);
+void recovery_tiles_from_sets(const SET *sets, long set_cnt, tile_t *tiles, long *tile_cnt);
+bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[0x54]);
 
-enum POINT_TYPE {
+enum fan_t {
     NONE = 0,
     BIG_FOUR_WINDS = 1, BIG_THREE_DRAGONS, ALL_GREEN, NINE_GATES, FOUR_KONGS, SEVEN_SHIFTED_PAIRS, THIRTEEN_ORPHANS,
     ALL_TERMINALS, LITTLE_FOUR_WINDS, LITTLE_THREE_DRAGONS, ALL_HONORS, FOUR_CONCEALED_PUNGS, PURE_TERMINAL_CHOWS,
@@ -84,11 +84,11 @@ enum POINT_TYPE {
     POINT_TYPE_COUNT
 };
 
-enum class WIND_TYPE {
+enum class wind_t {
     EAST, SOUTH, WEST, NORTH
 };
 
-typedef uint8_t WIN_TYPE;
+typedef uint8_t win_type_t;
 
 #define WIN_TYPE_DISCARD 0
 #define WIN_TYPE_SELF_DRAWN 1
@@ -96,8 +96,8 @@ typedef uint8_t WIN_TYPE;
 #define WIN_TYPE_ABOUT_KONG 4
 #define WIN_TYPE_WALL_LAST 8
 
-bool is_standing_tiles_contains_win_tile(const TILE *standing_tiles, long standing_cnt, TILE win_tile);
-size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, TILE win_tile);
+bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long standing_cnt, tile_t win_tile);
+size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, tile_t win_tile);
 
 #define MAX_SEPARAION_CNT 10
 
@@ -105,15 +105,15 @@ size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, TILE w
 #define ERROR_TILE_COUNT_GREATER_THAN_4 -2
 #define ERROR_NOT_WIN -3
 
-int check_calculator_input(const HAND_TILES *hand_tiles, TILE win_tile);
+int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile);
 
-struct EXTRA_CONDITION {
-    WIN_TYPE win_type;
-    WIND_TYPE prevalent_wind;
-    WIND_TYPE seat_wind;
+struct extra_condition_t {
+    win_type_t win_type;
+    wind_t prevalent_wind;
+    wind_t seat_wind;
 };
 
-int calculate_points(const HAND_TILES *hand_tiles, TILE win_tile, const EXTRA_CONDITION *ext_cond, long (&points_table)[POINT_TYPE_COUNT]);
+int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&points_table)[POINT_TYPE_COUNT]);
 
 #if 0
 

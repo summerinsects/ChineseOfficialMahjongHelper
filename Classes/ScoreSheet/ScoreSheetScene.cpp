@@ -359,7 +359,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
             if ((1ULL << n) & pointsFlag) {
                 unsigned idx = n;
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
-                if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+                if (idx >= mahjong::fan_t::CONCEALED_KONG_AND_MELDED_KONG) {
                     ++idx;
                 }
 #endif
@@ -614,7 +614,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
                 if ((1ULL << n) & pointsFlag) {
                     unsigned idx = n;
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
-                    if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+                    if (idx >= mahjong::fan_t::CONCEALED_KONG_AND_MELDED_KONG) {
                         ++idx;
                     }
 #endif

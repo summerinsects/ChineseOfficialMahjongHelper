@@ -309,7 +309,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
-        if (idx0 > mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+        if (idx0 > mahjong::fan_t::CONCEALED_KONG_AND_MELDED_KONG) {
             --idx0;
         }
 #endif
@@ -509,7 +509,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t index = reinterpret_cast<size_t>(button->getUserData());
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
-    if (index > mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+    if (index > mahjong::fan_t::CONCEALED_KONG_AND_MELDED_KONG) {
         --index;
     }
 #endif
@@ -533,7 +533,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
         if (_detail.points_flag & (1ULL << n)) {
             unsigned idx = n;
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
-            if (idx >= mahjong::POINT_TYPE::CONCEALED_KONG_AND_MELDED_KONG) {
+            if (idx >= mahjong::fan_t::CONCEALED_KONG_AND_MELDED_KONG) {
                 ++idx;
             }
 #endif

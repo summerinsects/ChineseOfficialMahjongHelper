@@ -30,7 +30,7 @@ bool TilePickWidget::init() {
 
     // 万
     for (int i = 0; i < 9; ++i) {
-        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, i + 1);
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, i + 1);
         _characterButtons[i] = ui::Button::create(tilesImageName[tile]);
         _characterButtons[i]->setScale(27 / _characterButtons[i]->getContentSize().width);
         tableWidget->addChild(_characterButtons[i]);
@@ -41,7 +41,7 @@ bool TilePickWidget::init() {
 
     // 条
     for (int i = 0; i < 9; ++i) {
-        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_BAMBOO, i + 1);
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_BAMBOO, i + 1);
         _bambooButtons[i] = ui::Button::create(tilesImageName[tile]);
         _bambooButtons[i]->setScale(27 / _bambooButtons[i]->getContentSize().width);
         tableWidget->addChild(_bambooButtons[i]);
@@ -52,7 +52,7 @@ bool TilePickWidget::init() {
 
     // 饼
     for (int i = 0; i < 9; ++i) {
-        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DOTS, i + 1);
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DOTS, i + 1);
         _dotsButtons[i] = ui::Button::create(tilesImageName[tile]);
         _dotsButtons[i]->setScale(27 / _dotsButtons[i]->getContentSize().width);
         tableWidget->addChild(_dotsButtons[i]);
@@ -63,7 +63,7 @@ bool TilePickWidget::init() {
 
     // 风
     for (int i = 0; i < 4; ++i) {
-        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_WINDS, i + 1);
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_WINDS, i + 1);
         _honorButtons[i] = ui::Button::create(tilesImageName[tile]);
         _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
         tableWidget->addChild(_honorButtons[i]);
@@ -74,7 +74,7 @@ bool TilePickWidget::init() {
 
     // 箭
     for (int i = 4; i < 7; ++i) {
-        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DRAGONS, i - 3);
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DRAGONS, i - 3);
         _honorButtons[i] = ui::Button::create(tilesImageName[tile]);
         _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
         tableWidget->addChild(_honorButtons[i]);
@@ -229,7 +229,7 @@ void TilePickWidget::sort() {
     }
 }
 
-void TilePickWidget::setData(const mahjong::HAND_TILES &hand_tiles, mahjong::TILE winTile) {
+void TilePickWidget::setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile) {
     _handTilesWidget->setData(hand_tiles, winTile);
     refreshAllTilesTableButton();
     refreshActionButtons();
@@ -243,11 +243,11 @@ void TilePickWidget::setData(const mahjong::HAND_TILES &hand_tiles, mahjong::TIL
 }
 
 // 刷新选牌按钮
-void TilePickWidget::refreshTilesTableButton(mahjong::TILE tile) {
+void TilePickWidget::refreshTilesTableButton(mahjong::tile_t tile) {
     // 如果某张牌已经使用了4张，就禁用相应按钮
     int n = _handTilesWidget->getUsedTileCount(tile);
-    mahjong::SUIT_TYPE suit = mahjong::tile_suit(tile);
-    mahjong::RANK_TYPE rank = mahjong::tile_rank(tile);
+    mahjong::suit_t suit = mahjong::tile_suit(tile);
+    mahjong::rank_t rank = mahjong::tile_rank(tile);
     switch (suit) {
     case TILE_SUIT_CHARACTERS: _characterButtons[rank - 1]->setEnabled(n < 4); break;
     case TILE_SUIT_BAMBOO: _bambooButtons[rank - 1]->setEnabled(n < 4); break;
@@ -261,8 +261,8 @@ void TilePickWidget::refreshTilesTableButton(mahjong::TILE tile) {
 void TilePickWidget::refreshAllTilesTableButton() {
     // 如果某张牌已经使用了4张，就禁用相应按钮
     // 序数牌都是1-9，放在同一个循环里
-    for (mahjong::RANK_TYPE rank = 1; rank < 10; ++rank) {
-        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, rank);
+    for (mahjong::rank_t rank = 1; rank < 10; ++rank) {
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, rank);
         int n = _handTilesWidget->getUsedTileCount(tile);
         _characterButtons[rank - 1]->setEnabled(n < 4);
 
@@ -276,15 +276,15 @@ void TilePickWidget::refreshAllTilesTableButton() {
     }
 
     // 风牌4种
-    for (mahjong::RANK_TYPE rank = 1; rank < 5; ++rank) {
-        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_WINDS, rank);
+    for (mahjong::rank_t rank = 1; rank < 5; ++rank) {
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_WINDS, rank);
         int n = _handTilesWidget->getUsedTileCount(tile);
         _honorButtons[rank - 1]->setEnabled(n < 4);
     }
 
     // 箭牌3种
-    for (mahjong::RANK_TYPE rank = 1; rank < 4; ++rank) {
-        mahjong::TILE tile = mahjong::make_tile(TILE_SUIT_DRAGONS, rank);
+    for (mahjong::rank_t rank = 1; rank < 4; ++rank) {
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DRAGONS, rank);
         int n = _handTilesWidget->getUsedTileCount(tile);
         _honorButtons[rank + 3]->setEnabled(n < 4);
     }
@@ -299,8 +299,8 @@ void TilePickWidget::refreshActionButtons() {
     _concealedKongButton->setEnabled(_meldedKongButton->isEnabled());
 }
 
-void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile) {
-    mahjong::TILE prevTile = _handTilesWidget->putTile(tile);
+void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t tile) {
+    mahjong::tile_t prevTile = _handTilesWidget->putTile(tile);
     if (prevTile != 0 && prevTile != tile) {  // 如果是替换牌，则会删了一张旧的牌
         refreshTilesTableButton(prevTile);
     }

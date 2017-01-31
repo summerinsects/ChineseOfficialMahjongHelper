@@ -23,7 +23,7 @@ struct work_state_t {
     long count;
 };
 
-void map_tiles(const TILE *tiles, long cnt, int (&cnt_table)[0x54]) {
+void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[0x54]) {
     memset(cnt_table, 0, sizeof(cnt_table));
     for (long i = 0; i < cnt; ++i) {
         ++cnt_table[tiles[i]];
@@ -32,7 +32,7 @@ void map_tiles(const TILE *tiles, long cnt, int (&cnt_table)[0x54]) {
 
 int count_contributing_tile(int (&used_table)[0x54], bool (&useful_table)[0x54]) {
     int cnt = 0;
-    for (TILE t = 0x11; t <= 0x53; ++t) {
+    for (tile_t t = 0x11; t <= 0x53; ++t) {
         if (useful_table[t])
             cnt += 4 - used_table[t];
     }
@@ -72,7 +72,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
 
     int result = std::numeric_limits<int>::max();
 
-    for (TILE t = 0x11; t <= 0x53; ++t) {
+    for (tile_t t = 0x11; t <= 0x53; ++t) {
         if (cnt_table[t] < 1) {
             continue;
         }
@@ -199,7 +199,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
 
         if (neighbor_need > 0) {
             // 面子搭子
-            for (TILE t = 0x11; t <= 0x53; ++t) {
+            for (tile_t t = 0x11; t <= 0x53; ++t) {
                 if (cnt_table[t] == 0) {
                     continue;
                 }
@@ -209,7 +209,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
 
                 // 顺子搭子（只能是序数牌）
                 if (is_numbered_suit(t)) {
-                    RANK_TYPE r = tile_rank(t);
+                    rank_t r = tile_rank(t);
                     if (r > 1) useful_table[t - 1] = true;
                     if (r > 2) useful_table[t - 2] = true;
                     if (r < 9) useful_table[t + 1] = true;
@@ -220,7 +220,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
 
         // 缺将
         if (!has_pair) {
-            for (TILE t = 0x11; t <= 0x53; ++t) {
+            for (tile_t t = 0x11; t <= 0x53; ++t) {
                 if (cnt_table[t] == 0) {
                     continue;
                 }
@@ -232,7 +232,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
     return result;
 }
 
-int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
+int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
     if (standing_tiles == nullptr || (standing_cnt != 13
         && standing_cnt != 10 && standing_cnt != 7 && standing_cnt != 4 && standing_cnt != 1)) {
         return std::numeric_limits<int>::max();
@@ -252,7 +252,7 @@ int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&u
 }
 
 static bool is_basic_type_wait_1(int (&cnt_table)[0x54], bool (&waiting_table)[0x54]) {
-    for (TILE t = 0x11; t < 0x54; ++t) {
+    for (tile_t t = 0x11; t < 0x54; ++t) {
         if (cnt_table[t] != 1) {
             continue;
         }
@@ -272,7 +272,7 @@ static bool is_basic_type_wait_1(int (&cnt_table)[0x54], bool (&waiting_table)[0
 
 static bool is_basic_type_wait_2(const int (&cnt_table)[0x54], bool (&waiting_table)[0x54]) {
     bool ret = false;
-    for (TILE t = 0x11; t < 0x54; ++t) {
+    for (tile_t t = 0x11; t < 0x54; ++t) {
         if (cnt_table[t] < 1) {
             continue;
         }
@@ -282,7 +282,7 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[0x54], bool (&waiting_ta
             continue;
         }
         if (is_numbered_suit_quick(t)) {  // 数牌搭子
-            RANK_TYPE r = tile_rank(t);
+            rank_t r = tile_rank(t);
             if (r > 1 && cnt_table[t - 1]) {  // 两面或者边张
                 if (r < 9) waiting_table[t + 1] = true;
                 if (r > 2) waiting_table[t - 2] = true;
@@ -302,7 +302,7 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[0x54], bool (&waiting_ta
 static bool is_basic_type_wait_4(int (&cnt_table)[0x54], bool (&waiting_table)[0x54]) {
     bool ret = false;
     // 削减将
-    for (TILE t = 0x11; t < 0x54; ++t) {
+    for (tile_t t = 0x11; t < 0x54; ++t) {
         if (cnt_table[t] < 2) {
             continue;
         }
@@ -324,7 +324,7 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[0x54], long left_cnt
 
     bool ret = false;
 
-    for (TILE t = 0x11; t <= 0x53; ++t) {
+    for (tile_t t = 0x11; t <= 0x53; ++t) {
         if (cnt_table[t] < 1) {
             continue;
         }
@@ -365,7 +365,7 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[0x54], long left_cnt
     return ret;
 }
 
-bool is_basic_type_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
+bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
     // 对立牌的种类进行打表
     int cnt_table[0x54];
     map_tiles(standing_tiles, standing_cnt, cnt_table);
@@ -373,7 +373,7 @@ bool is_basic_type_wait(const TILE *standing_tiles, long standing_cnt, bool (&wa
     return is_basic_type_wait_recursively(cnt_table, standing_cnt, waiting_table);
 }
 
-bool is_basic_type_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile) {
+bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     bool waiting_table[0x54];
     return (is_basic_type_wait(standing_tiles, standing_cnt, waiting_table)
         && waiting_table[test_tile]);
@@ -381,7 +381,7 @@ bool is_basic_type_win(const TILE *standing_tiles, long standing_cnt, TILE test_
 
 // 七对
 
-int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
+int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -390,7 +390,7 @@ int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&
     int pair_cnt = 0;
     int cnt_table[0x54] = { 0 };
     for (long i = 0; i < standing_cnt; ++i) {
-        TILE tile = standing_tiles[i];
+        tile_t tile = standing_tiles[i];
         ++cnt_table[tile];
         if (cnt_table[tile] == 2) {
             ++pair_cnt;
@@ -403,7 +403,7 @@ int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&
     return 6 - pair_cnt;
 }
 
-bool is_seven_pairs_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
+bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
     bool useful_table[0x54];
     if (0 == seven_pairs_wait_step(standing_tiles, standing_cnt, useful_table)) {
         memcpy(waiting_table, useful_table, sizeof(waiting_table));
@@ -412,7 +412,7 @@ bool is_seven_pairs_wait(const TILE *standing_tiles, long standing_cnt, bool (&w
     return false;
 }
 
-bool is_seven_pairs_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile) {
+bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     bool useful_table[0x54];
     return (0 == seven_pairs_wait_step(standing_tiles, standing_cnt, useful_table)
         && useful_table[test_tile]);
@@ -420,7 +420,7 @@ bool is_seven_pairs_win(const TILE *standing_tiles, long standing_cnt, TILE test
 
 // 十三幺
 
-int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
+int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -444,14 +444,14 @@ int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt, bo
     // 先标记所有的幺九牌为有效牌
     memset(useful_table, 0, sizeof(useful_table));
     std::for_each(std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans),
-        [&useful_table](TILE t) {
+        [&useful_table](tile_t t) {
         useful_table[t] = true;
     });
 
     if (has_pair) {  // 当有对子时，上听数为：12-幺九牌的种类
         // 当有对子时，已有的幺九牌都不需要了
         for (int i = 0; i < 13; ++i) {
-            TILE t = standard_thirteen_orphans[i];
+            tile_t t = standard_thirteen_orphans[i];
             int n = cnt_table[t];
             if (n > 0) {
                 useful_table[t] = false;
@@ -465,7 +465,7 @@ int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt, bo
 }
 
 
-bool is_thirteen_orphans_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
+bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
     bool useful_table[0x54];
     if (0 == thirteen_orphans_wait_step(standing_tiles, standing_cnt, useful_table)) {
         memcpy(waiting_table, useful_table, sizeof(waiting_table));
@@ -474,7 +474,7 @@ bool is_thirteen_orphans_wait(const TILE *standing_tiles, long standing_cnt, boo
     return false;
 }
 
-bool is_thirteen_orphans_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile) {
+bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     bool useful_table[0x54];
     return (0 == thirteen_orphans_wait_step(standing_tiles, standing_cnt, useful_table)
         && useful_table[test_tile]);
@@ -499,9 +499,9 @@ static bool is_basic_type_match_2(int (&cnt_table)[0x54]) {
 
     // 顺子（只能是序数牌）
     for (int s = 1; s <= 3; ++s) {
-        TILE t1 = make_tile(s, 1);
-        TILE t9 = make_tile(s, 9);
-        for (TILE t = t1; t <= t9 - 2; ++t) {
+        tile_t t1 = make_tile(s, 1);
+        tile_t t9 = make_tile(s, 9);
+        for (tile_t t = t1; t <= t9 - 2; ++t) {
             if (!cnt_table[t] || !cnt_table[t + 1] || !cnt_table[t + 2]) {
                 continue;
             }
@@ -520,7 +520,7 @@ static bool is_basic_type_match_2(int (&cnt_table)[0x54]) {
     }
 
     // 刻子
-    for (TILE t = 0x11; t <= 0x53; ++t) {
+    for (tile_t t = 0x11; t <= 0x53; ++t) {
         if (cnt_table[t] < 3) {
             continue;
         }
@@ -539,13 +539,13 @@ static bool is_basic_type_match_2(int (&cnt_table)[0x54]) {
 // “组合龙+面子+将”和型
 static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0x54], long left_cnt, bool (&waiting_table)[0x54]) {
     // 匹配组合龙
-    const TILE (*matched_seq)[9] = nullptr;
-    TILE missing_tiles[9];
+    const tile_t (*matched_seq)[9] = nullptr;
+    tile_t missing_tiles[9];
     int missing_cnt = 0;
     for (int i = 0; i < 6; ++i) {
         missing_cnt = 0;
         for (int k = 0; k < 9; ++k) {
-            TILE t = standard_knitted_straight[i][k];
+            tile_t t = standard_knitted_straight[i][k];
             if (cnt_table[t] == 0) {
                 missing_tiles[missing_cnt++] = t;
             }
@@ -564,7 +564,7 @@ static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0
     int temp_table[0x54];
     memcpy(temp_table, cnt_table, sizeof(temp_table));
     for (int i = 0; i < 9; ++i) {
-        TILE t = (*matched_seq)[i];
+        tile_t t = (*matched_seq)[i];
         if (temp_table[t]) {
             --temp_table[t];
         }
@@ -596,7 +596,7 @@ static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0
     return false;
 }
 
-static int knitted_straight_in_basic_type_wait_step_1(const TILE *standing_tiles, long standing_cnt, int which_seq, bool (&useful_table)[0x54]) {
+static int knitted_straight_in_basic_type_wait_step_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (&useful_table)[0x54]) {
     memset(useful_table, 0, sizeof(useful_table));
 
     // 打表
@@ -607,7 +607,7 @@ static int knitted_straight_in_basic_type_wait_step_1(const TILE *standing_tiles
 
     // 统计组合龙部分的牌
     for (int i = 0; i < 9; ++i) {
-        TILE t = standard_knitted_straight[which_seq][i];
+        tile_t t = standard_knitted_straight[which_seq][i];
         int n = cnt_table[t];
         if (n > 0) {  // 有，削减之
             ++cnt;
@@ -627,7 +627,7 @@ static int knitted_straight_in_basic_type_wait_step_1(const TILE *standing_tiles
     return (9 - cnt) + result;
 }
 
-int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
+int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
     if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return std::numeric_limits<int>::max();
     }
@@ -644,7 +644,7 @@ int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long st
             memcpy(useful_table, temp_table, sizeof(useful_table));
         }
         else if (st == ret) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
-            for (TILE t = 0x11; t < 0x54; ++t) {
+            for (tile_t t = 0x11; t < 0x54; ++t) {
                 if (temp_table[t] && !useful_table[t]) {
                     useful_table[t] = true;
                 }
@@ -655,7 +655,7 @@ int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long st
     return ret;
 }
 
-bool is_knitted_straight_in_basic_type_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
+bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
     if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return false;
     }
@@ -667,7 +667,7 @@ bool is_knitted_straight_in_basic_type_wait(const TILE *standing_tiles, long sta
     return is_knitted_straight_in_basic_type_wait_impl(cnt_table, standing_cnt, waiting_table);
 }
 
-bool is_knitted_straight_in_basic_type_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile) {
+bool is_knitted_straight_in_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     bool waiting_table[0x54];
     return (is_knitted_straight_in_basic_type_wait(standing_tiles, standing_cnt, waiting_table)
         && waiting_table[test_tile]);
@@ -675,7 +675,7 @@ bool is_knitted_straight_in_basic_type_win(const TILE *standing_tiles, long stan
 
 // 全不靠/七星不靠
 
-static int honors_and_knitted_tiles_wait_step_1(const TILE *standing_tiles, long standing_cnt, int which_seq, bool (&useful_table)[0x54]) {
+static int honors_and_knitted_tiles_wait_step_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (&useful_table)[0x54]) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -690,7 +690,7 @@ static int honors_and_knitted_tiles_wait_step_1(const TILE *standing_tiles, long
 
     // 统计组合龙部分的数牌
     for (int i = 0; i < 9; ++i) {
-        TILE t = standard_knitted_straight[which_seq][i];
+        tile_t t = standard_knitted_straight[which_seq][i];
         int n = cnt_table[t];
         if (n > 0) {  // 有，增加记数
             ++cnt;
@@ -702,7 +702,7 @@ static int honors_and_knitted_tiles_wait_step_1(const TILE *standing_tiles, long
 
     // 统计字牌
     for (int i = 6; i < 13; ++i) {
-        TILE t = standard_thirteen_orphans[i];
+        tile_t t = standard_thirteen_orphans[i];
         int n = cnt_table[t];
         if (n > 0) {  // 有，增加记数
             ++cnt;
@@ -716,7 +716,7 @@ static int honors_and_knitted_tiles_wait_step_1(const TILE *standing_tiles, long
     return 13 - cnt;
 }
 
-int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
+int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]) {
     int ret = std::numeric_limits<int>::max();
     bool temp_table[0x54];
     memset(useful_table, 0, sizeof(useful_table));
@@ -729,7 +729,7 @@ int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing
             memcpy(useful_table, temp_table, sizeof(useful_table));
         }
         else if (st == ret) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
-            for (TILE t = 0x11; t < 0x54; ++t) {
+            for (tile_t t = 0x11; t < 0x54; ++t) {
                 if (temp_table[t] && !useful_table[t]) {
                     useful_table[t] = true;
                 }
@@ -739,7 +739,7 @@ int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing
     return ret;
 }
 
-bool is_honors_and_knitted_tiles_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
+bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
     bool useful_table[0x54];
     if (0 == honors_and_knitted_tiles_wait_step(standing_tiles, standing_cnt, useful_table)) {
         memcpy(waiting_table, useful_table, sizeof(waiting_table));
@@ -748,7 +748,7 @@ bool is_honors_and_knitted_tiles_wait(const TILE *standing_tiles, long standing_
     return false;
 }
 
-bool is_honors_and_knitted_tiles_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile) {
+bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     bool useful_table[0x54];
     if (0 == honors_and_knitted_tiles_wait_step(standing_tiles, standing_cnt, useful_table)) {
         return useful_table[test_tile];

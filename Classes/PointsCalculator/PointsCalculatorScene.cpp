@@ -353,7 +353,7 @@ void PointsCalculatorScene::onFixedSetsChanged() {
 void PointsCalculatorScene::onWinTileChanged() {
     _maybeFourthTile = false;
     _winTileCountInFixedSets = 0;
-    mahjong::TILE winTile = _tilePicker->getHandTilesWidget()->getWinTile();
+    mahjong::tile_t winTile = _tilePicker->getHandTilesWidget()->getWinTile();
     if (winTile == 0) {  // 没有和牌张
         _fourthTileBox->setEnabled(false);
         _robKongBox->setEnabled(false);
@@ -454,8 +454,8 @@ void PointsCalculatorScene::parseInput(const char *input) {
         std::string tilesString(str.begin(), it);
         std::string winString(it + 1, str.end());
 
-        mahjong::HAND_TILES hand_tiles;
-        mahjong::TILE win_tile;
+        mahjong::hand_tiles_t hand_tiles;
+        mahjong::tile_t win_tile;
 
         long ret = mahjong::string_to_tiles(tilesString.c_str(), &hand_tiles);
         if (ret != PARSE_NO_ERROR) {
@@ -517,13 +517,13 @@ void PointsCalculatorScene::calculate() {
     }
 
     // 获取和牌张
-    mahjong::TILE win_tile = _tilePicker->getHandTilesWidget()->getWinTile();
+    mahjong::tile_t win_tile = _tilePicker->getHandTilesWidget()->getWinTile();
     if (win_tile == 0) {
         AlertLayer::showWithMessage("算番", "缺少和牌张", nullptr, nullptr);
         return;
     }
 
-    mahjong::HAND_TILES hand_tiles;
+    mahjong::hand_tiles_t hand_tiles;
 
     // 获取副露
     const std::vector<mahjong::SET> &fixedSets = _tilePicker->getHandTilesWidget()->getFixedSets();
@@ -531,7 +531,7 @@ void PointsCalculatorScene::calculate() {
         - std::begin(hand_tiles.fixed_sets);
 
     // 获取立牌
-    const std::vector<mahjong::TILE> &standingTiles = _tilePicker->getHandTilesWidget()->getStandingTiles();
+    const std::vector<mahjong::tile_t> &standingTiles = _tilePicker->getHandTilesWidget()->getStandingTiles();
     hand_tiles.tile_count = std::copy(standingTiles.begin(), standingTiles.end() - 1, std::begin(hand_tiles.standing_tiles))
         - std::begin(hand_tiles.standing_tiles);
     mahjong::sort_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count);
@@ -539,7 +539,7 @@ void PointsCalculatorScene::calculate() {
     long points_table[mahjong::POINT_TYPE_COUNT] = { 0 };
 
     // 获取绝张、杠开、抢杠、海底信息
-    mahjong::WIN_TYPE win_type = WIN_TYPE_DISCARD;
+    mahjong::win_type_t win_type = WIN_TYPE_DISCARD;
     if (_winTypeGroup->getSelectedButtonIndex() == 1) win_type |= WIN_TYPE_SELF_DRAWN;
     if (_fourthTileBox->isEnabled() && _fourthTileBox->isSelected()) win_type |= WIN_TYPE_4TH_TILE;
     if (_robKongBox->isEnabled() && _robKongBox->isSelected()) win_type |= WIN_TYPE_ABOUT_KONG;
@@ -547,11 +547,11 @@ void PointsCalculatorScene::calculate() {
     if (_lastTileBox->isEnabled() && _lastTileBox->isSelected()) win_type |= WIN_TYPE_WALL_LAST;
 
     // 获取圈风门风
-    mahjong::WIND_TYPE prevalent_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + _prevalentWindGroup->getSelectedButtonIndex());
-    mahjong::WIND_TYPE seat_wind = static_cast<mahjong::WIND_TYPE>(static_cast<int>(mahjong::WIND_TYPE::EAST) + _seatWindGroup->getSelectedButtonIndex());
+    mahjong::wind_t prevalent_wind = static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _prevalentWindGroup->getSelectedButtonIndex());
+    mahjong::wind_t seat_wind = static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _seatWindGroup->getSelectedButtonIndex());
 
     // 算番
-    mahjong::EXTRA_CONDITION ext_cond;
+    mahjong::extra_condition_t ext_cond;
     ext_cond.win_type = win_type;
     ext_cond.prevalent_wind = prevalent_wind;
     ext_cond.seat_wind = seat_wind;

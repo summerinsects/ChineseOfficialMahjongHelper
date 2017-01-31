@@ -13,7 +13,7 @@ public:
 
     void setFixedSetsChangedCallback(const std::function<void ()> &callback) { _fixedSetsChangedCallback = callback; }
     void setWinTileChangedCallback(const std::function<void ()> &callback) { _winTileChangedCallback = callback; }
-    void setData(const mahjong::HAND_TILES &hand_tiles, mahjong::TILE winTile);
+    void setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile);
 
     const HandTilesWidget *getHandTilesWidget() const { return _handTilesWidget; }
 
@@ -39,10 +39,10 @@ private:
 
     void reset();
     void sort();
-    void refreshTilesTableButton(mahjong::TILE tile);
+    void refreshTilesTableButton(mahjong::tile_t tile);
     void refreshAllTilesTableButton();
     void refreshActionButtons();
-    void onTileTableButton(cocos2d::Ref *sender, mahjong::TILE tile);
+    void onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t tile);
     void onChow_XXButton(cocos2d::Ref *sender);
     void onChowX_XButton(cocos2d::Ref *sender);
     void onChowXX_Button(cocos2d::Ref *sender);
