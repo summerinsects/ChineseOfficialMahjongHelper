@@ -97,8 +97,63 @@ void test_points(const char *str, const char *win_str, win_type_t win_type, wind
     //}
 }
 
+void test_wait_step(const char *str) {
+    hand_tiles_t hand_tiles;
+    long ret = string_to_tiles(str, &hand_tiles);
+    if (ret != 0) {
+        printf("error at line %d error = %ld\n", __LINE__, ret);
+        return;
+    }
+
+    auto display = [](const hand_tiles_t *hand_tiles, bool (&useful_table)[TILE_TABLE_COUNT]) {
+        for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+            if (useful_table[t])
+                printf("%s ", stringify_table[t]);
+        }
+
+        int cnt_table[TILE_TABLE_COUNT];
+        map_hand_tiles(hand_tiles, cnt_table);
+
+        printf("%d枚", count_contributing_tile(cnt_table, useful_table));
+    };
+
+    puts(str);
+    bool useful_table[TILE_TABLE_COUNT];
+    int ret0;
+    ret0 = thirteen_orphans_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    printf("131=== %d shanten\n", ret0);
+    if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
+    puts("\n");
+
+    ret0 = seven_pairs_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    printf("7d=== %d shanten\n", ret0);
+    if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
+    puts("\n");
+
+    ret0 = honors_and_knitted_tiles_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    printf("honors and knitted tiles  %d shanten\n", ret0);
+    if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
+    puts("\n");
+
+    ret0 = knitted_straight_in_basic_type_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    printf("knitted straight in basic type %d shanten\n", ret0);
+    if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
+    puts("\n");
+
+    ret0 = basic_type_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    printf("basic type %d shanten\n", ret0);
+    if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
+    puts("\n");
+}
+
 int main(int argc, const char *argv[]) {
     system("chcp 65001");
+
+    //test_wait_step("19m19s22pESWCFPP");
+    //test_wait_step("278m3378s3779pEC");
+    test_wait_step("678m 5m12p1569sSWP");
+    //return 0;
+
 #if 0
     test_wait("19m19s199pESWNCF");
     test_wait("19m19s19pESWNCFP");
