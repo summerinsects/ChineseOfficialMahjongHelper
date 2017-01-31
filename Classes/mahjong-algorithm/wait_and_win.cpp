@@ -22,9 +22,9 @@ int count_contributing_tile(int (&used_table)[0x54], bool (&useful_table)[0x54])
     return cnt;
 }
 
-static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt, bool has_pair, int neighbour_cnt,
+static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt, bool has_pair, int neighbor_cnt,
     bool (&useful_table)[0x54]) {
-    if (set_cnt + neighbour_cnt >= 4) {  // 搭子超载
+    if (set_cnt + neighbor_cnt >= 4) {  // 搭子超载
         // 有将的情况，听牌时完成面子数为3，上听数=3-完成面子数
         // 无将的情况，听牌时完成面子数为4，上听数=4-完成面子数
         return has_pair ? 3 - set_cnt : 4 - set_cnt;
@@ -41,7 +41,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
         if (cnt_table[t] > 2) {
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
-            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbour_cnt, useful_table);
+            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbor_cnt, useful_table);
             result = std::min(ret, result);
             cnt_table[t] += 3;
         }
@@ -54,7 +54,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
                 --cnt_table[t];
                 --cnt_table[t + 1];
                 --cnt_table[t + 2];
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbour_cnt, useful_table);
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbor_cnt, useful_table);
                 result = std::min(ret, result);
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
@@ -69,12 +69,12 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
 
             // 作为将，递归
             if (!has_pair) {
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, true, neighbour_cnt, useful_table);
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, true, neighbor_cnt, useful_table);
                 result = std::min(ret, result);
             }
 
             // 作为刻子搭子，递归
-            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbour_cnt + 1, useful_table);
+            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1, useful_table);
             result = std::min(ret, result);
             useful_table[t] = true;  // 记录有效牌
             cnt_table[t] += 2;
@@ -86,7 +86,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
             if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
                 --cnt_table[t];
                 --cnt_table[t + 1];
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbour_cnt + 1, useful_table);
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1, useful_table);
                 result = std::min(ret, result);
                 if (tile_rank(t) > 1) useful_table[t - 1] = true;  // 记录有效牌
                 if (tile_rank(t) < 8) useful_table[t + 2] = true;  // 记录有效牌
@@ -96,7 +96,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
             if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 坎张
                 --cnt_table[t];
                 --cnt_table[t + 2];
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbour_cnt + 1, useful_table);
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1, useful_table);
                 result = std::min(ret, result);
                 useful_table[t + 1] = true;  // 记录有效牌
                 ++cnt_table[t];
@@ -107,16 +107,16 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
 
     if (result == std::numeric_limits<int>::max()) {
         // 缺少的搭子数=4-完成的面子数-搭子数
-        int neighbour_need = 4 - set_cnt - neighbour_cnt;
+        int neighbor_need = 4 - set_cnt - neighbor_cnt;
 
         // 有将的情况，上听数=搭子数+缺少的搭子数*2-1
         // 无将的情况，上听数=搭子数+缺少的搭子数*2
-        result = neighbour_cnt + neighbour_need * 2;
+        result = neighbor_cnt + neighbor_need * 2;
         if (has_pair) {
             --result;
         }
 
-        if (neighbour_need > 0) {
+        if (neighbor_need > 0) {
             // 面子搭子
             for (TILE t = 0x11; t <= 0x53; ++t) {
                 if (cnt_table[t] == 0) {
