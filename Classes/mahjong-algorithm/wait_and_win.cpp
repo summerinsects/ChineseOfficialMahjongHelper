@@ -400,7 +400,7 @@ int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool 
     }
 
     // 有效牌
-    memcpy(useful_table, cnt_table, sizeof(useful_table));
+    std::transform(std::begin(cnt_table), std::end(cnt_table), std::begin(useful_table), [](int n) { return !!n; });
     return 6 - pair_cnt;
 }
 
