@@ -506,13 +506,41 @@ static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0
     return false;
 }
 
+static int knitted_straight_in_basic_type_wait_step_1(const TILE *standing_tiles, long standing_cnt, int which_seq, bool (&contributing_table)[0x54]) {
+    // TODO:
+    return std::numeric_limits<int>::max();
+}
+
 int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&contributing_table)[0x54]) {
     if (standing_tiles == nullptr || standing_cnt != 13 || standing_cnt != 10) {
         return std::numeric_limits<int>::max();
     }
 
-    // TODO:
-    return std::numeric_limits<int>::max();
+    // 对立牌的种类进行打表
+    int cnt_table[0x54];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
+
+    int ret = std::numeric_limits<int>::max();
+    bool temp_table[0x54];
+    memset(contributing_table, 0, sizeof(contributing_table));
+
+    // 6种组合龙分别计算
+    for (int i = 0; i < 6; ++i) {
+        int st = knitted_straight_in_basic_type_wait_step_1(standing_tiles, standing_cnt, i, temp_table);
+        if (st < ret) {
+            ret = st;
+            memcpy(contributing_table, temp_table, sizeof(contributing_table));
+        }
+        else if (st == ret) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
+            for (TILE t = 0x11; t < 0x54; ++t) {
+                if (temp_table[t] && !contributing_table[t]) {
+                    contributing_table[t] = true;
+                }
+            }
+        }
+    }
+
+    return ret;
 }
 
 bool is_knitted_straight_in_basic_type_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
