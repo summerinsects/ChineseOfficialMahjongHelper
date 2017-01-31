@@ -37,21 +37,10 @@ struct SEPERATIONS {
     long count;
 };
 
-static bool seperate_tail(int (&cnt_table)[0x54], long fixed_cnt, SET (&work_sets)[5], SEPERATIONS *separation) {
-    // 找到未使用的牌
-    int *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n > 0; });
-    // 存在且张数等于2
-    if (it == std::end(cnt_table) || *it != 2) {
-        return false;
-    }
-    // 还有其他未使用的牌
-    if (std::any_of(it + 1, std::end(cnt_table), [](int n) { return n > 0; })) {
-        return false;
-    }
-
+static void seperate_tail_add_pair(TILE tile, long fixed_cnt, SET (&work_sets)[5], SEPERATIONS *separation) {
     // 这2张作为将
     work_sets[4].is_melded = false;
-    work_sets[4].mid_tile = static_cast<TILE>(it - std::begin(cnt_table));
+    work_sets[4].mid_tile = tile;
     work_sets[4].set_type = SET_TYPE::PAIR;
 
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
@@ -71,8 +60,25 @@ static bool seperate_tail(int (&cnt_table)[0x54], long fixed_cnt, SET (&work_set
     else {
         LOG("same case");
     }
+}
 
-    return true;
+static bool seperate_tail(int (&cnt_table)[0x54], long fixed_cnt, SET (&work_sets)[5], SEPERATIONS *separation) {
+    for (TILE t = 0x11; t <= 0x53; ++t) {
+        if (cnt_table[t] < 2) {
+            continue;
+        }
+
+        cnt_table[t] -= 2;
+        // 全部使用完毕
+        if (std::all_of(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n == 0; })) {
+            cnt_table[t] += 2;
+            seperate_tail_add_pair(t, fixed_cnt, work_sets, separation);
+            return true;
+        }
+        cnt_table[t] += 2;
+    }
+
+    return false;
 }
 
 static bool is_separation_branch_exist(long fixed_cnt, long step, const SET (&work_sets)[5], const SEPERATIONS *separation) {

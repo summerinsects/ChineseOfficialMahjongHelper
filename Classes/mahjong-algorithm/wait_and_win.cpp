@@ -6,7 +6,7 @@
 
 namespace mahjong {
 
-static bool is_knitted_straight_in_basic_type_wait_(const int (&cnt_table)[0x54], long left_cnt, bool (&waiting_table)[0x54]);
+static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0x54], long left_cnt, bool (&waiting_table)[0x54]);
 
 static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long left_cnt, long step, int (&contributing_table)[0x54]) {
     if (left_cnt == 1) {
@@ -48,21 +48,23 @@ int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, int (&co
     return std::numeric_limits<int>::max();
 }
 
-static bool is_basic_type_wait_1(const int (&cnt_table)[0x54], bool (&waiting_table)[0x54]) {
-    // 找到未使用的牌
-    const int *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n > 0; });
-    // 存在且张数等于1
-    if (it == std::end(cnt_table) || *it != 1) {
-        return false;
-    }
-    // 还有其他未使用的牌
-    if (std::any_of(it + 1, std::end(cnt_table), [](int n) { return n > 0; })) {
-        return false;
+static bool is_basic_type_wait_1(int (&cnt_table)[0x54], bool (&waiting_table)[0x54]) {
+    for (TILE t = 0x11; t < 0x54; ++t) {
+        if (cnt_table[t] != 1) {
+            continue;
+        }
+
+        // 单钓将
+        cnt_table[t] = 0;
+        if (std::all_of(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n == 0; })) {
+            cnt_table[t] = 1;
+            waiting_table[t] = true;
+            return true;
+        }
+        cnt_table[t] = 1;
     }
 
-    TILE t = static_cast<TILE>(it - std::begin(cnt_table));
-    waiting_table[t] = true;
-    return true;
+    return false;
 }
 
 static bool is_basic_type_wait_2(const int (&cnt_table)[0x54], bool (&waiting_table)[0x54]) {
@@ -160,7 +162,7 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[0x54], long left_cnt
             ret = is_basic_type_wait_4(cnt_table, waiting_table);
         }
         else if (left_cnt == 10 || left_cnt == 13) {
-            ret = is_knitted_straight_in_basic_type_wait_(cnt_table, left_cnt, waiting_table);
+            ret = is_knitted_straight_in_basic_type_wait_impl(cnt_table, left_cnt, waiting_table);
         }
     }
     return ret;
@@ -344,7 +346,7 @@ static bool is_basic_type_match_2(int (&cnt_table)[0x54]) {
 }
 
 // “组合龙+面子+将”和型
-static bool is_knitted_straight_in_basic_type_wait_(const int (&cnt_table)[0x54], long left_cnt, bool (&waiting_table)[0x54]) {
+static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0x54], long left_cnt, bool (&waiting_table)[0x54]) {
     // 匹配组合龙
     const TILE (*matched_seq)[9] = nullptr;
     TILE missing_tiles[9];
