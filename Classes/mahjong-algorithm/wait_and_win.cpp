@@ -8,13 +8,138 @@ namespace mahjong {
 
 static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0x54], long left_cnt, bool (&waiting_table)[0x54]);
 
-static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long left_cnt, long step, int (&contributing_table)[0x54]) {
+static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt, bool has_pair, int neighbour_cnt,
+    int (&contributing_table)[0x54]) {
+    if (set_cnt + neighbour_cnt >= 4) {  // 搭子超载
+        // 有将的情况，听牌时完成面子数为3，上听数=3-完成面子数
+        // 无将的情况，听牌时完成面子数为4，上听数=4-完成面子数
+        return has_pair ? 3 - set_cnt : 4 - set_cnt;
+    }
+
+    int result = std::numeric_limits<int>::max();
+
+    for (TILE t = 0x11; t <= 0x53; ++t) {
+        if (cnt_table[t] < 1) {
+            continue;
+        }
+
+        // 刻子
+        if (cnt_table[t] > 2) {
+            // 削减这组刻子，递归
+            cnt_table[t] -= 3;
+            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbour_cnt, contributing_table);
+            result = std::min(ret, result);
+            cnt_table[t] += 3;
+        }
+
+        // 顺子（只能是序数牌）
+        bool is_numbered = is_numbered_suit(t);
+        if (is_numbered) {
+            if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
+                // 削减这组顺子，递归
+                --cnt_table[t];
+                --cnt_table[t + 1];
+                --cnt_table[t + 2];
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbour_cnt, contributing_table);
+                result = std::min(ret, result);
+                ++cnt_table[t];
+                ++cnt_table[t + 1];
+                ++cnt_table[t + 2];
+            }
+        }
+
+        // 对子可看作将或者刻子搭子
+        if (cnt_table[t] > 1) {
+            // 削减对子
+            cnt_table[t] -= 2;
+
+            // 作为将，递归
+            if (!has_pair) {
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, true, neighbour_cnt, contributing_table);
+                result = std::min(ret, result);
+            }
+
+            // 作为刻子搭子，递归
+            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbour_cnt + 1, contributing_table);
+            result = std::min(ret, result);
+            ++contributing_table[t];  // 记录有效牌
+            cnt_table[t] += 2;
+        }
+
+        // 顺子搭子（只能是序数牌）
+        if (is_numbered) {
+            // 削减搭子，递归
+            if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
+                --cnt_table[t];
+                --cnt_table[t + 1];
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbour_cnt + 1, contributing_table);
+                result = std::min(ret, result);
+                if (tile_rank(t) > 1) ++contributing_table[t - 1];  // 记录有效牌
+                if (tile_rank(t) < 8) ++contributing_table[t + 2];  // 记录有效牌
+                ++cnt_table[t];
+                ++cnt_table[t + 1];
+            }
+            if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 坎张
+                --cnt_table[t];
+                --cnt_table[t + 2];
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbour_cnt + 1, contributing_table);
+                result = std::min(ret, result);
+                ++contributing_table[t + 1];  // 记录有效牌
+                ++cnt_table[t];
+                ++cnt_table[t + 2];
+            }
+        }
+    }
+
+    if (result == std::numeric_limits<int>::max()) {
+        // 缺少的搭子数=4-完成的面子数-搭子数
+        int neighbour_need = 4 - set_cnt - neighbour_cnt;
+
+        // 有将的情况，上听数=搭子数+缺少的搭子数*2-1
+        // 无将的情况，上听数=搭子数+缺少的搭子数*2
+        result = neighbour_cnt + neighbour_need * 2;
+        if (has_pair) {
+            --result;
+        }
+
+        if (neighbour_need > 0) {
+            // 面子搭子
+            for (TILE t = 0x11; t <= 0x53; ++t) {
+                if (cnt_table[t] == 0) {
+                    continue;
+                }
+
+                // 刻子搭子
+                ++contributing_table[t];
+
+                // 顺子搭子（只能是序数牌）
+                if (is_numbered_suit(t)) {
+                    RANK_TYPE r = tile_rank(t);
+                    if (r > 1) ++contributing_table[t - 1];
+                    if (r > 2) ++contributing_table[t - 2];
+                    if (r < 9) ++contributing_table[t + 1];
+                    if (r < 8) ++contributing_table[t + 2];
+                }
+            }
+        }
+
+        // 缺将
+        if (!has_pair) {
+            for (TILE t = 0x11; t <= 0x53; ++t) {
+                if (cnt_table[t] == 0) {
+                    continue;
+                }
+                ++contributing_table[t];
+            }
+        }
+    }
+
+    return result;
 }
 
 int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, int (&contributing_table)[0x54]) {
-    // TODO:
-    if (standing_tiles == nullptr || standing_cnt != 13
-        || standing_cnt != 10 || standing_cnt != 7 || standing_cnt != 4 || standing_cnt != 1) {
+    if (standing_tiles == nullptr || (standing_cnt != 13
+        && standing_cnt != 10 && standing_cnt != 7 && standing_cnt != 4 && standing_cnt != 1)) {
         return std::numeric_limits<int>::max();
     }
 
@@ -24,7 +149,8 @@ int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, int (&co
         ++cnt_table[standing_tiles[i]];
     }
 
-    return std::numeric_limits<int>::max();
+    memset(contributing_table, 0, sizeof(contributing_table));
+    return basic_type_wait_step_recursively(cnt_table, (13 - standing_cnt) / 3, false, 0, contributing_table);
 }
 
 static bool is_basic_type_wait_1(int (&cnt_table)[0x54], bool (&waiting_table)[0x54]) {
