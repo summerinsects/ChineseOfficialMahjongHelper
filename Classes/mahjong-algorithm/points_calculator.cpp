@@ -1277,10 +1277,19 @@ static void check_tiles_hog(const TILE *tiles, long tile_cnt, long (&points_tabl
     points_table[TILE_HOG] = _4_cnt - kong_cnt;
 }
 
+// 移除和牌
+static void remove_win_tile(TILE *standing_tiles, long tile_cnt, TILE win_tile) {
+    TILE *it = std::find(standing_tiles, standing_tiles + tile_cnt, win_tile);
+    long idx = it - standing_tiles;
+    if (idx != tile_cnt) {
+        memmove(it, it + 1, (tile_cnt - idx - 1) * sizeof(TILE));
+    }
+}
+
 // 检测边坎钓
 static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cnt, TILE win_tile, long (&points_table)[POINT_TYPE_COUNT]) {
-    // 全求人不计单钓将，也不可能有边张坎张
-    if (points_table[MELDED_HAND]) {
+    // 全求人和四杠不计单钓将，也不可能有边张、坎张
+    if (points_table[MELDED_HAND] || points_table[FOUR_KONGS]) {
         return;
     }
 
@@ -1289,15 +1298,16 @@ static void check_edge_closed_single_wait(const SET *concealed_sets, long set_cn
     long tile_cnt;
     recovery_tiles_from_sets(concealed_sets, set_cnt, standing_tiles, &tile_cnt);
     sort_tiles(standing_tiles, tile_cnt);
-    copy_exclude(standing_tiles, standing_tiles + tile_cnt, &win_tile, (&win_tile) + 1, standing_tiles);
+    remove_win_tile(standing_tiles, tile_cnt, win_tile);
+    --tile_cnt;
 
     bool waiting_table[0x54] = { 0 };
-    is_basic_type_wait(standing_tiles, tile_cnt - 1, waiting_table);
+    is_basic_type_wait(standing_tiles, tile_cnt, waiting_table);
 
     if (set_cnt == 5) {
         // 判断是否为七对听牌
         bool temp_table[0x54] = { 0 };
-        if (is_seven_pairs_wait(standing_tiles, tile_cnt - 1, temp_table)) {
+        if (is_seven_pairs_wait(standing_tiles, tile_cnt, temp_table)) {
             std::transform(std::begin(temp_table), std::end(temp_table), std::begin(waiting_table),
                 std::begin(waiting_table), [](bool w, bool t) { return w || t; });
         }

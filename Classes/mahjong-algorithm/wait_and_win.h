@@ -53,22 +53,6 @@ static const TILE standard_nine_gates[3][13] = {
     { 0x31, 0x31, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x39, 0x39 }
 };
 
-template <class _InputIterator1, class _InputIterator2, class _OutputIterator>
-_OutputIterator copy_exclude(_InputIterator1 src_first, _InputIterator1 src_last,
-    _InputIterator2 fliter_first, _InputIterator2 fliter_last, _OutputIterator dest) {
-    while (src_first != src_last) {
-        if (fliter_first != fliter_last && *src_first == *fliter_first) {
-            ++fliter_first;
-        }
-        else {
-            *dest = *src_first;
-            ++dest;
-        }
-        ++src_first;
-    }
-    return dest;
-}
-
 }
 
 #endif
