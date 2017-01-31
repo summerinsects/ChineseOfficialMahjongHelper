@@ -511,8 +511,31 @@ static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0
 }
 
 static int knitted_straight_in_basic_type_wait_step_1(const TILE *standing_tiles, long standing_cnt, int which_seq, bool (&contributing_table)[0x54]) {
-    // TODO:
-    return std::numeric_limits<int>::max();
+    memset(contributing_table, 0, sizeof(contributing_table));
+
+    // 打表
+    int cnt_table[0x54];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
+
+    int cnt = 0;
+
+    // 统计组合龙部分的牌
+    for (int i = 0; i < 9; ++i) {
+        TILE t = standard_knitted_straight[which_seq][i];
+        int n = cnt_table[t];
+        if (n > 0) {  // 有，削减之
+            ++cnt;
+            --cnt_table[t];
+        }
+        else {  // 没有， 记录有效牌
+            contributing_table[t] = true;
+        }
+    }
+
+    // 余下“1组面子+将”的上听数
+    int result = basic_type_wait_step_recursively(cnt_table, 3, false, 0, contributing_table);
+    // 上听数=组合龙缺少的张数+余下“1组面子+将”的上听数
+    return (9 - cnt) + result;
 }
 
 int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&contributing_table)[0x54]) {
