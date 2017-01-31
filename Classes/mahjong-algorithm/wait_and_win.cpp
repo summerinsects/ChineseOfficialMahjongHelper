@@ -9,27 +9,6 @@ namespace mahjong {
 static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0x54], long left_cnt, bool (&waiting_table)[0x54]);
 
 static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long left_cnt, long step, int (&contributing_table)[0x54]) {
-    if (left_cnt == 1) {
-        // 找到未使用的牌
-        int *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n > 0; });
-        // 存在且张数等于1
-        if (it == std::end(cnt_table) || *it != 1) {
-            return std::numeric_limits<int>::max();
-        }
-        // 还有其他未使用的牌
-        if (std::any_of(it + 1, std::end(cnt_table), [](int n) { return n > 0; })) {
-            return std::numeric_limits<int>::max();
-        }
-
-        TILE t = static_cast<TILE>(it - std::begin(cnt_table));
-        contributing_table[t] = 1;
-        return 0;
-    }
-
-    // TODO:
-    if (left_cnt == 4) {
-
-    }
 }
 
 int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, int (&contributing_table)[0x54]) {
@@ -204,7 +183,7 @@ int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt, int (&c
     }
 
     // 有效牌
-    std::transform(std::begin(cnt_table), std::end(cnt_table), std::begin(contributing_table), [](int cnt) { return cnt; });
+    memcpy(contributing_table, cnt_table, sizeof(contributing_table));
     return 6 - pair_cnt;
 }
 
@@ -482,7 +461,7 @@ int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing
         int st = honors_and_knitted_tiles_wait_step_(standing_tiles, standing_cnt, i, temp_table);
         if (st < ret) {
             ret = st;
-            std::copy(std::begin(temp_table), std::end(temp_table), std::begin(contributing_table));
+            memcpy(contributing_table, temp_table, sizeof(contributing_table));
         }
         else if (st == ret) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
             for (TILE t = 0x11; t < 0x54; ++t) {
