@@ -5,6 +5,8 @@
 
 namespace mahjong {
 
+void map_tiles(const TILE *tiles, long cnt, int (&cnt_table)[0x54]);
+
 int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&contributing_table)[0x54]);
 bool is_basic_type_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
 bool is_basic_type_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile);

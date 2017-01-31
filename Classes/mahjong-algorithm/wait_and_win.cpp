@@ -6,6 +6,13 @@
 
 namespace mahjong {
 
+void map_tiles(const TILE *tiles, long cnt, int (&cnt_table)[0x54]) {
+    memset(cnt_table, 0, sizeof(cnt_table));
+    for (long i = 0; i < cnt; ++i) {
+        ++cnt_table[tiles[i]];
+    }
+}
+
 static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0x54], long left_cnt, bool (&waiting_table)[0x54]);
 
 static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt, bool has_pair, int neighbour_cnt,

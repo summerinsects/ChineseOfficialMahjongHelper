@@ -121,19 +121,6 @@ static forceinline bool is_rank_equal_quick(TILE tile0, TILE tile1) {
     return ((tile0 & 0xCF) == (tile1 & 0xCF));
 }
 
-static forceinline bool is_pung(TILE tile0, TILE tile1, TILE tile2) {
-    return (tile0 == tile1 && tile1 == tile2);
-}
-
-// 注意到不同花色的序数牌是不连续的，所以很容易确定是否为顺子
-static forceinline bool is_chow(TILE tile0, TILE tile1, TILE tile2) {
-    return (is_numbered_suit_quick(tile0) && tile0 + 1 == tile1 && tile1 + 1 == tile2);
-}
-
-bool forceinline is_concealed_set_completed(TILE tile0, TILE tile1, TILE tile2) {
-    return is_chow(tile0, tile1, tile2) || is_pung(tile0, tile1, tile2);
-}
-
 }
 
 #endif
