@@ -6,6 +6,23 @@
 
 namespace mahjong {
 
+typedef uint16_t work_units_t;
+#define UNIT_TYPE_CHOW 1
+#define UNIT_TYPE_PUNG 2
+#define UNIT_TYPE_PAIR 4
+#define UNIT_TYPE_NEIGHBOR_BOTH 5
+#define UNIT_TYPE_NEIGHBOR_MID 6
+#define UNIT_TYPE_NEIGHBOR_PUNG 7
+
+#define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
+
+#define MAX_STATE 100
+
+struct work_state_t {
+    work_units_t units[MAX_STATE][5];
+    long count;
+};
+
 void map_tiles(const TILE *tiles, long cnt, int (&cnt_table)[0x54]) {
     memset(cnt_table, 0, sizeof(cnt_table));
     for (long i = 0; i < cnt; ++i) {
@@ -22,9 +39,32 @@ int count_contributing_tile(int (&used_table)[0x54], bool (&useful_table)[0x54])
     return cnt;
 }
 
-static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt, bool has_pair, int neighbor_cnt,
-    bool (&useful_table)[0x54]) {
+static bool is_basic_type_branch_exist(long fixed_cnt, long step, const work_units_t (&work_units)[5], work_state_t *work_state) {
+    if (work_state->count <= 0) {
+        return false;
+    }
+
+    // std::includes要求有序
+    work_units_t temp[5];
+    memcpy(&temp[fixed_cnt], &work_units[fixed_cnt], step * sizeof(work_units_t));
+    std::sort(&temp[fixed_cnt], &temp[fixed_cnt + step]);
+
+    return std::any_of(&work_state->units[0], &work_state->units[work_state->count],
+        [&temp, fixed_cnt, step](const work_units_t (&uint)[5]) {
+        return std::includes(&uint[fixed_cnt], &uint[5], &temp[fixed_cnt], &temp[fixed_cnt + step]);
+    });
+}
+
+static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt, bool has_pair, long neighbor_cnt,
+    bool (&useful_table)[0x54], long fixed_cnt, work_units_t (&work_units)[5], work_state_t *work_state) {
+    long idx = set_cnt + neighbor_cnt + has_pair;
+
     if (set_cnt + neighbor_cnt >= 4) {  // 搭子超载
+        work_units_t (&uint)[5] = work_state->units[work_state->count++];
+        memset(uint, 0xFF, sizeof(work_units));
+        memcpy(uint, work_units, idx * sizeof(work_units_t));
+        std::sort(&uint[fixed_cnt], &uint[idx]);
+
         // 有将的情况，听牌时完成面子数为3，上听数=3-完成面子数
         // 无将的情况，听牌时完成面子数为4，上听数=4-完成面子数
         return has_pair ? 3 - set_cnt : 4 - set_cnt;
@@ -39,9 +79,15 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
 
         // 刻子
         if (cnt_table[t] > 2) {
+            work_units[idx] = MAKE_UNIT(UNIT_TYPE_PUNG, t);
+            if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
+                continue;
+            }
+
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
-            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbor_cnt, useful_table);
+            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbor_cnt,
+                useful_table, fixed_cnt, work_units, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 3;
         }
@@ -50,11 +96,17 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
         bool is_numbered = is_numbered_suit(t);
         if (is_numbered) {
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
+                work_units[idx] = MAKE_UNIT(UNIT_TYPE_CHOW, t);
+                if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
+                    continue;
+                }
+
                 // 削减这组顺子，递归
                 --cnt_table[t];
                 --cnt_table[t + 1];
                 --cnt_table[t + 2];
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbor_cnt, useful_table);
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbor_cnt,
+                    useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
@@ -64,17 +116,29 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
 
         // 对子可看作将或者刻子搭子
         if (cnt_table[t] > 1) {
-            // 削减对子
-            cnt_table[t] -= 2;
-
             // 作为将，递归
             if (!has_pair) {
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, true, neighbor_cnt, useful_table);
+                work_units[idx] = MAKE_UNIT(UNIT_TYPE_PAIR, t);
+                if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
+                    continue;
+                }
+
+                cnt_table[t] -= 2;
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, true, neighbor_cnt,
+                    useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
+                cnt_table[t] += 2;
             }
 
             // 作为刻子搭子，递归
-            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1, useful_table);
+            work_units[idx] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_PUNG, t);
+            if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
+                continue;
+            }
+
+            cnt_table[t] -= 2;
+            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1,
+                useful_table, fixed_cnt, work_units, work_state);
             result = std::min(ret, result);
             useful_table[t] = true;  // 记录有效牌
             cnt_table[t] += 2;
@@ -84,9 +148,15 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
         if (is_numbered) {
             // 削减搭子，递归
             if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
+                work_units[idx] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_BOTH, t);
+                if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
+                    continue;
+                }
+
                 --cnt_table[t];
                 --cnt_table[t + 1];
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1, useful_table);
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1,
+                    useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
                 if (tile_rank(t) > 1) useful_table[t - 1] = true;  // 记录有效牌
                 if (tile_rank(t) < 8) useful_table[t + 2] = true;  // 记录有效牌
@@ -94,9 +164,15 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
                 ++cnt_table[t + 1];
             }
             if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 坎张
+                work_units[idx] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_MID, t);
+                if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
+                    continue;
+                }
+
                 --cnt_table[t];
                 --cnt_table[t + 2];
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1, useful_table);
+                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1,
+                    useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
                 useful_table[t + 1] = true;  // 记录有效牌
                 ++cnt_table[t];
@@ -106,6 +182,11 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt,
     }
 
     if (result == std::numeric_limits<int>::max()) {
+        work_units_t (&uint)[5] = work_state->units[work_state->count++];
+        memset(uint, 0xFF, sizeof(work_units));
+        memcpy(uint, work_units, idx * sizeof(work_units_t));
+        std::sort(&uint[fixed_cnt], &uint[idx]);
+
         // 缺少的搭子数=4-完成的面子数-搭子数
         int neighbor_need = 4 - set_cnt - neighbor_cnt;
 
@@ -162,7 +243,12 @@ int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&u
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     memset(useful_table, 0, sizeof(useful_table));
-    return basic_type_wait_step_recursively(cnt_table, (13 - standing_cnt) / 3, false, 0, useful_table);
+
+    work_units_t work_units[5];
+    work_state_t work_state;
+    work_state.count = 0;
+    long fixed_cnt = (13 - standing_cnt) / 3;
+    return basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, useful_table, fixed_cnt, work_units, &work_state);
 }
 
 static bool is_basic_type_wait_1(int (&cnt_table)[0x54], bool (&waiting_table)[0x54]) {
@@ -533,7 +619,10 @@ static int knitted_straight_in_basic_type_wait_step_1(const TILE *standing_tiles
     }
 
     // 余下“1组面子+将”的上听数
-    int result = basic_type_wait_step_recursively(cnt_table, 3, false, 0, useful_table);
+    work_units_t work_units[5];
+    work_state_t work_state;
+    work_state.count = 0;
+    int result = basic_type_wait_step_recursively(cnt_table, 3, false, 0, useful_table, 3, work_units, &work_state);
     // 上听数=组合龙缺少的张数+余下“1组面子+将”的上听数
     return (9 - cnt) + result;
 }
