@@ -15,7 +15,7 @@ void test_wait(const char *str) {
     std::cout << "----------------" << std::endl;
     puts(str);
     bool is_wait = false;
-    bool table[0x54] = { false };
+    bool table[TILE_TABLE_COUNT] = { false };
 
     if (tile_cnt == 13) {
         if (is_thirteen_orphans_wait(tiles, tile_cnt, table)) {
@@ -47,7 +47,7 @@ void test_wait(const char *str) {
         puts("basic type wait:");
     }
 
-    for (tile_t t = 0x11; t < 0x54; ++t) {
+    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
         if (table[t])
             printf("%s ", stringify_table[t]);
     }
@@ -69,7 +69,7 @@ void test_points(const char *str, const char *win_str, win_type_t win_type, wind
 
     tile_t win_tile;
     ret = parse_tiles(win_str, &win_tile, 1);
-    if (ret != 0) {
+    if (ret != 1) {
         printf("error at line %d error = %ld\n", __LINE__, ret);
         return;
     }

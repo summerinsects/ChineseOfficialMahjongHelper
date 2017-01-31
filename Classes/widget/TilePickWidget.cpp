@@ -61,20 +61,9 @@ bool TilePickWidget::init() {
             std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
-    // 风
-    for (int i = 0; i < 4; ++i) {
-        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_WINDS, i + 1);
-        _honorButtons[i] = ui::Button::create(tilesImageName[tile]);
-        _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
-        tableWidget->addChild(_honorButtons[i]);
-        _honorButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
-        _honorButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
-    }
-
-    // 箭
-    for (int i = 4; i < 7; ++i) {
-        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DRAGONS, i - 3);
+    // 字牌
+    for (int i = 0; i < 7; ++i) {
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_HONORS, i + 1);
         _honorButtons[i] = ui::Button::create(tilesImageName[tile]);
         _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
         tableWidget->addChild(_honorButtons[i]);
@@ -252,8 +241,7 @@ void TilePickWidget::refreshTilesTableButton(mahjong::tile_t tile) {
     case TILE_SUIT_CHARACTERS: _characterButtons[rank - 1]->setEnabled(n < 4); break;
     case TILE_SUIT_BAMBOO: _bambooButtons[rank - 1]->setEnabled(n < 4); break;
     case TILE_SUIT_DOTS: _dotsButtons[rank - 1]->setEnabled(n < 4); break;
-    case TILE_SUIT_WINDS: _honorButtons[rank - 1]->setEnabled(n < 4); break;
-    case TILE_SUIT_DRAGONS: _honorButtons[rank + 3]->setEnabled(n < 4); break;
+    case TILE_SUIT_HONORS: _honorButtons[rank - 1]->setEnabled(n < 4); break;
     default: break;
     }
 }
@@ -275,18 +263,11 @@ void TilePickWidget::refreshAllTilesTableButton() {
         _dotsButtons[rank - 1]->setEnabled(n < 4);
     }
 
-    // 风牌4种
-    for (mahjong::rank_t rank = 1; rank < 5; ++rank) {
-        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_WINDS, rank);
+    // 字牌7种
+    for (mahjong::rank_t rank = 1; rank < 8; ++rank) {
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_HONORS, rank);
         int n = _handTilesWidget->getUsedTileCount(tile);
         _honorButtons[rank - 1]->setEnabled(n < 4);
-    }
-
-    // 箭牌3种
-    for (mahjong::rank_t rank = 1; rank < 4; ++rank) {
-        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DRAGONS, rank);
-        int n = _handTilesWidget->getUsedTileCount(tile);
-        _honorButtons[rank + 3]->setEnabled(n < 4);
     }
 }
 

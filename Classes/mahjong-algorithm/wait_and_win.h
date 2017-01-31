@@ -5,27 +5,27 @@
 
 namespace mahjong {
 
-void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[0x54]);
-int count_contributing_tile(int (&used_table)[0x54], bool (&useful_table)[0x54]);
+void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[TILE_TABLE_COUNT]);
+int count_contributing_tile(int (&used_table)[TILE_TABLE_COUNT], bool (&useful_table)[TILE_TABLE_COUNT]);
 
-int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]);
-bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
+int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
+bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
 bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
-int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]);
-bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
+int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
+bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
 bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
-int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]);
-bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
+int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
+bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
 bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
-int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]);
-bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
+int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
+bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
 bool is_knitted_straight_in_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
-int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[0x54]);
-bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
+int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
+bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
 bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
 // 组合龙只有6种
@@ -36,24 +36,17 @@ bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing
 // 369m 147s 258p
 // 369m 258s 147p
 static const tile_t standard_knitted_straight[6][9] = {
-    { 0x11, 0x14, 0x17, 0x22, 0x25, 0x28, 0x33, 0x36, 0x39 },
-    { 0x11, 0x14, 0x17, 0x23, 0x26, 0x29, 0x32, 0x35, 0x38 },
-    { 0x12, 0x15, 0x18, 0x21, 0x24, 0x27, 0x33, 0x36, 0x39 },
-    { 0x12, 0x15, 0x18, 0x23, 0x26, 0x29, 0x31, 0x34, 0x37 },
-    { 0x13, 0x16, 0x19, 0x21, 0x24, 0x27, 0x32, 0x35, 0x38 },
-    { 0x13, 0x16, 0x19, 0x22, 0x25, 0x28, 0x31, 0x34, 0x37 },
+    { TILE_1m, TILE_4m, TILE_7m, TILE_2s, TILE_5s, TILE_8s, TILE_3p, TILE_6p, TILE_9p },
+    { TILE_1m, TILE_4m, TILE_7m, TILE_3s, TILE_6s, TILE_9s, TILE_2p, TILE_5p, TILE_8p },
+    { TILE_2m, TILE_5m, TILE_8m, TILE_1s, TILE_4s, TILE_7s, TILE_3p, TILE_6p, TILE_9p },
+    { TILE_2m, TILE_5m, TILE_8m, TILE_3s, TILE_6s, TILE_9s, TILE_1p, TILE_4p, TILE_7p },
+    { TILE_3m, TILE_6m, TILE_9m, TILE_1s, TILE_4s, TILE_7s, TILE_2p, TILE_5p, TILE_8p },
+    { TILE_3m, TILE_6m, TILE_9m, TILE_2s, TILE_5s, TILE_8s, TILE_1p, TILE_4p, TILE_7p },
 };
 
 // 十三幺13面听
 static const tile_t standard_thirteen_orphans[13] = {
-    0x11, 0x19, 0x21, 0x29, 0x31, 0x39, 0x41, 0x42, 0x43, 0x44, 0x51, 0x52, 0x53
-};
-
-// 九莲宝灯
-static const tile_t standard_nine_gates[3][13] = {
-    { 0x11, 0x11, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x19, 0x19 },
-    { 0x21, 0x21, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x29, 0x29 },
-    { 0x31, 0x31, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x39, 0x39 }
+    TILE_1m, TILE_9m, TILE_1s, TILE_9s, TILE_1p, TILE_9p, TILE_E, TILE_S, TILE_W, TILE_N, TILE_C, TILE_F, TILE_P
 };
 
 }

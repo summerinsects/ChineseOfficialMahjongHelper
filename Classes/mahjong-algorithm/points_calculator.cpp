@@ -51,8 +51,8 @@ static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_pa
     }
 }
 
-static bool seperate_tail(int (&cnt_table)[0x54], long fixed_cnt, pack_t (&work_packs)[5], SEPERATIONS *separation) {
-    for (tile_t t = 0x11; t <= 0x53; ++t) {
+static bool seperate_tail(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, pack_t (&work_packs)[5], SEPERATIONS *separation) {
+    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
         if (cnt_table[t] < 2) {
             continue;
         }
@@ -87,14 +87,14 @@ static bool is_separation_branch_exist(long fixed_cnt, long step, const pack_t (
     });
 }
 
-static bool seperate_recursively(int (&cnt_table)[0x54], long fixed_cnt, long step, pack_t (&work_packs)[5], SEPERATIONS *separation) {
+static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, long step, pack_t (&work_packs)[5], SEPERATIONS *separation) {
     long idx = step + fixed_cnt;
     if (idx == 4) {  // 4组面子都有了
         return seperate_tail(cnt_table, fixed_cnt, work_packs, separation);
     }
 
     bool ret = false;
-    for (tile_t t = 0x11; t <= 0x53; ++t) {
+    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
         if (cnt_table[t] < 1) {
             continue;
         }
@@ -144,7 +144,7 @@ static bool seperate_win_hand(const tile_t *standing_tiles, const pack_t *fixed_
     long standing_cnt = 14 - fixed_cnt * 3;
 
     // 对立牌的种类进行打表
-    int cnt_table[0x54];
+    int cnt_table[TILE_TABLE_COUNT];
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     separation->count = 0;
@@ -189,7 +189,7 @@ void recovery_tiles_from_packs(const pack_t *packs, long pack_cnt, tile_t *tiles
     }
 }
 
-bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[0x54]) {
+bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[TILE_TABLE_COUNT]) {
     // 将每一次副露当作3张牌来算，那么总张数=13
     if (hand_tiles->tile_count <= 0 || hand_tiles->pack_count < 0 || hand_tiles->pack_count > 4
         || hand_tiles->pack_count * 3 + hand_tiles->tile_count != 13) {
@@ -963,7 +963,7 @@ static void calculate_1_pung(pack_t pung_pack, long (&fan_table)[FAN_COUNT]) {
 // 九莲宝灯
 static bool is_nine_gates(const tile_t (&tiles)[14], tile_t win_tile) {
     // 对立牌的种类进行打表
-    int cnt_table[0x54];
+    int cnt_table[TILE_TABLE_COUNT];
     map_tiles(tiles, 14, cnt_table);
     // 去除和牌张
     --cnt_table[win_tile];
@@ -1090,27 +1090,21 @@ static void check_tiles_suits(const tile_t *tiles, long tile_cnt, long (&fan_tab
         suit_flag |= (1 << tile_suit(tiles[i]));
     }
 
-    // 0011 1110
-    if (suit_flag == UINT8_C(0x3E)) {
-        fan_table[ALL_TYPES] = 1;  // 五门齐
-        return;
-    }
-
     // 1111 0001
     if (!(suit_flag & UINT8_C(0xF1))) {
         fan_table[NO_HONORS] = 1;  // 无字
     }
 
-    // 1100 0011
-    if (!(suit_flag & UINT8_C(0xC3))) {
+    // 1110 0011
+    if (!(suit_flag & UINT8_C(0xE3))) {
         ++fan_table[ONE_VOIDED_SUIT];  // 缺一门（万）
     }
-    // 1100 0101
-    if (!(suit_flag & UINT8_C(0xC5))) {
+    // 1110 0101
+    if (!(suit_flag & UINT8_C(0xE5))) {
         ++fan_table[ONE_VOIDED_SUIT];  // 缺一门（条）
     }
-    // 1100 1001
-    if (!(suit_flag & UINT8_C(0xC9))) {
+    // 1110 1001
+    if (!(suit_flag & UINT8_C(0xE9))) {
         ++fan_table[ONE_VOIDED_SUIT];  // 缺一门（饼）
     }
 
@@ -1118,6 +1112,14 @@ static void check_tiles_suits(const tile_t *tiles, long tile_cnt, long (&fan_tab
     if (fan_table[ONE_VOIDED_SUIT] == 2) {
         fan_table[ONE_VOIDED_SUIT] = 0;
         fan_table[suit_flag & UINT8_C(0xF1) ? HALF_FLUSH : FULL_FLUSH] = 1;
+    }
+
+    // 0001 1110
+    if (suit_flag == UINT8_C(0x1E)) {  // 三门序数牌和字牌都有
+        if (std::any_of(tiles, tiles + tile_cnt, &is_winds)
+            && std::any_of(tiles, tiles + tile_cnt, &is_dragons)) {
+            fan_table[ALL_TYPES] = 1;  // 五门齐
+        }
     }
 }
 
@@ -1278,10 +1280,8 @@ static void check_tiles_traits(const tile_t *tiles, long tile_cnt, long (&fan_ta
 // 检测四归一
 static void check_tiles_hog(const tile_t *tiles, long tile_cnt, long (&fan_table)[FAN_COUNT]) {
     long kong_cnt = tile_cnt - 14;  // 标准和牌14张，多出几张就说明有几个杠
-    int cnt_table[0x54] = { 0 };
-    for (long i = 0; i < tile_cnt; ++i) {
-        ++cnt_table[tiles[i]];
-    }
+    int cnt_table[TILE_TABLE_COUNT];
+    map_tiles(tiles, tile_cnt, cnt_table);
     // 有多少种已经用去4张的牌减去杠的数量，即为四归一的数量
     long _4_cnt = std::count(std::begin(cnt_table), std::end(cnt_table), 4);
     fan_table[TILE_HOG] = _4_cnt - kong_cnt;
@@ -1311,12 +1311,12 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     remove_win_tile(standing_tiles, tile_cnt, win_tile);
     --tile_cnt;
 
-    bool waiting_table[0x54] = { 0 };
+    bool waiting_table[TILE_TABLE_COUNT];
     is_basic_type_wait(standing_tiles, tile_cnt, waiting_table);
 
     if (pack_cnt == 5) {
         // 判断是否为七对听牌
-        bool temp_table[0x54] = { 0 };
+        bool temp_table[TILE_TABLE_COUNT];
         if (is_seven_pairs_wait(standing_tiles, tile_cnt, temp_table)) {
             std::transform(std::begin(temp_table), std::end(temp_table), std::begin(waiting_table),
                 std::begin(waiting_table), [](bool w, bool t) { return w || t; });
@@ -1831,7 +1831,7 @@ static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *
     long standing_cnt = hand_tiles->tile_count;
 
     // 对立牌和和牌的种类进行打表
-    int cnt_table[0x54];
+    int cnt_table[TILE_TABLE_COUNT];
     map_tiles(hand_tiles->standing_tiles, standing_cnt, cnt_table);
     ++cnt_table[win_tile];
 
@@ -1938,7 +1938,7 @@ bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], long 
         return false;
     }
 
-    static const tile_t seven_honors[] = { 0x41, 0x42, 0x43, 0x44, 0x51, 0x52, 0x53 };
+    static const tile_t seven_honors[] = { TILE_E, TILE_S, TILE_W, TILE_N, TILE_C, TILE_F, TILE_P };
     if (numbered_cnt == 7 && std::equal(std::begin(seven_honors), std::end(seven_honors), standing_tiles + 7)) {
         // 七种字牌齐，为七星不靠
         fan_table[GREATER_HONORS_AND_KNITTED_TILES] = 1;
@@ -2055,13 +2055,13 @@ static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long 
         case 'm': SET_SUIT_FOR_NUMBERED(0x10); break;
         case 's': SET_SUIT_FOR_NUMBERED(0x20); break;
         case 'p': SET_SUIT_FOR_NUMBERED(0x30); break;
-        case 'E': tiles[tile_cnt++] = 0x41; break;
-        case 'S': tiles[tile_cnt++] = 0x42; break;
-        case 'W': tiles[tile_cnt++] = 0x43; break;
-        case 'N': tiles[tile_cnt++] = 0x44; break;
-        case 'C': tiles[tile_cnt++] = 0x51; break;
-        case 'F': tiles[tile_cnt++] = 0x52; break;
-        case 'P': tiles[tile_cnt++] = 0x53; break;
+        case 'E': tiles[tile_cnt++] = TILE_E; break;
+        case 'S': tiles[tile_cnt++] = TILE_S; break;
+        case 'W': tiles[tile_cnt++] = TILE_W; break;
+        case 'N': tiles[tile_cnt++] = TILE_N; break;
+        case 'C': tiles[tile_cnt++] = TILE_C; break;
+        case 'F': tiles[tile_cnt++] = TILE_F; break;
+        case 'P': tiles[tile_cnt++] = TILE_P; break;
         default: goto parse_finish;
         }
     }
@@ -2236,7 +2236,7 @@ size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, t
 
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     // 打表
-    int cnt_table[0x54];
+    int cnt_table[TILE_TABLE_COUNT];
     if (!map_hand_tiles(hand_tiles, cnt_table)) {
         return ERROR_WRONG_TILES_COUNT;
     }

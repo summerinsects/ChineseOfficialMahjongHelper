@@ -62,7 +62,7 @@ struct hand_tiles_t {
 long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
 long string_to_tiles(const char *str, hand_tiles_t *hand_tiles);
 void recovery_tiles_from_packs(const pack_t *packs, long pack_cnt, tile_t *tiles, long *tile_cnt);
-bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[0x54]);
+bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[TILE_TABLE_COUNT]);
 
 enum fan_t {
     NONE = 0,
