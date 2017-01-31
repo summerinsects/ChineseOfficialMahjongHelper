@@ -511,10 +511,6 @@ int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long st
         return std::numeric_limits<int>::max();
     }
 
-    // 对立牌的种类进行打表
-    int cnt_table[0x54];
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
-
     int ret = std::numeric_limits<int>::max();
     bool temp_table[0x54];
     memset(contributing_table, 0, sizeof(contributing_table));
@@ -571,14 +567,14 @@ static int honors_and_knitted_tiles_wait_step_1(const TILE *standing_tiles, long
 
     int cnt = 0;
 
-    // 统计数牌
+    // 统计组合龙部分的数牌
     for (int i = 0; i < 9; ++i) {
         TILE t = standard_knitted_straight[which_seq][i];
-        int n = cnt_table[standard_knitted_straight[which_seq][i]];
-        if (n > 0) {
+        int n = cnt_table[t];
+        if (n > 0) {  // 有，增加记数
             ++cnt;
         }
-        else {
+        else {  // 没有， 记录有效牌
             contributing_table[t] = true;
         }
     }
@@ -587,14 +583,15 @@ static int honors_and_knitted_tiles_wait_step_1(const TILE *standing_tiles, long
     for (int i = 6; i < 13; ++i) {
         TILE t = standard_thirteen_orphans[i];
         int n = cnt_table[t];
-        if (n > 0) {
+        if (n > 0) {  // 有，增加记数
             ++cnt;
         }
-        else {
+        else {  // 没有， 记录有效牌
             contributing_table[t] = true;
         }
     }
 
+    // 上听数=13-符合牌型的记数
     return 13 - cnt;
 }
 
