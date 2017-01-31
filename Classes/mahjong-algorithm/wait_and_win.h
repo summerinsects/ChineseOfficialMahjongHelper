@@ -5,23 +5,23 @@
 
 namespace mahjong {
 
-int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, int (&contributing_table)[0x54]);
+int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&contributing_table)[0x54]);
 bool is_basic_type_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
 bool is_basic_type_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile);
 
-int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt, int (&contributing_table)[0x54]);
+int seven_pairs_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&contributing_table)[0x54]);
 bool is_seven_pairs_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
 bool is_seven_pairs_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile);
 
-int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt, int (&contributing_table)[0x54]);
+int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&contributing_table)[0x54]);
 bool is_thirteen_orphans_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
 bool is_thirteen_orphans_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile);
 
-int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, int (&contributing_table)[0x54]);
+int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&contributing_table)[0x54]);
 bool is_knitted_straight_in_basic_type_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
 bool is_knitted_straight_in_basic_type_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile);
 
-int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing_cnt, int (&contributing_table)[0x54]);
+int honors_and_knitted_tiles_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&contributing_table)[0x54]);
 bool is_honors_and_knitted_tiles_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]);
 bool is_honors_and_knitted_tiles_win(const TILE *standing_tiles, long standing_cnt, TILE test_tile);
 
