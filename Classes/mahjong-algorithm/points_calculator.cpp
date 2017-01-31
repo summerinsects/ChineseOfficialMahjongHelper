@@ -203,6 +203,31 @@ void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *
     }
 }
 
+bool map_hand_tiles(const HAND_TILES *hand_tiles, int (&cnt_table)[0x54]) {
+    // 将每一次副露当作3张牌来算，那么总张数=13
+    if (hand_tiles->tile_count <= 0 || hand_tiles->set_count < 0 || hand_tiles->set_count > 4
+        || hand_tiles->set_count * 3 + hand_tiles->tile_count != 13) {
+        return false;
+    }
+
+    // 将副露恢复成牌
+    TILE tiles[18];
+    long tile_cnt = 0;
+    if (hand_tiles->set_count == 0) {
+        memcpy(tiles, hand_tiles->standing_tiles, 13 * sizeof(TILE));
+        tile_cnt = 13;
+    }
+    else {
+        recovery_tiles_from_sets(hand_tiles->fixed_sets, hand_tiles->set_count, tiles, &tile_cnt);
+        memcpy(tiles + tile_cnt, hand_tiles->standing_tiles, hand_tiles->tile_count * sizeof(TILE));
+        tile_cnt += hand_tiles->tile_count;
+    }
+
+    // 打表
+    map_tiles(tiles, tile_cnt, cnt_table);
+    return true;
+}
+
 // 一色四同顺
 static forceinline bool is_quadruple_chow(TILE t0, TILE t1, TILE t2, TILE t3) {
     return (t0 == t1 && t0 == t2 && t0 == t3);
@@ -2236,30 +2261,12 @@ size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, TILE w
 }
 
 int check_calculator_input(const HAND_TILES *hand_tiles, TILE win_tile) {
-    // 将每一次副露当作3张牌来算，那么总张数=13
-    if (hand_tiles->tile_count <= 0 || hand_tiles->set_count < 0 || hand_tiles->set_count > 4
-        || hand_tiles->set_count * 3 + hand_tiles->tile_count != 13) {
-        return ERROR_WRONG_TILES_COUNT;
-    }
-
-    // 将副露恢复成牌
-    TILE tiles[18];
-    long tile_cnt = 0;
-    if (hand_tiles->set_count == 0) {
-        memcpy(tiles, hand_tiles->standing_tiles, 13 * sizeof(TILE));
-        tiles[13] = win_tile;
-        tile_cnt = 14;
-    }
-    else {
-        recovery_tiles_from_sets(hand_tiles->fixed_sets, hand_tiles->set_count, tiles, &tile_cnt);
-        memcpy(tiles + tile_cnt, hand_tiles->standing_tiles, hand_tiles->tile_count * sizeof(TILE));
-        tiles[tile_cnt] = win_tile;
-        ++tile_cnt;
-    }
-
     // 打表
     int cnt_table[0x54];
-    map_tiles(tiles, tile_cnt, cnt_table);
+    if (!map_hand_tiles(hand_tiles, cnt_table)) {
+        return ERROR_WRONG_TILES_COUNT;
+    }
+    ++cnt_table[win_tile];
 
     // 如果某张牌超过4
     if (std::any_of(std::begin(cnt_table), std::end(cnt_table), [](int cnt) { return cnt > 4; })) {

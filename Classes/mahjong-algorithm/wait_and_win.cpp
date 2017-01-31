@@ -13,6 +13,15 @@ void map_tiles(const TILE *tiles, long cnt, int (&cnt_table)[0x54]) {
     }
 }
 
+int count_contributing_tile(int (&used_table)[0x54], bool (&contributing_table)[0x54]) {
+    int cnt = 0;
+    for (TILE t = 0x11; t <= 0x53; ++t) {
+        if (contributing_table[t])
+            cnt += 4 - used_table[t];
+    }
+    return cnt;
+}
+
 static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt, bool has_pair, int neighbour_cnt,
     bool (&contributing_table)[0x54]) {
     if (set_cnt + neighbour_cnt >= 4) {  // 搭子超载

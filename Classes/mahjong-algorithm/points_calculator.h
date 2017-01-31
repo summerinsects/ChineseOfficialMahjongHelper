@@ -61,6 +61,7 @@ struct HAND_TILES {
 long parse_tiles(const char *str, TILE *tiles, long max_cnt);
 long string_to_tiles(const char *str, HAND_TILES *hand_tiles);
 void recovery_tiles_from_sets(const SET *sets, long set_cnt, TILE *tiles, long *tile_cnt);
+bool map_hand_tiles(const HAND_TILES *hand_tiles, int (&cnt_table)[0x54]);
 
 enum POINT_TYPE {
     NONE = 0,
