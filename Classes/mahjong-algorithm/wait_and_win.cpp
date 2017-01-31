@@ -13,8 +13,6 @@ void map_tiles(const TILE *tiles, long cnt, int (&cnt_table)[0x54]) {
     }
 }
 
-static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[0x54], long left_cnt, bool (&waiting_table)[0x54]);
-
 static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], int set_cnt, bool has_pair, int neighbour_cnt,
     bool (&contributing_table)[0x54]) {
     if (set_cnt + neighbour_cnt >= 4) {  // 搭子超载
@@ -268,9 +266,6 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[0x54], long left_cnt
         if (left_cnt == 4) {  // 4张无法提取面子的牌
             ret = is_basic_type_wait_4(cnt_table, waiting_table);
         }
-        else if (left_cnt == 10 || left_cnt == 13) {
-            ret = is_knitted_straight_in_basic_type_wait_impl(cnt_table, left_cnt, waiting_table);
-        }
     }
     return ret;
 }
@@ -512,7 +507,7 @@ static int knitted_straight_in_basic_type_wait_step_1(const TILE *standing_tiles
 }
 
 int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&contributing_table)[0x54]) {
-    if (standing_tiles == nullptr || standing_cnt != 13 || standing_cnt != 10) {
+    if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return std::numeric_limits<int>::max();
     }
 
@@ -544,7 +539,7 @@ int knitted_straight_in_basic_type_wait_step(const TILE *standing_tiles, long st
 }
 
 bool is_knitted_straight_in_basic_type_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
-    if (standing_tiles == nullptr || standing_cnt != 13 || standing_cnt != 10) {
+    if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return false;
     }
 
