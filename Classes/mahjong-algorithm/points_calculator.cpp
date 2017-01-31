@@ -159,10 +159,8 @@ static bool seperate_win_hand(const TILE *standing_tiles, const SET *fixed_sets,
     long standing_cnt = 14 - fixed_cnt * 3;
 
     // 对立牌的种类进行打表
-    int cnt_table[0x54] = { 0 };
-    for (long i = 0; i < standing_cnt; ++i) {
-        ++cnt_table[standing_tiles[i]];
-    }
+    int cnt_table[0x54];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     separation->count = 0;
 
@@ -954,10 +952,8 @@ static void calculate_1_pung(const SET &pung_set, long (&points_table)[POINT_TYP
 // 九莲宝灯
 static bool is_nine_gates(const TILE (&tiles)[14], TILE win_tile) {
     // 对立牌的种类进行打表
-    int cnt_table[0x54] = { 0 };
-    for (long i = 0; i < 14; ++i) {
-        ++cnt_table[tiles[i]];
-    }
+    int cnt_table[0x54];
+    map_tiles(tiles, 14, cnt_table);
     // 去除和牌张
     --cnt_table[win_tile];
 
@@ -1819,10 +1815,8 @@ static bool calculate_knitted_straight_in_basic_type_points(const HAND_TILES *ha
     long standing_cnt = hand_tiles->tile_count;
 
     // 对立牌和和牌的种类进行打表
-    int cnt_table[0x54] = { 0 };
-    for (long i = 0; i < standing_cnt; ++i) {
-        ++cnt_table[hand_tiles->standing_tiles[i]];
-    }
+    int cnt_table[0x54];
+    map_tiles(hand_tiles->standing_tiles, standing_cnt, cnt_table);
     ++cnt_table[win_tile];
 
     // 匹配组合龙
@@ -2264,10 +2258,8 @@ int check_calculator_input(const HAND_TILES *hand_tiles, TILE win_tile) {
     }
 
     // 打表
-    int cnt_table[0x54] = { 0 };
-    for (long i = 0; i < tile_cnt; ++i) {
-        ++cnt_table[tiles[i]];
-    }
+    int cnt_table[0x54];
+    map_tiles(tiles, tile_cnt, cnt_table);
 
     // 如果某张牌超过4
     if (std::any_of(std::begin(cnt_table), std::end(cnt_table), [](int cnt) { return cnt > 4; })) {

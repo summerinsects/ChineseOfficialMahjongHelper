@@ -151,10 +151,8 @@ int basic_type_wait_step(const TILE *standing_tiles, long standing_cnt, bool (&c
     }
 
     // 对立牌的种类进行打表
-    int cnt_table[0x54] = { 0 };
-    for (long i = 0; i < standing_cnt; ++i) {
-        ++cnt_table[standing_tiles[i]];
-    }
+    int cnt_table[0x54];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     memset(contributing_table, 0, sizeof(contributing_table));
     return basic_type_wait_step_recursively(cnt_table, (13 - standing_cnt) / 3, false, 0, contributing_table);
@@ -279,10 +277,8 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[0x54], long left_cnt
 
 bool is_basic_type_wait(const TILE *standing_tiles, long standing_cnt, bool (&waiting_table)[0x54]) {
     // 对立牌的种类进行打表
-    int cnt_table[0x54] = { 0 };
-    for (long i = 0; i < standing_cnt; ++i) {
-        ++cnt_table[standing_tiles[i]];
-    }
+    int cnt_table[0x54];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     return is_basic_type_wait_recursively(cnt_table, standing_cnt, waiting_table);
 }
@@ -340,10 +336,8 @@ int thirteen_orphans_wait_step(const TILE *standing_tiles, long standing_cnt, bo
     }
 
     // 对牌的种类进行打表
-    int cnt_table[0x54] = { 0 };
-    for (long i = 0; i < standing_cnt; ++i) {
-        ++cnt_table[standing_tiles[i]];
-    }
+    int cnt_table[0x54];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     bool has_pair = false;
     int cnt = 0;
@@ -542,13 +536,11 @@ static int honors_and_knitted_tiles_wait_step_(const TILE *standing_tiles, long 
         return std::numeric_limits<int>::max();
     }
 
-    std::fill(std::begin(contributing_table), std::end(contributing_table), 0);
+    memset(contributing_table, 0, sizeof(contributing_table));
 
     // 对牌的种类进行打表
-    int cnt_table[0x54] = { 0 };
-    for (long i = 0; i < standing_cnt; ++i) {
-        ++cnt_table[standing_tiles[i]];
-    }
+    int cnt_table[0x54];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     int cnt = 0;
 
