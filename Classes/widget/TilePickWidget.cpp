@@ -210,8 +210,8 @@ void TilePickWidget::reset() {
     _meldedKongButton->setEnabled(false);
     _concealedKongButton->setEnabled(false);
 
-    if (LIKELY(_fixedSetsChangedCallback)) {
-        _fixedSetsChangedCallback();
+    if (LIKELY(_fixedPacksChangedCallback)) {
+        _fixedPacksChangedCallback();
     }
     if (LIKELY(_winTileChangedCallback)) {
         _winTileChangedCallback();
@@ -221,8 +221,8 @@ void TilePickWidget::reset() {
 void TilePickWidget::sort() {
     _handTilesWidget->sortStandingTiles();
 
-    if (LIKELY(_fixedSetsChangedCallback)) {
-        _fixedSetsChangedCallback();
+    if (LIKELY(_fixedPacksChangedCallback)) {
+        _fixedPacksChangedCallback();
     }
     if (LIKELY(_winTileChangedCallback)) {
         _winTileChangedCallback();
@@ -234,8 +234,8 @@ void TilePickWidget::setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::t
     refreshAllTilesTableButton();
     refreshActionButtons();
 
-    if (LIKELY(_fixedSetsChangedCallback)) {
-        _fixedSetsChangedCallback();
+    if (LIKELY(_fixedPacksChangedCallback)) {
+        _fixedPacksChangedCallback();
     }
     if (LIKELY(_winTileChangedCallback)) {
         _winTileChangedCallback();
@@ -311,49 +311,49 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t til
 }
 
 void TilePickWidget::onChow_XXButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedChow_XXSet())) {
-        if (LIKELY(_fixedSetsChangedCallback)) {
-            _fixedSetsChangedCallback();
+    if (LIKELY(_handTilesWidget->makeFixedChow_XXPack())) {
+        if (LIKELY(_fixedPacksChangedCallback)) {
+            _fixedPacksChangedCallback();
         }
     }
 }
 
 void TilePickWidget::onChowX_XButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedChowX_XSet())) {
-        if (LIKELY(_fixedSetsChangedCallback)) {
-            _fixedSetsChangedCallback();
+    if (LIKELY(_handTilesWidget->makeFixedChowX_XPack())) {
+        if (LIKELY(_fixedPacksChangedCallback)) {
+            _fixedPacksChangedCallback();
         }
     }
 }
 
 void TilePickWidget::onChowXX_Button(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedChowXX_Set())) {
-        if (LIKELY(_fixedSetsChangedCallback)) {
-            _fixedSetsChangedCallback();
+    if (LIKELY(_handTilesWidget->makeFixedChowXX_Pack())) {
+        if (LIKELY(_fixedPacksChangedCallback)) {
+            _fixedPacksChangedCallback();
         }
     }
 }
 
 void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedPungSet())) {
-        if (LIKELY(_fixedSetsChangedCallback)) {
-            _fixedSetsChangedCallback();
+    if (LIKELY(_handTilesWidget->makeFixedPungPack())) {
+        if (LIKELY(_fixedPacksChangedCallback)) {
+            _fixedPacksChangedCallback();
         }
     }
 }
 
 void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedMeldedKongSet())) {
-        if (LIKELY(_fixedSetsChangedCallback)) {
-            _fixedSetsChangedCallback();
+    if (LIKELY(_handTilesWidget->makeFixedMeldedKongPack())) {
+        if (LIKELY(_fixedPacksChangedCallback)) {
+            _fixedPacksChangedCallback();
         }
     }
 }
 
 void TilePickWidget::onConcealedKongButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedConcealedKongSet())) {
-        if (LIKELY(_fixedSetsChangedCallback)) {
-            _fixedSetsChangedCallback();
+    if (LIKELY(_handTilesWidget->makeFixedConcealedKongPack())) {
+        if (LIKELY(_fixedPacksChangedCallback)) {
+            _fixedPacksChangedCallback();
         }
     }
 }

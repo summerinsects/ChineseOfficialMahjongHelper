@@ -19,7 +19,7 @@ private:
     void onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
-    void onFixedSetsChanged();
+    void onFixedPacksChanged();
     void onWinTileChanged();
 
     void showInputAlert(const char *prevInput);
@@ -40,7 +40,7 @@ private:
 
     bool _maybeFourthTile = false;
     bool _hasKong = false;
-    size_t _winTileCountInFixedSets = 0;
+    size_t _winTileCountInFixedPacks = 0;
 };
 
 #endif

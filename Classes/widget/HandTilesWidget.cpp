@@ -79,21 +79,21 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::
         mahjong::tile_t tile = mahjong::pack_tile(_fixedPacks[i]);
         switch (mahjong::pack_type(_fixedPacks[i])) {
         case PACK_TYPE_CHOW:
-            addFixedChowSet(tile, 0);
+            addFixedChowPack(tile, 0);
             ++_usedTilesTable[tile - 1];
             ++_usedTilesTable[tile];
             ++_usedTilesTable[tile + 1];
             break;
         case PACK_TYPE_PUNG:
-            addFixedPungSet(tile, 0);
+            addFixedPungPack(tile, 0);
             _usedTilesTable[tile] += 3;
             break;
         case PACK_TYPE_KONG:
             if (mahjong::is_pack_melded(_fixedPacks[i])) {
-                addFixedMeldedKongSet(tile, 0);
+                addFixedMeldedKongPack(tile, 0);
             }
             else {
-                addFixedConcealedKongSet(tile);
+                addFixedConcealedKongPack(tile);
             }
             _usedTilesTable[tile] += 4;
             break;
@@ -121,7 +121,7 @@ mahjong::tile_t HandTilesWidget::getWinTile() const {
     return _standingTiles.back();
 }
 
-bool HandTilesWidget::isFixedSetsContainsKong() const {
+bool HandTilesWidget::isFixedPacksContainsKong() const {
     return std::any_of(_fixedPacks.begin(), _fixedPacks.end(),
         [](mahjong::pack_t pack) { return mahjong::pack_type(pack) == PACK_TYPE_KONG; });
 }
@@ -135,7 +135,7 @@ bool HandTilesWidget::isStandingTilesContainsWinTile() const {
         &_standingTiles.front(), _standingTiles.size() - 1, winTile);
 }
 
-size_t HandTilesWidget::countWinTileInFixedSets() const {
+size_t HandTilesWidget::countWinTileInFixedPacks() const {
     mahjong::tile_t winTile = getWinTile();
     if (winTile == 0 || _fixedPacks.empty()) {
         return 0;
@@ -158,7 +158,7 @@ cocos2d::Vec2 HandTilesWidget::calcStandingTilePos(size_t idx) const {
     return pos;
 }
 
-cocos2d::Vec2 HandTilesWidget::calcFixedSetPos(size_t idx) const {
+cocos2d::Vec2 HandTilesWidget::calcFixedPackPos(size_t idx) const {
     const Size &fixedSize = _fixedWidget->getContentSize();
     Vec2 pos = Vec2(fixedSize.width * 0.25f, fixedSize.height * 0.25f);
     switch (idx) {
@@ -334,8 +334,8 @@ void HandTilesWidget::sortStandingTiles() {
 }
 
 // 添加一组吃
-void HandTilesWidget::addFixedChowSet(mahjong::tile_t tile, int meldedIdx) {
-    Vec2 center = calcFixedSetPos(_fixedPacks.size());
+void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
+    Vec2 center = calcFixedPackPos(_fixedPacks.size());
 
     // 一张牌的尺寸：27 * 39
     const char *image[3];
@@ -374,8 +374,8 @@ void HandTilesWidget::addFixedChowSet(mahjong::tile_t tile, int meldedIdx) {
 }
 
 // 添加一组碰
-void HandTilesWidget::addFixedPungSet(mahjong::tile_t tile, int meldedIdx) {
-    Vec2 center = calcFixedSetPos(_fixedPacks.size());
+void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
+    Vec2 center = calcFixedPackPos(_fixedPacks.size());
 
     // 一张牌的尺寸：27 * 39，横放一张
     Vec2 pos[3];
@@ -409,8 +409,8 @@ void HandTilesWidget::addFixedPungSet(mahjong::tile_t tile, int meldedIdx) {
 }
 
 // 添加一组明杠
-void HandTilesWidget::addFixedMeldedKongSet(mahjong::tile_t tile, int meldedIdx) {
-    Vec2 center = calcFixedSetPos(_fixedPacks.size());
+void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx) {
+    Vec2 center = calcFixedPackPos(_fixedPacks.size());
 
     // 一张牌的尺寸：27 * 39，横放一张
     Vec2 pos[4];
@@ -453,8 +453,8 @@ void HandTilesWidget::addFixedMeldedKongSet(mahjong::tile_t tile, int meldedIdx)
 }
 
 // 添加一组暗杠
-void HandTilesWidget::addFixedConcealedKongSet(mahjong::tile_t tile) {
-    Vec2 center = calcFixedSetPos(_fixedPacks.size());
+void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
+    Vec2 center = calcFixedPackPos(_fixedPacks.size());
 
     // 一张牌的尺寸：27 * 39，横放一张
     const char *image[4];
@@ -559,7 +559,7 @@ bool HandTilesWidget::canKong() {
     return (_standingTilesTable[tile] >= 4);
 }
 
-bool HandTilesWidget::makeFixedChow_XXSet() {
+bool HandTilesWidget::makeFixedChow_XXPack() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
         return false;
     }
@@ -593,12 +593,12 @@ bool HandTilesWidget::makeFixedChow_XXSet() {
     --_standingTilesTable[tile + 1];
     --_standingTilesTable[tile + 2];
 
-    addFixedChowSet(tile, 0);
+    addFixedChowPack(tile, 0);
     refreshStandingTiles();
     return true;
 }
 
-bool HandTilesWidget::makeFixedChowX_XSet() {
+bool HandTilesWidget::makeFixedChowX_XPack() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
         return false;
     }
@@ -632,12 +632,12 @@ bool HandTilesWidget::makeFixedChowX_XSet() {
     --_standingTilesTable[tile];
     --_standingTilesTable[tile + 1];
 
-    addFixedChowSet(tile, 1);
+    addFixedChowPack(tile, 1);
     refreshStandingTiles();
     return true;
 }
 
-bool HandTilesWidget::makeFixedChowXX_Set() {
+bool HandTilesWidget::makeFixedChowXX_Pack() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
         return false;
     }
@@ -671,7 +671,7 @@ bool HandTilesWidget::makeFixedChowXX_Set() {
     --_standingTilesTable[tile - 1];
     --_standingTilesTable[tile];
 
-    addFixedChowSet(tile, 2);
+    addFixedChowPack(tile, 2);
     refreshStandingTiles();
     return true;
 }
@@ -696,7 +696,7 @@ int HandTilesWidget::calcMeldedIdx(int maxIdx) const {
     return leftExsits ? (rightExsits ? 1 : maxIdx) : 0;
 }
 
-bool HandTilesWidget::makeFixedPungSet() {
+bool HandTilesWidget::makeFixedPungPack() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
         return false;
     }
@@ -724,12 +724,12 @@ bool HandTilesWidget::makeFixedPungSet() {
     }
     _standingTilesTable[tile] -= 3;
 
-    addFixedPungSet(tile, meldedIdx);
+    addFixedPungPack(tile, meldedIdx);
     refreshStandingTiles();
     return true;
 }
 
-bool HandTilesWidget::makeFixedMeldedKongSet() {
+bool HandTilesWidget::makeFixedMeldedKongPack() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
         return false;
     }
@@ -757,12 +757,12 @@ bool HandTilesWidget::makeFixedMeldedKongSet() {
     }
     _standingTilesTable[tile] -= 4;
 
-    addFixedMeldedKongSet(tile, meldedIdx);
+    addFixedMeldedKongPack(tile, meldedIdx);
     refreshStandingTiles();
     return true;
 }
 
-bool HandTilesWidget::makeFixedConcealedKongSet() {
+bool HandTilesWidget::makeFixedConcealedKongPack() {
     if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
         return false;
     }
@@ -788,7 +788,7 @@ bool HandTilesWidget::makeFixedConcealedKongSet() {
     }
     _standingTilesTable[tile] -= 4;
 
-    addFixedConcealedKongSet(tile);
+    addFixedConcealedKongPack(tile);
     refreshStandingTiles();
     return true;
 }

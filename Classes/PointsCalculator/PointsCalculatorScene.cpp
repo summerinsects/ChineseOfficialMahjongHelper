@@ -39,7 +39,7 @@ bool PointsCalculatorScene::init() {
     _tilePicker = TilePickWidget::create();
     const Size &widgetSize = _tilePicker->getContentSize();
     this->addChild(_tilePicker);
-    _tilePicker->setFixedSetsChangedCallback(std::bind(&PointsCalculatorScene::onFixedSetsChanged, this));
+    _tilePicker->setFixedPacksChangedCallback(std::bind(&PointsCalculatorScene::onFixedPacksChanged, this));
     _tilePicker->setWinTileChangedCallback(std::bind(&PointsCalculatorScene::onWinTileChanged, this));
 
     // 根据情况缩放
@@ -271,7 +271,7 @@ void PointsCalculatorScene::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton
         // 海底：抢杠没选中
         _fourthTileBox->setEnabled(_maybeFourthTile && !_robKongBox->isSelected());
         _replacementBox->setEnabled(false);
-        _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
+        _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedPacks == 0
             && !_fourthTileBox->isSelected() && !_lastTileBox->isSelected());
         _lastTileBox->setEnabled(!_robKongBox->isSelected());
     }
@@ -295,12 +295,12 @@ void PointsCalculatorScene::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::C
     }
     else {
         // 一定是绝张，则不允许取消选中绝张
-        if (_maybeFourthTile && _winTileCountInFixedSets == 3) {
+        if (_maybeFourthTile && _winTileCountInFixedPacks == 3) {
             _fourthTileBox->setSelected(true);
         }
         else {
             // 抢杠：可为绝张 && 副露不包含和牌 && 点和 && 海底没选中
-            _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
+            _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedPacks == 0
                 && _winTypeGroup->getSelectedButtonIndex() == 0
                 && !_lastTileBox->isSelected());
         }
@@ -331,15 +331,15 @@ void PointsCalculatorScene::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::Che
     }
     else {
         // 抢杠：可为绝张 && 副露不包含和牌 && 点和 && 绝张没选中
-        _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
+        _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedPacks == 0
             && _winTypeGroup->getSelectedButtonIndex() == 0
             && !_fourthTileBox->isSelected());
     }
 }
 
-void PointsCalculatorScene::onFixedSetsChanged() {
+void PointsCalculatorScene::onFixedPacksChanged() {
     // 当副露不包含杠的时候，杠开是禁用状态
-    _hasKong = _tilePicker->getHandTilesWidget()->isFixedSetsContainsKong();
+    _hasKong = _tilePicker->getHandTilesWidget()->isFixedPacksContainsKong();
     if (_winTypeGroup->getSelectedButtonIndex() == 1) {
         // 杠开：有杠
         _replacementBox->setEnabled(_hasKong);
@@ -352,7 +352,7 @@ void PointsCalculatorScene::onFixedSetsChanged() {
 
 void PointsCalculatorScene::onWinTileChanged() {
     _maybeFourthTile = false;
-    _winTileCountInFixedSets = 0;
+    _winTileCountInFixedPacks = 0;
     mahjong::tile_t winTile = _tilePicker->getHandTilesWidget()->getWinTile();
     if (winTile == 0) {  // 没有和牌张
         _fourthTileBox->setEnabled(false);
@@ -365,8 +365,8 @@ void PointsCalculatorScene::onWinTileChanged() {
     _maybeFourthTile = !_tilePicker->getHandTilesWidget()->isStandingTilesContainsWinTile();
 
     // 一定为绝张
-    _winTileCountInFixedSets = _tilePicker->getHandTilesWidget()->countWinTileInFixedSets();
-    if (_maybeFourthTile && _winTileCountInFixedSets == 3) {
+    _winTileCountInFixedPacks = _tilePicker->getHandTilesWidget()->countWinTileInFixedPacks();
+    if (_maybeFourthTile && _winTileCountInFixedPacks == 3) {
         _fourthTileBox->setEnabled(true);
         _robKongBox->setEnabled(false);
         _fourthTileBox->setSelected(true);
@@ -377,7 +377,7 @@ void PointsCalculatorScene::onWinTileChanged() {
     // 抢杠：可为绝张 && 副露不包含和牌 && 点和 && 绝张没选中 && 海底没选中
     // 海底：抢杠没选中
     _fourthTileBox->setEnabled(_maybeFourthTile && !_robKongBox->isSelected());
-    _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedSets == 0
+    _robKongBox->setEnabled(_maybeFourthTile && _winTileCountInFixedPacks == 0
         && _winTypeGroup->getSelectedButtonIndex() == 0
         && !_lastTileBox->isSelected()
         && !_fourthTileBox->isSelected());

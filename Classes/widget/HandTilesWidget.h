@@ -21,9 +21,9 @@ public:
     void setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile);
 
     mahjong::tile_t getWinTile() const;
-    bool isFixedSetsContainsKong() const;
+    bool isFixedPacksContainsKong() const;
     bool isStandingTilesContainsWinTile() const;
-    size_t countWinTileInFixedSets() const;
+    size_t countWinTileInFixedPacks() const;
 
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
@@ -39,12 +39,12 @@ public:
     bool canPung();
     bool canKong();
 
-    bool makeFixedChow_XXSet();
-    bool makeFixedChowX_XSet();
-    bool makeFixedChowXX_Set();
-    bool makeFixedPungSet();
-    bool makeFixedMeldedKongSet();
-    bool makeFixedConcealedKongSet();
+    bool makeFixedChow_XXPack();
+    bool makeFixedChowX_XPack();
+    bool makeFixedChowXX_Pack();
+    bool makeFixedPungPack();
+    bool makeFixedMeldedKongPack();
+    bool makeFixedConcealedKongPack();
 
 private:
     cocos2d::ui::Widget *_fixedWidget;
@@ -62,7 +62,7 @@ private:
 
 private:
     cocos2d::Vec2 calcStandingTilePos(size_t idx) const;
-    cocos2d::Vec2 calcFixedSetPos(size_t idx) const;
+    cocos2d::Vec2 calcFixedPackPos(size_t idx) const;
 
     void addTile(mahjong::tile_t tile);
     void replaceTile(mahjong::tile_t tile);
@@ -73,10 +73,10 @@ private:
     void onTileButton(cocos2d::Ref *sender);
 
     int calcMeldedIdx(int maxIdx) const;
-    void addFixedChowSet(mahjong::tile_t tile, int meldedIdx);
-    void addFixedPungSet(mahjong::tile_t tile, int meldedIdx);
-    void addFixedMeldedKongSet(mahjong::tile_t tile, int meldedIdx);
-    void addFixedConcealedKongSet(mahjong::tile_t tile);
+    void addFixedChowPack(mahjong::tile_t tile, int meldedIdx);
+    void addFixedPungPack(mahjong::tile_t tile, int meldedIdx);
+    void addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx);
+    void addFixedConcealedKongPack(mahjong::tile_t tile);
 };
 
 #endif
