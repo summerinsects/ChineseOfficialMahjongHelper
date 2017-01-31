@@ -10,7 +10,7 @@ public:
     CREATE_FUNC(HandTilesWidget);
 
     const std::vector<mahjong::tile_t> &getStandingTiles() const { return _standingTiles; }
-    const std::vector<mahjong::SET> &getFixedSets() const { return _fixedSets; }
+    const std::vector<mahjong::pack_t> &getFixedPacks() const { return _fixedPacks; }
 
     void setCurrentIdxChangedCallback(const std::function<void ()> &callback) { _currentIdxChangedCallback = callback; }
 
@@ -55,7 +55,7 @@ private:
     int _usedTilesTable[0x54];
     int _standingTilesTable[0x54];
     std::vector<mahjong::tile_t> _standingTiles;
-    std::vector<mahjong::SET> _fixedSets;
+    std::vector<mahjong::pack_t> _fixedPacks;
     size_t _currentIdx;
 
     std::function<void ()> _currentIdxChangedCallback;

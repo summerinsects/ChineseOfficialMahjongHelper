@@ -17,7 +17,7 @@ Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const 
     return scene;
 }
 
-static const int pointsLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
+static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
 static const size_t eachLevelBeginIndex[] =
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
 { 56, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
@@ -293,13 +293,13 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     Label *label = std::get<0>(ext);
     ui::Button *const (&buttons)[9] = std::get<1>(ext);
 
-    label->setString(StringUtils::format("%d番", pointsLevel[idx]));
+    label->setString(StringUtils::format("%d番", fanLevel[idx]));
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
     for (size_t k = 0; k < currentLevelCount; ++k) {
         size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
-        button->setTitleText(mahjong::points_name[idx0]);
+        button->setTitleText(mahjong::fan_name[idx0]);
         button->setUserData(reinterpret_cast<void *>(idx0));
         button->setVisible(true);
         button->setEnabled(true);
@@ -537,7 +537,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
                 ++idx;
             }
 #endif
-            currentWinScore += mahjong::points_value_table[idx];
+            currentWinScore += mahjong::fan_value_table[idx];
         }
     }
     currentWinScore = std::max(8, currentWinScore);

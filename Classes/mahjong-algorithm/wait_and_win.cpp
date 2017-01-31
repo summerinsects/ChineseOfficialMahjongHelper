@@ -55,11 +55,11 @@ static bool is_basic_type_branch_exist(long fixed_cnt, long step, const work_uni
     });
 }
 
-static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt, bool has_pair, long neighbor_cnt,
+static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long pack_cnt, bool has_pair, long neighbor_cnt,
     bool (&useful_table)[0x54], long fixed_cnt, work_units_t (&work_units)[5], work_state_t *work_state) {
-    long idx = set_cnt + neighbor_cnt + has_pair;
+    long idx = pack_cnt + neighbor_cnt + has_pair;
 
-    if (set_cnt + neighbor_cnt >= 4) {  // 搭子超载
+    if (pack_cnt + neighbor_cnt >= 4) {  // 搭子超载
         work_units_t (&uint)[5] = work_state->units[work_state->count++];
         memset(uint, 0xFF, sizeof(work_units));
         memcpy(uint, work_units, idx * sizeof(work_units_t));
@@ -67,7 +67,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
 
         // 有将的情况，听牌时完成面子数为3，上听数=3-完成面子数
         // 无将的情况，听牌时完成面子数为4，上听数=4-完成面子数
-        return has_pair ? 3 - set_cnt : 4 - set_cnt;
+        return has_pair ? 3 - pack_cnt : 4 - pack_cnt;
     }
 
     int result = std::numeric_limits<int>::max();
@@ -86,7 +86,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
 
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
-            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbor_cnt,
+            int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt + 1, has_pair, neighbor_cnt,
                 useful_table, fixed_cnt, work_units, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 3;
@@ -105,7 +105,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
                 --cnt_table[t];
                 --cnt_table[t + 1];
                 --cnt_table[t + 2];
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt + 1, has_pair, neighbor_cnt,
+                int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt + 1, has_pair, neighbor_cnt,
                     useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
                 ++cnt_table[t];
@@ -124,7 +124,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
                 }
 
                 cnt_table[t] -= 2;
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, true, neighbor_cnt,
+                int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, true, neighbor_cnt,
                     useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
                 cnt_table[t] += 2;
@@ -137,7 +137,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
             }
 
             cnt_table[t] -= 2;
-            int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1,
+            int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, has_pair, neighbor_cnt + 1,
                 useful_table, fixed_cnt, work_units, work_state);
             result = std::min(ret, result);
             useful_table[t] = true;  // 记录有效牌
@@ -155,7 +155,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
 
                 --cnt_table[t];
                 --cnt_table[t + 1];
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1,
+                int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, has_pair, neighbor_cnt + 1,
                     useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
                 if (tile_rank(t) > 1) useful_table[t - 1] = true;  // 记录有效牌
@@ -171,7 +171,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
 
                 --cnt_table[t];
                 --cnt_table[t + 2];
-                int ret = basic_type_wait_step_recursively(cnt_table, set_cnt, has_pair, neighbor_cnt + 1,
+                int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, has_pair, neighbor_cnt + 1,
                     useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
                 useful_table[t + 1] = true;  // 记录有效牌
@@ -188,7 +188,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[0x54], long set_cnt
         std::sort(&uint[fixed_cnt], &uint[idx]);
 
         // 缺少的搭子数=4-完成的面子数-搭子数
-        int neighbor_need = 4 - set_cnt - neighbor_cnt;
+        int neighbor_need = 4 - pack_cnt - neighbor_cnt;
 
         // 有将的情况，上听数=搭子数+缺少的搭子数*2-1
         // 无将的情况，上听数=搭子数+缺少的搭子数*2

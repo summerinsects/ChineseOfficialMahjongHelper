@@ -7,32 +7,33 @@
 
 namespace mahjong {
 
-enum class SET_TYPE : uint8_t {
-    NONE = 0,
-    CHOW = 1,
-    PUNG = 2,
-    KONG = 3,
-    PAIR = 4
-};
+#define PACK_TYPE_NONE 0
+#define PACK_TYPE_CHOW 1
+#define PACK_TYPE_PUNG 2
+#define PACK_TYPE_KONG 3
+#define PACK_TYPE_PAIR 4
 
-static const char *set_type_name[] = { "NONE", "CHOW", "PUNG", "KONG", "PAIR" };
+static const char *pack_type_name[] = { "NONE", "CHOW", "PUNG", "KONG", "PAIR" };
 
-struct SET {
-    bool is_melded;
-    SET_TYPE set_type;
-    tile_t mid_tile;
-};
+// 15---12----8----4----0
+// |meld |type|  tile   |
+// +-----+----+---------+
+typedef uint16_t pack_t;
 
-static bool is_set_contains_tile(const SET &set, tile_t tile) {
-    //assert(set.set_type != SET_TYPE::NONE);
-    if (set.set_type == SET_TYPE::CHOW) {
-        return (set.mid_tile - 1 == tile
-            || set.mid_tile == tile
-            || set.mid_tile + 1 == tile);
-    }
-    else {
-        return set.mid_tile == tile;
-    }
+static forceinline pack_t make_pack(bool melded, uint8_t type, tile_t tile) {
+    return (melded << 12 | (type << 8) | tile);
+}
+
+static forceinline suit_t is_pack_melded(pack_t pack) {
+    return !!(pack >> 12);
+}
+
+static forceinline uint8_t pack_type(pack_t pack) {
+    return ((pack >> 8) & 0xF);
+}
+
+static forceinline uint8_t pack_tile(pack_t pack) {
+    return (pack & 0xFF);
 }
 
 static const char *stringify_table[] = {
@@ -45,8 +46,8 @@ static const char *stringify_table[] = {
 };
 
 struct hand_tiles_t {
-    SET fixed_sets[5];
-    long set_count;
+    pack_t fixed_packs[5];
+    long pack_count;
     tile_t standing_tiles[13];
     long tile_count;
 };
@@ -60,7 +61,7 @@ struct hand_tiles_t {
 
 long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
 long string_to_tiles(const char *str, hand_tiles_t *hand_tiles);
-void recovery_tiles_from_sets(const SET *sets, long set_cnt, tile_t *tiles, long *tile_cnt);
+void recovery_tiles_from_packs(const pack_t *packs, long pack_cnt, tile_t *tiles, long *tile_cnt);
 bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[0x54]);
 
 enum fan_t {
@@ -81,7 +82,7 @@ enum fan_t {
     DRAGON_PUNG, PREVALENT_WIND, SEAT_WIND, CONCEALED_HAND, ALL_CHOWS, TILE_HOG, DOUBLE_PUNG, TWO_CONCEALED_PUNGS, CONCEALED_KONG, ALL_SIMPLES,
     PURE_DOUBLE_CHOW, MIXED_DOUBLE_CHOW, SHORT_STRAIGHT, TWO_TERMINAL_CHOWS, PUNG_OF_TERMINALS_OR_HONORS, MELDED_KONG, ONE_VOIDED_SUIT, NO_HONORS, EDGE_WAIT, CLOSED_WAIT, SINGLE_WAIT, SELF_DRAWN,
     FLOWER_TILES,
-    POINT_TYPE_COUNT
+    FAN_COUNT
 };
 
 enum class wind_t {
@@ -97,7 +98,7 @@ typedef uint8_t win_type_t;
 #define WIN_TYPE_WALL_LAST 8
 
 bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long standing_cnt, tile_t win_tile);
-size_t count_win_tile_in_fixed_sets(const SET *fixed_set, long fixed_cnt, tile_t win_tile);
+size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, tile_t win_tile);
 
 #define MAX_SEPARAION_CNT 10
 
@@ -113,11 +114,11 @@ struct extra_condition_t {
     wind_t seat_wind;
 };
 
-int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&points_table)[POINT_TYPE_COUNT]);
+int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_COUNT]);
 
 #if 0
 
-static const char *points_name[] = {
+static const char *fan_name[] = {
     "None",
     "Big Four Winds", "Big Three Dragons", "All Green", "Nine Gates", "Four Kongs", "Seven Shifted Pairs", "Thirteen Orphans",
     "All Terminals", "Little Four Winds", "Little Three Dragons", "All Honors", "Four Concealed Pungs", "Pure Terminal Chows",
@@ -144,7 +145,7 @@ static const char *points_name[] = {
 #pragma execution_character_set("utf-8")
 #endif
 
-static const char *points_name[] = {
+static const char *fan_name[] = {
     "无",
     "大四喜", "大三元", "绿一色", "九莲宝灯", "四杠", "连七对", "十三幺",
     "清幺九", "小四喜", "小三元", "字一色", "四暗刻", "一色双龙会",
@@ -166,7 +167,7 @@ static const char *points_name[] = {
 
 #endif
 
-static const int points_value_table[POINT_TYPE_COUNT] = {
+static const int fan_value_table[FAN_COUNT] = {
     0,
     88, 88, 88, 88, 88, 88, 88,
     64, 64, 64, 64, 64, 64,

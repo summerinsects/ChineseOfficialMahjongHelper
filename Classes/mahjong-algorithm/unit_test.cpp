@@ -74,25 +74,25 @@ void test_points(const char *str, const char *win_str, win_type_t win_type, wind
         return;
     }
 
-    long points_table[POINT_TYPE_COUNT] = { 0 };
+    long fan_table[FAN_COUNT] = { 0 };
     puts("----------------");
     printf("%s %s\n", str, win_str);
     mahjong::extra_condition_t ext_cond;
     ext_cond.win_type = win_type;
     ext_cond.prevalent_wind = prevalent_wind;
     ext_cond.seat_wind = seat_wind;
-    int points = calculate_points(&hand_tiles, win_tile, &ext_cond, points_table);
+    int points = calculate_points(&hand_tiles, win_tile, &ext_cond, fan_table);
 
     printf("max points = %d\n\n", points);
     //for (int i = 1; i < FLOWER_TILES; ++i) {
-    //    if (points_table[i] == 0) {
+    //    if (fan_table[i] == 0) {
     //        continue;
     //    }
-    //    if (points_table[i] == 1) {
-    //        printf("%s %d\n", points_name[i], points_value_table[i]);
+    //    if (fan_table[i] == 1) {
+    //        printf("%s %d\n", fan_name[i], fan_value_table[i]);
     //    }
     //    else {
-    //        printf("%s %d*%ld\n", points_name[i], points_value_table[i], points_table[i]);
+    //        printf("%s %d*%ld\n", fan_name[i], fan_value_table[i], fan_table[i]);
     //    }
     //}
 }

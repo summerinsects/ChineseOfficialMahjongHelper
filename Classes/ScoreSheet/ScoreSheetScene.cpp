@@ -363,7 +363,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
                     ++idx;
                 }
 #endif
-                label->setString(mahjong::points_name[idx]);
+                label->setString(mahjong::fan_name[idx]);
                 label->setVisible(true);
                 pointsNameVisible = true;
                 break;
@@ -621,7 +621,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
                     if (!str.empty()) {
                         str.append("、");
                     }
-                    str.append(mahjong::points_name[idx]);
+                    str.append(mahjong::fan_name[idx]);
                 }
             }
         }

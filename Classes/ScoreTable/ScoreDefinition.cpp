@@ -50,7 +50,7 @@ Scene *ScoreDefinitionScene::createScene(size_t idx) {
 }
 
 bool ScoreDefinitionScene::initWithIndex(size_t idx) {
-    const char *title = idx < 100 ? mahjong::points_name[idx] : principle_title[idx - 100];
+    const char *title = idx < 100 ? mahjong::fan_name[idx] : principle_title[idx - 100];
     if (!BaseLayer::initWithTitle(title)) {
         return false;
     }

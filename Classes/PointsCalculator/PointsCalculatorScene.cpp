@@ -526,9 +526,9 @@ void PointsCalculatorScene::calculate() {
     mahjong::hand_tiles_t hand_tiles;
 
     // 获取副露
-    const std::vector<mahjong::SET> &fixedSets = _tilePicker->getHandTilesWidget()->getFixedSets();
-    hand_tiles.set_count = std::copy(fixedSets.begin(), fixedSets.end(), std::begin(hand_tiles.fixed_sets))
-        - std::begin(hand_tiles.fixed_sets);
+    const std::vector<mahjong::pack_t> &fixedPacks = _tilePicker->getHandTilesWidget()->getFixedPacks();
+    hand_tiles.pack_count = std::copy(fixedPacks.begin(), fixedPacks.end(), std::begin(hand_tiles.fixed_packs))
+        - std::begin(hand_tiles.fixed_packs);
 
     // 获取立牌
     const std::vector<mahjong::tile_t> &standingTiles = _tilePicker->getHandTilesWidget()->getStandingTiles();
@@ -536,7 +536,7 @@ void PointsCalculatorScene::calculate() {
         - std::begin(hand_tiles.standing_tiles);
     mahjong::sort_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count);
 
-    long points_table[mahjong::POINT_TYPE_COUNT] = { 0 };
+    long fan_table[mahjong::FAN_COUNT] = { 0 };
 
     // 获取绝张、杠开、抢杠、海底信息
     mahjong::win_type_t win_type = WIN_TYPE_DISCARD;
@@ -555,7 +555,7 @@ void PointsCalculatorScene::calculate() {
     ext_cond.win_type = win_type;
     ext_cond.prevalent_wind = prevalent_wind;
     ext_cond.seat_wind = seat_wind;
-    int points = calculate_points(&hand_tiles, win_tile, &ext_cond, points_table);
+    int points = calculate_points(&hand_tiles, win_tile, &ext_cond, fan_table);
 
     Color3B textColor = UserDefault::getInstance()->getBoolForKey("night_mode") ? Color3B::WHITE : Color3B::BLACK;
     if (points == ERROR_NOT_WIN) {
@@ -576,10 +576,10 @@ void PointsCalculatorScene::calculate() {
 
     // 加花牌
     points += flowerCnt;
-    points_table[mahjong::FLOWER_TILES] = flowerCnt;
+    fan_table[mahjong::FLOWER_TILES] = flowerCnt;
 
     // 有n个番种，每行排2个
-    long n = mahjong::POINT_TYPE_COUNT - std::count(std::begin(points_table), std::end(points_table), 0);
+    long n = mahjong::FAN_COUNT - std::count(std::begin(fan_table), std::end(fan_table), 0);
     long rows = (n >> 1) + (n & 1);  // 需要这么多行
 
     // 排列
@@ -588,14 +588,14 @@ void PointsCalculatorScene::calculate() {
     innerNode->setContentSize(Size(visibleSize.width, pointsAreaHeight));
 
     for (int i = 0, j = 0; i < n; ++i) {
-        while (points_table[++j] == 0) continue;
+        while (fan_table[++j] == 0) continue;
 
         std::string str;
-        if (points_table[j] == 1) {
-            str = StringUtils::format("%s %d番\n", mahjong::points_name[j], mahjong::points_value_table[j]);
+        if (fan_table[j] == 1) {
+            str = StringUtils::format("%s %d番\n", mahjong::fan_name[j], mahjong::fan_value_table[j]);
         }
         else {
-            str = StringUtils::format("%s %d番x%ld\n", mahjong::points_name[j], mahjong::points_value_table[j], points_table[j]);
+            str = StringUtils::format("%s %d番x%ld\n", mahjong::fan_name[j], mahjong::fan_value_table[j], fan_table[j]);
         }
 
         // 创建label，每行排2个
