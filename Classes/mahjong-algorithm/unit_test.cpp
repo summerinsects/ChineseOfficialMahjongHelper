@@ -465,5 +465,6 @@ int main(int argc, const char *argv[]) {
     return 0;
 }
 
+#include "stringify.cpp"
 #include "wait_and_win.cpp"
 #include "points_calculator.cpp"
