@@ -15,6 +15,8 @@ typedef uint16_t work_units_t;
 #define UNIT_TYPE_NEIGHBOR_PUNG 7
 
 #define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
+#define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
+#define UNIT_TILE(unit_) ((unit_) & 0xFF)
 
 #define MAX_STATE 1024
 
@@ -60,6 +62,18 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
     long idx = pack_cnt + neighbor_cnt + has_pair;
 
     if (pack_cnt + neighbor_cnt >= 4) {  // 搭子超载
+        if (!has_pair) {
+            for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+                if (cnt_table[t] < 2) {
+                    continue;
+                }
+                work_units[idx] = MAKE_UNIT(UNIT_TYPE_PAIR, t);
+                has_pair = true;
+                ++idx;
+                break;
+            }
+        }
+
         work_units_t (&uint)[5] = work_state->units[work_state->count++];
         if (work_state->count < MAX_STATE) {
             memset(uint, 0xFF, sizeof(work_units));
@@ -242,6 +256,37 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
     return result;
 }
 
+static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, bool (*useful_table)[TILE_TABLE_COUNT]) {
+    // 计算上听数并获取可能减少上听数的牌
+    work_units_t work_units[5];
+    work_state_t work_state;
+    work_state.count = 0;
+    bool temp_table[TILE_TABLE_COUNT];
+    int result = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, temp_table, fixed_cnt, work_units, &work_state);
+
+    if (useful_table == nullptr) {
+        return result;
+    }
+
+    // 依次测试这些牌是否能减少上听数
+    bool temp_table2[TILE_TABLE_COUNT];
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (cnt_table[t] == 4 || !temp_table[t]) {
+            continue;
+        }
+
+        ++cnt_table[t];
+        int temp = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, temp_table2, fixed_cnt, work_units, &work_state);
+        if (temp < result) {
+            (*useful_table)[t] = true;  // 标记为有效牌
+        }
+        --cnt_table[t];
+    }
+
+    return result;
+}
+
 int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]) {
     if (standing_tiles == nullptr || (standing_cnt != 13
         && standing_cnt != 10 && standing_cnt != 7 && standing_cnt != 4 && standing_cnt != 1)) {
@@ -253,12 +298,7 @@ int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     memset(useful_table, 0, sizeof(useful_table));
-
-    work_units_t work_units[5];
-    work_state_t work_state;
-    work_state.count = 0;
-    long fixed_cnt = (13 - standing_cnt) / 3;
-    return basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, useful_table, fixed_cnt, work_units, &work_state);
+    return basic_type_wait_step_from_table(cnt_table, (13 - standing_cnt) / 3, &useful_table);
 }
 
 static bool is_basic_type_wait_1(int (&cnt_table)[TILE_TABLE_COUNT], bool (&waiting_table)[TILE_TABLE_COUNT]) {
@@ -626,10 +666,8 @@ static int knitted_straight_in_basic_type_wait_step_1(const tile_t *standing_til
     }
 
     // 余下“1组面子+将”的上听数
-    work_units_t work_units[5];
-    work_state_t work_state;
-    work_state.count = 0;
-    int result = basic_type_wait_step_recursively(cnt_table, 3, false, 0, useful_table, 3, work_units, &work_state);
+    int result = basic_type_wait_step_from_table(cnt_table, 3, &useful_table);
+
     // 上听数=组合龙缺少的张数+余下“1组面子+将”的上听数
     return (9 - cnt) + result;
 }
