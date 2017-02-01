@@ -428,14 +428,14 @@ void PointsCalculatorScene::showInputAlert(const char *prevInput) {
 }
 
 void PointsCalculatorScene::parseInput(const char *input) {
+    if (*input == '\0') {
+        return;
+    }
+
     const char *errorStr = nullptr;
     const std::string str = input;
 
     do {
-        if (str.empty()) {
-            break;
-        }
-
         mahjong::hand_tiles_t hand_tiles;
         mahjong::tile_t win_tile;
         long ret = mahjong::string_to_tiles_with_win_tile(input, &hand_tiles, &win_tile);
@@ -445,10 +445,14 @@ void PointsCalculatorScene::parseInput(const char *input) {
             case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = "数字后面需有后缀"; break;
             case PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK: errorStr = "一组副露包含了过多的牌"; break;
             case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = "无法正确解析副露"; break;
-            case PARSE_ERROR_NO_COMMA: errorStr = "缺少和牌张"; break;
             case PARSE_ERROR_TOO_MANY_COMMAS: errorStr = "过多逗号"; break;
             default: break;
             }
+            break;
+        }
+        if (win_tile == 0) {
+            errorStr = "缺少和牌张";
+            break;
         }
 
         ret = mahjong::check_calculator_input(&hand_tiles, win_tile);

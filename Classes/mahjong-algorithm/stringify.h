@@ -19,8 +19,7 @@ static const char *stringify_table[] = {
 #define PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK -3
 #define PARSE_ERROR_CANNOT_MAKE_FIXED_PACK -4
 #define PARSE_ERROR_TOO_MANY_FIXED_PACKS -5
-#define PARSE_ERROR_NO_COMMA -5
-#define PARSE_ERROR_TOO_MANY_COMMAS -6
+#define PARSE_ERROR_TOO_MANY_COMMAS -5
 
 long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
 long string_to_tiles(const char *str, hand_tiles_t *hand_tiles);

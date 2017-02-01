@@ -2065,7 +2065,9 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     if (!map_hand_tiles(hand_tiles, cnt_table)) {
         return ERROR_WRONG_TILES_COUNT;
     }
-    ++cnt_table[win_tile];
+    if (win_tile != 0) {
+        ++cnt_table[win_tile];
+    }
 
     // 如果某张牌超过4
     if (std::any_of(std::begin(cnt_table), std::end(cnt_table), [](int cnt) { return cnt > 4; })) {

@@ -186,28 +186,30 @@ long string_to_tiles_with_win_tile(const char *str, hand_tiles_t *hand_tiles, ti
         return PARSE_ERROR_ILLEGAL_CHARACTER;
     }
 
-    const char *p = strchr(str, ',');
-    if (p == nullptr) {
-        return PARSE_ERROR_NO_COMMA;
-    }
-
-    if (strchr(p + 1, ',') != nullptr) {
-        return PARSE_ERROR_TOO_MANY_COMMAS;
-    }
-
     char tilesString[64] = "";
-    size_t size = std::min<size_t>(sizeof(tilesString), p - str);
-    strncpy(tilesString, str, size);
+    const char *commas = strchr(str, ',');
+    if (commas != nullptr) {
+        if (strchr(commas + 1, ',') != nullptr) {
+            return PARSE_ERROR_TOO_MANY_COMMAS;
+        }
 
-    long ret = mahjong::string_to_tiles(tilesString, hand_tiles);
+        size_t size = std::min<size_t>(sizeof(tilesString), commas - str);
+        strncpy(tilesString, str, size);
+        str = tilesString;
+    }
+
+    long ret = mahjong::string_to_tiles(str, hand_tiles);
     if (ret != PARSE_NO_ERROR) {
         return ret;
     }
     mahjong::sort_tiles(hand_tiles->standing_tiles, hand_tiles->tile_count);
 
-    ret = mahjong::parse_tiles(p + 1, win_tile, 1);
-    if (ret != 1) {
-        return ret;
+    *win_tile = 0;
+    if (commas != nullptr) {
+        ret = mahjong::parse_tiles(commas + 1, win_tile, 1);
+        if (ret != 1) {
+            return ret;
+        }
     }
 
     return PARSE_NO_ERROR;
