@@ -159,8 +159,11 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles) {
             break;
         default: {
                 long ret = parse_tiles_impl(p, tiles, 13, &tile_cnt);
-                if (ret <= 0) {
+                if (ret < 0) {
                     return ret;
+                }
+                if (ret == 0) {
+                    return PARSE_ERROR_ILLEGAL_CHARACTER;
                 }
                 q = p + ret;
             }
