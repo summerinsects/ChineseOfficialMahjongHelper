@@ -30,7 +30,7 @@ void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[TILE_TABLE_COUNT]
     }
 }
 
-int count_contributing_tile(int (&used_table)[TILE_TABLE_COUNT], bool (&useful_table)[TILE_TABLE_COUNT]) {
+int count_contributing_tile(const int (&used_table)[TILE_TABLE_COUNT], const bool (*useful_table)[TILE_TABLE_COUNT]) {
     int cnt = 0;
     for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
         if (useful_table[t])
