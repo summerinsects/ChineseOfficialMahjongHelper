@@ -49,6 +49,25 @@ static const tile_t standard_thirteen_orphans[13] = {
     TILE_1m, TILE_9m, TILE_1s, TILE_9s, TILE_1p, TILE_9p, TILE_E, TILE_S, TILE_W, TILE_N, TILE_C, TILE_F, TILE_P
 };
 
+#define CONSIDERATION_FLAG_BASIC_TYPE               0x00
+#define CONSIDERATION_FLAG_SEVEN_PAIRS              0x01
+#define CONSIDERATION_FLAG_THIRTEEN_ORPHANS         0x02
+#define CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES 0x04
+#define CONSIDERATION_FLAG_KNITTED_STRAIGHT         0x08
+#define CONSIDERATION_FLAG_ALL                      0xFF
+
+struct enum_result_t {
+    tile_t discard_tile;
+    uint8_t consideration_flag;
+    int wait_step;
+    bool useful_table[TILE_TABLE_COUNT];
+};
+
+typedef void (*enum_callback_t)(void *context, const enum_result_t *result);
+
+void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t drawn_tile, unsigned consideration_flag,
+    void *context, enum_callback_t enum_callback);
+
 }
 
 #endif

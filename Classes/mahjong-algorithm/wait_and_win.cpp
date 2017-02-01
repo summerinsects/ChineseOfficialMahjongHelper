@@ -751,4 +751,83 @@ bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing
     return false;
 }
 
+static void enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_tile, unsigned consideration_flag,
+    void *context, enum_callback_t enum_callback) {
+    enum_result_t result;
+    result.discard_tile = discard_tile;
+    result.consideration_flag = CONSIDERATION_FLAG_BASIC_TYPE;
+    result.wait_step = basic_type_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, result.useful_table);
+    enum_callback(context, &result);
+
+    if (hand_tiles->tile_count == 13) {
+        if (consideration_flag | CONSIDERATION_FLAG_SEVEN_PAIRS) {
+            result.consideration_flag = CONSIDERATION_FLAG_SEVEN_PAIRS;
+            result.wait_step = seven_pairs_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, result.useful_table);
+            enum_callback(context, &result);
+        }
+
+        if (consideration_flag | CONSIDERATION_FLAG_THIRTEEN_ORPHANS) {
+            result.consideration_flag = CONSIDERATION_FLAG_THIRTEEN_ORPHANS;
+            result.wait_step = thirteen_orphans_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, result.useful_table);
+            enum_callback(context, &result);
+        }
+
+        if (consideration_flag | CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES) {
+            result.consideration_flag = CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES;
+            result.wait_step = honors_and_knitted_tiles_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, result.useful_table);
+            enum_callback(context, &result);
+        }
+    }
+
+    if (hand_tiles->tile_count == 13 || hand_tiles->tile_count == 10) {
+        if (consideration_flag | CONSIDERATION_FLAG_KNITTED_STRAIGHT) {
+            result.consideration_flag = CONSIDERATION_FLAG_KNITTED_STRAIGHT;
+            result.wait_step = knitted_straight_in_basic_type_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, result.useful_table);
+            enum_callback(context, &result);
+        }
+    }
+}
+
+static long table_to_tiles(const int (&cnt_table)[TILE_TABLE_COUNT], tile_t *tiles, long max_cnt) {
+    long cnt = 0;
+    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+        for (int n = 0; n < cnt_table[t]; ++n) {
+            *tiles++ = t;
+            ++cnt;
+            if (cnt == max_cnt) {
+                return max_cnt;
+            }
+        }
+    }
+    return cnt;
+}
+
+void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t drawn_tile, unsigned consideration_flag,
+    void *context, enum_callback_t enum_callback) {
+    enum_discard_tile_1(hand_tiles, drawn_tile, consideration_flag, context, enum_callback);
+
+    if (drawn_tile == 0) {
+        return;
+    }
+
+    int cnt_table[TILE_TABLE_COUNT];
+    map_tiles(hand_tiles->standing_tiles, hand_tiles->tile_count, cnt_table);
+
+    hand_tiles_t temp;
+    memcpy(&temp, hand_tiles, sizeof(temp));
+
+    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+        if (cnt_table[t] && t != drawn_tile) {
+            --cnt_table[t];
+            ++cnt_table[drawn_tile];
+
+            table_to_tiles(cnt_table, temp.standing_tiles, temp.tile_count);
+            enum_discard_tile_1(&temp, t, consideration_flag, context, enum_callback);
+
+            --cnt_table[drawn_tile];
+            ++cnt_table[t];
+        }
+    }
+}
+
 }
