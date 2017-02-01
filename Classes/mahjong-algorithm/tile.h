@@ -14,6 +14,7 @@
 
 namespace mahjong {
 
+// 牌
 typedef uint8_t suit_t;
 typedef uint8_t rank_t;
 
@@ -51,6 +52,44 @@ enum tile_table_t {
     TILE_1p = 0x31, TILE_2p, TILE_3p, TILE_4p, TILE_5p, TILE_6p, TILE_7p, TILE_8p, TILE_9p,
     TILE_E  = 0x41, TILE_S , TILE_W , TILE_N , TILE_C , TILE_F , TILE_P ,
     TILE_TABLE_COUNT
+};
+
+// 一组（面子或者雀头）
+#define PACK_TYPE_NONE 0
+#define PACK_TYPE_CHOW 1
+#define PACK_TYPE_PUNG 2
+#define PACK_TYPE_KONG 3
+#define PACK_TYPE_PAIR 4
+
+static const char *pack_type_name[] = { "NONE", "CHOW", "PUNG", "KONG", "PAIR" };
+
+// 15---12----8----4----0
+// |meld |type|  tile   |
+// +-----+----+---------+
+typedef uint16_t pack_t;
+
+static forceinline pack_t make_pack(bool melded, uint8_t type, tile_t tile) {
+    return (melded << 12 | (type << 8) | tile);
+}
+
+static forceinline suit_t is_pack_melded(pack_t pack) {
+    return !!(pack >> 12);
+}
+
+static forceinline uint8_t pack_type(pack_t pack) {
+    return ((pack >> 8) & 0xF);
+}
+
+static forceinline uint8_t pack_tile(pack_t pack) {
+    return (pack & 0xFF);
+}
+
+// 手牌结构
+struct hand_tiles_t {
+    pack_t fixed_packs[5];      // 副露的面子（包括暗杠）
+    long pack_count;            // 副露的面子（包括暗杠）数
+    tile_t standing_tiles[13];  // 立牌
+    long tile_count;            // 立牌数
 };
 
 static const uint32_t traits_mask_table[256] = {

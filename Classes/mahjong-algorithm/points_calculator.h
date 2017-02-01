@@ -7,51 +7,6 @@
 
 namespace mahjong {
 
-#define PACK_TYPE_NONE 0
-#define PACK_TYPE_CHOW 1
-#define PACK_TYPE_PUNG 2
-#define PACK_TYPE_KONG 3
-#define PACK_TYPE_PAIR 4
-
-static const char *pack_type_name[] = { "NONE", "CHOW", "PUNG", "KONG", "PAIR" };
-
-// 15---12----8----4----0
-// |meld |type|  tile   |
-// +-----+----+---------+
-typedef uint16_t pack_t;
-
-static forceinline pack_t make_pack(bool melded, uint8_t type, tile_t tile) {
-    return (melded << 12 | (type << 8) | tile);
-}
-
-static forceinline suit_t is_pack_melded(pack_t pack) {
-    return !!(pack >> 12);
-}
-
-static forceinline uint8_t pack_type(pack_t pack) {
-    return ((pack >> 8) & 0xF);
-}
-
-static forceinline uint8_t pack_tile(pack_t pack) {
-    return (pack & 0xFF);
-}
-
-static const char *stringify_table[] = {
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-    "", "1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "", "", "", "", "", "",
-    "", "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", "", "", "", "", "", "",
-    "", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "", "", "", "", "", "",
-    "", "E", "S", "W", "N", "", "", "", "", "", "", "", "", "", "", "",
-    "", "C", "F", "P", "", "", "", "", "", "", "", "", "", "", "", "",
-};
-
-struct hand_tiles_t {
-    pack_t fixed_packs[5];
-    long pack_count;
-    tile_t standing_tiles[13];
-    long tile_count;
-};
-
 #define PARSE_NO_ERROR 0
 #define PARSE_ERROR_ILLEGAL_CHARACTER -1
 #define PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT -2
