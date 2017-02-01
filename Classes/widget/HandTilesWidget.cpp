@@ -1,6 +1,7 @@
 ﻿#include "HandTilesWidget.h"
 #include "../common.h"
 #include "../compiler.h"
+#include "../mahjong-algorithm/points_calculator.h"
 
 USING_NS_CC;
 
@@ -70,12 +71,12 @@ void HandTilesWidget::reset() {
     _fixedWidget->removeAllChildren();
 }
 
-void HandTilesWidget::setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile) {
+void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t drawnTile) {
     reset();
 
     // 添加副露
-    for (long i = 0; i < hand_tiles.pack_count; ++i) {
-        _fixedPacks.push_back(hand_tiles.fixed_packs[i]);
+    for (long i = 0; i < handTiles.pack_count; ++i) {
+        _fixedPacks.push_back(handTiles.fixed_packs[i]);
         mahjong::tile_t tile = mahjong::pack_tile(_fixedPacks[i]);
         switch (mahjong::pack_type(_fixedPacks[i])) {
         case PACK_TYPE_CHOW:
@@ -103,17 +104,37 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::
     }
 
     // 添加立牌
-    for (long i = 0; i < hand_tiles.tile_count; ++i) {
-        mahjong::tile_t tile = hand_tiles.standing_tiles[i];
+    for (long i = 0; i < handTiles.tile_count; ++i) {
+        mahjong::tile_t tile = handTiles.standing_tiles[i];
         addTile(tile);
         ++_usedTilesTable[tile];
     }
-    addTile(winTile);
+
+    if (drawnTile != 0) {
+        addTile(drawnTile);
+    }
 
     refreshHighlightPos();
 }
 
-mahjong::tile_t HandTilesWidget::getWinTile() const {
+bool HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *drawnTile) const {
+    // 获取和牌张
+    *drawnTile = getDrawnTile();
+    if (*drawnTile == 0) {
+        return false;
+    }
+
+    // 获取副露
+    handTiles->pack_count = std::copy(_fixedPacks.begin(), _fixedPacks.end(), std::begin(handTiles->fixed_packs))
+        - std::begin(handTiles->fixed_packs);
+
+    // 获取立牌
+    handTiles->tile_count = std::copy(_standingTiles.begin(), _standingTiles.end() - 1, std::begin(handTiles->standing_tiles))
+        - std::begin(handTiles->standing_tiles);
+    return true;
+}
+
+mahjong::tile_t HandTilesWidget::getDrawnTile() const {
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
     if (_standingTiles.size() < maxCnt + 1) {
         return 0;
@@ -127,7 +148,7 @@ bool HandTilesWidget::isFixedPacksContainsKong() const {
 }
 
 bool HandTilesWidget::isStandingTilesContainsWinTile() const {
-    mahjong::tile_t winTile = getWinTile();
+    mahjong::tile_t winTile = getDrawnTile();
     if (winTile == 0) {
         return false;
     }
@@ -136,7 +157,7 @@ bool HandTilesWidget::isStandingTilesContainsWinTile() const {
 }
 
 size_t HandTilesWidget::countWinTileInFixedPacks() const {
-    mahjong::tile_t winTile = getWinTile();
+    mahjong::tile_t winTile = getDrawnTile();
     if (winTile == 0 || _fixedPacks.empty()) {
         return 0;
     }

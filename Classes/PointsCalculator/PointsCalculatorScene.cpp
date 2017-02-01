@@ -354,7 +354,7 @@ void PointsCalculatorScene::onFixedPacksChanged() {
 void PointsCalculatorScene::onWinTileChanged() {
     _maybeFourthTile = false;
     _winTileCountInFixedPacks = 0;
-    mahjong::tile_t winTile = _tilePicker->getHandTilesWidget()->getWinTile();
+    mahjong::tile_t winTile = _tilePicker->getHandTilesWidget()->getDrawnTile();
     if (winTile == 0) {  // 没有和牌张
         _fourthTileBox->setEnabled(false);
         _robKongBox->setEnabled(false);
@@ -485,24 +485,14 @@ void PointsCalculatorScene::calculate() {
         return;
     }
 
-    // 获取和牌张
-    mahjong::tile_t win_tile = _tilePicker->getHandTilesWidget()->getWinTile();
+    mahjong::hand_tiles_t hand_tiles;
+    mahjong::tile_t win_tile;
+    _tilePicker->getHandTilesWidget()->getData(&hand_tiles, &win_tile);
     if (win_tile == 0) {
         AlertLayer::showWithMessage("算番", "缺少和牌张", nullptr, nullptr);
         return;
     }
 
-    mahjong::hand_tiles_t hand_tiles;
-
-    // 获取副露
-    const std::vector<mahjong::pack_t> &fixedPacks = _tilePicker->getHandTilesWidget()->getFixedPacks();
-    hand_tiles.pack_count = std::copy(fixedPacks.begin(), fixedPacks.end(), std::begin(hand_tiles.fixed_packs))
-        - std::begin(hand_tiles.fixed_packs);
-
-    // 获取立牌
-    const std::vector<mahjong::tile_t> &standingTiles = _tilePicker->getHandTilesWidget()->getStandingTiles();
-    hand_tiles.tile_count = std::copy(standingTiles.begin(), standingTiles.end() - 1, std::begin(hand_tiles.standing_tiles))
-        - std::begin(hand_tiles.standing_tiles);
     mahjong::sort_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count);
 
     long fan_table[mahjong::FAN_COUNT] = { 0 };

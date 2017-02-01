@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
-#include "../mahjong-algorithm/points_calculator.h"
+#include "../mahjong-algorithm/tile.h"
 
 class HandTilesWidget;
 
