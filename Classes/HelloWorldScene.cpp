@@ -3,6 +3,7 @@
 #include "ScoreSheet/ScoreSheetScene.h"
 #include "ScoreTable/ScoreTable.h"
 #include "Other/OtherScene.h"
+#include "MahjongTheory/MahjongTheoryScene.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -58,7 +59,7 @@ bool HelloWorld::init() {
     button->setTitleFontSize(20);
     button->setTitleColor(textColor);
     button->setTitleText("算番器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 80));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 100));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(PointsCalculatorScene::createScene());
     });
@@ -70,7 +71,7 @@ bool HelloWorld::init() {
     button->setTitleFontSize(20);
     button->setTitleColor(textColor);
     button->setTitleText("计分器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 40));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 60));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(ScoreSheetScene::createScene());
     });
@@ -82,7 +83,7 @@ bool HelloWorld::init() {
     button->setTitleFontSize(20);
     button->setTitleColor(textColor);
     button->setTitleText("番种表");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 20));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(ScoreTableScene::createScene());
     });
@@ -94,7 +95,7 @@ bool HelloWorld::init() {
     button->setTitleFontSize(20);
     button->setTitleColor(textColor);
     button->setTitleText("其他");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 40));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(OtherScene::createScene());
     });
@@ -105,8 +106,20 @@ bool HelloWorld::init() {
     button->setContentSize(Size(75.0, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleColor(textColor);
+    button->setTitleText("牌理");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 60));
+    button->addClickEventListener([](Ref *) {
+        Director::getInstance()->pushScene(MahjongTheoryScene::createScene());
+    });
+
+    button = ui::Button::create(normalImage, selectedImage);
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(75.0, 32.0f));
+    button->setTitleFontSize(20);
+    button->setTitleColor(textColor);
     button->setTitleText(UserDefault::getInstance()->getBoolForKey("night_mode") ? "日间模式" : "夜间模式");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 80));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 100));
     button->addClickEventListener([](Ref *) {
         if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
             UserDefault::getInstance()->setBoolForKey("night_mode", false);
