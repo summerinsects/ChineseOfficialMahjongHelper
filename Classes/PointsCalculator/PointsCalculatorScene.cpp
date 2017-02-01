@@ -1,4 +1,5 @@
 ﻿#include "PointsCalculatorScene.h"
+#include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/points_calculator.h"
 
 #include "../widget/TilePickWidget.h"

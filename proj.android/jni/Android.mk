@@ -12,6 +12,7 @@ LOCAL_MODULE_FILENAME := libcocos2dcpp
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/mahjong-algorithm/points_calculator.cpp \
+                   ../../Classes/mahjong-algorithm/stringify.cpp \
                    ../../Classes/mahjong-algorithm/wait_and_win.cpp \
                    ../../Classes/Other/OtherScene.cpp \
                    ../../Classes/PointsCalculator/PointsCalculatorScene.cpp \

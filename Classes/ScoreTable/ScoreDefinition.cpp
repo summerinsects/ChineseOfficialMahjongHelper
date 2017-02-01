@@ -1,6 +1,7 @@
 ﻿#include "ScoreDefinition.h"
 #include "ui/UIWebView.h"
 #include "../common.h"
+#include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/points_calculator.h"
 #include "../compiler.h"
 #include <thread>

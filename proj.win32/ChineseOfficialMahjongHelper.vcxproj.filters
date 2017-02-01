@@ -78,6 +78,9 @@
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -139,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\widget\HandTilesWidget.h">
       <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\stringify.h">
+      <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
