@@ -16,7 +16,7 @@ typedef uint16_t work_units_t;
 
 #define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
 
-#define MAX_STATE 100
+#define MAX_STATE 1024
 
 struct work_state_t {
     work_units_t units[MAX_STATE][5];
@@ -61,9 +61,14 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
 
     if (pack_cnt + neighbor_cnt >= 4) {  // 搭子超载
         work_units_t (&uint)[5] = work_state->units[work_state->count++];
-        memset(uint, 0xFF, sizeof(work_units));
-        memcpy(uint, work_units, idx * sizeof(work_units_t));
-        std::sort(&uint[fixed_cnt], &uint[idx]);
+        if (work_state->count < MAX_STATE) {
+            memset(uint, 0xFF, sizeof(work_units));
+            memcpy(uint, work_units, idx * sizeof(work_units_t));
+            std::sort(&uint[fixed_cnt], &uint[idx]);
+        }
+        else {
+            assert(0 && "too many state!");
+        }
 
         // 有将的情况，听牌时完成面子数为3，上听数=3-完成面子数
         // 无将的情况，听牌时完成面子数为4，上听数=4-完成面子数
@@ -183,9 +188,14 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
 
     if (result == std::numeric_limits<int>::max()) {
         work_units_t (&uint)[5] = work_state->units[work_state->count++];
-        memset(uint, 0xFF, sizeof(work_units));
-        memcpy(uint, work_units, idx * sizeof(work_units_t));
-        std::sort(&uint[fixed_cnt], &uint[idx]);
+        if (work_state->count < MAX_STATE) {
+            memset(uint, 0xFF, sizeof(work_units));
+            memcpy(uint, work_units, idx * sizeof(work_units_t));
+            std::sort(&uint[fixed_cnt], &uint[idx]);
+        }
+        else {
+            assert(0 && "too many state!");
+        }
 
         // 缺少的搭子数=4-完成的面子数-搭子数
         int neighbor_need = 4 - pack_cnt - neighbor_cnt;
