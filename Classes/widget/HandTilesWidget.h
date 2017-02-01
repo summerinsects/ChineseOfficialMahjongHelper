@@ -19,7 +19,7 @@ public:
     int getStandingTileCount(mahjong::tile_t tile) const { return _standingTilesTable[tile]; }
 
     void setData(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t drawnTile);
-    bool getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *drawnTile) const;
+    void getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *drawnTile) const;
 
     mahjong::tile_t getDrawnTile() const;
     bool isFixedPacksContainsKong() const;

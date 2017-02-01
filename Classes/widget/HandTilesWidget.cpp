@@ -117,21 +117,24 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
     refreshHighlightPos();
 }
 
-bool HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *drawnTile) const {
-    // 获取和牌张
-    *drawnTile = getDrawnTile();
-    if (*drawnTile == 0) {
-        return false;
-    }
+void HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *drawnTile) const {
+    // 获取最后摸到的牌
+    mahjong::tile_t dt = getDrawnTile();
+    *drawnTile = dt;
 
     // 获取副露
     handTiles->pack_count = std::copy(_fixedPacks.begin(), _fixedPacks.end(), std::begin(handTiles->fixed_packs))
         - std::begin(handTiles->fixed_packs);
 
     // 获取立牌
-    handTiles->tile_count = std::copy(_standingTiles.begin(), _standingTiles.end() - 1, std::begin(handTiles->standing_tiles))
-        - std::begin(handTiles->standing_tiles);
-    return true;
+    if (dt == 0) {
+        handTiles->tile_count = std::copy(_standingTiles.begin(), _standingTiles.end(), std::begin(handTiles->standing_tiles))
+            - std::begin(handTiles->standing_tiles);
+    }
+    else {
+        handTiles->tile_count = std::copy(_standingTiles.begin(), _standingTiles.end() - 1, std::begin(handTiles->standing_tiles))
+            - std::begin(handTiles->standing_tiles);
+    }
 }
 
 mahjong::tile_t HandTilesWidget::getDrawnTile() const {
