@@ -1,5 +1,6 @@
 ﻿#include "tile.h"
 #include "wait_and_win.h"
+#include "stringify.h"
 #include "points_calculator.h"
 
 #include <iostream>

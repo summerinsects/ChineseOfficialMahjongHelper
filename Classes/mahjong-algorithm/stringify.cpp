@@ -79,7 +79,7 @@ long parse_tiles(const char *str, tile_t *tiles, long max_cnt) {
 static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
     if (tile_cnt > 0) {
         if (tile_cnt != 3 && tile_cnt != 4) {
-            return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_SET;
+            return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK;
         }
         if (tile_cnt == 3) {
             if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
@@ -92,13 +92,13 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
                     *pack = make_pack(true, PACK_TYPE_CHOW, temp[1]);
                 }
                 else {
-                    return PARSE_ERROR_CANNOT_MAKE_FIXED_SET;
+                    return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
                 }
             }
         }
         else {
             if (tiles[0] != tiles[1] || tiles[1] != tiles[2] || tiles[2] != tiles[3]) {
-                return PARSE_ERROR_CANNOT_MAKE_FIXED_SET;
+                return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
             }
             *pack = make_pack(true, PACK_TYPE_KONG, tiles[0]);
         }
@@ -120,7 +120,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles) {
         switch (c) {
         case ' ': {
             if (pack_cnt > 4) {
-                return PARSE_ERROR_TOO_MANY_FIXED_SET;
+                return PARSE_ERROR_TOO_MANY_FIXED_PACKS;
             }
             long ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt]);
             if (ret < 0) {
@@ -133,7 +133,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles) {
         }
         case '[': {
             if (pack_cnt > 4) {
-                return PARSE_ERROR_TOO_MANY_FIXED_SET;
+                return PARSE_ERROR_TOO_MANY_FIXED_PACKS;
             }
             long ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt]);
             if (ret < 0) {
@@ -149,7 +149,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles) {
                 return PARSE_ERROR_ILLEGAL_CHARACTER;
             }
             if (tile_cnt != 4) {
-                return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_SET;
+                return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK;
             }
             q = ++p;
             packs[pack_cnt] = make_pack(false, PACK_TYPE_KONG, tiles[0]);
@@ -176,6 +176,39 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles) {
     hand_tiles->pack_count = pack_cnt;
     memcpy(hand_tiles->standing_tiles, tiles, tile_cnt * sizeof(tile_t));
     hand_tiles->tile_count = tile_cnt;
+
+    return PARSE_NO_ERROR;
+}
+
+long string_to_tiles_with_win_tile(const char *str, hand_tiles_t *hand_tiles, tile_t *win_tile) {
+    size_t len = strlen(str);
+    if (strspn(str, "123456789mpsESWNCFP [],") != len) {
+        return PARSE_ERROR_ILLEGAL_CHARACTER;
+    }
+
+    const char *p = strchr(str, ',');
+    if (p == nullptr) {
+        return PARSE_ERROR_NO_COMMA;
+    }
+
+    if (strchr(p + 1, ',') != nullptr) {
+        return PARSE_ERROR_TOO_MANY_COMMAS;
+    }
+
+    char tilesString[64] = "";
+    size_t size = std::min<size_t>(sizeof(tilesString), p - str);
+    strncpy(tilesString, str, size);
+
+    long ret = mahjong::string_to_tiles(tilesString, hand_tiles);
+    if (ret != PARSE_NO_ERROR) {
+        return ret;
+    }
+    mahjong::sort_tiles(hand_tiles->standing_tiles, hand_tiles->tile_count);
+
+    ret = mahjong::parse_tiles(p + 1, win_tile, 1);
+    if (ret != 1) {
+        return ret;
+    }
 
     return PARSE_NO_ERROR;
 }

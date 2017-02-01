@@ -16,12 +16,15 @@ static const char *stringify_table[] = {
 #define PARSE_NO_ERROR 0
 #define PARSE_ERROR_ILLEGAL_CHARACTER -1
 #define PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT -2
-#define PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_SET -3
-#define PARSE_ERROR_CANNOT_MAKE_FIXED_SET -4
-#define PARSE_ERROR_TOO_MANY_FIXED_SET -5
+#define PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK -3
+#define PARSE_ERROR_CANNOT_MAKE_FIXED_PACK -4
+#define PARSE_ERROR_TOO_MANY_FIXED_PACKS -5
+#define PARSE_ERROR_NO_COMMA -5
+#define PARSE_ERROR_TOO_MANY_COMMAS -6
 
 long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
 long string_to_tiles(const char *str, hand_tiles_t *hand_tiles);
+long string_to_tiles_with_win_tile(const char *str, hand_tiles_t *hand_tiles, tile_t *win_tile);
 
 }
 

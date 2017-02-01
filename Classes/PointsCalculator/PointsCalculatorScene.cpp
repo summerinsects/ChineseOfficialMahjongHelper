@@ -436,51 +436,19 @@ void PointsCalculatorScene::parseInput(const char *input) {
             break;
         }
 
-        if (strspn(input, "123456789mpsESWNCFP [],") != str.length()) {
-            errorStr = "无法解析输入的文本";
-            break;
-        }
-
-        std::string::const_iterator it = std::find(str.begin(), str.end(), ',');
-        if (it == str.end()) {
-            errorStr = "缺少和牌张";
-            break;
-        }
-
-        if (std::any_of(it + 1, str.end(), [](char ch) { return ch == ','; })) {
-            errorStr = "过多逗号";
-            break;
-        }
-
-        std::string tilesString(str.begin(), it);
-        std::string winString(it + 1, str.end());
-
         mahjong::hand_tiles_t hand_tiles;
         mahjong::tile_t win_tile;
-
-        long ret = mahjong::string_to_tiles(tilesString.c_str(), &hand_tiles);
+        long ret = mahjong::string_to_tiles_with_win_tile(input, &hand_tiles, &win_tile);
         if (ret != PARSE_NO_ERROR) {
             switch (ret) {
             case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
             case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = "数字后面需有后缀"; break;
-            case PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_SET: errorStr = "一组副露包含了过多的牌"; break;
-            case PARSE_ERROR_CANNOT_MAKE_FIXED_SET: errorStr = "无法正确解析副露"; break;
+            case PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK: errorStr = "一组副露包含了过多的牌"; break;
+            case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = "无法正确解析副露"; break;
+            case PARSE_ERROR_NO_COMMA: errorStr = "缺少和牌张"; break;
+            case PARSE_ERROR_TOO_MANY_COMMAS: errorStr = "过多逗号"; break;
             default: break;
             }
-            break;
-        }
-        mahjong::sort_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count);
-
-        ret = mahjong::parse_tiles(winString.c_str(), &win_tile, 1);
-        if (ret != 1) {
-            switch (ret) {
-            case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
-            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = "数字后面需有后缀"; break;
-            case PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_SET: errorStr = "一组副露包含了过多的牌"; break;
-            case PARSE_ERROR_CANNOT_MAKE_FIXED_SET: errorStr = "无法正确解析副露"; break;
-            default: break;
-            }
-            break;
         }
 
         ret = mahjong::check_calculator_input(&hand_tiles, win_tile);
