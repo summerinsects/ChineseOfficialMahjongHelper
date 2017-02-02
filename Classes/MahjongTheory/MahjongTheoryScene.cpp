@@ -165,6 +165,7 @@ bool MahjongTheoryScene::init() {
     _tableView->reloadData();
     this->addChild(_tableView);
 
+    srand((unsigned)time(nullptr));
     setRandomInput();
 
     return true;
@@ -191,13 +192,11 @@ void MahjongTheoryScene::setRandomInput() {
     handTiles.tile_count = 13;
 
     int table[34] = {0};
-    std::default_random_engine generator(time(nullptr));
-    std::uniform_int_distribution<int> distribution(0, 33);
 
     // 立牌
     int cnt = 0;
     do {
-        int n = distribution(generator);
+        int n = rand() % 34;
         if (table[n] < 4) {
             ++table[n];
             handTiles.standing_tiles[cnt++] = mahjong::all_tiles[n];
@@ -208,7 +207,7 @@ void MahjongTheoryScene::setRandomInput() {
     // 上牌
     mahjong::tile_t drawnTile = 0;
     do {
-        int n = distribution(generator);
+        int n = rand() % 34;
         if (table[n] < 4) {
             ++table[n];
             drawnTile = mahjong::all_tiles[n];
@@ -430,10 +429,8 @@ void MahjongTheoryScene::onStandingTileEvent() {
 
     // 随机给一张牌
     mahjong::tile_t drawnTile = 0;
-    std::default_random_engine generator(time(nullptr));
-    std::uniform_int_distribution<int> distribution(0, 33);
     do {
-        int n = distribution(generator);
+        int n = rand() % 34;
         mahjong::tile_t t = mahjong::all_tiles[n];
         if (_handTilesTable[t] < 4) {
             drawnTile = t;
