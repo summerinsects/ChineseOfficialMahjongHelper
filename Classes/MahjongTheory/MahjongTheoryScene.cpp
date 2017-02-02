@@ -249,13 +249,13 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
         auto it2 = std::find_if(_resultSources.begin(), _resultSources.end(),
             [it1](const ResultEx &result) { return result.discard_tile == it1->discard_tile && result.wait_step == it1->wait_step; });
 
-        if (it2 == _resultSources.end()) {  // 没找到，直接添加it1
+        if (it2 == _resultSources.end()) {  // 没找到，直接到resultSources
             _resultSources.push_back(ResultEx());
             memcpy(&_resultSources.back(), &*it1, sizeof(mahjong::enum_result_t));
             continue;
         }
 
-        // 合并it1 it2
+        // 找到，则合并resultSources与allResults的和牌形式标记及有效牌
         it2->form_flag |= it1->form_flag;
         for (int i = 0; i < 34; ++i) {
             mahjong::tile_t t = mahjong::all_tiles[i];
@@ -313,6 +313,7 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
     std::transform(temp.begin(), temp.end(), _orderedIndices.begin(), [start](ResultEx *p) { return p - start; });
 }
 
+// 获取过滤标记
 uint8_t MahjongTheoryScene::getFilterFlag() const {
     uint8_t flag = FORM_FLAG_BASIC_TYPE;
     for (int i = 0; i < 4; ++i) {
@@ -341,14 +342,14 @@ void MahjongTheoryScene::calculate() {
 
     _newLineFlag = (win_tile == 0) ? 15 : 10;
 
-    // 计算
+    // 异步计算
     _allResults.clear();
 
     LoadingView *loadingView = LoadingView::create();
     this->addChild(loadingView);
     loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
 
-    auto thiz = RefPtr<MahjongTheoryScene>(this);
+    auto thiz = RefPtr<MahjongTheoryScene>(this);  // 保证线程回来之前不析构
     std::thread([thiz, hand_tiles, win_tile, loadingView]() {
         mahjong::enum_discard_tile(&hand_tiles, win_tile, FORM_FLAG_ALL, thiz.get(),
             [](void *context, const mahjong::enum_result_t *result) {
@@ -359,6 +360,7 @@ void MahjongTheoryScene::calculate() {
             return (thiz->getParent() != nullptr);
         });
 
+        // 调回cocos线程
         Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
             if (thiz->getParent() != nullptr) {
                 thiz->filterResultsByFlag(thiz->getFilterFlag());
@@ -384,6 +386,7 @@ void MahjongTheoryScene::onStandingTileEvent() {
         return;
     }
 
+    // 随机给一张牌
     mahjong::tile_t drawnTile = 0;
     std::default_random_engine generator(time(nullptr));
     std::uniform_int_distribution<int> distribution(0, 33);
@@ -395,6 +398,7 @@ void MahjongTheoryScene::onStandingTileEvent() {
         }
     } while (drawnTile == 0);
 
+    // 推演
     deduce(discardTile, drawnTile);
 }
 
@@ -409,6 +413,7 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t dra
     mahjong::tile_t drawnTile2;
     _handTilesWidget->getData(&handTiles, &drawnTile2);
 
+    // 对立牌打表
     int cntTable[mahjong::TILE_TABLE_COUNT];
     mahjong::map_tiles(handTiles.standing_tiles, handTiles.tile_count, cntTable);
     ++cntTable[drawnTile2];  // 当前摸到的牌
@@ -418,13 +423,17 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t dra
         --cntTable[discardTile];
     }
 
+    // 从表恢复成立牌
     const long prevCnt = handTiles.tile_count;
     handTiles.tile_count = mahjong::table_to_tiles(cntTable, handTiles.standing_tiles, 13);
     if (prevCnt != handTiles.tile_count) {
         return;
     }
 
+    // 设置UI
     _handTilesWidget->setData(handTiles, drawnTile);
+
+    // 计算
     calculate();
 }
 
