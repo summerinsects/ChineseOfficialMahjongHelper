@@ -354,10 +354,39 @@ void MahjongTheoryScene::calculate() {
 void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     mahjong::tile_t tile = mahjong::all_tiles[button->getTag()];
-    ssize_t cellIdx = reinterpret_cast<ssize_t>(button->getUserData());
+    size_t realIdx = reinterpret_cast<size_t>(button->getUserData());
 
-    // TODO:
-    CCLOG("%s %lu", mahjong::stringify_table[tile], cellIdx);
+    ResultEx *result = &_resultSources[realIdx];
+    deduce(result->discard_tile, tile);
+}
+
+// 推演
+void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t drawnTile) {
+    if (discardTile == drawnTile) {
+        return;
+    }
+
+    // 获取牌
+    mahjong::hand_tiles_t handTiles;
+    mahjong::tile_t winTile;
+    _handTilesWidget->getData(&handTiles, &winTile);
+
+    int cntTable[mahjong::TILE_TABLE_COUNT];
+    memcpy(cntTable, _handTilesTable, sizeof(cntTable));
+
+    // 打出牌
+    if (discardTile != 0 && cntTable[discardTile] > 0) {
+        --cntTable[discardTile];
+    }
+
+    const long prevCnt = handTiles.tile_count;
+    handTiles.tile_count = mahjong::table_to_tiles(cntTable, handTiles.standing_tiles, 13);
+    if (prevCnt != handTiles.tile_count) {
+        return;
+    }
+
+    _handTilesWidget->setData(handTiles, drawnTile);
+    calculate();
 }
 
 static std::string getResultTypeString(uint8_t flag, int step) {
@@ -600,7 +629,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
             continue;
         }
 
-        usefulButton[i]->setUserData(reinterpret_cast<void *>(idx));
+        usefulButton[i]->setUserData(reinterpret_cast<void *>(realIdx));
         usefulButton[i]->setVisible(true);
 
         if (xPos + 15 > visibleSize.width - 20) {
