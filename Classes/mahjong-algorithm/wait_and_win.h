@@ -64,7 +64,7 @@ struct enum_result_t {
     bool useful_table[TILE_TABLE_COUNT];
 };
 
-typedef void (*enum_callback_t)(void *context, const enum_result_t *result);
+typedef bool (*enum_callback_t)(void *context, const enum_result_t *result);
 
 void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t drawn_tile, unsigned consideration_flag,
     void *context, enum_callback_t enum_callback);
