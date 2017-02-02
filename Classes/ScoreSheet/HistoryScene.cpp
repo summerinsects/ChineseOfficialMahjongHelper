@@ -68,7 +68,7 @@ static void saveRecords(const std::vector<Record> &records) {
 static std::mutex g_mutex;
 
 static void loadRecordsAsync(const std::function<void ()> &callback) {
-    std::thread thread([callback]() {
+    std::thread([callback]() {
         std::vector<Record> temp;
         {
             std::lock_guard<std::mutex> guard(g_mutex);
@@ -79,21 +79,19 @@ static void loadRecordsAsync(const std::function<void ()> &callback) {
             g_records.swap(temp);
             callback();
         });
-    });
-    thread.detach();
+    }).detach();
 }
 
 static void saveRecordsAsync(const std::function<void ()> &callback) {
     std::vector<Record> temp = g_records;
-    std::thread thread([callback, temp](){
+    std::thread([callback, temp](){
         {
             std::lock_guard<std::mutex> guard(g_mutex);
             (void)guard;
             saveRecords(temp);
         }
         Director::getInstance()->getScheduler()->performFunctionInCocosThread(callback);
-    });
-    thread.detach();
+    }).detach();
 }
 
 bool HistoryScene::init() {

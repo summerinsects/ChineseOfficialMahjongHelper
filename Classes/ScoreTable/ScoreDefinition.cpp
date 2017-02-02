@@ -74,7 +74,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
         }
 
         auto thiz = RefPtr<ScoreDefinitionScene>(this);
-        std::thread thread([thiz, idx, scale, loadingView]() {
+        std::thread([thiz, idx, scale, loadingView]() {
             ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
             g_definitions.reserve(valueVec.size());
             std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions), [scale](const Value &value) {
@@ -97,8 +97,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
                     thiz->createContentView(idx);
                 }
             });
-        });
-        thread.detach();
+        }).detach();
     }
 
     return true;
