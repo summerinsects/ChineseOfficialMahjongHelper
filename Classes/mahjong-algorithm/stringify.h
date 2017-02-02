@@ -22,6 +22,9 @@ static const char *stringify_table[] = {
 
 long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
 long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *win_tile);
+long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_size);
+long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size);
+long hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, long max_size);
 
 }
 

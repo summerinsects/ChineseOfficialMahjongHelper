@@ -207,5 +207,107 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *win_tile
     return PARSE_NO_ERROR;
 }
 
+long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_size) {
+    bool tenhon = false;
+    char *p = str, *end = str + max_size;
+
+    static const char suffix[] = "mspz";
+    static const char honor_text[] = "ESWNCFP";
+    suit_t last_suit = 0;
+    for (long i = 0; i < tile_cnt && p < end; ++i) {
+        tile_t t = tiles[i];
+        suit_t s = tile_suit(t);
+        rank_t r = tile_rank(t);
+        if (s == 1 || s == 2 || s == 3) {  // 数牌
+            if (r >= 1 && r <= 9) {  // 有效范围1-9
+                if (last_suit != s && last_suit != 0) {  // 花色变了，加后缀
+                    if (last_suit != 4 || tenhon) {
+                        *p++ = suffix[last_suit - 1];
+                    }
+                }
+                if (p < end) {
+                    *p++ = '0' + r;  // 写入一个数字字符
+                }
+                last_suit = s;  // 记录花色
+            }
+        }
+        else if (s == 4) {  // 字牌
+            if (r >= 1 && r <= 7) {  // 有效范围1-7
+                if (last_suit != s && last_suit != 0) {  // 花色变了，加后缀
+                    if (last_suit != 4) {
+                        *p++ = suffix[last_suit - 1];
+                    }
+                }
+                if (p < end) {
+                    if (tenhon) {  // 天凤式后缀
+                        *p++ = '0' + r;  // 写入一个数字字符
+                    }
+                    else {
+                        *p++ = honor_text[r - 1];  // 直接写入字牌相应字母
+                    }
+                    last_suit = s;
+                }
+            }
+        }
+    }
+
+    // 写入过且还有空间，补充后缀
+    if (p != str && p < end && (last_suit != 4 || tenhon)) {
+        *p++ = suffix[last_suit - 1];
+    }
+
+    if (p < end) {
+        *p = '\0';
+    }
+    return p - str;
+}
+
+long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size) {
+    char *p = str, *end = str + max_size;
+    tile_t temp[4];
+    for (long i = 0; i < pack_cnt && p < end; ++i) {
+        pack_t pack = packs[i];
+        tile_t t = pack_tile(pack);
+        uint8_t pt = pack_type(pack);
+        switch (pt) {
+        case PACK_TYPE_CHOW:
+            temp[0] = t - 1; temp[1] = t; temp[2] = t + 1;
+            p += tiles_to_string(temp, 3, p, end - p);
+            if (p < end) *p++ = ' ';
+            break;
+        case PACK_TYPE_PUNG:
+            temp[0] = t; temp[1] = t; temp[2] = t;
+            p += tiles_to_string(temp, 3, p, end - p);
+            if (p < end) *p++ = ' ';
+            break;
+        case PACK_TYPE_KONG:
+            if (!is_pack_melded(pack) && p < end) *p++ = '[';
+            temp[0] = t; temp[1] = t; temp[2] = t; temp[2] = t;
+            p += tiles_to_string(temp, 4, p, end - p);
+            if (!is_pack_melded(pack) && p < end) *p++ = ']';
+            if (p < end) *p++ = ' ';
+            break;
+        case PACK_TYPE_PAIR:
+            temp[0] = t; temp[1] = t;
+            p += tiles_to_string(temp, 2, p, end - p);
+            if (p < end) *p++ = ' ';
+            break;
+        default: break;
+        }
+    }
+
+    if (p < end) {
+        *p = '\0';
+    }
+    return p - str;
+}
+
+long hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, long max_size) {
+    char *p = str, *end = str + max_size;
+    p += packs_to_string(hand_tiles->fixed_packs, hand_tiles->pack_count, str, max_size);
+    if (p < end) p += tiles_to_string(hand_tiles->standing_tiles, hand_tiles->tile_count, p, end - p);
+    return p - str;
+}
+
 }
 
