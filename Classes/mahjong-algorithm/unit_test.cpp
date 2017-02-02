@@ -62,7 +62,7 @@ void test_wait(const char *str) {
 
 void test_points(const char *str, const char *win_str, win_type_t win_type, wind_t prevalent_wind, wind_t seat_wind) {
     hand_tiles_t hand_tiles;
-    long ret = string_to_tiles(str, &hand_tiles);
+    long ret = string_to_tiles(str, &hand_tiles, nullptr);
     if (ret != 0) {
         printf("error at line %d error = %ld\n", __LINE__, ret);
         return;
@@ -100,7 +100,7 @@ void test_points(const char *str, const char *win_str, win_type_t win_type, wind
 
 void test_wait_step(const char *str) {
     hand_tiles_t hand_tiles;
-    long ret = string_to_tiles(str, &hand_tiles);
+    long ret = string_to_tiles(str, &hand_tiles, nullptr);
     if (ret != 0) {
         printf("error at line %d error = %ld\n", __LINE__, ret);
         return;
