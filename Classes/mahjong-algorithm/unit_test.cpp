@@ -6,6 +6,8 @@
 #include <iostream>
 #include <assert.h>
 
+#include <time.h>
+
 using namespace mahjong;
 
 void test_wait(const char *str) {
@@ -106,6 +108,10 @@ void test_wait_step(const char *str) {
         return;
     }
 
+    char buf[20];
+    ret = hand_tiles_to_string(&hand_tiles, buf, sizeof(buf));
+    puts(buf);
+
     auto display = [](const hand_tiles_t *hand_tiles, bool (&useful_table)[TILE_TABLE_COUNT]) {
         for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
             if (useful_table[t])
@@ -150,9 +156,28 @@ void test_wait_step(const char *str) {
 int main(int argc, const char *argv[]) {
     system("chcp 65001");
 
+    {
+        clock_t t1, t2;
+        tile_t st[] = { TILE_1p, TILE_1p, TILE_1p, TILE_2p, TILE_3p, TILE_4p, TILE_5p, TILE_6p, TILE_7p, TILE_8p, TILE_9p, TILE_9p, TILE_9p };
+        bool ct[TILE_TABLE_COUNT];
+        const int tms = 1000;
+
+        t1 = clock();
+        for (int i = 0; i < tms; ++i)
+        is_basic_type_wait(st, 13, ct);
+        t2 = clock() - t1;
+        printf("用时约: %ld毫秒\n", t2/* * 1000 / CLOCKS_PER_SEC*/);
+
+        t1 = clock();
+        for (int i = 0; i < tms; ++i)
+        basic_type_wait_step(st, 13, ct);
+        t2 = clock() - t1;
+        printf("用时约: %ld毫秒\n", t2/* * 1000 / CLOCKS_PER_SEC*/);
+    }
+
     //test_wait_step("19m19s22pESWCFPP");
     //test_wait_step("278m3378s3779pEC");
-    test_wait_step("678m 5m12p1569sSWP");
+    test_wait_step("111m 5m12p1569sSWP");
     //return 0;
 
 #if 0
