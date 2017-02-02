@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 
-class AlertLayer : public cocos2d::Layer {
+class AlertView : public cocos2d::Layer {
 public:
     bool initWithTitle(const std::string &title, cocos2d::Node *node, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback);
 

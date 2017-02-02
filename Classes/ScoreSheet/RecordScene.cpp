@@ -551,7 +551,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
 
 void RecordScene::onOkButton(cocos2d::Ref *sender) {
     if (_drawBox->isSelected() && _detail.points_flag != 0) {
-        AlertLayer::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", [this]() {
+        AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", [this]() {
             _detail.points_flag = 0;
             _okCallback(_detail);
             Director::getInstance()->popScene();

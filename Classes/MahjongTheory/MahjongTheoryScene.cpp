@@ -180,7 +180,7 @@ void MahjongTheoryScene::showInputAlert(cocos2d::Ref *sender, const char *prevIn
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
 
     ui::Button *button = (ui::Button *)sender;
-    AlertLayer::showWithNode("输入手牌", rootWidget, [this, editBox, button]() {
+    AlertView::showWithNode("输入手牌", rootWidget, [this, editBox, button]() {
         parseInput(button, editBox->getText());
     }, nullptr);
 }
@@ -226,7 +226,7 @@ bool MahjongTheoryScene::parseInput(cocos2d::ui::Button *button, const char *inp
     } while (0);
 
     if (errorStr != nullptr) {
-        AlertLayer::showWithMessage("输入牌", errorStr, [this, str, button]() {
+        AlertView::showWithMessage("输入牌", errorStr, [this, str, button]() {
             showInputAlert(button, str.c_str());
         }, nullptr);
     }

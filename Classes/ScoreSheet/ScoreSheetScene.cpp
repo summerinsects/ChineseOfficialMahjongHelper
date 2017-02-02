@@ -110,7 +110,7 @@ bool ScoreSheetScene::init() {
                 recover();
                 return true;
             }
-            AlertLayer::showWithMessage("提示", "当前一局尚未完成时不支持查看历史记录", nullptr, nullptr);
+            AlertView::showWithMessage("提示", "当前一局尚未完成时不支持查看历史记录", nullptr, nullptr);
             return false;
         }));
     });
@@ -471,11 +471,11 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *sender, size_t idx) {
     }
     else {
         if (g_currentRecord.current_index < 16) {
-            AlertLayer::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？",
+            AlertView::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？",
                 std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
         }
         else {
-            AlertLayer::showWithMessage("提示", "对局已经结束，是否要修改选手姓名？",
+            AlertView::showWithMessage("提示", "对局已经结束，是否要修改选手姓名？",
                 std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
         }
     }
@@ -495,7 +495,7 @@ void ScoreSheetScene::editName(size_t idx) {
     const char *wind[] = { "东", "南", "西", "北" };
     char title[64];
     snprintf(title, sizeof(title), "开局座位「%s」", wind[idx]);
-    AlertLayer::showWithNode(title, editBox, [this, editBox, idx]() {
+    AlertView::showWithNode(title, editBox, [this, editBox, idx]() {
         const char *text = editBox->getText();
         if (*text != '\0') {
             strncpy(g_currentRecord.name[idx], text, 255);
@@ -510,7 +510,7 @@ void ScoreSheetScene::editName(size_t idx) {
 void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
     const char (&name)[4][255] = g_currentRecord.name;
     if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)) {
-        AlertLayer::showWithMessage("锁定", "请先录入四位参赛选手姓名", nullptr, nullptr);
+        AlertView::showWithMessage("锁定", "请先录入四位参赛选手姓名", nullptr, nullptr);
         return;
     }
 
@@ -653,7 +653,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
 
     str = handNameText[handIdx];
     str.append("详情");
-    AlertLayer::showWithMessage(str, message,
+    AlertView::showWithMessage(str, message,
         std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
 }
 
@@ -677,7 +677,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         return;
     }
 
-    AlertLayer::showWithMessage("重置", "重置操作会清空当前已记录的信息，未打满北风北的记录将会丢失，确定要这样做吗？",
+    AlertView::showWithMessage("重置", "重置操作会清空当前已记录的信息，未打满北风北的记录将会丢失，确定要这样做吗？",
         std::bind(&ScoreSheetScene::reset, this), nullptr);
 }
 
@@ -716,7 +716,7 @@ static void showPursuit(int delta) {
             }
         }
     }
-    AlertLayer::showWithMessage("追分计算", msg, nullptr, nullptr);
+    AlertView::showWithMessage("追分计算", msg, nullptr, nullptr);
 }
 
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
@@ -793,8 +793,8 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     });
     editBox->setDelegate(delegate.get());
 
-    // 使这个代理随AlertLayer一起析构
-    AlertLayer::showWithNode("追分计算", rootWidget, [editBox, delegate]() {
+    // 使这个代理随AlertView一起析构
+    AlertView::showWithNode("追分计算", rootWidget, [editBox, delegate]() {
         const char *text = editBox->getText();
         if (*text != '\0') {
             int delta = atoi(text);
@@ -840,5 +840,5 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
         });
     }
 
-    AlertLayer::showWithNode(name[idx], rootWidget, nullptr, nullptr);
+    AlertView::showWithNode(name[idx], rootWidget, nullptr, nullptr);
 }

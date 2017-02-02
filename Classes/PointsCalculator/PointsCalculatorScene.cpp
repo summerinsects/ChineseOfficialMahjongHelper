@@ -421,7 +421,7 @@ void PointsCalculatorScene::showInputAlert(const char *prevInput) {
     editBox->setPosition(Vec2(width * 0.5f, 10));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
 
-    AlertLayer::showWithNode("直接输入", rootWidget, [this, editBox]() {
+    AlertView::showWithNode("直接输入", rootWidget, [this, editBox]() {
         parseInput(editBox->getText());
     }, nullptr);
 }
@@ -466,7 +466,7 @@ void PointsCalculatorScene::parseInput(const char *input) {
     } while (0);
 
     if (errorStr != nullptr) {
-        AlertLayer::showWithMessage("直接输入牌", errorStr, [this, str]() {
+        AlertView::showWithMessage("直接输入牌", errorStr, [this, str]() {
             showInputAlert(str.c_str());
         }, nullptr);
     }
@@ -483,7 +483,7 @@ void PointsCalculatorScene::calculate() {
 
     int flowerCnt = atoi(_editBox->getText());
     if (flowerCnt > 8) {
-        AlertLayer::showWithMessage("算番", "花牌数的范围为0~8", nullptr, nullptr);
+        AlertView::showWithMessage("算番", "花牌数的范围为0~8", nullptr, nullptr);
         return;
     }
 
@@ -491,7 +491,7 @@ void PointsCalculatorScene::calculate() {
     mahjong::tile_t win_tile;
     _tilePicker->getHandTilesWidget()->getData(&hand_tiles, &win_tile);
     if (win_tile == 0) {
-        AlertLayer::showWithMessage("算番", "缺少和牌张", nullptr, nullptr);
+        AlertView::showWithMessage("算番", "缺少和牌张", nullptr, nullptr);
         return;
     }
 
@@ -527,11 +527,11 @@ void PointsCalculatorScene::calculate() {
         return;
     }
     if (points == ERROR_WRONG_TILES_COUNT) {
-        AlertLayer::showWithMessage("算番", "牌张数错误", nullptr, nullptr);
+        AlertView::showWithMessage("算番", "牌张数错误", nullptr, nullptr);
         return;
     }
     if (points == ERROR_TILE_COUNT_GREATER_THAN_4) {
-        AlertLayer::showWithMessage("算番", "同一种牌最多只能使用4枚", nullptr, nullptr);
+        AlertView::showWithMessage("算番", "同一种牌最多只能使用4枚", nullptr, nullptr);
         return;
     }
 
