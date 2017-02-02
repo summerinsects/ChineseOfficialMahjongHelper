@@ -575,6 +575,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
     else {
         cntLabel1->setString(str);
+        cntLabel2->setVisible(false);
     }
     cntLabel1->setPosition(Vec2(xPos, yPos));
 
