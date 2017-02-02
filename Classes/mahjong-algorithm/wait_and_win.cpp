@@ -4,6 +4,32 @@
 #include <string.h>
 #include <limits>
 
+#if 0
+#include <stdarg.h>
+#ifdef _MSC_VER
+#include <windows.h>
+#undef min
+#undef max
+#endif
+static void __log(const char *fmt, ...) {
+    char buf[1024];
+
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    puts(buf);
+#ifdef _MSC_VER
+    ::OutputDebugStringA(buf);
+    ::OutputDebugStringA("\n");
+#endif
+}
+#define MJ_LOG(fmt_, ...) __log(fmt_, ##__VA_ARGS__)
+#else
+#define MJ_LOG(...) do { } while (0)
+#endif
+
 namespace mahjong {
 
 typedef uint16_t work_units_t;
@@ -117,6 +143,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
                 work_units[idx] = MAKE_UNIT(UNIT_TYPE_CHOW, t);
                 if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
+                    MJ_LOG("branch exist : %x %x %x %x %x", work_units[0], work_units[1], work_units[2], work_units[3], work_units[4]);
                     continue;
                 }
 
@@ -139,6 +166,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
             if (!has_pair) {
                 work_units[idx] = MAKE_UNIT(UNIT_TYPE_PAIR, t);
                 if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
+                    MJ_LOG("branch exist : %x %x %x %x %x", work_units[0], work_units[1], work_units[2], work_units[3], work_units[4]);
                     continue;
                 }
 
@@ -169,6 +197,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
             if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
                 work_units[idx] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_BOTH, t);
                 if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
+                    MJ_LOG("branch exist : %x %x %x %x %x", work_units[0], work_units[1], work_units[2], work_units[3], work_units[4]);
                     continue;
                 }
 
