@@ -1,6 +1,6 @@
 ﻿#include "HistoryScene.h"
 #include "Record.h"
-#include "../widget/AlertLayer.h"
+#include "../widget/AlertView.h"
 #include "../widget/CWTableView.h"
 #include "../compiler.h"
 #include <thread>

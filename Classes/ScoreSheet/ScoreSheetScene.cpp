@@ -2,7 +2,7 @@
 #include "Record.h"
 #include "RecordScene.h"
 #include "HistoryScene.h"
-#include "../widget/AlertLayer.h"
+#include "../widget/AlertView.h"
 #include "../widget/CWEditBoxDelegate.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"

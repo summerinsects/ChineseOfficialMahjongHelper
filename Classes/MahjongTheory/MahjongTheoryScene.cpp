@@ -6,7 +6,7 @@
 #include "../common.h"
 #include "../compiler.h"
 #include "../widget/HandTilesWidget.h"
-#include "../widget/AlertLayer.h"
+#include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
 
 #ifdef _MSC_VER

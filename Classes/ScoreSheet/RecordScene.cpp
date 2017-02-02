@@ -1,7 +1,7 @@
 ﻿#include "RecordScene.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
-#include "../widget/AlertLayer.h"
+#include "../widget/AlertView.h"
 #include "../widget/CWTableView.h"
 
 USING_NS_CC;

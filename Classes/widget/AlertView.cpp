@@ -1,4 +1,4 @@
-﻿#include "AlertLayer.h"
+﻿#include "AlertView.h"
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 

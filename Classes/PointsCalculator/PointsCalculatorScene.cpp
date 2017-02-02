@@ -4,7 +4,7 @@
 
 #include "../widget/TilePickWidget.h"
 #include "../widget/HandTilesWidget.h"
-#include "../widget/AlertLayer.h"
+#include "../widget/AlertView.h"
 
 USING_NS_CC;
 
