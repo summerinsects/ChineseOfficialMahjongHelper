@@ -4,6 +4,7 @@
 #include "../mahjong-algorithm/points_calculator.h"
 
 #include "../common.h"
+#include "../compiler.h"
 #include "../widget/HandTilesWidget.h"
 #include "../widget/AlertLayer.h"
 
@@ -275,26 +276,44 @@ void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {
     CCLOG("%s %lu", mahjong::stringify_table[tile], cellIdx);
 }
 
-static std::string getResultTypeString(const mahjong::enum_result_t *result) {
+static std::string getResultTypeString(uint8_t flag, int step) {
     std::string str;
-    switch (result->consideration_flag) {
-    case CONSIDERATION_FLAG_BASIC_TYPE: str.append("基本和型"); break;
-    case CONSIDERATION_FLAG_SEVEN_PAIRS: str.append("七对"); break;
-    case CONSIDERATION_FLAG_THIRTEEN_ORPHANS: str.append("十三幺"); break;
-    case CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES: str.append("全不靠"); break;
-    case CONSIDERATION_FLAG_KNITTED_STRAIGHT: str.append("组合龙"); break;
-    default: break;
+    switch (step) {
+    case 0: str = "听牌("; break;
+    case -1: str = "和了("; break;
+    default: str = StringUtils::format("%d上听(", step); break;
     }
 
-    switch (result->wait_step) {
-    case 0: str.append("听牌"); break;
-    case -1: str.append("和了"); break;
-    default: str.append(StringUtils::format("%d上听", result->wait_step)); break;
+    bool entered = false;
+    while (flag != 0) {
+        if (LIKELY(entered)) str.append("、");
+        entered = true;
+        if (flag & CONSIDERATION_FLAG_BASIC_TYPE) {
+            str.append("基本和型");
+            flag &= ~CONSIDERATION_FLAG_BASIC_TYPE;
+        }
+        if (flag & CONSIDERATION_FLAG_SEVEN_PAIRS) {
+            str.append("七对");
+            flag &= ~CONSIDERATION_FLAG_SEVEN_PAIRS;
+        }
+        if (flag & CONSIDERATION_FLAG_THIRTEEN_ORPHANS) {
+            str.append("十三幺");
+            flag &= ~CONSIDERATION_FLAG_THIRTEEN_ORPHANS;
+        }
+        if (flag & CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES) {
+            str.append("全不靠");
+            flag &= ~CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES;
+        }
+        if (flag & CONSIDERATION_FLAG_KNITTED_STRAIGHT) {
+            str.append("组合龙");
+            flag &= ~CONSIDERATION_FLAG_KNITTED_STRAIGHT;
+        }
     }
+    str.append(")");
     return str;
 }
 
-static int __isdigit(int c) {
+static int forceinline __isdigit(int c) {
     return (c >= -1 && c <= 255) ? isdigit(c) : 0;
 }
 
@@ -446,8 +465,8 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         layerColor[0]->setContentSize(Size(visibleSize.width - 10, result->cnt1 < _newLineFlag ? 48 : 78));
     }
 
-    typeLabel->setString(getResultTypeString(&result->origin));
     typeLabel->setPosition(Vec2(0, result->cnt1 < _newLineFlag ? 40 : 70));
+    typeLabel->setString(getResultTypeString(result->consideration_flag, result->wait_step));
 
     float xPos = 0;
     float yPos = result->cnt1 < _newLineFlag ? 15 : 40;
