@@ -581,12 +581,12 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
             bgColor0 = Color4B(22, 22, 22, 255);
             bgColor1 = Color4B(32, 32, 32, 255);
-            textColor = Color3B::WHITE;
+            textColor = Color3B(208, 208, 208);
         }
         else {
             bgColor0 = Color4B::WHITE;
             bgColor1 = Color4B(239, 243, 247, 255);
-            textColor = Color3B::BLACK;
+            textColor = Color3B(80, 80, 80);
         }
 
         CustomCell::ExtDataType &ext = cell->getExtData();
@@ -675,6 +675,12 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
     typeLabel->setString(getResultTypeString(result->form_flag, result->wait_step));
     typeLabel->setPosition(Vec2(5, result->count_in_tiles < _newLineFlag ? 40 : 70));
+    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+        typeLabel->setColor(result->wait_step != -1 ? Color3B(208, 208, 208) : Color3B::YELLOW);
+    }
+    else {
+        typeLabel->setColor(result->wait_step != -1 ? Color3B(80, 80, 80) : Color3B::ORANGE);
+    }
 
     float xPos = 5;
     float yPos = result->count_in_tiles < _newLineFlag ? 15 : 40;
