@@ -233,14 +233,14 @@ bool MahjongTheoryScene::parseInput(cocos2d::ui::Button *button, const char *inp
 }
 
 void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
-    flag |= CONSIDERATION_FLAG_BASIC_TYPE;  // 基本和型不能被过滤掉
+    flag |= FORM_FLAG_BASIC_TYPE;  // 基本和型不能被过滤掉
 
     _resultSources.clear();
     _orderedIndices.clear();
 
     // 从all里面过滤、合并
     for (auto it1 = _allResults.begin(); it1 != _allResults.end(); ++it1) {
-        if (!(it1->consideration_flag & flag)) {
+        if (!(it1->form_flag & flag)) {
             continue;
         }
 
@@ -255,7 +255,7 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
         }
 
         // 合并it1 it2
-        it2->consideration_flag |= it1->consideration_flag;
+        it2->form_flag |= it1->form_flag;
         for (int i = 0; i < 34; ++i) {
             mahjong::tile_t t = mahjong::all_tiles[i];
             if (it1->useful_table[t]) {
@@ -293,8 +293,8 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
         if (a->count_total < b->count_total) return false;
         if (a->count_in_tiles > b->count_in_tiles) return true;
         if (a->count_in_tiles < b->count_in_tiles) return false;
-        if (a->consideration_flag < b->consideration_flag) return true;
-        if (a->consideration_flag > b->consideration_flag) return false;
+        if (a->form_flag < b->form_flag) return true;
+        if (a->form_flag > b->form_flag) return false;
         if (a->discard_tile < b->discard_tile) return true;
         if (a->discard_tile > b->discard_tile) return false;
         return false;
@@ -313,7 +313,7 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
 }
 
 uint8_t MahjongTheoryScene::getFilterFlag() const {
-    uint8_t flag = CONSIDERATION_FLAG_BASIC_TYPE;
+    uint8_t flag = FORM_FLAG_BASIC_TYPE;
     for (int i = 0; i < 4; ++i) {
         if (_checkBoxes[i]->isSelected()) {
             flag |= 1 << (i + 1);
@@ -342,7 +342,7 @@ void MahjongTheoryScene::calculate() {
 
     // 计算
     _allResults.clear();
-    mahjong::enum_discard_tile(&hand_tiles, win_tile, CONSIDERATION_FLAG_ALL, this,
+    mahjong::enum_discard_tile(&hand_tiles, win_tile, FORM_FLAG_ALL, this,
         [](void *context, const mahjong::enum_result_t *result) {
         if (result->wait_step != std::numeric_limits<int>::max()) {
             MahjongTheoryScene *thiz = (MahjongTheoryScene *)context;
@@ -425,23 +425,23 @@ static std::string getResultTypeString(uint8_t flag, int step) {
 #define APPEND_CAESURA_SIGN_IF_NECESSARY() \
     if (LIKELY(needCaesuraSign)) { str.append("、"); } needCaesuraSign = true
 
-    if (flag & CONSIDERATION_FLAG_BASIC_TYPE) {
+    if (flag & FORM_FLAG_BASIC_TYPE) {
         needCaesuraSign = true;
         str.append("基本和型");
     }
-    if (flag & CONSIDERATION_FLAG_SEVEN_PAIRS) {
+    if (flag & FORM_FLAG_SEVEN_PAIRS) {
         APPEND_CAESURA_SIGN_IF_NECESSARY();
         str.append("七对");
     }
-    if (flag & CONSIDERATION_FLAG_THIRTEEN_ORPHANS) {
+    if (flag & FORM_FLAG_THIRTEEN_ORPHANS) {
         APPEND_CAESURA_SIGN_IF_NECESSARY();
         str.append("十三幺");
     }
-    if (flag & CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES) {
+    if (flag & FORM_FLAG_HONORS_AND_KNITTED_TILES) {
         APPEND_CAESURA_SIGN_IF_NECESSARY();
         str.append("全不靠");
     }
-    if (flag & CONSIDERATION_FLAG_KNITTED_STRAIGHT) {
+    if (flag & FORM_FLAG_KNITTED_STRAIGHT) {
         APPEND_CAESURA_SIGN_IF_NECESSARY();
         str.append("组合龙");
     }
@@ -604,7 +604,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         layerColor[0]->setContentSize(Size(visibleSize.width - 10, result->count_in_tiles < _newLineFlag ? 48 : 78));
     }
 
-    typeLabel->setString(getResultTypeString(result->consideration_flag, result->wait_step));
+    typeLabel->setString(getResultTypeString(result->form_flag, result->wait_step));
     typeLabel->setPosition(Vec2(5, result->count_in_tiles < _newLineFlag ? 40 : 70));
 
     float xPos = 5;
