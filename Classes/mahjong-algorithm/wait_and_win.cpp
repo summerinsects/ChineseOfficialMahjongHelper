@@ -84,7 +84,7 @@ static bool is_basic_type_branch_exist(long fixed_cnt, long step, const work_uni
 }
 
 static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long pack_cnt, bool has_pair, long neighbor_cnt,
-    bool (&useful_table)[TILE_TABLE_COUNT], long fixed_cnt, work_units_t (&work_units)[5], work_state_t *work_state) {
+    bool (*useful_table)[TILE_TABLE_COUNT], long fixed_cnt, work_units_t (&work_units)[5], work_state_t *work_state) {
     long idx = pack_cnt + neighbor_cnt + has_pair;
 
     if (pack_cnt + neighbor_cnt >= 4) {  // 搭子超载
@@ -187,7 +187,9 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
             int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, has_pair, neighbor_cnt + 1,
                 useful_table, fixed_cnt, work_units, work_state);
             result = std::min(ret, result);
-            useful_table[t] = true;  // 记录有效牌
+            if (useful_table != nullptr) {
+                (*useful_table)[t] = true;  // 记录有效牌
+            }
             cnt_table[t] += 2;
         }
 
@@ -206,8 +208,10 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
                 int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, has_pair, neighbor_cnt + 1,
                     useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
-                if (tile_rank(t) > 1) useful_table[t - 1] = true;  // 记录有效牌
-                if (tile_rank(t) < 8) useful_table[t + 2] = true;  // 记录有效牌
+                if (useful_table != nullptr) {
+                    if (tile_rank(t) > 1) (*useful_table)[t - 1] = true;  // 记录有效牌
+                    if (tile_rank(t) < 8) (*useful_table)[t + 2] = true;  // 记录有效牌
+                }
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
             }
@@ -222,7 +226,9 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
                 int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, has_pair, neighbor_cnt + 1,
                     useful_table, fixed_cnt, work_units, work_state);
                 result = std::min(ret, result);
-                useful_table[t + 1] = true;  // 记录有效牌
+                if (useful_table != nullptr) {
+                    (*useful_table)[t + 1] = true;  // 记录有效牌
+                }
                 ++cnt_table[t];
                 ++cnt_table[t + 2];
             }
@@ -250,34 +256,32 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
             --result;
         }
 
-        if (neighbor_need > 0) {
-            // 面子搭子
-            for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
-                if (cnt_table[t] == 0) {
-                    continue;
-                }
+        // 记录有效牌
+        if (useful_table != nullptr) {
+            if (neighbor_need > 0) {
+                // 面子搭子
+                for (int i = 0; i < 34; ++i) {
+                    tile_t t = all_tiles[i];
+                    if (cnt_table[t] == 0) continue;
 
-                // 刻子搭子
-                useful_table[t] = true;
-
-                // 顺子搭子（只能是序数牌）
-                if (is_numbered_suit(t)) {
-                    rank_t r = tile_rank(t);
-                    if (r > 1) useful_table[t - 1] = true;
-                    if (r > 2) useful_table[t - 2] = true;
-                    if (r < 9) useful_table[t + 1] = true;
-                    if (r < 8) useful_table[t + 2] = true;
+                    (*useful_table)[t] = true;  // 刻子搭子
+                    if (is_numbered_suit_quick(t)) {  // 顺子搭子（只能是序数牌）
+                        rank_t r = tile_rank(t);
+                        if (r > 1) (*useful_table)[t - 1] = true;
+                        if (r > 2) (*useful_table)[t - 2] = true;
+                        if (r < 9) (*useful_table)[t + 1] = true;
+                        if (r < 8) (*useful_table)[t + 2] = true;
+                    }
                 }
             }
-        }
 
-        // 缺将
-        if (!has_pair) {
-            for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
-                if (cnt_table[t] == 0) {
-                    continue;
+            // 缺将
+            if (!has_pair) {
+                for (int i = 0; i < 34; ++i) {
+                    tile_t t = all_tiles[i];
+                    if (cnt_table[t] == 0) continue;
+                    (*useful_table)[t] = true;  // 任意凑一对就可以有将
                 }
-                useful_table[t] = true;
             }
         }
     }
@@ -291,14 +295,13 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_COUNT], l
     work_state_t work_state;
     work_state.count = 0;
     bool temp_table[TILE_TABLE_COUNT];
-    int result = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, temp_table, fixed_cnt, work_units, &work_state);
+    int result = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, &temp_table, fixed_cnt, work_units, &work_state);
 
     if (useful_table == nullptr) {
         return result;
     }
 
     // 依次测试这些牌是否能减少上听数
-    bool temp_table2[TILE_TABLE_COUNT];
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] == 4 || !temp_table[t]) {
@@ -306,7 +309,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_COUNT], l
         }
 
         ++cnt_table[t];
-        int temp = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, temp_table2, fixed_cnt, work_units, &work_state);
+        int temp = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, nullptr, fixed_cnt, work_units, &work_state);
         if (temp < result) {
             (*useful_table)[t] = true;  // 标记为有效牌
         }
