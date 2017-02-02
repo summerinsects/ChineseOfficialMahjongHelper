@@ -297,14 +297,16 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
         return false;
     });
 
+    // 以第一个为标准，过滤掉上听数高的
     int minStep = temp.front()->wait_step;
-    std::vector<ResultEx *>::iterator it = std::remove_if(temp.begin(), temp.end(),
-        [minStep](ResultEx *a) { return a->wait_step > minStep; });
+    temp.erase(
+        std::find_if(temp.begin(), temp.end(), [minStep](ResultEx *a) { return a->wait_step > minStep; }),
+        temp.end());
 
     // 转成下标数组
     ResultEx *start = &_resultSources.front();
     _orderedIndices.resize(_resultSources.size());
-    std::transform(temp.begin(), it, _orderedIndices.begin(), [start](ResultEx *p) { return p - start; });
+    std::transform(temp.begin(), temp.end(), _orderedIndices.begin(), [start](ResultEx *p) { return p - start; });
 }
 
 uint8_t MahjongTheoryScene::getFilterFlag() const {
