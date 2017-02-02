@@ -206,6 +206,9 @@ void MahjongTheoryScene::calculate() {
     _handTilesWidget->getData(&hand_tiles, &win_tile);
 
     mahjong::map_hand_tiles(&hand_tiles, _handTilesTable);
+    if (win_tile != 0) {
+        ++_handTilesTable[win_tile];
+    }
 
     _newLineFlag = (win_tile == 0) ? 15 : 10;
 
@@ -461,7 +464,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardSprite->setPosition(Vec2(xPos, yPos));
         xPos += 15;
 
-        if (result->origin.wait_step != 0) {
+        if (result->origin.wait_step > 0) {
             usefulLabel->setString("」摸「");
         }
         else {
