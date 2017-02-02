@@ -338,6 +338,7 @@ void MahjongTheoryScene::calculate() {
     _newLineFlag = (win_tile == 0) ? 15 : 10;
 
     // 计算
+    _allResults.clear();
     _resultSources.clear();
     mahjong::enum_discard_tile(&hand_tiles, win_tile, CONSIDERATION_FLAG_ALL, this,
         [](void *context, const mahjong::enum_result_t *result) {
