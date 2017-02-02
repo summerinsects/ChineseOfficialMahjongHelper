@@ -11,7 +11,7 @@ namespace cw {
 
 class HandTilesWidget;
 
-class MahjongTheoryScene : public BaseLayer{
+class MahjongTheoryScene : public BaseLayer, cocos2d::ui::EditBoxDelegate {
 public:
     static cocos2d::Scene *createScene();
 
@@ -20,6 +20,7 @@ public:
     CREATE_FUNC(MahjongTheoryScene);
 
 private:
+    cocos2d::ui::EditBox *_editBox;
     HandTilesWidget *_handTilesWidget;
     cocos2d::ui::CheckBox *_checkBoxes[4];
     cw::TableView *_tableView;
@@ -35,8 +36,10 @@ private:
     std::vector<size_t> _orderedIndices;
     int _newLineFlag;
 
-    void showInputAlert(cocos2d::Ref *sender, const char *prevInput);
-    bool parseInput(cocos2d::ui::Button *button, const char *input);
+    virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
+    void setRandomInput();
+    void onGuideButton(cocos2d::Ref *sender);
+    bool parseInput(const char *input);
     void calculate();
     void filterResultsByFlag(uint8_t flag);
     uint8_t getFilterFlag() const;

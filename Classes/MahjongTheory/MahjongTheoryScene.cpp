@@ -49,25 +49,46 @@ bool MahjongTheoryScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    ui::Button *button = ui::Button::create(normalImage, selectedImage);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(visibleSize.width - 50, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("在此输入");
-    button->setTitleColor(titleColor);
-    this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 20, origin.y + visibleSize.height - 50));
-    button->addClickEventListener(std::bind(&MahjongTheoryScene::showInputAlert, this, std::placeholders::_1, nullptr));
+    _editBox = ui::EditBox::create(Size(visibleSize.width - 135, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    this->addChild(_editBox);
+    _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    _editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    _editBox->setFontColor(Color4B::BLACK);
+    _editBox->setFontSize(12);
+    _editBox->setPlaceholderFontColor(Color4B::GRAY);
+    _editBox->setPlaceHolder("在此处输入");
+    _editBox->setDelegate(this);
+    _editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 60, origin.y + visibleSize.height - 50));
 
-    button = ui::Button::create(normalImage, selectedImage);
+    ui::Button *button = ui::Button::create(normalImage, selectedImage);
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("计算");
     button->setTitleColor(titleColor);
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 105, origin.y + visibleSize.height - 50));
     button->addClickEventListener([this](Ref *) { calculate(); });
+
+    button = ui::Button::create(normalImage, selectedImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("随机");
+    button->setTitleColor(titleColor);
+    this->addChild(button);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 50));
+    button->addClickEventListener([this](Ref *) { setRandomInput(); });
+
+    button = ui::Button::create(normalImage, selectedImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("说明");
+    button->setTitleColor(titleColor);
+    this->addChild(button);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 50));
+    button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
 
     _handTilesWidget = HandTilesWidget::create();
     _handTilesWidget->setTileClickCallback(std::bind(&MahjongTheoryScene::onStandingTileEvent, this));
@@ -144,52 +165,70 @@ bool MahjongTheoryScene::init() {
     _tableView->reloadData();
     this->addChild(_tableView);
 
+    setRandomInput();
+
     return true;
 }
 
-void MahjongTheoryScene::showInputAlert(cocos2d::Ref *sender, const char *prevInput) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f;
-
-    ui::Widget *rootWidget = ui::Widget::create();
-
-    Label *label = Label::createWithSystemFont("使用说明：\n"
+void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
+    AlertView::showWithMessage("使用说明",
         "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，同花色的数牌可合并用一个后缀。\n"
-        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。\n"
+        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦可使用后缀z，但按中国顺序567z为中发白。\n"
         "3.每一组吃、碰、明杠之间用英文空格分隔，每一组暗杠用英文[]。\n"
-        "范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
-        "范例2：1112345678999s9s\n"
-        "范例3：WWWW 444s 45m678pFF6m\n", "Arial", 10);
-    label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0);
-    rootWidget->addChild(label);
-
-    // 输入手牌
-    ui::EditBox *editBox = ui::EditBox::create(Size(width - 10, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setPlaceholderFontColor(Color4B::GRAY);
-    editBox->setPlaceHolder("输入手牌");
-    if (prevInput != nullptr) {
-        editBox->setText(prevInput);
-    }
-
-    rootWidget->addChild(editBox);
-
-    const Size &labelSize = label->getContentSize();
-    rootWidget->setContentSize(Size(width, labelSize.height + 30));
-    editBox->setPosition(Vec2(width * 0.5f, 10));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
-
-    ui::Button *button = (ui::Button *)sender;
-    AlertView::showWithNode("输入手牌", rootWidget, [this, editBox, button]() {
-        parseInput(button, editBox->getText());
-    }, nullptr);
+        "4.基本和型暂时不考虑国标番型。\n"
+        "5.计算后可点击表格中的有效牌，切出该路线对应的弃牌，并上指定牌进行推演。\n"
+        "6.点击手牌可切出对应牌，并随机上张进行推演。\n"
+        "输入范例1：[EEEE]288s349pSCFF2p\n"
+        "输入范例2：123p 345s 999s 6m6pEW1m\n"
+        "输入范例3：356m18s1579pWNFF9p\n",
+        nullptr, nullptr);
 }
 
-bool MahjongTheoryScene::parseInput(cocos2d::ui::Button *button, const char *input) {
+void MahjongTheoryScene::setRandomInput() {
+    // 随机生成一副牌
+    mahjong::hand_tiles_t handTiles;
+    handTiles.pack_count = 0;
+    handTiles.tile_count = 13;
+
+    int table[34] = {0};
+    std::default_random_engine generator(time(nullptr));
+    std::uniform_int_distribution<int> distribution(0, 33);
+
+    // 立牌
+    int cnt = 0;
+    do {
+        int n = distribution(generator);
+        if (table[n] < 4) {
+            ++table[n];
+            handTiles.standing_tiles[cnt++] = mahjong::all_tiles[n];
+        }
+    } while (cnt < handTiles.tile_count);
+    std::sort(handTiles.standing_tiles, handTiles.standing_tiles + handTiles.tile_count);
+
+    // 上牌
+    mahjong::tile_t drawnTile = 0;
+    do {
+        int n = distribution(generator);
+        if (table[n] < 4) {
+            ++table[n];
+            drawnTile = mahjong::all_tiles[n];
+        }
+    } while (drawnTile == 0);
+
+    // 设置UI
+    _handTilesWidget->setData(handTiles, drawnTile);
+
+    char str[64];
+    long ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
+    mahjong::tiles_to_string(&drawnTile, 1, str + ret, sizeof(str) - ret);
+    _editBox->setText(str);
+}
+
+void MahjongTheoryScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
+    parseInput(editBox->getText());
+}
+
+bool MahjongTheoryScene::parseInput(const char *input) {
     if (*input == '\0') {
         return false;
     }
@@ -222,16 +261,13 @@ bool MahjongTheoryScene::parseInput(cocos2d::ui::Button *button, const char *inp
             break;
         }
 
-        if (button != nullptr) {
-            button->setTitleText(str);
-        }
         _handTilesWidget->setData(hand_tiles, win_tile);
         return true;
     } while (0);
 
     if (errorStr != nullptr) {
-        AlertView::showWithMessage("输入牌", errorStr, [this, str, button]() {
-            showInputAlert(button, str.c_str());
+        AlertView::showWithMessage("输入牌", errorStr, [this]() {
+            _editBox->touchDownAction(_editBox, ui::Widget::TouchEventType::ENDED);
         }, nullptr);
     }
     return false;
@@ -436,6 +472,11 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t dra
 
     // 设置UI
     _handTilesWidget->setData(handTiles, drawnTile);
+
+    char str[64];
+    long ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
+    mahjong::tiles_to_string(&drawnTile, 1, str + ret, sizeof(str) - ret);
+    _editBox->setText(str);
 
     // 计算
     calculate();
