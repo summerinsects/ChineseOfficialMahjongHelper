@@ -15,10 +15,18 @@ static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long 
         tiles[i] |= value_;                 \
         } (void)0
 
+#define SET_SUIT_FOR_HONOR() \
+    for (long i = tile_cnt; i > 0;) {       \
+        if (tiles[--i] & 0xF0) break;       \
+        if (tiles[i] > 7) return PARSE_ERROR_ILLEGAL_CHARACTER; \
+        tiles[i] |= 0x40;                   \
+        } (void)0
+
     const char *p = str;
     for (; tile_cnt < max_cnt && *p != '\0'; ++p) {
         char c = *p;
         switch (c) {
+        case '0': tiles[tile_cnt++] = 5; break;
         case '1': tiles[tile_cnt++] = 1; break;
         case '2': tiles[tile_cnt++] = 2; break;
         case '3': tiles[tile_cnt++] = 3; break;
@@ -31,6 +39,7 @@ static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long 
         case 'm': SET_SUIT_FOR_NUMBERED(0x10); break;
         case 's': SET_SUIT_FOR_NUMBERED(0x20); break;
         case 'p': SET_SUIT_FOR_NUMBERED(0x30); break;
+        case 'z': SET_SUIT_FOR_HONOR(); break;
         case 'E': tiles[tile_cnt++] = TILE_E; break;
         case 'S': tiles[tile_cnt++] = TILE_S; break;
         case 'W': tiles[tile_cnt++] = TILE_W; break;
@@ -109,7 +118,7 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
 
 long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *win_tile) {
     size_t len = strlen(str);
-    if (strspn(str, "123456789mpsESWNCFP []") != len) {
+    if (strspn(str, "0123456789mpszESWNCFP []") != len) {
         return PARSE_ERROR_ILLEGAL_CHARACTER;
     }
 
