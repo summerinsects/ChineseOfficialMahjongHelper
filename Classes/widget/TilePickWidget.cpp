@@ -248,7 +248,7 @@ void TilePickWidget::refreshTilesTableButton(mahjong::tile_t tile) {
 
 void TilePickWidget::refreshAllTilesTableButton() {
     // 如果某张牌已经使用了4张，就禁用相应按钮
-    // 序数牌都是1-9，放在同一个循环里
+    // 数牌都是1-9，放在同一个循环里
     for (mahjong::rank_t rank = 1; rank < 10; ++rank) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, rank);
         int n = _handTilesWidget->getUsedTileCount(tile);

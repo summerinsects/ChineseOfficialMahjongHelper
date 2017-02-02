@@ -113,8 +113,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
             assert(0 && "too many state!");
         }
 
-        // 有将的情况，听牌时完成面子数为3，上听数=3-完成面子数
-        // 无将的情况，听牌时完成面子数为4，上听数=4-完成面子数
+        // 有雀头的情况，听牌时完成面子数为3，上听数=3-完成面子数
+        // 无雀头的情况，听牌时完成面子数为4，上听数=4-完成面子数
         return has_pair ? 3 - pack_cnt : 4 - pack_cnt;
     }
 
@@ -141,7 +141,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
             cnt_table[t] += 3;
         }
 
-        // 顺子（只能是序数牌）
+        // 顺子（只能是数牌）
         bool is_numbered = is_numbered_suit(t);
         if (is_numbered) {
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
@@ -164,9 +164,9 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
             }
         }
 
-        // 对子可看作将或者刻子搭子
+        // 对子可看作雀头或者刻子搭子
         if (cnt_table[t] > 1) {
-            // 作为将，递归
+            // 作为雀头，递归
             if (!has_pair) {
                 work_units[idx] = MAKE_UNIT(UNIT_TYPE_PAIR, t);
                 if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
@@ -197,7 +197,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
             cnt_table[t] += 2;
         }
 
-        // 顺子搭子（只能是序数牌）
+        // 顺子搭子（只能是数牌）
         if (is_numbered) {
             // 削减搭子，递归
             if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
@@ -253,8 +253,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
         // 缺少的搭子数=4-完成的面子数-搭子数
         int neighbor_need = 4 - pack_cnt - neighbor_cnt;
 
-        // 有将的情况，上听数=搭子数+缺少的搭子数*2-1
-        // 无将的情况，上听数=搭子数+缺少的搭子数*2
+        // 有雀头的情况，上听数=搭子数+缺少的搭子数*2-1
+        // 无雀头的情况，上听数=搭子数+缺少的搭子数*2
         result = neighbor_cnt + neighbor_need * 2;
         if (has_pair) {
             --result;
@@ -269,7 +269,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
                     if (cnt_table[t] == 0) continue;
 
                     (*useful_table)[t] = true;  // 刻子搭子
-                    if (is_numbered_suit_quick(t)) {  // 顺子搭子（只能是序数牌）
+                    if (is_numbered_suit_quick(t)) {  // 顺子搭子（只能是数牌）
                         rank_t r = tile_rank(t);
                         if (r > 1) (*useful_table)[t - 1] = true;
                         if (r > 2) (*useful_table)[t - 2] = true;
@@ -279,12 +279,12 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
                 }
             }
 
-            // 缺将
+            // 缺雀头
             if (!has_pair) {
                 for (int i = 0; i < 34; ++i) {
                     tile_t t = all_tiles[i];
                     if (cnt_table[t] == 0) continue;
-                    (*useful_table)[t] = true;  // 任意凑一对就可以有将
+                    (*useful_table)[t] = true;  // 任意凑一对就有雀头
                 }
             }
         }
@@ -390,13 +390,13 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_COUNT], bool 
 
 static bool is_basic_type_wait_4(int (&cnt_table)[TILE_TABLE_COUNT], bool (&waiting_table)[TILE_TABLE_COUNT]) {
     bool ret = false;
-    // 削减将
+    // 削减雀头
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] < 2) {
             continue;
         }
-        // 削减将，递归
+        // 削减雀头，递归
         cnt_table[t] -= 2;
         if (is_basic_type_wait_2(cnt_table, waiting_table)) {
             ret = true;
@@ -430,7 +430,7 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_COUNT], l
             cnt_table[t] += 3;
         }
 
-        // 顺子（只能是序数牌）
+        // 顺子（只能是数牌）
         bool is_numbered = is_numbered_suit(t);
         if (is_numbered) {
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
@@ -585,7 +585,7 @@ static bool is_basic_type_match_1(const int (&cnt_table)[TILE_TABLE_COUNT]) {
 static bool is_basic_type_match_2(int (&cnt_table)[TILE_TABLE_COUNT]) {
     bool ret = false;
 
-    // 顺子（只能是序数牌）
+    // 顺子（只能是数牌）
     for (int s = 1; s <= 3; ++s) {
         tile_t t1 = make_tile(s, 1);
         tile_t t9 = make_tile(s, 9);
@@ -625,7 +625,7 @@ static bool is_basic_type_match_2(int (&cnt_table)[TILE_TABLE_COUNT]) {
     return ret;
 }
 
-// “组合龙+面子+将”和型
+// “组合龙+面子+雀头”和型
 static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[TILE_TABLE_COUNT], long left_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]) {
     // 匹配组合龙
     const tile_t (*matched_seq)[9] = nullptr;
@@ -707,10 +707,10 @@ static int knitted_straight_in_basic_type_wait_step_1(const tile_t *standing_til
         }
     }
 
-    // 余下“1组面子+将”的上听数
+    // 余下“1组面子+雀头”的上听数
     int result = basic_type_wait_step_from_table(cnt_table, 3, &useful_table);
 
-    // 上听数=组合龙缺少的张数+余下“1组面子+将”的上听数
+    // 上听数=组合龙缺少的张数+余下“1组面子+雀头”的上听数
     return (9 - cnt) + result;
 }
 

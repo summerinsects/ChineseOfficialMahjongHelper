@@ -29,7 +29,7 @@ struct SEPERATIONS {
 };
 
 static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_packs)[5], SEPERATIONS *separation) {
-    // 这2张作为将
+    // 这2张作为雀头
     work_packs[4] = make_pack(false, PACK_TYPE_PAIR, tile);
 
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
@@ -81,7 +81,7 @@ static bool is_separation_branch_exist(long fixed_cnt, long step, const pack_t (
     memcpy(&temp[fixed_cnt], &work_packs[fixed_cnt], step * sizeof(pack_t));
     std::sort(&temp[fixed_cnt], &temp[fixed_cnt + step]);
 
-    // 只需要比较面子是否重复分支，将牌不参与比较，所以下标是4
+    // 只需要比较面子是否重复分支，雀头不参与比较，所以下标是4
     return std::any_of(&separation->packs[0], &separation->packs[separation->count],
         [&temp, fixed_cnt, step](const pack_t(&pack)[5]) {
         return std::includes(&pack[fixed_cnt], &pack[4], &temp[fixed_cnt], &temp[fixed_cnt + step]);
@@ -116,7 +116,7 @@ static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_
             cnt_table[t] += 3;
         }
 
-        // 顺子（只能是序数牌）
+        // 顺子（只能是数牌）
         bool is_numbered = is_numbered_suit(t);
         if (is_numbered) {
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
@@ -980,7 +980,7 @@ static bool is_nine_gates(const tile_t (&tiles)[14], tile_t win_tile) {
 
 // 一色双龙会
 static bool is_pure_terminal_chows(const pack_t (&chow_packs)[4], pack_t pair_pack) {
-    if (tile_rank(pack_tile(pair_pack)) != 5) {  // 5作将
+    if (tile_rank(pack_tile(pair_pack)) != 5) {  // 5作雀头
         return false;
     }
 
@@ -988,7 +988,7 @@ static bool is_pure_terminal_chows(const pack_t (&chow_packs)[4], pack_t pair_pa
     suit_t pair_suit = tile_suit(pack_tile(pair_pack));
     for (long i = 0; i < 4; ++i) {
         suit_t suit = tile_suit(pack_tile(chow_packs[i]));
-        if (suit != pair_suit) {  // 花色与将相同
+        if (suit != pair_suit) {  // 花色与雀头相同
             return false;
         }
         rank_t rank = tile_rank(pack_tile(chow_packs[i]));
@@ -1003,7 +1003,7 @@ static bool is_pure_terminal_chows(const pack_t (&chow_packs)[4], pack_t pair_pa
 
 // 三色双龙会
 static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t pair_pack) {
-    if (tile_rank(pack_tile(pair_pack)) != 5) {  // 5作将
+    if (tile_rank(pack_tile(pair_pack)) != 5) {  // 5作雀头
         return false;
     }
 
@@ -1012,7 +1012,7 @@ static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t
     suit_t pair_suit = tile_suit(pack_tile(pair_pack));
     for (long i = 0; i < 4; ++i) {
         suit_t suit = tile_suit(pack_tile(chow_packs[i]));
-        if (suit == pair_suit) {  // 花色与将不相同
+        if (suit == pair_suit) {  // 花色与雀头不相同
             return false;
         }
         rank_t rank = tile_rank(pack_tile(chow_packs[i]));
@@ -1023,7 +1023,7 @@ static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t
         }
     }
 
-    // 与将花色不同的两色123和789各一组
+    // 与雀头花色不同的两色123和789各一组
     switch (pair_suit) {
     case 1: return (_123_suit_table[2] && _123_suit_table[3] && _789_suit_table[2] && _789_suit_table[3]);
     case 2: return (_123_suit_table[1] && _123_suit_table[3] && _789_suit_table[1] && _789_suit_table[3]);
@@ -1057,16 +1057,16 @@ static void check_melded_or_concealed_hand(const pack_t (&packs)[5], long fixed_
     }
 }
 
-// 检测将，确定平和、小三元、小四喜
+// 检测雀头，确定平和、小三元、小四喜
 static void check_pair_tile(tile_t pair_tile, long chow_cnt, long (&fan_table)[FAN_COUNT]) {
     if (chow_cnt == 4) {  // 4组都是顺子
-        if (is_numbered_suit_quick(pair_tile)) {  // 数牌将
+        if (is_numbered_suit_quick(pair_tile)) {  // 数牌雀头
             fan_table[ALL_CHOWS] = 1;  // 平和
         }
         return;
     }
 
-    // 在双箭刻的基础上，如果将是箭牌，则修正为小三元
+    // 在双箭刻的基础上，如果雀头是箭牌，则修正为小三元
     if (fan_table[TWO_DRAGONS_PUNGS]) {
         if (is_dragons(pair_tile)) {
             fan_table[LITTLE_THREE_DRAGONS] = 1;
@@ -1074,7 +1074,7 @@ static void check_pair_tile(tile_t pair_tile, long chow_cnt, long (&fan_table)[F
         }
         return;
     }
-    // 在三风刻的基础上，如果将是风牌，则修正为小四喜
+    // 在三风刻的基础上，如果雀头是风牌，则修正为小四喜
     if (fan_table[BIG_THREE_WINDS]) {
         if (is_winds(pair_tile)) {
             fan_table[LITTLE_FOUR_WINDS] = 1;
@@ -1117,7 +1117,7 @@ static void check_tiles_suits(const tile_t *tiles, long tile_cnt, long (&fan_tab
     }
 
     // 0001 1110
-    if (suit_flag == UINT8_C(0x1E)) {  // 三门序数牌和字牌都有
+    if (suit_flag == UINT8_C(0x1E)) {  // 三门数牌和字牌都有
         if (std::any_of(tiles, tiles + tile_cnt, &is_winds)
             && std::any_of(tiles, tiles + tile_cnt, &is_dragons)) {
             fan_table[ALL_TYPES] = 1;  // 五门齐
@@ -1791,7 +1791,7 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
 
     // 检测不求人、全求人
     check_melded_or_concealed_hand(packs, fixed_cnt, ext_cond->win_type & WIN_TYPE_SELF_DRAWN, fan_table);
-    // 检测将，确定平和、小三元、小四喜
+    // 检测雀头，确定平和、小三元、小四喜
     check_pair_tile(pack_tile(pair_pack), chow_cnt, fan_table);
     // 检测全带幺、全带五、全双刻
     check_tiles_rank_by_pack(packs, fan_table);
@@ -1821,7 +1821,7 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
     }
 }
 
-// “组合龙+面子+将”和型算番
+// “组合龙+面子+雀头”和型算番
 static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *hand_tiles,
     tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_COUNT]) {
     long fixed_cnt = hand_tiles->pack_count;
@@ -1868,7 +1868,7 @@ static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *
     fan_table[KNITTED_STRAIGHT] = 1;  // 组合龙
     if (pack_type(temp_pack[3]) == PACK_TYPE_CHOW) {
         if (is_numbered_suit_quick(pack_tile(temp_pack[4]))) {
-            fan_table[ALL_CHOWS] = 1;  // 第4组是顺子，将是数牌时，为平和
+            fan_table[ALL_CHOWS] = 1;  // 第4组是顺子，雀头是数牌时，为平和
         }
     }
     else {
@@ -1890,7 +1890,7 @@ static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *
     tile_t tiles[15];  // 第四组可能为杠，所以最多为15张
     memcpy(tiles, matched_seq, 9 * sizeof(tile_t));  // 组合龙的部分
     long tile_cnt;
-    recovery_tiles_from_packs(&temp_pack[3], 2, tiles + 9, &tile_cnt);  // 一组面子和一对将
+    recovery_tiles_from_packs(&temp_pack[3], 2, tiles + 9, &tile_cnt);  // 一组面子和一对雀头
     tile_cnt += 9;
 
     // 检测门（五门齐的门）
@@ -1927,7 +1927,7 @@ static bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
 bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], long (&fan_table)[FAN_COUNT]) {
     const tile_t *it = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
     long numbered_cnt = it - standing_tiles;
-    // 序数牌张数大于9或者小于7必然不可能是全不靠
+    // 数牌张数大于9或者小于7必然不可能是全不靠
     if (numbered_cnt > 9 || numbered_cnt < 7) {
         return false;
     }
