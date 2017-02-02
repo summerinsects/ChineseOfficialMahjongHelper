@@ -1,4 +1,8 @@
-﻿#include "HistoryScene.h"
+﻿#ifdef _MSC_VER
+#pragma warning(disable: 4351)
+#endif
+
+#include "HistoryScene.h"
 #include "Record.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"

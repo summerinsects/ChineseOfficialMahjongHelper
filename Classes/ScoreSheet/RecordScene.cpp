@@ -1,4 +1,8 @@
-﻿#include "RecordScene.h"
+﻿#ifdef _MSC_VER
+#pragma warning(disable: 4351)
+#endif
+
+#include "RecordScene.h"
 #include "../common.h"
 #include "../mahjong-algorithm/points_calculator.h"
 #include "../widget/AlertView.h"

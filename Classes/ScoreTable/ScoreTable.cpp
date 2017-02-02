@@ -1,4 +1,8 @@
-﻿#include "ScoreTable.h"
+﻿#ifdef _MSC_VER
+#pragma warning(disable: 4351)
+#endif
+
+#include "ScoreTable.h"
 #include "ScoreDefinition.h"
 #include "../widget/CWTableView.h"
 #include "../mahjong-algorithm/points_calculator.h"
