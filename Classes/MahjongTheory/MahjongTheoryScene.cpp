@@ -222,6 +222,8 @@ void MahjongTheoryScene::setRandomInput() {
     long ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
     mahjong::tiles_to_string(&drawnTile, 1, str + ret, sizeof(str) - ret);
     _editBox->setText(str);
+
+    _tableView->reloadData();
 }
 
 void MahjongTheoryScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
