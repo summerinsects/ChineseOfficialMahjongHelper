@@ -7,6 +7,7 @@
 #include "../compiler.h"
 #include "../widget/HandTilesWidget.h"
 #include "../widget/AlertLayer.h"
+#include "../widget/LoadingView.h"
 
 #ifdef _MSC_VER
 #pragma execution_character_set("utf-8")
@@ -342,17 +343,30 @@ void MahjongTheoryScene::calculate() {
 
     // 计算
     _allResults.clear();
-    mahjong::enum_discard_tile(&hand_tiles, win_tile, FORM_FLAG_ALL, this,
-        [](void *context, const mahjong::enum_result_t *result) {
-        if (result->wait_step != std::numeric_limits<int>::max()) {
-            MahjongTheoryScene *thiz = (MahjongTheoryScene *)context;
-            thiz->_allResults.push_back(*result);
-        }
-        return true;
-    });
 
-    filterResultsByFlag(getFilterFlag());
-    _tableView->reloadData();
+    LoadingView *loadingView = LoadingView::create();
+    this->addChild(loadingView);
+    loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
+
+    auto thiz = RefPtr<MahjongTheoryScene>(this);
+    std::thread([thiz, hand_tiles, win_tile, loadingView]() {
+        mahjong::enum_discard_tile(&hand_tiles, win_tile, FORM_FLAG_ALL, thiz.get(),
+            [](void *context, const mahjong::enum_result_t *result) {
+            MahjongTheoryScene *thiz = (MahjongTheoryScene *)context;
+            if (result->wait_step != std::numeric_limits<int>::max()) {
+                thiz->_allResults.push_back(*result);
+            }
+            return (thiz->getParent() != nullptr);
+        });
+
+        Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
+            if (thiz->getParent() != nullptr) {
+                thiz->filterResultsByFlag(thiz->getFilterFlag());
+                thiz->_tableView->reloadData();
+                loadingView->removeFromParent();
+            }
+        });
+    }).detach();
 }
 
 void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {

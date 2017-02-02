@@ -155,6 +155,9 @@
     <ClInclude Include="..\Classes\mahjong-algorithm\stringify.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\widget\LoadingView.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">
