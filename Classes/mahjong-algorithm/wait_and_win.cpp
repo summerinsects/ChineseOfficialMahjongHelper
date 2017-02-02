@@ -895,7 +895,7 @@ static void enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
     }
 }
 
-static long table_to_tiles(const int (&cnt_table)[TILE_TABLE_COUNT], tile_t *tiles, long max_cnt) {
+long table_to_tiles(const int (&cnt_table)[TILE_TABLE_COUNT], tile_t *tiles, long max_cnt) {
     long cnt = 0;
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
