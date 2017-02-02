@@ -397,31 +397,31 @@ static std::string getResultTypeString(uint8_t flag, int step) {
     default: str = StringUtils::format("%d上听(", step); break;
     }
 
-    bool entered = false;
-    while (flag != 0) {
-        if (LIKELY(entered)) str.append("、");
-        entered = true;
-        if (flag & CONSIDERATION_FLAG_BASIC_TYPE) {
-            str.append("基本和型");
-            flag &= ~CONSIDERATION_FLAG_BASIC_TYPE;
-        }
-        if (flag & CONSIDERATION_FLAG_SEVEN_PAIRS) {
-            str.append("七对");
-            flag &= ~CONSIDERATION_FLAG_SEVEN_PAIRS;
-        }
-        if (flag & CONSIDERATION_FLAG_THIRTEEN_ORPHANS) {
-            str.append("十三幺");
-            flag &= ~CONSIDERATION_FLAG_THIRTEEN_ORPHANS;
-        }
-        if (flag & CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES) {
-            str.append("全不靠");
-            flag &= ~CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES;
-        }
-        if (flag & CONSIDERATION_FLAG_KNITTED_STRAIGHT) {
-            str.append("组合龙");
-            flag &= ~CONSIDERATION_FLAG_KNITTED_STRAIGHT;
-        }
+    bool needCaesuraSign = false;
+#define APPEND_CAESURA_SIGN_IF_NECESSARY() \
+    if (LIKELY(needCaesuraSign)) { str.append("、"); } needCaesuraSign = true
+
+    if (flag & CONSIDERATION_FLAG_BASIC_TYPE) {
+        str.append("基本和型");
     }
+    if (flag & CONSIDERATION_FLAG_SEVEN_PAIRS) {
+        APPEND_CAESURA_SIGN_IF_NECESSARY();
+        str.append("七对");
+    }
+    if (flag & CONSIDERATION_FLAG_THIRTEEN_ORPHANS) {
+        APPEND_CAESURA_SIGN_IF_NECESSARY();
+        str.append("十三幺");
+    }
+    if (flag & CONSIDERATION_FLAG_HONORS_AND_KNITTED_TILES) {
+        APPEND_CAESURA_SIGN_IF_NECESSARY();
+        str.append("全不靠");
+    }
+    if (flag & CONSIDERATION_FLAG_KNITTED_STRAIGHT) {
+        APPEND_CAESURA_SIGN_IF_NECESSARY();
+        str.append("组合龙");
+    }
+#undef APPEND_CAESURA_SIGN_IF_NECESSARY
+
     str.append(")");
     return str;
 }
