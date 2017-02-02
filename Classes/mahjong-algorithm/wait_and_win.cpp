@@ -60,9 +60,11 @@ void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[TILE_TABLE_COUNT]
 
 int count_contributing_tile(const int (&used_table)[TILE_TABLE_COUNT], const bool (&useful_table)[TILE_TABLE_COUNT]) {
     int cnt = 0;
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
-        if (useful_table[t])
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (useful_table[t]) {
             cnt += 4 - used_table[t];
+        }
     }
     return cnt;
 }
@@ -89,7 +91,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
 
     if (pack_cnt + neighbor_cnt >= 4) {  // 搭子超载
         if (!has_pair) {
-            for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+            for (int i = 0; i < 34; ++i) {
+                tile_t t = all_tiles[i];
                 if (cnt_table[t] < 2) {
                     continue;
                 }
@@ -117,7 +120,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
 
     int result = std::numeric_limits<int>::max();
 
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         if (cnt_table[t] < 1) {
             continue;
         }
@@ -335,7 +339,8 @@ int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (
 }
 
 static bool is_basic_type_wait_1(int (&cnt_table)[TILE_TABLE_COUNT], bool (&waiting_table)[TILE_TABLE_COUNT]) {
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         if (cnt_table[t] != 1) {
             continue;
         }
@@ -355,7 +360,8 @@ static bool is_basic_type_wait_1(int (&cnt_table)[TILE_TABLE_COUNT], bool (&wait
 
 static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_COUNT], bool (&waiting_table)[TILE_TABLE_COUNT]) {
     bool ret = false;
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         if (cnt_table[t] < 1) {
             continue;
         }
@@ -385,7 +391,8 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_COUNT], bool 
 static bool is_basic_type_wait_4(int (&cnt_table)[TILE_TABLE_COUNT], bool (&waiting_table)[TILE_TABLE_COUNT]) {
     bool ret = false;
     // 削减将
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         if (cnt_table[t] < 2) {
             continue;
         }
@@ -407,7 +414,8 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_COUNT], l
 
     bool ret = false;
 
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         if (cnt_table[t] < 1) {
             continue;
         }
@@ -600,7 +608,8 @@ static bool is_basic_type_match_2(int (&cnt_table)[TILE_TABLE_COUNT]) {
     }
 
     // 刻子
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         if (cnt_table[t] < 3) {
             continue;
         }
@@ -722,7 +731,8 @@ int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long 
             memcpy(useful_table, temp_table, sizeof(useful_table));
         }
         else if (st == ret) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
-            for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+            for (int i = 0; i < 34; ++i) {
+                tile_t t = all_tiles[i];
                 if (temp_table[t] && !useful_table[t]) {
                     useful_table[t] = true;
                 }
@@ -807,7 +817,8 @@ int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standi
             memcpy(useful_table, temp_table, sizeof(useful_table));
         }
         else if (st == ret) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
-            for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+            for (int i = 0; i < 34; ++i) {
+                tile_t t = all_tiles[i];
                 if (temp_table[t] && !useful_table[t]) {
                     useful_table[t] = true;
                 }
@@ -886,7 +897,8 @@ static void enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
 
 static long table_to_tiles(const int (&cnt_table)[TILE_TABLE_COUNT], tile_t *tiles, long max_cnt) {
     long cnt = 0;
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         for (int n = 0; n < cnt_table[t]; ++n) {
             *tiles++ = t;
             ++cnt;
@@ -912,7 +924,8 @@ void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t drawn_tile, unsign
     hand_tiles_t temp;
     memcpy(&temp, hand_tiles, sizeof(temp));
 
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         if (cnt_table[t] && t != drawn_tile && cnt_table[drawn_tile] < 4) {
             --cnt_table[t];
             ++cnt_table[drawn_tile];

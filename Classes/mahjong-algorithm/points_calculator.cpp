@@ -52,7 +52,8 @@ static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_pa
 }
 
 static bool seperate_tail(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, pack_t (&work_packs)[5], SEPERATIONS *separation) {
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         if (cnt_table[t] < 2) {
             continue;
         }
@@ -94,7 +95,8 @@ static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_
     }
 
     bool ret = false;
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
         if (cnt_table[t] < 1) {
             continue;
         }
