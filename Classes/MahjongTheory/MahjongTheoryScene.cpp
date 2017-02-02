@@ -162,7 +162,6 @@ bool MahjongTheoryScene::init() {
     _tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
     _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 55));
-    _tableView->reloadData();
     this->addChild(_tableView);
 
     srand((unsigned)time(nullptr));
@@ -222,6 +221,10 @@ void MahjongTheoryScene::setRandomInput() {
     long ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
     mahjong::tiles_to_string(&drawnTile, 1, str + ret, sizeof(str) - ret);
     _editBox->setText(str);
+
+    _allResults.clear();
+    _resultSources.clear();
+    _orderedIndices.clear();
 
     _tableView->reloadData();
 }
