@@ -94,10 +94,10 @@ bool HelloWorld::init() {
     button->setContentSize(Size(75.0, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleColor(textColor);
-    button->setTitleText("其他");
+    button->setTitleText("牌理");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(OtherScene::createScene());
+        Director::getInstance()->pushScene(MahjongTheoryScene::createScene());
     });
 
     button = ui::Button::create(normalImage, selectedImage);
@@ -106,10 +106,10 @@ bool HelloWorld::init() {
     button->setContentSize(Size(75.0, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleColor(textColor);
-    button->setTitleText("牌理");
+    button->setTitleText("其他");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 60));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(MahjongTheoryScene::createScene());
+        Director::getInstance()->pushScene(OtherScene::createScene());
     });
 
     button = ui::Button::create(normalImage, selectedImage);
