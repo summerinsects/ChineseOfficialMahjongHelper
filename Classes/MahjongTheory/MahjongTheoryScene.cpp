@@ -347,8 +347,8 @@ void MahjongTheoryScene::calculate() {
         if (result->wait_step != std::numeric_limits<int>::max()) {
             MahjongTheoryScene *thiz = (MahjongTheoryScene *)context;
             thiz->_allResults.push_back(*result);
-            return true;
         }
+        return true;
     });
 
     filterResultsByFlag(getFilterFlag());
