@@ -4,7 +4,7 @@
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/points_calculator.h"
 #include "../compiler.h"
-#include <thread>
+#include "../widget/LoadingView.h"
 
 USING_NS_CC;
 
@@ -63,11 +63,9 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-        Sprite *sprite = Sprite::create("source_material/loading_black.png");
-        this->addChild(sprite);
-        sprite->setScale(40 / sprite->getContentSize().width);
-        sprite->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
-        sprite->runAction(RepeatForever::create(RotateBy::create(0.5f, 180.0f)));
+        LoadingView *loadingView = LoadingView::create();
+        this->addChild(loadingView);
+        loadingView->setPosition(origin);
 
         float scale = 1.0f;
         float maxWidth = (visibleSize.width - 10) / 18;
@@ -76,7 +74,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
         }
 
         auto thiz = RefPtr<ScoreDefinitionScene>(this);
-        std::thread thread([thiz, idx, scale, sprite]() {
+        std::thread thread([thiz, idx, scale, loadingView]() {
             ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
             g_definitions.reserve(valueVec.size());
             std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions), [scale](const Value &value) {
@@ -93,9 +91,9 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
                 return std::move(ret);
             });
 
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, sprite]() {
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView]() {
                 if (LIKELY(thiz->getParent() != nullptr)) {
-                    sprite->removeFromParent();
+                    loadingView->removeFromParent();
                     thiz->createContentView(idx);
                 }
             });

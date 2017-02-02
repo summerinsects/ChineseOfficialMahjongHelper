@@ -1,6 +1,7 @@
 ﻿#include "HistoryScene.h"
 #include "Record.h"
 #include "../widget/AlertView.h"
+#include "../widget/LoadingView.h"
 #include "../widget/CWTableView.h"
 #include "../compiler.h"
 #include <thread>
@@ -129,19 +130,15 @@ bool HistoryScene::init() {
     this->addChild(_tableView);
 
     if (UNLIKELY(g_records.empty())) {
-        _tableView->setEnabled(false);
 
-        Sprite *sprite = Sprite::create("source_material/loading_black.png");
-        this->addChild(sprite);
-        sprite->setScale(40 / sprite->getContentSize().width);
-        sprite->setPosition(_tableView->getPosition());
-        sprite->runAction(RepeatForever::create(RotateBy::create(0.5f, 180.0f)));
+        LoadingView *loadingView = LoadingView::create();
+        this->addChild(loadingView);
+        loadingView->setPosition(origin);
 
         auto thiz = RefPtr<HistoryScene>(this);
-        loadRecordsAsync([thiz, sprite]() {
+        loadRecordsAsync([thiz, loadingView]() {
             if (LIKELY(thiz->getParent() != nullptr)) {
-                sprite->removeFromParent();
-                thiz->_tableView->setEnabled(true);
+                loadingView->removeFromParent();
                 thiz->_tableView->reloadData();
             }
         });
