@@ -43,21 +43,21 @@ static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long 
     }
 
 parse_finish:
+    // 一连串数字+后缀，但已经超过容量，那么放弃中间一部分数字，直接解析最近的后缀
     if (tile_cnt > 0 && !(tiles[tile_cnt - 1] & 0xF0)) {
-        bool hasSuffix = false;
-        for (; !hasSuffix && *p != '\0'; ++p) {
-            char c = *p;
-            switch (c) {
-            case 'm': SET_SUIT_FOR_NUMBERED(0x10); hasSuffix = true; break;
-            case 's': SET_SUIT_FOR_NUMBERED(0x20); hasSuffix = true; break;
-            case 'p': SET_SUIT_FOR_NUMBERED(0x30); hasSuffix = true; break;
-            default: break;
-            }
-        }
-
-        if (!hasSuffix) {
+        const char *p1 = strpbrk(p, "mspz");
+        if (p1 == nullptr) {
             return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT;
         }
+
+        switch (*p1) {
+        case 'm': SET_SUIT_FOR_NUMBERED(0x10); break;
+        case 's': SET_SUIT_FOR_NUMBERED(0x20); break;
+        case 'p': SET_SUIT_FOR_NUMBERED(0x30); break;
+        case 'z': SET_SUIT_FOR_HONOR(); break;
+        default: return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT;
+        }
+        p = p1 + 1;
     }
 
 #undef SET_SUIT_FOR_NUMBERED
