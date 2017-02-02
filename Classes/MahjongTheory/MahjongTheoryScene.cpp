@@ -26,15 +26,17 @@ bool MahjongTheoryScene::init() {
         return false;
     }
 
-    Color3B titleColor;
+    Color3B titleColor, textColor;
     const char *normalImage, *selectedImage;
     if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
         titleColor = Color3B::BLACK;
+        textColor = Color3B::WHITE;
         normalImage = "source_material/btn_square_normal.png";
         selectedImage = "source_material/btn_square_highlighted.png";
     }
     else {
         titleColor = Color3B::WHITE;
+        textColor = Color3B::BLACK;
         normalImage = "source_material/btn_square_highlighted.png";
         selectedImage = "source_material/btn_square_selected.png";
     }
@@ -75,9 +77,39 @@ bool MahjongTheoryScene::init() {
     }
     _handTilesWidget->setPosition(Vec2(origin.x + widgetSize.width * 0.5f, origin.y + visibleSize.height - 65 - widgetSize.height * 0.5f));
 
+    Label *label = Label::createWithSystemFont("考虑特殊和型", "Arial", 12);
+    label->setColor(textColor);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 75 - widgetSize.height));
+
+    static const char *title[] = { "七对", "十三幺", "全不靠", "组合龙" };
+    const float yPos = origin.y + visibleSize.height - 100 - widgetSize.height;
+    const float gap = (visibleSize.width - 4.0f) * 0.25f;
+    for (int i = 0; i < 4; ++i) {
+        const float xPos = origin.x + gap * (i + 0.5f);
+        _checkBoxes[i] = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        this->addChild(_checkBoxes[i]);
+        _checkBoxes[i]->setZoomScale(0.0f);
+        _checkBoxes[i]->ignoreContentAdaptWithSize(false);
+        _checkBoxes[i]->setContentSize(Size(20.0f, 20.0f));
+        _checkBoxes[i]->setPosition(Vec2(xPos - 15, yPos));
+        _checkBoxes[i]->setSelected(true);
+        _checkBoxes[i]->addEventListener([this](Ref *sender, ui::CheckBox::EventType event) {
+            filterResultsByFlag(getFilterFlag());
+            _tableView->reloadData();
+        });
+
+        label = Label::createWithSystemFont(title[i], "Arial", 12);
+        label->setColor(textColor);
+        this->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(xPos, yPos));
+    }
+
     _newLineFlag = 15;
     _tableView = cw::TableView::create();
-    _tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 80 - widgetSize.height));
+    _tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 120 - widgetSize.height));
     _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
@@ -102,7 +134,7 @@ bool MahjongTheoryScene::init() {
 
     _tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
     _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, (visibleSize.height - widgetSize.height) * 0.5f - 35));
+    _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 55));
     _tableView->reloadData();
     this->addChild(_tableView);
 
@@ -277,6 +309,16 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
     std::transform(temp.begin(), it, _orderedIndices.begin(), [start](ResultEx *p) { return p - start; });
 }
 
+uint8_t MahjongTheoryScene::getFilterFlag() const {
+    uint8_t flag = CONSIDERATION_FLAG_BASIC_TYPE;
+    for (int i = 0; i < 4; ++i) {
+        if (_checkBoxes[i]->isSelected()) {
+            flag |= 1 << (i + 1);
+        }
+    }
+    return flag;
+}
+
 void MahjongTheoryScene::calculate() {
     // 获取牌
     mahjong::hand_tiles_t hand_tiles;
@@ -305,7 +347,7 @@ void MahjongTheoryScene::calculate() {
         }
     });
 
-    filterResultsByFlag(CONSIDERATION_FLAG_ALL);
+    filterResultsByFlag(getFilterFlag());
     _tableView->reloadData();
 }
 

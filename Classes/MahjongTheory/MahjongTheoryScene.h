@@ -21,6 +21,7 @@ public:
 
 private:
     HandTilesWidget *_handTilesWidget;
+    cocos2d::ui::CheckBox *_checkBoxes[4];
     cw::TableView *_tableView;
 
     int _handTilesTable[mahjong::TILE_TABLE_COUNT];
@@ -38,6 +39,7 @@ private:
     bool parseInput(cocos2d::ui::Button *button, const char *input);
     void calculate();
     void filterResultsByFlag(uint8_t flag);
+    uint8_t getFilterFlag() const;
     void onTileButton(cocos2d::Ref *sender);
 
     cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
