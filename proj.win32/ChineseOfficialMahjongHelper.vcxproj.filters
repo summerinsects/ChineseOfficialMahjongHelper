@@ -72,7 +72,7 @@
     <ClCompile Include="..\Classes\Other\OtherScene.cpp">
       <Filter>src\Other</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\widget\AlertLayer.cpp">
+    <ClCompile Include="..\Classes\widget\AlertView.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\widget\CWTableView.cpp">
@@ -140,7 +140,7 @@
     <ClInclude Include="..\Classes\Other\OtherScene.h">
       <Filter>src\Other</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\widget\AlertLayer.h">
+    <ClInclude Include="..\Classes\widget\AlertView.h">
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\CWTableView.h">

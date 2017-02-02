@@ -22,7 +22,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/ScoreSheet/ScoreSheetScene.cpp \
                    ../../Classes/ScoreTable/ScoreDefinition.cpp \
                    ../../Classes/ScoreTable/ScoreTable.cpp \
-                   ../../Classes/widget/AlertLayer.cpp \
+                   ../../Classes/widget/AlertView.cpp \
                    ../../Classes/widget/CWTableView.cpp \
                    ../../Classes/widget/HandTilesWidget.cpp \
                    ../../Classes/widget/TilePickWidget.cpp \
