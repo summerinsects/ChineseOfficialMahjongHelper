@@ -25,11 +25,11 @@ private:
 
     int _handTilesTable[mahjong::TILE_TABLE_COUNT];
 
-    struct ResultEx {
-        mahjong::enum_result_t origin;
-        int cnt1;
-        int cnt2;
+    struct ResultEx : mahjong::enum_result_t {
+        int count_in_tiles;
+        int count_total;
     };
+    std::vector<mahjong::enum_result_t> _allResults;
     std::vector<ResultEx> _resultSources;
     std::vector<size_t> _orderedIndices;
     int _newLineFlag;
@@ -37,6 +37,7 @@ private:
     void showInputAlert(cocos2d::Ref *sender, const char *prevInput);
     bool parseInput(cocos2d::ui::Button *button, const char *input);
     void calculate();
+    void filterResultsByFlag(uint8_t flag);
     void onTileButton(cocos2d::Ref *sender);
 
     cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);

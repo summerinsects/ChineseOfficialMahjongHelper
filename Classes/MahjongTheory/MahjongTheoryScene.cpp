@@ -81,7 +81,7 @@ bool MahjongTheoryScene::init() {
     _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
-            if (_resultSources[_orderedIndices[param1]].cnt1 < _newLineFlag) {
+            if (_resultSources[_orderedIndices[param1]].count_in_tiles < _newLineFlag) {
                 *(Size *)param2 = Size(0, 50);
             }
             else {
@@ -201,11 +201,21 @@ bool MahjongTheoryScene::parseInput(cocos2d::ui::Button *button, const char *inp
     return false;
 }
 
+void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
+
+}
+
 void MahjongTheoryScene::calculate() {
+    // 获取牌
     mahjong::hand_tiles_t hand_tiles;
     mahjong::tile_t win_tile;
     _handTilesWidget->getData(&hand_tiles, &win_tile);
 
+    if (hand_tiles.tile_count == 0) {
+        return;
+    }
+
+    // 打表
     mahjong::map_hand_tiles(&hand_tiles, _handTilesTable);
     if (win_tile != 0) {
         ++_handTilesTable[win_tile];
@@ -213,57 +223,17 @@ void MahjongTheoryScene::calculate() {
 
     _newLineFlag = (win_tile == 0) ? 15 : 10;
 
+    // 计算
     _resultSources.clear();
     mahjong::enum_discard_tile(&hand_tiles, win_tile, CONSIDERATION_FLAG_ALL, this,
         [](void *context, const mahjong::enum_result_t *result) {
-        MahjongTheoryScene *thiz = (MahjongTheoryScene *)context;
-
-        ResultEx temp;
-        memcpy(&temp.origin, result, sizeof(temp.origin));
-        temp.cnt1 = 0;
-        for (mahjong::tile_t t = mahjong::TILE_1m; t < mahjong::TILE_TABLE_COUNT; ++t) {
-            if (result->useful_table[t]) {
-                ++temp.cnt1;
-            }
+        if (result->wait_step != std::numeric_limits<int>::max()) {
+            MahjongTheoryScene *thiz = (MahjongTheoryScene *)context;
+            thiz->_allResults.push_back(*result);
         }
-        temp.cnt2 = mahjong::count_contributing_tile(thiz->_handTilesTable, temp.origin.useful_table);
-        thiz->_resultSources.push_back(temp);
     });
 
-    _orderedIndices.clear();
-    if (_resultSources.empty()) {
-        return;
-    }
-
-    // 指针数组
-    std::vector<ResultEx *> temp;
-    temp.reserve(_resultSources.size());
-    std::transform(_resultSources.begin(), _resultSources.end(), std::back_inserter(temp),
-        [](ResultEx &r) { return &r; });
-
-    // 排序
-    std::sort(temp.begin(), temp.end(), [](ResultEx *a, ResultEx *b) {
-        if (a->origin.wait_step < b->origin.wait_step) return true;
-        if (a->origin.wait_step > b->origin.wait_step) return false;
-        if (a->cnt2 > b->cnt2) return true;
-        if (a->cnt2 < b->cnt2) return false;
-        if (a->cnt1 > b->cnt1) return true;
-        if (a->cnt1 < b->cnt1) return false;
-        if (a->origin.consideration_flag < b->origin.consideration_flag) return true;
-        if (a->origin.consideration_flag > b->origin.consideration_flag) return false;
-        if (a->origin.discard_tile < b->origin.discard_tile) return true;
-        if (a->origin.discard_tile > b->origin.discard_tile) return false;
-        return false;
-    });
-
-    int minStep = temp.front()->origin.wait_step;
-    std::vector<ResultEx *>::iterator it = std::remove_if(temp.begin(), temp.end(),
-        [minStep](ResultEx *a) { return a->origin.wait_step > minStep; });
-
-    // 转成下标数组
-    ResultEx *start = &_resultSources.front();
-    std::transform(temp.begin(), it, std::back_inserter(_orderedIndices), [start](ResultEx *p) { return p - start; });
-
+    filterResultsByFlag(CONSIDERATION_FLAG_ALL);
     _tableView->reloadData();
 }
 
@@ -457,21 +427,21 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     if (idx & 1) {
         layerColor[0]->setVisible(false);
         layerColor[1]->setVisible(true);
-        layerColor[1]->setContentSize(Size(visibleSize.width - 10, result->cnt1 < _newLineFlag ? 48 : 78));
+        layerColor[1]->setContentSize(Size(visibleSize.width - 10, result->count_in_tiles < _newLineFlag ? 48 : 78));
     }
     else {
         layerColor[0]->setVisible(true);
         layerColor[1]->setVisible(false);
-        layerColor[0]->setContentSize(Size(visibleSize.width - 10, result->cnt1 < _newLineFlag ? 48 : 78));
+        layerColor[0]->setContentSize(Size(visibleSize.width - 10, result->count_in_tiles < _newLineFlag ? 48 : 78));
     }
 
-    typeLabel->setPosition(Vec2(0, result->cnt1 < _newLineFlag ? 40 : 70));
     typeLabel->setString(getResultTypeString(result->consideration_flag, result->wait_step));
+    typeLabel->setPosition(Vec2(0, result->count_in_tiles < _newLineFlag ? 40 : 70));
 
     float xPos = 0;
-    float yPos = result->cnt1 < _newLineFlag ? 15 : 40;
+    float yPos = result->count_in_tiles < _newLineFlag ? 15 : 40;
 
-    if (result->origin.discard_tile != 0) {
+    if (result->discard_tile != 0) {
         discardLabel->setVisible(true);
         discardSprite->setVisible(true);
 
@@ -479,11 +449,11 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardLabel->setPosition(Vec2(xPos, yPos));
         xPos += discardLabel->getContentSize().width;
 
-        discardSprite->setTexture(Director::getInstance()->getTextureCache()->addImage(tilesImageName[result->origin.discard_tile]));
+        discardSprite->setTexture(Director::getInstance()->getTextureCache()->addImage(tilesImageName[result->discard_tile]));
         discardSprite->setPosition(Vec2(xPos, yPos));
         xPos += 15;
 
-        if (result->origin.wait_step > 0) {
+        if (result->wait_step > 0) {
             usefulLabel->setString("」摸「");
         }
         else {
@@ -497,7 +467,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardLabel->setVisible(false);
         discardSprite->setVisible(false);
 
-        if (result->origin.wait_step != 0) {
+        if (result->wait_step != 0) {
             usefulLabel->setString("摸「");
         }
         else {
@@ -510,7 +480,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
     int btn = 0;
     for (int i = 0; i < 34; ++i) {
-        if (!result->origin.useful_table[mahjong::all_tiles[i]]) {
+        if (!result->useful_table[mahjong::all_tiles[i]]) {
             usefulButton[i]->setVisible(false);
             continue;
         }
@@ -526,8 +496,13 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         xPos += 15;
     }
 
-    spiltStringToLabel(StringUtils::format("」共%d种，%d枚", result->cnt1, result->cnt2),
-        visibleSize.width - 10 - xPos, cntLabel1, cntLabel2);
+    std::string str = StringUtils::format("」共%d种，%d枚", result->count_in_tiles, result->count_total);
+    if (yPos > 20) {
+        spiltStringToLabel(str, visibleSize.width - 10 - xPos, cntLabel1, cntLabel2);
+    }
+    else {
+        cntLabel1->setString(str);
+    }
     cntLabel1->setPosition(Vec2(xPos, yPos));
     cntLabel2->setPosition(Vec2(0, 15));
 
