@@ -202,7 +202,79 @@ bool MahjongTheoryScene::parseInput(cocos2d::ui::Button *button, const char *inp
 }
 
 void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
+    flag |= CONSIDERATION_FLAG_BASIC_TYPE;  // 基本和型不能被过滤掉
 
+    // 从all里面过滤、合并
+    for (auto it1 = _allResults.begin(); it1 != _allResults.end(); ++it1) {
+        if (!(it1->consideration_flag & flag)) {
+            continue;
+        }
+
+        // 相同出牌有相同上听数的两个result
+        auto it2 = std::find_if(_resultSources.begin(), _resultSources.end(),
+            [it1](const ResultEx &result) { return result.discard_tile == it1->discard_tile && result.wait_step == it1->wait_step; });
+
+        if (it2 == _resultSources.end()) {  // 没找到，直接添加it1
+            _resultSources.push_back(ResultEx());
+            memcpy(&_resultSources.back(), &*it1, sizeof(mahjong::enum_result_t));
+            continue;
+        }
+
+        // 合并it1 it2
+        it2->consideration_flag |= it1->consideration_flag;
+        for (int i = 0; i < 34; ++i) {
+            mahjong::tile_t t = mahjong::all_tiles[i];
+            if (it1->useful_table[t]) {
+                it2->useful_table[t] = true;
+            }
+        }
+    }
+
+    // 更新count
+    std::for_each(_resultSources.begin(), _resultSources.end(), [this](ResultEx &result) {
+        result.count_in_tiles = 0;
+        for (int i = 0; i < 34; ++i) {
+            mahjong::tile_t t = mahjong::all_tiles[i];
+            if (result.useful_table[t]) {
+                ++result.count_in_tiles;
+            }
+        }
+        result.count_total = mahjong::count_contributing_tile(_handTilesTable, result.useful_table);
+    });
+
+    _orderedIndices.clear();
+    if (_resultSources.empty()) {
+        return;
+    }
+
+    // 指针数组
+    std::vector<ResultEx *> temp;
+    temp.resize(_resultSources.size());
+    std::transform(_resultSources.begin(), _resultSources.end(), temp.begin(), [](ResultEx &r) { return &r; });
+
+    // 排序
+    std::sort(temp.begin(), temp.end(), [](ResultEx *a, ResultEx *b) {
+        if (a->wait_step < b->wait_step) return true;
+        if (a->wait_step > b->wait_step) return false;
+        if (a->count_total > b->count_total) return true;
+        if (a->count_total < b->count_total) return false;
+        if (a->count_in_tiles > b->count_in_tiles) return true;
+        if (a->count_in_tiles < b->count_in_tiles) return false;
+        if (a->consideration_flag < b->consideration_flag) return true;
+        if (a->consideration_flag > b->consideration_flag) return false;
+        if (a->discard_tile < b->discard_tile) return true;
+        if (a->discard_tile > b->discard_tile) return false;
+        return false;
+    });
+
+    int minStep = temp.front()->wait_step;
+    std::vector<ResultEx *>::iterator it = std::remove_if(temp.begin(), temp.end(),
+        [minStep](ResultEx *a) { return a->wait_step > minStep; });
+
+    // 转成下标数组
+    ResultEx *start = &_resultSources.front();
+    _orderedIndices.resize(_resultSources.size());
+    std::transform(temp.begin(), it, _orderedIndices.begin(), [start](ResultEx *p) { return p - start; });
 }
 
 void MahjongTheoryScene::calculate() {
