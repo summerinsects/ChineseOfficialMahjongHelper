@@ -402,6 +402,7 @@ static std::string getResultTypeString(uint8_t flag, int step) {
     if (LIKELY(needCaesuraSign)) { str.append("、"); } needCaesuraSign = true
 
     if (flag & CONSIDERATION_FLAG_BASIC_TYPE) {
+        needCaesuraSign = true;
         str.append("基本和型");
     }
     if (flag & CONSIDERATION_FLAG_SEVEN_PAIRS) {
