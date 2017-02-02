@@ -151,10 +151,9 @@ void MahjongTheoryScene::showInputAlert(cocos2d::Ref *sender, const char *prevIn
         "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，同花色的数牌可合并用一个后缀。\n"
         "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。\n"
         "3.每一组吃、碰、明杠之间用英文空格分隔，每一组暗杠用英文[]。\n"
-        "4.如果有摸到的牌用英文逗号,与手牌分隔开。\n"
-        "范例1：[EEEE][CCCC][FFFF][PPPP]N,N\n"
-        "范例2：1112345678999s,9s\n"
-        "范例3：WWWW 444s 45m678pFF,6m\n", "Arial", 10);
+        "范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
+        "范例2：1112345678999s9s\n"
+        "范例3：WWWW 444s 45m678pFF6m\n", "Arial", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0);
     rootWidget->addChild(label);
@@ -195,14 +194,13 @@ bool MahjongTheoryScene::parseInput(cocos2d::ui::Button *button, const char *inp
     do {
         mahjong::hand_tiles_t hand_tiles;
         mahjong::tile_t win_tile;
-        long ret = mahjong::string_to_tiles_with_win_tile(input, &hand_tiles, &win_tile);
+        long ret = mahjong::string_to_tiles(input, &hand_tiles, &win_tile);
         if (ret != PARSE_NO_ERROR) {
             switch (ret) {
             case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
             case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = "数字后面需有后缀"; break;
             case PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK: errorStr = "一组副露包含了过多的牌"; break;
             case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = "无法正确解析副露"; break;
-            case PARSE_ERROR_TOO_MANY_COMMAS: errorStr = "过多逗号"; break;
             default: break;
             }
             break;

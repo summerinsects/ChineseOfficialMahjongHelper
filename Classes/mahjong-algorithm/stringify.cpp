@@ -107,11 +107,16 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
     return 0;
 }
 
-long string_to_tiles(const char *str, hand_tiles_t *hand_tiles) {
+long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *win_tile) {
+    size_t len = strlen(str);
+    if (strspn(str, "123456789mpsESWNCFP []") != len) {
+        return PARSE_ERROR_ILLEGAL_CHARACTER;
+    }
+
     pack_t packs[4];
     long pack_cnt = 0;
     bool is_concealed_kong = false;
-    tile_t tiles[13];
+    tile_t tiles[14];
     long tile_cnt = 0;
 
     const char *p = str;
@@ -158,7 +163,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles) {
             tile_cnt = 0;
             break;
         default: {
-                long ret = parse_tiles_impl(p, tiles, 13, &tile_cnt);
+                long ret = parse_tiles_impl(p, tiles, 14, &tile_cnt);
                 if (ret < 0) {
                     return ret;
                 }
@@ -174,41 +179,19 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles) {
 
     memcpy(hand_tiles->fixed_packs, packs, pack_cnt * sizeof(pack_t));
     hand_tiles->pack_count = pack_cnt;
-    memcpy(hand_tiles->standing_tiles, tiles, tile_cnt * sizeof(tile_t));
-    hand_tiles->tile_count = tile_cnt;
-
-    return PARSE_NO_ERROR;
-}
-
-long string_to_tiles_with_win_tile(const char *str, hand_tiles_t *hand_tiles, tile_t *win_tile) {
-    size_t len = strlen(str);
-    if (strspn(str, "123456789mpsESWNCFP [],") != len) {
-        return PARSE_ERROR_ILLEGAL_CHARACTER;
-    }
-
-    char tilesString[64] = "";
-    const char *commas = strchr(str, ',');
-    if (commas != nullptr) {
-        if (strchr(commas + 1, ',') != nullptr) {
-            return PARSE_ERROR_TOO_MANY_COMMAS;
+    long max_cnt = 13 - pack_cnt * 3;
+    if (tile_cnt > max_cnt) {
+        memcpy(hand_tiles->standing_tiles, tiles, max_cnt * sizeof(tile_t));
+        hand_tiles->tile_count = max_cnt;
+        if (win_tile != nullptr) {
+            *win_tile = tiles[max_cnt];
         }
-
-        size_t size = std::min<size_t>(sizeof(tilesString), commas - str);
-        strncpy(tilesString, str, size);
-        str = tilesString;
     }
-
-    long ret = mahjong::string_to_tiles(str, hand_tiles);
-    if (ret != PARSE_NO_ERROR) {
-        return ret;
-    }
-    mahjong::sort_tiles(hand_tiles->standing_tiles, hand_tiles->tile_count);
-
-    *win_tile = 0;
-    if (commas != nullptr) {
-        ret = mahjong::parse_tiles(commas + 1, win_tile, 1);
-        if (ret != 1) {
-            return ret;
+    else {
+        memcpy(hand_tiles->standing_tiles, tiles, tile_cnt * sizeof(tile_t));
+        hand_tiles->tile_count = tile_cnt;
+        if (win_tile != nullptr) {
+            *win_tile = 0;
         }
     }
 
