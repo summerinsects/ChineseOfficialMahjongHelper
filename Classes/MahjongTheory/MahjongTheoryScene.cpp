@@ -406,11 +406,12 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t dra
 
     // 获取牌
     mahjong::hand_tiles_t handTiles;
-    mahjong::tile_t winTile;
-    _handTilesWidget->getData(&handTiles, &winTile);
+    mahjong::tile_t drawnTile2;
+    _handTilesWidget->getData(&handTiles, &drawnTile2);
 
     int cntTable[mahjong::TILE_TABLE_COUNT];
-    memcpy(cntTable, _handTilesTable, sizeof(cntTable));
+    mahjong::map_tiles(handTiles.standing_tiles, handTiles.tile_count, cntTable);
+    ++cntTable[drawnTile2];  // 当前摸到的牌
 
     // 打出牌
     if (discardTile != 0 && cntTable[discardTile] > 0) {

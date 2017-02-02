@@ -126,15 +126,11 @@ void HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t 
     handTiles->pack_count = std::copy(_fixedPacks.begin(), _fixedPacks.end(), std::begin(handTiles->fixed_packs))
         - std::begin(handTiles->fixed_packs);
 
+    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
     // 获取立牌
-    if (dt == 0) {
-        handTiles->tile_count = std::copy(_standingTiles.begin(), _standingTiles.end(), std::begin(handTiles->standing_tiles))
+    size_t cnt = std::copy(_standingTiles.begin(), _standingTiles.end() - (dt == 0 ? 0 : 1), std::begin(handTiles->standing_tiles))
             - std::begin(handTiles->standing_tiles);
-    }
-    else {
-        handTiles->tile_count = std::copy(_standingTiles.begin(), _standingTiles.end() - 1, std::begin(handTiles->standing_tiles))
-            - std::begin(handTiles->standing_tiles);
-    }
+    handTiles->tile_count = std::min(maxCnt, cnt);
 }
 
 mahjong::tile_t HandTilesWidget::getDrawnTile() const {
