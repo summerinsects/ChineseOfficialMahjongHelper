@@ -13,8 +13,10 @@ public:
     const std::vector<mahjong::pack_t> &getFixedPacks() const { return _fixedPacks; }
 
     void setCurrentIdxChangedCallback(const std::function<void ()> &callback) { _currentIdxChangedCallback = callback; }
+    void setTileClickCallback(const std::function<void ()> &callback) { _tileClickCallback = callback; }
 
     size_t getCurrentIdx() const { return _currentIdx; }
+    mahjong::tile_t getCurrentTile() const { return _currentIdx < _standingTiles.size() ? _standingTiles[_currentIdx] : 0; }
     int getUsedTileCount(mahjong::tile_t tile) const { return _usedTilesTable[tile]; }
     int getStandingTileCount(mahjong::tile_t tile) const { return _standingTilesTable[tile]; }
 
@@ -60,6 +62,7 @@ private:
     size_t _currentIdx;
 
     std::function<void ()> _currentIdxChangedCallback;
+    std::function<void ()> _tileClickCallback;
 
 private:
     cocos2d::Vec2 calcStandingTilePos(size_t idx) const;

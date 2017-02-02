@@ -65,6 +65,7 @@ bool MahjongTheoryScene::init() {
     button->addClickEventListener([this](Ref *) { calculate(); });
 
     _handTilesWidget = HandTilesWidget::create();
+    _handTilesWidget->setTileClickCallback(std::bind(&MahjongTheoryScene::onStandingTileEvent, this));
     this->addChild(_handTilesWidget);
     Size widgetSize = _handTilesWidget->getContentSize();
 
@@ -360,6 +361,26 @@ void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {
 
     ResultEx *result = &_resultSources[realIdx];
     deduce(result->discard_tile, tile);
+}
+
+void MahjongTheoryScene::onStandingTileEvent() {
+    mahjong::tile_t discardTile = _handTilesWidget->getCurrentTile();
+    if (discardTile == 0 || _handTilesWidget->getDrawnTile() == 0) {
+        return;
+    }
+
+    mahjong::tile_t drawnTile = 0;
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(0, 34);
+    do {
+        int n = distribution(generator);
+        mahjong::tile_t t = mahjong::all_tiles[n];
+        if (_handTilesTable[t] < 4) {
+            drawnTile = t;
+        }
+    } while (drawnTile == 0);
+
+    deduce(discardTile, drawnTile);
 }
 
 // 推演
