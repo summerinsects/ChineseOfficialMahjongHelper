@@ -309,6 +309,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_COUNT], l
         }
 
         ++cnt_table[t];
+        work_state.count = 0;
         int temp = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, nullptr, fixed_cnt, work_units, &work_state);
         if (temp < result) {
             (*useful_table)[t] = true;  // 标记为有效牌
