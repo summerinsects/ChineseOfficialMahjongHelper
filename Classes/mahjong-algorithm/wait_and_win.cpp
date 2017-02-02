@@ -181,6 +181,12 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
                 cnt_table[t] += 2;
             }
 
+            // 有雀头时N个搭子至少N-1上听
+            // 无雀头时N个搭子至少N上听
+            if ((has_pair ? neighbor_cnt - 1 : neighbor_cnt) >= result) {
+                continue;
+            }
+
             // 作为刻子搭子，递归
             work_units[idx] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_PUNG, t);
             if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_units, work_state)) {
@@ -199,6 +205,12 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
 
         // 顺子搭子（只能是数牌）
         if (is_numbered) {
+            // 有雀头时N个搭子至少N-1上听
+            // 无雀头时N个搭子至少N上听
+            if ((has_pair ? neighbor_cnt - 1 : neighbor_cnt) >= result) {
+                continue;
+            }
+
             // 削减搭子，递归
             if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
                 work_units[idx] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_BOTH, t);
