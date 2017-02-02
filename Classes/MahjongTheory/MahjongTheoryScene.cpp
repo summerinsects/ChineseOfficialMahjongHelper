@@ -409,6 +409,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         cntLabel2->setColor(textColor);
         cntLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(cntLabel2);
+        cntLabel2->setPosition(Vec2(0, 15));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -504,7 +505,6 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         cntLabel1->setString(str);
     }
     cntLabel1->setPosition(Vec2(xPos, yPos));
-    cntLabel2->setPosition(Vec2(0, 15));
 
     return cell;
 }
