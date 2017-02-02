@@ -234,6 +234,9 @@ bool MahjongTheoryScene::parseInput(cocos2d::ui::Button *button, const char *inp
 void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
     flag |= CONSIDERATION_FLAG_BASIC_TYPE;  // 基本和型不能被过滤掉
 
+    _resultSources.clear();
+    _orderedIndices.clear();
+
     // 从all里面过滤、合并
     for (auto it1 = _allResults.begin(); it1 != _allResults.end(); ++it1) {
         if (!(it1->consideration_flag & flag)) {
@@ -272,7 +275,6 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
         result.count_total = mahjong::count_contributing_tile(_handTilesTable, result.useful_table);
     });
 
-    _orderedIndices.clear();
     if (_resultSources.empty()) {
         return;
     }
@@ -305,7 +307,7 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
 
     // 转成下标数组
     ResultEx *start = &_resultSources.front();
-    _orderedIndices.resize(_resultSources.size());
+    _orderedIndices.resize(temp.size());
     std::transform(temp.begin(), temp.end(), _orderedIndices.begin(), [start](ResultEx *p) { return p - start; });
 }
 
@@ -339,7 +341,6 @@ void MahjongTheoryScene::calculate() {
 
     // 计算
     _allResults.clear();
-    _resultSources.clear();
     mahjong::enum_discard_tile(&hand_tiles, win_tile, CONSIDERATION_FLAG_ALL, this,
         [](void *context, const mahjong::enum_result_t *result) {
         if (result->wait_step != std::numeric_limits<int>::max()) {
