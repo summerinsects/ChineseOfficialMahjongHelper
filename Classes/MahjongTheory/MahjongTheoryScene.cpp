@@ -386,7 +386,7 @@ void MahjongTheoryScene::onStandingTileEvent() {
 
     mahjong::tile_t drawnTile = 0;
     std::default_random_engine generator(time(nullptr));
-    std::uniform_int_distribution<int> distribution(0, 34);
+    std::uniform_int_distribution<int> distribution(0, 33);
     do {
         int n = distribution(generator);
         mahjong::tile_t t = mahjong::all_tiles[n];
