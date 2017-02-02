@@ -481,7 +481,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         cntLabel2->setColor(textColor);
         cntLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(cntLabel2);
-        cntLabel2->setPosition(Vec2(0, 15));
+        cntLabel2->setPosition(Vec2(5, 15));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -509,9 +509,9 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
 
     typeLabel->setString(getResultTypeString(result->consideration_flag, result->wait_step));
-    typeLabel->setPosition(Vec2(0, result->count_in_tiles < _newLineFlag ? 40 : 70));
+    typeLabel->setPosition(Vec2(5, result->count_in_tiles < _newLineFlag ? 40 : 70));
 
-    float xPos = 0;
+    float xPos = 5;
     float yPos = result->count_in_tiles < _newLineFlag ? 15 : 40;
 
     if (result->discard_tile != 0) {
@@ -561,8 +561,8 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         usefulButton[i]->setUserData(reinterpret_cast<void *>(idx));
         usefulButton[i]->setVisible(true);
 
-        if (xPos + 15 > visibleSize.width - 10) {
-            xPos = 0;
+        if (xPos + 15 > visibleSize.width - 20) {
+            xPos = 5;
             yPos -= 25;
         }
         usefulButton[i]->setPosition(Vec2(xPos, yPos));
@@ -571,7 +571,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
     std::string str = StringUtils::format("」共%d种，%d枚", result->count_in_tiles, result->count_total);
     if (yPos > 20) {
-        spiltStringToLabel(str, visibleSize.width - 10 - xPos, cntLabel1, cntLabel2);
+        spiltStringToLabel(str, visibleSize.width - 20 - xPos, cntLabel1, cntLabel2);
     }
     else {
         cntLabel1->setString(str);
