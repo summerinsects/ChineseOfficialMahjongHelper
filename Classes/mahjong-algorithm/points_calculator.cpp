@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#define MAX_SEPARAION_CNT 10
+
 #if 0
 #define LOG(fmt_, ...) printf(fmt_, ##__VA_ARGS__)
 #else
@@ -157,65 +159,6 @@ static bool seperate_win_hand(const tile_t *standing_tiles, const pack_t *fixed_
     pack_t work_packs[5];
     memcpy(work_packs, fixed_packs, fixed_cnt * sizeof(pack_t));
     return seperate_recursively(cnt_table, fixed_cnt, 0, work_packs, separation);
-}
-
-// 从一组一组的牌恢复成一张一张的牌
-void recovery_tiles_from_packs(const pack_t *packs, long pack_cnt, tile_t *tiles, long *tile_cnt) {
-    assert(tiles != nullptr && tile_cnt != nullptr);
-    *tile_cnt = 0;
-    for (int i = 0; i < pack_cnt; ++i) {
-        tile_t tile = pack_tile(packs[i]);
-        switch (pack_type(packs[i])) {
-        case PACK_TYPE_CHOW:
-            tiles[(*tile_cnt)++] = tile - 1;
-            tiles[(*tile_cnt)++] = tile;
-            tiles[(*tile_cnt)++] = tile + 1;
-            break;
-        case PACK_TYPE_PUNG:
-            tiles[(*tile_cnt)++] = tile;
-            tiles[(*tile_cnt)++] = tile;
-            tiles[(*tile_cnt)++] = tile;
-            break;
-        case PACK_TYPE_KONG:
-            tiles[(*tile_cnt)++] = tile;
-            tiles[(*tile_cnt)++] = tile;
-            tiles[(*tile_cnt)++] = tile;
-            tiles[(*tile_cnt)++] = tile;
-            break;
-        case PACK_TYPE_PAIR:
-            tiles[(*tile_cnt)++] = tile;
-            tiles[(*tile_cnt)++] = tile;
-            break;
-        default:
-            assert(0);
-            break;
-        }
-    }
-}
-
-bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[TILE_TABLE_COUNT]) {
-    // 将每一次副露当作3张牌来算，那么总张数=13
-    if (hand_tiles->tile_count <= 0 || hand_tiles->pack_count < 0 || hand_tiles->pack_count > 4
-        || hand_tiles->pack_count * 3 + hand_tiles->tile_count != 13) {
-        return false;
-    }
-
-    // 将副露恢复成牌
-    tile_t tiles[18];
-    long tile_cnt = 0;
-    if (hand_tiles->pack_count == 0) {
-        memcpy(tiles, hand_tiles->standing_tiles, 13 * sizeof(tile_t));
-        tile_cnt = 13;
-    }
-    else {
-        recovery_tiles_from_packs(hand_tiles->fixed_packs, hand_tiles->pack_count, tiles, &tile_cnt);
-        memcpy(tiles + tile_cnt, hand_tiles->standing_tiles, hand_tiles->tile_count * sizeof(tile_t));
-        tile_cnt += hand_tiles->tile_count;
-    }
-
-    // 打表
-    map_tiles(tiles, tile_cnt, cnt_table);
-    return true;
 }
 
 // 一色四同顺
@@ -1304,8 +1247,7 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
 
     // 恢复成一张一张的牌
     tile_t standing_tiles[14];
-    long tile_cnt;
-    recovery_tiles_from_packs(concealed_packs, pack_cnt, standing_tiles, &tile_cnt);
+    long tile_cnt = packs_to_tiles(concealed_packs, pack_cnt, standing_tiles, 14);
     sort_tiles(standing_tiles, tile_cnt);
     remove_win_tile(standing_tiles, tile_cnt, win_tile);
     --tile_cnt;
@@ -1732,8 +1674,7 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
     }
 
     tile_t tiles[18];
-    long tile_cnt = 0;
-    recovery_tiles_from_packs(packs, 5, tiles, &tile_cnt);
+    long tile_cnt = packs_to_tiles(packs, 5, tiles, 18);
 
     // 九莲宝灯
     if (fixed_cnt == 0 && tile_cnt == 14) {
@@ -1886,8 +1827,7 @@ static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *
     // 还原牌
     tile_t tiles[15];  // 第四组可能为杠，所以最多为15张
     memcpy(tiles, matched_seq, 9 * sizeof(tile_t));  // 组合龙的部分
-    long tile_cnt;
-    recovery_tiles_from_packs(&temp_pack[3], 2, tiles + 9, &tile_cnt);  // 一组面子和一对雀头
+    long tile_cnt = packs_to_tiles(&temp_pack[3], 2, tiles + 9, 6);  // 一组面子+一对雀头 最多6张牌
     tile_cnt += 9;
 
     // 检测门（五门齐的门）

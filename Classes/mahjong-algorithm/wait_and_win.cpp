@@ -51,6 +51,42 @@ struct work_state_t {
     long count;
 };
 
+long packs_to_tiles(const pack_t *packs, long pack_cnt, tile_t *tiles, long tile_cnt) {
+    if (packs == nullptr || tiles == nullptr) {
+        return 0;
+    }
+
+    long cnt = 0;
+    for (int i = 0; i < pack_cnt && cnt < tile_cnt; ++i) {
+        tile_t tile = pack_tile(packs[i]);
+        switch (pack_type(packs[i])) {
+        case PACK_TYPE_CHOW:
+            if (cnt < tile_cnt) tiles[cnt++] = tile - 1;
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            if (cnt < tile_cnt) tiles[cnt++] = tile + 1;
+            break;
+        case PACK_TYPE_PUNG:
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            break;
+        case PACK_TYPE_KONG:
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            break;
+        case PACK_TYPE_PAIR:
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            if (cnt < tile_cnt) tiles[cnt++] = tile;
+            break;
+        default:
+            break;
+        }
+    }
+    return cnt;
+}
+
 void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[TILE_TABLE_COUNT]) {
     memset(cnt_table, 0, sizeof(cnt_table));
     for (long i = 0; i < cnt; ++i) {
@@ -58,7 +94,32 @@ void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[TILE_TABLE_COUNT]
     }
 }
 
-int count_contributing_tile(const int (&used_table)[TILE_TABLE_COUNT], const bool (&useful_table)[TILE_TABLE_COUNT]) {
+bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[TILE_TABLE_COUNT]) {
+    // 将每一次副露当作3张牌来算，那么总张数=13
+    if (hand_tiles->tile_count <= 0 || hand_tiles->pack_count < 0 || hand_tiles->pack_count > 4
+        || hand_tiles->pack_count * 3 + hand_tiles->tile_count != 13) {
+        return false;
+    }
+
+    // 将副露恢复成牌
+    tile_t tiles[18];
+    long tile_cnt = 0;
+    if (hand_tiles->pack_count == 0) {
+        memcpy(tiles, hand_tiles->standing_tiles, 13 * sizeof(tile_t));
+        tile_cnt = 13;
+    }
+    else {
+        tile_cnt = packs_to_tiles(hand_tiles->fixed_packs, hand_tiles->pack_count, tiles, 18);
+        memcpy(tiles + tile_cnt, hand_tiles->standing_tiles, hand_tiles->tile_count * sizeof(tile_t));
+        tile_cnt += hand_tiles->tile_count;
+    }
+
+    // 打表
+    map_tiles(tiles, tile_cnt, cnt_table);
+    return true;
+}
+
+int count_useful_tile(const int (&used_table)[TILE_TABLE_COUNT], const bool (&useful_table)[TILE_TABLE_COUNT]) {
     int cnt = 0;
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];

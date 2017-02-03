@@ -319,7 +319,7 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
                 ++result.count_in_tiles;
             }
         }
-        result.count_total = mahjong::count_contributing_tile(_handTilesTable, result.useful_table);
+        result.count_total = mahjong::count_useful_tile(_handTilesTable, result.useful_table);
     });
 
     if (_resultSources.empty()) {

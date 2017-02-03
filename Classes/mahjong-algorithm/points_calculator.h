@@ -3,13 +3,13 @@
 
 #include "tile.h"
 
-#define HAS_CONCEALED_KONG_AND_MELDED_KONG  1
+#define HAS_CONCEALED_KONG_AND_MELDED_KONG  1  // 支持明暗杠
 
 namespace mahjong {
 
-void recovery_tiles_from_packs(const pack_t *packs, long pack_cnt, tile_t *tiles, long *tile_cnt);
-bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[TILE_TABLE_COUNT]);
-
+/**
+ * @brief 番种
+ */
 enum fan_t {
     NONE = 0,
     BIG_FOUR_WINDS = 1, BIG_THREE_DRAGONS, ALL_GREEN, NINE_GATES, FOUR_KONGS, SEVEN_SHIFTED_PAIRS, THIRTEEN_ORPHANS,
@@ -31,39 +31,63 @@ enum fan_t {
     FAN_COUNT
 };
 
+/**
+ * @brief 风（用来表示圈风门风）
+ */
 enum class wind_t {
     EAST, SOUTH, WEST, NORTH
 };
 
+/**
+ * @brief 和牌类型
+ */
 typedef uint8_t win_type_t;
 
-#define WIN_TYPE_DISCARD 0
-#define WIN_TYPE_SELF_DRAWN 1
-#define WIN_TYPE_4TH_TILE 2
-#define WIN_TYPE_ABOUT_KONG 4
-#define WIN_TYPE_WALL_LAST 8
-
-bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long standing_cnt, tile_t win_tile);
-size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, tile_t win_tile);
-
-#define MAX_SEPARAION_CNT 10
+#define WIN_TYPE_DISCARD 0  // 点和
+#define WIN_TYPE_SELF_DRAWN 1  // 自摸
+#define WIN_TYPE_4TH_TILE 2  // 绝张
+#define WIN_TYPE_ABOUT_KONG 4  // 关于杠，复合点和时为枪杠和，复合自摸则为杠上开花
+#define WIN_TYPE_WALL_LAST 8  // 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
 
 #define ERROR_WRONG_TILES_COUNT -1
 #define ERROR_TILE_COUNT_GREATER_THAN_4 -2
 #define ERROR_NOT_WIN -3
 
+/**
+ * @brief 检查算番的输入是否合法
+ *
+ *
+ * @param [in] hand_tiles 手牌信息
+ * @param [in] win_tile 和牌张
+ * @return 返回0表示成功，否则返回上述错误码
+ */
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile);
 
+/**
+ * @brief 附加信息
+ */
 struct extra_condition_t {
-    win_type_t win_type;
-    wind_t prevalent_wind;
-    wind_t seat_wind;
+    win_type_t win_type;    ///< 和牌类型
+    wind_t prevalent_wind;  ///< 圈风
+    wind_t seat_wind;       ///< 门风
 };
 
+/**
+ * @brief 算番
+ *
+ * @param [in] hand_tiles 手牌信息
+ * @param [in] win_tile 和牌张
+ * @param [in] ext_cond 附加信息
+ * @param [out] fan_table 番表，当有某种番时，相应的会设置为这种番出现的次数
+ * @return 番值
+ */
 int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_COUNT]);
 
 #if 0
 
+/**
+ * @brief 番名（英文）
+ */
 static const char *fan_name[] = {
     "None",
     "Big Four Winds", "Big Three Dragons", "All Green", "Nine Gates", "Four Kongs", "Seven Shifted Pairs", "Thirteen Orphans",
@@ -91,6 +115,9 @@ static const char *fan_name[] = {
 #pragma execution_character_set("utf-8")
 #endif
 
+/**
+ * @brief 番名（简体中文）
+ */
 static const char *fan_name[] = {
     "无",
     "大四喜", "大三元", "绿一色", "九莲宝灯", "四杠", "连七对", "十三幺",
@@ -113,6 +140,9 @@ static const char *fan_name[] = {
 
 #endif
 
+/**
+ * @brief 番值
+ */
 static const int fan_value_table[FAN_COUNT] = {
     0,
     88, 88, 88, 88, 88, 88, 88,
@@ -132,6 +162,28 @@ static const int fan_value_table[FAN_COUNT] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1
 };
+
+/**
+ * @brief 判断立牌是否包含和牌
+ * 如果是，则必然不是和绝张
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [in] win_tile 和牌张
+ * @return bool
+ */
+bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long standing_cnt, tile_t win_tile);
+
+/**
+ * @brief 统计和牌在副露中出现的张数
+ * 如果出现3张，则必然和绝张
+ *
+ * @param [in] fixed_pack 副露牌组
+ * @param [in] standing_cnt 副露牌组数
+ * @param [in] win_tile 和牌张
+ * @return size_t
+ */
+size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, tile_t win_tile);
 
 }
 
