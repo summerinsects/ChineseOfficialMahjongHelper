@@ -50,9 +50,12 @@ void test_wait(const char *str) {
         puts("basic type wait:");
     }
 
+    char buf[64];
     for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
-        if (table[t])
-            printf("%s ", stringify_table[t]);
+        if (table[t]) {
+            tiles_to_string(&t, 1, buf, sizeof(buf));
+            printf("%s ", buf);
+        }
     }
     puts("");
 
@@ -113,15 +116,18 @@ void test_wait_step(const char *str) {
     puts(buf);
 
     auto display = [](const hand_tiles_t *hand_tiles, bool (&useful_table)[TILE_TABLE_COUNT]) {
+        char buf[64];
         for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
-            if (useful_table[t])
-                printf("%s ", stringify_table[t]);
+            if (useful_table[t]) {
+                tiles_to_string(&t, 1, buf, sizeof(buf));
+                printf("%s ", buf);
+            }
         }
 
         int cnt_table[TILE_TABLE_COUNT];
         map_hand_tiles(hand_tiles, cnt_table);
 
-        printf("%d枚", count_contributing_tile(cnt_table, useful_table));
+        printf("%d枚", count_useful_tile(cnt_table, useful_table));
     };
 
     puts(str);
