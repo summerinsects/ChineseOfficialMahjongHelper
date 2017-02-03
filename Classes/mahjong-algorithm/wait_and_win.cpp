@@ -85,8 +85,8 @@ static bool is_basic_type_branch_exist(long fixed_cnt, long step, const work_uni
     });
 }
 
-static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long pack_cnt, bool has_pair, long neighbor_cnt,
-    bool (*useful_table)[TILE_TABLE_COUNT], long fixed_cnt, work_units_t (&work_units)[5], work_state_t *work_state) {
+static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], int pack_cnt, bool has_pair, int neighbor_cnt,
+    bool (*useful_table)[TILE_TABLE_COUNT], int fixed_cnt, work_units_t (&work_units)[5], work_state_t *work_state) {
     long idx = pack_cnt + neighbor_cnt + has_pair;
 
     if (pack_cnt + neighbor_cnt >= 4) {  // 搭子超载
@@ -311,7 +311,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_COUNT], l
     work_state_t work_state;
     work_state.count = 0;
     bool temp_table[TILE_TABLE_COUNT];
-    int result = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, &temp_table, fixed_cnt, work_units, &work_state);
+    int result = basic_type_wait_step_recursively(cnt_table, static_cast<int>(fixed_cnt), false, 0, &temp_table, static_cast<int>(fixed_cnt), work_units, &work_state);
 
     if (useful_table == nullptr) {
         return result;
@@ -326,7 +326,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_COUNT], l
 
         ++cnt_table[t];
         work_state.count = 0;
-        int temp = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, nullptr, fixed_cnt, work_units, &work_state);
+        int temp = basic_type_wait_step_recursively(cnt_table, static_cast<int>(fixed_cnt), false, 0, nullptr, static_cast<int>(fixed_cnt), work_units, &work_state);
         if (temp < result) {
             (*useful_table)[t] = true;  // 标记为有效牌
         }

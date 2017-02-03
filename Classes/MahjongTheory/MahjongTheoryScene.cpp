@@ -725,7 +725,6 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         xPos += usefulLabel->getContentSize().width;
     }
 
-    int btn = 0;
     for (int i = 0; i < 34; ++i) {
         if (!result->useful_table[mahjong::all_tiles[i]]) {
             usefulButton[i]->setVisible(false);
