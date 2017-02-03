@@ -68,7 +68,7 @@ struct enum_result_t {
 typedef bool (*enum_callback_t)(void *context, const enum_result_t *result);
 
 // 枚举打哪张牌
-void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t drawn_tile, uint8_t form_flag,
+void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint8_t form_flag,
     void *context, enum_callback_t enum_callback);
 
 }

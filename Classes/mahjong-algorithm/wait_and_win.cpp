@@ -934,13 +934,13 @@ long table_to_tiles(const int (&cnt_table)[TILE_TABLE_COUNT], tile_t *tiles, lon
     return cnt;
 }
 
-void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t drawn_tile, uint8_t form_flag,
+void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint8_t form_flag,
     void *context, enum_callback_t enum_callback) {
-    if (!enum_discard_tile_1(hand_tiles, drawn_tile, form_flag, context, enum_callback)) {
+    if (!enum_discard_tile_1(hand_tiles, serving_tile, form_flag, context, enum_callback)) {
         return;
     }
 
-    if (drawn_tile == 0) {
+    if (serving_tile == 0) {
         return;
     }
 
@@ -952,16 +952,16 @@ void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t drawn_tile, uint8_
 
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
-        if (cnt_table[t] && t != drawn_tile && cnt_table[drawn_tile] < 4) {
+        if (cnt_table[t] && t != serving_tile && cnt_table[serving_tile] < 4) {
             --cnt_table[t];
-            ++cnt_table[drawn_tile];
+            ++cnt_table[serving_tile];
 
             table_to_tiles(cnt_table, temp.standing_tiles, temp.tile_count);
             if (!enum_discard_tile_1(&temp, t, form_flag, context, enum_callback)) {
                 return;
             }
 
-            --cnt_table[drawn_tile];
+            --cnt_table[serving_tile];
             ++cnt_table[t];
         }
     }

@@ -71,7 +71,7 @@ void HandTilesWidget::reset() {
     _fixedWidget->removeAllChildren();
 }
 
-void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t drawnTile) {
+void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile) {
     reset();
 
     // 添加副露
@@ -110,17 +110,17 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
         ++_usedTilesTable[tile];
     }
 
-    if (drawnTile != 0) {
-        addTile(drawnTile);
+    if (servingTile != 0) {
+        addTile(servingTile);
     }
 
     refreshHighlightPos();
 }
 
-void HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *drawnTile) const {
+void HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *servingTile) const {
     // 获取最后摸到的牌
-    mahjong::tile_t dt = getDrawnTile();
-    *drawnTile = dt;
+    mahjong::tile_t st = getServingTile();
+    *servingTile = st;
 
     // 获取副露
     handTiles->pack_count = std::copy(_fixedPacks.begin(), _fixedPacks.end(), std::begin(handTiles->fixed_packs))
@@ -128,12 +128,12 @@ void HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t 
 
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
     // 获取立牌
-    size_t cnt = std::copy(_standingTiles.begin(), _standingTiles.end() - (dt == 0 ? 0 : 1), std::begin(handTiles->standing_tiles))
+    size_t cnt = std::copy(_standingTiles.begin(), _standingTiles.end() - (st == 0 ? 0 : 1), std::begin(handTiles->standing_tiles))
             - std::begin(handTiles->standing_tiles);
     handTiles->tile_count = std::min(maxCnt, cnt);
 }
 
-mahjong::tile_t HandTilesWidget::getDrawnTile() const {
+mahjong::tile_t HandTilesWidget::getServingTile() const {
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
     if (_standingTiles.size() < maxCnt + 1) {
         return 0;
@@ -146,23 +146,23 @@ bool HandTilesWidget::isFixedPacksContainsKong() const {
         [](mahjong::pack_t pack) { return mahjong::pack_type(pack) == PACK_TYPE_KONG; });
 }
 
-bool HandTilesWidget::isStandingTilesContainsWinTile() const {
-    mahjong::tile_t winTile = getDrawnTile();
-    if (winTile == 0) {
+bool HandTilesWidget::isStandingTilesContainsServingTile() const {
+    mahjong::tile_t servingTile = getServingTile();
+    if (servingTile == 0) {
         return false;
     }
     return mahjong::is_standing_tiles_contains_win_tile(
-        &_standingTiles.front(), _standingTiles.size() - 1, winTile);
+        &_standingTiles.front(), _standingTiles.size() - 1, servingTile);
 }
 
-size_t HandTilesWidget::countWinTileInFixedPacks() const {
-    mahjong::tile_t winTile = getDrawnTile();
-    if (winTile == 0 || _fixedPacks.empty()) {
+size_t HandTilesWidget::countServingTileInFixedPacks() const {
+    mahjong::tile_t servingTile = getServingTile();
+    if (servingTile == 0 || _fixedPacks.empty()) {
         return 0;
     }
 
     return mahjong::count_win_tile_in_fixed_packs(
-        &_fixedPacks.front(), _fixedPacks.size(), winTile);
+        &_fixedPacks.front(), _fixedPacks.size(), servingTile);
 }
 
 cocos2d::Vec2 HandTilesWidget::calcStandingTilePos(size_t idx) const {

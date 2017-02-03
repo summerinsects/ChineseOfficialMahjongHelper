@@ -354,7 +354,7 @@ void PointsCalculatorScene::onFixedPacksChanged() {
 void PointsCalculatorScene::onWinTileChanged() {
     _maybeFourthTile = false;
     _winTileCountInFixedPacks = 0;
-    mahjong::tile_t winTile = _tilePicker->getHandTilesWidget()->getDrawnTile();
+    mahjong::tile_t winTile = _tilePicker->getHandTilesWidget()->getServingTile();
     if (winTile == 0) {  // 没有和牌张
         _fourthTileBox->setEnabled(false);
         _robKongBox->setEnabled(false);
@@ -363,10 +363,10 @@ void PointsCalculatorScene::onWinTileChanged() {
     }
 
     // 立牌中不包含和牌张，则可能为绝张
-    _maybeFourthTile = !_tilePicker->getHandTilesWidget()->isStandingTilesContainsWinTile();
+    _maybeFourthTile = !_tilePicker->getHandTilesWidget()->isStandingTilesContainsServingTile();
 
     // 一定为绝张
-    _winTileCountInFixedPacks = _tilePicker->getHandTilesWidget()->countWinTileInFixedPacks();
+    _winTileCountInFixedPacks = _tilePicker->getHandTilesWidget()->countServingTileInFixedPacks();
     if (_maybeFourthTile && _winTileCountInFixedPacks == 3) {
         _fourthTileBox->setEnabled(true);
         _robKongBox->setEnabled(false);

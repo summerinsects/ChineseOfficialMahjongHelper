@@ -116,7 +116,7 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
     return 0;
 }
 
-long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *win_tile) {
+long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile) {
     size_t len = strlen(str);
     if (strspn(str, "0123456789mpszESWNCFP []") != len) {
         return PARSE_ERROR_ILLEGAL_CHARACTER;
@@ -192,15 +192,15 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *win_tile
     if (tile_cnt > max_cnt) {
         memcpy(hand_tiles->standing_tiles, tiles, max_cnt * sizeof(tile_t));
         hand_tiles->tile_count = max_cnt;
-        if (win_tile != nullptr) {
-            *win_tile = tiles[max_cnt];
+        if (serving_tile != nullptr) {
+            *serving_tile = tiles[max_cnt];
         }
     }
     else {
         memcpy(hand_tiles->standing_tiles, tiles, tile_cnt * sizeof(tile_t));
         hand_tiles->tile_count = tile_cnt;
-        if (win_tile != nullptr) {
-            *win_tile = 0;
+        if (serving_tile != nullptr) {
+            *serving_tile = 0;
         }
     }
 

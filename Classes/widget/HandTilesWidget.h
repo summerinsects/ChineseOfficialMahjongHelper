@@ -20,13 +20,13 @@ public:
     int getUsedTileCount(mahjong::tile_t tile) const { return _usedTilesTable[tile]; }
     int getStandingTileCount(mahjong::tile_t tile) const { return _standingTilesTable[tile]; }
 
-    void setData(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t drawnTile);
-    void getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *drawnTile) const;
+    void setData(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile);
+    void getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *servingTile) const;
 
-    mahjong::tile_t getDrawnTile() const;
+    mahjong::tile_t getServingTile() const;
     bool isFixedPacksContainsKong() const;
-    bool isStandingTilesContainsWinTile() const;
-    size_t countWinTileInFixedPacks() const;
+    bool isStandingTilesContainsServingTile() const;
+    size_t countServingTileInFixedPacks() const;
 
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;

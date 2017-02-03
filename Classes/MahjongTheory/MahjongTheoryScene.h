@@ -45,7 +45,7 @@ private:
     uint8_t getFilterFlag() const;
     void onTileButton(cocos2d::Ref *sender);
     void onStandingTileEvent();
-    void deduce(mahjong::tile_t discardTile, mahjong::tile_t drawnTile);
+    void deduce(mahjong::tile_t discardTile, mahjong::tile_t servingTile);
 
     cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
 };

@@ -205,21 +205,21 @@ void MahjongTheoryScene::setRandomInput() {
     std::sort(handTiles.standing_tiles, handTiles.standing_tiles + handTiles.tile_count);
 
     // 上牌
-    mahjong::tile_t drawnTile = 0;
+    mahjong::tile_t servingTile = 0;
     do {
         int n = rand() % 34;
         if (table[n] < 4) {
             ++table[n];
-            drawnTile = mahjong::all_tiles[n];
+            servingTile = mahjong::all_tiles[n];
         }
-    } while (drawnTile == 0);
+    } while (servingTile == 0);
 
     // 设置UI
-    _handTilesWidget->setData(handTiles, drawnTile);
+    _handTilesWidget->setData(handTiles, servingTile);
 
     char str[64];
     long ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
-    mahjong::tiles_to_string(&drawnTile, 1, str + ret, sizeof(str) - ret);
+    mahjong::tiles_to_string(&servingTile, 1, str + ret, sizeof(str) - ret);
     _editBox->setText(str);
 
     _allResults.clear();
@@ -243,8 +243,8 @@ bool MahjongTheoryScene::parseInput(const char *input) {
 
     do {
         mahjong::hand_tiles_t hand_tiles;
-        mahjong::tile_t win_tile;
-        long ret = mahjong::string_to_tiles(input, &hand_tiles, &win_tile);
+        mahjong::tile_t serving_tile;
+        long ret = mahjong::string_to_tiles(input, &hand_tiles, &serving_tile);
         if (ret != PARSE_NO_ERROR) {
             switch (ret) {
             case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
@@ -256,7 +256,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             break;
         }
 
-        ret = mahjong::check_calculator_input(&hand_tiles, win_tile);
+        ret = mahjong::check_calculator_input(&hand_tiles, serving_tile);
         if (ret != 0) {
             switch (ret) {
             case ERROR_WRONG_TILES_COUNT: errorStr = "牌张数错误"; break;
@@ -266,7 +266,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             break;
         }
 
-        _handTilesWidget->setData(hand_tiles, win_tile);
+        _handTilesWidget->setData(hand_tiles, serving_tile);
         return true;
     } while (0);
 
@@ -372,8 +372,8 @@ uint8_t MahjongTheoryScene::getFilterFlag() const {
 void MahjongTheoryScene::calculate() {
     // 获取牌
     mahjong::hand_tiles_t hand_tiles;
-    mahjong::tile_t win_tile;
-    _handTilesWidget->getData(&hand_tiles, &win_tile);
+    mahjong::tile_t serving_tile;
+    _handTilesWidget->getData(&hand_tiles, &serving_tile);
 
     if (hand_tiles.tile_count == 0) {
         return;
@@ -381,11 +381,11 @@ void MahjongTheoryScene::calculate() {
 
     // 打表
     mahjong::map_hand_tiles(&hand_tiles, _handTilesTable);
-    if (win_tile != 0) {
-        ++_handTilesTable[win_tile];
+    if (serving_tile != 0) {
+        ++_handTilesTable[serving_tile];
     }
 
-    _newLineFlag = (win_tile == 0) ? 15 : 10;
+    _newLineFlag = (serving_tile == 0) ? 15 : 10;
 
     // 异步计算
     _allResults.clear();
@@ -395,8 +395,8 @@ void MahjongTheoryScene::calculate() {
     loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
 
     auto thiz = RefPtr<MahjongTheoryScene>(this);  // 保证线程回来之前不析构
-    std::thread([thiz, hand_tiles, win_tile, loadingView]() {
-        mahjong::enum_discard_tile(&hand_tiles, win_tile, FORM_FLAG_ALL, thiz.get(),
+    std::thread([thiz, hand_tiles, serving_tile, loadingView]() {
+        mahjong::enum_discard_tile(&hand_tiles, serving_tile, FORM_FLAG_ALL, thiz.get(),
             [](void *context, const mahjong::enum_result_t *result) {
             MahjongTheoryScene *thiz = (MahjongTheoryScene *)context;
             if (result->wait_step != std::numeric_limits<int>::max()) {
@@ -427,39 +427,39 @@ void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {
 
 void MahjongTheoryScene::onStandingTileEvent() {
     mahjong::tile_t discardTile = _handTilesWidget->getCurrentTile();
-    if (discardTile == 0 || _handTilesWidget->getDrawnTile() == 0) {
+    if (discardTile == 0 || _handTilesWidget->getServingTile() == 0) {
         return;
     }
 
     // 随机给一张牌
-    mahjong::tile_t drawnTile = 0;
+    mahjong::tile_t servingTile = 0;
     do {
         int n = rand() % 34;
         mahjong::tile_t t = mahjong::all_tiles[n];
         if (_handTilesTable[t] < 4) {
-            drawnTile = t;
+            servingTile = t;
         }
-    } while (drawnTile == 0 || drawnTile == discardTile);
+    } while (servingTile == 0 || servingTile == discardTile);
 
     // 推演
-    deduce(discardTile, drawnTile);
+    deduce(discardTile, servingTile);
 }
 
 // 推演
-void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t drawnTile) {
-    if (discardTile == drawnTile) {
+void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t servingTile) {
+    if (discardTile == servingTile) {
         return;
     }
 
     // 获取牌
     mahjong::hand_tiles_t handTiles;
-    mahjong::tile_t drawnTile2;
-    _handTilesWidget->getData(&handTiles, &drawnTile2);
+    mahjong::tile_t st;
+    _handTilesWidget->getData(&handTiles, &st);
 
     // 对立牌打表
     int cntTable[mahjong::TILE_TABLE_COUNT];
     mahjong::map_tiles(handTiles.standing_tiles, handTiles.tile_count, cntTable);
-    ++cntTable[drawnTile2];  // 当前摸到的牌
+    ++cntTable[st];  // 当前摸到的牌
 
     // 打出牌
     if (discardTile != 0 && cntTable[discardTile] > 0) {
@@ -474,11 +474,11 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t dra
     }
 
     // 设置UI
-    _handTilesWidget->setData(handTiles, drawnTile);
+    _handTilesWidget->setData(handTiles, servingTile);
 
     char str[64];
     long ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
-    mahjong::tiles_to_string(&drawnTile, 1, str + ret, sizeof(str) - ret);
+    mahjong::tiles_to_string(&servingTile, 1, str + ret, sizeof(str) - ret);
     _editBox->setText(str);
 
     // 计算
