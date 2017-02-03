@@ -172,9 +172,9 @@ bool MahjongTheoryScene::init() {
 
 void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
     AlertView::showWithMessage("使用说明",
-        "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，同花色的数牌可合并用一个后缀。\n"
-        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦可使用后缀z，但按中国顺序567z为中发白。\n"
-        "3.每一组吃、碰、明杠之间用英文空格分隔，每一组暗杠用英文[]。\n"
+        "1." INPUT_GUIDE_STRING_1 "\n"
+        "2." INPUT_GUIDE_STRING_2 "\n"
+        "3." INPUT_GUIDE_STRING_3 "\n"
         "4.基本和型暂不考虑国标番型。\n"
         "5.不考虑暗杠。\n"
         "6.计算出结果后，可点击表格中的有效牌，切出该切法的弃牌，并上指定牌进行推演。\n"

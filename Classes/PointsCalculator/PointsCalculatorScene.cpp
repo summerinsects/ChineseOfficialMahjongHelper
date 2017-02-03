@@ -392,12 +392,12 @@ void PointsCalculatorScene::showInputAlert(const char *prevInput) {
     ui::Widget *rootWidget = ui::Widget::create();
 
     Label *label = Label::createWithSystemFont("使用说明：\n"
-        "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，同花色的数牌可合并用一个后缀。\n"
-        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。\n"
-        "3.每一组吃、碰、明杠之间用英文空格分隔，每一组暗杠用英文[]。\n"
-        "范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
-        "范例2：1112345678999s9s\n"
-        "范例3：WWWW 444s 45m678pFF6m\n", "Arial", 10);
+        "1." INPUT_GUIDE_STRING_1 "\n"
+        "2." INPUT_GUIDE_STRING_2 "\n"
+        "3." INPUT_GUIDE_STRING_3 "\n"
+        "输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
+        "输入范例2：1112345678999s9s\n"
+        "输入范例3：WWWW 444s 45m678pFF6m\n", "Arial", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0);
     rootWidget->addChild(label);
