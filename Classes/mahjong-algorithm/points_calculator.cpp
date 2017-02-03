@@ -23,6 +23,8 @@
 
 namespace mahjong {
 
+extern long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size);
+
 struct SEPERATIONS {
     pack_t packs[MAX_SEPARAION_CNT][5];
     long count;
@@ -2138,32 +2140,9 @@ int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extr
     // 遍历各种划分方式，分别算番，找出最大的番的划分方式
     for (long i = 0; i < separation.count; ++i) {
 #if 0  // Debug
-        for (int j = 0; j < 5; ++j) {
-            //printf("[%d %s %x]", _separation_packs[i][j].is_melded,
-            //    pack_type_name[(int)_separation_packs[i][j].pack_type], _separation_packs[i][j].mid_tile);
-            tile_t mid_tile = pack_tile(separation.packs[i][j]);
-            switch (pack_type(separation.packs[i][j])) {
-            case PACK_TYPE_CHOW:
-                printf(is_pack_melded(separation.packs[i][j]) ? "[%s%s%s]" : "{%s%s%s}",
-                    stringify_table[mid_tile - 1], stringify_table[mid_tile], stringify_table[mid_tile + 1]);
-                break;
-            case PACK_TYPE_PUNG:
-                printf(is_pack_melded(separation.packs[i][j]) ? "[%s%s%s]" : "{%s%s%s}",
-                    stringify_table[mid_tile], stringify_table[mid_tile], stringify_table[mid_tile]);
-                break;
-            case PACK_TYPE_KONG:
-                printf(is_pack_melded(separation.packs[i][j]) ? "[%s%s%s%s]" : "{%s%s%s%s}",
-                    stringify_table[mid_tile], stringify_table[mid_tile], stringify_table[mid_tile], stringify_table[mid_tile]);
-                break;
-            case PACK_TYPE_PAIR:
-                printf(is_pack_melded(separation.packs[i][j]) ? "[%s%s]" : "{%s%s}",
-                    stringify_table[mid_tile], stringify_table[mid_tile]);
-                break;
-            default:
-                break;
-            }
-        }
-        puts("");
+        char str[64];
+        packs_to_string(separation.packs[i], 5, str, sizeof(str));
+        puts(str);
 #endif
         calculate_basic_type_points(separation.packs[i], fixed_cnt, win_tile, ext_cond, fan_tables[i]);
         int current_points = get_points_by_table(fan_tables[i]);
