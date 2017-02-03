@@ -118,7 +118,7 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
 }
 
 void HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *servingTile) const {
-    // 获取最后摸到的牌
+    // 获取上的牌
     mahjong::tile_t st = getServingTile();
     *servingTile = st;
 

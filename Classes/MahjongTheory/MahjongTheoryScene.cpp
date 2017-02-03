@@ -459,7 +459,7 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t ser
     // 对立牌打表
     int cntTable[mahjong::TILE_TABLE_COUNT];
     mahjong::map_tiles(handTiles.standing_tiles, handTiles.tile_count, cntTable);
-    ++cntTable[st];  // 当前摸到的牌
+    ++cntTable[st];  // 当前上牌
 
     // 打出牌
     if (discardTile != 0 && cntTable[discardTile] > 0) {
