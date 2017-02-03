@@ -425,6 +425,9 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_COUNT], l
     }
 
     bool ret = false;
+    if (left_cnt == 4) {
+        ret = is_basic_type_wait_4(cnt_table, waiting_table);
+    }
 
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
@@ -460,11 +463,6 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_COUNT], l
         }
     }
 
-    if (!ret) {
-        if (left_cnt == 4) {  // 4张无法提取面子的牌
-            ret = is_basic_type_wait_4(cnt_table, waiting_table);
-        }
-    }
     return ret;
 }
 
