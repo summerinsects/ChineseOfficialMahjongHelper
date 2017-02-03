@@ -439,7 +439,7 @@ void MahjongTheoryScene::onStandingTileEvent() {
         if (_handTilesTable[t] < 4) {
             drawnTile = t;
         }
-    } while (drawnTile == 0);
+    } while (drawnTile == 0 || drawnTile == discardTile);
 
     // 推演
     deduce(discardTile, drawnTile);
