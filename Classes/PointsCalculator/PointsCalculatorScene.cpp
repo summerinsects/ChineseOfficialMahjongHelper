@@ -218,12 +218,6 @@ bool PointsCalculatorScene::init() {
     }
 
     // 直接输入
-    label = Label::createWithSystemFont("选牌太麻烦？试试", "Arial", 12);
-    label->setColor(textColor);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    infoWidget->addChild(label);
-    label->setPosition(Vec2(visibleSize.width - 15, 100.0f));
-
     ui::Button *button = ui::Button::create(normalImage, selectedImage);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -231,7 +225,7 @@ bool PointsCalculatorScene::init() {
     button->setTitleText("直接输入");
     button->setTitleColor(Color3B::BLACK);
     infoWidget->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40, 80.0f));
+    button->setPosition(Vec2(visibleSize.width - 40, 75.0f));
     button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
 
     // 花牌数
