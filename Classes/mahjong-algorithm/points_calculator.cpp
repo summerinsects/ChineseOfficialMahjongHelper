@@ -1034,12 +1034,7 @@ static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t
 
 // 检测不求人、全求人
 static void check_melded_or_concealed_hand(const pack_t (&packs)[5], long fixed_cnt, bool self_drawn, long (&fan_table)[FAN_COUNT]) {
-    long melded_cnt = 0;  // 明的组数
-    for (long i = 0; i < fixed_cnt; ++i) {
-        if (is_pack_melded(packs[i])) {
-            ++melded_cnt;
-        }
-    }
+    long melded_cnt = std::count_if(&packs[0], &packs[fixed_cnt], &is_pack_melded);  // 明副露的组数
 
     switch (melded_cnt) {
     case 0:  // 0组明的，自摸为不求人，点和为门前清
@@ -1752,7 +1747,7 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
         if (!is_win_tile_in_concealed_chow_packs(chow_packs, chow_cnt, win_tile)) {
             for (long i = 0; i < pung_cnt; ++i) {
                 if (pack_tile(pung_packs[i]) == win_tile && !is_pack_melded(pung_packs[i])) {
-                    pung_packs[i] |= (1 << 12);
+                    pung_packs[i] |= (1 << 12);  // 标记为明副露
                 }
             }
         }
