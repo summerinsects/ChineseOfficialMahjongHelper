@@ -80,7 +80,7 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
         mahjong::tile_t tile = mahjong::pack_tile(_fixedPacks[i]);
         switch (mahjong::pack_type(_fixedPacks[i])) {
         case PACK_TYPE_CHOW:
-            addFixedChowPack(tile, 0);
+            addFixedChowPack(tile - 1, 0);
             ++_usedTilesTable[tile - 1];
             ++_usedTilesTable[tile];
             ++_usedTilesTable[tile + 1];

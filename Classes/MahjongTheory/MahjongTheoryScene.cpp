@@ -230,7 +230,13 @@ void MahjongTheoryScene::setRandomInput() {
 }
 
 void MahjongTheoryScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
-    parseInput(editBox->getText());
+    if (parseInput(editBox->getText())) {
+        _allResults.clear();
+        _resultSources.clear();
+        _orderedIndices.clear();
+
+        _tableView->reloadData();
+    }
 }
 
 bool MahjongTheoryScene::parseInput(const char *input) {
