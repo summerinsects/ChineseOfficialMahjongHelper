@@ -170,7 +170,7 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile);
  * @brief 附加信息
  */
 struct extra_condition_t {
-    win_type_t win_flag;    ///< 和牌标记
+    win_flag_t win_flag;    ///< 和牌标记
     wind_t prevalent_wind;  ///< 圈风
     wind_t seat_wind;       ///< 门风
 };

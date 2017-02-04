@@ -507,7 +507,7 @@ void PointsCalculatorScene::calculate() {
 
     // 算番
     mahjong::extra_condition_t ext_cond;
-    ext_cond.win_type = win_type;
+    ext_cond.win_flag = win_flag;
     ext_cond.prevalent_wind = prevalent_wind;
     ext_cond.seat_wind = seat_wind;
     int points = calculate_points(&hand_tiles, win_tile, &ext_cond, fan_table);
