@@ -92,13 +92,26 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
         }
         if (tile_cnt == 3) {
             if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
-                *pack = make_pack(true, PACK_TYPE_PUNG, tiles[0]);
+                *pack = make_pack(1, PACK_TYPE_PUNG, tiles[0]);  // TODO: 增加供牌信息
             }
             else {
-                tile_t temp[3] = { tiles[0], tiles[1], tiles[2] };
-                std::sort(std::begin(temp), std::end(temp));
-                if (temp[0] + 1 == temp[1] && temp[1] + 1 == temp[2]) {
-                    *pack = make_pack(true, PACK_TYPE_CHOW, temp[1]);
+                if (tiles[0] + 1 == tiles[1] && tiles[1] + 1 == tiles[2]) {
+                    *pack = make_pack(1, PACK_TYPE_CHOW, tiles[1]);
+                }
+                else if (tiles[0] + 1 == tiles[2] && tiles[2] + 1 == tiles[1]) {
+                    *pack = make_pack(1, PACK_TYPE_CHOW, tiles[2]);
+                }
+                else if (tiles[1] + 1 == tiles[0] && tiles[0] + 1 == tiles[2]) {
+                    *pack = make_pack(2, PACK_TYPE_CHOW, tiles[0]);
+                }
+                else if (tiles[1] + 1 == tiles[2] && tiles[2] + 1 == tiles[0]) {
+                    *pack = make_pack(3, PACK_TYPE_CHOW, tiles[2]);
+                }
+                else if (tiles[2] + 1 == tiles[0] && tiles[0] + 1 == tiles[1]) {
+                    *pack = make_pack(2, PACK_TYPE_CHOW, tiles[0]);
+                }
+                else if (tiles[2] + 1 == tiles[1] && tiles[1] + 1 == tiles[0]) {
+                    *pack = make_pack(3, PACK_TYPE_CHOW, tiles[1]);
                 }
                 else {
                     return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
@@ -109,7 +122,7 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
             if (tiles[0] != tiles[1] || tiles[1] != tiles[2] || tiles[2] != tiles[3]) {
                 return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
             }
-            *pack = make_pack(true, PACK_TYPE_KONG, tiles[0]);
+            *pack = make_pack(1, PACK_TYPE_KONG, tiles[0]);  // TODO: 增加供牌信息
         }
         return 1;
     }
@@ -166,7 +179,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
                 return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK;
             }
             q = ++p;
-            packs[pack_cnt] = make_pack(false, PACK_TYPE_KONG, tiles[0]);
+            packs[pack_cnt] = make_pack(0, PACK_TYPE_KONG, tiles[0]);
             is_concealed_kong = false;
             ++pack_cnt;
             tile_cnt = 0;

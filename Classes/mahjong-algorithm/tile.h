@@ -120,29 +120,43 @@ static const tile_t all_tiles[] = {
  * 内存结构：
  * - 0-7 8bit tile 牌（对于顺子，为中间那张牌）
  * - 8-11 4bit type 牌组类型
- * - 12-15 4bit melded 是否为明的（明顺、明刻、明杠）
+ * - 12-15 4bit offer 供牌信息\n
+ *       0表示暗手（暗顺、暗刻、暗杠），非0表示明手（明顺、明刻、明杠）
+ *
+ *       对于牌组是刻子和杠时，123分别来表示是上家/对家/下家供的\n
+ *       对于牌组为顺子时，由于吃牌只能是上家供，这里用123分别来表示第几张是上家供的
  */
 typedef uint16_t pack_t;
 
 /**
  * @brief 生成一个牌组
  *  函数不检查输入的合法性，不保证返回值的合法性
- * @param [in] melded 是否为明的（明顺、明刻、明杠）
+ * @param [in] offer 供牌信息
  * @param [in] type 牌组类型
  * @param [in] tile 牌（对于顺子，为中间那张牌）
  */
-static forceinline pack_t make_pack(bool melded, uint8_t type, tile_t tile) {
-    return (melded << 12 | (type << 8) | tile);
+static forceinline pack_t make_pack(uint8_t offer, uint8_t type, tile_t tile) {
+    return (offer << 12 | (type << 8) | tile);
 }
 
 /**
- * @brief 牌组是否为明的（明顺、明刻、明杠）
+ * @brief 牌组是否为明的
  *  函数不检查输入的合法性，不保证返回值的合法性
  * @param [in] pack 牌组
  * @return bool
  */
 static forceinline bool is_pack_melded(pack_t pack) {
-    return !!(pack >> 12);
+    return !!((pack >> 12) & 0xF);
+}
+
+/**
+ * @brief 牌组的供牌信息
+ *  函数不检查输入的合法性，不保证返回值的合法性
+ * @param [in] pack 牌组
+ * @return uint8_t
+ */
+static forceinline uint8_t pack_offer(pack_t pack) {
+    return ((pack >> 12) & 0xF);
 }
 
 /**

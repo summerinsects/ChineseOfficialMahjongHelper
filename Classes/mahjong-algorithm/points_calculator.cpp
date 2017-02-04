@@ -35,7 +35,7 @@ struct seperations_t {
 
 static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_packs)[5], seperations_t *separation) {
     // 这2张作为雀头
-    work_packs[4] = make_pack(false, PACK_TYPE_PAIR, tile);
+    work_packs[4] = make_pack(0, PACK_TYPE_PAIR, tile);
 
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
     // 这里不能直接在work_packs上排序，否则会破坏递归外层的数据
@@ -108,7 +108,7 @@ static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_c
 
         // 刻子
         if (cnt_table[t] > 2) {
-            work_packs[idx] = make_pack(false, PACK_TYPE_PUNG, t);
+            work_packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);
             if (is_separation_branch_exist(fixed_cnt, step + 1, work_packs, separation)) {
                 continue;
             }
@@ -125,7 +125,7 @@ static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_c
         bool is_numbered = is_numbered_suit(t);
         if (is_numbered) {
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-                work_packs[idx] = make_pack(false, PACK_TYPE_CHOW, t + 1);
+                work_packs[idx] = make_pack(0, PACK_TYPE_CHOW, t + 1);
                 if (is_separation_branch_exist(fixed_cnt, step + 1, work_packs, separation)) {
                     continue;
                 }
