@@ -191,7 +191,7 @@ static const uint32_t traits_mask_table[256] = {
  * @param [in] tile 牌
  * @return bool
  */
-bool forceinline is_green(tile_t tile) {
+static bool forceinline is_green(tile_t tile) {
     //return (tile == 0x22 || tile == 0x23 || tile == 0x24 || tile == 0x26 || tile == 0x28 || tile == 0x52);
     return (traits_mask_table[tile] & GREEN_BIT) != 0;
 }
@@ -201,12 +201,15 @@ bool forceinline is_green(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-bool forceinline is_reversible_tile(tile_t tile) {
+static bool forceinline is_reversible_tile(tile_t tile) {
     //return (tile == 0x22 || tile == 0x24 || tile == 0x25 || tile == 0x26 || tile == 0x28 || tile == 0x29 ||
     //    tile == 0x31 || tile == 0x32 || tile == 0x33 || tile == 0x34 || tile == 0x35 || tile == 0x38 || tile == 0x39 ||
     //    tile == 0x53);
     return (traits_mask_table[tile] & REVERSIBLE_BIT);
 }
+
+#undef GREEN_BIT
+#undef REVERSIBLE_BIT
 
 /**
  * @brief 判断是否为数牌幺九（老头牌）

@@ -1184,7 +1184,7 @@ static void check_tiles_traits(const tile_t *tiles, long tile_cnt, long (&fan_ta
     }
 
     // 推不倒
-    if (std::all_of(tiles, tiles + tile_cnt, &is_reversible_tile)) {
+    if (std::all_of(tiles, tiles + tile_cnt, &is_reversible)) {
         fan_table[REVERSIBLE_TILES] = 1;
     }
 
