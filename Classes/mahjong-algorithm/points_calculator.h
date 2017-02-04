@@ -130,15 +130,29 @@ enum class wind_t {
  */
 typedef uint8_t win_type_t;
 
+/**
+ * @name win types
+ * @{
+ */
 #define WIN_TYPE_DISCARD    0   ///< 点和
 #define WIN_TYPE_SELF_DRAWN 1   ///< 自摸
 #define WIN_TYPE_4TH_TILE   2   ///< 绝张
 #define WIN_TYPE_ABOUT_KONG 4   ///< 关于杠，复合点和时为枪杠和，复合自摸则为杠上开花
 #define WIN_TYPE_WALL_LAST  8   ///< 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
+/**
+ * @}
+ */
 
+/**
+ * @name error codes
+ * @{
+ */
 #define ERROR_WRONG_TILES_COUNT -1              ///< 错误的张数
 #define ERROR_TILE_COUNT_GREATER_THAN_4 -2      ///< 某张牌出现超过4枚
 #define ERROR_NOT_WIN -3                        ///< 没和牌
+/**
+ * @}
+ */
 
 /**
  * @brief 检查算番的输入是否合法
@@ -146,7 +160,9 @@ typedef uint8_t win_type_t;
  *
  * @param [in] hand_tiles 手牌信息
  * @param [in] win_tile 和牌张
- * @return 返回0表示成功，否则返回上述错误码
+ * @retval 0 成功
+ * @retval ERROR_WRONG_TILES_COUNT 错误的张数
+ * @retval ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
  */
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile);
 
@@ -166,7 +182,10 @@ struct extra_condition_t {
  * @param [in] win_tile 和牌张
  * @param [in] ext_cond 附加信息
  * @param [out] fan_table 番表，当有某种番时，相应的会设置为这种番出现的次数
- * @return 番值
+ * @retval >0 番数
+ * @retval ERROR_WRONG_TILES_COUNT 错误的张数
+ * @retval ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
+ * @retval ERROR_NOT_WIN 没和牌
  */
 int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_TABLE_SIZE]);
 

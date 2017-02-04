@@ -53,7 +53,10 @@ long table_to_tiles(const int (&cnt_table)[TILE_TABLE_SIZE], tile_t *tiles, long
  */
 int count_useful_tile(const int (&used_table)[TILE_TABLE_SIZE], const bool (&useful_table)[TILE_TABLE_SIZE]);
 
-
+/**
+ * @addtogroup shanten
+ * @{
+ */
 
 /**
  * @brief 基本和型上听数
@@ -70,7 +73,7 @@ int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null)
  * @return bool 是否听牌
  */
 bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]);
@@ -102,7 +105,7 @@ int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool 
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null)
  * @return bool 是否听牌
  */
 bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]);
@@ -134,7 +137,7 @@ int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, 
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null)
  * @return bool 是否听牌
  */
 bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]);
@@ -166,7 +169,7 @@ int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long 
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null)
  * @return bool 是否听牌
  */
 bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]);
@@ -198,7 +201,7 @@ int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standi
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null)
  * @return bool 是否听牌
  */
 bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]);
@@ -239,13 +242,20 @@ static const tile_t standard_thirteen_orphans[13] = {
     TILE_1m, TILE_9m, TILE_1s, TILE_9s, TILE_1p, TILE_9p, TILE_E, TILE_S, TILE_W, TILE_N, TILE_C, TILE_F, TILE_P
 };
 
-
-#define FORM_FLAG_BASIC_TYPE                0x01
-#define FORM_FLAG_SEVEN_PAIRS               0x02
-#define FORM_FLAG_THIRTEEN_ORPHANS          0x04
-#define FORM_FLAG_HONORS_AND_KNITTED_TILES  0x08
-#define FORM_FLAG_KNITTED_STRAIGHT          0x10
-#define FORM_FLAG_ALL                       0xFF
+/**
+ * @name form flags
+ * @{
+ *  解析牌的错误码
+ */
+#define FORM_FLAG_BASIC_TYPE                0x01  ///< 基本和型
+#define FORM_FLAG_SEVEN_PAIRS               0x02  ///< 七对
+#define FORM_FLAG_THIRTEEN_ORPHANS          0x04  ///< 十三幺
+#define FORM_FLAG_HONORS_AND_KNITTED_TILES  0x08  ///< 全不靠
+#define FORM_FLAG_KNITTED_STRAIGHT          0x10  ///< 组合龙
+#define FORM_FLAG_ALL                       0xFF  ///< 全部和型
+/**
+ * @}
+ */
 
 /**
  * @brief 枚举打哪张牌的计算结果信息
@@ -262,7 +272,8 @@ struct enum_result_t {
  *
  * @param [in] context 从enum_discard_tile传过来的context原样传回
  * @param [in] result 计算结果
- * @return bool 返回false可提前结束枚举
+ * @retval true 继续枚举
+ * @retval false 结束枚举
  */
 typedef bool (*enum_callback_t)(void *context, const enum_result_t *result);
 
@@ -279,5 +290,10 @@ void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint
     void *context, enum_callback_t enum_callback);
 
 }
+
+/**
+ * end group
+ * @}
+ */
 
 #endif
