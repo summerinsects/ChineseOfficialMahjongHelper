@@ -11,7 +11,7 @@ namespace mahjong {
  * @brief 番种
  */
 enum fan_t {
-    NONE = 0,
+    FAN_NONE = 0,
     BIG_FOUR_WINDS = 1, BIG_THREE_DRAGONS, ALL_GREEN, NINE_GATES, FOUR_KONGS, SEVEN_SHIFTED_PAIRS, THIRTEEN_ORPHANS,
     ALL_TERMINALS, LITTLE_FOUR_WINDS, LITTLE_THREE_DRAGONS, ALL_HONORS, FOUR_CONCEALED_PUNGS, PURE_TERMINAL_CHOWS,
     QUADRUPLE_CHOW, FOUR_PURE_SHIFTED_PUNGS,
@@ -28,7 +28,7 @@ enum fan_t {
     DRAGON_PUNG, PREVALENT_WIND, SEAT_WIND, CONCEALED_HAND, ALL_CHOWS, TILE_HOG, DOUBLE_PUNG, TWO_CONCEALED_PUNGS, CONCEALED_KONG, ALL_SIMPLES,
     PURE_DOUBLE_CHOW, MIXED_DOUBLE_CHOW, SHORT_STRAIGHT, TWO_TERMINAL_CHOWS, PUNG_OF_TERMINALS_OR_HONORS, MELDED_KONG, ONE_VOIDED_SUIT, NO_HONORS, EDGE_WAIT, CLOSED_WAIT, SINGLE_WAIT, SELF_DRAWN,
     FLOWER_TILES,
-    FAN_COUNT
+    FAN_TABLE_SIZE
 };
 
 /**
@@ -81,7 +81,7 @@ struct extra_condition_t {
  * @param [out] fan_table 番表，当有某种番时，相应的会设置为这种番出现的次数
  * @return 番值
  */
-int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_COUNT]);
+int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_TABLE_SIZE]);
 
 #if 0
 
@@ -143,7 +143,7 @@ static const char *fan_name[] = {
 /**
  * @brief 番值
  */
-static const int fan_value_table[FAN_COUNT] = {
+static const int fan_value_table[FAN_TABLE_SIZE] = {
     0,
     88, 88, 88, 88, 88, 88, 88,
     64, 64, 64, 64, 64, 64,

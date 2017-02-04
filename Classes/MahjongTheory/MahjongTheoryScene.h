@@ -25,7 +25,7 @@ private:
     cocos2d::ui::CheckBox *_checkBoxes[4];
     cw::TableView *_tableView;
 
-    int _handTilesTable[mahjong::TILE_TABLE_COUNT];
+    int _handTilesTable[mahjong::TILE_TABLE_SIZE];
 
     struct ResultEx : mahjong::enum_result_t {
         int count_in_tiles;

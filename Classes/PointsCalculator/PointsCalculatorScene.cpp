@@ -491,7 +491,7 @@ void PointsCalculatorScene::calculate() {
 
     mahjong::sort_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count);
 
-    long fan_table[mahjong::FAN_COUNT] = { 0 };
+    long fan_table[mahjong::FAN_TABLE_SIZE] = { 0 };
 
     // 获取绝张、杠开、抢杠、海底信息
     mahjong::win_type_t win_type = WIN_TYPE_DISCARD;
@@ -534,7 +534,7 @@ void PointsCalculatorScene::calculate() {
     fan_table[mahjong::FLOWER_TILES] = flowerCnt;
 
     // 有n个番种，每行排2个
-    long n = mahjong::FAN_COUNT - std::count(std::begin(fan_table), std::end(fan_table), 0);
+    long n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
     long rows = (n >> 1) + (n & 1);  // 需要这么多行
 
     // 排列
