@@ -852,7 +852,8 @@ int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long 
             }
         }
         else if (st == ret && useful_table != nullptr) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
-            std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table), std::begin(*useful_table), [](bool u, bool t) { return u || t; });
+            std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table),
+                std::begin(*useful_table), [](bool u, bool t) { return u || t; });
         }
     }
 
@@ -940,7 +941,8 @@ int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standi
             }
         }
         else if (st == ret && useful_table != nullptr) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
-            std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table), std::begin(*useful_table), [](bool u, bool t) { return u || t; });
+            std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table),
+                std::begin(*useful_table), [](bool u, bool t) { return u || t; });
         }
     }
     return ret;
