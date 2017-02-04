@@ -710,20 +710,16 @@ bool HandTilesWidget::makeFixedChowXX_Pack() {
 int HandTilesWidget::calcMeldedIdx(int maxIdx) const {
     mahjong::tile_t tile = _standingTiles[_currentIdx];
 
-    struct Pred {
-        Pred(mahjong::tile_t t) : tile(t) { }
-        mahjong::tile_t tile;
-        bool operator()(mahjong::tile_t t) { return tile == t; }
-    };
-
     size_t offset = 0;
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
     if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
         offset = 1;
     }
 
-    bool leftExsits = std::any_of(_standingTiles.begin(), _standingTiles.begin() + _currentIdx, Pred(tile));
-    bool rightExsits = std::any_of(_standingTiles.begin() + _currentIdx + 1, _standingTiles.end() - offset, Pred(tile));
+    bool leftExsits = std::any_of(_standingTiles.begin(), _standingTiles.begin() + _currentIdx,
+        [tile](mahjong::tile_t t) { return tile == t; });
+    bool rightExsits = std::any_of(_standingTiles.begin() + _currentIdx + 1, _standingTiles.end() - offset,
+        [tile](mahjong::tile_t t) { return tile == t; });
     return leftExsits ? (rightExsits ? 1 : maxIdx) : 0;
 }
 
