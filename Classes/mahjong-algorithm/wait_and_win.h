@@ -60,7 +60,7 @@ int count_useful_tile(const int (&used_table)[TILE_TABLE_COUNT], const bool (&us
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 有效牌标记表
+ * @param [out] useful_table 有效牌标记表（可为null)
  * @return int 上听数
  */
 int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
@@ -70,7 +70,7 @@ int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 听牌标记表
+ * @param [out] useful_table 听牌标记表（可为null)
  * @return bool 是否听牌
  */
 bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
@@ -85,20 +85,132 @@ bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*
  */
 bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
+
+
+/**
+ * @brief 七对上听数
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [out] useful_table 有效牌标记表（可为null)
+ * @return int 上听数
+ */
 int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
+
+/**
+ * @brief 七对是否听牌
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [out] useful_table 听牌标记表（可为null)
+ * @return bool 是否听牌
+ */
 bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
+
+/**
+ * @brief 七对是否和牌
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [in] test_tile 测试的牌
+ * @return bool 是否和牌
+ */
 bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
+
+
+/**
+ * @brief 十三幺上听数
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [out] useful_table 有效牌标记表（可为null)
+ * @return int 上听数
+ */
 int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
+
+/**
+ * @brief 十三幺是否听牌
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [out] useful_table 听牌标记表（可为null)
+ * @return bool 是否听牌
+ */
 bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
+
+/**
+ * @brief 十三幺是否和牌
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [in] test_tile 测试的牌
+ * @return bool 是否和牌
+ */
 bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
+
+
+/**
+ * @brief 组合龙上听数
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [out] useful_table 有效牌标记表（可为null)
+ * @return int 上听数
+ */
 int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
+
+/**
+ * @brief 组合龙是否听牌
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [out] useful_table 听牌标记表（可为null)
+ * @return bool 是否听牌
+ */
 bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
+
+/**
+ * @brief 组合龙是否和牌
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [in] test_tile 测试的牌
+ * @return bool 是否和牌
+ */
 bool is_knitted_straight_in_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
+
+
+/**
+ * @brief 全不靠上听数
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [out] useful_table 有效牌标记表（可为null)
+ * @return int 上听数
+ */
 int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
+
+/**
+ * @brief 全不靠是否听牌
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [out] useful_table 听牌标记表（可为null)
+ * @return bool 是否听牌
+ */
 bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
+
+/**
+ * @brief 全不靠是否和牌
+ *
+ * @param [in] standing_tiles 立牌
+ * @param [in] standing_cnt 立牌数
+ * @param [in] test_tile 测试的牌
+ * @return bool 是否和牌
+ */
 bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
 /**
@@ -163,7 +275,6 @@ typedef bool (*enum_callback_t)(void *context, const enum_result_t *result);
  * @param [in] context 用户自定义参数，将原样从回调函数传回
  * @param [in] enum_callback 回调函数
  */
-// 枚举打哪张牌
 void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint8_t form_flag,
     void *context, enum_callback_t enum_callback);
 

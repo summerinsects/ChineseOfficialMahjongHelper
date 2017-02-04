@@ -898,7 +898,7 @@ static int honors_and_knitted_tiles_wait_step_1(const tile_t *standing_tiles, lo
     for (int i = 0; i < 9; ++i) {
         tile_t t = standard_knitted_straight[which_seq][i];
         int n = cnt_table[t];
-        if (n > 0) {  // 有，增加记数
+        if (n > 0) {  // 有，增加计数
             ++cnt;
         }
         else if (useful_table != nullptr) {  // 没有， 记录有效牌
@@ -910,7 +910,7 @@ static int honors_and_knitted_tiles_wait_step_1(const tile_t *standing_tiles, lo
     for (int i = 6; i < 13; ++i) {
         tile_t t = standard_thirteen_orphans[i];
         int n = cnt_table[t];
-        if (n > 0) {  // 有，增加记数
+        if (n > 0) {  // 有，增加计数
             ++cnt;
         }
         else if (useful_table != nullptr) {  // 没有， 记录有效牌
@@ -918,7 +918,7 @@ static int honors_and_knitted_tiles_wait_step_1(const tile_t *standing_tiles, lo
         }
     }
 
-    // 上听数=13-符合牌型的记数
+    // 上听数=13-符合牌型的计数
     return 13 - cnt;
 }
 
