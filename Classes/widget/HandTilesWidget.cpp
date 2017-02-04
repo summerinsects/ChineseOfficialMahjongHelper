@@ -375,8 +375,8 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
         break;
     case 2:
         image[0] = tilesImageName[tile];
-        image[1] = tilesImageName[tile - 1];
-        image[2] = tilesImageName[tile - 2];
+        image[1] = tilesImageName[tile - 2];
+        image[2] = tilesImageName[tile - 1];
         break;
     }
 
