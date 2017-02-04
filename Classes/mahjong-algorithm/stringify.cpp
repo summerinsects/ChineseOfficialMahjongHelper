@@ -22,6 +22,9 @@ static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long 
         tiles[i] |= 0x40;                   \
         } (void)0
 
+#define NO_SUFFIX_AFTER_DIGIT() (tile_cnt > 0 && !(tiles[tile_cnt - 1] & 0xF0))
+#define CHECK_SUFFIX() if (NO_SUFFIX_AFTER_DIGIT()) return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT
+
     const char *p = str;
     for (; tile_cnt < max_cnt && *p != '\0'; ++p) {
         char c = *p;
@@ -40,20 +43,20 @@ static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long 
         case 's': SET_SUIT_FOR_NUMBERED(0x20); break;
         case 'p': SET_SUIT_FOR_NUMBERED(0x30); break;
         case 'z': SET_SUIT_FOR_HONOR(); break;
-        case 'E': tiles[tile_cnt++] = TILE_E; break;
-        case 'S': tiles[tile_cnt++] = TILE_S; break;
-        case 'W': tiles[tile_cnt++] = TILE_W; break;
-        case 'N': tiles[tile_cnt++] = TILE_N; break;
-        case 'C': tiles[tile_cnt++] = TILE_C; break;
-        case 'F': tiles[tile_cnt++] = TILE_F; break;
-        case 'P': tiles[tile_cnt++] = TILE_P; break;
+        case 'E': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_E; break;
+        case 'S': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_S; break;
+        case 'W': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_W; break;
+        case 'N': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_N; break;
+        case 'C': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_C; break;
+        case 'F': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_F; break;
+        case 'P': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_P; break;
         default: goto parse_finish;
         }
     }
 
 parse_finish:
     // 一连串数字+后缀，但已经超过容量，那么放弃中间一部分数字，直接解析最近的后缀
-    if (tile_cnt > 0 && !(tiles[tile_cnt - 1] & 0xF0)) {
+    if (NO_SUFFIX_AFTER_DIGIT()) {
         const char *p1 = strpbrk(p, "mspz");
         if (p1 == nullptr) {
             return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT;
@@ -70,6 +73,9 @@ parse_finish:
     }
 
 #undef SET_SUIT_FOR_NUMBERED
+#undef SET_SUIT_FOR_HONOR
+#undef NO_SUFFIX_AFTER_DIGIT
+#undef CHECK_SUFFIX
 
     if (out_tile_cnt != nullptr) {
         *out_tile_cnt = tile_cnt;
