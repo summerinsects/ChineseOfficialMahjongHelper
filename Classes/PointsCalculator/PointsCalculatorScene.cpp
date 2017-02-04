@@ -494,12 +494,12 @@ void PointsCalculatorScene::calculate() {
     long fan_table[mahjong::FAN_TABLE_SIZE] = { 0 };
 
     // 获取绝张、杠开、抢杠、海底信息
-    mahjong::win_type_t win_type = WIN_TYPE_DISCARD;
-    if (_winTypeGroup->getSelectedButtonIndex() == 1) win_type |= WIN_TYPE_SELF_DRAWN;
-    if (_fourthTileBox->isEnabled() && _fourthTileBox->isSelected()) win_type |= WIN_TYPE_4TH_TILE;
-    if (_robKongBox->isEnabled() && _robKongBox->isSelected()) win_type |= WIN_TYPE_ABOUT_KONG;
-    if (_replacementBox->isEnabled() && _replacementBox->isSelected()) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
-    if (_lastTileBox->isEnabled() && _lastTileBox->isSelected()) win_type |= WIN_TYPE_WALL_LAST;
+    mahjong::win_flag_t win_flag = WIN_FLAG_DISCARD;
+    if (_winTypeGroup->getSelectedButtonIndex() == 1) win_flag |= WIN_FLAG_SELF_DRAWN;
+    if (_fourthTileBox->isEnabled() && _fourthTileBox->isSelected()) win_flag |= WIN_FLAG_4TH_TILE;
+    if (_robKongBox->isEnabled() && _robKongBox->isSelected()) win_flag |= WIN_FLAG_ABOUT_KONG;
+    if (_replacementBox->isEnabled() && _replacementBox->isSelected()) win_flag |= (WIN_FLAG_ABOUT_KONG | WIN_FLAG_SELF_DRAWN);
+    if (_lastTileBox->isEnabled() && _lastTileBox->isSelected()) win_flag |= WIN_FLAG_WALL_LAST;
 
     // 获取圈风门风
     mahjong::wind_t prevalent_wind = static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _prevalentWindGroup->getSelectedButtonIndex());

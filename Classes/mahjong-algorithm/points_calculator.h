@@ -126,19 +126,19 @@ enum class wind_t {
 };
 
 /**
- * @brief 和牌类型
+ * @brief 和牌标记
  */
-typedef uint8_t win_type_t;
+typedef uint8_t win_flag_t;
 
 /**
- * @name win types
+ * @name win flag
  * @{
  */
-#define WIN_TYPE_DISCARD    0   ///< 点和
-#define WIN_TYPE_SELF_DRAWN 1   ///< 自摸
-#define WIN_TYPE_4TH_TILE   2   ///< 绝张
-#define WIN_TYPE_ABOUT_KONG 4   ///< 关于杠，复合点和时为枪杠和，复合自摸则为杠上开花
-#define WIN_TYPE_WALL_LAST  8   ///< 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
+#define WIN_FLAG_DISCARD    0   ///< 点和
+#define WIN_FLAG_SELF_DRAWN 1   ///< 自摸
+#define WIN_FLAG_4TH_TILE   2   ///< 绝张
+#define WIN_FLAG_ABOUT_KONG 4   ///< 关于杠，复合点和时为枪杠和，复合自摸则为杠上开花
+#define WIN_FLAG_WALL_LAST  8   ///< 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
 /**
  * @}
  */
@@ -170,7 +170,7 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile);
  * @brief 附加信息
  */
 struct extra_condition_t {
-    win_type_t win_type;    ///< 和牌类型
+    win_type_t win_flag;    ///< 和牌标记
     wind_t prevalent_wind;  ///< 圈风
     wind_t seat_wind;       ///< 门风
 };

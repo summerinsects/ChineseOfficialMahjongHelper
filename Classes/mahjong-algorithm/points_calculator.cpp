@@ -1634,17 +1634,17 @@ static void correction_fan_table(long (&fan_table)[FAN_TABLE_SIZE], bool prevale
 }
 
 // 检测和绝张、妙手回春、海底捞月、自摸
-static void check_win_type(win_type_t win_type, long (&fan_table)[FAN_TABLE_SIZE]) {
-    if (win_type & WIN_TYPE_4TH_TILE) {
+static void check_win_flag(win_flag_t win_flag, long (&fan_table)[FAN_TABLE_SIZE]) {
+    if (win_flag & WIN_FLAG_4TH_TILE) {
         fan_table[LAST_TILE] = 1;
     }
-    if (win_type & WIN_TYPE_WALL_LAST) {
-        fan_table[win_type & WIN_TYPE_SELF_DRAWN ? LAST_TILE_DRAW : LAST_TILE_CLAIM] = 1;
+    if (win_flag & WIN_FLAG_WALL_LAST) {
+        fan_table[win_flag & WIN_FLAG_SELF_DRAWN ? LAST_TILE_DRAW : LAST_TILE_CLAIM] = 1;
     }
-    if (win_type & WIN_TYPE_ABOUT_KONG) {
-        fan_table[win_type & WIN_TYPE_SELF_DRAWN ? OUT_WITH_REPLACEMENT_TILE : ROBBING_THE_KONG] = 1;
+    if (win_flag & WIN_FLAG_ABOUT_KONG) {
+        fan_table[win_flag & WIN_FLAG_SELF_DRAWN ? OUT_WITH_REPLACEMENT_TILE : ROBBING_THE_KONG] = 1;
     }
-    if (win_type & WIN_TYPE_SELF_DRAWN) {
+    if (win_flag & WIN_FLAG_SELF_DRAWN) {
         fan_table[SELF_DRAWN] = 1;
     }
 }
@@ -1689,10 +1689,10 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
         }
     }
 
-    check_win_type(ext_cond->win_type, fan_table);
+    check_win_flag(ext_cond->win_flag, fan_table);
 
     // 点和的牌张，如果不能解释为暗顺中的一张，那么将其解释为刻子，并标记这个刻子为明刻
-    if ((ext_cond->win_type & WIN_TYPE_SELF_DRAWN) == 0) {
+    if ((ext_cond->win_flag & WIN_FLAG_SELF_DRAWN) == 0) {
         if (!is_win_tile_in_concealed_chow_packs(chow_packs, chow_cnt, win_tile)) {
             for (long i = 0; i < pung_cnt; ++i) {
                 if (pack_tile(pung_packs[i]) == win_tile && !is_pack_melded(pung_packs[i])) {
@@ -1734,7 +1734,7 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
     }
 
     // 检测不求人、全求人
-    check_melded_or_concealed_hand(packs, fixed_cnt, ext_cond->win_type & WIN_TYPE_SELF_DRAWN, fan_table);
+    check_melded_or_concealed_hand(packs, fixed_cnt, ext_cond->win_flag & WIN_FLAG_SELF_DRAWN, fan_table);
     // 检测雀头，确定平和、小三元、小四喜
     check_pair_tile(pack_tile(pair_pack), chow_cnt, fan_table);
     // 检测全带幺、全带五、全双刻
@@ -1819,10 +1819,10 @@ static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *
         calculate_1_pung(temp_pack[3], fan_table);
     }
 
-    check_win_type(ext_cond->win_type, fan_table);
+    check_win_flag(ext_cond->win_flag, fan_table);
     // 门前清（暗杠不影响）
     if (fixed_cnt == 0 || (pack_type(temp_pack[3]) == PACK_TYPE_KONG && !is_pack_melded(temp_pack[3]))) {
-        if (ext_cond->win_type & WIN_TYPE_SELF_DRAWN) {
+        if (ext_cond->win_flag & WIN_FLAG_SELF_DRAWN) {
             fan_table[FULLY_CONCEALED_HAND] = 1;
         }
         else {
@@ -1902,7 +1902,7 @@ bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], long 
 }
 
 // 特殊和型算番
-static bool calculate_special_type_points(const tile_t (&standing_tiles)[14], win_type_t win_type, long (&fan_table)[FAN_TABLE_SIZE]) {
+static bool calculate_special_type_points(const tile_t (&standing_tiles)[14], win_flag_t win_flag, long (&fan_table)[FAN_TABLE_SIZE]) {
     // 七对
     if (standing_tiles[0] == standing_tiles[1]
         && standing_tiles[2] == standing_tiles[3]
@@ -1947,7 +1947,7 @@ static bool calculate_special_type_points(const tile_t (&standing_tiles)[14], wi
         return false;
     }
 
-    check_win_type(win_type, fan_table);
+    check_win_flag(win_flag, fan_table);
     // 圈风刻、门风刻没必要检测了，这些特殊和型都没有面子
     // 统一校正一些不计的
     correction_fan_table(fan_table, false);
@@ -2058,7 +2058,7 @@ int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extr
             }
             LOG("points = %d\n\n", current_points);
         }
-        else if (calculate_special_type_points(standing_tiles, ext_cond->win_type, fan_tables[separation.count])) {
+        else if (calculate_special_type_points(standing_tiles, ext_cond->win_flag, fan_tables[separation.count])) {
             int current_points = get_points_by_table(fan_tables[separation.count]);
             if (current_points > max_points) {
                 max_points = current_points;
