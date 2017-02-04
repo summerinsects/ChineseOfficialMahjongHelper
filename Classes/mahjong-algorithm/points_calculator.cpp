@@ -1658,7 +1658,7 @@ static bool is_win_tile_in_concealed_chow_packs(const pack_t *chow_packs, long c
 // 基本和型算番
 static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt, tile_t win_tile,
     const extra_condition_t *ext_cond, long (&fan_table)[FAN_COUNT]) {
-    pack_t pair_pack;
+    pack_t pair_pack = 0;
     pack_t chow_packs[4];
     pack_t pung_packs[4];
     long chow_cnt = 0;
@@ -1671,6 +1671,10 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
         case PACK_TYPE_PAIR: pair_pack = packs[i]; break;
         default: assert(0); return;
         }
+    }
+
+    if (pair_pack == 0 || chow_cnt + pung_cnt != 4) {
+        return;
     }
 
     tile_t tiles[18];
