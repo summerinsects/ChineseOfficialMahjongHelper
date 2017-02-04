@@ -8,26 +8,113 @@
 namespace mahjong {
 
 /**
+ * @addtogroup calculator
+ * @{
+ */
+
+/**
  * @brief 番种
  */
 enum fan_t {
-    FAN_NONE = 0,
-    BIG_FOUR_WINDS = 1, BIG_THREE_DRAGONS, ALL_GREEN, NINE_GATES, FOUR_KONGS, SEVEN_SHIFTED_PAIRS, THIRTEEN_ORPHANS,
-    ALL_TERMINALS, LITTLE_FOUR_WINDS, LITTLE_THREE_DRAGONS, ALL_HONORS, FOUR_CONCEALED_PUNGS, PURE_TERMINAL_CHOWS,
-    QUADRUPLE_CHOW, FOUR_PURE_SHIFTED_PUNGS,
-    FOUR_PURE_SHIFTED_CHOWS, THREE_KONGS, ALL_TERMINALS_AND_HONORS,
-    SEVEN_PAIRS, GREATER_HONORS_AND_KNITTED_TILES, ALL_EVEN_PUNGS, FULL_FLUSH, PURE_TRIPLE_CHOW, PURE_SHIFTED_PUNGS, UPPER_TILES, MIDDLE_TILES, LOWER_TILES,
-    PURE_STRAIGHT, THREE_SUITED_TERMINAL_CHOWS, PURE_SHIFTED_CHOWS, ALL_FIVE, TRIPLE_PUNG, THREE_CONCEALED_PUNGS,
-    LESSER_HONORS_AND_KNITTED_TILES, KNITTED_STRAIGHT, UPPER_FOUR, LOWER_FOUR, BIG_THREE_WINDS,
-    MIXED_STRAIGHT, REVERSIBLE_TILES, MIXED_TRIPLE_CHOW, MIXED_SHIFTED_PUNGS, CHICKEN_HAND, LAST_TILE_DRAW, LAST_TILE_CLAIM, OUT_WITH_REPLACEMENT_TILE, ROBBING_THE_KONG,
-    ALL_PUNGS, HALF_FLUSH, MIXED_SHIFTED_CHOWS, ALL_TYPES, MELDED_HAND, TWO_CONCEALED_KONGS, TWO_DRAGONS_PUNGS,
+    FAN_NONE = 0,                       ///< 无效
+    BIG_FOUR_WINDS,                     ///< 大四喜
+    BIG_THREE_DRAGONS,                  ///< 大三元
+    ALL_GREEN,                          ///< 绿一色
+    NINE_GATES,                         ///< 九莲宝灯
+    FOUR_KONGS,                         ///< 四杠
+    SEVEN_SHIFTED_PAIRS,                ///< 连七对
+    THIRTEEN_ORPHANS,                   ///< 十三幺
+
+    ALL_TERMINALS,                      ///< 清幺九
+    LITTLE_FOUR_WINDS,                  ///< 小四喜
+    LITTLE_THREE_DRAGONS,               ///< 小三元
+    ALL_HONORS,                         ///< 字一色
+    FOUR_CONCEALED_PUNGS,               ///< 四暗刻
+    PURE_TERMINAL_CHOWS,                ///< 一色双龙会
+
+    QUADRUPLE_CHOW,                     ///< 一色四同顺
+    FOUR_PURE_SHIFTED_PUNGS,            ///< 一色四节高
+
+    FOUR_PURE_SHIFTED_CHOWS,            ///< 一色四步高
+    THREE_KONGS,                        ///< 三杠
+    ALL_TERMINALS_AND_HONORS,           ///< 混幺九
+
+    SEVEN_PAIRS,                        ///< 七对
+    GREATER_HONORS_AND_KNITTED_TILES,   ///< 七星不靠
+    ALL_EVEN_PUNGS,                     ///< 全双刻
+    FULL_FLUSH,                         ///< 清一色
+    PURE_TRIPLE_CHOW,                   ///< 一色三同顺
+    PURE_SHIFTED_PUNGS,                 ///< 一色三节高
+    UPPER_TILES,                        ///< 全大
+    MIDDLE_TILES,                       ///< 全中
+    LOWER_TILES,                        ///< 全小
+
+    PURE_STRAIGHT,                      ///< 清龙
+    THREE_SUITED_TERMINAL_CHOWS,        ///< 三色双龙会
+    PURE_SHIFTED_CHOWS,                 ///< 一色三步高
+    ALL_FIVE,                           ///< 全带五
+    TRIPLE_PUNG,                        ///< 三同刻
+    THREE_CONCEALED_PUNGS,              ///< 三暗刻
+
+    LESSER_HONORS_AND_KNITTED_TILES,    ///< 全不靠
+    KNITTED_STRAIGHT,                   ///< 组合龙
+    UPPER_FOUR,                         ///< 大于五
+    LOWER_FOUR,                         ///< 小于五
+    BIG_THREE_WINDS,                    ///< 三风刻
+
+    MIXED_STRAIGHT,                     ///< 花龙
+    REVERSIBLE_TILES,                   ///< 推不倒
+    MIXED_TRIPLE_CHOW,                  ///< 三色三同顺
+    MIXED_SHIFTED_PUNGS,                ///< 三色三节高
+    CHICKEN_HAND,                       ///< 无番和
+    LAST_TILE_DRAW,                     ///< 妙手回春
+    LAST_TILE_CLAIM,                    ///< 海底捞月
+    OUT_WITH_REPLACEMENT_TILE,          ///< 杠上开花
+    ROBBING_THE_KONG,                   ///< 抢杠和
+
+    ALL_PUNGS,                          ///< 碰碰和
+    HALF_FLUSH,                         ///< 混一色
+    MIXED_SHIFTED_CHOWS,                ///< 三色三步高
+    ALL_TYPES,                          ///< 五门齐
+    MELDED_HAND,                        ///< 全求人
+    TWO_CONCEALED_KONGS,                ///< 双暗杠
+    TWO_DRAGONS_PUNGS,                  ///< 双箭刻
+
 #if HAS_CONCEALED_KONG_AND_MELDED_KONG
-    CONCEALED_KONG_AND_MELDED_KONG,
+    CONCEALED_KONG_AND_MELDED_KONG,     ///< 明暗杠
 #endif
-    OUTSIDE_HAND, FULLY_CONCEALED_HAND, TWO_MELDED_KONGS, LAST_TILE,
-    DRAGON_PUNG, PREVALENT_WIND, SEAT_WIND, CONCEALED_HAND, ALL_CHOWS, TILE_HOG, DOUBLE_PUNG, TWO_CONCEALED_PUNGS, CONCEALED_KONG, ALL_SIMPLES,
-    PURE_DOUBLE_CHOW, MIXED_DOUBLE_CHOW, SHORT_STRAIGHT, TWO_TERMINAL_CHOWS, PUNG_OF_TERMINALS_OR_HONORS, MELDED_KONG, ONE_VOIDED_SUIT, NO_HONORS, EDGE_WAIT, CLOSED_WAIT, SINGLE_WAIT, SELF_DRAWN,
-    FLOWER_TILES,
+
+    OUTSIDE_HAND,                       ///< 全带幺
+    FULLY_CONCEALED_HAND,               ///< 不求人
+    TWO_MELDED_KONGS,                   ///< 双明杠
+    LAST_TILE,                          ///< 和牌张
+
+    DRAGON_PUNG,                        ///< 箭刻
+    PREVALENT_WIND,                     ///< 圈风刻
+    SEAT_WIND,                          ///< 门风刻
+    CONCEALED_HAND,                     ///< 门前清
+    ALL_CHOWS,                          ///< 平和
+    TILE_HOG,                           ///< 四归一
+    DOUBLE_PUNG,                        ///< 双同刻
+    TWO_CONCEALED_PUNGS,                ///< 双暗刻
+    CONCEALED_KONG,                     ///< 暗杠
+    ALL_SIMPLES,                        ///< 断幺
+
+    PURE_DOUBLE_CHOW,                   ///< 一般高
+    MIXED_DOUBLE_CHOW,                  ///< 喜相逢
+    SHORT_STRAIGHT,                     ///< 连六
+    TWO_TERMINAL_CHOWS,                 ///< 老少副
+    PUNG_OF_TERMINALS_OR_HONORS,        ///< 幺九刻
+    MELDED_KONG,                        ///< 明杠
+    ONE_VOIDED_SUIT,                    ///< 缺一门
+    NO_HONORS,                          ///< 无字
+    EDGE_WAIT,                          ///< 边张
+    CLOSED_WAIT,                        ///< 坎张
+    SINGLE_WAIT,                        ///< 单钓将
+    SELF_DRAWN,                         ///< 自摸
+
+    FLOWER_TILES,                       ///< 花牌
+
     FAN_TABLE_SIZE
 };
 
@@ -43,15 +130,15 @@ enum class wind_t {
  */
 typedef uint8_t win_type_t;
 
-#define WIN_TYPE_DISCARD 0  // 点和
-#define WIN_TYPE_SELF_DRAWN 1  // 自摸
-#define WIN_TYPE_4TH_TILE 2  // 绝张
-#define WIN_TYPE_ABOUT_KONG 4  // 关于杠，复合点和时为枪杠和，复合自摸则为杠上开花
-#define WIN_TYPE_WALL_LAST 8  // 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
+#define WIN_TYPE_DISCARD    0   ///< 点和
+#define WIN_TYPE_SELF_DRAWN 1   ///< 自摸
+#define WIN_TYPE_4TH_TILE   2   ///< 绝张
+#define WIN_TYPE_ABOUT_KONG 4   ///< 关于杠，复合点和时为枪杠和，复合自摸则为杠上开花
+#define WIN_TYPE_WALL_LAST  8   ///< 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
 
-#define ERROR_WRONG_TILES_COUNT -1
-#define ERROR_TILE_COUNT_GREATER_THAN_4 -2
-#define ERROR_NOT_WIN -3
+#define ERROR_WRONG_TILES_COUNT -1              ///< 错误的张数
+#define ERROR_TILE_COUNT_GREATER_THAN_4 -2      ///< 某张牌出现超过4枚
+#define ERROR_NOT_WIN -3                        ///< 没和牌
 
 /**
  * @brief 检查算番的输入是否合法
@@ -179,11 +266,16 @@ bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long stan
  * 如果出现3张，则必然和绝张
  *
  * @param [in] fixed_pack 副露牌组
- * @param [in] standing_cnt 副露牌组数
+ * @param [in] fixed_cnt 副露牌组数
  * @param [in] win_tile 和牌张
  * @return size_t
  */
 size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, tile_t win_tile);
+
+/**
+ * end group
+ * @}
+ */
 
 }
 
