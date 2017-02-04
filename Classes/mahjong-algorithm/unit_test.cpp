@@ -21,45 +21,46 @@ void test_wait(const char *str) {
     bool table[TILE_TABLE_COUNT] = { false };
 
     if (tile_cnt == 13) {
-        if (is_thirteen_orphans_wait(tiles, tile_cnt, table)) {
+        if (is_thirteen_orphans_wait(tiles, tile_cnt, nullptr)) {
             is_wait = true;
-            puts("thirteen orphans wait:");
+            printf("thirteen orphans");
         }
-        else if (is_honors_and_knitted_tiles_wait(tiles, tile_cnt, table)) {
+        else if (is_honors_and_knitted_tiles_wait(tiles, tile_cnt, nullptr)) {
             is_wait = true;
-            puts("honors and knitted tiles wait:");
+            printf("honors and knitted tiles");
         }
-        else if (is_seven_pairs_wait(tiles, tile_cnt, table)) {
+        else if (is_seven_pairs_wait(tiles, tile_cnt, nullptr)) {
             is_wait = true;
-            puts("seven pairs wait:");
+            printf("seven pairs");
         }
-        else if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, table)) {
+        else if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, nullptr)) {
             is_wait = true;
-            puts("knitted straight in basic type wait:");
+            printf("knitted straight in basic type");
         }
     }
     else if (tile_cnt == 10) {
-        if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, table)) {
+        if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, nullptr)) {
             is_wait = true;
-            puts("knitted straight in basic type wait:");
+            printf("knitted straight in basic type");
         }
     }
 
-    if (is_basic_type_wait(tiles, tile_cnt, table)) {
+    if (is_basic_type_wait(tiles, tile_cnt, nullptr)) {
         is_wait = true;
-        puts("basic type wait:");
+        printf("basic type");
     }
 
-    char buf[64];
-    for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
-        if (table[t]) {
-            tiles_to_string(&t, 1, buf, sizeof(buf));
-            printf("%s ", buf);
+    if (is_wait) {
+        puts(" waiting:");
+        char buf[64];
+        for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+            if (table[t]) {
+                tiles_to_string(&t, 1, buf, sizeof(buf));
+                printf("%s ", buf);
+            }
         }
     }
-    puts("");
-
-    if (!is_wait) {
+    else {
         puts("not wait!");
     }
     puts("");
@@ -131,29 +132,29 @@ void test_wait_step(const char *str) {
     };
 
     puts(str);
-    bool useful_table[TILE_TABLE_COUNT];
+    bool useful_table[TILE_TABLE_COUNT] = {false};
     int ret0;
-    ret0 = thirteen_orphans_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    ret0 = thirteen_orphans_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("131=== %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = seven_pairs_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    ret0 = seven_pairs_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("7d=== %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = honors_and_knitted_tiles_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    ret0 = honors_and_knitted_tiles_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("honors and knitted tiles  %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = knitted_straight_in_basic_type_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    ret0 = knitted_straight_in_basic_type_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("knitted straight in basic type %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = basic_type_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, useful_table);
+    ret0 = basic_type_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("basic type %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");

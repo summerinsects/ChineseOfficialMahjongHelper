@@ -63,7 +63,7 @@ int count_useful_tile(const int (&used_table)[TILE_TABLE_COUNT], const bool (&us
  * @param [out] useful_table 有效牌标记表
  * @return int 上听数
  */
-int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
+int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
 
 /**
  * @brief 基本和型是否听牌
@@ -73,7 +73,7 @@ int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (
  * @param [out] useful_table 听牌标记表
  * @return bool 是否听牌
  */
-bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
+bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
 
 /**
  * @brief 基本和型是否和牌
@@ -85,20 +85,20 @@ bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (&
  */
 bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
-int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
-bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
+int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
+bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
 bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
-int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
-bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
+int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
+bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
 bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
-int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
-bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
+int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
+bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
 bool is_knitted_straight_in_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
-int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (&useful_table)[TILE_TABLE_COUNT]);
-bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (&waiting_table)[TILE_TABLE_COUNT]);
+int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_COUNT]);
+bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_COUNT]);
 bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
 /**

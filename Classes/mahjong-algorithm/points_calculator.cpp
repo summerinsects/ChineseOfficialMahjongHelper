@@ -1252,13 +1252,14 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     remove_win_tile(standing_tiles, tile_cnt, win_tile);
     --tile_cnt;
 
-    bool waiting_table[TILE_TABLE_COUNT];
-    is_basic_type_wait(standing_tiles, tile_cnt, waiting_table);
+    bool waiting_table[TILE_TABLE_COUNT];  // 听牌标记表
+    is_basic_type_wait(standing_tiles, tile_cnt, &waiting_table);
 
     if (pack_cnt == 5) {
         // 判断是否为七对听牌
         bool temp_table[TILE_TABLE_COUNT];
-        if (is_seven_pairs_wait(standing_tiles, tile_cnt, temp_table)) {
+        if (is_seven_pairs_wait(standing_tiles, tile_cnt, &temp_table)) {
+            // 合并听牌标记表
             std::transform(std::begin(temp_table), std::end(temp_table), std::begin(waiting_table),
                 std::begin(waiting_table), [](bool w, bool t) { return w || t; });
         }
