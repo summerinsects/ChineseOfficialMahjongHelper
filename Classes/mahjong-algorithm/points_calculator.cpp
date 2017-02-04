@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#define MAX_SEPARAION_CNT 10
+#define MAX_SEPARAION_CNT 20  // 一副牌最多也没有20种划分吧，够用了
 
 #if 0
 #define LOG(fmt_, ...) printf(fmt_, ##__VA_ARGS__)
@@ -27,12 +27,13 @@ namespace mahjong {
 
 extern long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size);
 
-struct SEPERATIONS {
-    pack_t packs[MAX_SEPARAION_CNT][5];
-    long count;
+// 所有的划分
+struct seperations_t {
+    pack_t packs[MAX_SEPARAION_CNT][5];     // 每一种划分
+    long count;                             // 划分方式总数
 };
 
-static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_packs)[5], SEPERATIONS *separation) {
+static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_packs)[5], seperations_t *separation) {
     // 这2张作为雀头
     work_packs[4] = make_pack(false, PACK_TYPE_PAIR, tile);
 
@@ -55,7 +56,7 @@ static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_pa
     }
 }
 
-static bool seperate_tail(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, pack_t (&work_packs)[5], SEPERATIONS *separation) {
+static bool seperate_tail(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, pack_t (&work_packs)[5], seperations_t *separation) {
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] < 2) {
@@ -75,7 +76,7 @@ static bool seperate_tail(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, pa
     return false;
 }
 
-static bool is_separation_branch_exist(long fixed_cnt, long step, const pack_t (&work_packs)[5], const SEPERATIONS *separation) {
+static bool is_separation_branch_exist(long fixed_cnt, long step, const pack_t (&work_packs)[5], const seperations_t *separation) {
     if (separation->count <= 0) {
         return false;
     }
@@ -92,7 +93,7 @@ static bool is_separation_branch_exist(long fixed_cnt, long step, const pack_t (
     });
 }
 
-static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, long step, pack_t (&work_packs)[5], SEPERATIONS *separation) {
+static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, long step, pack_t (&work_packs)[5], seperations_t *separation) {
     long idx = step + fixed_cnt;
     if (idx == 4) {  // 4组面子都有了
         return seperate_tail(cnt_table, fixed_cnt, work_packs, separation);
@@ -146,7 +147,7 @@ static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_
     return ret;
 }
 
-static bool seperate_win_hand(const tile_t *standing_tiles, const pack_t *fixed_packs, long fixed_cnt, SEPERATIONS *separation) {
+static bool seperate_win_hand(const tile_t *standing_tiles, const pack_t *fixed_packs, long fixed_cnt, seperations_t *separation) {
     long standing_cnt = 14 - fixed_cnt * 3;
 
     // 对立牌的种类进行打表
@@ -1794,7 +1795,7 @@ static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *
     std::for_each(std::begin(*matched_seq), std::end(*matched_seq), [&cnt_table](tile_t t) { --cnt_table[t]; });
 
     // 按基本和型划分
-    SEPERATIONS separation;
+    seperations_t separation;
     separation.count = 0;
     pack_t work_packs[5];
     memset(work_packs, 0, sizeof(work_packs));
@@ -2030,7 +2031,7 @@ int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extr
     long standing_cnt = hand_tiles->tile_count;
 
     tile_t standing_tiles[14];
-    SEPERATIONS separation;
+    seperations_t separation;
 
     // 合并得到14张牌
     memcpy(standing_tiles, hand_tiles->standing_tiles, standing_cnt * sizeof(tile_t));
