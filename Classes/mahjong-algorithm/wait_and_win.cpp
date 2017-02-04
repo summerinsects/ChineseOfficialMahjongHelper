@@ -130,6 +130,30 @@ int count_useful_tile(const int (&used_table)[TILE_TABLE_COUNT], const bool (&us
     return cnt;
 }
 
+static void mark_useful_tile_for_pair(const int (&cnt_table)[TILE_TABLE_COUNT], bool (*useful_table)[TILE_TABLE_COUNT]) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (cnt_table[t] == 0) continue;
+        (*useful_table)[t] = true;  // 任意凑一对就有雀头
+    }
+}
+
+static void mark_useful_tile_for_neighbor(const int (&cnt_table)[TILE_TABLE_COUNT], bool (*useful_table)[TILE_TABLE_COUNT]) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (cnt_table[t] == 0) continue;
+
+        (*useful_table)[t] = true;  // 凑刻子搭子
+        if (is_numbered_suit_quick(t)) {  // 凑顺子搭子（只能是数牌）
+            rank_t r = tile_rank(t);
+            if (r > 1) (*useful_table)[t - 1] = true;
+            if (r > 2) (*useful_table)[t - 2] = true;
+            if (r < 9) (*useful_table)[t + 1] = true;
+            if (r < 8) (*useful_table)[t + 2] = true;
+        }
+    }
+}
+
 static bool is_basic_type_branch_exist(long fixed_cnt, long step, const work_units_t (&work_units)[5], work_state_t *work_state) {
     if (work_state->count <= 0) {
         return false;
@@ -172,6 +196,10 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
         }
         else {
             assert(0 && "too many state!");
+        }
+
+        if (!has_pair && useful_table != nullptr) {
+            mark_useful_tile_for_pair(cnt_table, useful_table);
         }
 
         // 有雀头的情况，听牌时完成面子数为3，上听数=3-完成面子数
@@ -336,29 +364,12 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_COUNT], 
         // 记录有效牌
         if (useful_table != nullptr) {
             if (neighbor_need > 0) {
-                // 面子搭子
-                for (int i = 0; i < 34; ++i) {
-                    tile_t t = all_tiles[i];
-                    if (cnt_table[t] == 0) continue;
-
-                    (*useful_table)[t] = true;  // 刻子搭子
-                    if (is_numbered_suit_quick(t)) {  // 顺子搭子（只能是数牌）
-                        rank_t r = tile_rank(t);
-                        if (r > 1) (*useful_table)[t - 1] = true;
-                        if (r > 2) (*useful_table)[t - 2] = true;
-                        if (r < 9) (*useful_table)[t + 1] = true;
-                        if (r < 8) (*useful_table)[t + 2] = true;
-                    }
-                }
+                mark_useful_tile_for_neighbor(cnt_table, useful_table);
             }
 
             // 缺雀头
             if (!has_pair) {
-                for (int i = 0; i < 34; ++i) {
-                    tile_t t = all_tiles[i];
-                    if (cnt_table[t] == 0) continue;
-                    (*useful_table)[t] = true;  // 任意凑一对就有雀头
-                }
+                mark_useful_tile_for_pair(cnt_table, useful_table);
             }
         }
     }
