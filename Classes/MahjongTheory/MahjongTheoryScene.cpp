@@ -160,7 +160,7 @@ bool MahjongTheoryScene::init() {
     _waitingLabelWidth1 = tempLabel->getContentSize().width;
     tempLabel->setString("听「");
     _waitingLabelWidth2 = tempLabel->getContentSize().width;
-    tempLabel->setString("」共34种，136枚");
+    tempLabel->setString("」共0种，00枚");
     _totalLabelWidth = tempLabel->getContentSize().width;
 
     _tableView = cw::TableView::create();
@@ -855,7 +855,13 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
 
     std::string str = StringUtils::format("」共%d种，%d枚", result->count_in_tiles, result->count_total);
-    spiltStringToLabel(str, _cellWidth - SPACE * 2 - xPos, cntLabel1, cntLabel2);
+    if (yPos > 15) {
+        spiltStringToLabel(str, _cellWidth - SPACE * 2 - xPos, cntLabel1, cntLabel2);
+    }
+    else {
+        cntLabel1->setString(str);
+        cntLabel2->setVisible(false);
+    }
     cntLabel1->setPosition(Vec2(xPos, yPos));
 
     return cell;
