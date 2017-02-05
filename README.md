@@ -1,10 +1,11 @@
 # Chinese Official Mahjong Helper
 国标麻将助手
 
-基于cocos2dx引擎写的国标麻将助手，可用于算番和面麻计分
+本程序以cocos2dx引擎为UI写成，内容包含算番器、计分器、番种详细说明等
+算番逻辑可提取出来单独使用
 
 ##VS2013/VS2015配置
-1. 下载cocos2dx v3.11
+1. 下载cocos2dx v3.14.1
 2. clone项目
 3. 随便创建一个c++工程
 4. 将生成的工程下的cocos2d目录拷贝到Classes的同一级目录下
