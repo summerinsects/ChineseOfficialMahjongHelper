@@ -49,7 +49,7 @@ bool MahjongTheoryScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    _editBox = ui::EditBox::create(Size(visibleSize.width - 135, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    _editBox = ui::EditBox::create(Size(visibleSize.width - 95, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     _editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -58,19 +58,9 @@ bool MahjongTheoryScene::init() {
     _editBox->setPlaceholderFontColor(Color4B::GRAY);
     _editBox->setPlaceHolder("在此处输入");
     _editBox->setDelegate(this);
-    _editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 60, origin.y + visibleSize.height - 50));
+    _editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40, origin.y + visibleSize.height - 50));
 
     ui::Button *button = ui::Button::create(normalImage, selectedImage);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(35.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("计算");
-    button->setTitleColor(titleColor);
-    this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 105, origin.y + visibleSize.height - 50));
-    button->addClickEventListener([this](Ref *) { calculate(); });
-
-    button = ui::Button::create(normalImage, selectedImage);
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -173,7 +163,6 @@ bool MahjongTheoryScene::init() {
     tempLabel->setString("」共34种，136枚");
     _totalLabelWidth = tempLabel->getContentSize().width;
 
-
     _tableView = cw::TableView::create();
     _tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 120 - widgetSize.height));
     _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
@@ -261,6 +250,8 @@ void MahjongTheoryScene::setRandomInput() {
     _orderedIndices.clear();
 
     _tableView->reloadData();
+
+    calculate();
 }
 
 void MahjongTheoryScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
@@ -270,6 +261,8 @@ void MahjongTheoryScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
         _orderedIndices.clear();
 
         _tableView->reloadData();
+
+        calculate();
     }
 }
 
