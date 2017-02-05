@@ -23,6 +23,10 @@ public:
 private:
     cocos2d::ui::EditBox *_editBox;
     HandTilesWidget *_handTilesWidget;
+#if 0
+    cocos2d::ui::Button *_undoButton;
+    cocos2d::ui::Button *_redoButton;
+#endif
     cocos2d::ui::CheckBox *_checkBoxes[4];
     cw::TableView *_tableView;
 
@@ -35,6 +39,10 @@ private:
     std::vector<mahjong::enum_result_t> _allResults;
     std::vector<ResultEx> _resultSources;
     std::vector<size_t> _orderedIndices;
+#if 0
+    std::vector<std::pair<mahjong::tile_t, mahjong::tile_t> > _undoCache;
+    std::vector<std::pair<mahjong::tile_t, mahjong::tile_t> > _redoCache;
+#endif
 
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
     void setRandomInput();
@@ -45,6 +53,10 @@ private:
     uint8_t getFilterFlag() const;
     void onTileButton(cocos2d::Ref *sender);
     void onStandingTileEvent();
+#if 0
+    void onUndoButton(cocos2d::Ref *sender);
+    void onRedoButton(cocos2d::Ref *sender);
+#endif
     void deduce(mahjong::tile_t discardTile, mahjong::tile_t servingTile);
 
     float _cellWidth;
