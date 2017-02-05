@@ -134,18 +134,28 @@ bool MahjongTheoryScene::init() {
         label->setPosition(Vec2(xPos, yPos));
     }
 
-    _newLineFlag = 15;
+    // 预先算好Cell及各label的Size
+    _cellWidth = visibleSize.width - 10;
+    Label *tempLabel = Label::createWithSystemFont("打「", "Arial", 12);
+    _discardLabelWidth = tempLabel->getContentSize().width;
+    tempLabel->setString("」摸「"); 
+    _servingLabelWidth1 = tempLabel->getContentSize().width;
+    tempLabel->setString("摸「");
+    _servingLabelWidth2 = tempLabel->getContentSize().width;
+    tempLabel->setString("」听「");
+    _waitingLabelWidth1 = tempLabel->getContentSize().width;
+    tempLabel->setString("听「");
+    _waitingLabelWidth2 = tempLabel->getContentSize().width;
+    tempLabel->setString("」共34种，136枚");
+    _totalLabelWidth = tempLabel->getContentSize().width;
+
+
     _tableView = cw::TableView::create();
     _tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 120 - widgetSize.height));
     _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
-            if (_resultSources[_orderedIndices[param1]].count_in_tiles < _newLineFlag) {
-                *(Size *)param2 = Size(0, 50);
-            }
-            else {
-                *(Size *)param2 = Size(0, 80);
-            }
+            *(Size *)param2 = tableCellSizeAtIndex(table, param1);
             return 0;
         }
         case cw::TableView::CallbackType::CELL_AT_INDEX:
@@ -391,8 +401,6 @@ void MahjongTheoryScene::calculate() {
         ++_handTilesTable[serving_tile];
     }
 
-    _newLineFlag = (serving_tile == 0) ? 15 : 10;
-
     // 异步计算
     _allResults.clear();
 
@@ -577,10 +585,51 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
     }
 }
 
+#define SPACE 2
+#define TILE_WIDTH 15
+
+cocos2d::Size MahjongTheoryScene::tableCellSizeAtIndex(cw::TableView *table, ssize_t idx) {
+    size_t realIdx = _orderedIndices[idx];
+    const ResultEx *result = &_resultSources[realIdx];  // 当前cell的数据
+
+    const uint16_t key = ((!!result->discard_tile) << 9) | ((!!result->wait_step) << 8) | result->count_in_tiles;
+    std::unordered_map<uint16_t, int>::iterator it = _cellHeightMap.find(key);
+    if (it != _cellHeightMap.end()) {
+        return Size(0, it->second);
+    }
+
+    const float cellWidth = _cellWidth - SPACE * 2;  // 前后各留2像素
+    float remainWidth;  // 第一行除了前面一些label之后剩下宽度
+    if (result->discard_tile != 0) {
+        remainWidth = cellWidth - _discardLabelWidth - TILE_WIDTH -
+            (result->wait_step > 0 ? _servingLabelWidth1 : _waitingLabelWidth1);
+    }
+    else {
+        remainWidth = cellWidth -
+            (result->wait_step > 0 ? _servingLabelWidth2 : _waitingLabelWidth2);
+    }
+
+    int lineCnt = 1;
+    int remainCnt = result->count_in_tiles;
+    do {
+        int limitedCnt = (int)remainWidth / TILE_WIDTH;  // 第N行可以排这么多
+        if (limitedCnt >= remainCnt) {  // 排得下
+            // 包括后面的字是否排得下
+            bool inOneLine = remainCnt * TILE_WIDTH + _totalLabelWidth <= remainWidth;
+            int height = 25 + 25 * (inOneLine ? lineCnt : lineCnt + 1);
+            _cellHeightMap.insert(std::make_pair(key, height));
+            return Size(0, height);
+        }
+        remainCnt -= limitedCnt;
+        ++lineCnt;
+        remainWidth = cellWidth;
+    } while (remainCnt > 0);
+
+    return Size(0, 50);
+}
+
 cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
     typedef cw::TableViewCellEx<LayerColor *[2], Label *, Label *, Sprite *, Label *, ui::Button *[34], Label *, Label *> CustomCell;
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-
     CustomCell *cell = (CustomCell *)table->dequeueCell();
     if (cell == nullptr) {
         cell = CustomCell::create();
@@ -608,11 +657,11 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         Label *&cntLabel1 = std::get<6>(ext);
         Label *&cntLabel2 = std::get<7>(ext);
 
-        layerColor[0] = LayerColor::create(bgColor0, visibleSize.width - 10, 0);
+        layerColor[0] = LayerColor::create(bgColor0, _cellWidth, 0);
         cell->addChild(layerColor[0]);
         layerColor[0]->setPosition(Vec2(0, 1));
 
-        layerColor[1] = LayerColor::create(bgColor1, visibleSize.width - 10, 0);
+        layerColor[1] = LayerColor::create(bgColor1, _cellWidth, 0);
         cell->addChild(layerColor[1]);
         layerColor[1]->setPosition(Vec2(0, 1));
 
@@ -628,7 +677,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
         discardSprite = Sprite::create("tiles/bg.png");
         discardSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        discardSprite->setScale(15 / discardSprite->getContentSize().width);
+        discardSprite->setScale(TILE_WIDTH / discardSprite->getContentSize().width);
         cell->addChild(discardSprite);
 
         usefulLabel = Label::createWithSystemFont("", "Arial", 12);
@@ -638,7 +687,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
         for (int i = 0; i < 34; ++i) {
             ui::Button *button = ui::Button::create(tilesImageName[mahjong::all_tiles[i]]);
-            button->setScale(15 / button->getContentSize().width);
+            button->setScale(TILE_WIDTH / button->getContentSize().width);
             button->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
             cell->addChild(button);
             button->setTag(i);
@@ -655,7 +704,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         cntLabel2->setColor(textColor);
         cntLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(cntLabel2);
-        cntLabel2->setPosition(Vec2(5, 15));
+        cntLabel2->setPosition(Vec2(SPACE, TILE_WIDTH));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -668,22 +717,23 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     Label *cntLabel1 = std::get<6>(ext);
     Label *cntLabel2 = std::get<7>(ext);
 
+    const Size cellSize = tableCellSizeAtIndex(table, idx);
     size_t realIdx = _orderedIndices[idx];
-    ResultEx *result = &_resultSources[realIdx];
+    const ResultEx *result = &_resultSources[realIdx];
 
     if (idx & 1) {
         layerColor[0]->setVisible(false);
         layerColor[1]->setVisible(true);
-        layerColor[1]->setContentSize(Size(visibleSize.width - 10, result->count_in_tiles < _newLineFlag ? 48 : 78));
+        layerColor[1]->setContentSize(Size(_cellWidth, cellSize.height - 2));
     }
     else {
         layerColor[0]->setVisible(true);
         layerColor[1]->setVisible(false);
-        layerColor[0]->setContentSize(Size(visibleSize.width - 10, result->count_in_tiles < _newLineFlag ? 48 : 78));
+        layerColor[0]->setContentSize(Size(_cellWidth, cellSize.height - 2));
     }
 
     typeLabel->setString(getResultTypeString(result->form_flag, result->wait_step));
-    typeLabel->setPosition(Vec2(5, result->count_in_tiles < _newLineFlag ? 40 : 70));
+    typeLabel->setPosition(Vec2(SPACE, cellSize.height - 10));
     if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
         typeLabel->setColor(result->wait_step != -1 ? Color3B(208, 208, 208) : Color3B::YELLOW);
     }
@@ -691,8 +741,8 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         typeLabel->setColor(result->wait_step != -1 ? Color3B(80, 80, 80) : Color3B::ORANGE);
     }
 
-    float xPos = 5;
-    float yPos = result->count_in_tiles < _newLineFlag ? 15 : 40;
+    float xPos = SPACE;
+    float yPos = cellSize.height - 35;
 
     if (result->discard_tile != 0) {
         discardLabel->setVisible(true);
@@ -704,7 +754,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
         discardSprite->setTexture(Director::getInstance()->getTextureCache()->addImage(tilesImageName[result->discard_tile]));
         discardSprite->setPosition(Vec2(xPos, yPos));
-        xPos += 15;
+        xPos += TILE_WIDTH;
 
         if (result->wait_step > 0) {
             usefulLabel->setString("」摸「");
@@ -740,22 +790,16 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         usefulButton[i]->setUserData(reinterpret_cast<void *>(realIdx));
         usefulButton[i]->setVisible(true);
 
-        if (xPos + 15 > visibleSize.width - 20) {
-            xPos = 5;
+        if (xPos + TILE_WIDTH > _cellWidth - SPACE * 2) {
+            xPos = SPACE;
             yPos -= 25;
         }
         usefulButton[i]->setPosition(Vec2(xPos, yPos));
-        xPos += 15;
+        xPos += TILE_WIDTH;
     }
 
     std::string str = StringUtils::format("」共%d种，%d枚", result->count_in_tiles, result->count_total);
-    if (yPos > 20) {
-        spiltStringToLabel(str, visibleSize.width - 20 - xPos, cntLabel1, cntLabel2);
-    }
-    else {
-        cntLabel1->setString(str);
-        cntLabel2->setVisible(false);
-    }
+    spiltStringToLabel(str, _cellWidth - SPACE * 2 - xPos, cntLabel1, cntLabel2);
     cntLabel1->setPosition(Vec2(xPos, yPos));
 
     return cell;
