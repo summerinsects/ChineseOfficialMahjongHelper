@@ -72,7 +72,7 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, con
     // 背景
     LayerColor *background = LayerColor::create(Color4B::WHITE, width, height);
     this->addChild(background);
-    background->ignoreAnchorPointForPosition(false);
+    background->setIgnoreAnchorPointForPosition(false);
     background->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
 
     // 标题
@@ -96,7 +96,7 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, con
 
     // 传入的node
     background->addChild(node);
-    node->ignoreAnchorPointForPosition(false);
+    node->setIgnoreAnchorPointForPosition(false);
     node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     node->setPosition(Vec2(width * 0.5f, 35.0f + nodeSize.height * 0.5f));
 
