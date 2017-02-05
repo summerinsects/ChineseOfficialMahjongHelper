@@ -122,7 +122,7 @@ bool MahjongTheoryScene::init() {
     label->setColor(textColor);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 75 - widgetSize.height));
+    label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 80 - widgetSize.height));
 
     static const char *title[] = { "七对", "十三幺", "全不靠", "组合龙" };
     const float yPos = origin.y + visibleSize.height - 100 - widgetSize.height;
