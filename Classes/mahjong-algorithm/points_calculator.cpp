@@ -35,7 +35,7 @@ struct seperations_t {
 
 static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_packs)[5], seperations_t *separation) {
     // 这2张作为雀头
-    work_packs[4] = make_pack(false, PACK_TYPE_PAIR, tile);
+    work_packs[4] = make_pack(0, PACK_TYPE_PAIR, tile);
 
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
     // 这里不能直接在work_packs上排序，否则会破坏递归外层的数据
@@ -56,7 +56,7 @@ static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_pa
     }
 }
 
-static bool seperate_tail(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, pack_t (&work_packs)[5], seperations_t *separation) {
+static bool seperate_tail(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, pack_t (&work_packs)[5], seperations_t *separation) {
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] < 2) {
@@ -93,7 +93,7 @@ static bool is_separation_branch_exist(long fixed_cnt, long step, const pack_t (
     });
 }
 
-static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_cnt, long step, pack_t (&work_packs)[5], seperations_t *separation) {
+static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, long step, pack_t (&work_packs)[5], seperations_t *separation) {
     long idx = step + fixed_cnt;
     if (idx == 4) {  // 4组面子都有了
         return seperate_tail(cnt_table, fixed_cnt, work_packs, separation);
@@ -108,7 +108,7 @@ static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_
 
         // 刻子
         if (cnt_table[t] > 2) {
-            work_packs[idx] = make_pack(false, PACK_TYPE_PUNG, t);
+            work_packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);
             if (is_separation_branch_exist(fixed_cnt, step + 1, work_packs, separation)) {
                 continue;
             }
@@ -125,7 +125,7 @@ static bool seperate_recursively(int (&cnt_table)[TILE_TABLE_COUNT], long fixed_
         bool is_numbered = is_numbered_suit(t);
         if (is_numbered) {
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-                work_packs[idx] = make_pack(false, PACK_TYPE_CHOW, t + 1);
+                work_packs[idx] = make_pack(0, PACK_TYPE_CHOW, t + 1);
                 if (is_separation_branch_exist(fixed_cnt, step + 1, work_packs, separation)) {
                     continue;
                 }
@@ -151,7 +151,7 @@ static bool seperate_win_hand(const tile_t *standing_tiles, const pack_t *fixed_
     long standing_cnt = 14 - fixed_cnt * 3;
 
     // 对立牌的种类进行打表
-    int cnt_table[TILE_TABLE_COUNT];
+    int cnt_table[TILE_TABLE_SIZE];
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     separation->count = 0;
@@ -298,7 +298,7 @@ static fan_t get_4_chows_points(tile_t t0, tile_t t1, tile_t t2, tile_t t3) {
         return QUADRUPLE_CHOW;
     }
     // 以上都没有
-    return NONE;
+    return FAN_NONE;
 }
 
 // 3组顺子的番
@@ -329,7 +329,7 @@ static fan_t get_3_chows_points(tile_t t0, tile_t t1, tile_t t2) {
         return PURE_TRIPLE_CHOW;
     }
     // 以上都没有
-    return NONE;
+    return FAN_NONE;
 }
 
 // 2组顺子的番
@@ -352,7 +352,7 @@ static fan_t get_2_chows_points(tile_t t0, tile_t t1) {
         return PURE_DOUBLE_CHOW;
     }
     // 以上都没有
-    return NONE;
+    return FAN_NONE;
 }
 
 // 大四喜
@@ -392,7 +392,7 @@ static fan_t get_4_pungs_points(tile_t t0, tile_t t1, tile_t t2, tile_t t3) {
         return BIG_FOUR_WINDS;
     }
     // 以上都没有
-    return NONE;
+    return FAN_NONE;
 }
 
 // 3组刻子的番
@@ -419,7 +419,7 @@ static fan_t get_3_pungs_points(tile_t t0, tile_t t1, tile_t t2) {
         return BIG_THREE_DRAGONS;
     }
     // 以上都没有
-    return NONE;
+    return FAN_NONE;
 }
 
 // 2组刻子的番
@@ -434,7 +434,7 @@ static fan_t get_2_pungs_points(tile_t t0, tile_t t1) {
         return TWO_DRAGONS_PUNGS;
     }
     // 以上都没有
-    return NONE;
+    return FAN_NONE;
 }
 
 // 1组刻子的番
@@ -448,12 +448,12 @@ static fan_t get_1_pung_points(tile_t mid_tile) {
         return PUNG_OF_TERMINALS_OR_HONORS;
     }
     // 以上都没有
-    return NONE;
+    return FAN_NONE;
 }
 
 template <long _Size>
 static fan_t *pairwise_test_chows(const tile_t (&chows_mid_tile)[_Size], fan_t *selected_points) {
-    fan_t all_points[_Size][_Size] = { { NONE } };
+    fan_t all_points[_Size][_Size] = { { FAN_NONE } };
 
     // 初始化矩阵
     for (int i = 0; i < _Size; ++i) {
@@ -485,7 +485,7 @@ static fan_t *pairwise_test_chows(const tile_t (&chows_mid_tile)[_Size], fan_t *
                 continue;
             }
             fan_t pt = all_points[i][j];
-            if (pt != NONE) {
+            if (pt != FAN_NONE) {
                 int idx = pt - PURE_DOUBLE_CHOW;  // 般逢连老
                 // 不得相同原则，如果i和j都没算过某一种番，则算这种番
                 if ((used_flag[i] & (1 << idx)) == 0 && (used_flag[j] & (1 << idx)) == 0) {
@@ -501,7 +501,7 @@ static fan_t *pairwise_test_chows(const tile_t (&chows_mid_tile)[_Size], fan_t *
 }
 
 // 4组顺子算番
-static void calculate_4_chows(const pack_t chow_packs[4], long (&fan_table)[FAN_COUNT]) {
+static void calculate_4_chows(const pack_t chow_packs[4], long (&fan_table)[FAN_TABLE_SIZE]) {
     tile_t tiles[4];
     tiles[0] = pack_tile(chow_packs[0]);
     tiles[1] = pack_tile(chow_packs[1]);
@@ -520,25 +520,25 @@ static void calculate_4_chows(const pack_t chow_packs[4], long (&fan_table)[FAN_
     bool _3_chows_has_points = false;
     long free_pack_idx = -1;  // 未使用的1组顺子
     // 012构成3组顺子的番种
-    if ((points = get_3_chows_points(tiles[0], tiles[1], tiles[2])) != NONE) {
+    if ((points = get_3_chows_points(tiles[0], tiles[1], tiles[2])) != FAN_NONE) {
         fan_table[points] = 1;
         free_pack_idx = 3;
         _3_chows_has_points = true;
     }
     // 013构成3组顺子的番种
-    else if ((points = get_3_chows_points(tiles[0], tiles[1], tiles[3])) != NONE) {
+    else if ((points = get_3_chows_points(tiles[0], tiles[1], tiles[3])) != FAN_NONE) {
         fan_table[points] = 1;
         free_pack_idx = 2;
         _3_chows_has_points = true;
     }
     // 023构成3组顺子的番种
-    else if ((points = get_3_chows_points(tiles[0], tiles[2], tiles[3])) != NONE) {
+    else if ((points = get_3_chows_points(tiles[0], tiles[2], tiles[3])) != FAN_NONE) {
         fan_table[points] = 1;
         free_pack_idx = 1;
         _3_chows_has_points = true;
     }
     // 123构成3组顺子的番种
-    else if ((points = get_3_chows_points(tiles[1], tiles[2], tiles[3])) != NONE) {
+    else if ((points = get_3_chows_points(tiles[1], tiles[2], tiles[3])) != FAN_NONE) {
         fan_table[points] = 1;
         free_pack_idx = 0;
         _3_chows_has_points = true;
@@ -551,7 +551,7 @@ static void calculate_4_chows(const pack_t chow_packs[4], long (&fan_table)[FAN_
                 continue;
             }
             // 依次与未使用的这组顺子测试番种，一旦有则不再计算了（套算一次原则）
-            if ((points = get_2_chows_points(tiles[i], tiles[free_pack_idx])) != NONE) {
+            if ((points = get_2_chows_points(tiles[i], tiles[free_pack_idx])) != FAN_NONE) {
                 ++fan_table[points];
                 break;
             }
@@ -560,17 +560,17 @@ static void calculate_4_chows(const pack_t chow_packs[4], long (&fan_table)[FAN_
     }
 
     // 不存在3组顺子的番种时，4组顺子最多3番
-    fan_t selected_points[3] = { NONE };
+    fan_t selected_points[3] = { FAN_NONE };
     pairwise_test_chows(tiles, selected_points);
     for (long i = 0; i < 3; ++i) {
-        if (selected_points[i] != NONE) {
+        if (selected_points[i] != FAN_NONE) {
             ++fan_table[selected_points[i]];
         }
     }
 }
 
 // 3组顺子算番
-static void calculate_3_chows(const pack_t chow_packs[3], long (&fan_table)[FAN_COUNT]) {
+static void calculate_3_chows(const pack_t chow_packs[3], long (&fan_table)[FAN_TABLE_SIZE]) {
     tile_t tiles[3];
     tiles[0] = pack_tile(chow_packs[0]);
     tiles[1] = pack_tile(chow_packs[1]);
@@ -580,34 +580,34 @@ static void calculate_3_chows(const pack_t chow_packs[3], long (&fan_table)[FAN_
     fan_t points;
 
     // 存在3组顺子的番种时，不再检测其他的
-    if ((points = get_3_chows_points(tiles[0], tiles[1], tiles[2])) != NONE) {
+    if ((points = get_3_chows_points(tiles[0], tiles[1], tiles[2])) != FAN_NONE) {
         fan_table[points] = 1;
         return;
     }
 
     // 不存在上述番种时，3组顺子最多2番
-    fan_t selected_points[2] = { NONE };
+    fan_t selected_points[2] = { FAN_NONE };
     pairwise_test_chows(tiles, selected_points);
     for (long i = 0; i < 2; ++i) {
-        if (selected_points[i] != NONE) {
+        if (selected_points[i] != FAN_NONE) {
             ++fan_table[selected_points[i]];
         }
     }
 }
 
 // 2组顺子算番
-static void calculate_2_chows(const pack_t chow_packs[2], long (&fan_table)[FAN_COUNT]) {
+static void calculate_2_chows(const pack_t chow_packs[2], long (&fan_table)[FAN_TABLE_SIZE]) {
     tile_t tiles[2];
     tiles[0] = pack_tile(chow_packs[0]);
     tiles[1] = pack_tile(chow_packs[1]);
     fan_t points;
-    if ((points = get_2_chows_points(tiles[0], tiles[1])) != NONE) {
+    if ((points = get_2_chows_points(tiles[0], tiles[1])) != FAN_NONE) {
         ++fan_table[points];
     }
 }
 
 // 刻子（杠）算番
-static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, long (&fan_table)[FAN_COUNT]) {
+static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, long (&fan_table)[FAN_TABLE_SIZE]) {
     // 统计明杠 暗杠 明刻 暗刻
     int melded_kong_cnt = 0;
     int concealed_kong_cnt = 0;
@@ -777,14 +777,14 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, long (&fan_
     // 逐组刻子的番（箭刻、幺九刻）
     for (long i = 0; i < pung_cnt; ++i) {
         fan_t points = get_1_pung_points(pack_tile(pung_packs[i]));
-        if (points != NONE) {
+        if (points != FAN_NONE) {
             ++fan_table[points];
         }
     }
 }
 
 // 4组刻子算番
-static void calculate_4_pungs(const pack_t pung_packs[4], long (&fan_table)[FAN_COUNT]) {
+static void calculate_4_pungs(const pack_t pung_packs[4], long (&fan_table)[FAN_TABLE_SIZE]) {
     tile_t tiles[4];
     tiles[0] = pack_tile(pung_packs[0]);
     tiles[1] = pack_tile(pung_packs[1]);
@@ -796,7 +796,7 @@ static void calculate_4_pungs(const pack_t pung_packs[4], long (&fan_table)[FAN_
 
     fan_t points;
     // 存在4组刻子的番种时，不再检测其他的了
-    if ((points = get_4_pungs_points(tiles[0], tiles[1], tiles[2], tiles[3])) != NONE) {
+    if ((points = get_4_pungs_points(tiles[0], tiles[1], tiles[2], tiles[3])) != FAN_NONE) {
         fan_table[points] = 1;
         return;
     }
@@ -805,25 +805,25 @@ static void calculate_4_pungs(const pack_t pung_packs[4], long (&fan_table)[FAN_
     bool _3_pungs_has_points = false;
     long free_pack_idx = -1;  // 未使用的1组刻子
     // 012构成3组刻子的番种
-    if ((points = get_3_pungs_points(tiles[0], tiles[1], tiles[2])) != NONE) {
+    if ((points = get_3_pungs_points(tiles[0], tiles[1], tiles[2])) != FAN_NONE) {
         fan_table[points] = 1;
         free_pack_idx = 3;
         _3_pungs_has_points = true;
     }
     // 013构成3组刻子的番种
-    else if ((points = get_3_pungs_points(tiles[0], tiles[1], tiles[3])) != NONE) {
+    else if ((points = get_3_pungs_points(tiles[0], tiles[1], tiles[3])) != FAN_NONE) {
         fan_table[points] = 1;
         free_pack_idx = 2;
         _3_pungs_has_points = true;
     }
     // 023构成3组刻子的番种
-    else if ((points = get_3_pungs_points(tiles[0], tiles[2], tiles[3])) != NONE) {
+    else if ((points = get_3_pungs_points(tiles[0], tiles[2], tiles[3])) != FAN_NONE) {
         fan_table[points] = 1;
         free_pack_idx = 1;
         _3_pungs_has_points = true;
     }
     // 123构成3组刻子的番种
-    else if ((points = get_3_pungs_points(tiles[1], tiles[2], tiles[3])) != NONE) {
+    else if ((points = get_3_pungs_points(tiles[1], tiles[2], tiles[3])) != FAN_NONE) {
         fan_table[points] = 1;
         free_pack_idx = 0;
         _3_pungs_has_points = true;
@@ -836,7 +836,7 @@ static void calculate_4_pungs(const pack_t pung_packs[4], long (&fan_table)[FAN_
                 continue;
             }
             // 依次与未使用的这组刻子测试番种
-            if ((points = get_2_pungs_points(tiles[i], tiles[free_pack_idx])) != NONE) {
+            if ((points = get_2_pungs_points(tiles[i], tiles[free_pack_idx])) != FAN_NONE) {
                 ++fan_table[points];
                 break;
             }
@@ -845,28 +845,28 @@ static void calculate_4_pungs(const pack_t pung_packs[4], long (&fan_table)[FAN_
     }
 
     // 不存在3组刻子的番种时，两两计算番种
-    if ((points = get_2_pungs_points(tiles[0], tiles[1])) != NONE) {
+    if ((points = get_2_pungs_points(tiles[0], tiles[1])) != FAN_NONE) {
         ++fan_table[points];
     }
-    if ((points = get_2_pungs_points(tiles[0], tiles[2])) != NONE) {
+    if ((points = get_2_pungs_points(tiles[0], tiles[2])) != FAN_NONE) {
         ++fan_table[points];
     }
-    if ((points = get_2_pungs_points(tiles[0], tiles[3])) != NONE) {
+    if ((points = get_2_pungs_points(tiles[0], tiles[3])) != FAN_NONE) {
         ++fan_table[points];
     }
-    if ((points = get_2_pungs_points(tiles[1], tiles[2])) != NONE) {
+    if ((points = get_2_pungs_points(tiles[1], tiles[2])) != FAN_NONE) {
         ++fan_table[points];
     }
-    if ((points = get_2_pungs_points(tiles[1], tiles[3])) != NONE) {
+    if ((points = get_2_pungs_points(tiles[1], tiles[3])) != FAN_NONE) {
         ++fan_table[points];
     }
-    if ((points = get_2_pungs_points(tiles[2], tiles[3])) != NONE) {
+    if ((points = get_2_pungs_points(tiles[2], tiles[3])) != FAN_NONE) {
         ++fan_table[points];
     }
 }
 
 // 3组刻子算番
-static void calculate_3_pungs(const pack_t pung_packs[3], long (&fan_table)[FAN_COUNT]) {
+static void calculate_3_pungs(const pack_t pung_packs[3], long (&fan_table)[FAN_TABLE_SIZE]) {
     tile_t tiles[3];
     tiles[0] = pack_tile(pung_packs[0]);
     tiles[1] = pack_tile(pung_packs[1]);
@@ -877,41 +877,41 @@ static void calculate_3_pungs(const pack_t pung_packs[3], long (&fan_table)[FAN_
     fan_t points;
 
     // 存在3组刻子的番种（三节高 三同刻 三风刻 大三元）时，不再检测其他的
-    if ((points = get_3_pungs_points(tiles[0], tiles[1], tiles[2])) != NONE) {
+    if ((points = get_3_pungs_points(tiles[0], tiles[1], tiles[2])) != FAN_NONE) {
         fan_table[points] = 1;
         return;
     }
 
     // 不存在3组刻子的番种时，两两计算番种
-    if ((points = get_2_pungs_points(tiles[0], tiles[1])) != NONE) {
+    if ((points = get_2_pungs_points(tiles[0], tiles[1])) != FAN_NONE) {
         ++fan_table[points];
     }
-    if ((points = get_2_pungs_points(tiles[0], tiles[2])) != NONE) {
+    if ((points = get_2_pungs_points(tiles[0], tiles[2])) != FAN_NONE) {
         ++fan_table[points];
     }
-    if ((points = get_2_pungs_points(tiles[1], tiles[2])) != NONE) {
+    if ((points = get_2_pungs_points(tiles[1], tiles[2])) != FAN_NONE) {
         ++fan_table[points];
     }
 }
 
 // 2组刻子算番
-static void calculate_2_pungs(const pack_t pung_packs[2], long (&fan_table)[FAN_COUNT]) {
+static void calculate_2_pungs(const pack_t pung_packs[2], long (&fan_table)[FAN_TABLE_SIZE]) {
     calculate_kongs(pung_packs, 2, fan_table);
     fan_t points = get_2_pungs_points(pack_tile(pung_packs[0]), pack_tile(pung_packs[1]));
-    if (points != NONE) {
+    if (points != FAN_NONE) {
         ++fan_table[points];
     }
 }
 
 // 1组刻子算番
-static void calculate_1_pung(pack_t pung_pack, long (&fan_table)[FAN_COUNT]) {
+static void calculate_1_pung(pack_t pung_pack, long (&fan_table)[FAN_TABLE_SIZE]) {
     calculate_kongs(&pung_pack, 1, fan_table);
 }
 
 // 九莲宝灯
 static bool is_nine_gates(const tile_t (&tiles)[14], tile_t win_tile) {
     // 对立牌的种类进行打表
-    int cnt_table[TILE_TABLE_COUNT];
+    int cnt_table[TILE_TABLE_SIZE];
     map_tiles(tiles, 14, cnt_table);
     // 去除和牌张
     --cnt_table[win_tile];
@@ -979,7 +979,7 @@ static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t
 }
 
 // 检测不求人、全求人
-static void check_melded_or_concealed_hand(const pack_t (&packs)[5], long fixed_cnt, bool self_drawn, long (&fan_table)[FAN_COUNT]) {
+static void check_melded_or_concealed_hand(const pack_t (&packs)[5], long fixed_cnt, bool self_drawn, long (&fan_table)[FAN_TABLE_SIZE]) {
     long melded_cnt = std::count_if(&packs[0], &packs[fixed_cnt], &is_pack_melded);  // 明副露的组数
 
     switch (melded_cnt) {
@@ -999,7 +999,7 @@ static void check_melded_or_concealed_hand(const pack_t (&packs)[5], long fixed_
 }
 
 // 检测雀头，确定平和、小三元、小四喜
-static void check_pair_tile(tile_t pair_tile, long chow_cnt, long (&fan_table)[FAN_COUNT]) {
+static void check_pair_tile(tile_t pair_tile, long chow_cnt, long (&fan_table)[FAN_TABLE_SIZE]) {
     if (chow_cnt == 4) {  // 4组都是顺子
         if (is_numbered_suit_quick(pair_tile)) {  // 数牌雀头
             fan_table[ALL_CHOWS] = 1;  // 平和
@@ -1026,7 +1026,7 @@ static void check_pair_tile(tile_t pair_tile, long chow_cnt, long (&fan_table)[F
 }
 
 // 检测门（五门齐的门）
-static void check_tiles_suits(const tile_t *tiles, long tile_cnt, long (&fan_table)[FAN_COUNT]) {
+static void check_tiles_suits(const tile_t *tiles, long tile_cnt, long (&fan_table)[FAN_TABLE_SIZE]) {
     // 打表标记有哪些花色
     uint8_t suit_flag = 0;
     for (long i = 0; i < tile_cnt; ++i) {
@@ -1067,7 +1067,7 @@ static void check_tiles_suits(const tile_t *tiles, long tile_cnt, long (&fan_tab
 }
 
 // 检测数牌的范围（大于五、小于五、全大、全中、全小）
-static void check_tiles_rank_range(const tile_t *tiles, long tile_cnt, long (&fan_table)[FAN_COUNT]) {
+static void check_tiles_rank_range(const tile_t *tiles, long tile_cnt, long (&fan_table)[FAN_TABLE_SIZE]) {
 #ifdef STRICT_98_RULE
     if (fan_table[SEVEN_PAIRS]) {
         return;  // 严格98规则的七对不支持叠加这些
@@ -1136,7 +1136,7 @@ static bool is_pack_contains_5(pack_t pack) {
 }
 
 // 检测全带幺、全带五、全双刻
-static void check_tiles_rank_by_pack(const pack_t (&packs)[5], long (&fan_table)[FAN_COUNT]) {
+static void check_tiles_rank_by_pack(const pack_t (&packs)[5], long (&fan_table)[FAN_TABLE_SIZE]) {
     // 统计包含数牌19、字牌、5、双数牌的组数
     int terminal_cnt = 0;
     int honor_cnt = 0;
@@ -1177,14 +1177,14 @@ static void check_tiles_rank_by_pack(const pack_t (&packs)[5], long (&fan_table)
 }
 
 // 检测特性（断幺、推不倒、绿一色、字一色、清幺九、混幺九）
-static void check_tiles_traits(const tile_t *tiles, long tile_cnt, long (&fan_table)[FAN_COUNT]) {
+static void check_tiles_traits(const tile_t *tiles, long tile_cnt, long (&fan_table)[FAN_TABLE_SIZE]) {
     // 断幺
     if (!std::any_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
         fan_table[ALL_SIMPLES] = 1;
     }
 
     // 推不倒
-    if (std::all_of(tiles, tiles + tile_cnt, &is_reversible_tile)) {
+    if (std::all_of(tiles, tiles + tile_cnt, &is_reversible)) {
         fan_table[REVERSIBLE_TILES] = 1;
     }
 
@@ -1221,9 +1221,9 @@ static void check_tiles_traits(const tile_t *tiles, long tile_cnt, long (&fan_ta
 }
 
 // 检测四归一
-static void check_tiles_hog(const tile_t *tiles, long tile_cnt, long (&fan_table)[FAN_COUNT]) {
+static void check_tiles_hog(const tile_t *tiles, long tile_cnt, long (&fan_table)[FAN_TABLE_SIZE]) {
     long kong_cnt = tile_cnt - 14;  // 标准和牌14张，多出几张就说明有几个杠
-    int cnt_table[TILE_TABLE_COUNT];
+    int cnt_table[TILE_TABLE_SIZE];
     map_tiles(tiles, tile_cnt, cnt_table);
     // 有多少种已经用去4张的牌减去杠的数量，即为四归一的数量
     long _4_cnt = std::count(std::begin(cnt_table), std::end(cnt_table), 4);
@@ -1240,7 +1240,7 @@ static void remove_win_tile(tile_t *standing_tiles, long tile_cnt, tile_t win_ti
 }
 
 // 检测边坎钓
-static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pack_cnt, tile_t win_tile, long (&fan_table)[FAN_COUNT]) {
+static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pack_cnt, tile_t win_tile, long (&fan_table)[FAN_TABLE_SIZE]) {
     // 全求人和四杠不计单钓将，也不可能有边张、坎张
     if (fan_table[MELDED_HAND] || fan_table[FOUR_KONGS]) {
         return;
@@ -1253,12 +1253,12 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     remove_win_tile(standing_tiles, tile_cnt, win_tile);
     --tile_cnt;
 
-    bool waiting_table[TILE_TABLE_COUNT];  // 听牌标记表
+    bool waiting_table[TILE_TABLE_SIZE];  // 听牌标记表
     is_basic_type_wait(standing_tiles, tile_cnt, &waiting_table);
 
     if (pack_cnt == 5) {
         // 判断是否为七对听牌
-        bool temp_table[TILE_TABLE_COUNT];
+        bool temp_table[TILE_TABLE_SIZE];
         if (is_seven_pairs_wait(standing_tiles, tile_cnt, &temp_table)) {
             // 合并听牌标记表
             std::transform(std::begin(temp_table), std::end(temp_table), std::begin(waiting_table),
@@ -1316,7 +1316,7 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
 }
 
 // 检测圈风刻、门风刻
-static void check_wind_pungs(pack_t packs, wind_t prevalent_wind, wind_t seat_wind, long (&fan_table)[FAN_COUNT]) {
+static void check_wind_pungs(pack_t packs, wind_t prevalent_wind, wind_t seat_wind, long (&fan_table)[FAN_TABLE_SIZE]) {
     uint8_t type = pack_type(packs);
     if (type == PACK_TYPE_PUNG || type == PACK_TYPE_KONG) {
         rank_t delta = pack_tile(packs) - 0x41;
@@ -1330,7 +1330,7 @@ static void check_wind_pungs(pack_t packs, wind_t prevalent_wind, wind_t seat_wi
 }
 
 // 统一校正一些不计的
-static void correction_fan_table(long (&fan_table)[FAN_COUNT], bool prevalent_eq_seat) {
+static void correction_fan_table(long (&fan_table)[FAN_TABLE_SIZE], bool prevalent_eq_seat) {
     // 大四喜不计三风刻、碰碰和、圈风刻、门风刻、幺九刻
     if (fan_table[BIG_FOUR_WINDS]) {
         fan_table[BIG_THREE_WINDS] = 0;
@@ -1634,17 +1634,17 @@ static void correction_fan_table(long (&fan_table)[FAN_COUNT], bool prevalent_eq
 }
 
 // 检测和绝张、妙手回春、海底捞月、自摸
-static void check_win_type(win_type_t win_type, long (&fan_table)[FAN_COUNT]) {
-    if (win_type & WIN_TYPE_4TH_TILE) {
+static void check_win_flag(win_flag_t win_flag, long (&fan_table)[FAN_TABLE_SIZE]) {
+    if (win_flag & WIN_FLAG_4TH_TILE) {
         fan_table[LAST_TILE] = 1;
     }
-    if (win_type & WIN_TYPE_WALL_LAST) {
-        fan_table[win_type & WIN_TYPE_SELF_DRAWN ? LAST_TILE_DRAW : LAST_TILE_CLAIM] = 1;
+    if (win_flag & WIN_FLAG_WALL_LAST) {
+        fan_table[win_flag & WIN_FLAG_SELF_DRAWN ? LAST_TILE_DRAW : LAST_TILE_CLAIM] = 1;
     }
-    if (win_type & WIN_TYPE_ABOUT_KONG) {
-        fan_table[win_type & WIN_TYPE_SELF_DRAWN ? OUT_WITH_REPLACEMENT_TILE : ROBBING_THE_KONG] = 1;
+    if (win_flag & WIN_FLAG_ABOUT_KONG) {
+        fan_table[win_flag & WIN_FLAG_SELF_DRAWN ? OUT_WITH_REPLACEMENT_TILE : ROBBING_THE_KONG] = 1;
     }
-    if (win_type & WIN_TYPE_SELF_DRAWN) {
+    if (win_flag & WIN_FLAG_SELF_DRAWN) {
         fan_table[SELF_DRAWN] = 1;
     }
 }
@@ -1659,7 +1659,7 @@ static bool is_win_tile_in_concealed_chow_packs(const pack_t *chow_packs, long c
 
 // 基本和型算番
 static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt, tile_t win_tile,
-    const extra_condition_t *ext_cond, long (&fan_table)[FAN_COUNT]) {
+    const extra_condition_t *ext_cond, long (&fan_table)[FAN_TABLE_SIZE]) {
     pack_t pair_pack = 0;
     pack_t chow_packs[4];
     pack_t pung_packs[4];
@@ -1689,10 +1689,10 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
         }
     }
 
-    check_win_type(ext_cond->win_type, fan_table);
+    check_win_flag(ext_cond->win_flag, fan_table);
 
     // 点和的牌张，如果不能解释为暗顺中的一张，那么将其解释为刻子，并标记这个刻子为明刻
-    if ((ext_cond->win_type & WIN_TYPE_SELF_DRAWN) == 0) {
+    if ((ext_cond->win_flag & WIN_FLAG_SELF_DRAWN) == 0) {
         if (!is_win_tile_in_concealed_chow_packs(chow_packs, chow_cnt, win_tile)) {
             for (long i = 0; i < pung_cnt; ++i) {
                 if (pack_tile(pung_packs[i]) == win_tile && !is_pack_melded(pung_packs[i])) {
@@ -1734,7 +1734,7 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
     }
 
     // 检测不求人、全求人
-    check_melded_or_concealed_hand(packs, fixed_cnt, ext_cond->win_type & WIN_TYPE_SELF_DRAWN, fan_table);
+    check_melded_or_concealed_hand(packs, fixed_cnt, ext_cond->win_flag & WIN_FLAG_SELF_DRAWN, fan_table);
     // 检测雀头，确定平和、小三元、小四喜
     check_pair_tile(pack_tile(pair_pack), chow_cnt, fan_table);
     // 检测全带幺、全带五、全双刻
@@ -1767,7 +1767,7 @@ static void calculate_basic_type_points(const pack_t (&packs)[5], long fixed_cnt
 
 // “组合龙+面子+雀头”和型算番
 static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *hand_tiles,
-    tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_COUNT]) {
+    tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_TABLE_SIZE]) {
     long fixed_cnt = hand_tiles->pack_count;
     if (fixed_cnt > 1) {
         return false;
@@ -1777,7 +1777,7 @@ static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *
     long standing_cnt = hand_tiles->tile_count;
 
     // 对立牌和和牌的种类进行打表
-    int cnt_table[TILE_TABLE_COUNT];
+    int cnt_table[TILE_TABLE_SIZE];
     map_tiles(hand_tiles->standing_tiles, standing_cnt, cnt_table);
     ++cnt_table[win_tile];
 
@@ -1819,10 +1819,10 @@ static bool calculate_knitted_straight_in_basic_type_points(const hand_tiles_t *
         calculate_1_pung(temp_pack[3], fan_table);
     }
 
-    check_win_type(ext_cond->win_type, fan_table);
+    check_win_flag(ext_cond->win_flag, fan_table);
     // 门前清（暗杠不影响）
     if (fixed_cnt == 0 || (pack_type(temp_pack[3]) == PACK_TYPE_KONG && !is_pack_melded(temp_pack[3]))) {
-        if (ext_cond->win_type & WIN_TYPE_SELF_DRAWN) {
+        if (ext_cond->win_flag & WIN_FLAG_SELF_DRAWN) {
             fan_table[FULLY_CONCEALED_HAND] = 1;
         }
         else {
@@ -1867,7 +1867,7 @@ static bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
 }
 
 // 全不靠/七星不靠算番
-bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], long (&fan_table)[FAN_COUNT]) {
+bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], long (&fan_table)[FAN_TABLE_SIZE]) {
     const tile_t *it = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
     long numbered_cnt = it - standing_tiles;
     // 数牌张数大于9或者小于7必然不可能是全不靠
@@ -1902,7 +1902,7 @@ bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], long 
 }
 
 // 特殊和型算番
-static bool calculate_special_type_points(const tile_t (&standing_tiles)[14], win_type_t win_type, long (&fan_table)[FAN_COUNT]) {
+static bool calculate_special_type_points(const tile_t (&standing_tiles)[14], win_flag_t win_flag, long (&fan_table)[FAN_TABLE_SIZE]) {
     // 七对
     if (standing_tiles[0] == standing_tiles[1]
         && standing_tiles[2] == standing_tiles[3]
@@ -1947,14 +1947,14 @@ static bool calculate_special_type_points(const tile_t (&standing_tiles)[14], wi
         return false;
     }
 
-    check_win_type(win_type, fan_table);
+    check_win_flag(win_flag, fan_table);
     // 圈风刻、门风刻没必要检测了，这些特殊和型都没有面子
     // 统一校正一些不计的
     correction_fan_table(fan_table, false);
     return true;
 }
 
-static int get_points_by_table(const long (&fan_table)[FAN_COUNT]) {
+static int get_points_by_table(const long (&fan_table)[FAN_TABLE_SIZE]) {
     int points = 0;
     for (int i = 1; i < FLOWER_TILES; ++i) {
         if (fan_table[i] == 0) {
@@ -2006,7 +2006,7 @@ size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, t
 
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     // 打表
-    int cnt_table[TILE_TABLE_COUNT];
+    int cnt_table[TILE_TABLE_SIZE];
     if (!map_hand_tiles(hand_tiles, cnt_table)) {
         return ERROR_WRONG_TILES_COUNT;
     }
@@ -2022,7 +2022,7 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     return 0;
 }
 
-int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_COUNT]) {
+int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_TABLE_SIZE]) {
     if (int ret = check_calculator_input(hand_tiles, win_tile)) {
         return ret;
     }
@@ -2044,7 +2044,7 @@ int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extr
         std::sort(&separation.packs[i][fixed_cnt], &separation.packs[i][4]);
     }
 
-    long fan_tables[MAX_SEPARAION_CNT][FAN_COUNT] = { { 0 } };
+    long fan_tables[MAX_SEPARAION_CNT][FAN_TABLE_SIZE] = { { 0 } };
     int max_points = 0;
     long max_idx = -1;
 
@@ -2058,7 +2058,7 @@ int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extr
             }
             LOG("points = %d\n\n", current_points);
         }
-        else if (calculate_special_type_points(standing_tiles, ext_cond->win_type, fan_tables[separation.count])) {
+        else if (calculate_special_type_points(standing_tiles, ext_cond->win_flag, fan_tables[separation.count])) {
             int current_points = get_points_by_table(fan_tables[separation.count]);
             if (current_points > max_points) {
                 max_points = current_points;

@@ -491,15 +491,15 @@ void PointsCalculatorScene::calculate() {
 
     mahjong::sort_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count);
 
-    long fan_table[mahjong::FAN_COUNT] = { 0 };
+    long fan_table[mahjong::FAN_TABLE_SIZE] = { 0 };
 
     // 获取绝张、杠开、抢杠、海底信息
-    mahjong::win_type_t win_type = WIN_TYPE_DISCARD;
-    if (_winTypeGroup->getSelectedButtonIndex() == 1) win_type |= WIN_TYPE_SELF_DRAWN;
-    if (_fourthTileBox->isEnabled() && _fourthTileBox->isSelected()) win_type |= WIN_TYPE_4TH_TILE;
-    if (_robKongBox->isEnabled() && _robKongBox->isSelected()) win_type |= WIN_TYPE_ABOUT_KONG;
-    if (_replacementBox->isEnabled() && _replacementBox->isSelected()) win_type |= (WIN_TYPE_ABOUT_KONG | WIN_TYPE_SELF_DRAWN);
-    if (_lastTileBox->isEnabled() && _lastTileBox->isSelected()) win_type |= WIN_TYPE_WALL_LAST;
+    mahjong::win_flag_t win_flag = WIN_FLAG_DISCARD;
+    if (_winTypeGroup->getSelectedButtonIndex() == 1) win_flag |= WIN_FLAG_SELF_DRAWN;
+    if (_fourthTileBox->isEnabled() && _fourthTileBox->isSelected()) win_flag |= WIN_FLAG_4TH_TILE;
+    if (_robKongBox->isEnabled() && _robKongBox->isSelected()) win_flag |= WIN_FLAG_ABOUT_KONG;
+    if (_replacementBox->isEnabled() && _replacementBox->isSelected()) win_flag |= (WIN_FLAG_ABOUT_KONG | WIN_FLAG_SELF_DRAWN);
+    if (_lastTileBox->isEnabled() && _lastTileBox->isSelected()) win_flag |= WIN_FLAG_WALL_LAST;
 
     // 获取圈风门风
     mahjong::wind_t prevalent_wind = static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _prevalentWindGroup->getSelectedButtonIndex());
@@ -507,7 +507,7 @@ void PointsCalculatorScene::calculate() {
 
     // 算番
     mahjong::extra_condition_t ext_cond;
-    ext_cond.win_type = win_type;
+    ext_cond.win_flag = win_flag;
     ext_cond.prevalent_wind = prevalent_wind;
     ext_cond.seat_wind = seat_wind;
     int points = calculate_points(&hand_tiles, win_tile, &ext_cond, fan_table);
@@ -534,7 +534,7 @@ void PointsCalculatorScene::calculate() {
     fan_table[mahjong::FLOWER_TILES] = flowerCnt;
 
     // 有n个番种，每行排2个
-    long n = mahjong::FAN_COUNT - std::count(std::begin(fan_table), std::end(fan_table), 0);
+    long n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
     long rows = (n >> 1) + (n & 1);  // 需要这么多行
 
     // 排列

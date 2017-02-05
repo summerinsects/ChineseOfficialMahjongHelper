@@ -6,21 +6,32 @@
 namespace mahjong {
 
 /**
- * @brief 解析牌的错误码
+ * @addtogroup stringify
+ * @{
  */
-#define PARSE_NO_ERROR 0                                // 无错误
-#define PARSE_ERROR_ILLEGAL_CHARACTER -1                // 非法字符
-#define PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT -2            // 数字后面缺少后缀
-#define PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK -3    // 副露包含过多的牌
-#define PARSE_ERROR_CANNOT_MAKE_FIXED_PACK -4           // 无法正确解析副露
-#define PARSE_ERROR_TOO_MANY_FIXED_PACKS -5             // 过多组副露（一副合法手牌最多4副露）
+
+/**
+ * @name error codes
+ * @{
+ *  解析牌的错误码
+ */
+#define PARSE_NO_ERROR 0                                ///< 无错误
+#define PARSE_ERROR_ILLEGAL_CHARACTER -1                ///< 非法字符
+#define PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT -2            ///< 数字后面缺少后缀
+#define PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK -3    ///< 副露包含过多的牌
+#define PARSE_ERROR_CANNOT_MAKE_FIXED_PACK -4           ///< 无法正确解析副露
+#define PARSE_ERROR_TOO_MANY_FIXED_PACKS -5             ///< 过多组副露（一副合法手牌最多4副露）
+/**
+ * @}
+ */
 
 /**
  * @brief 解析牌
  * @param [in] str 字符串
- * @param [out] tile 牌
+ * @param [out] tiles 牌
  * @param [in] max_cnt 牌的最大数量
- * @return long 实际牌的数量。返回0表示失败
+ * @retval > 0 实际牌的数量
+ * @retval == 0 失败
  */
 long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
 
@@ -29,7 +40,12 @@ long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
  * @param [in] str 字符串
  * @param [out] hand_tiles 手牌结构
  * @param [out] serving_tile 上的牌
- * @return long 返回错误码，成功时为PARSE_NO_ERROR
+ * @retval PARSE_NO_ERROR 无错误
+ * @retval PARSE_ERROR_ILLEGAL_CHARACTER 非法字符
+ * @retval PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT 数字后面缺少后缀
+ * @retval PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK 副露包含过多的牌
+ * @retval PARSE_ERROR_CANNOT_MAKE_FIXED_PACK 无法正确解析副露
+ * @retval PARSE_ERROR_TOO_MANY_FIXED_PACKS 过多组副露（一副合法手牌最多4副露）
  */
 long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile);
 
@@ -62,9 +78,15 @@ long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_siz
  */
 long hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, long max_size);
 
+/**
+ * end group
+ * @}
+ */
+
 #define INPUT_GUIDE_STRING_1 "数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。"
 #define INPUT_GUIDE_STRING_2 "字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦可使用后缀z，但按中国习惯顺序567z为中发白。"
 #define INPUT_GUIDE_STRING_3 "每组吃、碰、明杠之间用英文空格分隔，每一组暗杠前后用英文[]。副露与立牌之间也用英文空格分隔。"
+
 }
 
 #endif

@@ -18,7 +18,7 @@ void test_wait(const char *str) {
     std::cout << "----------------" << std::endl;
     puts(str);
     bool is_wait = false;
-    bool table[TILE_TABLE_COUNT] = { false };
+    bool table[TILE_TABLE_SIZE] = { false };
 
     if (tile_cnt == 13) {
         if (is_thirteen_orphans_wait(tiles, tile_cnt, nullptr)) {
@@ -53,7 +53,7 @@ void test_wait(const char *str) {
     if (is_wait) {
         puts(" waiting:");
         char buf[64];
-        for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+        for (tile_t t = TILE_1m; t < TILE_TABLE_SIZE; ++t) {
             if (table[t]) {
                 tiles_to_string(&t, 1, buf, sizeof(buf));
                 printf("%s ", buf);
@@ -81,7 +81,7 @@ void test_points(const char *str, const char *win_str, win_type_t win_type, wind
         return;
     }
 
-    long fan_table[FAN_COUNT] = { 0 };
+    long fan_table[FAN_TABLE_SIZE] = { 0 };
     puts("----------------");
     printf("%s %s\n", str, win_str);
     mahjong::extra_condition_t ext_cond;
@@ -116,23 +116,23 @@ void test_wait_step(const char *str) {
     ret = hand_tiles_to_string(&hand_tiles, buf, sizeof(buf));
     puts(buf);
 
-    auto display = [](const hand_tiles_t *hand_tiles, bool (&useful_table)[TILE_TABLE_COUNT]) {
+    auto display = [](const hand_tiles_t *hand_tiles, bool (&useful_table)[TILE_TABLE_SIZE]) {
         char buf[64];
-        for (tile_t t = TILE_1m; t < TILE_TABLE_COUNT; ++t) {
+        for (tile_t t = TILE_1m; t < TILE_TABLE_SIZE; ++t) {
             if (useful_table[t]) {
                 tiles_to_string(&t, 1, buf, sizeof(buf));
                 printf("%s ", buf);
             }
         }
 
-        int cnt_table[TILE_TABLE_COUNT];
+        int cnt_table[TILE_TABLE_SIZE];
         map_hand_tiles(hand_tiles, cnt_table);
 
         printf("%d枚", count_useful_tile(cnt_table, useful_table));
     };
 
     puts(str);
-    bool useful_table[TILE_TABLE_COUNT] = {false};
+    bool useful_table[TILE_TABLE_SIZE] = {false};
     int ret0;
     ret0 = thirteen_orphans_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("131=== %d shanten\n", ret0);
@@ -166,18 +166,18 @@ int main(int argc, const char *argv[]) {
     {
         clock_t t1, t2;
         tile_t st[] = { TILE_1p, TILE_1p, TILE_1p, TILE_2p, TILE_3p, TILE_4p, TILE_5p, TILE_6p, TILE_7p, TILE_8p, TILE_9p, TILE_9p, TILE_9p };
-        bool ct[TILE_TABLE_COUNT];
+        bool ct[TILE_TABLE_SIZE];
         const int tms = 1000;
 
         t1 = clock();
         for (int i = 0; i < tms; ++i)
-        is_basic_type_wait(st, 13, ct);
+        is_basic_type_wait(st, 13, &ct);
         t2 = clock() - t1;
         printf("用时约: %ld毫秒\n", t2/* * 1000 / CLOCKS_PER_SEC*/);
 
         t1 = clock();
         for (int i = 0; i < tms; ++i)
-        basic_type_wait_step(st, 13, ct);
+        basic_type_wait_step(st, 13, &ct);
         t2 = clock() - t1;
         printf("用时约: %ld毫秒\n", t2/* * 1000 / CLOCKS_PER_SEC*/);
     }

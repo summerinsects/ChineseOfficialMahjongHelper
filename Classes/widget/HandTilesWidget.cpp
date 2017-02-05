@@ -80,21 +80,29 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
         mahjong::tile_t tile = mahjong::pack_tile(_fixedPacks[i]);
         switch (mahjong::pack_type(_fixedPacks[i])) {
         case PACK_TYPE_CHOW:
-            addFixedChowPack(tile - 1, 0);
+            switch (mahjong::pack_offer(_fixedPacks[i])) {
+            default: addFixedChowPack(tile - 1, 0); break;
+            case 2: addFixedChowPack(tile, 1); break;
+            case 3: addFixedChowPack(tile + 1, 2); break;
+            }
             ++_usedTilesTable[tile - 1];
             ++_usedTilesTable[tile];
             ++_usedTilesTable[tile + 1];
             break;
         case PACK_TYPE_PUNG:
-            addFixedPungPack(tile, 0);
+            switch (mahjong::pack_offer(_fixedPacks[i])) {
+            default: addFixedPungPack(tile, 0); break;
+            case 2: addFixedPungPack(tile, 1); break;
+            case 3: addFixedPungPack(tile, 2); break;
+            }
             _usedTilesTable[tile] += 3;
             break;
         case PACK_TYPE_KONG:
-            if (mahjong::is_pack_melded(_fixedPacks[i])) {
-                addFixedMeldedKongPack(tile, 0);
-            }
-            else {
-                addFixedConcealedKongPack(tile);
+            switch (mahjong::pack_offer(_fixedPacks[i])) {
+            case 0: addFixedConcealedKongPack(tile); break;
+            default: addFixedMeldedKongPack(tile, 0); break;
+            case 2: addFixedMeldedKongPack(tile, 1); break;
+            case 3: addFixedMeldedKongPack(tile, 3); break;
             }
             _usedTilesTable[tile] += 4;
             break;
@@ -375,8 +383,8 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
         break;
     case 2:
         image[0] = tilesImageName[tile];
-        image[1] = tilesImageName[tile - 1];
-        image[2] = tilesImageName[tile - 2];
+        image[1] = tilesImageName[tile - 2];
+        image[2] = tilesImageName[tile - 1];
         break;
     }
 
@@ -601,7 +609,7 @@ bool HandTilesWidget::makeFixedChow_XXPack() {
         return false;
     }
 
-    mahjong::pack_t pack = mahjong::make_pack(true, PACK_TYPE_CHOW, tile + 1);
+    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, tile + 1);
     _fixedPacks.push_back(pack);
 
     // 这里迭代器不能连续使用，因为立牌不一定有序
@@ -640,7 +648,7 @@ bool HandTilesWidget::makeFixedChowX_XPack() {
         return false;
     }
 
-    mahjong::pack_t pack = mahjong::make_pack(true, PACK_TYPE_CHOW, tile);
+    mahjong::pack_t pack = mahjong::make_pack(2, PACK_TYPE_CHOW, tile);
     _fixedPacks.push_back(pack);
 
     // 这里迭代器不能连续使用，因为立牌不一定有序
@@ -679,7 +687,7 @@ bool HandTilesWidget::makeFixedChowXX_Pack() {
         return false;
     }
 
-    mahjong::pack_t pack = mahjong::make_pack(true, PACK_TYPE_CHOW, tile - 1);
+    mahjong::pack_t pack = mahjong::make_pack(3, PACK_TYPE_CHOW, tile - 1);
     _fixedPacks.push_back(pack);
 
     // 这里迭代器不能连续使用，因为立牌不一定有序
@@ -702,20 +710,16 @@ bool HandTilesWidget::makeFixedChowXX_Pack() {
 int HandTilesWidget::calcMeldedIdx(int maxIdx) const {
     mahjong::tile_t tile = _standingTiles[_currentIdx];
 
-    struct Pred {
-        Pred(mahjong::tile_t t) : tile(t) { }
-        mahjong::tile_t tile;
-        bool operator()(mahjong::tile_t t) { return tile == t; }
-    };
-
     size_t offset = 0;
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
     if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
         offset = 1;
     }
 
-    bool leftExsits = std::any_of(_standingTiles.begin(), _standingTiles.begin() + _currentIdx, Pred(tile));
-    bool rightExsits = std::any_of(_standingTiles.begin() + _currentIdx + 1, _standingTiles.end() - offset, Pred(tile));
+    bool leftExsits = std::any_of(_standingTiles.begin(), _standingTiles.begin() + _currentIdx,
+        [tile](mahjong::tile_t t) { return tile == t; });
+    bool rightExsits = std::any_of(_standingTiles.begin() + _currentIdx + 1, _standingTiles.end() - offset,
+        [tile](mahjong::tile_t t) { return tile == t; });
     return leftExsits ? (rightExsits ? 1 : maxIdx) : 0;
 }
 
@@ -734,7 +738,7 @@ bool HandTilesWidget::makeFixedPungPack() {
         return false;
     }
 
-    mahjong::pack_t pack = mahjong::make_pack(true, PACK_TYPE_PUNG, tile);
+    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_PUNG, tile);  // TODO: 这里丢失了供牌信息
     _fixedPacks.push_back(pack);
 
     int meldedIdx = calcMeldedIdx(2);
@@ -767,7 +771,7 @@ bool HandTilesWidget::makeFixedMeldedKongPack() {
         return false;
     }
 
-    mahjong::pack_t pack = mahjong::make_pack(true, PACK_TYPE_KONG, tile);
+    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_KONG, tile);  // TODO: 这里丢失了供牌信息
     _fixedPacks.push_back(pack);
 
     int meldedIdx = calcMeldedIdx(3);
@@ -800,7 +804,7 @@ bool HandTilesWidget::makeFixedConcealedKongPack() {
         return false;
     }
 
-    mahjong::pack_t pack = mahjong::make_pack(false, PACK_TYPE_KONG, tile);
+    mahjong::pack_t pack = mahjong::make_pack(0, PACK_TYPE_KONG, tile);
     _fixedPacks.push_back(pack);
 
     // 这里迭代器可以连续使用，因为移除的是同一种牌

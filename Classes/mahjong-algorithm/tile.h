@@ -15,6 +15,11 @@
 namespace mahjong {
 
 /**
+ * @addtogroup tile
+ * @{
+ */
+
+/**
  * @brief 花色
  */
 typedef uint8_t suit_t;
@@ -24,20 +29,20 @@ typedef uint8_t suit_t;
  */
 typedef uint8_t rank_t;
 
-#define TILE_SUIT_NONE 0
-#define TILE_SUIT_CHARACTERS 1
-#define TILE_SUIT_BAMBOO 2
-#define TILE_SUIT_DOTS 3
-#define TILE_SUIT_HONORS 4
+#define TILE_SUIT_NONE          0  ///< 无效
+#define TILE_SUIT_CHARACTERS    1  ///< 万子（CHARACTERS）
+#define TILE_SUIT_BAMBOO        2  ///< 条子（BAMBOO）
+#define TILE_SUIT_DOTS          3  ///< 饼子（DOTS）
+#define TILE_SUIT_HONORS        4  ///< 字牌（HONORS）
 
 /**
  * @brief 牌
  *
  * 合法的牌为：
- *  0x11 - 0x19 万子（CHARACTERS）
- *  0x21 - 0x29 条子（BAMBOO）
- *  0x31 - 0x39 饼子（DOTS）
- *  0x41 - 0x47 字牌（HONORS）
+ * - 0x11 - 0x19 万子（CHARACTERS）
+ * - 0x21 - 0x29 条子（BAMBOO）
+ * - 0x31 - 0x39 饼子（DOTS）
+ * - 0x41 - 0x47 字牌（HONORS）
  */
 typedef uint8_t tile_t;
 
@@ -89,7 +94,7 @@ enum tile_value_t {
     TILE_1s = 0x21, TILE_2s, TILE_3s, TILE_4s, TILE_5s, TILE_6s, TILE_7s, TILE_8s, TILE_9s,
     TILE_1p = 0x31, TILE_2p, TILE_3p, TILE_4p, TILE_5p, TILE_6p, TILE_7p, TILE_8p, TILE_9p,
     TILE_E  = 0x41, TILE_S , TILE_W , TILE_N , TILE_C , TILE_F , TILE_P ,
-    TILE_TABLE_COUNT
+    TILE_TABLE_SIZE
 };
 
 /**
@@ -102,7 +107,7 @@ static const tile_t all_tiles[] = {
     TILE_E , TILE_S , TILE_W , TILE_N , TILE_C , TILE_F , TILE_P
 };
 
-#define PACK_TYPE_NONE 0
+#define PACK_TYPE_NONE 0  ///< 无效
 #define PACK_TYPE_CHOW 1  ///< 顺子
 #define PACK_TYPE_PUNG 2  ///< 刻子
 #define PACK_TYPE_KONG 3  ///< 杠
@@ -113,34 +118,45 @@ static const tile_t all_tiles[] = {
  * 用于表示一组面子或者雀头
  *
  * 内存结构：
- * 15---12----8----4----0
- * |meld |type|  tile   |
- * +-----+----+---------+
- *  melded 是否为明的（明顺、明刻、明杠）
- *  type 牌组类型
- *  tile 牌（对于顺子，为中间那张牌）
+ * - 0-7 8bit tile 牌（对于顺子，为中间那张牌）
+ * - 8-11 4bit type 牌组类型
+ * - 12-15 4bit offer 供牌信息\n
+ *       0表示暗手（暗顺、暗刻、暗杠），非0表示明手（明顺、明刻、明杠）
+ *
+ *       对于牌组是刻子和杠时，123分别来表示是上家/对家/下家供的\n
+ *       对于牌组为顺子时，由于吃牌只能是上家供，这里用123分别来表示第几张是上家供的
  */
 typedef uint16_t pack_t;
 
 /**
  * @brief 生成一个牌组
  *  函数不检查输入的合法性，不保证返回值的合法性
- * @param [in] melded 是否为明的（明顺、明刻、明杠）
+ * @param [in] offer 供牌信息
  * @param [in] type 牌组类型
  * @param [in] tile 牌（对于顺子，为中间那张牌）
  */
-static forceinline pack_t make_pack(bool melded, uint8_t type, tile_t tile) {
-    return (melded << 12 | (type << 8) | tile);
+static forceinline pack_t make_pack(uint8_t offer, uint8_t type, tile_t tile) {
+    return (offer << 12 | (type << 8) | tile);
 }
 
 /**
- * @brief 牌组是否为明的（明顺、明刻、明杠）
+ * @brief 牌组是否为明的
  *  函数不检查输入的合法性，不保证返回值的合法性
  * @param [in] pack 牌组
  * @return bool
  */
 static forceinline bool is_pack_melded(pack_t pack) {
-    return !!(pack >> 12);
+    return !!((pack >> 12) & 0xF);
+}
+
+/**
+ * @brief 牌组的供牌信息
+ *  函数不检查输入的合法性，不保证返回值的合法性
+ * @param [in] pack 牌组
+ * @return uint8_t
+ */
+static forceinline uint8_t pack_offer(pack_t pack) {
+    return ((pack >> 12) & 0xF);
 }
 
 /**
@@ -183,17 +199,14 @@ static const uint32_t traits_mask_table[256] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-#define REVERSIBLE_BIT 0x01
-#define GREEN_BIT 0x02
-
 /**
  * @brief 判断是否为绿一色构成牌
  * @param [in] tile 牌
  * @return bool
  */
-bool forceinline is_green(tile_t tile) {
+static bool forceinline is_green(tile_t tile) {
     //return (tile == 0x22 || tile == 0x23 || tile == 0x24 || tile == 0x26 || tile == 0x28 || tile == 0x52);
-    return (traits_mask_table[tile] & GREEN_BIT) != 0;
+    return (traits_mask_table[tile] & 0x02) != 0;
 }
 
 /**
@@ -201,11 +214,11 @@ bool forceinline is_green(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-bool forceinline is_reversible_tile(tile_t tile) {
+static bool forceinline is_reversible(tile_t tile) {
     //return (tile == 0x22 || tile == 0x24 || tile == 0x25 || tile == 0x26 || tile == 0x28 || tile == 0x29 ||
     //    tile == 0x31 || tile == 0x32 || tile == 0x33 || tile == 0x34 || tile == 0x35 || tile == 0x38 || tile == 0x39 ||
     //    tile == 0x53);
-    return (traits_mask_table[tile] & REVERSIBLE_BIT);
+    return (traits_mask_table[tile] & 0x01);
 }
 
 /**
@@ -296,6 +309,11 @@ static forceinline bool is_suit_equal_quick(tile_t tile0, tile_t tile1) {
 static forceinline bool is_rank_equal_quick(tile_t tile0, tile_t tile1) {
     return ((tile0 & 0xCF) == (tile1 & 0xCF));
 }
+
+/**
+ * end group
+ * @}
+ */
 
 }
 

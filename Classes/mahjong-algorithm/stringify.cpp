@@ -22,6 +22,9 @@ static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long 
         tiles[i] |= 0x40;                   \
         } (void)0
 
+#define NO_SUFFIX_AFTER_DIGIT() (tile_cnt > 0 && !(tiles[tile_cnt - 1] & 0xF0))
+#define CHECK_SUFFIX() if (NO_SUFFIX_AFTER_DIGIT()) return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT
+
     const char *p = str;
     for (; tile_cnt < max_cnt && *p != '\0'; ++p) {
         char c = *p;
@@ -40,20 +43,20 @@ static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long 
         case 's': SET_SUIT_FOR_NUMBERED(0x20); break;
         case 'p': SET_SUIT_FOR_NUMBERED(0x30); break;
         case 'z': SET_SUIT_FOR_HONOR(); break;
-        case 'E': tiles[tile_cnt++] = TILE_E; break;
-        case 'S': tiles[tile_cnt++] = TILE_S; break;
-        case 'W': tiles[tile_cnt++] = TILE_W; break;
-        case 'N': tiles[tile_cnt++] = TILE_N; break;
-        case 'C': tiles[tile_cnt++] = TILE_C; break;
-        case 'F': tiles[tile_cnt++] = TILE_F; break;
-        case 'P': tiles[tile_cnt++] = TILE_P; break;
+        case 'E': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_E; break;
+        case 'S': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_S; break;
+        case 'W': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_W; break;
+        case 'N': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_N; break;
+        case 'C': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_C; break;
+        case 'F': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_F; break;
+        case 'P': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_P; break;
         default: goto parse_finish;
         }
     }
 
 parse_finish:
     // 一连串数字+后缀，但已经超过容量，那么放弃中间一部分数字，直接解析最近的后缀
-    if (tile_cnt > 0 && !(tiles[tile_cnt - 1] & 0xF0)) {
+    if (NO_SUFFIX_AFTER_DIGIT()) {
         const char *p1 = strpbrk(p, "mspz");
         if (p1 == nullptr) {
             return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT;
@@ -70,6 +73,9 @@ parse_finish:
     }
 
 #undef SET_SUIT_FOR_NUMBERED
+#undef SET_SUIT_FOR_HONOR
+#undef NO_SUFFIX_AFTER_DIGIT
+#undef CHECK_SUFFIX
 
     if (out_tile_cnt != nullptr) {
         *out_tile_cnt = tile_cnt;
@@ -92,13 +98,26 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
         }
         if (tile_cnt == 3) {
             if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
-                *pack = make_pack(true, PACK_TYPE_PUNG, tiles[0]);
+                *pack = make_pack(1, PACK_TYPE_PUNG, tiles[0]);  // TODO: 增加供牌信息
             }
             else {
-                tile_t temp[3] = { tiles[0], tiles[1], tiles[2] };
-                std::sort(std::begin(temp), std::end(temp));
-                if (temp[0] + 1 == temp[1] && temp[1] + 1 == temp[2]) {
-                    *pack = make_pack(true, PACK_TYPE_CHOW, temp[1]);
+                if (tiles[0] + 1 == tiles[1] && tiles[1] + 1 == tiles[2]) {
+                    *pack = make_pack(1, PACK_TYPE_CHOW, tiles[1]);
+                }
+                else if (tiles[0] + 1 == tiles[2] && tiles[2] + 1 == tiles[1]) {
+                    *pack = make_pack(1, PACK_TYPE_CHOW, tiles[2]);
+                }
+                else if (tiles[1] + 1 == tiles[0] && tiles[0] + 1 == tiles[2]) {
+                    *pack = make_pack(2, PACK_TYPE_CHOW, tiles[0]);
+                }
+                else if (tiles[1] + 1 == tiles[2] && tiles[2] + 1 == tiles[0]) {
+                    *pack = make_pack(3, PACK_TYPE_CHOW, tiles[2]);
+                }
+                else if (tiles[2] + 1 == tiles[0] && tiles[0] + 1 == tiles[1]) {
+                    *pack = make_pack(2, PACK_TYPE_CHOW, tiles[0]);
+                }
+                else if (tiles[2] + 1 == tiles[1] && tiles[1] + 1 == tiles[0]) {
+                    *pack = make_pack(3, PACK_TYPE_CHOW, tiles[1]);
                 }
                 else {
                     return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
@@ -109,7 +128,7 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
             if (tiles[0] != tiles[1] || tiles[1] != tiles[2] || tiles[2] != tiles[3]) {
                 return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
             }
-            *pack = make_pack(true, PACK_TYPE_KONG, tiles[0]);
+            *pack = make_pack(1, PACK_TYPE_KONG, tiles[0]);  // TODO: 增加供牌信息
         }
         return 1;
     }
@@ -166,7 +185,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
                 return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK;
             }
             q = ++p;
-            packs[pack_cnt] = make_pack(false, PACK_TYPE_KONG, tiles[0]);
+            packs[pack_cnt] = make_pack(0, PACK_TYPE_KONG, tiles[0]);
             is_concealed_kong = false;
             ++pack_cnt;
             tile_cnt = 0;
