@@ -3,6 +3,7 @@
 
 #include "../BaseLayer.h"
 #include "../mahjong-algorithm/wait_and_win.h"
+#include <unordered_map>
 
 namespace cw {
     class TableViewCell;
@@ -34,7 +35,6 @@ private:
     std::vector<mahjong::enum_result_t> _allResults;
     std::vector<ResultEx> _resultSources;
     std::vector<size_t> _orderedIndices;
-    int _newLineFlag;
 
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
     void setRandomInput();
@@ -47,6 +47,15 @@ private:
     void onStandingTileEvent();
     void deduce(mahjong::tile_t discardTile, mahjong::tile_t servingTile);
 
+    float _cellWidth;
+    float _discardLabelWidth;
+    float _servingLabelWidth1;
+    float _servingLabelWidth2;
+    float _waitingLabelWidth1;
+    float _waitingLabelWidth2;
+    float _totalLabelWidth;
+    std::unordered_map<uint16_t, int> _cellHeightMap;
+    cocos2d::Size tableCellSizeAtIndex(cw::TableView *table, ssize_t idx);
     cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
 };
 
