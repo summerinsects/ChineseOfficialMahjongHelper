@@ -32,30 +32,6 @@ static void __log(const char *fmt, ...) {
 
 namespace mahjong {
 
-typedef uint16_t work_units_t;
-#define UNIT_TYPE_CHOW 1
-#define UNIT_TYPE_PUNG 2
-#define UNIT_TYPE_PAIR 4
-#define UNIT_TYPE_NEIGHBOR_BOTH 5
-#define UNIT_TYPE_NEIGHBOR_MID 6
-#define UNIT_TYPE_NEIGHBOR_PUNG 7
-
-#define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
-#define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
-#define UNIT_TILE(unit_) ((unit_) & 0xFF)
-
-#define MAX_STATE 1024
-#define UNIT_SIZE 7
-
-struct work_path_t {
-    work_units_t units[UNIT_SIZE];  // 14/2=7最多7个搭子
-};
-
-struct work_state_t {
-    work_path_t paths[MAX_STATE];
-    long count;
-};
-
 long packs_to_tiles(const pack_t *packs, long pack_cnt, tile_t *tiles, long tile_cnt) {
     if (packs == nullptr || tiles == nullptr) {
         return 0;
@@ -135,20 +111,62 @@ int count_useful_tile(const int (&used_table)[TILE_TABLE_SIZE], const bool (&use
     return cnt;
 }
 
-static bool is_basic_type_branch_exist(const int fixed_cnt, const int step, const work_path_t *work_path, const work_state_t *work_state) {
+typedef uint16_t path_unit_t;
+#define UNIT_TYPE_CHOW 1
+#define UNIT_TYPE_PUNG 2
+#define UNIT_TYPE_PAIR 4
+#define UNIT_TYPE_NEIGHBOR_BOTH 5
+#define UNIT_TYPE_NEIGHBOR_MID 6
+#define UNIT_TYPE_NEIGHBOR_PUNG 7
+
+#define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
+#define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
+#define UNIT_TILE(unit_) ((unit_) & 0xFF)
+
+#define MAX_STATE 1024
+#define UNIT_SIZE 7
+
+struct work_path_t {
+    path_unit_t units[UNIT_SIZE];  // 14/2=7最多7个搭子
+    uint16_t depth;  // 当前路径深度
+};
+
+struct work_state_t {
+    work_path_t paths[MAX_STATE];  // 所有路径
+    long count;  // 路径数量
+};
+
+static bool is_basic_type_branch_exist(const int fixed_cnt, const work_path_t *work_path, const work_state_t *work_state) {
     if (work_state->count <= 0) {
         return false;
     }
 
-    // std::includes要求有序
+    const int depth = work_path->depth + 1;
+
+    // std::includes要求有序，但又不能破坏当前数据
     work_path_t temp;
-    memcpy(&temp, work_path, sizeof(temp));
-    std::sort(&temp.units[fixed_cnt], &temp.units[fixed_cnt + step]);
+    temp.depth = work_path->depth;
+    std::copy(&temp.units[fixed_cnt], &temp.units[depth], &temp.units[fixed_cnt]);
+    std::sort(&temp.units[fixed_cnt], &temp.units[depth]);
 
     return std::any_of(&work_state->paths[0], &work_state->paths[work_state->count],
-        [&temp, fixed_cnt, step](const work_path_t &path) {
-        return std::includes(&path.units[fixed_cnt], &path.units[UNIT_SIZE], &temp.units[fixed_cnt], &temp.units[fixed_cnt + step]);
+        [&temp, fixed_cnt, depth](const work_path_t &path) {
+        return std::includes(&path.units[fixed_cnt], &path.units[path.depth], &temp.units[fixed_cnt], &temp.units[depth]);
     });
+}
+
+static void save_work_path(const int fixed_cnt, const work_path_t *work_path, work_state_t *work_state) {
+    work_path_t &path = work_state->paths[work_state->count++];
+    if (work_state->count < MAX_STATE) {
+        path.depth = work_path->depth;
+        std::copy(&work_path->units[fixed_cnt], &work_path->units[work_path->depth], &path.units[fixed_cnt]);
+
+        // 检测是否重复路径时，std::includes要求有序，所以这里将它排序
+        std::sort(&path.units[fixed_cnt], &path.units[path.depth]);
+    }
+    else {
+        assert(0 && "too many state!");
+    }
 }
 
 static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], const int pack_cnt, const bool has_pair, const int neighbor_cnt,
@@ -172,20 +190,13 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
         max_ret = (has_pair ? 3 : 4) - pack_cnt;
     }
 
-    const long idx = pack_cnt + neighbor_cnt + has_pair;
+    const uint16_t depth = pack_cnt + neighbor_cnt + has_pair;
+    work_path->depth = depth;
+
     int result = max_ret;
 
     if (pack_cnt + neighbor_cnt > 4) {  // 搭子超载
-        work_path_t &path = work_state->paths[work_state->count++];
-        if (work_state->count < MAX_STATE) {
-            memset(&path, 0xFF, sizeof(path));
-            memcpy(&path, work_path, idx * sizeof(work_units_t));
-            std::sort(&path.units[fixed_cnt], &path.units[idx]);
-        }
-        else {
-            assert(0 && "too many state!");
-        }
-
+        save_work_path(fixed_cnt, work_path, work_state);
         return max_ret;
     }
 
@@ -197,8 +208,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
         // 雀头
         if (!has_pair && cnt_table[t] > 1) {
-            work_path->units[idx] = MAKE_UNIT(UNIT_TYPE_PAIR, t);
-            if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_path, work_state)) {
+            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PAIR, t);
+            if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                 MJ_LOG("branch exist : %x %x %x %x %x", work_units[0], work_units[1], work_units[2], work_units[3], work_units[4]);
                 continue;
             }
@@ -213,8 +224,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
         // 刻子
         if (cnt_table[t] > 2) {
-            work_path->units[idx] = MAKE_UNIT(UNIT_TYPE_PUNG, t);
-            if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_path, work_state)) {
+            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PUNG, t);
+            if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                 continue;
             }
 
@@ -229,8 +240,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
         // 顺子（只能是数牌）
         bool is_numbered = is_numbered_suit(t);
         if (is_numbered && tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-            work_path->units[idx] = MAKE_UNIT(UNIT_TYPE_CHOW, t);
-            if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_path, work_state)) {
+            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW, t);
+            if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                 MJ_LOG("branch exist : %x %x %x %x %x", work_units[0], work_units[1], work_units[2], work_units[3], work_units[4]);
                 continue;
             }
@@ -258,8 +269,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
         // 刻子搭子
         if (cnt_table[t] > 1) {
             // 削减刻子搭子，递归
-            work_path->units[idx] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_PUNG, t);
-            if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_path, work_state)) {
+            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_PUNG, t);
+            if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                 continue;
             }
 
@@ -274,8 +285,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
         if (is_numbered) {
             // 削减搭子，递归
             if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
-                work_path->units[idx] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_BOTH, t);
-                if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_path, work_state)) {
+                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_BOTH, t);
+                if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                     MJ_LOG("branch exist : %x %x %x %x %x", work_units[0], work_units[1], work_units[2], work_units[3], work_units[4]);
                     continue;
                 }
@@ -289,8 +300,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
                 ++cnt_table[t + 1];
             }
             if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 坎张
-                work_path->units[idx] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_MID, t);
-                if (is_basic_type_branch_exist(fixed_cnt, idx - fixed_cnt + 1, work_path, work_state)) {
+                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_MID, t);
+                if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                     continue;
                 }
 
@@ -306,15 +317,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
     }
 
     if (result == max_ret) {
-        work_path_t &path = work_state->paths[work_state->count++];
-        if (work_state->count < MAX_STATE) {
-            memset(&path, 0xFF, sizeof(path));
-            memcpy(&path, work_path, idx * sizeof(work_units_t));
-            std::sort(&path.units[fixed_cnt], &path.units[idx]);
-        }
-        else {
-            assert(0 && "too many state!");
-        }
+        save_work_path(fixed_cnt, work_path, work_state);
     }
 
     return result;
