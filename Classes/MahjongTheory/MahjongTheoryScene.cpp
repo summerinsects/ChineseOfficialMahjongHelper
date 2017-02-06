@@ -473,15 +473,22 @@ void MahjongTheoryScene::onStandingTileEvent() {
         return;
     }
 
+    // 没用到的牌表
+    int remainTable[mahjong::TILE_TABLE_SIZE];
+    std::transform(std::begin(_handTilesTable), std::end(_handTilesTable), std::begin(remainTable),
+        [](int n) { return 4 - n; });
+    //--remainTable[discardTile];  // 有必要吗？
+
+    // 没用到的牌
+    mahjong::tile_t remainTiles[136];
+    long remainCnt = mahjong::table_to_tiles(remainTable, remainTiles, 136);
+
     // 随机给一张牌
-    mahjong::tile_t servingTile = 0;
+    mahjong::tile_t servingTile;
     do {
-        int n = rand() % 34;
-        mahjong::tile_t t = mahjong::all_tiles[n];
-        if (_handTilesTable[t] < 4) {
-            servingTile = t;
-        }
-    } while (servingTile == 0 || servingTile == discardTile);
+        servingTile = remainTiles[rand() % remainCnt];
+    } while (servingTile == discardTile);
+
 
     // 推演
     deduce(discardTile, servingTile);
