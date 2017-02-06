@@ -136,12 +136,12 @@ struct work_state_t {
     long count;  // 路径数量
 };
 
-static bool is_basic_type_branch_exist(const int fixed_cnt, const work_path_t *work_path, const work_state_t *work_state) {
+static bool is_basic_type_branch_exist(const long fixed_cnt, const work_path_t *work_path, const work_state_t *work_state) {
     if (work_state->count <= 0) {
         return false;
     }
 
-    const int depth = work_path->depth + 1;
+    const uint16_t depth = work_path->depth + 1;
 
     // std::includes要求有序，但又不能破坏当前数据
     work_path_t temp;
@@ -154,7 +154,7 @@ static bool is_basic_type_branch_exist(const int fixed_cnt, const work_path_t *w
     });
 }
 
-static void save_work_path(const int fixed_cnt, const work_path_t *work_path, work_state_t *work_state) {
+static void save_work_path(const long fixed_cnt, const work_path_t *work_path, work_state_t *work_state) {
     if (work_state->count < MAX_STATE) {
         work_path_t &path = work_state->paths[work_state->count++];
         path.depth = work_path->depth;
@@ -168,8 +168,8 @@ static void save_work_path(const int fixed_cnt, const work_path_t *work_path, wo
     }
 }
 
-static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], const int pack_cnt, const bool has_pair, const int neighbor_cnt,
-    const int fixed_cnt, work_path_t *work_path, work_state_t *work_state) {
+static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], const long fixed_cnt, const bool has_pair, const uint16_t pack_cnt,
+    const uint16_t neighbor_cnt, work_path_t *work_path, work_state_t *work_state) {
     if (pack_cnt == 4) {  // 已经有4组面子
         return has_pair ? -1 : 0;  // 有雀头：和了；无雀头：听牌
     }
@@ -215,8 +215,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
             // 削减雀头，递归
             cnt_table[t] -= 2;
-            int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, true, neighbor_cnt,
-                fixed_cnt, work_path, work_state);
+            int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, true, pack_cnt,
+                neighbor_cnt, work_path, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 2;
         }
@@ -230,8 +230,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
-            int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt + 1, has_pair, neighbor_cnt,
-                fixed_cnt, work_path, work_state);
+            int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt + 1,
+                neighbor_cnt, work_path, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 3;
         }
@@ -249,8 +249,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
             --cnt_table[t];
             --cnt_table[t + 1];
             --cnt_table[t + 2];
-            int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt + 1, has_pair, neighbor_cnt,
-                fixed_cnt, work_path, work_state);
+            int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt + 1,
+                neighbor_cnt, work_path, work_state);
             result = std::min(ret, result);
             ++cnt_table[t];
             ++cnt_table[t + 1];
@@ -274,8 +274,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
             }
 
             cnt_table[t] -= 2;
-            int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, has_pair, neighbor_cnt + 1,
-                fixed_cnt, work_path, work_state);
+            int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
+                neighbor_cnt + 1, work_path, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 2;
         }
@@ -292,8 +292,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
                 --cnt_table[t];
                 --cnt_table[t + 1];
-                int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, has_pair, neighbor_cnt + 1,
-                    fixed_cnt, work_path, work_state);
+                int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
+                    neighbor_cnt + 1, work_path, work_state);
                 result = std::min(ret, result);
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
@@ -306,8 +306,8 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
                 --cnt_table[t];
                 --cnt_table[t + 2];
-                int ret = basic_type_wait_step_recursively(cnt_table, pack_cnt, has_pair, neighbor_cnt + 1,
-                    fixed_cnt, work_path, work_state);
+                int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
+                    neighbor_cnt + 1, work_path, work_state);
                 result = std::min(ret, result);
                 ++cnt_table[t];
                 ++cnt_table[t + 2];
@@ -336,8 +336,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_SIZE], lo
     work_path_t work_path;
     work_state_t work_state;
     work_state.count = 0;
-    int result = basic_type_wait_step_recursively(cnt_table, static_cast<int>(fixed_cnt), false, 0,
-        static_cast<int>(fixed_cnt), &work_path, &work_state);
+    int result = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, static_cast<uint16_t>(fixed_cnt), &work_path, &work_state);
 
     if (useful_table == nullptr) {
         return result;
@@ -359,8 +358,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_SIZE], lo
 
         ++cnt_table[t];
         work_state.count = 0;
-        int temp = basic_type_wait_step_recursively(cnt_table, static_cast<int>(fixed_cnt), false, 0,
-            static_cast<int>(fixed_cnt), &work_path, &work_state);
+        int temp = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, static_cast<uint16_t>(fixed_cnt), &work_path, &work_state);
         if (temp < result) {
             (*useful_table)[t] = true;  // 标记为有效牌
         }
