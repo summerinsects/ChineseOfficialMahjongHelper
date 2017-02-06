@@ -123,7 +123,7 @@ typedef uint16_t path_unit_t;
 #define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
 #define UNIT_TILE(unit_) ((unit_) & 0xFF)
 
-#define MAX_STATE 1024
+#define MAX_STATE 256
 #define UNIT_SIZE 7
 
 struct work_path_t {
@@ -145,8 +145,7 @@ static bool is_basic_type_branch_exist(const int fixed_cnt, const work_path_t *w
 
     // std::includes要求有序，但又不能破坏当前数据
     work_path_t temp;
-    temp.depth = work_path->depth;
-    std::copy(&temp.units[fixed_cnt], &temp.units[depth], &temp.units[fixed_cnt]);
+    std::copy(&work_path->units[fixed_cnt], &work_path->units[depth], &temp.units[fixed_cnt]);
     std::sort(&temp.units[fixed_cnt], &temp.units[depth]);
 
     return std::any_of(&work_state->paths[0], &work_state->paths[work_state->count],
@@ -156,8 +155,8 @@ static bool is_basic_type_branch_exist(const int fixed_cnt, const work_path_t *w
 }
 
 static void save_work_path(const int fixed_cnt, const work_path_t *work_path, work_state_t *work_state) {
-    work_path_t &path = work_state->paths[work_state->count++];
     if (work_state->count < MAX_STATE) {
+        work_path_t &path = work_state->paths[work_state->count++];
         path.depth = work_path->depth;
         std::copy(&work_path->units[fixed_cnt], &work_path->units[work_path->depth], &path.units[fixed_cnt]);
 
