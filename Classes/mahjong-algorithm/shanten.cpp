@@ -544,12 +544,73 @@ bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*
     return is_basic_type_wait_recursively(cnt_table, standing_cnt, waiting_table);
 }
 
+// 基本和型匹配2张
+static bool is_basic_type_win_2(const int (&cnt_table)[TILE_TABLE_SIZE]) {
+    // 找到未使用的牌
+    const int *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n > 0; });
+    // 存在且张数等于2
+    if (it == std::end(cnt_table) || *it != 2) {
+        return false;
+    }
+    // 还有其他未使用的牌
+    if (std::any_of(it + 1, std::end(cnt_table), [](int n) { return n > 0; })) {
+        return false;
+    }
+    return true;
+}
+
+// 递归计算基本和型是否和牌
+static bool is_basic_type_win_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long left_cnt) {
+    if (left_cnt == 2) {
+        return is_basic_type_win_2(cnt_table);
+    }
+
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (cnt_table[t] < 1) {
+            continue;
+        }
+
+        // 刻子
+        if (cnt_table[t] > 2) {
+            // 削减这组刻子，递归
+            cnt_table[t] -= 3;
+            bool ret = is_basic_type_win_recursively(cnt_table, left_cnt - 3);            
+            cnt_table[t] += 3;
+            if (ret) {
+                return true;
+            }
+        }
+
+        // 顺子（只能是数牌）
+        bool is_numbered = is_numbered_suit(t);
+        if (is_numbered) {
+            if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
+                // 削减这组顺子，递归
+                --cnt_table[t];
+                --cnt_table[t + 1];
+                --cnt_table[t + 2];
+                bool ret = is_basic_type_win_recursively(cnt_table, left_cnt - 3);
+                ++cnt_table[t];
+                ++cnt_table[t + 1];
+                ++cnt_table[t + 2];
+                if (ret) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 // 基本和型是否和牌
-// TODO 这里还可以写一套更高效的代码，比听牌判断更少递归，更快返回
 bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
-    bool waiting_table[TILE_TABLE_SIZE];
-    return (is_basic_type_wait(standing_tiles, standing_cnt, &waiting_table)
-        && waiting_table[test_tile]);
+    // 对立牌的种类进行打表
+    int cnt_table[TILE_TABLE_SIZE];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    ++cnt_table[test_tile];
+    return is_basic_type_win_recursively(cnt_table, standing_cnt + 1);
 }
 
 // 七对
@@ -670,65 +731,6 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, ti
         && useful_table[test_tile]);
 }
 
-// 基本和型匹配1张
-static bool is_basic_type_match_1(const int (&cnt_table)[TILE_TABLE_SIZE]) {
-    // 找到未使用的牌
-    const int *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n > 0; });
-    // 存在且张数等于2
-    if (it == std::end(cnt_table) || *it != 2) {
-        return false;
-    }
-    // 还有其他未使用的牌
-    if (std::any_of(it + 1, std::end(cnt_table), [](int n) { return n > 0; })) {
-        return false;
-    }
-    return true;
-}
-
-// 基本和型匹配2张
-static bool is_basic_type_match_2(int (&cnt_table)[TILE_TABLE_SIZE]) {
-    bool ret = false;
-
-    // 顺子（只能是数牌）
-    for (int s = 1; s <= 3; ++s) {
-        tile_t t1 = make_tile(s, 1);
-        tile_t t9 = make_tile(s, 9);
-        for (tile_t t = t1; t <= t9 - 2; ++t) {
-            if (!cnt_table[t] || !cnt_table[t + 1] || !cnt_table[t + 2]) {
-                continue;
-            }
-
-            // 削减这组顺子，递归
-            --cnt_table[t];
-            --cnt_table[t + 1];
-            --cnt_table[t + 2];
-            if (is_basic_type_match_1(cnt_table)) {
-                ret = true;
-            }
-            ++cnt_table[t];
-            ++cnt_table[t + 1];
-            ++cnt_table[t + 2];
-        }
-    }
-
-    // 刻子
-    for (int i = 0; i < 34; ++i) {
-        tile_t t = all_tiles[i];
-        if (cnt_table[t] < 3) {
-            continue;
-        }
-
-        // 削减这组刻子，递归
-        cnt_table[t] -= 3;
-        if (is_basic_type_match_1(cnt_table)) {
-            ret = true;
-        }
-        cnt_table[t] += 3;
-    }
-
-    return ret;
-}
-
 // “组合龙+面子+雀头”和型
 
 // 组合龙是否听牌实现
@@ -767,7 +769,7 @@ static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[T
 
     if (missing_cnt == 1) {  // 如果缺一张，那么除去组合龙之后的牌应该是完成状态才能听牌
         if (left_cnt == 10) {
-            if (is_basic_type_match_1(temp_table)) {
+            if (is_basic_type_win_recursively(temp_table, 2)) {
                 if (waiting_table != nullptr) {
                     (*waiting_table)[missing_tiles[0]] = true;
                 }
@@ -775,7 +777,7 @@ static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[T
             }
         }
         else {
-            if (is_basic_type_match_2(temp_table)) {
+            if (is_basic_type_win_recursively(temp_table, 5)) {
                 if (waiting_table != nullptr) {
                     (*waiting_table)[missing_tiles[0]] = true;
                 }
