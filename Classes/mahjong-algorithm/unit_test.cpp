@@ -1,7 +1,7 @@
 ﻿#include "tile.h"
-#include "wait_and_win.h"
+#include "shanten.h"
 #include "stringify.h"
-#include "points_calculator.h"
+#include "fan_calculator.h"
 
 #include <iostream>
 #include <assert.h>
@@ -21,31 +21,31 @@ void test_wait(const char *str) {
     bool table[TILE_TABLE_SIZE] = { false };
 
     if (tile_cnt == 13) {
-        if (is_thirteen_orphans_wait(tiles, tile_cnt, nullptr)) {
+        if (is_thirteen_orphans_wait(tiles, tile_cnt, &table)) {
             is_wait = true;
             printf("thirteen orphans");
         }
-        else if (is_honors_and_knitted_tiles_wait(tiles, tile_cnt, nullptr)) {
+        else if (is_honors_and_knitted_tiles_wait(tiles, tile_cnt, &table)) {
             is_wait = true;
             printf("honors and knitted tiles");
         }
-        else if (is_seven_pairs_wait(tiles, tile_cnt, nullptr)) {
+        else if (is_seven_pairs_wait(tiles, tile_cnt, &table)) {
             is_wait = true;
             printf("seven pairs");
         }
-        else if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, nullptr)) {
+        else if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, &table)) {
             is_wait = true;
             printf("knitted straight in basic type");
         }
     }
     else if (tile_cnt == 10) {
-        if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, nullptr)) {
+        if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, &table)) {
             is_wait = true;
             printf("knitted straight in basic type");
         }
     }
 
-    if (is_basic_type_wait(tiles, tile_cnt, nullptr)) {
+    if (!is_wait && is_basic_type_wait(tiles, tile_cnt, &table)) {
         is_wait = true;
         printf("basic type");
     }
@@ -88,7 +88,7 @@ void test_points(const char *str, const char *win_str, win_flag_t win_flag, wind
     ext_cond.win_flag = win_flag;
     ext_cond.prevalent_wind = prevalent_wind;
     ext_cond.seat_wind = seat_wind;
-    int points = calculate_points(&hand_tiles, win_tile, &ext_cond, fan_table);
+    int points = calculate_fan(&hand_tiles, win_tile, &ext_cond, fan_table);
 
     printf("max points = %d\n\n", points);
     //for (int i = 1; i < FLOWER_TILES; ++i) {
@@ -104,7 +104,7 @@ void test_points(const char *str, const char *win_str, win_flag_t win_flag, wind
     //}
 }
 
-void test_wait_step(const char *str) {
+void test_shanten(const char *str) {
     hand_tiles_t hand_tiles;
     long ret = string_to_tiles(str, &hand_tiles, nullptr);
     if (ret != 0) {
@@ -134,27 +134,27 @@ void test_wait_step(const char *str) {
     puts(str);
     bool useful_table[TILE_TABLE_SIZE] = {false};
     int ret0;
-    ret0 = thirteen_orphans_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = thirteen_orphans_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("131=== %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = seven_pairs_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = seven_pairs_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("7d=== %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = honors_and_knitted_tiles_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = honors_and_knitted_tiles_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("honors and knitted tiles  %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = knitted_straight_in_basic_type_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = knitted_straight_in_basic_type_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("knitted straight in basic type %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = basic_type_wait_step(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = basic_type_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("basic type %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
@@ -177,17 +177,17 @@ int main(int argc, const char *argv[]) {
 
         t1 = clock();
         for (int i = 0; i < tms; ++i)
-        basic_type_wait_step(st, 13, &ct);
+        basic_type_shanten(st, 13, &ct);
         t2 = clock() - t1;
         printf("用时约: %ld毫秒\n", t2/* * 1000 / CLOCKS_PER_SEC*/);
     }
 
-    //test_wait_step("19m19s22pESWCFPP");
-    //test_wait_step("278m3378s3779pEC");
-    test_wait_step("111m 5m12p1569sSWP");
+    //test_shanten("19m19s22pESWCFPP");
+    //test_shanten("278m3378s3779pEC");
+    test_shanten("111m 5m12p1569sSWP");
     //return 0;
 
-#if 0
+#if 1
     test_wait("19m19s199pESWNCF");
     test_wait("19m19s19pESWNCFP");
 
@@ -498,5 +498,5 @@ int main(int argc, const char *argv[]) {
 }
 
 #include "stringify.cpp"
-#include "wait_and_win.cpp"
-#include "points_calculator.cpp"
+#include "shanten.cpp"
+#include "fan_calculator.cpp"
