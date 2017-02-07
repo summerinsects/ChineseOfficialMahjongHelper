@@ -308,7 +308,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
         bool selected = TEST_FAN(_detail.points_flag, idx0);
         button->setHighlighted(selected);
-        button->setUserData((void *)selected);
+        button->setTag(selected);
 
         scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
     }
@@ -506,15 +506,15 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     size_t index = reinterpret_cast<size_t>(button->getUserData());
 
     // 标记/取消标记番种
-    bool selected = !!button->getUserData();
+    bool selected = !!button->getTag();
     if (selected) {
         button->setHighlighted(false);
-        button->setUserData((void *)false);
+        button->setTag(false);
         RESET_FAN(_detail.points_flag, index);
     }
     else {
         button->setHighlighted(true);
-        button->setUserData((void *)true);
+        button->setTag(true);
         SET_FAN(_detail.points_flag, index);
     }
 
