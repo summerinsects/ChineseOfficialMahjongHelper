@@ -581,7 +581,12 @@ int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*
 
 // 七对是否听牌
 bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
-    if (0 == seven_pairs_shanten(standing_tiles, standing_cnt, waiting_table)) {
+    bool useful_table[TILE_TABLE_SIZE];
+    if (0 == seven_pairs_shanten(standing_tiles, standing_cnt,
+        waiting_table != nullptr ? &useful_table : nullptr)) {
+        if (waiting_table != nullptr) {
+            memcpy(*waiting_table, useful_table, sizeof(*useful_table));
+        }
         return true;
     }
     return false;
@@ -648,7 +653,8 @@ int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, bo
 // 十三幺是否听牌
 bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
     bool useful_table[TILE_TABLE_SIZE];
-    if (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt, &useful_table)) {
+    if (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt,
+        waiting_table != nullptr ? &useful_table : nullptr)) {
         if (waiting_table != nullptr) {
             memcpy(*waiting_table, useful_table, sizeof(*useful_table));
         }
@@ -946,7 +952,12 @@ int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing
 
 // 全不靠是否听牌
 bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
-    if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt, waiting_table)) {
+    bool useful_table[TILE_TABLE_SIZE];
+    if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt,
+        waiting_table != nullptr ? &useful_table : nullptr)) {
+        if (waiting_table != nullptr) {
+            memcpy(*waiting_table, useful_table, sizeof(*useful_table));
+        }
         return true;
     }
     return false;
