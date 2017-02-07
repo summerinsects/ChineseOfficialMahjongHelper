@@ -355,8 +355,8 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 
     uint64_t pointsFlag = detail.points_flag;
     if (pointsFlag != 0) {
-        for (unsigned n = 0; n < 64; ++n) {
-            if ((1ULL << n) & pointsFlag) {
+        for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
+            if (TEST_FAN(pointsFlag, n)) {
                 unsigned idx = n;
                 label->setString(mahjong::fan_name[idx]);
                 label->setVisible(true);
@@ -605,8 +605,8 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
 
         uint64_t pointsFlag = detail.points_flag;
         if (pointsFlag != 0) {
-            for (unsigned n = 0; n < 64; ++n) {
-                if ((1ULL << n) & pointsFlag) {
+            for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
+                if (TEST_FAN(pointsFlag, n)) {
                     unsigned idx = n;
                     if (!str.empty()) {
                         str.append("、");

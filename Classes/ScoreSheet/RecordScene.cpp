@@ -4,7 +4,6 @@
 
 #include "RecordScene.h"
 #include "../common.h"
-#include "../mahjong-algorithm/points_calculator.h"
 #include "../widget/AlertView.h"
 #include "../widget/CWTableView.h"
 
@@ -307,7 +306,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         size_t row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
-        bool selected = !!(_detail.points_flag & (1ULL << idx0));
+        bool selected = TEST_FAN(_detail.points_flag, idx0);
         button->setHighlighted(selected);
         button->setUserData((void *)selected);
 
@@ -510,19 +509,19 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     if (selected) {
         button->setHighlighted(false);
         button->setUserData((void *)false);
-        _detail.points_flag &= ~(1ULL << index);
+        RESET_FAN(_detail.points_flag, index);
     }
     else {
         button->setHighlighted(true);
         button->setUserData((void *)true);
-        _detail.points_flag |= 1ULL << index;
+        SET_FAN(_detail.points_flag, index);
     }
 
     // 增加番数
     int prevWinScore = atoi(_editBox->getText());
     int currentWinScore = 0;
-    for (int n = 0; n < 64; ++n) {
-        if (_detail.points_flag & (1ULL << n)) {
+    for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
+        if (TEST_FAN(_detail.points_flag, n)) {
             unsigned idx = n;
             currentWinScore += mahjong::fan_value_table[idx];
         }

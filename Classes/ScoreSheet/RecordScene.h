@@ -3,11 +3,16 @@
 
 #include "../BaseLayer.h"
 #include "Record.h"
+#include "../mahjong-algorithm/points_calculator.h"
 
 namespace cw {
     class TableViewCell;
     class TableView;
 }
+
+#define SET_FAN(flag_, fan_) ((flag_) |= (1ULL << (mahjong::LAST_TILE - (fan_))))
+#define RESET_FAN(flag_, fan_) ((flag_) &= ~(1ULL << (mahjong::LAST_TILE - (fan_))))
+#define TEST_FAN(flag_, fan_) !!((flag_) & (1ULL << (mahjong::LAST_TILE - (fan_))))
 
 class RecordScene : public BaseLayer, public cocos2d::ui::EditBoxDelegate {
 public:
