@@ -330,7 +330,7 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
 
         // 相同出牌有相同上听数的两个result
         auto it2 = std::find_if(_resultSources.begin(), _resultSources.end(),
-            [it1](const ResultEx &result) { return result.discard_tile == it1->discard_tile && result.wait_step == it1->wait_step; });
+            [it1](const ResultEx &result) { return result.discard_tile == it1->discard_tile && result.shanten == it1->shanten; });
 
         if (it2 == _resultSources.end()) {  // 没找到，直接到resultSources
             _resultSources.push_back(ResultEx());
@@ -371,8 +371,8 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
 
     // 排序
     std::sort(temp.begin(), temp.end(), [](ResultEx *a, ResultEx *b) {
-        if (a->wait_step < b->wait_step) return true;
-        if (a->wait_step > b->wait_step) return false;
+        if (a->shanten < b->shanten) return true;
+        if (a->shanten > b->shanten) return false;
         if (a->count_total > b->count_total) return true;
         if (a->count_total < b->count_total) return false;
         if (a->count_in_tiles > b->count_in_tiles) return true;
@@ -385,9 +385,9 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
     });
 
     // 以第一个为标准，过滤掉上听数高的
-    int minStep = temp.front()->wait_step;
+    int minStep = temp.front()->shanten;
     temp.erase(
-        std::find_if(temp.begin(), temp.end(), [minStep](ResultEx *a) { return a->wait_step > minStep; }),
+        std::find_if(temp.begin(), temp.end(), [minStep](ResultEx *a) { return a->shanten > minStep; }),
         temp.end());
 
     // 转成下标数组
@@ -435,7 +435,7 @@ void MahjongTheoryScene::calculate() {
         mahjong::enum_discard_tile(&hand_tiles, serving_tile, FORM_FLAG_ALL, thiz.get(),
             [](void *context, const mahjong::enum_result_t *result) {
             MahjongTheoryScene *thiz = (MahjongTheoryScene *)context;
-            if (result->wait_step != std::numeric_limits<int>::max()) {
+            if (result->shanten != std::numeric_limits<int>::max()) {
                 thiz->_allResults.push_back(*result);
             }
             return (thiz->getParent() != nullptr);
@@ -655,7 +655,7 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeAtIndex(cw::TableView *table, ssi
     size_t realIdx = _orderedIndices[idx];
     const ResultEx *result = &_resultSources[realIdx];  // 当前cell的数据
 
-    const uint16_t key = ((!!result->discard_tile) << 9) | ((!!result->wait_step) << 8) | result->count_in_tiles;
+    const uint16_t key = ((!!result->discard_tile) << 9) | ((!!result->shanten) << 8) | result->count_in_tiles;
     std::unordered_map<uint16_t, int>::iterator it = _cellHeightMap.find(key);
     if (it != _cellHeightMap.end()) {
         return Size(0, it->second);
@@ -665,11 +665,11 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeAtIndex(cw::TableView *table, ssi
     float remainWidth;  // 第一行除了前面一些label之后剩下宽度
     if (result->discard_tile != 0) {
         remainWidth = cellWidth - _discardLabelWidth - TILE_WIDTH -
-            (result->wait_step > 0 ? _servingLabelWidth1 : _waitingLabelWidth1);
+            (result->shanten > 0 ? _servingLabelWidth1 : _waitingLabelWidth1);
     }
     else {
         remainWidth = cellWidth -
-            (result->wait_step > 0 ? _servingLabelWidth2 : _waitingLabelWidth2);
+            (result->shanten > 0 ? _servingLabelWidth2 : _waitingLabelWidth2);
     }
 
     int lineCnt = 1;
@@ -795,13 +795,13 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         layerColor[0]->setContentSize(Size(_cellWidth, cellSize.height - 2));
     }
 
-    typeLabel->setString(getResultTypeString(result->form_flag, result->wait_step));
+    typeLabel->setString(getResultTypeString(result->form_flag, result->shanten));
     typeLabel->setPosition(Vec2(SPACE, cellSize.height - 10));
     if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-        typeLabel->setColor(result->wait_step != -1 ? Color3B(208, 208, 208) : Color3B::YELLOW);
+        typeLabel->setColor(result->shanten != -1 ? Color3B(208, 208, 208) : Color3B::YELLOW);
     }
     else {
-        typeLabel->setColor(result->wait_step != -1 ? Color3B(80, 80, 80) : Color3B::ORANGE);
+        typeLabel->setColor(result->shanten != -1 ? Color3B(80, 80, 80) : Color3B::ORANGE);
     }
 
     float xPos = SPACE;
@@ -819,7 +819,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardSprite->setPosition(Vec2(xPos, yPos));
         xPos += TILE_WIDTH;
 
-        if (result->wait_step > 0) {
+        if (result->shanten > 0) {
             usefulLabel->setString("」摸「");
         }
         else {
@@ -833,7 +833,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardLabel->setVisible(false);
         discardSprite->setVisible(false);
 
-        if (result->wait_step != 0) {
+        if (result->shanten != 0) {
             usefulLabel->setString("摸「");
         }
         else {

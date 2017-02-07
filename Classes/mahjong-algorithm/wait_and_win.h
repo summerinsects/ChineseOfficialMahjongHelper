@@ -66,7 +66,7 @@ int count_useful_tile(const int (&used_table)[TILE_TABLE_SIZE], const bool (&use
  * @param [out] useful_table 有效牌标记表（可为null)
  * @return int 上听数
  */
-int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
+int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
 
 /**
  * @brief 基本和型是否听牌
@@ -98,7 +98,7 @@ bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t t
  * @param [out] useful_table 有效牌标记表（可为null)
  * @return int 上听数
  */
-int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
+int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
 
 /**
  * @brief 七对是否听牌
@@ -130,7 +130,7 @@ bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t 
  * @param [out] useful_table 有效牌标记表（可为null)
  * @return int 上听数
  */
-int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
+int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
 
 /**
  * @brief 十三幺是否听牌
@@ -162,7 +162,7 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, ti
  * @param [out] useful_table 有效牌标记表（可为null)
  * @return int 上听数
  */
-int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
+int knitted_straight_in_basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
 
 /**
  * @brief 组合龙是否听牌
@@ -194,7 +194,7 @@ bool is_knitted_straight_in_basic_type_win(const tile_t *standing_tiles, long st
  * @param [out] useful_table 有效牌标记表（可为null)
  * @return int 上听数
  */
-int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
+int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
 
 /**
  * @brief 全不靠是否听牌
@@ -263,7 +263,7 @@ static const tile_t standard_thirteen_orphans[13] = {
 struct enum_result_t {
     tile_t discard_tile;                    ///< 打这张牌
     uint8_t form_flag;                      ///< 和牌形式
-    int wait_step;                          ///< 上听数
+    int shanten;                            ///< 上听数
     bool useful_table[TILE_TABLE_SIZE];     ///< 有效牌标记表
 };
 

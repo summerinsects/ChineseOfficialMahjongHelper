@@ -143,7 +143,7 @@ static void save_work_path(const long fixed_cnt, const work_path_t *work_path, w
     }
 }
 
-static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], const long fixed_cnt, const bool has_pair, const uint16_t pack_cnt,
+static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], const long fixed_cnt, const bool has_pair, const uint16_t pack_cnt,
     const uint16_t neighbor_cnt, work_path_t *work_path, work_state_t *work_state) {
     if (pack_cnt == 4) {  // 已经有4组面子
         return has_pair ? -1 : 0;  // 有雀头：和了；无雀头：听牌
@@ -189,7 +189,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
             // 削减雀头，递归
             cnt_table[t] -= 2;
-            int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, true, pack_cnt,
+            int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, true, pack_cnt,
                 neighbor_cnt, work_path, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 2;
@@ -204,7 +204,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
-            int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt + 1,
+            int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt + 1,
                 neighbor_cnt, work_path, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 3;
@@ -222,7 +222,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
             --cnt_table[t];
             --cnt_table[t + 1];
             --cnt_table[t + 2];
-            int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt + 1,
+            int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt + 1,
                 neighbor_cnt, work_path, work_state);
             result = std::min(ret, result);
             ++cnt_table[t];
@@ -247,7 +247,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
             }
 
             cnt_table[t] -= 2;
-            int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
+            int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
                 neighbor_cnt + 1, work_path, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 2;
@@ -264,7 +264,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
                 --cnt_table[t];
                 --cnt_table[t + 1];
-                int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
+                int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
                     neighbor_cnt + 1, work_path, work_state);
                 result = std::min(ret, result);
                 ++cnt_table[t];
@@ -278,7 +278,7 @@ static int basic_type_wait_step_recursively(int (&cnt_table)[TILE_TABLE_SIZE], c
 
                 --cnt_table[t];
                 --cnt_table[t + 2];
-                int ret = basic_type_wait_step_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
+                int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
                     neighbor_cnt + 1, work_path, work_state);
                 result = std::min(ret, result);
                 ++cnt_table[t];
@@ -303,12 +303,12 @@ static bool numbered_tile_has_neighbor(const int (&cnt_table)[TILE_TABLE_SIZE], 
     return false;
 }
 
-static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+static int basic_type_shanten_from_table(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
     // 计算上听数
     work_path_t work_path;
     work_state_t work_state;
     work_state.count = 0;
-    int result = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, static_cast<uint16_t>(fixed_cnt), 0, &work_path, &work_state);
+    int result = basic_type_shanten_recursively(cnt_table, fixed_cnt, false, static_cast<uint16_t>(fixed_cnt), 0, &work_path, &work_state);
 
     if (useful_table == nullptr) {
         return result;
@@ -330,7 +330,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_SIZE], lo
 
         ++cnt_table[t];
         work_state.count = 0;
-        int temp = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, static_cast<uint16_t>(fixed_cnt), 0, &work_path, &work_state);
+        int temp = basic_type_shanten_recursively(cnt_table, fixed_cnt, false, static_cast<uint16_t>(fixed_cnt), 0, &work_path, &work_state);
         if (temp < result) {
             (*useful_table)[t] = true;  // 标记为有效牌
         }
@@ -340,7 +340,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_SIZE], lo
     return result;
 }
 
-int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
     if (standing_tiles == nullptr || (standing_cnt != 13
         && standing_cnt != 10 && standing_cnt != 7 && standing_cnt != 4 && standing_cnt != 1)) {
         return std::numeric_limits<int>::max();
@@ -353,7 +353,7 @@ int basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
     }
-    return basic_type_wait_step_from_table(cnt_table, (13 - standing_cnt) / 3, useful_table);
+    return basic_type_shanten_from_table(cnt_table, (13 - standing_cnt) / 3, useful_table);
 }
 
 static bool is_basic_type_wait_1(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiting_table)[TILE_TABLE_SIZE]) {
@@ -520,7 +520,7 @@ bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t t
 
 // 七对
 
-int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -545,7 +545,7 @@ int seven_pairs_wait_step(const tile_t *standing_tiles, long standing_cnt, bool 
 }
 
 bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
-    if (0 == seven_pairs_wait_step(standing_tiles, standing_cnt, waiting_table)) {
+    if (0 == seven_pairs_shanten(standing_tiles, standing_cnt, waiting_table)) {
         return true;
     }
     return false;
@@ -553,13 +553,13 @@ bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (
 
 bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     bool useful_table[TILE_TABLE_SIZE];
-    return (0 == seven_pairs_wait_step(standing_tiles, standing_cnt, &useful_table)
+    return (0 == seven_pairs_shanten(standing_tiles, standing_cnt, &useful_table)
         && useful_table[test_tile]);
 }
 
 // 十三幺
 
-int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -609,7 +609,7 @@ int thirteen_orphans_wait_step(const tile_t *standing_tiles, long standing_cnt, 
 
 
 bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
-    if (0 == thirteen_orphans_wait_step(standing_tiles, standing_cnt, waiting_table)) {
+    if (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt, waiting_table)) {
         return true;
     }
     return false;
@@ -617,7 +617,7 @@ bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, b
 
 bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     bool useful_table[TILE_TABLE_SIZE];
-    return (0 == thirteen_orphans_wait_step(standing_tiles, standing_cnt, &useful_table)
+    return (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt, &useful_table)
         && useful_table[test_tile]);
 }
 
@@ -742,7 +742,7 @@ static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[T
     return false;
 }
 
-static int knitted_straight_in_basic_type_wait_step_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (*useful_table)[TILE_TABLE_SIZE]) {
+static int knitted_straight_in_basic_type_shanten_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (*useful_table)[TILE_TABLE_SIZE]) {
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
     }
@@ -767,13 +767,13 @@ static int knitted_straight_in_basic_type_wait_step_1(const tile_t *standing_til
     }
 
     // 余下“1组面子+雀头”的上听数
-    int result = basic_type_wait_step_from_table(cnt_table, 3, useful_table);
+    int result = basic_type_shanten_from_table(cnt_table, 3, useful_table);
 
     // 上听数=组合龙缺少的张数+余下“1组面子+雀头”的上听数
     return (9 - cnt) + result;
 }
 
-int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int knitted_straight_in_basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
     if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return std::numeric_limits<int>::max();
     }
@@ -787,7 +787,7 @@ int knitted_straight_in_basic_type_wait_step(const tile_t *standing_tiles, long 
 
     // 6种组合龙分别计算
     for (int i = 0; i < 6; ++i) {
-        int st = knitted_straight_in_basic_type_wait_step_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
+        int st = knitted_straight_in_basic_type_shanten_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
         if (st < ret) {
             ret = st;
             if (useful_table != nullptr) {
@@ -823,7 +823,7 @@ bool is_knitted_straight_in_basic_type_win(const tile_t *standing_tiles, long st
 
 // 全不靠/七星不靠
 
-static int honors_and_knitted_tiles_wait_step_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (*useful_table)[TILE_TABLE_SIZE]) {
+static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (*useful_table)[TILE_TABLE_SIZE]) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -866,7 +866,7 @@ static int honors_and_knitted_tiles_wait_step_1(const tile_t *standing_tiles, lo
     return 13 - cnt;
 }
 
-int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
     int ret = std::numeric_limits<int>::max();
     bool temp_table[TILE_TABLE_SIZE];
 
@@ -876,7 +876,7 @@ int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standi
 
     // 6种组合龙分别计算
     for (int i = 0; i < 6; ++i) {
-        int st = honors_and_knitted_tiles_wait_step_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
+        int st = honors_and_knitted_tiles_shanten_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
         if (st < ret) {
             ret = st;
             if (useful_table != nullptr) {
@@ -892,7 +892,7 @@ int honors_and_knitted_tiles_wait_step(const tile_t *standing_tiles, long standi
 }
 
 bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
-    if (0 == honors_and_knitted_tiles_wait_step(standing_tiles, standing_cnt, waiting_table)) {
+    if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt, waiting_table)) {
         return true;
     }
     return false;
@@ -900,7 +900,7 @@ bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standin
 
 bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     bool useful_table[TILE_TABLE_SIZE];
-    if (0 == honors_and_knitted_tiles_wait_step(standing_tiles, standing_cnt, &useful_table)) {
+    if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt, &useful_table)) {
         return useful_table[test_tile];
     }
     return false;
@@ -911,9 +911,9 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
     enum_result_t result;
     result.discard_tile = discard_tile;
     result.form_flag = FORM_FLAG_BASIC_TYPE;
-    result.wait_step = basic_type_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-    if (result.wait_step == 0 && result.useful_table[discard_tile]) {
-        result.wait_step = -1;
+    result.shanten = basic_type_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
+    if (result.shanten == 0 && result.useful_table[discard_tile]) {
+        result.shanten = -1;
     }
     if (!enum_callback(context, &result)) {
         return false;
@@ -922,9 +922,9 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
     if (hand_tiles->tile_count == 13) {
         if (form_flag | FORM_FLAG_SEVEN_PAIRS) {
             result.form_flag = FORM_FLAG_SEVEN_PAIRS;
-            result.wait_step = seven_pairs_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-            if (result.wait_step == 0 && result.useful_table[discard_tile]) {
-                result.wait_step = -1;
+            result.shanten = seven_pairs_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
+            if (result.shanten == 0 && result.useful_table[discard_tile]) {
+                result.shanten = -1;
             }
             if (!enum_callback(context, &result)) {
                 return false;
@@ -933,9 +933,9 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
 
         if (form_flag | FORM_FLAG_THIRTEEN_ORPHANS) {
             result.form_flag = FORM_FLAG_THIRTEEN_ORPHANS;
-            result.wait_step = thirteen_orphans_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-            if (result.wait_step == 0 && result.useful_table[discard_tile]) {
-                result.wait_step = -1;
+            result.shanten = thirteen_orphans_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
+            if (result.shanten == 0 && result.useful_table[discard_tile]) {
+                result.shanten = -1;
             }
             if (!enum_callback(context, &result)) {
                 return false;
@@ -944,9 +944,9 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
 
         if (form_flag | FORM_FLAG_HONORS_AND_KNITTED_TILES) {
             result.form_flag = FORM_FLAG_HONORS_AND_KNITTED_TILES;
-            result.wait_step = honors_and_knitted_tiles_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-            if (result.wait_step == 0 && result.useful_table[discard_tile]) {
-                result.wait_step = -1;
+            result.shanten = honors_and_knitted_tiles_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
+            if (result.shanten == 0 && result.useful_table[discard_tile]) {
+                result.shanten = -1;
             }
             if (!enum_callback(context, &result)) {
                 return false;
@@ -957,9 +957,9 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
     if (hand_tiles->tile_count == 13 || hand_tiles->tile_count == 10) {
         if (form_flag | FORM_FLAG_KNITTED_STRAIGHT) {
             result.form_flag = FORM_FLAG_KNITTED_STRAIGHT;
-            result.wait_step = knitted_straight_in_basic_type_wait_step(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-            if (result.wait_step == 0 && result.useful_table[discard_tile]) {
-                result.wait_step = -1;
+            result.shanten = knitted_straight_in_basic_type_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
+            if (result.shanten == 0 && result.useful_table[discard_tile]) {
+                result.shanten = -1;
             }
             if (!enum_callback(context, &result)) {
                 return false;
