@@ -1,5 +1,5 @@
-﻿#ifndef _WAIT_AND_WIN_TEST_H_
-#define _WAIT_AND_WIN_TEST_H_
+﻿#ifndef __SHANTEN_H__
+#define __SHANTEN_H__
 
 #include "tile.h"
 

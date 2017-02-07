@@ -1,5 +1,5 @@
-﻿#ifndef _POINTS_CALCULATOR_H_
-#define _POINTS_CALCULATOR_H_
+﻿#ifndef __FAN_CALCULATOR_H__
+#define __FAN_CALCULATOR_H__
 
 #include "tile.h"
 
