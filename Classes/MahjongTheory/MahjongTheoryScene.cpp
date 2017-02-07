@@ -5,7 +5,7 @@
 #include "MahjongTheoryScene.h"
 #include "../widget/CWTableView.h"
 #include "../mahjong-algorithm/stringify.h"
-#include "../mahjong-algorithm/points_calculator.h"
+#include "../mahjong-algorithm/fan_calculator.h"
 
 #include "../common.h"
 #include "../compiler.h"

@@ -5,7 +5,7 @@
 #include "ScoreTable.h"
 #include "ScoreDefinition.h"
 #include "../widget/CWTableView.h"
-#include "../mahjong-algorithm/points_calculator.h"
+#include "../mahjong-algorithm/fan_calculator.h"
 #include "../common.h"
 
 USING_NS_CC;

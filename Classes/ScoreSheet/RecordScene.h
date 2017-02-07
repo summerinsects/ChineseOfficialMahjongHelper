@@ -3,7 +3,7 @@
 
 #include "../BaseLayer.h"
 #include "Record.h"
-#include "../mahjong-algorithm/points_calculator.h"
+#include "../mahjong-algorithm/fan_calculator.h"
 
 namespace cw {
     class TableViewCell;

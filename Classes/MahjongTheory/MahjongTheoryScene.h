@@ -2,7 +2,7 @@
 #define __MAHJONG_THEORY_SCENE_H__
 
 #include "../BaseLayer.h"
-#include "../mahjong-algorithm/wait_and_win.h"
+#include "../mahjong-algorithm/shanten.h"
 #include <unordered_map>
 
 namespace cw {

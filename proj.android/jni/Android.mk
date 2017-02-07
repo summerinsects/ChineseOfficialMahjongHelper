@@ -12,9 +12,9 @@ LOCAL_MODULE := MyGame_shared
 LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
-                   ../../Classes/mahjong-algorithm/points_calculator.cpp \
+                   ../../Classes/mahjong-algorithm/fan_calculator.cpp \
                    ../../Classes/mahjong-algorithm/stringify.cpp \
-                   ../../Classes/mahjong-algorithm/wait_and_win.cpp \
+                   ../../Classes/mahjong-algorithm/shanten.cpp \
                    ../../Classes/MahjongTheory/MahjongTheoryScene.cpp \
                    ../../Classes/Other/OtherScene.cpp \
                    ../../Classes/PointsCalculator/PointsCalculatorScene.cpp \

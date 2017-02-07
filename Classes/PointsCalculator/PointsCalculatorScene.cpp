@@ -1,6 +1,6 @@
 ﻿#include "PointsCalculatorScene.h"
 #include "../mahjong-algorithm/stringify.h"
-#include "../mahjong-algorithm/points_calculator.h"
+#include "../mahjong-algorithm/fan_calculator.h"
 
 #include "../widget/TilePickWidget.h"
 #include "../widget/HandTilesWidget.h"

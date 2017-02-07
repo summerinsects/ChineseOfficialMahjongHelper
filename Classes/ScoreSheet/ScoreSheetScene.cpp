@@ -5,7 +5,7 @@
 #include "../widget/AlertView.h"
 #include "../widget/CWEditBoxDelegate.h"
 #include "../common.h"
-#include "../mahjong-algorithm/points_calculator.h"
+#include "../mahjong-algorithm/fan_calculator.h"
 
 USING_NS_CC;
 

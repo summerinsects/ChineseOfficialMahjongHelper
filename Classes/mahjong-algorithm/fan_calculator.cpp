@@ -1,5 +1,5 @@
-﻿#include "points_calculator.h"
-#include "wait_and_win.h"
+﻿#include "fan_calculator.h"
+#include "shanten.h"
 
 #include <assert.h>
 #include <stddef.h>

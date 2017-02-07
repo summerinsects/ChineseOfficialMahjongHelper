@@ -42,10 +42,10 @@
     <ClCompile Include="..\Classes\HelloWorldScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\mahjong-algorithm\points_calculator.cpp">
+    <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp">
       <Filter>src\mahjong-algorithm</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\mahjong-algorithm\wait_and_win.cpp">
+    <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp">
       <Filter>src\mahjong-algorithm</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\PointsCalculator\PointsCalculatorScene.cpp">
@@ -101,10 +101,10 @@
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\mahjong-algorithm\points_calculator.h">
+    <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\mahjong-algorithm\wait_and_win.h">
+    <ClInclude Include="..\Classes\mahjong-algorithm\shanten.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\PointsCalculator\PointsCalculatorScene.h">

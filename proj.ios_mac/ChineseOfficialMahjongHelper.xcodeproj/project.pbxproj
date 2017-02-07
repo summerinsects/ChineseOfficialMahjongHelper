@@ -27,10 +27,10 @@
 		1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */; };
 		1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */; };
 		1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */; };
-		1FDD94431C8337140031BC38 /* points_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* points_calculator.cpp */; };
-		1FDD94441C8337140031BC38 /* points_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* points_calculator.cpp */; };
-		1FDD94451C8337140031BC38 /* wait_and_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win.cpp */; };
-		1FDD94461C8337140031BC38 /* wait_and_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* wait_and_win.cpp */; };
+		1FDD94431C8337140031BC38 /* fan_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* fan_calculator.cpp */; };
+		1FDD94441C8337140031BC38 /* fan_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* fan_calculator.cpp */; };
+		1FDD94451C8337140031BC38 /* shanten.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* shanten.cpp */; };
+		1FDD94461C8337140031BC38 /* shanten.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* shanten.cpp */; };
 		1FDD950E1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
 		1FDD950F1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
 		1FE04ADE1C94682A008401EA /* PointsCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04AD71C94682A008401EA /* PointsCalculatorScene.cpp */; };
@@ -165,11 +165,11 @@
 		1FCC3C011CC47200001C9555 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Record.h; sourceTree = "<group>"; };
 		1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HandTilesWidget.cpp; sourceTree = "<group>"; };
 		1FD228F11E39837E00DF5C1D /* HandTilesWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandTilesWidget.h; sourceTree = "<group>"; };
-		1FDD943C1C8337140031BC38 /* points_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = points_calculator.cpp; sourceTree = "<group>"; };
-		1FDD943D1C8337140031BC38 /* points_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = points_calculator.h; sourceTree = "<group>"; };
+		1FDD943C1C8337140031BC38 /* fan_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fan_calculator.cpp; sourceTree = "<group>"; };
+		1FDD943D1C8337140031BC38 /* fan_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fan_calculator.h; sourceTree = "<group>"; };
 		1FDD943E1C8337140031BC38 /* tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tile.h; sourceTree = "<group>"; };
-		1FDD943F1C8337140031BC38 /* wait_and_win.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wait_and_win.cpp; sourceTree = "<group>"; };
-		1FDD94401C8337140031BC38 /* wait_and_win.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wait_and_win.h; sourceTree = "<group>"; };
+		1FDD943F1C8337140031BC38 /* shanten.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = shanten.cpp; sourceTree = "<group>"; };
+		1FDD94401C8337140031BC38 /* shanten.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shanten.h; sourceTree = "<group>"; };
 		1FDD950D1C8338700031BC38 /* source_material */ = {isa = PBXFileReference; lastKnownFileType = folder; path = source_material; sourceTree = "<group>"; };
 		1FE04AD71C94682A008401EA /* PointsCalculatorScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointsCalculatorScene.cpp; sourceTree = "<group>"; };
 		1FE04AD81C94682A008401EA /* PointsCalculatorScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointsCalculatorScene.h; sourceTree = "<group>"; };
@@ -340,13 +340,13 @@
 		1FDD943B1C8337140031BC38 /* mahjong-algorithm */ = {
 			isa = PBXGroup;
 			children = (
-				1FDD943C1C8337140031BC38 /* points_calculator.cpp */,
-				1FDD943D1C8337140031BC38 /* points_calculator.h */,
+				1FDD943C1C8337140031BC38 /* fan_calculator.cpp */,
+				1FDD943D1C8337140031BC38 /* fan_calculator.h */,
 				1F154E3F1E440A160083F8B3 /* stringify.cpp */,
 				1F154E401E440A160083F8B3 /* stringify.h */,
 				1FDD943E1C8337140031BC38 /* tile.h */,
-				1FDD943F1C8337140031BC38 /* wait_and_win.cpp */,
-				1FDD94401C8337140031BC38 /* wait_and_win.h */,
+				1FDD943F1C8337140031BC38 /* shanten.cpp */,
+				1FDD94401C8337140031BC38 /* shanten.h */,
 			);
 			path = "mahjong-algorithm";
 			sourceTree = "<group>";
@@ -674,7 +674,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1FDD94431C8337140031BC38 /* points_calculator.cpp in Sources */,
+				1FDD94431C8337140031BC38 /* fan_calculator.cpp in Sources */,
 				1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
 				1FE2A3ED1CBB30D1008C45C5 /* ScoreTable.cpp in Sources */,
@@ -683,7 +683,7 @@
 				1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
 				1F2D25871E076FC20071ADE2 /* AlertView.cpp in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
-				1FDD94451C8337140031BC38 /* wait_and_win.cpp in Sources */,
+				1FDD94451C8337140031BC38 /* shanten.cpp in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				1F4192741E10A10200CDC47D /* CWTableView.cpp in Sources */,
@@ -701,7 +701,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1FDD94441C8337140031BC38 /* points_calculator.cpp in Sources */,
+				1FDD94441C8337140031BC38 /* fan_calculator.cpp in Sources */,
 				1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */,
 				1FE2A3EE1CBB30D1008C45C5 /* ScoreTable.cpp in Sources */,
 				1FE2A3EC1CBB30D1008C45C5 /* ScoreDefinition.cpp in Sources */,
@@ -715,7 +715,7 @@
 				1F154E421E440A160083F8B3 /* stringify.cpp in Sources */,
 				1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				46880B8B19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
-				1FDD94461C8337140031BC38 /* wait_and_win.cpp in Sources */,
+				1FDD94461C8337140031BC38 /* shanten.cpp in Sources */,
 				1FE04AE11C94682A008401EA /* RecordScene.cpp in Sources */,
 				1FE5CFDE1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
 				1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */,

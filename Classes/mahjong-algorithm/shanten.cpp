@@ -1,4 +1,4 @@
-﻿#include "wait_and_win.h"
+﻿#include "shanten.h"
 
 #include <assert.h>
 #include <string.h>

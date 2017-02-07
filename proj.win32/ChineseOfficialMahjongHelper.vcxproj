@@ -145,9 +145,9 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
-    <ClCompile Include="..\Classes\mahjong-algorithm\points_calculator.cpp" />
+    <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp" />
-    <ClCompile Include="..\Classes\mahjong-algorithm\wait_and_win.cpp" />
+    <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp" />
     <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp" />
     <ClCompile Include="..\Classes\Other\OtherScene.cpp" />
     <ClCompile Include="..\Classes\PointsCalculator\PointsCalculatorScene.cpp" />
@@ -167,10 +167,10 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\BaseLayer.h" />
     <ClInclude Include="..\Classes\common.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
-    <ClInclude Include="..\Classes\mahjong-algorithm\points_calculator.h" />
+    <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\stringify.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h" />
-    <ClInclude Include="..\Classes\mahjong-algorithm\wait_and_win.h" />
+    <ClInclude Include="..\Classes\mahjong-algorithm\shanten.h" />
     <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h" />
     <ClInclude Include="..\Classes\Other\OtherScene.h" />
     <ClInclude Include="..\Classes\PointsCalculator\PointsCalculatorScene.h" />
