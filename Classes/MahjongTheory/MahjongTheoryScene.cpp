@@ -280,8 +280,8 @@ bool MahjongTheoryScene::parseInput(const char *input) {
     const std::string str = input;
 
     do {
-        mahjong::hand_tiles_t hand_tiles;
-        mahjong::tile_t serving_tile;
+        mahjong::hand_tiles_t hand_tiles = { 0 };
+        mahjong::tile_t serving_tile = 0;
         long ret = mahjong::string_to_tiles(input, &hand_tiles, &serving_tile);
         if (ret != PARSE_NO_ERROR) {
             switch (ret) {
@@ -292,6 +292,20 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             default: break;
             }
             break;
+        }
+
+        if (hand_tiles.tile_count < 13) {
+            switch (hand_tiles.tile_count % 3) {
+            case 2:
+                // 将最后一张作为上牌，不需要break
+                serving_tile = hand_tiles.standing_tiles[--hand_tiles.tile_count];
+            case 1:
+                // 修正副露组数，以便骗过检查
+                hand_tiles.pack_count = 4 - hand_tiles.tile_count / 3;
+                break;
+            default:
+                break;
+            }
         }
 
         ret = mahjong::check_calculator_input(&hand_tiles, serving_tile);
