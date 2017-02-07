@@ -336,7 +336,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_SIZE], lo
     work_path_t work_path;
     work_state_t work_state;
     work_state.count = 0;
-    int result = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, static_cast<uint16_t>(fixed_cnt), &work_path, &work_state);
+    int result = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, static_cast<uint16_t>(fixed_cnt), 0, &work_path, &work_state);
 
     if (useful_table == nullptr) {
         return result;
@@ -358,7 +358,7 @@ static int basic_type_wait_step_from_table(int (&cnt_table)[TILE_TABLE_SIZE], lo
 
         ++cnt_table[t];
         work_state.count = 0;
-        int temp = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, 0, static_cast<uint16_t>(fixed_cnt), &work_path, &work_state);
+        int temp = basic_type_wait_step_recursively(cnt_table, fixed_cnt, false, static_cast<uint16_t>(fixed_cnt), 0, &work_path, &work_state);
         if (temp < result) {
             (*useful_table)[t] = true;  // 标记为有效牌
         }
