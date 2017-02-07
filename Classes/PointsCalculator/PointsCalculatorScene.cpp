@@ -63,11 +63,11 @@ bool PointsCalculatorScene::init() {
     infoWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 85));
 
     // 番种显示的Node
-    _pointsAreaNode = Node::create();
-    _pointsAreaNode->setContentSize(Size(visibleSize.width, y - 145));
-    _pointsAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    this->addChild(_pointsAreaNode);
-    _pointsAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + y * 0.5f - 70));
+    _fanAreaNode = Node::create();
+    _fanAreaNode->setContentSize(Size(visibleSize.width, y - 145));
+    _fanAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    this->addChild(_fanAreaNode);
+    _fanAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + y * 0.5f - 70));
 
     // 点和与自摸互斥
     _winTypeGroup = ui::RadioButtonGroup::create();
@@ -469,11 +469,11 @@ void PointsCalculatorScene::parseInput(const char *input) {
 #define FONT_SIZE 14
 
 void PointsCalculatorScene::calculate() {
-    _pointsAreaNode->removeAllChildren();
+    _fanAreaNode->removeAllChildren();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const Size &pointsAreaSize = _pointsAreaNode->getContentSize();
-    Vec2 pos(pointsAreaSize.width * 0.5f, pointsAreaSize.height * 0.5f);
+    const Size &fanAreaSize = _fanAreaNode->getContentSize();
+    Vec2 pos(fanAreaSize.width * 0.5f, fanAreaSize.height * 0.5f);
 
     int flowerCnt = atoi(_editBox->getText());
     if (flowerCnt > 8) {
@@ -510,27 +510,27 @@ void PointsCalculatorScene::calculate() {
     ext_cond.win_flag = win_flag;
     ext_cond.prevalent_wind = prevalent_wind;
     ext_cond.seat_wind = seat_wind;
-    int points = calculate_points(&hand_tiles, win_tile, &ext_cond, fan_table);
+    int fan = calculate_fan(&hand_tiles, win_tile, &ext_cond, fan_table);
 
     Color3B textColor = UserDefault::getInstance()->getBoolForKey("night_mode") ? Color3B::WHITE : Color3B::BLACK;
-    if (points == ERROR_NOT_WIN) {
+    if (fan == ERROR_NOT_WIN) {
         Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", FONT_SIZE);
         errorLabel->setColor(textColor);
-        _pointsAreaNode->addChild(errorLabel);
+        _fanAreaNode->addChild(errorLabel);
         errorLabel->setPosition(pos);
         return;
     }
-    if (points == ERROR_WRONG_TILES_COUNT) {
+    if (fan == ERROR_WRONG_TILES_COUNT) {
         AlertView::showWithMessage("算番", "牌张数错误", nullptr, nullptr);
         return;
     }
-    if (points == ERROR_TILE_COUNT_GREATER_THAN_4) {
+    if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
         AlertView::showWithMessage("算番", "同一种牌最多只能使用4枚", nullptr, nullptr);
         return;
     }
 
     // 加花牌
-    points += flowerCnt;
+    fan += flowerCnt;
     fan_table[mahjong::FLOWER_TILES] = flowerCnt;
 
     // 有n个番种，每行排2个
@@ -539,8 +539,8 @@ void PointsCalculatorScene::calculate() {
 
     // 排列
     Node *innerNode = Node::create();
-    float pointsAreaHeight = (FONT_SIZE + 2) * (rows + 2);  // 每行间隔2像素，留空1行，另一行给“总计”用
-    innerNode->setContentSize(Size(visibleSize.width, pointsAreaHeight));
+    float fanAreaHeight = (FONT_SIZE + 2) * (rows + 2);  // 每行间隔2像素，留空1行，另一行给“总计”用
+    innerNode->setContentSize(Size(visibleSize.width, fanAreaHeight));
 
     for (int i = 0, j = 0; i < n; ++i) {
         while (fan_table[++j] == 0) continue;
@@ -554,23 +554,23 @@ void PointsCalculatorScene::calculate() {
         }
 
         // 创建label，每行排2个
-        Label *pointName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
-        pointName->setColor(textColor);
-        innerNode->addChild(pointName);
-        pointName->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+        Label *fanName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
+        fanName->setColor(textColor);
+        innerNode->addChild(fanName);
+        fanName->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
         div_t ret = div(i, 2);
-        pointName->setPosition(Vec2(ret.rem == 0 ? 5.0f : visibleSize.width * 0.5f + 5.0f, (FONT_SIZE + 2) * (rows - ret.quot + 2)));
+        fanName->setPosition(Vec2(ret.rem == 0 ? 5.0f : visibleSize.width * 0.5f + 5.0f, (FONT_SIZE + 2) * (rows - ret.quot + 2)));
     }
 
-    Label *pointTotal = Label::createWithSystemFont(StringUtils::format("总计：%d番", points), "Arial", FONT_SIZE);
-    pointTotal->setColor(textColor);
-    innerNode->addChild(pointTotal);
-    pointTotal->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-    pointTotal->setPosition(Vec2(5.0f, FONT_SIZE + 2));
+    Label *fanTotal = Label::createWithSystemFont(StringUtils::format("总计：%d番", fan), "Arial", FONT_SIZE);
+    fanTotal->setColor(textColor);
+    innerNode->addChild(fanTotal);
+    fanTotal->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+    fanTotal->setPosition(Vec2(5.0f, FONT_SIZE + 2));
 
     // 超出高度就使用ScrollView
-    if (pointsAreaHeight <= pointsAreaSize.height) {
-        _pointsAreaNode->addChild(innerNode);
+    if (fanAreaHeight <= fanAreaSize.height) {
+        _fanAreaNode->addChild(innerNode);
         innerNode->setAnchorPoint(Vec2(0.5f, 0.5f));
         innerNode->setPosition(pos);
     }
@@ -578,11 +578,11 @@ void PointsCalculatorScene::calculate() {
         ui::ScrollView *scrollView = ui::ScrollView::create();
         scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
         scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
-        scrollView->setContentSize(pointsAreaSize);
+        scrollView->setContentSize(fanAreaSize);
         scrollView->setInnerContainerSize(innerNode->getContentSize());
         scrollView->addChild(innerNode);
 
-        _pointsAreaNode->addChild(scrollView);
+        _fanAreaNode->addChild(scrollView);
         scrollView->setAnchorPoint(Vec2(0.5f, 0.5f));
         scrollView->setPosition(pos);
     }

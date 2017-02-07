@@ -20,7 +20,7 @@ private:
     cocos2d::Label *_scoreLabels[16][4];
     cocos2d::ui::Button *_recordButton[16];
     cocos2d::ui::Button *_detailButton[16];
-    cocos2d::Label *_pointNameLabel[16];
+    cocos2d::Label *_fanNameLabel[16];
     cocos2d::Label *_timeLabel = nullptr;
 
     void fillRow(size_t handIdx);

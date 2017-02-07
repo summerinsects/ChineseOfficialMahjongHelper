@@ -36,7 +36,7 @@ private:
     cocos2d::ui::RadioButtonGroup *_prevalentWindGroup = nullptr;
     cocos2d::ui::RadioButtonGroup *_seatWindGroup = nullptr;
 
-    cocos2d::Node *_pointsAreaNode = nullptr;
+    cocos2d::Node *_fanAreaNode = nullptr;
 
     bool _maybeFourthTile = false;
     bool _hasKong = false;

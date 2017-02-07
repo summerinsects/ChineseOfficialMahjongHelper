@@ -306,7 +306,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         size_t row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
-        bool selected = TEST_FAN(_detail.points_flag, idx0);
+        bool selected = TEST_FAN(_detail.fan_flag, idx0);
         button->setHighlighted(selected);
         button->setTag(selected);
 
@@ -510,19 +510,19 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     if (selected) {
         button->setHighlighted(false);
         button->setTag(false);
-        RESET_FAN(_detail.points_flag, index);
+        RESET_FAN(_detail.fan_flag, index);
     }
     else {
         button->setHighlighted(true);
         button->setTag(true);
-        SET_FAN(_detail.points_flag, index);
+        SET_FAN(_detail.fan_flag, index);
     }
 
     // 增加番数
     int prevWinScore = atoi(_editBox->getText());
     int currentWinScore = 0;
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-        if (TEST_FAN(_detail.points_flag, n)) {
+        if (TEST_FAN(_detail.fan_flag, n)) {
             unsigned idx = n;
             currentWinScore += mahjong::fan_value_table[idx];
         }
@@ -537,9 +537,9 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
 }
 
 void RecordScene::onOkButton(cocos2d::Ref *sender) {
-    if (_drawBox->isSelected() && _detail.points_flag != 0) {
+    if (_drawBox->isSelected() && _detail.fan_flag != 0) {
         AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", [this]() {
-            _detail.points_flag = 0;
+            _detail.fan_flag = 0;
             _okCallback(_detail);
             Director::getInstance()->popScene();
         }, nullptr);

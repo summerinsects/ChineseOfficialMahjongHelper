@@ -12,7 +12,7 @@ struct Record {
         uint8_t win_claim;
         uint8_t false_win;
         uint32_t score;
-        uint64_t points_flag;
+        uint64_t fan_flag;
     } detail[16];
     size_t current_index;
     time_t start_time;
@@ -53,7 +53,7 @@ static void fromJson(Record *record, const jw::cppJSON &json) {
         record->detail[i].win_claim = static_cast<uint8_t>(temp["win_claim"]);
         record->detail[i].false_win = static_cast<uint8_t>(temp["false_win"]);
         record->detail[i].score = static_cast<uint32_t>(temp["score"]);
-        record->detail[i].points_flag = temp["points_flag"];
+        record->detail[i].fan_flag = temp["fan_flag"];
     }
 
     record->start_time = json.GetValueByKeyNoThrow<time_t>("start_time");
@@ -74,7 +74,7 @@ static void toJson(const Record &record, jw::cppJSON *json) {
         temp.insert(std::make_pair("win_claim", record.detail[i].win_claim));
         temp.insert(std::make_pair("false_win", record.detail[i].false_win));
         temp.insert(std::make_pair("score", record.detail[i].score));
-        temp.insert(std::make_pair("points_flag", record.detail[i].points_flag));
+        temp.insert(std::make_pair("fan_flag", record.detail[i].fan_flag));
         detail.push_back(std::move(temp));
     }
     json->insert(std::make_pair("detail", std::move(detail)));

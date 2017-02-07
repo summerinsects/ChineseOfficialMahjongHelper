@@ -187,7 +187,7 @@ struct extra_condition_t {
  * @retval ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
  * @retval ERROR_NOT_WIN 没和牌
  */
-int calculate_points(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_TABLE_SIZE]);
+int calculate_fan(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_TABLE_SIZE]);
 
 #if 0
 

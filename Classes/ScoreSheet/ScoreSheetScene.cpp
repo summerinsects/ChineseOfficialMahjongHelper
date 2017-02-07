@@ -273,11 +273,11 @@ bool ScoreSheetScene::init() {
         _recordButton[k]->setVisible(false);
 
         // 备注的番种label
-        _pointNameLabel[k] = Label::createWithSystemFont("", "Arail", 12);
-        _pointNameLabel[k]->setColor(scoreColor);
-        _pointNameLabel[k]->setPosition(Vec2(gap * 5.5f, y));
-        node->addChild(_pointNameLabel[k]);
-        _pointNameLabel[k]->setVisible(false);
+        _fanNameLabel[k] = Label::createWithSystemFont("", "Arail", 12);
+        _fanNameLabel[k]->setColor(scoreColor);
+        _fanNameLabel[k]->setPosition(Vec2(gap * 5.5f, y));
+        node->addChild(_fanNameLabel[k]);
+        _fanNameLabel[k]->setVisible(false);
 
         // 查看详情按钮
         _detailButton[k] = ui::Button::create();
@@ -302,7 +302,7 @@ void ScoreSheetScene::cleanRow(size_t handIdx) {
     }
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
-    _pointNameLabel[handIdx]->setVisible(false);
+    _fanNameLabel[handIdx]->setVisible(false);
     _detailButton[handIdx]->setEnabled(false);
 }
 
@@ -343,29 +343,29 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     _recordButton[handIdx]->setEnabled(false);
     _detailButton[handIdx]->setEnabled(true);
 
-    Label *label = _pointNameLabel[handIdx];
-    bool pointsNameVisible = false;
+    Label *label = _fanNameLabel[handIdx];
+    bool fanNameVisible = false;
     if (detail.score == 0) {
         label->setString("荒庄");
         label->setVisible(true);
-        pointsNameVisible = true;
+        fanNameVisible = true;
     }
 
     // 选取标记的最大番种显示出来
 
-    uint64_t pointsFlag = detail.points_flag;
-    if (pointsFlag != 0) {
+    uint64_t fanFlag = detail.fan_flag;
+    if (fanFlag != 0) {
         for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-            if (TEST_FAN(pointsFlag, n)) {
+            if (TEST_FAN(fanFlag, n)) {
                 unsigned idx = n;
                 label->setString(mahjong::fan_name[idx]);
                 label->setVisible(true);
-                pointsNameVisible = true;
+                fanNameVisible = true;
                 break;
             }
         }
     }
-    if (!pointsNameVisible) {
+    if (!fanNameVisible) {
         label->setVisible(false);
     }
     else {
@@ -603,10 +603,10 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
             message.append("」放炮。\n");
         }
 
-        uint64_t pointsFlag = detail.points_flag;
-        if (pointsFlag != 0) {
+        uint64_t fanFlag = detail.fan_flag;
+        if (fanFlag != 0) {
             for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-                if (TEST_FAN(pointsFlag, n)) {
+                if (TEST_FAN(fanFlag, n)) {
                     unsigned idx = n;
                     if (!str.empty()) {
                         str.append("、");
