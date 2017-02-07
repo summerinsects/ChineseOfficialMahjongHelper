@@ -2,8 +2,8 @@
 #pragma warning(disable: 4351)
 #endif
 
-#include "ScoreTable.h"
-#include "ScoreDefinition.h"
+#include "FanTable.h"
+#include "FanDefinition.h"
 #include "../widget/CWTableView.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../common.h"

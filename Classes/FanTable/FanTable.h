@@ -1,5 +1,5 @@
-﻿#ifndef __SCORE_TABLE_H__
-#define __SCORE_TABLE_H__
+﻿#ifndef __FAN_TABLE_H__
+#define __FAN_TABLE_H__
 
 #include "../BaseLayer.h"
 

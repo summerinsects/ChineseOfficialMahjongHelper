@@ -1,5 +1,5 @@
-﻿#ifndef _POINTS_CALCULATOR_SCENE_H_
-#define _POINTS_CALCULATOR_SCENE_H_
+﻿#ifndef __FAN_CALCULATOR_SCENE_H__
+#define __FAN_CALCULATOR_SCENE_H__
 
 #include "../BaseLayer.h"
 

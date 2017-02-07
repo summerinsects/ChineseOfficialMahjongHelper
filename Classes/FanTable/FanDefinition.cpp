@@ -1,4 +1,4 @@
-﻿#include "ScoreDefinition.h"
+﻿#include "FanDefinition.h"
 #include "ui/UIWebView.h"
 #include "../common.h"
 #include "../mahjong-algorithm/stringify.h"

@@ -1,4 +1,4 @@
-﻿#include "PointsCalculatorScene.h"
+﻿#include "FanCalculatorScene.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 

@@ -16,13 +16,13 @@
     <Filter Include="src\ScoreSheet">
       <UniqueIdentifier>{c70d58d3-f21e-45b5-8fdb-54c4d378ccfa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\PointsCalculator">
+    <Filter Include="src\FanCalculator">
       <UniqueIdentifier>{ee88c5ab-d66e-486f-9367-a564efe30b78}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\widget">
       <UniqueIdentifier>{2f551755-0a71-4dde-9a7d-314583535ec8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\ScoreTable">
+    <Filter Include="src\FanTable">
       <UniqueIdentifier>{c45dcad3-107b-4c78-a709-2ca8c957501f}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Other">
@@ -48,8 +48,8 @@
     <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp">
       <Filter>src\mahjong-algorithm</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\PointsCalculator\PointsCalculatorScene.cpp">
-      <Filter>src\PointsCalculator</Filter>
+    <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp">
+      <Filter>src\FanCalculator</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\ScoreSheet\ScoreSheetScene.cpp">
       <Filter>src\ScoreSheet</Filter>
@@ -60,11 +60,11 @@
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\ScoreTable\ScoreTable.cpp">
-      <Filter>src\ScoreTable</Filter>
+    <ClCompile Include="..\Classes\FanTable\FanTable.cpp">
+      <Filter>src\FanTable</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\ScoreTable\ScoreDefinition.cpp">
-      <Filter>src\ScoreTable</Filter>
+    <ClCompile Include="..\Classes\FanTable\FanDefinition.cpp">
+      <Filter>src\FanTable</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp">
       <Filter>src\ScoreSheet</Filter>
@@ -107,8 +107,8 @@
     <ClInclude Include="..\Classes\mahjong-algorithm\shanten.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\PointsCalculator\PointsCalculatorScene.h">
-      <Filter>src\PointsCalculator</Filter>
+    <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h">
+      <Filter>src\FanCalculator</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\ScoreSheet\ScoreSheetScene.h">
       <Filter>src\ScoreSheet</Filter>
@@ -119,11 +119,11 @@
     <ClInclude Include="..\Classes\widget\TilePickWidget.h">
       <Filter>src\widget</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\ScoreTable\ScoreTable.h">
-      <Filter>src\ScoreTable</Filter>
+    <ClInclude Include="..\Classes\FanTable\FanTable.h">
+      <Filter>src\FanTable</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\ScoreTable\ScoreDefinition.h">
-      <Filter>src\ScoreTable</Filter>
+    <ClInclude Include="..\Classes\FanTable\FanDefinition.h">
+      <Filter>src\FanTable</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\common.h">
       <Filter>src</Filter>

@@ -12,17 +12,17 @@ LOCAL_MODULE := MyGame_shared
 LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
+                   ../../Classes/FanCalculator/FanCalculatorScene.cpp \
+                   ../../Classes/FanTable/FanDefinition.cpp \
+                   ../../Classes/FanTable/FanTable.cpp \
                    ../../Classes/mahjong-algorithm/fan_calculator.cpp \
                    ../../Classes/mahjong-algorithm/stringify.cpp \
                    ../../Classes/mahjong-algorithm/shanten.cpp \
                    ../../Classes/MahjongTheory/MahjongTheoryScene.cpp \
                    ../../Classes/Other/OtherScene.cpp \
-                   ../../Classes/PointsCalculator/PointsCalculatorScene.cpp \
                    ../../Classes/ScoreSheet/HistoryScene.cpp \
                    ../../Classes/ScoreSheet/RecordScene.cpp \
                    ../../Classes/ScoreSheet/ScoreSheetScene.cpp \
-                   ../../Classes/ScoreTable/ScoreDefinition.cpp \
-                   ../../Classes/ScoreTable/ScoreTable.cpp \
                    ../../Classes/widget/AlertView.cpp \
                    ../../Classes/widget/CWTableView.cpp \
                    ../../Classes/widget/HandTilesWidget.cpp \
