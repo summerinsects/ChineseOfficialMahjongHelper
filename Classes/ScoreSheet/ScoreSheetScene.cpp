@@ -588,8 +588,8 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     }
     else {
         int wc = detail.win_claim;
-        int winIndex = (wc & 0x80) ? 3 : (wc & 0x40) ? 2 : (wc & 0x20) ? 1 : (wc & 0x10) ? 0 : -1;
-        int claimIndex = (wc & 0x8) ? 3 : (wc & 0x4) ? 2 : (wc & 0x2) ? 1 : (wc & 0x1) ? 0 : -1;
+        int winIndex = WIN_INDEX(wc);
+        int claimIndex = CLAIM_INDEX(wc);
         if (winIndex == claimIndex) {
             message.append("「");
             message.append(g_currentRecord.name[winIndex]);
@@ -626,7 +626,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     if (detail.false_win != 0) {
         str.clear();
         for (int i = 0; i < 4; ++i) {
-            if (detail.false_win & (1 << i)) {
+            if (TEST_FALSE_WIN(detail.false_win, i)) {
                 if (!str.empty()) {
                     str.append("、");
                 }

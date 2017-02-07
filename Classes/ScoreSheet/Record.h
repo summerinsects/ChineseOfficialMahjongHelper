@@ -23,6 +23,15 @@ static bool operator==(const Record &left, const Record &right) {
     return memcmp(&left, &right, sizeof(Record)) == 0;
 }
 
+#define SET_WIN(wc_, n_) ((wc_) |= (1 << ((n_) + 4)))
+#define SET_CLAIM(wc_, n_) ((wc_) |= (1 << (n_)))
+
+#define WIN_INDEX(wc_) (((wc_) & 0x80) ? 3 : ((wc_) & 0x40) ? 2 : ((wc_) & 0x20) ? 1 : ((wc_) & 0x10) ? 0 : -1)
+#define CLAIM_INDEX(wc_) (((wc_) & 0x8) ? 3 : ((wc_) & 0x4) ? 2 : ((wc_) & 0x2) ? 1 : ((wc_) & 0x1) ? 0 : -1)
+
+#define SET_FALSE_WIN(fw_, n_) ((fw_) |= (1 << (n_)))
+#define TEST_FALSE_WIN(fw_, n_) !!((fw_) & (1 << (n_)))
+
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #define PRId64 "lld"
 #endif
@@ -74,13 +83,13 @@ static void toJson(const Record &record, jw::cppJSON *json) {
     json->insert(std::make_pair("end_time", record.end_time));
 }
 
-static void translateDetailToScoreTable(const Record::Detail &detail, int(&scoreTable)[4]) {
+static void translateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
     memset(scoreTable, 0, sizeof(scoreTable));
     int winScore = detail.score;
     if (winScore >= 8 && !!(detail.win_claim & 0xF0)) {
         uint8_t wc = detail.win_claim;
-        int winIndex = (wc & 0x80) ? 3 : (wc & 0x40) ? 2 : (wc & 0x20) ? 1 : (wc & 0x10) ? 0 : -1;
-        int claimIndex = (wc & 0x8) ? 3 : (wc & 0x4) ? 2 : (wc & 0x2) ? 1 : (wc & 0x1) ? 0 : -1;
+        int winIndex = WIN_INDEX(wc);
+        int claimIndex = CLAIM_INDEX(wc);
         if (winIndex == claimIndex) {  // 自摸
             for (int i = 0; i < 4; ++i) {
                 scoreTable[i] = (i == winIndex) ? (winScore + 8) * 3 : (-8 - winScore);
@@ -95,7 +104,7 @@ static void translateDetailToScoreTable(const Record::Detail &detail, int(&score
 
     // 检查错和
     for (int i = 0; i < 4; ++i) {
-        if (detail.false_win & (1 << i)) {
+        if (TEST_FALSE_WIN(detail.false_win, i)) {
             scoreTable[i] -= 30;
             for (int j = 0; j < 4; ++j) {
                 if (j == i) continue;

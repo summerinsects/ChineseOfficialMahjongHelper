@@ -333,9 +333,9 @@ void RecordScene::refresh() {
         _editBox->setText(str);
     }
 
-    _winIndex = (wc & 0x80) ? 3 : (wc & 0x40) ? 2 : (wc & 0x20) ? 1 : (wc & 0x10) ? 0 : -1;
+    _winIndex = WIN_INDEX(wc);
     if (_winIndex != -1) {  // 有人和牌
-        int claimIndex = (wc & 0x8) ? 3 : (wc & 0x4) ? 2 : (wc & 0x2) ? 1 : (wc & 0x1) ? 0 : -1;  // 点炮者
+        int claimIndex = CLAIM_INDEX(wc);  // 点炮者
         _winGroup->setSelectedButton(_winIndex);
         if (claimIndex != -1) {
             _claimGroup->setSelectedButton(claimIndex);
@@ -345,7 +345,7 @@ void RecordScene::refresh() {
     // 错和
     if (_detail.false_win != 0) {
         for (int i = 0; i < 4; ++i) {
-            _falseWinBox[i]->setSelected(!!(_detail.false_win & (1 << i)));
+            _falseWinBox[i]->setSelected(TEST_FALSE_WIN(_detail.false_win, i));
         }
     }
 
@@ -367,9 +367,10 @@ void RecordScene::updateScoreLabel() {
         claimIndex = _claimGroup->getSelectedButtonIndex();
 
         // 记录和牌和点炮
-        _detail.win_claim = (1 << (_winIndex + 4));
+        _detail.win_claim = 0;
+        SET_WIN(_detail.win_claim, _winIndex);
         if (claimIndex != -1) {
-            _detail.win_claim |= (1 << claimIndex);
+            SET_CLAIM(_detail.win_claim, claimIndex);
         }
     }
     else {  // 荒庄
@@ -380,7 +381,7 @@ void RecordScene::updateScoreLabel() {
     _detail.false_win = 0;
     for (int i = 0; i < 4; ++i) {
         if (_falseWinBox[i]->isEnabled() && _falseWinBox[i]->isSelected()) {
-            _detail.false_win |= (1 << i);
+            SET_FALSE_WIN(_detail.false_win, i);
         }
     }
 
