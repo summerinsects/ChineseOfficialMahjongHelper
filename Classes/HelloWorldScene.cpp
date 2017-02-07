@@ -4,6 +4,7 @@
 #include "ScoreTable/ScoreTable.h"
 #include "Other/OtherScene.h"
 #include "MahjongTheory/MahjongTheoryScene.h"
+#include "common.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -131,6 +132,7 @@ bool HelloWorld::init() {
 
         Director::getInstance()->replaceScene(HelloWorld::createScene());
     });
+    scaleLabelToFitWidth(button->getTitleLabel(), 70);
 
     return true;
 }

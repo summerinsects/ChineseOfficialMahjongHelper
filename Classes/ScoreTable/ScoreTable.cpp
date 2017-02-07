@@ -6,6 +6,7 @@
 #include "ScoreDefinition.h"
 #include "../widget/CWTableView.h"
 #include "../mahjong-algorithm/points_calculator.h"
+#include "../common.h"
 
 USING_NS_CC;
 
@@ -97,6 +98,9 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
     typedef cw::TableViewCellEx<Label *, ui::Button *[13]> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float gap = (visibleSize.width - 10.0f) * 0.25f;
+
     if (cell == nullptr) {
         cell = CustomCell::create();
 
@@ -114,7 +118,7 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
         for (size_t k = 0; k < 13; ++k) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
-            button->setContentSize(Size(65.0f, 20.0f));
+            button->setContentSize(Size(gap - 5.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
             button->addClickEventListener(std::bind(&ScoreTableScene::onPointsNameButton, this, std::placeholders::_1));
@@ -125,9 +129,6 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
     }
 
     const size_t currentLevelCount = eachLevelCounts[idx];
-
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float gap = (visibleSize.width - 10.0f) * 0.25f;
     size_t totalRows = computeRowsAlign4(currentLevelCount);
 
     const CustomCell::ExtDataType ext = cell->getExtData();
@@ -147,6 +148,8 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
         size_t col = k & 0x3;
         size_t row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
+
+        scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
     }
 
     for (size_t k = currentLevelCount; k < 13; ++k) {

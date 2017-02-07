@@ -260,6 +260,9 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     typedef cw::TableViewCellEx<Label *, ui::Button *[9]> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float gap = (visibleSize.width - 10.0f) * 0.25f;
+
     if (cell == nullptr) {
         cell = CustomCell::create();
 
@@ -277,7 +280,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         for (size_t k = 0; k < 9; ++k) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
-            button->setContentSize(Size(65.0f, 20.0f));
+            button->setContentSize(Size(gap - 5.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
             button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1));
@@ -288,9 +291,6 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     }
 
     const size_t currentLevelCount = eachLevelCounts[idx];
-
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float gap = (visibleSize.width - 10.0f) * 0.25f;
     size_t totalRows = computeRowsAlign4(currentLevelCount);
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -320,6 +320,8 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         bool selected = !!(_detail.points_flag & (1ULL << idx0));
         button->setHighlighted(selected);
         button->setUserData((void *)selected);
+
+        scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
     }
 
     for (size_t k = currentLevelCount; k < 9; ++k) {
