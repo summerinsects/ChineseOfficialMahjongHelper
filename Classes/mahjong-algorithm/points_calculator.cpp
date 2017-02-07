@@ -689,7 +689,7 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, long (&fan_
             }
             break;
         case 1:  // 明暗杠
-#if HAS_CONCEALED_KONG_AND_MELDED_KONG
+#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
             fan_table[CONCEALED_KONG_AND_MELDED_KONG] = 1;
 #else
             fan_table[MELDED_KONG] = 1;

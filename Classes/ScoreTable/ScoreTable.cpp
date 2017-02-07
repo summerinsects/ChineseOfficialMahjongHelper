@@ -19,12 +19,7 @@ Scene *ScoreTableScene::createScene() {
 
 static const int fanLevel[] = { 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };  // 番种
 static const size_t eachLevelCounts[] = { 13, 10, 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次番种的个数
-static const size_t eachLevelBeginIndex[] =
-#if HAS_CONCEALED_KONG_AND_MELDED_KONG
-{ 70, 60, 56, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
-#else
-{ 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
-#endif
+static const size_t eachLevelBeginIndex[] = { 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 
 static inline size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);

@@ -22,12 +22,7 @@ Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const 
 }
 
 static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
-static const size_t eachLevelBeginIndex[] =
-#if HAS_CONCEALED_KONG_AND_MELDED_KONG
-{ 56, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
-#else
-{ 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
-#endif
+static const size_t eachLevelBeginIndex[] = { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 static const size_t eachLevelCounts[] = { 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
 
 static inline size_t computeRowsAlign4(size_t cnt) {
@@ -312,11 +307,6 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         size_t row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
-#if HAS_CONCEALED_KONG_AND_MELDED_KONG
-        if (idx0 > mahjong::fan_t::CONCEALED_KONG_AND_MELDED_KONG) {
-            --idx0;
-        }
-#endif
         bool selected = !!(_detail.points_flag & (1ULL << idx0));
         button->setHighlighted(selected);
         button->setUserData((void *)selected);
@@ -514,11 +504,7 @@ void RecordScene::onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::Eve
 void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t index = reinterpret_cast<size_t>(button->getUserData());
-#if HAS_CONCEALED_KONG_AND_MELDED_KONG
-    if (index > mahjong::fan_t::CONCEALED_KONG_AND_MELDED_KONG) {
-        --index;
-    }
-#endif
+
     // 标记/取消标记番种
     bool selected = !!button->getUserData();
     if (selected) {
@@ -538,11 +524,6 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     for (int n = 0; n < 64; ++n) {
         if (_detail.points_flag & (1ULL << n)) {
             unsigned idx = n;
-#if HAS_CONCEALED_KONG_AND_MELDED_KONG
-            if (idx >= mahjong::fan_t::CONCEALED_KONG_AND_MELDED_KONG) {
-                ++idx;
-            }
-#endif
             currentWinScore += mahjong::fan_value_table[idx];
         }
     }
