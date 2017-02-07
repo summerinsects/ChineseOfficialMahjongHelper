@@ -474,13 +474,21 @@ mahjong::tile_t MahjongTheoryScene::serveRandomTile(mahjong::tile_t discardTile)
 
 void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    mahjong::tile_t tile = mahjong::all_tiles[button->getTag()];
     size_t realIdx = reinterpret_cast<size_t>(button->getUserData());
+    mahjong::tile_t discardTile = _resultSources[realIdx].discard_tile;
+    mahjong::tile_t servingTile;
 
-    ResultEx *result = &_resultSources[realIdx];
-    deduce(result->discard_tile, tile);
+    int tag = button->getTag();
+    if (tag != INVALID_TAG) {
+        servingTile = mahjong::all_tiles[tag];
+    }
+    else {
+        servingTile = serveRandomTile(discardTile);
+    }
+
+    deduce(discardTile, servingTile);
 #if 0
-    _undoCache.push_back(std::make_pair(result->discard_tile, tile));
+    _undoCache.push_back(std::make_pair(discardTile, servingTile));
     _redoCache.clear();
     _undoButton->setEnabled(true);
     _redoButton->setEnabled(false);
@@ -697,7 +705,7 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeAtIndex(cw::TableView *table, ssi
 }
 
 cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<LayerColor *[2], Label *, Label *, Sprite *, Label *, ui::Button *[34], Label *, Label *> CustomCell;
+    typedef cw::TableViewCellEx<LayerColor *[2], Label *, Label *, ui::Button *, Label *, ui::Button *[34], Label *, Label *> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
     if (cell == nullptr) {
         cell = CustomCell::create();
@@ -719,7 +727,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         LayerColor *(&layerColor)[2] = std::get<0>(ext);
         Label *&typeLabel = std::get<1>(ext);
         Label *&discardLabel = std::get<2>(ext);
-        Sprite *&discardSprite = std::get<3>(ext);
+        ui::Button *&discardButton = std::get<3>(ext);
         Label *&usefulLabel = std::get<4>(ext);
         ui::Button *(&usefulButton)[34] = std::get<5>(ext);
         Label *&cntLabel1 = std::get<6>(ext);
@@ -743,10 +751,11 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(discardLabel);
 
-        discardSprite = Sprite::create("tiles/bg.png");
-        discardSprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        discardSprite->setScale(TILE_WIDTH / discardSprite->getContentSize().width);
-        cell->addChild(discardSprite);
+        discardButton = ui::Button::create("tiles/bg.png");
+        discardButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        discardButton->setScale(TILE_WIDTH / discardButton->getContentSize().width);
+        cell->addChild(discardButton);
+        discardButton->addClickEventListener(std::bind(&MahjongTheoryScene::onTileButton, this, std::placeholders::_1));
 
         usefulLabel = Label::createWithSystemFont("", "Arial", 12);
         usefulLabel->setColor(textColor);
@@ -779,7 +788,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     LayerColor *const (&layerColor)[2] = std::get<0>(ext);
     Label *typeLabel = std::get<1>(ext);
     Label *discardLabel = std::get<2>(ext);
-    Sprite *discardSprite = std::get<3>(ext);
+    ui::Button *discardButton = std::get<3>(ext);
     Label *usefulLabel = std::get<4>(ext);
     ui::Button *const (&usefulButton)[34] = std::get<5>(ext);
     Label *cntLabel1 = std::get<6>(ext);
@@ -814,14 +823,15 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
     if (result->discard_tile != 0) {
         discardLabel->setVisible(true);
-        discardSprite->setVisible(true);
+        discardButton->setVisible(true);
 
         discardLabel->setString("打「");
         discardLabel->setPosition(Vec2(xPos, yPos));
         xPos += discardLabel->getContentSize().width;
 
-        discardSprite->setTexture(Director::getInstance()->getTextureCache()->addImage(tilesImageName[result->discard_tile]));
-        discardSprite->setPosition(Vec2(xPos, yPos));
+        discardButton->loadTextureNormal(tilesImageName[result->discard_tile]);
+        discardButton->setUserData(reinterpret_cast<void *>(realIdx));
+        discardButton->setPosition(Vec2(xPos, yPos));
         xPos += TILE_WIDTH;
 
         if (result->shanten > 0) {
@@ -836,7 +846,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
     else {
         discardLabel->setVisible(false);
-        discardSprite->setVisible(false);
+        discardButton->setVisible(false);
 
         if (result->shanten != 0) {
             usefulLabel->setString("摸「");
