@@ -75,6 +75,21 @@ bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[TILE_TABLE_
     return true;
 }
 
+long table_to_tiles(const int (&cnt_table)[TILE_TABLE_SIZE], tile_t *tiles, long max_cnt) {
+    long cnt = 0;
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        for (int n = 0; n < cnt_table[t]; ++n) {
+            *tiles++ = t;
+            ++cnt;
+            if (cnt == max_cnt) {
+                return max_cnt;
+            }
+        }
+    }
+    return cnt;
+}
+
 int count_useful_tile(const int (&used_table)[TILE_TABLE_SIZE], const bool (&useful_table)[TILE_TABLE_SIZE]) {
     int cnt = 0;
     for (int i = 0; i < 34; ++i) {
@@ -968,21 +983,6 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
     }
 
     return true;
-}
-
-long table_to_tiles(const int (&cnt_table)[TILE_TABLE_SIZE], tile_t *tiles, long max_cnt) {
-    long cnt = 0;
-    for (int i = 0; i < 34; ++i) {
-        tile_t t = all_tiles[i];
-        for (int n = 0; n < cnt_table[t]; ++n) {
-            *tiles++ = t;
-            ++cnt;
-            if (cnt == max_cnt) {
-                return max_cnt;
-            }
-        }
-    }
-    return cnt;
 }
 
 void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint8_t form_flag,
