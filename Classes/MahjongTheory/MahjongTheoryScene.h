@@ -51,6 +51,7 @@ private:
     void calculate();
     void filterResultsByFlag(uint8_t flag);
     uint8_t getFilterFlag() const;
+    mahjong::tile_t serveRandomTile(mahjong::tile_t discardTile) const;
     void onTileButton(cocos2d::Ref *sender);
     void onStandingTileEvent();
 #if 0
