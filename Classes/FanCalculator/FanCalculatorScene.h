@@ -5,13 +5,13 @@
 
 class TilePickWidget;
 
-class PointsCalculatorScene : public BaseLayer {
+class FanCalculatorScene : public BaseLayer {
 public:
     static cocos2d::Scene *createScene();
 
     virtual bool init() override;
 
-    CREATE_FUNC(PointsCalculatorScene);
+    CREATE_FUNC(FanCalculatorScene);
 
 private:
     void onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);

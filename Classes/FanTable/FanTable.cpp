@@ -10,9 +10,9 @@
 
 USING_NS_CC;
 
-Scene *ScoreTableScene::createScene() {
+Scene *FanTableScene::createScene() {
     auto scene = Scene::create();
-    auto layer = ScoreTableScene::create();
+    auto layer = FanTableScene::create();
     scene->addChild(layer);
     return scene;
 }
@@ -25,7 +25,7 @@ static inline size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
 }
 
-bool ScoreTableScene::init() {
+bool FanTableScene::init() {
     if (!BaseLayer::initWithTitle("国标麻将番种表")) {
         return false;
     }
@@ -49,7 +49,7 @@ bool ScoreTableScene::init() {
         button->setTitleFontSize(12);
         button->setTitleText(principle_title[i]);
         button->setUserData(reinterpret_cast<void *>(100 + i));
-        button->addClickEventListener(std::bind(&ScoreTableScene::onPointsNameButton, this, std::placeholders::_1));
+        button->addClickEventListener(std::bind(&FanTableScene::onPointsNameButton, this, std::placeholders::_1));
 
         this->addChild(button);
 
@@ -89,7 +89,7 @@ bool ScoreTableScene::init() {
     return true;
 }
 
-cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
+cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
     typedef cw::TableViewCellEx<Label *, ui::Button *[13]> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
@@ -116,7 +116,7 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
             button->setContentSize(Size(gap - 5.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
-            button->addClickEventListener(std::bind(&ScoreTableScene::onPointsNameButton, this, std::placeholders::_1));
+            button->addClickEventListener(std::bind(&FanTableScene::onPointsNameButton, this, std::placeholders::_1));
 
             cell->addChild(button);
             buttons[k] = button;
@@ -155,8 +155,8 @@ cw::TableViewCell *ScoreTableScene::tableCellAtIndex(cw::TableView *table, ssize
     return cell;
 }
 
-void ScoreTableScene::onPointsNameButton(cocos2d::Ref *sender) {
+void FanTableScene::onPointsNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
-    Director::getInstance()->pushScene(ScoreDefinitionScene::createScene(idx));
+    Director::getInstance()->pushScene(FanDefinitionScene::createScene(idx));
 }

@@ -8,13 +8,13 @@ namespace cw {
     class TableView;
 }
 
-class ScoreTableScene : public BaseLayer {
+class FanTableScene : public BaseLayer {
 public:
     static cocos2d::Scene *createScene();
 
     virtual bool init() override;
 
-    CREATE_FUNC(ScoreTableScene);
+    CREATE_FUNC(FanTableScene);
 
 private:
     cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);

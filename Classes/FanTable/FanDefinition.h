@@ -7,7 +7,7 @@
 
 static const char *principle_title[] = { "不重复原则", "不拆移原则", "不得相同原则", "就高不就低原则", "套算一次原则" };
 
-class ScoreDefinitionScene : public BaseLayer {
+class FanDefinitionScene : public BaseLayer {
 public:
     static cocos2d::Scene *createScene(size_t idx);
 

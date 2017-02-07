@@ -62,7 +62,7 @@ bool HelloWorld::init() {
     button->setTitleText("算番器");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 100));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(PointsCalculatorScene::createScene());
+        Director::getInstance()->pushScene(FanCalculatorScene::createScene());
     });
 
     button = ui::Button::create(normalImage, selectedImage);
@@ -86,7 +86,7 @@ bool HelloWorld::init() {
     button->setTitleText("番种表");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 20));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(ScoreTableScene::createScene());
+        Director::getInstance()->pushScene(FanTableScene::createScene());
     });
 
     button = ui::Button::create(normalImage, selectedImage);

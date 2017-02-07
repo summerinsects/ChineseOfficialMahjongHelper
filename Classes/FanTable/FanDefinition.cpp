@@ -40,9 +40,9 @@ static void replaceTilesToImage(std::string &text, float scale) {
     }
 }
 
-Scene *ScoreDefinitionScene::createScene(size_t idx) {
+Scene *FanDefinitionScene::createScene(size_t idx) {
     auto scene = Scene::create();
-    auto layer = new (std::nothrow) ScoreDefinitionScene();
+    auto layer = new (std::nothrow) FanDefinitionScene();
     layer->initWithIndex(idx);
     layer->autorelease();
 
@@ -50,7 +50,7 @@ Scene *ScoreDefinitionScene::createScene(size_t idx) {
     return scene;
 }
 
-bool ScoreDefinitionScene::initWithIndex(size_t idx) {
+bool FanDefinitionScene::initWithIndex(size_t idx) {
     const char *title = idx < 100 ? mahjong::fan_name[idx] : principle_title[idx - 100];
     if (!BaseLayer::initWithTitle(title)) {
         return false;
@@ -73,7 +73,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
             scale = maxWidth / 27;
         }
 
-        auto thiz = RefPtr<ScoreDefinitionScene>(this);
+        auto thiz = RefPtr<FanDefinitionScene>(this);
         std::thread([thiz, idx, scale, loadingView]() {
             ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
             g_definitions.reserve(valueVec.size());
@@ -103,7 +103,7 @@ bool ScoreDefinitionScene::initWithIndex(size_t idx) {
     return true;
 }
 
-void ScoreDefinitionScene::createContentView(size_t idx) {
+void FanDefinitionScene::createContentView(size_t idx) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 

@@ -8,14 +8,14 @@
 
 USING_NS_CC;
 
-Scene *PointsCalculatorScene::createScene() {
+Scene *FanCalculatorScene::createScene() {
     auto scene = Scene::create();
-    auto layer = PointsCalculatorScene::create();
+    auto layer = FanCalculatorScene::create();
     scene->addChild(layer);
     return scene;
 }
 
-bool PointsCalculatorScene::init() {
+bool FanCalculatorScene::init() {
     if (!BaseLayer::initWithTitle("国标麻将算番器")) {
         return false;
     }
@@ -40,8 +40,8 @@ bool PointsCalculatorScene::init() {
     _tilePicker = TilePickWidget::create();
     const Size &widgetSize = _tilePicker->getContentSize();
     this->addChild(_tilePicker);
-    _tilePicker->setFixedPacksChangedCallback(std::bind(&PointsCalculatorScene::onFixedPacksChanged, this));
-    _tilePicker->setWinTileChangedCallback(std::bind(&PointsCalculatorScene::onWinTileChanged, this));
+    _tilePicker->setFixedPacksChangedCallback(std::bind(&FanCalculatorScene::onFixedPacksChanged, this));
+    _tilePicker->setWinTileChangedCallback(std::bind(&FanCalculatorScene::onWinTileChanged, this));
 
     // 根据情况缩放
     float y = origin.y + visibleSize.height - 10;
@@ -72,7 +72,7 @@ bool PointsCalculatorScene::init() {
     // 点和与自摸互斥
     _winTypeGroup = ui::RadioButtonGroup::create();
     infoWidget->addChild(_winTypeGroup);
-    _winTypeGroup->addEventListener(std::bind(&PointsCalculatorScene::onWinTypeGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    _winTypeGroup->addEventListener(std::bind(&FanCalculatorScene::onWinTypeGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     // 点和
     const float gapX = 65;
@@ -113,7 +113,7 @@ bool PointsCalculatorScene::init() {
     _fourthTileBox->setContentSize(Size(20.0f, 20.0f));
     _fourthTileBox->setPosition(Vec2(20.0f + gapX * 2, 105.0f));
     _fourthTileBox->setEnabled(false);
-    _fourthTileBox->addEventListener(std::bind(&PointsCalculatorScene::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
+    _fourthTileBox->addEventListener(std::bind(&FanCalculatorScene::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("绝张", "Arial", 12);
     label->setColor(textColor);
@@ -144,7 +144,7 @@ bool PointsCalculatorScene::init() {
     _robKongBox->setContentSize(Size(20.0f, 20.0f));
     _robKongBox->setPosition(Vec2(20.0f + gapX, 75.0f));
     _robKongBox->setEnabled(false);
-    _robKongBox->addEventListener(std::bind(&PointsCalculatorScene::onRobKongBox, this, std::placeholders::_1, std::placeholders::_2));
+    _robKongBox->addEventListener(std::bind(&FanCalculatorScene::onRobKongBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("抢杠", "Arial", 12);
     label->setColor(textColor);
@@ -159,7 +159,7 @@ bool PointsCalculatorScene::init() {
     _lastTileBox->ignoreContentAdaptWithSize(false);
     _lastTileBox->setContentSize(Size(20.0f, 20.0f));
     _lastTileBox->setPosition(Vec2(20.0f + gapX * 2, 75.0f));
-    _lastTileBox->addEventListener(std::bind(&PointsCalculatorScene::onLastTileBox, this, std::placeholders::_1, std::placeholders::_2));
+    _lastTileBox->addEventListener(std::bind(&FanCalculatorScene::onLastTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("海底", "Arial", 12);
     label->setColor(textColor);
@@ -258,7 +258,7 @@ bool PointsCalculatorScene::init() {
     return true;
 }
 
-void PointsCalculatorScene::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
+void FanCalculatorScene::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
     if (index == 0) {  // 点和
         // 绝张：可为绝张 && 抢杠没选中
         // 杠开：禁用
@@ -282,7 +282,7 @@ void PointsCalculatorScene::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton
     }
 }
 
-void PointsCalculatorScene::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+void FanCalculatorScene::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 绝张与抢杠互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
         // 抢杠：禁用
@@ -302,7 +302,7 @@ void PointsCalculatorScene::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::C
     }
 }
 
-void PointsCalculatorScene::onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+void FanCalculatorScene::onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 抢杠与绝张、海底互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
         // 绝张：禁用
@@ -318,7 +318,7 @@ void PointsCalculatorScene::onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::Chec
     }
 }
 
-void PointsCalculatorScene::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+void FanCalculatorScene::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     // 海底与抢杠互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
         // 抢杠：禁用
@@ -332,7 +332,7 @@ void PointsCalculatorScene::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::Che
     }
 }
 
-void PointsCalculatorScene::onFixedPacksChanged() {
+void FanCalculatorScene::onFixedPacksChanged() {
     // 当副露不包含杠的时候，杠开是禁用状态
     _hasKong = _tilePicker->getHandTilesWidget()->isFixedPacksContainsKong();
     if (_winTypeGroup->getSelectedButtonIndex() == 1) {
@@ -345,7 +345,7 @@ void PointsCalculatorScene::onFixedPacksChanged() {
     }
 }
 
-void PointsCalculatorScene::onWinTileChanged() {
+void FanCalculatorScene::onWinTileChanged() {
     _maybeFourthTile = false;
     _winTileCountInFixedPacks = 0;
     mahjong::tile_t winTile = _tilePicker->getHandTilesWidget()->getServingTile();
@@ -379,7 +379,7 @@ void PointsCalculatorScene::onWinTileChanged() {
     _lastTileBox->setEnabled(!_robKongBox->isSelected());
 }
 
-void PointsCalculatorScene::showInputAlert(const char *prevInput) {
+void FanCalculatorScene::showInputAlert(const char *prevInput) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float width = visibleSize.width * 0.8f;
 
@@ -420,7 +420,7 @@ void PointsCalculatorScene::showInputAlert(const char *prevInput) {
     }, nullptr);
 }
 
-void PointsCalculatorScene::parseInput(const char *input) {
+void FanCalculatorScene::parseInput(const char *input) {
     if (*input == '\0') {
         return;
     }
@@ -468,7 +468,7 @@ void PointsCalculatorScene::parseInput(const char *input) {
 
 #define FONT_SIZE 14
 
-void PointsCalculatorScene::calculate() {
+void FanCalculatorScene::calculate() {
     _fanAreaNode->removeAllChildren();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
