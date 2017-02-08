@@ -730,8 +730,8 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, ti
 
 // “组合龙+面子+雀头”和型
 
-// 组合龙是否听牌实现
-static bool is_knitted_straight_wait_impl(const int (&cnt_table)[TILE_TABLE_SIZE], long left_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+// 以表格为参数计算组合龙是否听牌
+static bool is_knitted_straight_wait_from_table(const int(&cnt_table)[TILE_TABLE_SIZE], long left_cnt, bool(*waiting_table)[TILE_TABLE_SIZE]) {
     // 匹配组合龙
     const tile_t (*matched_seq)[9] = nullptr;
     tile_t missing_tiles[9];
@@ -867,7 +867,7 @@ bool is_knitted_straight_wait(const tile_t *standing_tiles, long standing_cnt, b
     int cnt_table[TILE_TABLE_SIZE];
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
-    return is_knitted_straight_wait_impl(cnt_table, standing_cnt, waiting_table);
+    return is_knitted_straight_wait_from_table(cnt_table, standing_cnt, waiting_table);
 }
 
 // 组合龙是否和牌
