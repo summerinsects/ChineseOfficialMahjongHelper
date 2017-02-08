@@ -819,7 +819,7 @@ static int basic_type_shanten_specified(const int (&cnt_table)[TILE_TABLE_SIZE],
     }
 
     // 余下牌的上听数
-    int result = basic_type_shanten_from_table(temp_table, fixed_cnt - main_cnt / 3, useful_table);
+    int result = basic_type_shanten_from_table(temp_table, fixed_cnt + main_cnt / 3, useful_table);
 
     // 上听数=主番缺少的张数+余下牌的上听数
     return (main_cnt - exsit_cnt) + result;
