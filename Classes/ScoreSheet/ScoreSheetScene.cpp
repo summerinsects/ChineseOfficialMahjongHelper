@@ -756,7 +756,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
             else {
                 button->setTitleText(StringUtils::format("「%s」与「%s」平分", name[pairwise[i].first], name[pairwise[i].second]));
             }
-            scaleLabelToFitWidth(button->getTitleRenderer(), 148.0f);
+            scaleLabelToFitWidth(button->getTitleLabel(), 148.0f);
             rootWidget->addChild(button);
             button->setPosition(Vec2(75.0f, 170.0f - i * 25.0f));
             button->addClickEventListener([delta](Ref *) {
@@ -832,7 +832,7 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
         else {
             button->setTitleText(StringUtils::format("与「%s」平分", name[dst]));
         }
-        scaleLabelToFitWidth(button->getTitleRenderer(), 148.0f);
+        scaleLabelToFitWidth(button->getTitleLabel(), 148.0f);
         rootWidget->addChild(button);
         button->setPosition(Vec2(75.0f, 60.0f - i * 25.0f));
         button->addClickEventListener([delta](Ref *) {
