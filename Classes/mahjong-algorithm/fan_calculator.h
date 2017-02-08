@@ -211,7 +211,7 @@ static const char *fan_name[] = {
     "Pure Double Chow", "Mixed Double Chow", "Short Straight", "Two Terminal Chows", "Pung of Terminals or Honors", "Melded Kong", "One Voided Suit", "No Honors", "Edge Wait", "Closed Wait", "Single Wait", "Self-Drawn",
     "Flower Tiles"
 #if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
-    "Concealed Kong and Melded Kong",
+    , "Concealed Kong and Melded Kong"
 #endif
 };
 
@@ -240,7 +240,7 @@ static const char *fan_name[] = {
     "一般高", "喜相逢", "连六", "老少副", "幺九刻", "明杠", "缺一门", "无字", "边张", "坎张", "单钓将", "自摸",
     "花牌"
 #if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
-    "明暗杠",
+    , "明暗杠"
 #endif
 };
 
@@ -263,11 +263,9 @@ static const int fan_value_table[FAN_TABLE_SIZE] = {
     4, 4, 4, 4,
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
-    1,
-    5
-#else
     1
+#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
+    , 5
 #endif
 };
 
