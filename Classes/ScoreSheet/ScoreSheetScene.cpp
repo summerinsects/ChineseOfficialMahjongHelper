@@ -126,14 +126,14 @@ bool ScoreSheetScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
 
-    // 追分计算按钮
+    // 追分与保位按钮
     button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
-    button->setTitleText("追分和保位");
+    button->setTitleText("追分与保位");
     button->setPosition(Vec2(origin.x + 28, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
     scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
@@ -674,7 +674,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
 
 static void showPursuit(int delta) {
     if (delta == 0) {
-        AlertView::showWithMessage("追分和保位", "平分", nullptr, nullptr);
+        AlertView::showWithMessage("追分与保位", "平分", nullptr, nullptr);
         return;
     }
 
@@ -805,7 +805,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     editBox->setDelegate(delegate.get());
 
     // 使这个代理随AlertView一起析构
-    AlertView::showWithNode("追分计算", rootWidget, [editBox, delegate]() {
+    AlertView::showWithNode("追分与保位", rootWidget, [editBox, delegate]() {
         const char *text = editBox->getText();
         if (*text != '\0') {
             int delta = atoi(text);
