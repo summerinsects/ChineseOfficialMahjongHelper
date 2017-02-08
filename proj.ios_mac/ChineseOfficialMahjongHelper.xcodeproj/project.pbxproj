@@ -466,14 +466,14 @@
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
 				1F6A373D1CBDD3C9001617E6 /* BaseLayer.h */,
 				1F6A373E1CBDD3C9001617E6 /* common.h */,
+				1FE04AD61C94682A008401EA /* FanCalculator */,
+				1FE2A3E61CBB30D1008C45C5 /* FanTable */,
 				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
 				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
 				1FDD943B1C8337140031BC38 /* mahjong-algorithm */,
 				1F154E391E4409420083F8B3 /* MahjongTheory */,
 				1F764BE81CC5DB1F00844DAF /* Other */,
-				1FE04AD61C94682A008401EA /* FanCalculator */,
 				1FE04AD91C94682A008401EA /* ScoreSheet */,
-				1FE2A3E61CBB30D1008C45C5 /* FanTable */,
 				1FE5CFDA1CAE029200A5C38B /* widget */,
 			);
 			name = Classes;
