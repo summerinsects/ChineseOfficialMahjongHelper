@@ -847,13 +847,13 @@ int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, bo
         int fixed_cnt = (13 - standing_cnt) / 3;
         int st = basic_type_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt,
             useful_table != nullptr ? &temp_table : nullptr);
-        if (st < ret) {
+        if (st < ret) {  // 上听数小的，直接覆盖数据
             ret = st;
             if (useful_table != nullptr) {
                 memcpy(*useful_table, temp_table, sizeof(*useful_table));
             }
         }
-        else if (st == ret && useful_table != nullptr) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
+        else if (st == ret && useful_table != nullptr) {  // 两种不同组合龙上听数如果相等的话，直接合并有效牌
             std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table),
                 std::begin(*useful_table), [](bool u, bool t) { return u || t; });
         }
@@ -940,13 +940,13 @@ int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing
     // 6种组合龙分别计算
     for (int i = 0; i < 6; ++i) {
         int st = honors_and_knitted_tiles_shanten_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
-        if (st < ret) {
+        if (st < ret) {  // 上听数小的，直接覆盖数据
             ret = st;
             if (useful_table != nullptr) {
                 memcpy(*useful_table, temp_table, sizeof(*useful_table));
             }
         }
-        else if (st == ret && useful_table != nullptr) {  // 两种不同组合龙上听数如果相等的话，直接增加有效牌
+        else if (st == ret && useful_table != nullptr) {  // 两种不同组合龙上听数如果相等的话，直接合并有效牌
             std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table),
                 std::begin(*useful_table), [](bool u, bool t) { return u || t; });
         }
