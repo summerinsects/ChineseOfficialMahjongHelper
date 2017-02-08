@@ -724,6 +724,16 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
         rootWidget->addChild(label);
         label->setPosition(Vec2(75.0f, 190.0f));
 
+        const char *normalImage, *selectedImage;
+        if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
+            normalImage = "source_material/btn_square_selected.png";
+            selectedImage = "source_material/btn_square_highlighted.png";
+        }
+        else {
+            normalImage = "source_material/btn_square_highlighted.png";
+            selectedImage = "source_material/btn_square_selected.png";
+        }
+
         static std::pair<int, int> pairwise[6] = {
             std::make_pair(0, 1), std::make_pair(0, 2), std::make_pair(0, 3),
             std::make_pair(1, 2), std::make_pair(1, 3), std::make_pair(2, 3),
@@ -732,7 +742,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
         for (int i = 0; i < 6; ++i) {
             int delta = _totalScores[pairwise[i].first] - _totalScores[pairwise[i].second];
 
-            ui::Button *button = ui::Button::create("source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png");
+            ui::Button *button = ui::Button::create(normalImage, selectedImage);
             button->setScale9Enabled(true);
             button->setContentSize(Size(150.0f, 20.0f));
             button->setTitleFontSize(12);
