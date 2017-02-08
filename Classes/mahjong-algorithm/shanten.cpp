@@ -254,11 +254,8 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
             ++cnt_table[t + 2];
         }
 
-        // 有雀头时N个搭子至少N-1上听
-        // 无雀头时N个搭子至少N上听
-        int min_ret = has_pair ? neighbor_cnt - 1 : neighbor_cnt;
-        // 已经没有再削减搭子的必要了，上听数肯定会超过之前已经计算过的
-        if (min_ret >= result) {
+        // 如果已经通过削减雀头/面子降低了上听数，再按搭子计算的上听数肯定不会更少
+        if (result < max_ret) {
             continue;
         }
 
