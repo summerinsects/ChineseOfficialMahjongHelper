@@ -195,7 +195,7 @@ bool MahjongTheoryScene::init() {
 
 void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f;
+    const float width = visibleSize.width * 0.8f - 10;
 
     Label *label = Label::createWithSystemFont(
         "1." INPUT_GUIDE_STRING_1 "\n"

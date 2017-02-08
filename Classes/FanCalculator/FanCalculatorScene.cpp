@@ -381,7 +381,7 @@ void FanCalculatorScene::onWinTileChanged() {
 
 void FanCalculatorScene::showInputAlert(const char *prevInput) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f;
+    const float width = visibleSize.width * 0.8f - 10;
 
     ui::Widget *rootWidget = ui::Widget::create();
 
