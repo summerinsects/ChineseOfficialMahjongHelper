@@ -202,9 +202,9 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
         "2." INPUT_GUIDE_STRING_2 "\n"
         "3." INPUT_GUIDE_STRING_3 "\n"
         "4.基本和型暂不考虑国标番型。\n"
-        "5.不考虑暗杠。\n"
-        "6.计算出结果后，可点击表格中的有效牌，切出该切法的弃牌，并上指定牌进行推演。\n"
-        "7.点击手牌可切出对应牌，随机上张进行推演。\n"
+        "5.暂不考虑吃碰杠操作。\n"
+        "6.点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n"
+        "7.点击手牌可切出对应牌，随机上牌。\n"
         "输入范例1：[EEEE]288s349pSCFF2p\n"
         "输入范例2：123p 345s 999s 6m6pEW1m\n"
         "输入范例3：356m18s1579pWNFF9p\n", "Arial", 10);
