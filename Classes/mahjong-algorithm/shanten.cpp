@@ -794,36 +794,35 @@ static bool is_knitted_straight_wait_from_table(const int(&cnt_table)[TILE_TABLE
     return false;
 }
 
-// 1种组合龙的上听数
-static int knitted_straight_shanten_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (*useful_table)[TILE_TABLE_SIZE]) {
+// 基本和型包含主番的上听数，可用于计算三步高 三同顺 龙等三组面子的番种整个立牌的上听数
+static int basic_type_shanten_specified(const int (&cnt_table)[TILE_TABLE_SIZE], const tile_t *main_tiles, int main_cnt,
+    long fixed_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
     }
 
-    // 打表
-    int cnt_table[TILE_TABLE_SIZE];
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    int temp_table[TILE_TABLE_SIZE];
+    memcpy(temp_table, cnt_table, sizeof(temp_table));
+    int exsit_cnt = 0;
 
-    int cnt = 0;
-
-    // 统计组合龙部分的牌
-    for (int i = 0; i < 9; ++i) {
-        tile_t t = standard_knitted_straight[which_seq][i];
+    // 统计主番的牌
+    for (int i = 0; i < main_cnt; ++i) {
+        tile_t t = main_tiles[i];
         int n = cnt_table[t];
         if (n > 0) {  // 有，削减之
-            ++cnt;
-            --cnt_table[t];
+            ++exsit_cnt;
+            --temp_table[t];
         }
         else if (useful_table != nullptr) {  // 没有， 记录有效牌
             (*useful_table)[t] = true;
         }
     }
 
-    // 余下“1组面子+雀头”的上听数
-    int result = basic_type_shanten_from_table(cnt_table, 3, useful_table);
+    // 余下牌的上听数
+    int result = basic_type_shanten_from_table(temp_table, fixed_cnt - main_cnt / 3, useful_table);
 
-    // 上听数=组合龙缺少的张数+余下“1组面子+雀头”的上听数
-    return (9 - cnt) + result;
+    // 上听数=主番缺少的张数+余下牌的上听数
+    return (main_cnt - exsit_cnt) + result;
 }
 
 // 组合龙上听数
@@ -831,6 +830,10 @@ int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, bo
     if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return std::numeric_limits<int>::max();
     }
+
+    // 打表
+    int cnt_table[TILE_TABLE_SIZE];
+    map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     int ret = std::numeric_limits<int>::max();
     bool temp_table[TILE_TABLE_SIZE];
@@ -841,7 +844,9 @@ int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, bo
 
     // 6种组合龙分别计算
     for (int i = 0; i < 6; ++i) {
-        int st = knitted_straight_shanten_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
+        int fixed_cnt = (13 - standing_cnt) / 3;
+        int st = basic_type_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt,
+            useful_table != nullptr ? &temp_table : nullptr);
         if (st < ret) {
             ret = st;
             if (useful_table != nullptr) {
