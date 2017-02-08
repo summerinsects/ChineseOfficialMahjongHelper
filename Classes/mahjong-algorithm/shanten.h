@@ -162,7 +162,7 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, ti
  * @param [out] useful_table 有效牌标记表（可为null)
  * @return int 上听数
  */
-int knitted_straight_in_basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
+int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]);
 
 /**
  * @brief 组合龙是否听牌
@@ -172,7 +172,7 @@ int knitted_straight_in_basic_type_shanten(const tile_t *standing_tiles, long st
  * @param [out] waiting_table 听牌标记表（可为null)
  * @return bool 是否听牌
  */
-bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]);
+bool is_knitted_straight_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]);
 
 /**
  * @brief 组合龙是否和牌
@@ -182,7 +182,7 @@ bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long s
  * @param [in] test_tile 测试的牌
  * @return bool 是否和牌
  */
-bool is_knitted_straight_in_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
+bool is_knitted_straight_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
 
 

@@ -731,7 +731,7 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, ti
 // “组合龙+面子+雀头”和型
 
 // 组合龙是否听牌实现
-static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[TILE_TABLE_SIZE], long left_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+static bool is_knitted_straight_wait_impl(const int (&cnt_table)[TILE_TABLE_SIZE], long left_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
     // 匹配组合龙
     const tile_t (*matched_seq)[9] = nullptr;
     tile_t missing_tiles[9];
@@ -795,7 +795,7 @@ static bool is_knitted_straight_in_basic_type_wait_impl(const int (&cnt_table)[T
 }
 
 // 1种组合龙的上听数
-static int knitted_straight_in_basic_type_shanten_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (*useful_table)[TILE_TABLE_SIZE]) {
+static int knitted_straight_shanten_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (*useful_table)[TILE_TABLE_SIZE]) {
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
     }
@@ -827,7 +827,7 @@ static int knitted_straight_in_basic_type_shanten_1(const tile_t *standing_tiles
 }
 
 // 组合龙上听数
-int knitted_straight_in_basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
     if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return std::numeric_limits<int>::max();
     }
@@ -841,7 +841,7 @@ int knitted_straight_in_basic_type_shanten(const tile_t *standing_tiles, long st
 
     // 6种组合龙分别计算
     for (int i = 0; i < 6; ++i) {
-        int st = knitted_straight_in_basic_type_shanten_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
+        int st = knitted_straight_shanten_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
         if (st < ret) {
             ret = st;
             if (useful_table != nullptr) {
@@ -858,7 +858,7 @@ int knitted_straight_in_basic_type_shanten(const tile_t *standing_tiles, long st
 }
 
 // 组合龙是否听牌
-bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+bool is_knitted_straight_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
     if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return false;
     }
@@ -867,13 +867,13 @@ bool is_knitted_straight_in_basic_type_wait(const tile_t *standing_tiles, long s
     int cnt_table[TILE_TABLE_SIZE];
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
-    return is_knitted_straight_in_basic_type_wait_impl(cnt_table, standing_cnt, waiting_table);
+    return is_knitted_straight_wait_impl(cnt_table, standing_cnt, waiting_table);
 }
 
 // 组合龙是否和牌
-bool is_knitted_straight_in_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
+bool is_knitted_straight_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     bool waiting_table[TILE_TABLE_SIZE];
-    return (is_knitted_straight_in_basic_type_wait(standing_tiles, standing_cnt, &waiting_table)
+    return (is_knitted_straight_wait(standing_tiles, standing_cnt, &waiting_table)
         && waiting_table[test_tile]);
 }
 
@@ -1023,7 +1023,7 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
     if (hand_tiles->tile_count == 13 || hand_tiles->tile_count == 10) {
         if (form_flag | FORM_FLAG_KNITTED_STRAIGHT) {
             result.form_flag = FORM_FLAG_KNITTED_STRAIGHT;
-            result.shanten = knitted_straight_in_basic_type_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
+            result.shanten = knitted_straight_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
             if (result.shanten == 0 && result.useful_table[discard_tile]) {
                 result.shanten = -1;
             }

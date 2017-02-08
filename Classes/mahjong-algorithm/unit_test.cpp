@@ -33,13 +33,13 @@ void test_wait(const char *str) {
             is_wait = true;
             printf("seven pairs");
         }
-        else if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, &table)) {
+        else if (is_knitted_straight_wait(tiles, tile_cnt, &table)) {
             is_wait = true;
             printf("knitted straight in basic type");
         }
     }
     else if (tile_cnt == 10) {
-        if (is_knitted_straight_in_basic_type_wait(tiles, tile_cnt, &table)) {
+        if (is_knitted_straight_wait(tiles, tile_cnt, &table)) {
             is_wait = true;
             printf("knitted straight in basic type");
         }
@@ -149,7 +149,7 @@ void test_shanten(const char *str) {
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = knitted_straight_in_basic_type_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = knitted_straight_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
     printf("knitted straight in basic type %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
