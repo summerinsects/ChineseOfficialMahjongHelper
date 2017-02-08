@@ -110,9 +110,9 @@ typedef uint16_t path_unit_t;  // 路径信息
 #define UNIT_TYPE_CHOW 1
 #define UNIT_TYPE_PUNG 2
 #define UNIT_TYPE_PAIR 4
-#define UNIT_TYPE_NEIGHBOR_BOTH 5
-#define UNIT_TYPE_NEIGHBOR_MID 6
-#define UNIT_TYPE_NEIGHBOR_PUNG 7
+#define UNIT_TYPE_CHOW_OPEN_END 5
+#define UNIT_TYPE_CHOW_CLOSED 6
+#define UNIT_TYPE_INCOMPLETE_PUNG 7
 
 #define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
 #define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
@@ -168,7 +168,7 @@ static void save_work_path(const long fixed_cnt, const work_path_t *work_path, w
 
 // 递归计算基本和型上听数
 static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], const long fixed_cnt, const bool has_pair, const uint16_t pack_cnt,
-    const uint16_t neighbor_cnt, work_path_t *work_path, work_state_t *work_state) {
+    const uint16_t incomplete_cnt, work_path_t *work_path, work_state_t *work_state) {
     if (pack_cnt == 4) {  // 已经有4组面子
         return has_pair ? -1 : 0;  // 有雀头：和了；无雀头：听牌
     }
@@ -176,11 +176,11 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
     int max_ret;  // 当前状态能返回的最大上听数
 
     // 缺少的搭子数=4-完成的面子数-搭子数
-    int neighbor_need = 4 - pack_cnt - neighbor_cnt;
-    if (neighbor_need > 0) {  // 还需要搭子的情况
+    int incomplete_need = 4 - pack_cnt - incomplete_cnt;
+    if (incomplete_need > 0) {  // 还需要搭子的情况
         // 有雀头时，上听数=搭子数+缺少的搭子数*2-1
         // 无雀头时，上听数=搭子数+缺少的搭子数*2
-        max_ret = neighbor_cnt + neighbor_need * 2 - (has_pair ? 1 : 0);
+        max_ret = incomplete_cnt + incomplete_need * 2 - (has_pair ? 1 : 0);
     }
     else {  // 搭子齐了的情况
         // 有雀头时，上听数=3-完成面子数
@@ -188,12 +188,12 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
         max_ret = (has_pair ? 3 : 4) - pack_cnt;
     }
 
-    const uint16_t depth = pack_cnt + neighbor_cnt + has_pair;
+    const uint16_t depth = pack_cnt + incomplete_cnt + has_pair;
     work_path->depth = depth;
 
     int result = max_ret;
 
-    if (pack_cnt + neighbor_cnt > 4) {  // 搭子超载
+    if (pack_cnt + incomplete_cnt > 4) {  // 搭子超载
         save_work_path(fixed_cnt, work_path, work_state);
         return max_ret;
     }
@@ -214,7 +214,7 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
             // 削减雀头，递归
             cnt_table[t] -= 2;
             int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, true, pack_cnt,
-                neighbor_cnt, work_path, work_state);
+                incomplete_cnt, work_path, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 2;
         }
@@ -229,7 +229,7 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
             int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt + 1,
-                neighbor_cnt, work_path, work_state);
+                incomplete_cnt, work_path, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 3;
         }
@@ -247,7 +247,7 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
             --cnt_table[t + 1];
             --cnt_table[t + 2];
             int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt + 1,
-                neighbor_cnt, work_path, work_state);
+                incomplete_cnt, work_path, work_state);
             result = std::min(ret, result);
             ++cnt_table[t];
             ++cnt_table[t + 1];
@@ -262,14 +262,14 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
         // 刻子搭子
         if (cnt_table[t] > 1) {
             // 削减刻子搭子，递归
-            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_PUNG, t);
+            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_INCOMPLETE_PUNG, t);
             if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                 continue;
             }
 
             cnt_table[t] -= 2;
             int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
-                neighbor_cnt + 1, work_path, work_state);
+                incomplete_cnt + 1, work_path, work_state);
             result = std::min(ret, result);
             cnt_table[t] += 2;
         }
@@ -278,7 +278,7 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
         if (is_numbered) {
             // 削减搭子，递归
             if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
-                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_BOTH, t);
+                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_OPEN_END, t);
                 if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                     continue;
                 }
@@ -286,13 +286,13 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
                 --cnt_table[t];
                 --cnt_table[t + 1];
                 int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
-                    neighbor_cnt + 1, work_path, work_state);
+                    incomplete_cnt + 1, work_path, work_state);
                 result = std::min(ret, result);
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
             }
             if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 坎张
-                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_NEIGHBOR_MID, t);
+                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_CLOSED, t);
                 if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                     continue;
                 }
@@ -300,7 +300,7 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
                 --cnt_table[t];
                 --cnt_table[t + 2];
                 int ret = basic_type_shanten_recursively(cnt_table, fixed_cnt, has_pair, pack_cnt,
-                    neighbor_cnt + 1, work_path, work_state);
+                    incomplete_cnt + 1, work_path, work_state);
                 result = std::min(ret, result);
                 ++cnt_table[t];
                 ++cnt_table[t + 2];
