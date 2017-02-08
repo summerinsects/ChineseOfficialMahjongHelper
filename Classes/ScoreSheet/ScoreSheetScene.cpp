@@ -133,9 +133,10 @@ bool ScoreSheetScene::init() {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
-    button->setTitleText("追分计算");
+    button->setTitleText("追分和保位");
     button->setPosition(Vec2(origin.x + 28, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
+    scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
 
     // 时间label
     _timeLabel = Label::createWithSystemFont("当前时间", "Arial", 12);
@@ -672,41 +673,52 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
 }
 
 static void showPursuit(int delta) {
-    std::string msg;
-    msg.reserve(128);
     if (delta == 0) {
-        msg = "平分";
+        AlertView::showWithMessage("追分和保位", "平分", nullptr, nullptr);
+        return;
+    }
+
+    std::string msg;
+    msg.reserve(256);
+    if (delta < 0) {
+        delta = -delta;
+    }
+    msg.append(StringUtils::format("分差%d分\n\n超分需", delta));
+
+    int d1 = delta - 32;
+    if (d1 < 8) {
+        msg.append("任意和牌");
     }
     else {
-        if (delta < 0) {
-            delta = -delta;
-            msg.append(StringUtils::format("领先%d分，对手超分需：", delta));
+        int d2 = d1 >> 1;
+        if (d2 < 8) {
+            msg.append(StringUtils::format("任意自摸或对点，旁点至少%d番", d1 + 1));
         }
         else {
-            msg.append(StringUtils::format("落后%d分，超分需：", delta));
-        }
-
-        int d1 = delta - 32;
-        if (d1 < 8) {
-            msg.append("任意和牌");
-        }
-        else {
-            int d2 = d1 >> 1;
-            if (d2 < 8) {
-                msg.append(StringUtils::format("任意自摸或对点，旁点至少%d番", d1 + 1));
+            int d4 = d2 >> 1;
+            if (d4 < 8) {
+                msg.append(StringUtils::format("任意自摸，对点至少%d番，旁点至少%d番", d2 + 1, d1 + 1));
             }
             else {
-                int d4 = d2 >> 1;
-                if (d4 < 8) {
-                    msg.append(StringUtils::format("任意自摸，对点至少%d番，旁点至少%d番", d2 + 1, d1 + 1));
-                }
-                else {
-                    msg.append(StringUtils::format("自摸至少%d番，对点至少%d番，旁点至少%d番", d4 + 1, d2 + 1, d1 + 1));
-                }
+                msg.append(StringUtils::format("自摸至少%d番，对点至少%d番，旁点至少%d番", d4 + 1, d2 + 1, d1 + 1));
             }
         }
     }
-    AlertView::showWithMessage("追分计算", msg, nullptr, nullptr);
+
+    if (delta <= 8) {
+        msg.append("\n\n点炮无法保位");
+    }
+    else {
+        int d2 = d1 >> 1;
+        if (d2 <= 8) {
+            msg.append(StringUtils::format("\n\n对点无法保位，保位可旁点至多%d番", delta - 1));
+        }
+        else {
+            msg.append(StringUtils::format("\n\n保位可对点至多%d番，旁点至多%d番", (d1 & 1) ? d2 : d2 - 1, delta - 1));
+        }
+    }
+
+    AlertView::showWithMessage("追分与保位", msg, nullptr, nullptr);
 }
 
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
@@ -750,8 +762,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
                 button->setTitleText(StringUtils::format("「%s」领先「%s」%d分", name[pairwise[i].first], name[pairwise[i].second], delta));
             }
             else if (delta < 0) {
-                delta = -delta;
-                button->setTitleText(StringUtils::format("「%s」落后「%s」%d分", name[pairwise[i].first], name[pairwise[i].second], delta));
+                button->setTitleText(StringUtils::format("「%s」落后「%s」%d分", name[pairwise[i].first], name[pairwise[i].second], -delta));
             }
             else {
                 button->setTitleText(StringUtils::format("「%s」与「%s」平分", name[pairwise[i].first], name[pairwise[i].second]));
@@ -836,7 +847,7 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
         rootWidget->addChild(button);
         button->setPosition(Vec2(75.0f, 60.0f - i * 25.0f));
         button->addClickEventListener([delta](Ref *) {
-            showPursuit(-delta);
+            showPursuit(delta);
         });
     }
 
