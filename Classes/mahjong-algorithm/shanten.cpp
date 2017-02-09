@@ -844,7 +844,7 @@ int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, bo
 
     // 6种组合龙分别计算
     for (int i = 0; i < 6; ++i) {
-        int fixed_cnt = (13 - standing_cnt) / 3;
+        int fixed_cnt = (13 - static_cast<int>(standing_cnt)) / 3;
         int st = basic_type_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt,
             useful_table != nullptr ? &temp_table : nullptr);
         if (st < ret) {  // 上听数小的，直接覆盖数据
