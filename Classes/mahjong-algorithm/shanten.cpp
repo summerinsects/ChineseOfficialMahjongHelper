@@ -643,7 +643,7 @@ bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (
     if (0 == seven_pairs_shanten(standing_tiles, standing_cnt,
         waiting_table != nullptr ? &useful_table : nullptr)) {
         if (waiting_table != nullptr) {
-            memcpy(*waiting_table, useful_table, sizeof(*useful_table));
+            memcpy(*waiting_table, useful_table, sizeof(*waiting_table));
         }
         return true;
     }
@@ -714,7 +714,7 @@ bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, b
     if (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt,
         waiting_table != nullptr ? &useful_table : nullptr)) {
         if (waiting_table != nullptr) {
-            memcpy(*waiting_table, useful_table, sizeof(*useful_table));
+            memcpy(*waiting_table, useful_table, sizeof(*waiting_table));
         }
         return true;
     }
@@ -960,7 +960,7 @@ bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standin
     if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt,
         waiting_table != nullptr ? &useful_table : nullptr)) {
         if (waiting_table != nullptr) {
-            memcpy(*waiting_table, useful_table, sizeof(*useful_table));
+            memcpy(*waiting_table, useful_table, sizeof(*waiting_table));
         }
         return true;
     }
