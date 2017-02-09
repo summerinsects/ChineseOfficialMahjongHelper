@@ -40,7 +40,7 @@ static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_pa
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
     // 这里不能直接在work_packs上排序，否则会破坏递归外层的数据
     pack_t temp[5];
-    memcpy(temp, work_packs, 5 * sizeof(pack_t));
+    memcpy(temp, work_packs, sizeof(temp));
     std::sort(temp + fixed_cnt, temp + 4);
 
     // 检查这种划分是否已经存在了
@@ -48,7 +48,7 @@ static void seperate_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_pa
         [&temp, fixed_cnt](const pack_t (&pack)[5]) {
         return std::equal(&pack[fixed_cnt], &pack[4], &temp[fixed_cnt]);
     })) {
-        memcpy(separation->packs[separation->count], temp, 5 * sizeof(pack_t));
+        memcpy(separation->packs[separation->count], temp, sizeof(temp));
         ++separation->count;
     }
     else {
@@ -1832,7 +1832,7 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
 
     // 还原牌
     tile_t tiles[15];  // 第四组可能为杠，所以最多为15张
-    memcpy(tiles, matched_seq, 9 * sizeof(tile_t));  // 组合龙的部分
+    memcpy(tiles, matched_seq, sizeof(*matched_seq));  // 组合龙的部分
     long tile_cnt = packs_to_tiles(&temp_pack[3], 2, tiles + 9, 6);  // 一组面子+一对雀头 最多6张牌
     tile_cnt += 9;
 
