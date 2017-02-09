@@ -1956,7 +1956,7 @@ static bool calculate_special_type_fan(const tile_t (&standing_tiles)[14], win_f
 
 static int get_fan_by_table(const long (&fan_table)[FAN_TABLE_SIZE]) {
     int fan = 0;
-    for (int i = 1; i < FLOWER_TILES; ++i) {
+    for (int i = 1; i < FAN_TABLE_SIZE; ++i) {
         if (fan_table[i] == 0) {
             continue;
         }
