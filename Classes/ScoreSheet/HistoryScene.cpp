@@ -16,6 +16,7 @@
 USING_NS_CC;
 
 static std::vector<Record> g_records;
+static std::mutex g_mutex;
 
 Scene *HistoryScene::createScene(const std::function<bool (const Record &)> &viewCallback) {
     auto scene = Scene::create();
@@ -69,35 +70,6 @@ static void saveRecords(const std::vector<Record> &records) {
     }
 }
 
-static std::mutex g_mutex;
-
-static void loadRecordsAsync(const std::function<void ()> &callback) {
-    std::thread([callback]() {
-        std::vector<Record> temp;
-        {
-            std::lock_guard<std::mutex> guard(g_mutex);
-            (void)guard;
-            loadRecords(temp);
-        }
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread([callback, temp]() mutable {
-            g_records.swap(temp);
-            callback();
-        });
-    }).detach();
-}
-
-static void saveRecordsAsync(const std::function<void ()> &callback) {
-    std::vector<Record> temp = g_records;
-    std::thread([callback, temp](){
-        {
-            std::lock_guard<std::mutex> guard(g_mutex);
-            (void)guard;
-            saveRecords(temp);
-        }
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread(callback);
-    }).detach();
-}
-
 bool HistoryScene::init() {
     if (!BaseLayer::initWithTitle("历史记录")) {
         return false;
@@ -132,18 +104,26 @@ bool HistoryScene::init() {
     this->addChild(_tableView);
 
     if (UNLIKELY(g_records.empty())) {
-
         LoadingView *loadingView = LoadingView::create();
         this->addChild(loadingView);
         loadingView->setPosition(origin);
 
         auto thiz = RefPtr<HistoryScene>(this);
-        loadRecordsAsync([thiz, loadingView]() {
-            if (LIKELY(thiz->getParent() != nullptr)) {
-                loadingView->removeFromParent();
-                thiz->_tableView->reloadData();
-            }
-        });
+
+        std::thread([thiz, loadingView]() {
+            std::vector<Record> temp;
+            std::lock_guard<std::mutex> lg(g_mutex);
+            loadRecords(temp);
+
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
+                g_records.swap(temp);
+
+                if (LIKELY(thiz->getParent() != nullptr)) {
+                    loadingView->removeFromParent();
+                    thiz->_tableView->reloadData();
+                }
+            });
+        }).detach();
     }
 
     return true;
@@ -265,11 +245,17 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     AlertView::showWithMessage("删除记录", "删除后无法找回，确认删除？", [this, idx]() {
         g_records.erase(g_records.begin() + idx);
         auto thiz = RefPtr<HistoryScene>(this);
-        saveRecordsAsync([thiz]() {
-            if (LIKELY(thiz->getParent() != nullptr)) {
-                thiz->_tableView->reloadData();
-            }
-        });
+
+        std::vector<Record> temp = g_records;
+        std::thread([thiz, temp](){
+            std::lock_guard<std::mutex> lg(g_mutex);
+            saveRecords(temp);
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz]() {
+                if (LIKELY(thiz->getParent() != nullptr)) {
+                    thiz->_tableView->reloadData();
+                }
+            });
+        }).detach();
     }, nullptr);
 }
 
@@ -281,25 +267,36 @@ void HistoryScene::onViewButton(cocos2d::Ref *sender) {
     }
 }
 
-static void addRecord(const Record &record) {
+static void __addRecord(const Record &record) {
     if (g_records.end() == std::find(g_records.begin(), g_records.end(), record)) {
         g_records.push_back(record);
-        saveRecordsAsync([]{});
+        std::vector<Record> temp = g_records;
+        std::thread([temp]() {
+            std::lock_guard<std::mutex> lg(g_mutex);
+            saveRecords(temp);
+        }).detach();
     }
 }
 
 void HistoryScene::addRecord(const Record &record) {
     if (g_records.empty()) {
-        loadRecordsAsync([record]{
-            ::addRecord(record);
-        });
+        std::thread([record]() {
+            std::vector<Record> temp;
+            std::lock_guard<std::mutex> lg(g_mutex);
+            loadRecords(temp);
+
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([record, temp]() mutable {
+                g_records.swap(temp);
+                __addRecord(record);
+            });
+        }).detach();
     }
     else {
-        ::addRecord(record);
+        __addRecord(record);
     }
 }
 
-static void modifyRecord(const Record &record) {
+static void __modifyRecord(const Record &record) {
     auto it = std::find_if(g_records.begin(), g_records.end(), [&record](const Record &r) {
         return (r.start_time == record.start_time
             && r.end_time == record.end_time);
@@ -311,16 +308,28 @@ static void modifyRecord(const Record &record) {
     else {
         memcpy(&*it, &record, sizeof(Record));
     }
-    saveRecordsAsync([]{});
+
+    std::vector<Record> temp = g_records;
+    std::thread([temp]() {
+        std::lock_guard<std::mutex> lg(g_mutex);
+        saveRecords(temp);
+    }).detach();
 }
 
 void HistoryScene::modifyRecord(const Record &record) {
     if (g_records.empty()) {
-        loadRecordsAsync([record]{
-            ::modifyRecord(record);
-        });
+        std::thread([record]() {
+            std::vector<Record> temp;
+            std::lock_guard<std::mutex> lg(g_mutex);
+            loadRecords(temp);
+
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([record, temp]() mutable {
+                g_records.swap(temp);
+                __modifyRecord(record);
+            });
+        }).detach();
     }
     else {
-        ::modifyRecord(record);
+        __modifyRecord(record);
     }
 }
