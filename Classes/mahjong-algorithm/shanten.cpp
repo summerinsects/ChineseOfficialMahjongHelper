@@ -54,7 +54,7 @@ void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[TILE_TABLE_SIZE])
 
 // 将手牌打表
 bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[TILE_TABLE_SIZE]) {
-    // 将每一次副露当作3张牌来算，那么总张数=13
+    // 将每一组副露当作3张牌来算，那么总张数=13
     if (hand_tiles->tile_count <= 0 || hand_tiles->pack_count < 0 || hand_tiles->pack_count > 4
         || hand_tiles->pack_count * 3 + hand_tiles->tile_count != 13) {
         return false;
@@ -236,6 +236,7 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
 
         // 顺子（只能是数牌）
         bool is_numbered = is_numbered_suit(t);
+        // 顺子t t+1 t+2，显然t不能是8点以上的数牌
         if (is_numbered && tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW, t);
             if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
@@ -277,6 +278,7 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
         // 顺子搭子（只能是数牌）
         if (is_numbered) {
             // 削减搭子，递归
+            // 两面或者边张搭子t t+1，显然t不能是9点以上的数牌
             if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
                 work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_OPEN_END, t);
                 if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
@@ -291,6 +293,7 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
             }
+            // 坎张搭子t t+2，显然t不能是8点以上的数牌
             if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 坎张
                 work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_CLOSED, t);
                 if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
@@ -464,7 +467,7 @@ static bool is_basic_type_wait_4(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiti
             ret = true;
         }
         cnt_table[t] += 2;
-        if (ret && waiting_table == nullptr) {
+        if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
             return true;
         }
     }
@@ -481,7 +484,7 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_SIZE], lo
     bool ret = false;
     if (left_cnt == 4) {
         ret = is_basic_type_wait_4(cnt_table, waiting_table);
-        if (ret && waiting_table == nullptr) {
+        if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
             return true;
         }
     }
@@ -500,14 +503,14 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_SIZE], lo
                 ret = true;
             }
             cnt_table[t] += 3;
-            if (ret && waiting_table == nullptr) {
+            if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
                 return true;
             }
         }
 
         // 顺子（只能是数牌）
-        bool is_numbered = is_numbered_suit(t);
-        if (is_numbered) {
+        if (is_numbered_suit(t)) {
+            // 顺子t t+1 t+2，显然t不能是8点以上的数牌
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
                 // 削减这组顺子，递归
                 --cnt_table[t];
@@ -519,7 +522,7 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_SIZE], lo
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
                 ++cnt_table[t + 2];
-                if (ret && waiting_table == nullptr) {
+                if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
                     return true;
                 }
             }
@@ -580,8 +583,8 @@ static bool is_basic_type_win_recursively(int (&cnt_table)[TILE_TABLE_SIZE], lon
         }
 
         // 顺子（只能是数牌）
-        bool is_numbered = is_numbered_suit(t);
-        if (is_numbered) {
+        if (is_numbered_suit(t)) {
+            // 顺子t t+1 t+2，显然t不能是8点以上的数牌
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
                 // 削减这组顺子，递归
                 --cnt_table[t];
@@ -682,7 +685,7 @@ int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, bo
     }
 
     if (useful_table != nullptr) {
-    // 先标记所有的幺九牌为有效牌
+        // 先标记所有的幺九牌为有效牌
         memset(*useful_table, 0, sizeof(*useful_table));
         std::for_each(std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans),
             [useful_table](tile_t t) {
