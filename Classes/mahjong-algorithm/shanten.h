@@ -245,7 +245,7 @@ static const tile_t standard_thirteen_orphans[13] = {
 /**
  * @name form flags
  * @{
- *  解析牌的错误码
+ *  和型
  */
 #define FORM_FLAG_BASIC_TYPE                0x01  ///< 基本和型
 #define FORM_FLAG_SEVEN_PAIRS               0x02  ///< 七对
