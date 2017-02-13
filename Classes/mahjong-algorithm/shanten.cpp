@@ -395,7 +395,7 @@ static bool is_basic_type_wait_1(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiti
         cnt_table[t] = 0;
         if (std::all_of(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n == 0; })) {
             cnt_table[t] = 1;
-            if (waiting_table != nullptr) {
+            if (waiting_table != nullptr) {  // 不需要获取听牌张，则可以直接返回
                 (*waiting_table)[t] = true;
             }
             return true;
@@ -415,7 +415,7 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_SIZE], bool (
             continue;
         }
         if (cnt_table[t] > 1) {
-            if (waiting_table != nullptr) {
+            if (waiting_table != nullptr) {  // 不需要获取听牌张，则可以直接返回
                 (*waiting_table)[t] = true;  // 对倒
                 ret = true;
                 continue;
@@ -427,7 +427,7 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_SIZE], bool (
         if (is_numbered_suit_quick(t)) {  // 数牌搭子
             rank_t r = tile_rank(t);
             if (r > 1 && cnt_table[t - 1]) {  // 两面或者边张
-                if (waiting_table != nullptr) {
+                if (waiting_table != nullptr) {  // 不需要获取听牌张，则可以直接返回
                     if (r < 9) (*waiting_table)[t + 1] = true;
                     if (r > 2) (*waiting_table)[t - 2] = true;
                     ret = true;
@@ -438,7 +438,7 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_SIZE], bool (
                 }
             }
             if (r > 2 && cnt_table[t - 2]) {  // 坎张
-                if (waiting_table != nullptr) {
+                if (waiting_table != nullptr) {  // 不需要获取听牌张，则可以直接返回
                     (*waiting_table)[t - 1] = true;
                     ret = true;
                     continue;
