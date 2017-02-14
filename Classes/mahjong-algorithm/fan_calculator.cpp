@@ -27,36 +27,40 @@ namespace mahjong {
 
 extern long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size);
 
-// 所有的划分
-struct divisions_t {
-    pack_t packs[MAX_DIVISION_CNT][5];  // 每一种划分
-    long count;                         // 划分方式总数
+struct one_division_t {  // 每一种划分
+    pack_t packs[5];
 };
 
-static void divide_tail_add_pair(tile_t tile, long fixed_cnt, pack_t (&work_packs)[5], divisions_t *division) {
+// 所有的划分
+struct divisions_t {
+    one_division_t divisions[MAX_DIVISION_CNT];
+    long count;  // 划分方式总数
+};
+
+static void divide_tail_add_pair(tile_t tile, long fixed_cnt, one_division_t *work_division, divisions_t *result) {
     // 这2张作为雀头
-    work_packs[4] = make_pack(0, PACK_TYPE_PAIR, tile);
+    work_division->packs[4] = make_pack(0, PACK_TYPE_PAIR, tile);
 
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
-    // 这里不能直接在work_packs上排序，否则会破坏递归外层的数据
-    pack_t temp[5];
-    memcpy(temp, work_packs, sizeof(temp));
-    std::sort(temp + fixed_cnt, temp + 4);
+    // 这里不能直接在work_division.packs上排序，否则会破坏递归外层的数据
+    one_division_t temp;
+    memcpy(&temp, work_division, sizeof(temp));
+    std::sort(temp.packs + fixed_cnt, temp.packs + 4);
 
     // 检查这种划分是否已经存在了
-    if (std::none_of(&division->packs[0], &division->packs[division->count],
-        [&temp, fixed_cnt](const pack_t (&pack)[5]) {
-        return std::equal(&pack[fixed_cnt], &pack[4], &temp[fixed_cnt]);
+    if (std::none_of(&result->divisions[0], &result->divisions[result->count],
+        [&temp, fixed_cnt](const one_division_t &od) {
+        return std::equal(&od.packs[fixed_cnt], &od.packs[4], &temp.packs[fixed_cnt]);
     })) {
-        memcpy(division->packs[division->count], temp, sizeof(temp));
-        ++division->count;
+        memcpy(&result->divisions[result->count], &temp, sizeof(temp));
+        ++result->count;
     }
     else {
         LOG("same case");
     }
 }
 
-static bool divide_tail(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, pack_t (&work_packs)[5], divisions_t *division) {
+static bool divide_tail(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, one_division_t *work_division, divisions_t *result) {
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] < 2) {
@@ -67,7 +71,7 @@ static bool divide_tail(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, pack_
         // 全部使用完毕
         if (std::all_of(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n == 0; })) {
             cnt_table[t] += 2;
-            divide_tail_add_pair(t, fixed_cnt, work_packs, division);
+            divide_tail_add_pair(t, fixed_cnt, work_division, result);
             return true;
         }
         cnt_table[t] += 2;
@@ -76,27 +80,27 @@ static bool divide_tail(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, pack_
     return false;
 }
 
-static bool is_division_branch_exist(long fixed_cnt, long step, const pack_t (&work_packs)[5], const divisions_t *division) {
-    if (division->count <= 0) {
+static bool is_division_branch_exist(long fixed_cnt, long step, const one_division_t *work_division, const divisions_t *result) {
+    if (result->count <= 0) {
         return false;
     }
 
     // std::includes要求有序
-    pack_t temp[5];
-    memcpy(&temp[fixed_cnt], &work_packs[fixed_cnt], step * sizeof(pack_t));
-    std::sort(&temp[fixed_cnt], &temp[fixed_cnt + step]);
+    one_division_t temp;
+    memcpy(&temp.packs[fixed_cnt], &work_division->packs[fixed_cnt], step * sizeof(pack_t));
+    std::sort(&temp.packs[fixed_cnt], &temp.packs[fixed_cnt + step]);
 
     // 只需要比较面子是否重复分支，雀头不参与比较，所以下标是4
-    return std::any_of(&division->packs[0], &division->packs[division->count],
-        [&temp, fixed_cnt, step](const pack_t(&pack)[5]) {
-        return std::includes(&pack[fixed_cnt], &pack[4], &temp[fixed_cnt], &temp[fixed_cnt + step]);
+    return std::any_of(&result->divisions[0], &result->divisions[result->count],
+        [&temp, fixed_cnt, step](const one_division_t &od) {
+        return std::includes(&od.packs[fixed_cnt], &od.packs[4], &temp.packs[fixed_cnt], &temp.packs[fixed_cnt + step]);
     });
 }
 
-static bool divide_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, long step, pack_t (&work_packs)[5], divisions_t *division) {
+static bool divide_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, long step, one_division_t *work_division, divisions_t *result) {
     long idx = step + fixed_cnt;
     if (idx == 4) {  // 4组面子都有了
-        return divide_tail(cnt_table, fixed_cnt, work_packs, division);
+        return divide_tail(cnt_table, fixed_cnt, work_division, result);
     }
 
     bool ret = false;
@@ -108,14 +112,14 @@ static bool divide_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt
 
         // 刻子
         if (cnt_table[t] > 2) {
-            work_packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);
-            if (is_division_branch_exist(fixed_cnt, step + 1, work_packs, division)) {
+            work_division->packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);
+            if (is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
                 continue;
             }
 
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
-            if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_packs, division)) {
+            if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
                 ret = true;
             }
             cnt_table[t] += 3;
@@ -125,8 +129,8 @@ static bool divide_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt
         bool is_numbered = is_numbered_suit(t);
         if (is_numbered) {
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-                work_packs[idx] = make_pack(0, PACK_TYPE_CHOW, t + 1);
-                if (is_division_branch_exist(fixed_cnt, step + 1, work_packs, division)) {
+                work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, t + 1);
+                if (is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
                     continue;
                 }
 
@@ -134,7 +138,7 @@ static bool divide_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt
                 --cnt_table[t];
                 --cnt_table[t + 1];
                 --cnt_table[t + 2];
-                if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_packs, division)) {
+                if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
                     ret = true;
                 }
                 ++cnt_table[t];
@@ -147,19 +151,19 @@ static bool divide_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt
     return ret;
 }
 
-static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_packs, long fixed_cnt, divisions_t *division) {
+static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_packs, long fixed_cnt, divisions_t *result) {
     long standing_cnt = 14 - fixed_cnt * 3;
 
     // 对立牌的种类进行打表
     int cnt_table[TILE_TABLE_SIZE];
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
-    division->count = 0;
+    result->count = 0;
 
     // 复制副露的面子
-    pack_t work_packs[5];
-    memcpy(work_packs, fixed_packs, fixed_cnt * sizeof(pack_t));
-    return divide_recursively(cnt_table, fixed_cnt, 0, work_packs, division);
+    one_division_t work_division;
+    memcpy(work_division.packs, fixed_packs, fixed_cnt * sizeof(pack_t));
+    return divide_recursively(cnt_table, fixed_cnt, 0, &work_division, result);
 }
 
 // 一色四同顺
@@ -1795,19 +1799,19 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
     std::for_each(std::begin(*matched_seq), std::end(*matched_seq), [&cnt_table](tile_t t) { --cnt_table[t]; });
 
     // 按基本和型划分
-    divisions_t division;
-    division.count = 0;
-    pack_t work_packs[5];
-    memset(work_packs, 0, sizeof(work_packs));
+    divisions_t result;
+    result.count = 0;
+    one_division_t work_division;
+    memset(&work_division, 0, sizeof(work_division));
     if (fixed_cnt == 1) {
-        work_packs[3] = fixed_packs[0];  // 无关第4组是明副露，将其放在3处，这样就与门清状态的划分统一了
+        work_division.packs[3] = fixed_packs[0];  // 无关第4组是明副露，将其放在3处，这样就与门清状态的划分统一了
     }
-    divide_recursively(cnt_table, fixed_cnt + 3, 0, work_packs, &division);
-    if (division.count != 1) {
+    divide_recursively(cnt_table, fixed_cnt + 3, 0, &work_division, &result);
+    if (result.count != 1) {
         return false;
     }
 
-    pack_t *temp_pack = division.packs[0];
+    pack_t *temp_pack = result.divisions[0].packs;
 
     fan_table[KNITTED_STRAIGHT] = 1;  // 组合龙
     if (pack_type(temp_pack[3]) == PACK_TYPE_CHOW) {
@@ -2031,17 +2035,17 @@ int calculate_fan(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_c
     long standing_cnt = hand_tiles->tile_count;
 
     tile_t standing_tiles[14];
-    divisions_t division;
+    divisions_t result;
 
     // 合并得到14张牌
     memcpy(standing_tiles, hand_tiles->standing_tiles, standing_cnt * sizeof(tile_t));
     standing_tiles[standing_cnt] = win_tile;
     sort_tiles(standing_tiles, standing_cnt + 1);
 
-    divide_win_hand(standing_tiles, hand_tiles->fixed_packs, fixed_cnt, &division);
+    divide_win_hand(standing_tiles, hand_tiles->fixed_packs, fixed_cnt, &result);
 
-    for (long i = 0; i < division.count; ++i) {
-        std::sort(&division.packs[i][fixed_cnt], &division.packs[i][4]);
+    for (long i = 0; i < result.count; ++i) {
+        std::sort(&result.divisions[i].packs[fixed_cnt], &result.divisions[i].packs[4]);
     }
 
     long fan_tables[MAX_DIVISION_CNT][FAN_TABLE_SIZE] = { { 0 } };
@@ -2050,47 +2054,47 @@ int calculate_fan(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_c
 
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
         if (calculate_knitted_straight_in_basic_type_fan(hand_tiles,
-            win_tile, ext_cond, fan_tables[division.count])) {
-            int current_fan = get_fan_by_table(fan_tables[division.count]);
+            win_tile, ext_cond, fan_tables[result.count])) {
+            int current_fan = get_fan_by_table(fan_tables[result.count]);
             if (current_fan > max_fan) {
                 max_fan = current_fan;
-                max_idx = division.count;
+                max_idx = result.count;
             }
             LOG("fan = %d\n\n", current_fan);
         }
-        else if (calculate_special_type_fan(standing_tiles, ext_cond->win_flag, fan_tables[division.count])) {
-            int current_fan = get_fan_by_table(fan_tables[division.count]);
+        else if (calculate_special_type_fan(standing_tiles, ext_cond->win_flag, fan_tables[result.count])) {
+            int current_fan = get_fan_by_table(fan_tables[result.count]);
             if (current_fan > max_fan) {
                 max_fan = current_fan;
-                max_idx = division.count;
+                max_idx = result.count;
             }
             LOG("fan = %d\n\n", current_fan);
-            if (fan_tables[division.count][SEVEN_SHIFTED_PAIRS]) {
-                division.count = 0;
+            if (fan_tables[result.count][SEVEN_SHIFTED_PAIRS]) {
+                result.count = 0;
             }
         }
     }
-    else if (fixed_cnt == 1 && division.count == 0) {
+    else if (fixed_cnt == 1 && result.count == 0) {
         // 1副露状态，有可能是基本和型组合龙
         if (calculate_knitted_straight_in_basic_type_fan(hand_tiles,
             win_tile, ext_cond, fan_tables[0])) {
             int current_fan = get_fan_by_table(fan_tables[0]);
             if (current_fan > max_fan) {
                 max_fan = current_fan;
-                max_idx = division.count;
+                max_idx = result.count;
             }
             LOG("fan = %d\n\n", current_fan);
         }
     }
 
     // 遍历各种划分方式，分别算番，找出最大的番的划分方式
-    for (long i = 0; i < division.count; ++i) {
+    for (long i = 0; i < result.count; ++i) {
 #if 0  // Debug
         char str[64];
-        packs_to_string(division.packs[i], 5, str, sizeof(str));
+        packs_to_string(result.divisions[i].packs, 5, str, sizeof(str));
         puts(str);
 #endif
-        calculate_basic_type_fan(division.packs[i], fixed_cnt, win_tile, ext_cond, fan_tables[i]);
+        calculate_basic_type_fan(result.divisions[i].packs, fixed_cnt, win_tile, ext_cond, fan_tables[i]);
         int current_fan = get_fan_by_table(fan_tables[i]);
         if (current_fan > max_fan) {
             max_fan = current_fan;
