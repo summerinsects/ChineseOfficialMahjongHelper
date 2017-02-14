@@ -172,6 +172,15 @@ static void save_work_path(const long fixed_cnt, const work_path_t *work_path, w
 }
 
 // 递归计算基本和型上听数
+// 参数说明：
+//   cnt_table牌表
+//   has_pair是否有雀头
+//   pack_cnt完成的面子数
+//   incomplete_cnt搭子数
+// 最后三个参数为优化性能用的，
+// work_path保存当前正在计算的路径，
+// work_state保存了所有已经计算过的路径，
+// 从0到fixed_cnt的数据是不使用的，这些保留给了副露的面子
 static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], const bool has_pair, const uint16_t pack_cnt, const uint16_t incomplete_cnt,
     const long fixed_cnt, work_path_t *work_path, work_state_t *work_state) {
     if (pack_cnt == 4) {  // 已经有4组面子
@@ -1071,20 +1080,22 @@ void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint
         return;
     }
 
-    // 再逐个打掉手里的牌，计算之
+    // 将立牌打表
     int cnt_table[TILE_TABLE_SIZE];
     map_tiles(hand_tiles->standing_tiles, hand_tiles->tile_count, cnt_table);
 
+    // 复制一份手牌
     hand_tiles_t temp;
     memcpy(&temp, hand_tiles, sizeof(temp));
 
+    // 依次尝试打手中的立牌
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] && t != serving_tile && cnt_table[serving_tile] < 4) {
             --cnt_table[t];  // 打这张牌
             ++cnt_table[serving_tile];  // 上这张牌
 
-            // 从table转成牌
+            // 从table转成立牌
             table_to_tiles(cnt_table, temp.standing_tiles, temp.tile_count);
 
             // 计算
