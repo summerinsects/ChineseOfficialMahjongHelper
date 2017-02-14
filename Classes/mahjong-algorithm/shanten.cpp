@@ -552,6 +552,8 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_SIZE], lo
 }
 
 // 基本和型是否听牌
+// 这里之所以不用直接调用上听数计算函数，判断其返回值为0的方式
+// 是因为前者会削减搭子，这个在听牌判断中是没必要的，所以单独写一套逻辑
 bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
     // 对立牌的种类进行打表
     int cnt_table[TILE_TABLE_SIZE];
@@ -579,6 +581,8 @@ static bool is_basic_type_win_2(const int (&cnt_table)[TILE_TABLE_SIZE]) {
 }
 
 // 递归计算基本和型是否和牌
+// 这里之所以不用直接调用上听数计算函数，判断其返回值为-1的方式，
+// 是因为前者会削减搭子，这个在和牌判断中是没必要的，所以单独写一套逻辑
 static bool is_basic_type_win_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long left_cnt) {
     if (left_cnt == 2) {
         return is_basic_type_win_2(cnt_table);
@@ -791,7 +795,7 @@ static bool is_knitted_straight_wait_from_table(const int(&cnt_table)[TILE_TABLE
     if (missing_cnt == 1) {  // 如果缺一张，那么除去组合龙之后的牌应该是完成状态才能听牌
         if (left_cnt == 10) {
             if (is_basic_type_win_recursively(temp_table, 2)) {
-                if (waiting_table != nullptr) {
+                if (waiting_table != nullptr) {  // 获取听牌张，听组合龙缺的一张
                     (*waiting_table)[missing_tiles[0]] = true;
                 }
                 return true;
@@ -799,7 +803,7 @@ static bool is_knitted_straight_wait_from_table(const int(&cnt_table)[TILE_TABLE
         }
         else {
             if (is_basic_type_win_recursively(temp_table, 5)) {
-                if (waiting_table != nullptr) {
+                if (waiting_table != nullptr) {  // 获取听牌张，听组合龙缺的一张
                     (*waiting_table)[missing_tiles[0]] = true;
                 }
                 return true;
@@ -837,7 +841,7 @@ static int basic_type_shanten_specified(const int (&cnt_table)[TILE_TABLE_SIZE],
             ++exsit_cnt;
             --temp_table[t];
         }
-        else if (useful_table != nullptr) {  // 没有， 记录有效牌
+        else if (useful_table != nullptr) {  // 没有，记录有效牌
             (*useful_table)[t] = true;
         }
     }
@@ -873,7 +877,7 @@ int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, bo
             useful_table != nullptr ? &temp_table : nullptr);
         if (st < ret) {  // 上听数小的，直接覆盖数据
             ret = st;
-            if (useful_table != nullptr) {
+            if (useful_table != nullptr) {  // 直接覆盖原来的有效牌数据
                 memcpy(*useful_table, temp_table, sizeof(*useful_table));
             }
         }
@@ -931,7 +935,7 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, long
         if (n > 0) {  // 有，增加计数
             ++cnt;
         }
-        else if (useful_table != nullptr) {  // 没有， 记录有效牌
+        else if (useful_table != nullptr) {  // 没有，记录有效牌
             (*useful_table)[t] = true;
         }
     }
@@ -943,7 +947,7 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, long
         if (n > 0) {  // 有，增加计数
             ++cnt;
         }
-        else if (useful_table != nullptr) {  // 没有， 记录有效牌
+        else if (useful_table != nullptr) {  // 没有，记录有效牌
             (*useful_table)[t] = true;
         }
     }
@@ -966,7 +970,7 @@ int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing
         int st = honors_and_knitted_tiles_shanten_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
         if (st < ret) {  // 上听数小的，直接覆盖数据
             ret = st;
-            if (useful_table != nullptr) {
+            if (useful_table != nullptr) {  // 直接覆盖原来的有效牌数据
                 memcpy(*useful_table, temp_table, sizeof(*useful_table));
             }
         }
