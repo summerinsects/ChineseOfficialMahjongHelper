@@ -106,13 +106,17 @@ int count_useful_tile(const int (&used_table)[TILE_TABLE_SIZE], const bool (&use
     return cnt;
 }
 
-typedef uint16_t path_unit_t;  // 路径信息
-#define UNIT_TYPE_CHOW 1
-#define UNIT_TYPE_PUNG 2
-#define UNIT_TYPE_PAIR 4
-#define UNIT_TYPE_CHOW_OPEN_END 5
-#define UNIT_TYPE_CHOW_CLOSED 6
-#define UNIT_TYPE_INCOMPLETE_PUNG 7
+// 路径单元，单元有面子、雀头、搭子等种类，见下面的宏
+// 高8位表示类型，低8位表示牌
+// 对于顺子和顺子搭子，牌指的是最小的一张牌，
+// 例如在顺子123万中，牌为1万，在两面搭子45条中，牌为4条等等
+typedef uint16_t path_unit_t;
+#define UNIT_TYPE_CHOW 1                // 顺子
+#define UNIT_TYPE_PUNG 2                // 刻子
+#define UNIT_TYPE_PAIR 4                // 雀头
+#define UNIT_TYPE_CHOW_OPEN_END 5       // 两面或者边张搭子
+#define UNIT_TYPE_CHOW_CLOSED 6         // 坎张搭子
+#define UNIT_TYPE_INCOMPLETE_PUNG 7     // 刻子搭子
 
 #define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
 #define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
@@ -138,6 +142,7 @@ static bool is_basic_type_branch_exist(const long fixed_cnt, const work_path_t *
         return false;
     }
 
+    // depth处有信息，所以按stl风格的end应该要+1
     const uint16_t depth = work_path->depth + 1;
 
     // std::includes要求有序，但又不能破坏当前数据
@@ -175,19 +180,22 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
 
     int max_ret;  // 当前状态能返回的最大上听数
 
-    // 缺少的搭子数=4-完成的面子数-搭子数
+    // 缺少的面子数=4-完成的面子数
+    // 缺少的搭子数=缺少的面子数-已有的搭子数
+    // 两式合并：缺少的搭子数=4-完成的面子数-已有的搭子数
     int incomplete_need = 4 - pack_cnt - incomplete_cnt;
     if (incomplete_need > 0) {  // 还需要搭子的情况
-        // 有雀头时，上听数=搭子数+缺少的搭子数*2-1
-        // 无雀头时，上听数=搭子数+缺少的搭子数*2
+        // 有雀头时，上听数=已有的搭子数+缺少的搭子数*2-1
+        // 无雀头时，上听数=已有的搭子数+缺少的搭子数*2
         max_ret = incomplete_cnt + incomplete_need * 2 - (has_pair ? 1 : 0);
     }
     else {  // 搭子齐了的情况
-        // 有雀头时，上听数=3-完成面子数
-        // 无雀头时，上听数=4-完成面子数
+        // 有雀头时，上听数=3-完成的面子数
+        // 无雀头时，上听数=4-完成的面子数
         max_ret = (has_pair ? 3 : 4) - pack_cnt;
     }
 
+    // 当前路径深度
     const uint16_t depth = pack_cnt + incomplete_cnt + has_pair;
     work_path->depth = depth;
 
@@ -340,7 +348,7 @@ static int basic_type_shanten_from_table(int (&cnt_table)[TILE_TABLE_SIZE], long
         return result;
     }
 
-    // 获取能减少上听数的牌
+    // 穷举所有的牌，获取能减少上听数的牌
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] == 4) {
@@ -383,7 +391,7 @@ int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*u
     return basic_type_shanten_from_table(cnt_table, (13 - standing_cnt) / 3, useful_table);
 }
 
-// 基本和型是否听牌1张
+// 基本和型判断1张是否听牌
 static bool is_basic_type_wait_1(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiting_table)[TILE_TABLE_SIZE]) {
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
@@ -406,7 +414,7 @@ static bool is_basic_type_wait_1(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiti
     return false;
 }
 
-// 基本和型是否听牌2张
+// 基本和型判断2张是否听牌
 static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiting_table)[TILE_TABLE_SIZE]) {
     bool ret = false;
     for (int i = 0; i < 34; ++i) {
@@ -415,35 +423,35 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_SIZE], bool (
             continue;
         }
         if (cnt_table[t] > 1) {
-            if (waiting_table != nullptr) {  // 不需要获取听牌张，则可以直接返回
+            if (waiting_table != nullptr) {  // 获取听牌张
                 (*waiting_table)[t] = true;  // 对倒
                 ret = true;
                 continue;
             }
-            else {
+            else {  // 不需要获取听牌张，则可以直接返回
                 return true;
             }
         }
         if (is_numbered_suit_quick(t)) {  // 数牌搭子
             rank_t r = tile_rank(t);
             if (r > 1 && cnt_table[t - 1]) {  // 两面或者边张
-                if (waiting_table != nullptr) {  // 不需要获取听牌张，则可以直接返回
+                if (waiting_table != nullptr) {  // 获取听牌张
                     if (r < 9) (*waiting_table)[t + 1] = true;
                     if (r > 2) (*waiting_table)[t - 2] = true;
                     ret = true;
                     continue;
                 }
-                else {
+                else {  // 不需要获取听牌张，则可以直接返回
                     return true;
                 }
             }
             if (r > 2 && cnt_table[t - 2]) {  // 坎张
-                if (waiting_table != nullptr) {  // 不需要获取听牌张，则可以直接返回
+                if (waiting_table != nullptr) {  // 获取听牌张
                     (*waiting_table)[t - 1] = true;
                     ret = true;
                     continue;
                 }
-                else {
+                else {  // 不需要获取听牌张，则可以直接返回
                     return true;
                 }
             }
@@ -452,7 +460,7 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_SIZE], bool (
     return ret;
 }
 
-// 基本和型是否听牌4张
+// 基本和型判断4张是否听牌
 static bool is_basic_type_wait_4(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiting_table)[TILE_TABLE_SIZE]) {
     bool ret = false;
     // 削减雀头
@@ -544,7 +552,7 @@ bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*
     return is_basic_type_wait_recursively(cnt_table, standing_cnt, waiting_table);
 }
 
-// 基本和型匹配2张
+// 基本和型2张能否和牌
 static bool is_basic_type_win_2(const int (&cnt_table)[TILE_TABLE_SIZE]) {
     // 找到未使用的牌
     const int *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n > 0; });
@@ -609,7 +617,7 @@ bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t t
     // 对立牌的种类进行打表
     int cnt_table[TILE_TABLE_SIZE];
     map_tiles(standing_tiles, standing_cnt, cnt_table);
-    ++cnt_table[test_tile];
+    ++cnt_table[test_tile];  // 添加测试的牌
     return is_basic_type_win_recursively(cnt_table, standing_cnt + 1);
 }
 
@@ -642,6 +650,7 @@ int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*
 
 // 七对是否听牌
 bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+    // 直接计算其上听数，上听数为0即为听牌
     bool useful_table[TILE_TABLE_SIZE];
     if (0 == seven_pairs_shanten(standing_tiles, standing_cnt,
         waiting_table != nullptr ? &useful_table : nullptr)) {
@@ -713,6 +722,7 @@ int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, bo
 
 // 十三幺是否听牌
 bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+    // 直接计算其上听数，上听数为0即为听牌
     bool useful_table[TILE_TABLE_SIZE];
     if (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt,
         waiting_table != nullptr ? &useful_table : nullptr)) {
@@ -959,6 +969,7 @@ int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing
 
 // 全不靠是否听牌
 bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+    // 直接计算其上听数，上听数为0即为听牌
     bool useful_table[TILE_TABLE_SIZE];
     if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt,
         waiting_table != nullptr ? &useful_table : nullptr)) {
@@ -986,18 +997,19 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
     result.discard_tile = discard_tile;
     result.form_flag = FORM_FLAG_BASIC_TYPE;
     result.shanten = basic_type_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-    if (result.shanten == 0 && result.useful_table[discard_tile]) {
+    if (result.shanten == 0 && result.useful_table[discard_tile]) {  // 0上听，并且打出的牌是有效牌，则修正为和了
         result.shanten = -1;
     }
     if (!enum_callback(context, &result)) {
         return false;
     }
 
+    // 立牌有13张时，才需要计算特殊和型
     if (hand_tiles->tile_count == 13) {
         if (form_flag | FORM_FLAG_SEVEN_PAIRS) {
             result.form_flag = FORM_FLAG_SEVEN_PAIRS;
             result.shanten = seven_pairs_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-            if (result.shanten == 0 && result.useful_table[discard_tile]) {
+            if (result.shanten == 0 && result.useful_table[discard_tile]) {  // 0上听，并且打出的牌是有效牌，则修正为和了
                 result.shanten = -1;
             }
             if (!enum_callback(context, &result)) {
@@ -1008,7 +1020,7 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
         if (form_flag | FORM_FLAG_THIRTEEN_ORPHANS) {
             result.form_flag = FORM_FLAG_THIRTEEN_ORPHANS;
             result.shanten = thirteen_orphans_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-            if (result.shanten == 0 && result.useful_table[discard_tile]) {
+            if (result.shanten == 0 && result.useful_table[discard_tile]) {  // 0上听，并且打出的牌是有效牌，则修正为和了
                 result.shanten = -1;
             }
             if (!enum_callback(context, &result)) {
@@ -1019,7 +1031,7 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
         if (form_flag | FORM_FLAG_HONORS_AND_KNITTED_TILES) {
             result.form_flag = FORM_FLAG_HONORS_AND_KNITTED_TILES;
             result.shanten = honors_and_knitted_tiles_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-            if (result.shanten == 0 && result.useful_table[discard_tile]) {
+            if (result.shanten == 0 && result.useful_table[discard_tile]) {  // 0上听，并且打出的牌是有效牌，则修正为和了
                 result.shanten = -1;
             }
             if (!enum_callback(context, &result)) {
@@ -1028,11 +1040,12 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
         }
     }
 
+    // 立牌有13张或者10张时，才需要计算组合龙
     if (hand_tiles->tile_count == 13 || hand_tiles->tile_count == 10) {
         if (form_flag | FORM_FLAG_KNITTED_STRAIGHT) {
             result.form_flag = FORM_FLAG_KNITTED_STRAIGHT;
             result.shanten = knitted_straight_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
-            if (result.shanten == 0 && result.useful_table[discard_tile]) {
+            if (result.shanten == 0 && result.useful_table[discard_tile]) {  // 0上听，并且打出的牌是有效牌，则修正为和了
                 result.shanten = -1;
             }
             if (!enum_callback(context, &result)) {
@@ -1066,14 +1079,18 @@ void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] && t != serving_tile && cnt_table[serving_tile] < 4) {
-            --cnt_table[t];
-            ++cnt_table[serving_tile];
+            --cnt_table[t];  // 打这张牌
+            ++cnt_table[serving_tile];  // 上这张牌
 
+            // 从table转成牌
             table_to_tiles(cnt_table, temp.standing_tiles, temp.tile_count);
+
+            // 计算
             if (!enum_discard_tile_1(&temp, t, form_flag, context, enum_callback)) {
                 return;
             }
 
+            // 复原
             --cnt_table[serving_tile];
             ++cnt_table[t];
         }
