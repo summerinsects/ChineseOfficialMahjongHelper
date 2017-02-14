@@ -1803,8 +1803,12 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
     result.count = 0;
     one_division_t work_division;
     memset(&work_division, 0, sizeof(work_division));
+
+    // 此处逻辑为：将组合龙9张牌当作是已经完成的3组面子，占据了0 1 2下标处的3组
+    // 如果第4组是副露的，将其放在下标3处
+    // 然后按基本和型从从fixed_cnt + 3开始递归
     if (fixed_cnt == 1) {
-        work_division.packs[3] = fixed_packs[0];  // 无关第4组是明副露，将其放在3处，这样就与门清状态的划分统一了
+        work_division.packs[3] = fixed_packs[0];
     }
     divide_recursively(cnt_table, fixed_cnt + 3, 0, &work_division, &result);
     if (result.count != 1) {
