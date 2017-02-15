@@ -39,6 +39,8 @@
 #include <sstream>
 #include <vector>
 #include <list>
+#include <forward_list>
+#include <deque>
 #include <set>
 #include <unordered_set>
 #include <map>
@@ -1310,6 +1312,14 @@ namespace jw {
         struct AssignImpl<_JsonType, std::list<_T, _Alloc> >
             : AssignFromArrayImpl<_JsonType, std::list<_T, _Alloc> > { };
 
+        template <class _JsonType, class _T, class _Alloc>
+        struct AssignImpl<_JsonType, std::forward_list<_T, _Alloc> >
+            : AssignFromArrayImpl<_JsonType, std::forward_list<_T, _Alloc> > { };
+
+        template <class _JsonType, class _T, class _Alloc>
+        struct AssignImpl<_JsonType, std::deque<_T, _Alloc> >
+            : AssignFromArrayImpl<_JsonType, std::deque<_T, _Alloc> > { };
+
         template <class _JsonType, class _T, class _Compare, class _Alloc>
         struct AssignImpl<_JsonType, std::set<_T, _Compare, _Alloc> >
             : AssignFromArrayImpl<_JsonType, std::set<_T, _Compare, _Alloc> > { };
@@ -1578,6 +1588,10 @@ namespace jw {
         template <class _JsonType, class _T, class _Alloc>
         struct AsImpl<_JsonType, std::list<_T, _Alloc> >
             : AsArrayImpl<_JsonType, std::list<_T, _Alloc> > { };
+
+        template <class _JsonType, class _T, class _Alloc>
+        struct AsImpl<_JsonType, std::deque<_T, _Alloc> >
+            : AsArrayImpl<_JsonType, std::deque<_T, _Alloc> > { };
 
         template <class _JsonType, class _T, class _Compare, class _Alloc>
         struct AsImpl<_JsonType, std::set<_T, _Compare, _Alloc> >
