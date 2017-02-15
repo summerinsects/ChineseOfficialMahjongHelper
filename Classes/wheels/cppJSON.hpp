@@ -604,7 +604,7 @@ namespace jw {
             return ptr->as<_T>();
         }
 
-        template <class _T, class _String> inline _T GetValueByKeyNoThrow(const _String &key) const {
+        template <class _T, class _String> inline _T GetValueByKeyNoThrow(const _String &key) const noexcept {
             try {
                 return GetValueByKey<_T, _String>(key);
             }
