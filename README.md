@@ -8,7 +8,7 @@
 
 由于cocos2dx引擎自身的源码较为庞大，这里就不上传了，请按如下步骤配置
 
-##配置步骤
+##配置步骤##
 1. 下载cocos2dx v3.14.1
 2. clone本项目
 3. 随便创建一个c++工程（命令行：cocos new -l cpp --portrait 工程名）
@@ -16,7 +16,8 @@
 
 ###VS2013/VS2015###
 打开proj.win32目录下的ChineseOfficialMahjongHelper.sln
-PS. 当第一次编译完成后，可以将引擎相关的项目都卸载了，以节约下次编译的时间
+
+PS:当第一次编译完成后，可以将引擎相关的项目都卸载了，以节约下次编译的时间
 
 ###Xcode###
 打开proj.ios_mac目录下的ChineseOfficialMahjongHelper.xcodeproj
