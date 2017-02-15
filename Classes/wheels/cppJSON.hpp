@@ -576,9 +576,6 @@ namespace jw {
                 const typename std::remove_extent<_String>::type *,
                 typename std::remove_cv<_String>::type>::type FixedCStringType;
             static_assert(std::is_convertible<const char *, FixedCStringType>::value, "key_type must be able to convert to const char *");
-            if (_valueType != ValueType::Object) {
-                throw std::logic_error("Only Object support find by key!");
-            }
             pointer ptr = _DoFind(__cpp_basic_json_impl::_FixString(key));
             return ptr != nullptr ? iterator(ptr) : end();
         }
@@ -588,9 +585,6 @@ namespace jw {
                 const typename std::remove_extent<_String>::type *,
                 typename std::remove_cv<_String>::type>::type FixedCStringType;
             static_assert(std::is_convertible<const char *, FixedCStringType>::value, "key_type must be able to convert to const char *");
-            if (_valueType != ValueType::Object) {
-                throw std::logic_error("Only Object support find by key!");
-            }
             pointer ptr = _DoFind(__cpp_basic_json_impl::_FixString(key));
             return ptr != nullptr ? const_iterator(ptr) : end();
         }
@@ -600,9 +594,6 @@ namespace jw {
                 const typename std::remove_extent<_String>::type *,
                 typename std::remove_cv<_String>::type>::type FixedCStringType;
             static_assert(std::is_convertible<const char *, FixedCStringType>::value, "key_type must be able to convert to const char *");
-            if (_valueType != ValueType::Object) {
-                throw std::logic_error("Only Object support find by key!");
-            }
             const char *str = __cpp_basic_json_impl::_FixString(key);
             pointer ptr = _DoFind(str);
             if (ptr == nullptr) {
