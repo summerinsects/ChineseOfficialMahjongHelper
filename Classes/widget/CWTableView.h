@@ -64,12 +64,11 @@ namespace cw {
             BOTTOM_UP
         };
 
-        typedef std::function<void (TableView *table, TableViewCell *cell)> ccTableViewCellWillRecycleCallback;
-
         enum class CallbackType {
             CELL_SIZE,  // param1 is for idx, param2 is for pointer to Size
             CELL_AT_INDEX,  // param1 is for idx, param2 is unused, returns TableViewCell*
             NUMBER_OF_CELLS, // params are unused, returns size_t
+            CELL_WILL_RECYCLE  // param1 is for cell, param2 is unused
         };
 
         typedef std::function<intptr_t (TableView *table, CallbackType, intptr_t param1, intptr_t param2)> ccTableViewCallback;
@@ -90,7 +89,6 @@ namespace cw {
         static TableView *create();
         virtual bool init() override;
 
-        void setTableViewCellWillRecycleCallback(const ccTableViewCellWillRecycleCallback &callback);
         void setTableViewCallback(const ccTableViewCallback &callback);
 
         /**
@@ -184,7 +182,6 @@ namespace cw {
          */
         cocos2d::Vector<TableViewCell *> _cellsFreed;
 
-        ccTableViewCellWillRecycleCallback _tableViewCellWillRecycleCallback;
         ccTableViewCallback _tableViewCallback;
 
         cocos2d::ui::ScrollView::Direction _oldDirection;
