@@ -365,6 +365,10 @@ namespace jw {
             return As<_Tp>();
         }
 
+        template <class _Tp> _Tp as() {
+            return As<_Tp>();
+        }
+
         bool empty() const {
             if (_valueType != ValueType::Array && _valueType != ValueType::Object) {
                 throw std::logic_error("Only Array and Object support function empty!");
