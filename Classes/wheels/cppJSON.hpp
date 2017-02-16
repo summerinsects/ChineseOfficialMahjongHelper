@@ -403,6 +403,19 @@ namespace jw {
         template <class _Unused>
         struct AssignImpl<uint64_t, _Unused> : AssignFromIntegerImpl<uint64_t> { };
 
+        // 枚举
+        template <class _T, class = typename std::enable_if<std::is_enum<_T>::value>::type>
+        struct AssignFromEnumImpl {
+            typedef _T SourceType;
+            static inline void invoke(JsonType &ref, SourceType arg) {
+                ref._valueType = ValueType::Integer;
+                ref._valueInt = static_cast<IntegerType>(arg);
+            }
+        };
+
+        template <class _SourceType, class _Unused>
+        struct AssignImpl : AssignFromEnumImpl<_SourceType> { };
+
         // 浮点数
         template <class _Flt>
         struct AssignFromFloatImpl {
@@ -739,6 +752,17 @@ namespace jw {
         template <class _Unused> struct AsImpl<unsigned long,  _Unused> : AsIntegerImpl<unsigned long> { };
         template <class _Unused> struct AsImpl<int64_t,        _Unused> : AsIntegerImpl<int64_t> { };
         template <class _Unused> struct AsImpl<uint64_t,       _Unused> : AsIntegerImpl<uint64_t> { };
+
+        // AS成枚举
+        template <class _T, class = typename std::enable_if<std::is_enum<_T>::value>::type>
+        struct AsEnumImpl {
+            typedef _T TargetType;
+            static inline TargetType invoke(const JsonType &ref) {
+                return ref.AsInteger<TargetType>();
+            }
+        };
+
+        template <class _T, class _Unused> struct AsImpl: AsEnumImpl<_T> { };
 
         // AS成浮点数
         template <class _Flt> struct AsFloatImpl {
