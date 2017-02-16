@@ -191,22 +191,22 @@ namespace jw {
             }
         }
 
-        template <class _T>
-        explicit BasicJSON(_T &&val) {
+        template <class _Tp>
+        explicit BasicJSON(_Tp &&val) {
             reset();
-            AssignImpl<typename std::remove_cv<typename std::remove_reference<_T>::type>::type, void>::invoke(*this, std::forward<_T>(val));
+            AssignImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type, void>::invoke(*this, std::forward<_Tp>(val));
         }
 
-        template <class _T>
-        explicit BasicJSON(const std::initializer_list<_T> &il) {
+        template <class _Tp>
+        explicit BasicJSON(const std::initializer_list<_Tp> &il) {
             reset();
-            AssignImpl<std::initializer_list<_T>, void>::invoke(*this, il);
+            AssignImpl<std::initializer_list<_Tp>, void>::invoke(*this, il);
         }
 
-        template <class _T>
-        explicit BasicJSON(std::initializer_list<_T> &&il) {
+        template <class _Tp>
+        explicit BasicJSON(std::initializer_list<_Tp> &&il) {
             reset();
-            AssignImpl<std::initializer_list<_T>, void>::invoke(*this, il);
+            AssignImpl<std::initializer_list<_Tp>, void>::invoke(*this, il);
         }
 
         // 复制构造
@@ -271,8 +271,8 @@ namespace jw {
         inline bool operator!=(std::nullptr_t) const { return (_valueType != ValueType::Null); }
 
         // as
-        template <class _T> _T as() const {
-            return AsImpl<_T, void>::invoke(*this);
+        template <class _Tp> _Tp as() const {
+            return AsImpl<_Tp, void>::invoke(*this);
         }
 
         bool empty() const {
@@ -401,9 +401,9 @@ namespace jw {
         struct AssignImpl<uint64_t, _Unused> : AssignFromIntegerImpl<uint64_t> { };
 
         // 枚举
-        template <class _T, class = typename std::enable_if<std::is_enum<_T>::value>::type>
+        template <class _Tp, class = typename std::enable_if<std::is_enum<_Tp>::value>::type>
         struct AssignFromEnumImpl {
-            static inline void invoke(JsonType &ref, _T arg) {
+            static inline void invoke(JsonType &ref, _Tp arg) {
                 ref._valueType = ValueType::Integer;
                 ref._valueInt = static_cast<IntegerType>(arg);
             }
@@ -491,41 +491,41 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _T, class _Alloc>
-        struct AssignImpl<std::vector<_T, _Alloc>, _Unused>
-            : AssignFromMoveableArrayImpl<std::vector<_T, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Alloc>
+        struct AssignImpl<std::vector<_Tp, _Alloc>, _Unused>
+            : AssignFromMoveableArrayImpl<std::vector<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc>
-        struct AssignImpl<std::list<_T, _Alloc>, _Unused>
-            : AssignFromMoveableArrayImpl<std::list<_T, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Alloc>
+        struct AssignImpl<std::list<_Tp, _Alloc>, _Unused>
+            : AssignFromMoveableArrayImpl<std::list<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc>
-        struct AssignImpl<std::forward_list<_T, _Alloc>, _Unused>
-            : AssignFromMoveableArrayImpl<std::forward_list<_T, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Alloc>
+        struct AssignImpl<std::forward_list<_Tp, _Alloc>, _Unused>
+            : AssignFromMoveableArrayImpl<std::forward_list<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc>
-        struct AssignImpl<std::deque<_T, _Alloc>, _Unused>
-            : AssignFromMoveableArrayImpl<std::deque<_T, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Alloc>
+        struct AssignImpl<std::deque<_Tp, _Alloc>, _Unused>
+            : AssignFromMoveableArrayImpl<std::deque<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _T, size_t _Size>
-        struct AssignImpl<std::array<_T, _Size>, _Unused>
-            : AssignFromMoveableArrayImpl<std::array<_T, _Size> > { };
+        template <class _Unused, class _Tp, size_t _Size>
+        struct AssignImpl<std::array<_Tp, _Size>, _Unused>
+            : AssignFromMoveableArrayImpl<std::array<_Tp, _Size> > { };
 
-        template <class _Unused, class _T, class _Compare, class _Alloc>
-        struct AssignImpl<std::set<_T, _Compare, _Alloc>, _Unused>
-            : AssignFromImmovableArrayImpl<std::set<_T, _Compare, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Compare, class _Alloc>
+        struct AssignImpl<std::set<_Tp, _Compare, _Alloc>, _Unused>
+            : AssignFromImmovableArrayImpl<std::set<_Tp, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Compare, class _Alloc>
-        struct AssignImpl<std::multiset<_T, _Compare, _Alloc>, _Unused>
-            : AssignFromImmovableArrayImpl<std::multiset<_T, _Compare, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Compare, class _Alloc>
+        struct AssignImpl<std::multiset<_Tp, _Compare, _Alloc>, _Unused>
+            : AssignFromImmovableArrayImpl<std::multiset<_Tp, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc>, _Unused>
-            : AssignFromImmovableArrayImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc>, _Unused>
+            : AssignFromImmovableArrayImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc>, _Unused>
-            : AssignFromImmovableArrayImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc>, _Unused>
+            : AssignFromImmovableArrayImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc> > { };
 
         // 键值对类容器
         template <class _Map>
@@ -560,9 +560,9 @@ namespace jw {
             : AssignFromMapImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc> > { };
 
         // C++11初始化列表
-        template <class _Unused, class _T>
-        struct AssignImpl<std::initializer_list<_T>, _Unused>
-            : AssignFromMoveableArrayImpl<std::initializer_list<_T> > { };
+        template <class _Unused, class _Tp>
+        struct AssignImpl<std::initializer_list<_Tp>, _Unused>
+            : AssignFromMoveableArrayImpl<std::initializer_list<_Tp> > { };
 
         // AS成Bool
         bool AsBoolean() const {
@@ -698,7 +698,7 @@ namespace jw {
         }
 
         // AS
-        template <class _T, class _Unused> struct AsImpl;
+        template <class _Tp, class _Unused> struct AsImpl;
 
         // AS成自己的指针
         template <class _Unused> struct AsImpl<const JsonType *, _Unused> {
@@ -741,14 +741,14 @@ namespace jw {
         template <class _Unused> struct AsImpl<uint64_t,       _Unused> : AsIntegerImpl<uint64_t> { };
 
         // AS成枚举
-        template <class _T, class = typename std::enable_if<std::is_enum<_T>::value>::type>
+        template <class _Tp, class = typename std::enable_if<std::is_enum<_Tp>::value>::type>
         struct AsEnumImpl {
-            static inline _T invoke(const JsonType &ref) {
-                return ref.AsInteger<_T>();
+            static inline _Tp invoke(const JsonType &ref) {
+                return ref.AsInteger<_Tp>();
             }
         };
 
-        template <class _T, class _Unused> struct AsImpl: AsEnumImpl<_T> { };
+        template <class _Tp, class _Unused> struct AsImpl: AsEnumImpl<_Tp> { };
 
         // AS成浮点数
         template <class _Flt> struct AsFloatImpl {
@@ -778,33 +778,33 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _T, class _Alloc>
-        struct AsImpl<std::vector<_T, _Alloc>, _Unused>
-            : AsArrayImpl<std::vector<_T, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Alloc>
+        struct AsImpl<std::vector<_Tp, _Alloc>, _Unused>
+            : AsArrayImpl<std::vector<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc>
-        struct AsImpl<std::list<_T, _Alloc>, _Unused>
-            : AsArrayImpl<std::list<_T, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Alloc>
+        struct AsImpl<std::list<_Tp, _Alloc>, _Unused>
+            : AsArrayImpl<std::list<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc>
-        struct AsImpl<std::deque<_T, _Alloc>, _Unused>
-            : AsArrayImpl<std::deque<_T, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Alloc>
+        struct AsImpl<std::deque<_Tp, _Alloc>, _Unused>
+            : AsArrayImpl<std::deque<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Compare, class _Alloc>
-        struct AsImpl<std::set<_T, _Compare, _Alloc>, _Unused>
-            : AsArrayImpl<std::set<_T, _Compare, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Compare, class _Alloc>
+        struct AsImpl<std::set<_Tp, _Compare, _Alloc>, _Unused>
+            : AsArrayImpl<std::set<_Tp, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Compare, class _Alloc>
-        struct AsImpl<std::multiset<_T, _Compare, _Alloc>, _Unused>
-            : AsArrayImpl<std::multiset<_T, _Compare, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Compare, class _Alloc>
+        struct AsImpl<std::multiset<_Tp, _Compare, _Alloc>, _Unused>
+            : AsArrayImpl<std::multiset<_Tp, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc>, _Unused>
-            : AsArrayImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc>, _Unused>
+            : AsArrayImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc>, _Unused>
-            : AsArrayImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc> > { };
+        template <class _Unused, class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc>, _Unused>
+            : AsArrayImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc> > { };
 
         // AS成键值对类容器
         template <class _Map> struct AsMapImpl {
@@ -813,21 +813,21 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _String, class _Val, class _Compare, class _Alloc>
-        struct AsImpl<std::map<_String, _Val, _Compare, _Alloc>, _Unused>
-            : AsMapImpl<std::map<_String, _Val, _Compare, _Alloc> > { };
+        template <class _Unused, class _String, class _Value, class _Compare, class _Alloc>
+        struct AsImpl<std::map<_String, _Value, _Compare, _Alloc>, _Unused>
+            : AsMapImpl<std::map<_String, _Value, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _String, class _Val, class _Compare, class _Alloc>
-        struct AsImpl<std::multimap<_String, _Val, _Compare, _Alloc>, _Unused>
-            : AsMapImpl<std::multimap<_String, _Val, _Compare, _Alloc> > { };
+        template <class _Unused, class _String, class _Value, class _Compare, class _Alloc>
+        struct AsImpl<std::multimap<_String, _Value, _Compare, _Alloc>, _Unused>
+            : AsMapImpl<std::multimap<_String, _Value, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _String, class _Val, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_map<_String, _Val, _Hash, _Pred, _Alloc>, _Unused>
-            : AsMapImpl<std::unordered_map<_String, _Val, _Hash, _Pred, _Alloc> > { };
+        template <class _Unused, class _String, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_map<_String, _Value, _Hash, _Pred, _Alloc>, _Unused>
+            : AsMapImpl<std::unordered_map<_String, _Value, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _String, class _Val, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_multimap<_String, _Val, _Hash, _Pred, _Alloc>, _Unused>
-            : AsMapImpl<std::unordered_multimap<_String, _Val, _Hash, _Pred, _Alloc> > { };
+        template <class _Unused, class _String, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_multimap<_String, _Value, _Hash, _Pred, _Alloc>, _Unused>
+            : AsMapImpl<std::unordered_multimap<_String, _Value, _Hash, _Pred, _Alloc> > { };
 
     public:
         // 迭代器相关
@@ -940,7 +940,7 @@ namespace jw {
         inline const_reverse_iterator rend() const { return const_reverse_iterator(_child->_next); }
         inline const_reverse_iterator crend() const { return const_reverse_iterator(_child->_next); }
 
-        template <class _T> iterator insert(const_iterator where, _T &&val) {
+        template <class _Tp> iterator insert(const_iterator where, _Tp &&val) {
             if (_valueType != ValueType::Array) {
                 throw std::logic_error("Only Array support insert with position specified by iterator!");
             }
@@ -948,14 +948,14 @@ namespace jw {
 #if (defined _DEBUG) || (defined DEBUG)
             assert(_RangeCheck(ptr));
 #endif
-            return _DoInsertForArray(ptr, std::forward<_T>(val));
+            return _DoInsertForArray(ptr, std::forward<_Tp>(val));
         }
 
-        template <class _T> inline std::pair<iterator, bool> insert(_T &&val) {
+        template <class _Tp> inline std::pair<iterator, bool> insert(_Tp &&val) {
             return _DoInsertForMap(val);
         }
 
-        template <class _T> iterator insert(const_iterator where, size_t n, const _T &val) {
+        template <class _Tp> iterator insert(const_iterator where, size_t n, const _Tp &val) {
             if (_valueType != ValueType::Array) {
                 throw std::logic_error("Only Array support with position specified by iterator!");
             }
@@ -991,7 +991,7 @@ namespace jw {
             }
         }
 
-        template <class _T> iterator insert(const_iterator where, std::initializer_list<_T> il) {
+        template <class _Tp> iterator insert(const_iterator where, std::initializer_list<_Tp> il) {
             if (_valueType != ValueType::Array) {
                 throw std::logic_error("Only Array support with position specified by iterator!");
             }
@@ -999,33 +999,33 @@ namespace jw {
 #if (defined _DEBUG) || (defined DEBUG)
             assert(_RangeCheck(ptr));
 #endif
-            for (typename std::initializer_list<_T>::iterator it = il.begin(); it != il.end(); ++it) {
+            for (typename std::initializer_list<_Tp>::iterator it = il.begin(); it != il.end(); ++it) {
                 iterator ret = _DoInsertForArray(ptr, *it);
                 ptr = ret._ptr->_next;
             }
             return iterator(ptr);
         }
 
-        template <class _T> void insert(std::initializer_list<_T> il) {
-            for (typename std::initializer_list<_T>::iterator it = il.begin(); it != il.end(); ++it) {
+        template <class _Tp> void insert(std::initializer_list<_Tp> il) {
+            for (typename std::initializer_list<_Tp>::iterator it = il.begin(); it != il.end(); ++it) {
                 _DoInsertForMap(*it);
             }
         }
 
-        template <class _T>
-        inline void push_back(_T &&val) {
+        template <class _Tp>
+        inline void push_back(_Tp &&val) {
             if (_valueType != ValueType::Array) {
                 throw std::logic_error("Only Array support push_back!");
             }
-            _DoInsertForArray(_child, std::forward<_T>(val));
+            _DoInsertForArray(_child, std::forward<_Tp>(val));
         }
 
-        template <class _T>
-        inline void push_front(_T &&val) {
+        template <class _Tp>
+        inline void push_front(_Tp &&val) {
             if (_valueType != ValueType::Array) {
                 throw std::logic_error("Only Array support push_front!");
             }
-            _DoInsertForArray(_child->_next, std::forward<_T>(val));
+            _DoInsertForArray(_child->_next, std::forward<_Tp>(val));
         }
 
         iterator erase(const_iterator where) {
@@ -1104,7 +1104,7 @@ namespace jw {
             return ptr != nullptr ? const_iterator(ptr) : end();
         }
 
-        template <class _T, class _String> inline _T GetValueByKey(const _String &key) const {
+        template <class _Tp, class _String> inline _Tp GetValueByKey(const _String &key) const {
             typedef typename std::conditional<std::is_array<_String>::value,
                 const typename std::remove_extent<_String>::type *,
                 typename std::remove_cv<_String>::type>::type FixedCStringType;
@@ -1116,15 +1116,15 @@ namespace jw {
                 snprintf(err, 255, "Cannot find value for key: [%s]", str);
                 throw std::logic_error(err);
             }
-            return ptr->as<_T>();
+            return ptr->as<_Tp>();
         }
 
-        template <class _T, class _String> inline _T GetValueByKeyNoThrow(const _String &key) const throw() {
+        template <class _Tp, class _String> inline _Tp GetValueByKeyNoThrow(const _String &key) const throw() {
             try {
-                return GetValueByKey<_T, _String>(key);
+                return GetValueByKey<_Tp, _String>(key);
             }
             catch (...) {
-                return _T();
+                return _Tp();
             }
         }
 
@@ -1142,9 +1142,9 @@ namespace jw {
             return false;
         }
 
-        template <class _T> iterator _DoInsertForArray(pointer ptr, _T &&val) {
+        template <class _Tp> iterator _DoInsertForArray(pointer ptr, _Tp &&val) {
             pointer item = New();
-            AssignImpl<typename std::remove_cv<typename std::remove_reference<_T>::type>::type, void>::invoke(*item, std::forward<_T>(val));
+            AssignImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type, void>::invoke(*item, std::forward<_Tp>(val));
             if (_child->_next != _child && _child->_next->_valueType != item->_valueType) {
                 Delete(item);
                 throw std::logic_error("Cannot insert a difference type into an Array.");
@@ -1161,8 +1161,8 @@ namespace jw {
             return iterator(item);
         }
 
-        template <class _T> std::pair<iterator, bool> _DoInsertForMap(_T &&val) {
-            typedef typename std::remove_cv<typename std::remove_reference<_T>::type>::type _PairType;
+        template <class _Tp> std::pair<iterator, bool> _DoInsertForMap(_Tp &&val) {
+            typedef typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type _PairType;
             static_assert(std::is_convertible<const char *, typename _PairType::first_type>::value, "key_type must be able to convert to const char *");
             pointer item = New();
             AssignImpl<typename _PairType::second_type, void>::invoke(*item, val.second);
