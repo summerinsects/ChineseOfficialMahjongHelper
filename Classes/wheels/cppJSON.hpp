@@ -503,40 +503,50 @@ namespace jw {
         };
 
         template <class _Unused, class _T, class _Allocator>
-        struct AssignImpl<std::vector<_T, _Allocator>, _Unused> : AssignFromMoveableArrayImpl<std::vector<_T, _Allocator> > { };
+        struct AssignImpl<std::vector<_T, _Allocator>, _Unused>
+            : AssignFromMoveableArrayImpl<std::vector<_T, _Allocator> > { };
 
         template <class _Unused, class _T, class _Allocator>
-        struct AssignImpl<std::list<_T, _Allocator>, _Unused> : AssignFromMoveableArrayImpl<std::list<_T, _Allocator> > { };
+        struct AssignImpl<std::list<_T, _Allocator>, _Unused>
+            : AssignFromMoveableArrayImpl<std::list<_T, _Allocator> > { };
 
         template <class _Unused, class _T, class _Allocator>
-        struct AssignImpl<std::forward_list<_T, _Allocator>, _Unused> : AssignFromMoveableArrayImpl<std::forward_list<_T, _Allocator> > { };
+        struct AssignImpl<std::forward_list<_T, _Allocator>, _Unused>
+            : AssignFromMoveableArrayImpl<std::forward_list<_T, _Allocator> > { };
 
         template <class _Unused, class _T, class _Allocator>
-        struct AssignImpl<std::deque<_T, _Allocator>, _Unused> : AssignFromMoveableArrayImpl<std::deque<_T, _Allocator> > { };
+        struct AssignImpl<std::deque<_T, _Allocator>, _Unused>
+            : AssignFromMoveableArrayImpl<std::deque<_T, _Allocator> > { };
 
         template <class _Unused, class _T, class _Compare, class _Allocator>
-        struct AssignImpl<std::set<_T, _Compare, _Allocator>, _Unused> : AssignFromImmovableArrayImpl<std::set<_T, _Allocator> > { };
+        struct AssignImpl<std::set<_T, _Compare, _Allocator>, _Unused>
+            : AssignFromImmovableArrayImpl<std::set<_T, _Allocator> > { };
 
         template <class _Unused, class _T, class _Compare, class _Allocator>
-        struct AssignImpl<std::multiset<_T, _Compare, _Allocator>, _Unused> : AssignFromImmovableArrayImpl<std::multiset<_T, _Compare, _Allocator> > { };
+        struct AssignImpl<std::multiset<_T, _Compare, _Allocator>, _Unused>
+            : AssignFromImmovableArrayImpl<std::multiset<_T, _Compare, _Allocator> > { };
 
         template <class _Unused, class _T, class _Hash, class _Pred, class _Allocator>
-        struct AssignImpl<std::unordered_set<_T, _Hash, _Pred, _Allocator>, _Unused> : AssignFromImmovableArrayImpl<std::unordered_set<_T, _Hash, _Pred, _Allocator> > { };
+        struct AssignImpl<std::unordered_set<_T, _Hash, _Pred, _Allocator>, _Unused>
+            : AssignFromImmovableArrayImpl<std::unordered_set<_T, _Hash, _Pred, _Allocator> > { };
 
         template <class _Unused, class _T, class _Hash, class _Pred, class _Allocator>
-        struct AssignImpl<std::unordered_multiset<_T, _Hash, _Pred, _Allocator>, _Unused> : AssignFromImmovableArrayImpl<std::unordered_multiset<_T, _Hash, _Pred, _Allocator> > { };
+        struct AssignImpl<std::unordered_multiset<_T, _Hash, _Pred, _Allocator>, _Unused>
+            : AssignFromImmovableArrayImpl<std::unordered_multiset<_T, _Hash, _Pred, _Allocator> > { };
 
         // 键值对类容器
         template <class _Map>
         struct AssignFromMapImpl {
             typedef _Map SourceType;
             static void invoke(JsonType *thiz, const SourceType &arg) {
-                static_assert(std::is_convertible<const char *, typename SourceType::key_type>::value, "key_type must be able to convert to const char *");
+                static_assert(std::is_convertible<const char *, typename SourceType::key_type>::value,
+                    "key_type must be able to convert to const char *");
                 thiz->AssignFromMapIterator(arg.begin(), arg.end());
             }
 
             static void invoke(JsonType *thiz, SourceType &&arg) {
-                static_assert(std::is_convertible<const char *, typename SourceType::key_type>::value, "key_type must be able to convert to const char *");
+                static_assert(std::is_convertible<const char *, typename SourceType::key_type>::value,
+                    "key_type must be able to convert to const char *");
                 thiz->AssignFromMapIterator(std::make_move_iterator(arg.begin()), std::make_move_iterator(arg.end()));
             }
         };
