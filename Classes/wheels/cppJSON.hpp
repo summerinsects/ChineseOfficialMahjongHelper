@@ -1091,11 +1091,11 @@ namespace jw {
             return (pointer)p;
         }
 
-        static inline void Delete(pointer c) {
+        static inline void Delete(pointer p) {
             typedef typename _Allocator::template rebind<JsonType>::other AllocatorType;
             AllocatorType allocator;
-            allocator.destroy(c);
-            allocator.deallocate(c, sizeof(JsonType));
+            allocator.destroy(p);
+            allocator.deallocate(p, sizeof(JsonType));
         }
 
         static const char *skip(const char *in) {
@@ -1493,20 +1493,20 @@ namespace jw {
 
     // 流输出
     template <class _OS, class _Integer, class _Float, class _CharTraits, class _Allocator>
-    static inline _OS &operator<<(_OS &os, const BasicJSON<_Integer, _Float, _CharTraits, _Allocator> &c) {
-        os << c.Print();
+    static inline _OS &operator<<(_OS &os, const BasicJSON<_Integer, _Float, _CharTraits, _Allocator> &json) {
+        os << json.Print();
         return os;
     }
 
     // 重载与nullptr的比较
     template <class _CharTraits, class _Integer, class _Float, class _Allocator>
-    static inline bool operator==(std::nullptr_t, const BasicJSON<_Integer, _Float, _CharTraits, _Allocator> &c) throw() {
-        return c.operator==(nullptr);
+    static inline bool operator==(std::nullptr_t, const BasicJSON<_Integer, _Float, _CharTraits, _Allocator> &json) throw() {
+        return json.operator==(nullptr);
     }
 
     template <class _CharTraits, class _Integer, class _Float, class _Allocator>
-    static inline bool operator!=(std::nullptr_t, const BasicJSON<_Integer, _Float, _CharTraits, _Allocator> &c) {
-        return c.operator!=(nullptr);
+    static inline bool operator!=(std::nullptr_t, const BasicJSON<_Integer, _Float, _CharTraits, _Allocator> &json) {
+        return json.operator!=(nullptr);
     }
 
     typedef BasicJSON<int64_t, double, std::char_traits<char>, std::allocator<char> > cppJSON;
