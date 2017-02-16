@@ -236,10 +236,10 @@ namespace jw {
             if (_child != nullptr) {
                 for (pointer p = _child->_next; p != _child; ) {
                     pointer q = p->_next;
-                    Delete(p);
+                    cJSON_Delete(p);
                     p = q;
                 }
-                Delete(_child);
+                cJSON_Delete(_child);
                 _child = nullptr;
             }
             reset();
@@ -256,7 +256,7 @@ namespace jw {
             reset();
             _valueType = valueType;
             if (_valueType == ValueType::Array || _valueType == ValueType::Object) {
-                _child = New();
+                _child = cJSON_New_Item();
                 if (_child == nullptr) throw std::bad_alloc();
                 _child->_next = _child->_prev = _child;
             }
@@ -283,7 +283,7 @@ namespace jw {
         // 复制构造
         BasicJSON(const BasicJSON &other) {
             reset();
-            Duplicate(*this, other, true);
+            cJSON_Duplicate(*this, other, true);
         }
 
         // 移动构造
@@ -309,7 +309,7 @@ namespace jw {
         // 赋值
         BasicJSON &operator=(const BasicJSON &other) {
             clear();
-            Duplicate(*this, other, true);
+            cJSON_Duplicate(*this, other, true);
             return *this;
         }
 
@@ -370,11 +370,11 @@ namespace jw {
         template <class _Iterator>
         inline void AssignFromArrayIterator(_Iterator first, _Iterator last) {
             this->_valueType = ValueType::Array;
-            this->_child = New();
+            this->_child = cJSON_New_Item();
             BasicJSON *prev = this->_child;
             prev->_next = prev->_prev = prev;
             for (; first != last; ++first) {
-                BasicJSON *item = New();
+                BasicJSON *item = cJSON_New_Item();
                 item->Assign<typename std::iterator_traits<_Iterator>::value_type>(*first);
                 prev->_next = item;
                 item->_prev = prev;
@@ -389,11 +389,11 @@ namespace jw {
         template <class _Iterator>
         void AssignFromMapIterator(_Iterator first, _Iterator last) {
             this->_valueType = ValueType::Object;
-            this->_child = New();
+            this->_child = cJSON_New_Item();
             BasicJSON *prev = this->_child;
             prev->_next = prev->_prev = prev;
             for (; first != last; ++first) {
-                BasicJSON *item = New();
+                BasicJSON *item = cJSON_New_Item();
                 item->_key = __basic_json_helper::_FixString((*first).first);
                 item->Assign<typename std::iterator_traits<_Iterator>::value_type::second_type>((*first).second);
                 prev->_next = item;
@@ -408,7 +408,7 @@ namespace jw {
         // 自己
         template <class _Tp>
         void Assign(const typename std::enable_if<std::is_same<BasicJSON, _Tp>::value, _Tp>::type &arg) {
-            Duplicate(*this, arg, true);
+            cJSON_Duplicate(*this, arg, true);
         }
 
         template <class _Tp>
@@ -1001,14 +1001,14 @@ namespace jw {
         }
 
         template <class _Tp> iterator _DoInsertForArray(pointer ptr, _Tp &&val) {
-            pointer item = New();
+            pointer item = cJSON_New_Item();
             item->Assign<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type>(std::forward<_Tp>(val));
             if (_child->_next != _child && _child->_next->_valueType != item->_valueType) {
-                Delete(item);
+                cJSON_Delete(item);
                 throw std::logic_error("Cannot insert a difference type into an Array.");
             }
             if (item->_prev != nullptr || item->_next != nullptr) {
-                Delete(item);
+                cJSON_Delete(item);
                 throw std::logic_error("Item already added. It can't be added again");
             }
             ptr->_prev->_next = item;  // 连接ptr的前驱和item
@@ -1022,10 +1022,10 @@ namespace jw {
         template <class _Tp> std::pair<iterator, bool> _DoInsertForMap(_Tp &&val) {
             typedef typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type _PairType;
             static_assert(std::is_convertible<const char *, typename _PairType::first_type>::value, "key_type must be able to convert to const char *");
-            pointer item = New();
+            pointer item = cJSON_New_Item();
             item->Assign<typename _PairType::second_type>(val.second);
             if (item->_prev != nullptr || item->_next != nullptr || !item->_key.empty()) {
-                Delete(item);
+                cJSON_Delete(item);
                 throw std::logic_error("Item already added. It can't be added again");
             }
             const char *key = __basic_json_helper::_FixString(val.first);
@@ -1050,7 +1050,7 @@ namespace jw {
             ptr->_next->_prev = ptr->_prev;
             ptr->_prev = nullptr;
             ptr->_next = nullptr;  // 设置为nullptr防止将后继结点都释放了
-            Delete(ptr);
+            cJSON_Delete(ptr);
             --_child->_valueInt;
             return ret;
         }
@@ -1068,7 +1068,7 @@ namespace jw {
             return nullptr;
         }
 
-        static inline pointer New() {
+        static inline pointer cJSON_New_Item() {
             typedef typename _Allocator::template rebind<JsonType>::other AllocatorType;
             AllocatorType allocator;
             typename AllocatorType::pointer p = allocator.allocate(sizeof(JsonType));
@@ -1076,7 +1076,7 @@ namespace jw {
             return (pointer)p;
         }
 
-        static inline void Delete(pointer p) {
+        static inline void cJSON_Delete(pointer p) {
             typedef typename _Allocator::template rebind<JsonType>::other AllocatorType;
             AllocatorType allocator;
             allocator.destroy(p);
@@ -1218,9 +1218,9 @@ namespace jw {
             if (*value == ']') return value + 1;    // empty array.
 
             _valueType = ValueType::Array;
-            this->_child = New();
+            this->_child = cJSON_New_Item();
             if (this->_child == nullptr) return nullptr;        // memory fail
-            this->_child->_next = child = New();
+            this->_child->_next = child = cJSON_New_Item();
             if (child == nullptr) return nullptr;        // memory fail
             value = skip(child->parse_value(skip(value)));  // skip any spacing, get the value.
             if (value == nullptr) return nullptr;
@@ -1229,7 +1229,7 @@ namespace jw {
             ++this->_child->_valueInt;
 
             while (*value == ',') {
-                pointer new_item = New();
+                pointer new_item = cJSON_New_Item();
                 if (new_item == nullptr) return nullptr;     // memory fail
                 child->_next = new_item; new_item->_prev = child; child = new_item;
                 value = skip(child->parse_value(skip(value + 1)));
@@ -1252,9 +1252,9 @@ namespace jw {
 
             _valueType = ValueType::Object;
             pointer child;
-            this->_child = New();
+            this->_child = cJSON_New_Item();
             if (this->_child == nullptr) return nullptr;        // memory fail
-            this->_child->_next = child = New();
+            this->_child->_next = child = cJSON_New_Item();
             if (child == nullptr) return nullptr;        // memory fail
             value = skip(child->parse_string(skip(value)));
             child->_valueType = ValueType::Null;
@@ -1268,7 +1268,7 @@ namespace jw {
             ++this->_child->_valueInt;
 
             while (*value == ',') {
-                pointer new_item = New();
+                pointer new_item = cJSON_New_Item();
                 if (new_item == nullptr)   return nullptr; // memory fail
                 child->_next = new_item; new_item->_prev = child; child = new_item;
                 value = skip(child->parse_string(skip(value + 1)));
@@ -1414,7 +1414,7 @@ namespace jw {
             ret.push_back('}');
         }
 
-        static bool Duplicate(reference newitem, const_reference item, bool recurse) {
+        static bool cJSON_Duplicate(reference newitem, const_reference item, bool recurse) {
             newitem.clear();
             const_pointer cptr;
             pointer nptr = nullptr, newchild;
@@ -1426,13 +1426,13 @@ namespace jw {
             if (!recurse) return true;
             // Walk the ->next chain for the child.
             if (item._child != nullptr) {
-                newitem._child = New();
+                newitem._child = cJSON_New_Item();
                 nptr = newitem._child;
                 cptr = item._child->_next;
                 while (cptr != item._child) {
-                    newchild = New();
+                    newchild = cJSON_New_Item();
                     if (newchild == nullptr) return false;
-                    if (!Duplicate(*newchild, *cptr, true)) { Delete(newchild); return false; }     // Duplicate (with recurse) each item in the ->next chain
+                    if (!cJSON_Duplicate(*newchild, *cptr, true)) { cJSON_Delete(newchild); return false; }     // cJSON_Duplicate (with recurse) each item in the ->next chain
                     nptr->_next = newchild, newchild->_prev = nptr; nptr = newchild;    // crosswire ->prev and ->next and move on
                     cptr = cptr->_next;
                 }
