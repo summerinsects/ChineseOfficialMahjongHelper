@@ -223,10 +223,10 @@ enum class E2 {
 
 int main(int argc, char *argv[])
 {
-#if (defined _DEBUG) || (defined DEBUG)
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    //_CrtSetBreakAlloc(147);
-#endif
+//#if (defined _DEBUG) || (defined DEBUG)
+//    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+//    //_CrtSetBreakAlloc(147);
+//#endif
 
     typedef jw::BasicJSON<int, float, TestCharTraits, TestAllocator<char> > cppJSON;
 
