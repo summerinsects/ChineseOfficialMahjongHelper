@@ -554,50 +554,50 @@ namespace jw {
 
         template <class _Unused, class _Key, class _Value, class _Compare, class _Alloc1>
         struct AssignImpl<std::map<_Key, _Value, _Compare, _Alloc1>, _Unused>
-        : AssignFromMapImpl<std::map<_Key, _Value, _Compare, _Alloc1>> { };
+            : AssignFromMapImpl<std::map<_Key, _Value, _Compare, _Alloc1>> { };
 
         template <class _Unused, class _Key, class _Value, class _Compare, class _Alloc1>
         struct AssignImpl<std::multimap<_Key, _Value, _Compare, _Alloc1>, _Unused >
-        : AssignFromMapImpl<std::multimap<_Key, _Value, _Compare, _Alloc1> > { };
+            : AssignFromMapImpl<std::multimap<_Key, _Value, _Compare, _Alloc1> > { };
 
         template <class _Unused, class _Key, class _Value, class _Hash, class _Pred, class _Alloc1>
         struct AssignImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc1>, _Unused>
-        : AssignFromMapImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc1> > { };
+            : AssignFromMapImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc1> > { };
 
         template <class _Unused, class _Key, class _Value, class _Hash, class _Pred, class _Alloc1>
         struct AssignImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc1>, _Unused>
-        : AssignFromMapImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc1> > { };
+            : AssignFromMapImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc1> > { };
 
         // C++11初始化列表
         template <class _Unused, class _T>
         struct AssignImpl<std::initializer_list<_T>, _Unused>
-          : AssignFromMoveableArrayImpl<std::initializer_list<_T> > { };
+            : AssignFromMoveableArrayImpl<std::initializer_list<_T> > { };
 
         // AS成Bool
         bool AsBoolean() const {
             switch (_valueType) {
-                case ValueType::Null: return false;
-                case ValueType::False: return false;
-                case ValueType::True: return true;
-                case ValueType::Integer: return !!_valueInt;
-                case ValueType::Float: return !!_valueFloat;
-                case ValueType::String: {
-                    // 不支持tRUE trUE之类的奇葩输入
-                    if (strcmp(_valueString.c_str(), "true") == 0 || strcmp(_valueString.c_str(), "True") == 0
-                        || strcmp(_valueString.c_str(), "TRUE") == 0 || strcmp(_valueString.c_str(), "1")) {
-                        return true;
-                    }
-                    else if (strcmp(_valueString.c_str(), "false") == 0 || strcmp(_valueString.c_str(), "False") == 0
-                             || strcmp(_valueString.c_str(), "FALSE") == 0 || strcmp(_valueString.c_str(), "0")) {
-                        return false;
-                    }
-                    else {
-                        throw std::logic_error("Cannot convert JSON_String to bool"); break;
-                    }
+            case ValueType::Null: return false;
+            case ValueType::False: return false;
+            case ValueType::True: return true;
+            case ValueType::Integer: return !!_valueInt;
+            case ValueType::Float: return !!_valueFloat;
+            case ValueType::String: {
+                // 不支持tRUE trUE之类的奇葩输入
+                if (strcmp(_valueString.c_str(), "true") == 0 || strcmp(_valueString.c_str(), "True") == 0
+                    || strcmp(_valueString.c_str(), "TRUE") == 0 || strcmp(_valueString.c_str(), "1")) {
+                    return true;
                 }
-                case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to bool"); break;
-                case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to bool"); break;
-                default: throw std::out_of_range("JSON type out of range"); break;
+                else if (strcmp(_valueString.c_str(), "false") == 0 || strcmp(_valueString.c_str(), "False") == 0
+                         || strcmp(_valueString.c_str(), "FALSE") == 0 || strcmp(_valueString.c_str(), "0")) {
+                    return false;
+                }
+                else {
+                    throw std::logic_error("Cannot convert JSON_String to bool"); break;
+                }
+            }
+            case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to bool"); break;
+            case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to bool"); break;
+            default: throw std::out_of_range("JSON type out of range"); break;
             }
         }
 
@@ -605,15 +605,15 @@ namespace jw {
         template <class _Int>
         _Int AsInteger() const {
             switch (_valueType) {
-                case ValueType::Null: return _Int(0);
-                case ValueType::False: return _Int(0);
-                case ValueType::True: return _Int(1);
-                case ValueType::Integer: return static_cast<_Int>(_valueInt);
-                case ValueType::Float: return static_cast<_Int>(_valueFloat);
-                case ValueType::String: return static_cast<_Int>(atoll(_valueString.c_str()));
-                case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Integer"); break;
-                case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Integer"); break;
-                default: throw std::out_of_range("JSON type out of range"); break;
+            case ValueType::Null: return _Int(0);
+            case ValueType::False: return _Int(0);
+            case ValueType::True: return _Int(1);
+            case ValueType::Integer: return static_cast<_Int>(_valueInt);
+            case ValueType::Float: return static_cast<_Int>(_valueFloat);
+            case ValueType::String: return static_cast<_Int>(atoll(_valueString.c_str()));
+            case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Integer"); break;
+            case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Integer"); break;
+            default: throw std::out_of_range("JSON type out of range"); break;
             }
         }
 
@@ -621,15 +621,15 @@ namespace jw {
         template <class _Flt>
         _Flt AsFloat() const {
             switch (_valueType) {
-                case ValueType::Null: return _Flt(0);
-                case ValueType::False: return _Flt(0);
-                case ValueType::True: return _Flt(1);
-                case ValueType::Integer: return static_cast<_Flt>(_valueInt);
-                case ValueType::Float: return static_cast<_Flt>(_valueFloat);
-                case ValueType::String: return static_cast<_Flt>(atof(_valueString.c_str()));
-                case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Float"); break;
-                case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Float"); break;
-                default: throw std::out_of_range("JSON type out of range"); break;
+            case ValueType::Null: return _Flt(0);
+            case ValueType::False: return _Flt(0);
+            case ValueType::True: return _Flt(1);
+            case ValueType::Integer: return static_cast<_Flt>(_valueInt);
+            case ValueType::Float: return static_cast<_Flt>(_valueFloat);
+            case ValueType::String: return static_cast<_Flt>(atof(_valueString.c_str()));
+            case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Float"); break;
+            case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Float"); break;
+            default: throw std::out_of_range("JSON type out of range"); break;
             }
         }
 
@@ -637,23 +637,23 @@ namespace jw {
         template <class _Str>
         _Str AsString() const {
             switch (_valueType) {
-                case ValueType::Null: return _Str();
-                case ValueType::False: return _Str("false");
-                case ValueType::True: return _Str("true");
-                case ValueType::Integer: {
-                    char str[21];  // 2^64+1 can be represented in 21 chars.
-                    snprintf(str, 21, "%" PRId64, (int64_t)_valueInt);
-                    return _Str(str);
-                }
-                case ValueType::Float: {
-                    std::basic_ostringstream<typename _Str::value_type, typename _Str::traits_type, typename _Str::allocator_type> ss;
-                    ss << _valueFloat;
-                    return ss.str();
-                }
-                case ValueType::String: return _Str(_valueString.begin(), _valueString.end());
-                case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to String"); break;
-                case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to String"); break;
-                default: throw std::out_of_range("JSON type out of range"); break;
+            case ValueType::Null: return _Str();
+            case ValueType::False: return _Str("false");
+            case ValueType::True: return _Str("true");
+            case ValueType::Integer: {
+                char str[21];  // 2^64+1 can be represented in 21 chars.
+                snprintf(str, 21, "%" PRId64, (int64_t)_valueInt);
+                return _Str(str);
+            }
+            case ValueType::Float: {
+                std::basic_ostringstream<typename _Str::value_type, typename _Str::traits_type, typename _Str::allocator_type> ss;
+                ss << _valueFloat;
+                return ss.str();
+            }
+            case ValueType::String: return _Str(_valueString.begin(), _valueString.end());
+            case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to String"); break;
+            case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to String"); break;
+            default: throw std::out_of_range("JSON type out of range"); break;
             }
         }
 
@@ -661,20 +661,20 @@ namespace jw {
         template <class _Array>
         _Array AsArray() const {
             switch (_valueType) {
-                case ValueType::Null: return _Array();
-                case ValueType::False: throw std::logic_error("Cannot convert JSON_False to Array"); break;
-                case ValueType::True: throw std::logic_error("Cannot convert JSON_True to Array"); break;
-                case ValueType::Integer: throw std::logic_error("Cannot convert JSON_Integer to Array"); break;
-                case ValueType::Float: throw std::logic_error("Cannot convert JSON_Float to Array"); break;
-                case ValueType::String: throw std::logic_error("Cannot convert JSON_String to Array"); break;
-                case ValueType::Array: {
-                    _Array ret = _Array();
-                    std::transform(this->begin(), this->end(), std::inserter(ret, ret.begin()),
-                        &AsImpl<typename _Array::value_type, void>::invoke);
-                    return ret;
-                }
-                case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Array"); break;
-                default: throw std::out_of_range("JSON type out of range"); break;
+            case ValueType::Null: return _Array();
+            case ValueType::False: throw std::logic_error("Cannot convert JSON_False to Array"); break;
+            case ValueType::True: throw std::logic_error("Cannot convert JSON_True to Array"); break;
+            case ValueType::Integer: throw std::logic_error("Cannot convert JSON_Integer to Array"); break;
+            case ValueType::Float: throw std::logic_error("Cannot convert JSON_Float to Array"); break;
+            case ValueType::String: throw std::logic_error("Cannot convert JSON_String to Array"); break;
+            case ValueType::Array: {
+                _Array ret = _Array();
+                std::transform(this->begin(), this->end(), std::inserter(ret, ret.begin()),
+                    &AsImpl<typename _Array::value_type, void>::invoke);
+                return ret;
+            }
+            case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Array"); break;
+            default: throw std::out_of_range("JSON type out of range"); break;
             }
         }
 
@@ -690,19 +690,19 @@ namespace jw {
         _Map AsMap() const {
             static_assert(std::is_convertible<const char *, typename _Map::key_type>::value, "key_type must be able to convert to const char *");
             switch (_valueType) {
-                case ValueType::Null: return _Map();
-                case ValueType::False: throw std::logic_error("Cannot convert JSON_False to Object"); break;
-                case ValueType::True: throw std::logic_error("Cannot convert JSON_True to Object"); break;
-                case ValueType::Integer: throw std::logic_error("Cannot convert JSON_Integer to Object"); break;
-                case ValueType::Float: throw std::logic_error("Cannot convert JSON_Float to Object"); break;
-                case ValueType::String: throw std::logic_error("Cannot convert JSON_String to Object"); break;
-                case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Object"); break;
-                case ValueType::Object: {
-                    _Map ret = _Map();
-                    std::transform(this->begin(), this->end(), std::inserter(ret, ret.begin()), _make_value<_Map>);
-                    return ret;
-                }
-                default: throw std::out_of_range("JSON type out of range"); break;
+            case ValueType::Null: return _Map();
+            case ValueType::False: throw std::logic_error("Cannot convert JSON_False to Object"); break;
+            case ValueType::True: throw std::logic_error("Cannot convert JSON_True to Object"); break;
+            case ValueType::Integer: throw std::logic_error("Cannot convert JSON_Integer to Object"); break;
+            case ValueType::Float: throw std::logic_error("Cannot convert JSON_Float to Object"); break;
+            case ValueType::String: throw std::logic_error("Cannot convert JSON_String to Object"); break;
+            case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Object"); break;
+            case ValueType::Object: {
+                _Map ret = _Map();
+                std::transform(this->begin(), this->end(), std::inserter(ret, ret.begin()), _make_value<_Map>);
+                return ret;
+            }
+            default: throw std::out_of_range("JSON type out of range"); break;
             }
         }
 
