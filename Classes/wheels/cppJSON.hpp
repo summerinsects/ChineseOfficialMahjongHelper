@@ -557,15 +557,8 @@ namespace jw {
 
         // C++11初始化列表
         template <class _Unused, class _T>
-        struct AssignImpl<std::initializer_list<_T>, _Unused> {
-            typedef std::initializer_list<_T> SourceType;
-            static inline void invoke(JsonType &ref, const SourceType &arg) {
-                // TODO:
-            }
-            static inline void invoke(JsonType &ref, SourceType &&arg) {
-                // TODO:
-            }
-        };
+        struct AssignImpl<std::initializer_list<_T>, _Unused>
+          : AssignFromMoveableArrayImpl<std::initializer_list<_T> > { };
 
         // AS成Bool
         bool AsBoolean() const {
