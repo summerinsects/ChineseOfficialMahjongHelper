@@ -336,8 +336,7 @@ namespace jw {
         // 自己
         template <class _Unused>
         struct AssignImpl<JsonType, _Unused> {
-            typedef JsonType SourceType;
-            static inline void invoke(JsonType &ref, const SourceType &arg) {
+            static inline void invoke(JsonType &ref, const JsonType &arg) {
                 Duplicate(ref, arg, true);
             }
         };
@@ -345,8 +344,7 @@ namespace jw {
         // nullptr
         template <class _Unused>
         struct AssignImpl<std::nullptr_t, _Unused> {
-            typedef std::nullptr_t SourceType;
-            static inline void invoke(JsonType &ref, SourceType) {
+            static inline void invoke(JsonType &ref, std::nullptr_t) {
                 ref.AssignFromNull();
             }
         };
@@ -354,8 +352,7 @@ namespace jw {
         // bool
         template <class _Unused>
         struct AssignImpl<bool, _Unused> {
-            typedef bool SourceType;
-            static inline void invoke(JsonType &ref, SourceType arg) {
+            static inline void invoke(JsonType &ref, bool arg) {
                 ref._valueType = arg ? ValueType::True : ValueType::False;
             }
         };
@@ -363,8 +360,7 @@ namespace jw {
         // 整数
         template <class _Int>
         struct AssignFromIntegerImpl {
-            typedef _Int SourceType;
-            static inline void invoke(JsonType &ref, SourceType arg) {
+            static inline void invoke(JsonType &ref, _Int arg) {
                 ref._valueType = ValueType::Integer;
                 ref._valueInt = static_cast<IntegerType>(arg);
             }
@@ -406,8 +402,7 @@ namespace jw {
         // 枚举
         template <class _T, class = typename std::enable_if<std::is_enum<_T>::value>::type>
         struct AssignFromEnumImpl {
-            typedef _T SourceType;
-            static inline void invoke(JsonType &ref, SourceType arg) {
+            static inline void invoke(JsonType &ref, _T arg) {
                 ref._valueType = ValueType::Integer;
                 ref._valueInt = static_cast<IntegerType>(arg);
             }
@@ -419,8 +414,7 @@ namespace jw {
         // 浮点数
         template <class _Flt>
         struct AssignFromFloatImpl {
-            typedef _Flt SourceType;
-            static inline void invoke(JsonType &ref, SourceType arg) {
+            static inline void invoke(JsonType &ref, _Flt arg) {
                 ref._valueType = ValueType::Float;
                 ref._valueFloat = static_cast<FloatType>(arg);
             }
@@ -438,8 +432,7 @@ namespace jw {
         // 字符串
         template <class _Str>
         struct AssignFromStringImpl {
-            typedef _Str SourceType;
-            static inline void invoke(JsonType &ref, const SourceType &arg) {
+            static inline void invoke(JsonType &ref, const _Str &arg) {
                 ref._valueType = ValueType::String;
                 ref._valueString = __cpp_basic_json_impl::_FixString(arg);
             }
@@ -455,12 +448,11 @@ namespace jw {
 
         template <class _Unused>
         struct AssignImpl<StringType, _Unused> {
-            typedef StringType SourceType;
-            static inline void invoke(JsonType &ref, const SourceType &arg) {
+            static inline void invoke(JsonType &ref, const StringType &arg) {
                 ref._valueType = ValueType::String;
                 ref._valueString = arg;
             }
-            static inline void invoke(JsonType &ref, SourceType &&arg) {
+            static inline void invoke(JsonType &ref, StringType &&arg) {
                 ref._valueType = ValueType::String;
                 ref._valueString = std::move(arg);
             }
@@ -474,11 +466,10 @@ namespace jw {
         // 传统数组
         template <class _Unused, class _Elem, size_t _Size>
         struct AssignImpl<_Elem [_Size], _Unused> {
-            typedef _Elem SourceType[_Size];
-            static void invoke(JsonType &ref, const SourceType &arg) {
+            static void invoke(JsonType &ref, const _Elem (&arg)[_Size]) {
                 ref.AssignFromArrayIterator(std::begin(arg), std::end(arg));
             }
-            static void invoke(JsonType &ref, SourceType &&arg) {
+            static void invoke(JsonType &ref, _Elem (&&arg)[_Size]) {
                 ref.AssignFromArrayIterator(std::make_move_iterator(std::begin(arg)), std::make_move_iterator(std::end(arg)));
             }
         };
@@ -486,19 +477,15 @@ namespace jw {
         // 数组类容器
         template <class _Array>
         struct AssignFromImmovableArrayImpl {
-            typedef _Array SourceType;
-            static void invoke(JsonType &ref, const SourceType &arg) {
+            static void invoke(JsonType &ref, const _Array &arg) {
                 ref.AssignFromArrayIterator(arg.begin(), arg.end());
             }
         };
 
         template <class _Array>
         struct AssignFromMoveableArrayImpl : AssignFromImmovableArrayImpl<_Array> {
-            typedef AssignFromImmovableArrayImpl<_Array> BaseType;
-            using typename BaseType::SourceType;
-            using BaseType::invoke;
-
-            static void invoke(JsonType &ref, SourceType &&arg) {
+            using AssignFromImmovableArrayImpl<_Array>::invoke;
+            static void invoke(JsonType &ref, _Array &&arg) {
                 ref.AssignFromArrayIterator(std::make_move_iterator(arg.begin()), std::make_move_iterator(arg.end()));
             }
         };
@@ -538,15 +525,14 @@ namespace jw {
         // 键值对类容器
         template <class _Map>
         struct AssignFromMapImpl {
-            typedef _Map SourceType;
-            static void invoke(JsonType &ref, const SourceType &arg) {
-                static_assert(std::is_convertible<const char *, typename SourceType::key_type>::value,
+            static void invoke(JsonType &ref, const _Map &arg) {
+                static_assert(std::is_convertible<const char *, typename _Map::key_type>::value,
                     "key_type must be able to convert to const char *");
                 ref.AssignFromMapIterator(arg.begin(), arg.end());
             }
 
-            static void invoke(JsonType &ref, SourceType &&arg) {
-                static_assert(std::is_convertible<const char *, typename SourceType::key_type>::value,
+            static void invoke(JsonType &ref, _Map &&arg) {
+                static_assert(std::is_convertible<const char *, typename _Map::key_type>::value,
                     "key_type must be able to convert to const char *");
                 ref.AssignFromMapIterator(std::make_move_iterator(arg.begin()), std::make_move_iterator(arg.end()));
             }
@@ -711,33 +697,29 @@ namespace jw {
 
         // AS成自己的指针
         template <class _Unused> struct AsImpl<const JsonType *, _Unused> {
-            typedef const JsonType *TargetType;
-            static inline TargetType invoke(const JsonType &ref) {
+            static inline const JsonType *invoke(const JsonType &ref) {
                 return &ref;
             }
         };
 
         // AS成自己的常引用
         template <class _Unused> struct AsImpl<const JsonType &, _Unused> {
-            typedef const JsonType &TargetType;
-            static inline TargetType invoke(const JsonType &ref) {
+            static inline const JsonType &invoke(const JsonType &ref) {
                 return ref;
             }
         };
 
         // AS成Bool
         template <class _Unused> struct AsImpl<bool, _Unused> {
-            typedef bool TargetType;
-            static inline TargetType invoke(const JsonType &ref) {
+            static inline bool invoke(const JsonType &ref) {
                 return ref.AsBool();
             }
         };
 
         // AS成整数
         template <class _Int> struct AsIntegerImpl {
-            typedef _Int TargetType;
-            static inline TargetType invoke(const JsonType &ref) {
-                return ref.AsInteger<TargetType>();
+            static inline _Int invoke(const JsonType &ref) {
+                return ref.AsInteger<_Int>();
             }
         };
 
@@ -756,9 +738,8 @@ namespace jw {
         // AS成枚举
         template <class _T, class = typename std::enable_if<std::is_enum<_T>::value>::type>
         struct AsEnumImpl {
-            typedef _T TargetType;
-            static inline TargetType invoke(const JsonType &ref) {
-                return ref.AsInteger<TargetType>();
+            static inline _T invoke(const JsonType &ref) {
+                return ref.AsInteger<_T>();
             }
         };
 
@@ -766,9 +747,8 @@ namespace jw {
 
         // AS成浮点数
         template <class _Flt> struct AsFloatImpl {
-            typedef const _Flt TargetType;
-            static inline TargetType invoke(const JsonType &ref) {
-                return ref.AsFloat<TargetType>();
+            static inline _Flt invoke(const JsonType &ref) {
+                return ref.AsFloat<_Flt>();
             }
         };
 
@@ -777,9 +757,8 @@ namespace jw {
 
         // AS成STL字符串
         template <class _Str> struct AsStringImpl {
-            typedef _Str TargetType;
-            static inline TargetType invoke(const JsonType &ref) {
-                return ref.AsString<TargetType>();
+            static inline _Str invoke(const JsonType &ref) {
+                return ref.AsString<_Str>();
             }
         };
 
@@ -789,8 +768,7 @@ namespace jw {
 
         // AS成数组类容器
         template <class _Array> struct AsArrayImpl {
-            typedef _Array TargetType;
-            static inline TargetType invoke(const JsonType &ref) {
+            static inline _Array invoke(const JsonType &ref) {
                 return ref.AsArray<_Array>();
             }
         };
@@ -825,8 +803,7 @@ namespace jw {
 
         // AS成键值对类容器
         template <class _Map> struct AsMapImpl {
-            typedef _Map TargetType;
-            static inline TargetType invoke(const JsonType &ref) {
+            static inline _Map invoke(const JsonType &ref) {
                 return ref.AsMap<_Map>();
             }
         };
