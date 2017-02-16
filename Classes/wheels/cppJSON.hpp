@@ -71,7 +71,7 @@
 
 namespace jw {
 
-    template <class _Integer, class _Float, class _Traits, class _Allocator>
+    template <class _Integer, class _Float, class _CharTraits, class _Allocator>
     class BasicJSON;
 
     namespace __cpp_basic_json_impl {
@@ -81,13 +81,13 @@ namespace jw {
         static inline const char *_FixString(const char *const str) { return str; }
         template <size_t _Size> const char *_FixString(char (&str)[_Size]) { return str; }
         template <size_t _Size> const char *_FixString(const char (&str)[_Size]) { return str; }
-        template <class _Traits, class _Allocator>
-        static inline const char *_FixString(const std::basic_string<char, _Traits, _Allocator> &str) {
+        template <class _CharTraits, class _Allocator>
+        static inline const char *_FixString(const std::basic_string<char, _CharTraits, _Allocator> &str) {
             return str.c_str();
         }
     }
 
-    template <class _Integer, class _Float, class _Traits, class _Allocator>
+    template <class _Integer, class _Float, class _CharTraits, class _Allocator>
     class BasicJSON {
     public:
         friend class iterator;
@@ -109,7 +109,7 @@ namespace jw {
         typedef _Float FloatType;
 
         // 开始作死 →_→
-        typedef std::basic_string<char, _Traits, typename _Allocator::template rebind<char>::other> StringType;
+        typedef std::basic_string<char, _CharTraits, typename _Allocator::template rebind<char>::other> StringType;
 
     private:
         ValueType _valueType;  // The type of the item, as above.
@@ -1619,20 +1619,20 @@ namespace jw {
     };
 
     // 流输出
-    template <class _OS, class _Integer, class _Float, class _Traits, class _Allocator>
-    static inline _OS &operator<<(_OS &os, const BasicJSON<_Integer, _Float, _Traits, _Allocator> &c) {
+    template <class _OS, class _Integer, class _Float, class _CharTraits, class _Allocator>
+    static inline _OS &operator<<(_OS &os, const BasicJSON<_Integer, _Float, _CharTraits, _Allocator> &c) {
         os << c.Print();
         return os;
     }
 
     // 重载与nullptr的比较
-    template <class _Traits, class _Integer, class _Float, class _Allocator>
-    static inline bool operator==(std::nullptr_t, const BasicJSON<_Integer, _Float, _Traits, _Allocator> &c) throw() {
+    template <class _CharTraits, class _Integer, class _Float, class _Allocator>
+    static inline bool operator==(std::nullptr_t, const BasicJSON<_Integer, _Float, _CharTraits, _Allocator> &c) throw() {
         return c.operator==(nullptr);
     }
 
-    template <class _Traits, class _Integer, class _Float, class _Allocator>
-    static inline bool operator!=(std::nullptr_t, const BasicJSON<_Integer, _Float, _Traits, _Allocator> &c) {
+    template <class _CharTraits, class _Integer, class _Float, class _Allocator>
+    static inline bool operator!=(std::nullptr_t, const BasicJSON<_Integer, _Float, _CharTraits, _Allocator> &c) {
         return c.operator!=(nullptr);
     }
 
