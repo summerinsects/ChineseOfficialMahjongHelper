@@ -41,6 +41,7 @@
 #include <list>
 #include <forward_list>
 #include <deque>
+#include <array>
 #include <set>
 #include <unordered_set>
 #include <map>
@@ -505,6 +506,10 @@ namespace jw {
         template <class _Unused, class _T, class _Alloc1>
         struct AssignImpl<std::deque<_T, _Alloc1>, _Unused>
             : AssignFromMoveableArrayImpl<std::deque<_T, _Alloc1> > { };
+
+        template <class _Unused, class _T, size_t _Size>
+        struct AssignImpl<std::array<_T, _Size>, _Unused>
+            : AssignFromMoveableArrayImpl<std::array<_T, _Size> > { };
 
         template <class _Unused, class _T, class _Compare, class _Alloc1>
         struct AssignImpl<std::set<_T, _Compare, _Alloc1>, _Unused>
