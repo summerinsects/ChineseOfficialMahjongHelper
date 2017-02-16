@@ -309,29 +309,28 @@ namespace jw {
             reset();
         }
 
+        void swap(BasicJSON &other) {
+            std::swap(_type, other._type);
+            std::swap(_valueint, other._valueint);
+            std::swap(_valuefloat, other._valuefloat);
+            std::swap(_valuestring, other._valuestring);
+
+            std::swap(_keystring, other._keystring);
+            std::swap(_child, other._child);
+            std::swap(_next, other._next);
+            std::swap(_prev, other._prev);
+            std::swap(_count, other._count);
+        }
+
         // 赋值
         BasicJSON &operator=(const BasicJSON &other) {
-            clear();
-            cJSON_Duplicate(*this, other, true);
+            BasicJSON(other).swap(*this);
             return *this;
         }
 
         // 移动赋值
         BasicJSON &operator=(BasicJSON &&other) {
-            clear();
-
-            _type = other._type;
-            _valueint = other._valueint;
-            _valuefloat = other._valuefloat;
-            _valuestring = std::move(other._valuestring);
-
-            _keystring = std::move(other._keystring);
-            _child = other._child;
-            _next = other._next;
-            _prev = other._prev;
-            _count = other._count;
-
-            other.reset();
+            BasicJSON(std::move(other)).swap(*this);
             return *this;
         }
 
@@ -417,7 +416,6 @@ namespace jw {
 
         template <class _Tp>
         void Assign(typename std::enable_if<std::is_same<BasicJSON, _Tp>::value, _Tp>::type &&arg) {
-            //TODO swap
             *this = std::move(arg);
         }
 
