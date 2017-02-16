@@ -96,7 +96,7 @@ namespace jw {
             Null, False, True, Integer, Float, String, Array, Object
         };
 
-        typedef BasicJSON<_Integer, _Float, _Traits, _Allocator> JsonType;
+        typedef BasicJSON JsonType;
         typedef JsonType value_type;
         typedef value_type *pointer;
         typedef value_type &reference;
@@ -141,8 +141,8 @@ namespace jw {
 
     public:
         // 默认构造
-        BasicJSON<_Integer, _Float, _Traits, _Allocator>() { reset(); }
-        ~BasicJSON<_Integer, _Float, _Traits, _Allocator>() { clear(); }
+        BasicJSON() { reset(); }
+        ~BasicJSON() { clear(); }
 
         ValueType GetValueType() const { return _valueType; }
         const StringType &key() const { return _key; }
@@ -181,7 +181,7 @@ namespace jw {
         }
 
         // 带参构造
-        BasicJSON<_Integer, _Float, _Traits, _Allocator>(ValueType valueType) {
+        BasicJSON(ValueType valueType) {
             reset();
             _valueType = valueType;
             if (_valueType == ValueType::Array || _valueType == ValueType::Object) {
@@ -192,31 +192,31 @@ namespace jw {
         }
 
         template <class _T>
-        explicit BasicJSON<_Integer, _Float, _Traits, _Allocator>(_T &&val) {
+        explicit BasicJSON(_T &&val) {
             reset();
             AssignImpl<typename std::remove_cv<typename std::remove_reference<_T>::type>::type, void>::invoke(*this, std::forward<_T>(val));
         }
 
         template <class _T>
-        explicit BasicJSON<_Integer, _Float, _Traits, _Allocator>(const std::initializer_list<_T> &il) {
+        explicit BasicJSON(const std::initializer_list<_T> &il) {
             reset();
             AssignImpl<std::initializer_list<_T>, void>::invoke(*this, il);
         }
 
         template <class _T>
-        explicit BasicJSON<_Integer, _Float, _Traits, _Allocator>(std::initializer_list<_T> &&il) {
+        explicit BasicJSON(std::initializer_list<_T> &&il) {
             reset();
             AssignImpl<std::initializer_list<_T>, void>::invoke(*this, il);
         }
 
         // 复制构造
-        BasicJSON<_Integer, _Float, _Traits, _Allocator>(const BasicJSON<_Integer, _Float, _Traits, _Allocator> &other) {
+        BasicJSON(const BasicJSON &other) {
             reset();
             Duplicate(*this, other, true);
         }
 
         // 移动构造
-        BasicJSON<_Integer, _Float, _Traits, _Allocator>(BasicJSON<_Integer, _Float, _Traits, _Allocator> &&other) {
+        BasicJSON(BasicJSON &&other) {
             _valueType = other._valueType;
             _valueInt = other._valueInt;
             _valueFloat = other._valueFloat;
@@ -231,19 +231,19 @@ namespace jw {
         }
 
         // 用nullptr构造
-        BasicJSON<_Integer, _Float, _Traits, _Allocator>(std::nullptr_t) {
+        BasicJSON(std::nullptr_t) {
             reset();
         }
 
         // 赋值
-        BasicJSON<_Integer, _Float, _Traits, _Allocator> &operator=(const BasicJSON<_Integer, _Float, _Traits, _Allocator> &other) {
+        BasicJSON &operator=(const BasicJSON &other) {
             clear();
             Duplicate(*this, other, true);
             return *this;
         }
 
         // 移动赋值
-        BasicJSON<_Integer, _Float, _Traits, _Allocator> &operator=(BasicJSON<_Integer, _Float, _Traits, _Allocator> &&other) {
+        BasicJSON &operator=(BasicJSON &&other) {
             clear();
 
             _valueType = other._valueType;
@@ -261,7 +261,7 @@ namespace jw {
         }
 
         // 用nullptr赋值
-        BasicJSON<_Integer, _Float, _Traits, _Allocator> &operator=(std::nullptr_t) {
+        BasicJSON &operator=(std::nullptr_t) {
             clear();
             return *this;
         }
@@ -832,7 +832,7 @@ namespace jw {
     public:
         // 迭代器相关
         class iterator : public std::iterator<std::bidirectional_iterator_tag, value_type> {
-            friend class BasicJSON<_Integer, _Float, _Traits, _Allocator>;
+            friend class BasicJSON;
             friend class const_iterator;
 
             JsonType *_ptr;
@@ -880,7 +880,7 @@ namespace jw {
         typedef std::reverse_iterator<iterator> reverse_iterator;
 
         class const_iterator : public std::iterator<std::bidirectional_iterator_tag, const value_type> {
-            friend class BasicJSON<_Integer, _Float, _Traits, _Allocator>;
+            friend class BasicJSON;
             JsonType *_ptr;
 
             const_iterator(JsonType *ptr) throw() : _ptr(ptr) { }
