@@ -835,9 +835,9 @@ namespace jw {
             friend class BasicJSON<_Integer, _Float, _Traits, _Alloc>;
             friend class const_iterator;
 
-            BasicJSON<_Integer, _Float, _Traits, _Alloc> *_ptr;
+            JsonType *_ptr;
 
-            iterator(BasicJSON<_Integer, _Float, _Traits, _Alloc> *ptr) throw() : _ptr(ptr) { }
+            iterator(JsonType *ptr) throw() : _ptr(ptr) { }
 
         public:
             iterator() throw() : _ptr(nullptr) { }
@@ -881,9 +881,9 @@ namespace jw {
 
         class const_iterator : public std::iterator<std::bidirectional_iterator_tag, const value_type> {
             friend class BasicJSON<_Integer, _Float, _Traits, _Alloc>;
-            BasicJSON<_Integer, _Float, _Traits, _Alloc> *_ptr;
+            JsonType *_ptr;
 
-            const_iterator(BasicJSON<_Integer, _Float, _Traits, _Alloc> *ptr) throw() : _ptr(ptr) { }
+            const_iterator(JsonType *ptr) throw() : _ptr(ptr) { }
 
         public:
             const_iterator() throw() : _ptr(nullptr) { }
@@ -1130,7 +1130,7 @@ namespace jw {
 
     private:
         const char *ep = nullptr;
-        //typename _Alloc::template rebind<BasicJSON<_Integer, _Float, _Traits, _Alloc> >::other _allocator;
+        //typename _Alloc::template rebind<JsonType>::other _allocator;
 
 		bool _RangeCheck(const_pointer ptr) const {
             if (_child != nullptr) {
@@ -1211,18 +1211,18 @@ namespace jw {
         }
 
         static inline pointer New() {
-            typedef typename _Alloc::template rebind<BasicJSON<_Integer, _Float, _Traits, _Alloc> >::other AllocatorType;
+            typedef typename _Alloc::template rebind<JsonType>::other AllocatorType;
             AllocatorType allocator;
-            typename AllocatorType::pointer p = allocator.allocate(sizeof(BasicJSON<_Integer, _Float, _Traits, _Alloc>));
+            typename AllocatorType::pointer p = allocator.allocate(sizeof(JsonType));
             allocator.construct(p);
             return (pointer)p;
         }
 
         static inline void Delete(pointer c) {
-            typedef typename _Alloc::template rebind<BasicJSON<_Integer, _Float, _Traits, _Alloc> >::other AllocatorType;
+            typedef typename _Alloc::template rebind<JsonType>::other AllocatorType;
             AllocatorType allocator;
             allocator.destroy(c);
-            allocator.deallocate(c, sizeof(BasicJSON<_Integer, _Float, _Traits, _Alloc>));
+            allocator.deallocate(c, sizeof(JsonType));
         }
 
         static const char *skip(const char *in) {
