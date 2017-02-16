@@ -71,7 +71,7 @@
 
 namespace jw {
 
-    template <class _Integer, class _Float, class _Traits, class _Alloc>
+    template <class _Integer, class _Float, class _Traits, class _Allocator>
     class BasicJSON;
 
     namespace __cpp_basic_json_impl {
@@ -81,13 +81,13 @@ namespace jw {
         static inline const char *_FixString(const char *const str) { return str; }
         template <size_t _Size> const char *_FixString(char (&str)[_Size]) { return str; }
         template <size_t _Size> const char *_FixString(const char (&str)[_Size]) { return str; }
-        template <class _Traits, class _Alloc>
-        static inline const char *_FixString(const std::basic_string<char, _Traits, _Alloc> &str) {
+        template <class _Traits, class _Allocator>
+        static inline const char *_FixString(const std::basic_string<char, _Traits, _Allocator> &str) {
             return str.c_str();
         }
     }
 
-    template <class _Integer, class _Float, class _Traits, class _Alloc>
+    template <class _Integer, class _Float, class _Traits, class _Allocator>
     class BasicJSON {
     public:
         friend class iterator;
@@ -96,7 +96,7 @@ namespace jw {
             Null, False, True, Integer, Float, String, Array, Object
         };
 
-        typedef BasicJSON<_Integer, _Float, _Traits, _Alloc> JsonType;
+        typedef BasicJSON<_Integer, _Float, _Traits, _Allocator> JsonType;
         typedef JsonType value_type;
         typedef value_type *pointer;
         typedef value_type &reference;
@@ -109,7 +109,7 @@ namespace jw {
         typedef _Float FloatType;
 
         // 开始作死 →_→
-        typedef std::basic_string<char, _Traits, typename _Alloc::template rebind<char>::other> StringType;
+        typedef std::basic_string<char, _Traits, typename _Allocator::template rebind<char>::other> StringType;
 
     private:
         ValueType _valueType;  // The type of the item, as above.
@@ -141,8 +141,8 @@ namespace jw {
 
     public:
         // 默认构造
-        BasicJSON<_Integer, _Float, _Traits, _Alloc>() { reset(); }
-        ~BasicJSON<_Integer, _Float, _Traits, _Alloc>() { clear(); }
+        BasicJSON<_Integer, _Float, _Traits, _Allocator>() { reset(); }
+        ~BasicJSON<_Integer, _Float, _Traits, _Allocator>() { clear(); }
 
         ValueType GetValueType() const { return _valueType; }
         const StringType &key() const { return _key; }
@@ -181,7 +181,7 @@ namespace jw {
         }
 
         // 带参构造
-        BasicJSON<_Integer, _Float, _Traits, _Alloc>(ValueType valueType) {
+        BasicJSON<_Integer, _Float, _Traits, _Allocator>(ValueType valueType) {
             reset();
             _valueType = valueType;
             if (_valueType == ValueType::Array || _valueType == ValueType::Object) {
@@ -192,31 +192,31 @@ namespace jw {
         }
 
         template <class _T>
-        explicit BasicJSON<_Integer, _Float, _Traits, _Alloc>(_T &&val) {
+        explicit BasicJSON<_Integer, _Float, _Traits, _Allocator>(_T &&val) {
             reset();
             AssignImpl<typename std::remove_cv<typename std::remove_reference<_T>::type>::type, void>::invoke(*this, std::forward<_T>(val));
         }
 
         template <class _T>
-        explicit BasicJSON<_Integer, _Float, _Traits, _Alloc>(const std::initializer_list<_T> &il) {
+        explicit BasicJSON<_Integer, _Float, _Traits, _Allocator>(const std::initializer_list<_T> &il) {
             reset();
             AssignImpl<std::initializer_list<_T>, void>::invoke(*this, il);
         }
 
         template <class _T>
-        explicit BasicJSON<_Integer, _Float, _Traits, _Alloc>(std::initializer_list<_T> &&il) {
+        explicit BasicJSON<_Integer, _Float, _Traits, _Allocator>(std::initializer_list<_T> &&il) {
             reset();
             AssignImpl<std::initializer_list<_T>, void>::invoke(*this, il);
         }
 
         // 复制构造
-        BasicJSON<_Integer, _Float, _Traits, _Alloc>(const BasicJSON<_Integer, _Float, _Traits, _Alloc> &other) {
+        BasicJSON<_Integer, _Float, _Traits, _Allocator>(const BasicJSON<_Integer, _Float, _Traits, _Allocator> &other) {
             reset();
             Duplicate(*this, other, true);
         }
 
         // 移动构造
-        BasicJSON<_Integer, _Float, _Traits, _Alloc>(BasicJSON<_Integer, _Float, _Traits, _Alloc> &&other) {
+        BasicJSON<_Integer, _Float, _Traits, _Allocator>(BasicJSON<_Integer, _Float, _Traits, _Allocator> &&other) {
             _valueType = other._valueType;
             _valueInt = other._valueInt;
             _valueFloat = other._valueFloat;
@@ -231,19 +231,19 @@ namespace jw {
         }
 
         // 用nullptr构造
-        BasicJSON<_Integer, _Float, _Traits, _Alloc>(std::nullptr_t) {
+        BasicJSON<_Integer, _Float, _Traits, _Allocator>(std::nullptr_t) {
             reset();
         }
 
         // 赋值
-        BasicJSON<_Integer, _Float, _Traits, _Alloc> &operator=(const BasicJSON<_Integer, _Float, _Traits, _Alloc> &other) {
+        BasicJSON<_Integer, _Float, _Traits, _Allocator> &operator=(const BasicJSON<_Integer, _Float, _Traits, _Allocator> &other) {
             clear();
             Duplicate(*this, other, true);
             return *this;
         }
 
         // 移动赋值
-        BasicJSON<_Integer, _Float, _Traits, _Alloc> &operator=(BasicJSON<_Integer, _Float, _Traits, _Alloc> &&other) {
+        BasicJSON<_Integer, _Float, _Traits, _Allocator> &operator=(BasicJSON<_Integer, _Float, _Traits, _Allocator> &&other) {
             clear();
 
             _valueType = other._valueType;
@@ -261,7 +261,7 @@ namespace jw {
         }
 
         // 用nullptr赋值
-        BasicJSON<_Integer, _Float, _Traits, _Alloc> &operator=(std::nullptr_t) {
+        BasicJSON<_Integer, _Float, _Traits, _Allocator> &operator=(std::nullptr_t) {
             clear();
             return *this;
         }
@@ -832,7 +832,7 @@ namespace jw {
     public:
         // 迭代器相关
         class iterator : public std::iterator<std::bidirectional_iterator_tag, value_type> {
-            friend class BasicJSON<_Integer, _Float, _Traits, _Alloc>;
+            friend class BasicJSON<_Integer, _Float, _Traits, _Allocator>;
             friend class const_iterator;
 
             JsonType *_ptr;
@@ -880,7 +880,7 @@ namespace jw {
         typedef std::reverse_iterator<iterator> reverse_iterator;
 
         class const_iterator : public std::iterator<std::bidirectional_iterator_tag, const value_type> {
-            friend class BasicJSON<_Integer, _Float, _Traits, _Alloc>;
+            friend class BasicJSON<_Integer, _Float, _Traits, _Allocator>;
             JsonType *_ptr;
 
             const_iterator(JsonType *ptr) throw() : _ptr(ptr) { }
@@ -1130,7 +1130,7 @@ namespace jw {
 
     private:
         const char *ep = nullptr;
-        //typename _Alloc::template rebind<JsonType>::other _allocator;
+        //typename _Allocator::template rebind<JsonType>::other _allocator;
 
 		bool _RangeCheck(const_pointer ptr) const {
             if (_child != nullptr) {
@@ -1211,7 +1211,7 @@ namespace jw {
         }
 
         static inline pointer New() {
-            typedef typename _Alloc::template rebind<JsonType>::other AllocatorType;
+            typedef typename _Allocator::template rebind<JsonType>::other AllocatorType;
             AllocatorType allocator;
             typename AllocatorType::pointer p = allocator.allocate(sizeof(JsonType));
             allocator.construct(p);
@@ -1219,7 +1219,7 @@ namespace jw {
         }
 
         static inline void Delete(pointer c) {
-            typedef typename _Alloc::template rebind<JsonType>::other AllocatorType;
+            typedef typename _Allocator::template rebind<JsonType>::other AllocatorType;
             AllocatorType allocator;
             allocator.destroy(c);
             allocator.deallocate(c, sizeof(JsonType));
@@ -1619,20 +1619,20 @@ namespace jw {
     };
 
     // 流输出
-    template <class _OS, class _Integer, class _Float, class _Traits, class _Alloc>
-    static inline _OS &operator<<(_OS &os, const BasicJSON<_Integer, _Float, _Traits, _Alloc> &c) {
+    template <class _OS, class _Integer, class _Float, class _Traits, class _Allocator>
+    static inline _OS &operator<<(_OS &os, const BasicJSON<_Integer, _Float, _Traits, _Allocator> &c) {
         os << c.Print();
         return os;
     }
 
     // 重载与nullptr的比较
-    template <class _Traits, class _Integer, class _Float, class _Alloc>
-    static inline bool operator==(std::nullptr_t, const BasicJSON<_Integer, _Float, _Traits, _Alloc> &c) throw() {
+    template <class _Traits, class _Integer, class _Float, class _Allocator>
+    static inline bool operator==(std::nullptr_t, const BasicJSON<_Integer, _Float, _Traits, _Allocator> &c) throw() {
         return c.operator==(nullptr);
     }
 
-    template <class _Traits, class _Integer, class _Float, class _Alloc>
-    static inline bool operator!=(std::nullptr_t, const BasicJSON<_Integer, _Float, _Traits, _Alloc> &c) {
+    template <class _Traits, class _Integer, class _Float, class _Allocator>
+    static inline bool operator!=(std::nullptr_t, const BasicJSON<_Integer, _Float, _Traits, _Allocator> &c) {
         return c.operator!=(nullptr);
     }
 
