@@ -87,43 +87,30 @@ namespace jw {
         }
 
         // _IsCString
-        template <class _Tp> struct _IsCString : std::false_type { };
-        template <size_t _Size> struct _IsCString<char [_Size]> : std::true_type { };
-        template <size_t _Size> struct _IsCString<const char [_Size]> : std::true_type { };
-        template <size_t _Size> struct _IsCString<char (&)[_Size]> : std::true_type { };
-        template <size_t _Size> struct _IsCString<const char (&)[_Size]> : std::true_type { };
-        template <> struct _IsCString<char *> : std::true_type { };
-        template <> struct _IsCString<const char *> : std::true_type { };
-        template <> struct _IsCString<const char *const> : std::true_type { };
+        template <class _Tp> struct _IsCStringImpl : std::false_type { };
+        template <size_t _Size> struct _IsCStringImpl<char [_Size]> : std::true_type { };
+        template <> struct _IsCStringImpl<char *> : std::true_type { };
+        template <> struct _IsCStringImpl<const char *> : std::true_type { };
+
+        template <class _Tp> struct _IsCString
+            : _IsCStringImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
         // _IsSTLString
-        template <class _Tp> struct _IsSTLString : std::false_type { };
+        template <class _Tp> struct _IsSTLStringImpl : std::false_type{};
         template <class _CharTraits, class _Allocator>
-        struct _IsSTLString<std::basic_string<char, _CharTraits, _Allocator> > : std::true_type { };
+        struct _IsSTLStringImpl<std::basic_string<char, _CharTraits, _Allocator> > : std::true_type { };
 
-        template <class _CharTraits, class _Allocator>
-        struct _IsSTLString<std::basic_string<char, _CharTraits, _Allocator> &> : std::true_type { };
-
-        template <class _CharTraits, class _Allocator>
-        struct _IsSTLString<const std::basic_string<char, _CharTraits, _Allocator> &> : std::true_type { };
-
-        template <class _CharTraits, class _Allocator>
-        struct _IsSTLString<std::basic_string<char, _CharTraits, _Allocator> &&> : std::true_type { };
+        template <class _Tp> struct _IsSTLString
+            : _IsSTLStringImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
         // _IsCArray
-        template <class _Tp> struct _IsCArray : std::false_type { };
-
+        template <class _Tp> struct _IsCArrayImpl : std::false_type { };
         template <class _Elem, size_t _Size>
-        struct _IsCArray<_Elem [_Size]> : std::true_type { };
+        struct _IsCArrayImpl<_Elem [_Size]> : std::true_type { };
 
-        template <class _Elem, size_t _Size>
-        struct _IsCArray<const _Elem [_Size]> : std::true_type { };
-
-        template <class _Elem, size_t _Size>
-        struct _IsCArray<_Elem (&)[_Size]> : std::true_type { };
-
-        template <class _Elem, size_t _Size>
-        struct _IsCArray<const _Elem (&)[_Size]> : std::true_type { };
+        template <class _Tp>
+        struct _IsCArray
+            : _IsCArrayImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
         // _IsElemModifiableContainer
         template <class _Tp> struct _IsElemModifiableContainer : std::false_type { };
