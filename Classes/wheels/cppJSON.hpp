@@ -112,26 +112,24 @@ namespace jw {
         struct _IsCArray
             : _IsCArrayImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
-        // _IsElemModifiableContainer
-        template <class _Tp> struct _IsElemModifiableContainer : std::false_type { };
-
+        // _IsSequential
+        template <class _Tp> struct _IsSequentialImpl : std::false_type { };
         template <class _Tp, class _Alloc>
-        struct _IsElemModifiableContainer<std::vector<_Tp, _Alloc> > : std::true_type { };
-
+        struct _IsSequentialImpl<std::vector<_Tp, _Alloc> > : std::true_type { };
         template <class _Tp, class _Alloc>
-        struct _IsElemModifiableContainer<std::list<_Tp, _Alloc> > : std::true_type { };
-
+        struct _IsSequentialImpl<std::list<_Tp, _Alloc> > : std::true_type { };
         template <class _Tp, class _Alloc>
-        struct _IsElemModifiableContainer<std::forward_list<_Tp, _Alloc> > : std::true_type { };
-
+        struct _IsSequentialImpl<std::forward_list<_Tp, _Alloc> > : std::true_type { };
         template <class _Tp, class _Alloc>
-        struct _IsElemModifiableContainer<std::deque<_Tp, _Alloc> > : std::true_type { };
-
+        struct _IsSequentialImpl<std::deque<_Tp, _Alloc> > : std::true_type { };
         template <class _Tp, size_t _Size>
-        struct _IsElemModifiableContainer<std::array<_Tp, _Size> > : std::true_type { };
+        struct _IsSequentialImpl<std::array<_Tp, _Size> > : std::true_type { };
+        template <class _Tp>
+        struct _IsSequentialImpl<std::initializer_list<_Tp> > : std::true_type { };
 
         template <class _Tp>
-        struct _IsElemModifiableContainer<std::initializer_list<_Tp> > : std::true_type { };
+        struct _IsSequential
+            : _IsSequentialImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
         // _IsSet
         template <class _Tp> struct _IsSet : std::false_type { };
@@ -490,13 +488,13 @@ namespace jw {
         }
 
         template <class _Tp>
-        void Assign(const typename std::enable_if<__basic_json_helper::_IsElemModifiableContainer<_Tp>::value
+        void Assign(const typename std::enable_if<__basic_json_helper::_IsSequential<_Tp>::value
                 || __basic_json_helper::_IsSet<_Tp>::value, _Tp>::type &arg) {
             AssignFromArrayIterator(std::begin(arg), std::end(arg));
         }
 
         template <class _Tp>
-        void Assign(typename std::enable_if<__basic_json_helper::_IsElemModifiableContainer<_Tp>::value, _Tp>::type &&arg) {
+        void Assign(typename std::enable_if<__basic_json_helper::_IsSequential<_Tp>::value, _Tp>::type &&arg) {
             AssignFromArrayIterator(std::make_move_iterator(std::begin(arg)), std::make_move_iterator(std::end(arg)));
         }
 
@@ -645,7 +643,7 @@ namespace jw {
 
         // AS成数组类容器
         template <class _Tp>
-        typename std::enable_if<__basic_json_helper::_IsElemModifiableContainer<_Tp>::value
+        typename std::enable_if<__basic_json_helper::_IsSequential<_Tp>::value
             || __basic_json_helper::_IsSet<_Tp>::value, _Tp>::type As() const {
             switch (_valueType) {
             case ValueType::Null: return _Tp();
