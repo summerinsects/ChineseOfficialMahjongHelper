@@ -49,10 +49,6 @@ namespace cw {
         }
     }
 
-    void TableView::setTableViewCellWillRecycleCallback(const ccTableViewCellWillRecycleCallback &callback) {
-        _tableViewCellWillRecycleCallback = callback;
-    }
-
     void TableView::setTableViewCallback(const ccTableViewCallback &callback) {
         _tableViewCallback = callback;
     }
@@ -90,10 +86,7 @@ namespace cw {
         _oldDirection = Direction::NONE;
 
         for (const auto &cell : _cellsUsed) {
-            if (_tableViewCellWillRecycleCallback) {
-                _tableViewCellWillRecycleCallback(this, cell);
-            }
-
+            _tableViewCallback(this, CallbackType::CELL_WILL_RECYCLE, (intptr_t)cell, 0);
             _cellsFreed.pushBack(cell);
 
             cell->reset();
@@ -118,10 +111,7 @@ namespace cw {
         _oldDirection = _direction;
 
         for (const auto &cell : _cellsUsed) {
-            if (_tableViewCellWillRecycleCallback) {
-                _tableViewCellWillRecycleCallback(this, cell);
-            }
-
+            _tableViewCallback(this, CallbackType::CELL_WILL_RECYCLE, (intptr_t)cell, 0);
             _cellsFreed.pushBack(cell);
 
             cell->reset();
@@ -337,10 +327,7 @@ namespace cw {
     }
 
     void TableView::_moveCellOutOfSight(TableViewCell *cell) {
-        if (_tableViewCellWillRecycleCallback) {
-            _tableViewCellWillRecycleCallback(this, cell);
-        }
-
+        _tableViewCallback(this, CallbackType::CELL_WILL_RECYCLE, (intptr_t)cell, 0);
         _cellsFreed.pushBack(cell);
         _cellsUsed.eraseObject(cell);
         _isUsedCellsDirty = true;

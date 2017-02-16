@@ -39,6 +39,8 @@
 #include <sstream>
 #include <vector>
 #include <list>
+#include <forward_list>
+#include <deque>
 #include <set>
 #include <unordered_set>
 #include <map>
@@ -93,11 +95,11 @@ namespace jw {
         template <class _JsonType, class _Float> struct AssignFromFloatImpl;
         template <class _JsonType, class _String, bool _Moveable> struct AssignFromStringImpl;
 
-        template <class _JsonType, class Iterator>
-        void _AssignFromArrayHelper(_JsonType &c, Iterator first, Iterator last);
+        template <class _JsonType, class _Iterator>
+        void _AssignFromArrayHelper(_JsonType &c, _Iterator first, _Iterator last);
 
-        template <class _JsonType, class Iterator>
-        void _AssignFromMapHelper(_JsonType &c, Iterator first, Iterator last);
+        template <class _JsonType, class _Iterator>
+        void _AssignFromMapHelper(_JsonType &c, _Iterator first, _Iterator last);
 
         // AsImpl
         template <class _JsonType, class _TargetType> struct AsImpl {
@@ -618,11 +620,11 @@ namespace jw {
         template <class, class> friend struct __cpp_basic_json_impl::AssignFromFloatImpl;
         template <class, class, bool> friend struct __cpp_basic_json_impl::AssignFromStringImpl;
 
-        template <class _JsonType, class Iterator>
-        friend void __cpp_basic_json_impl::_AssignFromArrayHelper(_JsonType &c, Iterator first, Iterator last);
+        template <class _JsonType, class _Iterator>
+        friend void __cpp_basic_json_impl::_AssignFromArrayHelper(_JsonType &c, _Iterator first, _Iterator last);
 
-        template <class _JsonType, class Iterator>
-        friend void __cpp_basic_json_impl::_AssignFromMapHelper(_JsonType &c, Iterator first, Iterator last);
+        template <class _JsonType, class _Iterator>
+        friend void __cpp_basic_json_impl::_AssignFromMapHelper(_JsonType &c, _Iterator first, _Iterator last);
 
         template <class, class> friend struct __cpp_basic_json_impl::AsImpl;
         template <class, class> friend struct __cpp_basic_json_impl::AsIntegerImpl;
@@ -1259,15 +1261,15 @@ namespace jw {
             std::is_same<std::basic_string<char, _Traits, _Alloc>, typename _JsonType::StringType>::value> { };
 
         // 数组类容器迭代器
-        template <class _JsonType, class Iterator>
-        void _AssignFromArrayHelper(_JsonType &c, Iterator first, Iterator last) {
+        template <class _JsonType, class _Iterator>
+        void _AssignFromArrayHelper(_JsonType &c, _Iterator first, _Iterator last) {
             c._valueType = _JsonType::ValueType::Array;
             c._child = _JsonType::New();
             _JsonType *prev = c._child;
             prev->_next = prev->_prev = prev;
             for (; first != last; ++first) {
                 _JsonType *item = _JsonType::New();
-                AssignImpl<_JsonType, typename std::iterator_traits<Iterator>::value_type>::invoke(*item, *first);
+                AssignImpl<_JsonType, typename std::iterator_traits<_Iterator>::value_type>::invoke(*item, *first);
                 prev->_next = item;
                 item->_prev = prev;
                 item->_next = c._child;
@@ -1310,6 +1312,14 @@ namespace jw {
         struct AssignImpl<_JsonType, std::list<_T, _Alloc> >
             : AssignFromArrayImpl<_JsonType, std::list<_T, _Alloc> > { };
 
+        template <class _JsonType, class _T, class _Alloc>
+        struct AssignImpl<_JsonType, std::forward_list<_T, _Alloc> >
+            : AssignFromArrayImpl<_JsonType, std::forward_list<_T, _Alloc> > { };
+
+        template <class _JsonType, class _T, class _Alloc>
+        struct AssignImpl<_JsonType, std::deque<_T, _Alloc> >
+            : AssignFromArrayImpl<_JsonType, std::deque<_T, _Alloc> > { };
+
         template <class _JsonType, class _T, class _Compare, class _Alloc>
         struct AssignImpl<_JsonType, std::set<_T, _Compare, _Alloc> >
             : AssignFromArrayImpl<_JsonType, std::set<_T, _Compare, _Alloc> > { };
@@ -1327,8 +1337,8 @@ namespace jw {
             : AssignFromArrayImpl<_JsonType, std::unordered_multiset<_T, _Hash, _Pred, _Alloc> > { };
 
         // 键值对类容器迭代器
-        template <class _JsonType, class Iterator>
-        void _AssignFromMapHelper(_JsonType &c, Iterator first, Iterator last) {
+        template <class _JsonType, class _Iterator>
+        void _AssignFromMapHelper(_JsonType &c, _Iterator first, _Iterator last) {
             c._valueType = _JsonType::ValueType::Object;
             c._child = _JsonType::New();
             _JsonType *prev = c._child;
@@ -1336,7 +1346,7 @@ namespace jw {
             for (; first != last; ++first) {
                 _JsonType *item = _JsonType::New();
                 item->_key = _FixString((*first).first);
-                AssignImpl<_JsonType, typename std::iterator_traits<Iterator>::value_type::second_type>::invoke(*item, (*first).second);
+                AssignImpl<_JsonType, typename std::iterator_traits<_Iterator>::value_type::second_type>::invoke(*item, (*first).second);
                 prev->_next = item;
                 item->_prev = prev;
                 item->_next = c._child;
@@ -1578,6 +1588,10 @@ namespace jw {
         template <class _JsonType, class _T, class _Alloc>
         struct AsImpl<_JsonType, std::list<_T, _Alloc> >
             : AsArrayImpl<_JsonType, std::list<_T, _Alloc> > { };
+
+        template <class _JsonType, class _T, class _Alloc>
+        struct AsImpl<_JsonType, std::deque<_T, _Alloc> >
+            : AsArrayImpl<_JsonType, std::deque<_T, _Alloc> > { };
 
         template <class _JsonType, class _T, class _Compare, class _Alloc>
         struct AsImpl<_JsonType, std::set<_T, _Compare, _Alloc> >
