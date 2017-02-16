@@ -513,7 +513,7 @@ namespace jw {
 
         template <class _Unused, class _T, class _Compare, class _Alloc1>
         struct AssignImpl<std::set<_T, _Compare, _Alloc1>, _Unused>
-            : AssignFromImmovableArrayImpl<std::set<_T, _Alloc1> > { };
+            : AssignFromImmovableArrayImpl<std::set<_T, _Compare, _Alloc1> > { };
 
         template <class _Unused, class _T, class _Compare, class _Alloc1>
         struct AssignImpl<std::multiset<_T, _Compare, _Alloc1>, _Unused>

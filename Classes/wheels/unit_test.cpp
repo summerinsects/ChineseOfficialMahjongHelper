@@ -257,8 +257,10 @@ int main(int argc, char *argv[])
 	std::cout << cppJSON(std::vector<int>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })) << std::endl;
 	std::cout << cppJSON(std::list<double>({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })) << std::endl;
     std::cout << cppJSON(std::forward_list<float>({ 1, 2, 3, 4, 5 })) << std::endl;
-    //std::cout << cppJSON(std::set<unsigned>({ '1', '2', '3', '4', '5' })) << std::endl;  // TODO
-    //std::cout << cppJSON(std::multiset<float>({ 1, 2, 3, 4, 5, 1 })) << std::endl;  // TODO
+    std::cout << cppJSON(std::set<unsigned>({ '1', '2', '3', '4', '5' })) << std::endl;  // TODO
+    std::cout << cppJSON(std::multiset<float>({ 1, 2, 3, 4, 5, 1 })) << std::endl;
+    std::cout << cppJSON(std::unordered_set<unsigned>({ '1', '2', '3', '4', '5' })) << std::endl;
+    std::cout << cppJSON(std::unordered_multiset<float>({ 1, 2, 3, 4, 5, 1 })) << std::endl;
     std::cout << cppJSON({1, 2, 3, 4, 5}) << std::endl;
     std::cout << cppJSON(std::deque<unsigned>({ 1, 2, 3, 4, 5, 7 })) << std::endl;
     std::cout << cppJSON(std::array<int, 5>()) << std::endl;
