@@ -460,9 +460,9 @@ namespace jw {
         };
 
         // STL字符串
-        template <class _Unused, class _Traits1, class _Alloc1>
-        struct AssignImpl<std::basic_string<char, _Traits1, _Alloc1>, _Unused>
-            : AssignFromStringImpl<std::basic_string<char, _Traits1, _Alloc1> > { };
+        template <class _Unused, class _Traits, class _Alloc>
+        struct AssignImpl<std::basic_string<char, _Traits, _Alloc>, _Unused>
+            : AssignFromStringImpl<std::basic_string<char, _Traits, _Alloc> > { };
 
         // 传统数组
         template <class _Unused, class _Elem, size_t _Size>
@@ -491,41 +491,41 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _T, class _Alloc1>
-        struct AssignImpl<std::vector<_T, _Alloc1>, _Unused>
-            : AssignFromMoveableArrayImpl<std::vector<_T, _Alloc1> > { };
+        template <class _Unused, class _T, class _Alloc>
+        struct AssignImpl<std::vector<_T, _Alloc>, _Unused>
+            : AssignFromMoveableArrayImpl<std::vector<_T, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc1>
-        struct AssignImpl<std::list<_T, _Alloc1>, _Unused>
-            : AssignFromMoveableArrayImpl<std::list<_T, _Alloc1> > { };
+        template <class _Unused, class _T, class _Alloc>
+        struct AssignImpl<std::list<_T, _Alloc>, _Unused>
+            : AssignFromMoveableArrayImpl<std::list<_T, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc1>
-        struct AssignImpl<std::forward_list<_T, _Alloc1>, _Unused>
-            : AssignFromMoveableArrayImpl<std::forward_list<_T, _Alloc1> > { };
+        template <class _Unused, class _T, class _Alloc>
+        struct AssignImpl<std::forward_list<_T, _Alloc>, _Unused>
+            : AssignFromMoveableArrayImpl<std::forward_list<_T, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc1>
-        struct AssignImpl<std::deque<_T, _Alloc1>, _Unused>
-            : AssignFromMoveableArrayImpl<std::deque<_T, _Alloc1> > { };
+        template <class _Unused, class _T, class _Alloc>
+        struct AssignImpl<std::deque<_T, _Alloc>, _Unused>
+            : AssignFromMoveableArrayImpl<std::deque<_T, _Alloc> > { };
 
         template <class _Unused, class _T, size_t _Size>
         struct AssignImpl<std::array<_T, _Size>, _Unused>
             : AssignFromMoveableArrayImpl<std::array<_T, _Size> > { };
 
-        template <class _Unused, class _T, class _Compare, class _Alloc1>
-        struct AssignImpl<std::set<_T, _Compare, _Alloc1>, _Unused>
-            : AssignFromImmovableArrayImpl<std::set<_T, _Compare, _Alloc1> > { };
+        template <class _Unused, class _T, class _Compare, class _Alloc>
+        struct AssignImpl<std::set<_T, _Compare, _Alloc>, _Unused>
+            : AssignFromImmovableArrayImpl<std::set<_T, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Compare, class _Alloc1>
-        struct AssignImpl<std::multiset<_T, _Compare, _Alloc1>, _Unused>
-            : AssignFromImmovableArrayImpl<std::multiset<_T, _Compare, _Alloc1> > { };
+        template <class _Unused, class _T, class _Compare, class _Alloc>
+        struct AssignImpl<std::multiset<_T, _Compare, _Alloc>, _Unused>
+            : AssignFromImmovableArrayImpl<std::multiset<_T, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc1>
-        struct AssignImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc1>, _Unused>
-            : AssignFromImmovableArrayImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc1> > { };
+        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc>, _Unused>
+            : AssignFromImmovableArrayImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc1>
-        struct AssignImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc1>, _Unused>
-            : AssignFromImmovableArrayImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc1> > { };
+        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc>, _Unused>
+            : AssignFromImmovableArrayImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc> > { };
 
         // 键值对类容器
         template <class _Map>
@@ -543,21 +543,21 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _Key, class _Value, class _Compare, class _Alloc1>
-        struct AssignImpl<std::map<_Key, _Value, _Compare, _Alloc1>, _Unused>
-            : AssignFromMapImpl<std::map<_Key, _Value, _Compare, _Alloc1>> { };
+        template <class _Unused, class _Key, class _Value, class _Compare, class _Alloc>
+        struct AssignImpl<std::map<_Key, _Value, _Compare, _Alloc>, _Unused>
+            : AssignFromMapImpl<std::map<_Key, _Value, _Compare, _Alloc>> { };
 
-        template <class _Unused, class _Key, class _Value, class _Compare, class _Alloc1>
-        struct AssignImpl<std::multimap<_Key, _Value, _Compare, _Alloc1>, _Unused >
-            : AssignFromMapImpl<std::multimap<_Key, _Value, _Compare, _Alloc1> > { };
+        template <class _Unused, class _Key, class _Value, class _Compare, class _Alloc>
+        struct AssignImpl<std::multimap<_Key, _Value, _Compare, _Alloc>, _Unused >
+            : AssignFromMapImpl<std::multimap<_Key, _Value, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _Key, class _Value, class _Hash, class _Pred, class _Alloc1>
-        struct AssignImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc1>, _Unused>
-            : AssignFromMapImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc1> > { };
+        template <class _Unused, class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc>, _Unused>
+            : AssignFromMapImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _Key, class _Value, class _Hash, class _Pred, class _Alloc1>
-        struct AssignImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc1>, _Unused>
-            : AssignFromMapImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc1> > { };
+        template <class _Unused, class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc>, _Unused>
+            : AssignFromMapImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc> > { };
 
         // C++11初始化列表
         template <class _Unused, class _T>
@@ -767,9 +767,9 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _Char, class _Traits1, class _Alloc1>
-        struct AsImpl<std::basic_string<_Char, _Traits1, _Alloc1>, _Unused>
-            : AsStringImpl<std::basic_string<_Char, _Traits1, _Alloc1> > { };
+        template <class _Unused, class _Char, class _Traits, class _Alloc>
+        struct AsImpl<std::basic_string<_Char, _Traits, _Alloc>, _Unused>
+            : AsStringImpl<std::basic_string<_Char, _Traits, _Alloc> > { };
 
         // AS成数组类容器
         template <class _Array> struct AsArrayImpl {
@@ -778,33 +778,33 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _T, class _Alloc1>
-        struct AsImpl<std::vector<_T, _Alloc1>, _Unused>
-            : AsArrayImpl<std::vector<_T, _Alloc1> > { };
+        template <class _Unused, class _T, class _Alloc>
+        struct AsImpl<std::vector<_T, _Alloc>, _Unused>
+            : AsArrayImpl<std::vector<_T, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc1>
-        struct AsImpl<std::list<_T, _Alloc1>, _Unused>
-            : AsArrayImpl<std::list<_T, _Alloc1> > { };
+        template <class _Unused, class _T, class _Alloc>
+        struct AsImpl<std::list<_T, _Alloc>, _Unused>
+            : AsArrayImpl<std::list<_T, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Alloc1>
-        struct AsImpl<std::deque<_T, _Alloc1>, _Unused>
-            : AsArrayImpl<std::deque<_T, _Alloc1> > { };
+        template <class _Unused, class _T, class _Alloc>
+        struct AsImpl<std::deque<_T, _Alloc>, _Unused>
+            : AsArrayImpl<std::deque<_T, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Compare, class _Alloc1>
-        struct AsImpl<std::set<_T, _Compare, _Alloc1>, _Unused>
-            : AsArrayImpl<std::set<_T, _Compare, _Alloc1> > { };
+        template <class _Unused, class _T, class _Compare, class _Alloc>
+        struct AsImpl<std::set<_T, _Compare, _Alloc>, _Unused>
+            : AsArrayImpl<std::set<_T, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Compare, class _Alloc1>
-        struct AsImpl<std::multiset<_T, _Compare, _Alloc1>, _Unused>
-            : AsArrayImpl<std::multiset<_T, _Compare, _Alloc1> > { };
+        template <class _Unused, class _T, class _Compare, class _Alloc>
+        struct AsImpl<std::multiset<_T, _Compare, _Alloc>, _Unused>
+            : AsArrayImpl<std::multiset<_T, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc1>
-        struct AsImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc1>, _Unused>
-            : AsArrayImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc1> > { };
+        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc>, _Unused>
+            : AsArrayImpl<std::unordered_set<_T, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc1>
-        struct AsImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc1>, _Unused>
-            : AsArrayImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc1> > { };
+        template <class _Unused, class _T, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc>, _Unused>
+            : AsArrayImpl<std::unordered_multiset<_T, _Hash, _Pred, _Alloc> > { };
 
         // AS成键值对类容器
         template <class _Map> struct AsMapImpl {
@@ -813,21 +813,21 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _String, class _Val, class _Compare, class _Alloc1>
-        struct AsImpl<std::map<_String, _Val, _Compare, _Alloc1>, _Unused>
-            : AsMapImpl<std::map<_String, _Val, _Compare, _Alloc1> > { };
+        template <class _Unused, class _String, class _Val, class _Compare, class _Alloc>
+        struct AsImpl<std::map<_String, _Val, _Compare, _Alloc>, _Unused>
+            : AsMapImpl<std::map<_String, _Val, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _String, class _Val, class _Compare, class _Alloc1>
-        struct AsImpl<std::multimap<_String, _Val, _Compare, _Alloc1>, _Unused>
-            : AsMapImpl<std::multimap<_String, _Val, _Compare, _Alloc1> > { };
+        template <class _Unused, class _String, class _Val, class _Compare, class _Alloc>
+        struct AsImpl<std::multimap<_String, _Val, _Compare, _Alloc>, _Unused>
+            : AsMapImpl<std::multimap<_String, _Val, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _String, class _Val, class _Hash, class _Pred, class _Alloc1>
-        struct AsImpl<std::unordered_map<_String, _Val, _Hash, _Pred, _Alloc1>, _Unused>
-            : AsMapImpl<std::unordered_map<_String, _Val, _Hash, _Pred, _Alloc1> > { };
+        template <class _Unused, class _String, class _Val, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_map<_String, _Val, _Hash, _Pred, _Alloc>, _Unused>
+            : AsMapImpl<std::unordered_map<_String, _Val, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _String, class _Val, class _Hash, class _Pred, class _Alloc1>
-        struct AsImpl<std::unordered_multimap<_String, _Val, _Hash, _Pred, _Alloc1>, _Unused>
-            : AsMapImpl<std::unordered_multimap<_String, _Val, _Hash, _Pred, _Alloc1> > { };
+        template <class _Unused, class _String, class _Val, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_multimap<_String, _Val, _Hash, _Pred, _Alloc>, _Unused>
+            : AsMapImpl<std::unordered_multimap<_String, _Val, _Hash, _Pred, _Alloc> > { };
 
     public:
         // 迭代器相关
