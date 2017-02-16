@@ -192,10 +192,10 @@ namespace jw {
         pointer _child;  // An array or object item will have a child pointer pointing to a chain of the items in the array/object.
         pointer _next;  // next/prev allow you to walk array/object chains.
         pointer _prev;
+        size_t _count;  // 结点数
 
         // 原本cJSON的实现是用的双向非循环键表，
-        // 这里为了实现迭代器，增加一个头结点，用_child指向它，将头结点的_valueint用来表示链表结点数，
-        // 改成了循环键表
+        // 这里为了实现迭代器，改成了循环键表，_child改为指向头结点，非第一个元素的结点
 
     private:
         inline void reset() {
@@ -208,6 +208,7 @@ namespace jw {
             _child = nullptr;
             _next = nullptr;
             _prev = nullptr;
+            _count = 0;
         }
 
     public:
@@ -297,6 +298,7 @@ namespace jw {
             _child = other._child;
             _next = other._next;
             _prev = other._prev;
+            _count = other._count;
 
             other.reset();
         }
@@ -326,6 +328,7 @@ namespace jw {
             _child = other._child;
             _next = other._next;
             _prev = other._prev;
+            _count = other._count;
 
             other.reset();
             return *this;
@@ -357,11 +360,11 @@ namespace jw {
             return (_child->_next == _child);
         }
 
-        typename std::make_unsigned<IntegerType>::type size() const {
+        size_t size() const {
             if (_type != ValueType::Array && _type != ValueType::Object) {
                 throw std::logic_error("Only Array and Object support function size!");
             }
-            return static_cast<typename std::make_unsigned<IntegerType>::type>(_child->_valueint);
+            return _count;
         }
 
     private:
@@ -380,7 +383,7 @@ namespace jw {
                 item->_prev = prev;
                 item->_next = this->_child;
                 this->_child->_prev = item;
-                ++this->_child->_valueint;
+                ++this->_count;
                 prev = item;
             }
         }
@@ -400,7 +403,7 @@ namespace jw {
                 item->_prev = prev;
                 item->_next = this->_child;
                 this->_child->_prev = item;
-                ++this->_child->_valueint;
+                ++this->_count;
                 prev = item;
             }
         }
@@ -1015,7 +1018,7 @@ namespace jw {
             item->_prev = ptr->_prev;
             item->_next = ptr;  // 连接item和ptr的后继
             ptr->_prev = item;
-            ++_child->_valueint;
+            ++_count;
             return iterator(item);
         }
 
@@ -1040,7 +1043,7 @@ namespace jw {
             item->_prev = ptr->_prev;
             item->_next = ptr;  // 连接item和ptr的后继
             ptr->_prev = item;
-            ++_child->_valueint;
+            ++_count;
             return std::make_pair(iterator(item), true);
         }
 
@@ -1051,7 +1054,7 @@ namespace jw {
             ptr->_prev = nullptr;
             ptr->_next = nullptr;  // 设置为nullptr防止将后继结点都释放了
             cJSON_Delete(ptr);
-            --_child->_valueint;
+            --_count;
             return ret;
         }
 
@@ -1226,7 +1229,7 @@ namespace jw {
             if (value == nullptr) return nullptr;
             child->_next = this->_child;
             child->_prev = this->_child;
-            ++this->_child->_valueint;
+            ++_count;
 
             while (*value == ',') {
                 pointer new_item = cJSON_New_Item();
@@ -1236,7 +1239,7 @@ namespace jw {
                 if (value == nullptr) return nullptr; // memory fail
                 new_item->_next = this->_child;
                 this->_child->_prev = new_item;
-                ++this->_child->_valueint;
+                ++_count;
             }
 
             if (*value == ']') return value + 1;    // end of array
@@ -1265,7 +1268,7 @@ namespace jw {
             if (value == nullptr) return nullptr;
             child->_next = this->_child;
             child->_prev = this->_child;
-            ++this->_child->_valueint;
+            ++_count;
 
             while (*value == ',') {
                 pointer new_item = cJSON_New_Item();
@@ -1280,7 +1283,7 @@ namespace jw {
                 if (value == nullptr) return nullptr;
                 new_item->_next = this->_child;
                 this->_child->_prev = new_item;
-                ++this->_child->_valueint;
+                ++_count;
             }
 
             if (*value == '}') return value + 1;    // end of array
@@ -1367,10 +1370,10 @@ namespace jw {
         }
 
         template <class _CharSequence> void print_array(_CharSequence &ret, int depth, bool fmt) const {
-            size_t numentries = static_cast<size_t>(_child->_valueint);
+            size_t numentries = _count;
 
             // Explicitly handle empty object case
-            if (_child->_valueint == 0) {
+            if (_count == 0) {
                 _AppendString(ret, "[]");
                 return;
             }
@@ -1387,7 +1390,7 @@ namespace jw {
         }
 
         template <class _CharSequence> void print_object(_CharSequence &ret, int depth, bool fmt) const {
-            size_t numentries = static_cast<size_t>(_child->_valueint);
+            size_t numentries = _count;
 
             // Explicitly handle empty object case
             if (numentries == 0) {
@@ -1424,6 +1427,7 @@ namespace jw {
             newitem._keystring = item._keystring;
             // If non-recursive, then we're done!
             if (!recurse) return true;
+            newitem._count = item._count;
             // Walk the ->next chain for the child.
             if (item._child != nullptr) {
                 newitem._child = cJSON_New_Item();
