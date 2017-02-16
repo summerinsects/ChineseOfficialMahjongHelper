@@ -296,10 +296,10 @@ namespace jw {
         inline void AssignFromArrayIterator(_Iterator first, _Iterator last) {
             this->_valueType = ValueType::Array;
             this->_child = New();
-            auto *prev = this->_child;
+            BasicJSON *prev = this->_child;
             prev->_next = prev->_prev = prev;
             for (; first != last; ++first) {
-                auto *item = New();
+                BasicJSON *item = New();
                 AssignImpl<typename std::iterator_traits<_Iterator>::value_type, void>::invoke(*item, *first);
                 prev->_next = item;
                 item->_prev = prev;
@@ -315,10 +315,10 @@ namespace jw {
         void AssignFromMapIterator(_Iterator first, _Iterator last) {
             this->_valueType = ValueType::Object;
             this->_child = New();
-            auto *prev = this->_child;
+            BasicJSON *prev = this->_child;
             prev->_next = prev->_prev = prev;
             for (; first != last; ++first) {
-                auto *item = New();
+                BasicJSON *item = New();
                 item->_key = __cpp_basic_json_impl::_FixString((*first).first);
                 AssignImpl<typename std::iterator_traits<_Iterator>::value_type::second_type, void>::invoke(*item, (*first).second);
                 prev->_next = item;
