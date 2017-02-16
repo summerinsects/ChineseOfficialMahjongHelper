@@ -218,17 +218,18 @@ namespace jw {
 
         ValueType GetValueType() const { return _type; }
         const StringType &key() const { return _keystring; }
+        const char *GetErrorPtr() const { return _errorptr; }
 
         inline bool Parse(const char *src) { return ParseWithOpts(src, nullptr, false); }
 
         bool ParseWithOpts(const char *src, const char **return_parse_end, bool require_null_terminated) {
             clear();
             const char *end = parse_value(skip(src));
-            ep = nullptr;
+            _errorptr = nullptr;
             if (end == nullptr) return false;
 
             // if we require null-terminated JSON without appended garbage, skip and then check for a null terminator
-            if (require_null_terminated) { end = skip(end); if (*end) { ep = end; return 0; } }
+            if (require_null_terminated) { end = skip(end); if (*end) { _errorptr = end; return 0; } }
             if (return_parse_end) *return_parse_end = end;
             return true;
         }
@@ -990,7 +991,7 @@ namespace jw {
         }
 
     private:
-        const char *ep = nullptr;
+        const char *_errorptr = nullptr;
         //typename _Allocator::template rebind<JsonType>::other _allocator;
 
 		bool _RangeCheck(const_pointer ptr) const {
@@ -1101,7 +1102,7 @@ namespace jw {
             if (*value == '[') { return parse_array(value); }
             if (*value == '{') { return parse_object(value); }
 
-            ep = value; return nullptr; // failure.
+            _errorptr = value; return nullptr; // failure.
         }
 
         static unsigned parse_hex4(const char *str) {
@@ -1131,7 +1132,7 @@ namespace jw {
         const char *parse_string(const char *str) {
             static const unsigned char firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
             const char *ptr = str + 1; int len = 0; unsigned uc, uc2;
-            if (*str != '\"') { ep = str; return 0; }   // not a string!
+            if (*str != '\"') { _errorptr = str; return 0; }   // not a string!
 
             while (*ptr != '\"' && *ptr && ++len) if (*ptr++ == '\\') ++ptr;    // Skip escaped quotes.
 
@@ -1215,7 +1216,7 @@ namespace jw {
 
         const char *parse_array(const char *value) {
             pointer child;
-            if (*value != '[')  { ep = value; return nullptr; } // not an array!
+            if (*value != '[')  { _errorptr = value; return nullptr; } // not an array!
 
             value = skip(value + 1);
             if (*value == ']') return value + 1;    // empty array.
@@ -1243,12 +1244,12 @@ namespace jw {
             }
 
             if (*value == ']') return value + 1;    // end of array
-            ep = value; return nullptr; // malformed.
+            _errorptr = value; return nullptr; // malformed.
         }
 
         // Build an object from the text.
         const char *parse_object(const char *value) {
-            if (*value != '{')  { ep = value; return nullptr; } // not an object!
+            if (*value != '{')  { _errorptr = value; return nullptr; } // not an object!
 
             value = skip(value + 1);
             if (*value == '}') return value + 1;    // empty array.
@@ -1263,7 +1264,7 @@ namespace jw {
             child->_type = ValueType::Null;
             if (value == nullptr) return nullptr;
             child->_keystring = std::move(child->_valuestring); child->_valuestring.clear();
-            if (*value != ':') { ep = value; return nullptr; }  // fail!
+            if (*value != ':') { _errorptr = value; return nullptr; }  // fail!
             value = skip(child->parse_value(skip(value + 1)));  // skip any spacing, get the value.
             if (value == nullptr) return nullptr;
             child->_next = this->_child;
@@ -1278,7 +1279,7 @@ namespace jw {
                 child->_type = ValueType::Null;
                 if (value == nullptr) return nullptr;
                 child->_keystring = std::move(child->_valuestring); child->_valuestring.clear();
-                if (*value != ':') { ep = value; return nullptr; }  // fail!
+                if (*value != ':') { _errorptr = value; return nullptr; }  // fail!
                 value = skip(child->parse_value(skip(value + 1)));  // skip any spacing, get the value.
                 if (value == nullptr) return nullptr;
                 new_item->_next = this->_child;
@@ -1287,7 +1288,7 @@ namespace jw {
             }
 
             if (*value == '}') return value + 1;    // end of array
-            ep = value; return nullptr; // malformed.
+            _errorptr = value; return nullptr; // malformed.
         }
 
         template <class _CharSequence>
