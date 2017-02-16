@@ -108,8 +108,7 @@ namespace jw {
         template <class _Elem, size_t _Size>
         struct _IsCArrayImpl<_Elem [_Size]> : std::true_type { };
 
-        template <class _Tp>
-        struct _IsCArray
+        template <class _Tp> struct _IsCArray
             : _IsCArrayImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
         // _IsSequential
@@ -127,39 +126,36 @@ namespace jw {
         template <class _Tp>
         struct _IsSequentialImpl<std::initializer_list<_Tp> > : std::true_type { };
 
-        template <class _Tp>
-        struct _IsSequential
+        template <class _Tp> struct _IsSequential
             : _IsSequentialImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
         // _IsSet
-        template <class _Tp> struct _IsSet : std::false_type { };
-
+        template <class _Tp> struct _IsSetImpl : std::false_type { };
         template <class _Tp, class _Compare, class _Alloc>
-        struct _IsSet<std::set<_Tp, _Compare, _Alloc> > : std::true_type { };
-
+        struct _IsSetImpl<std::set<_Tp, _Compare, _Alloc> > : std::true_type { };
         template <class _Tp, class _Compare, class _Alloc>
-        struct _IsSet<std::multiset<_Tp, _Compare, _Alloc> > : std::true_type { };
-
+        struct _IsSetImpl<std::multiset<_Tp, _Compare, _Alloc> > : std::true_type { };
         template <class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct _IsSet<std::unordered_set<_Tp, _Hash, _Pred, _Alloc> > : std::true_type { };
-
+        struct _IsSetImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc> > : std::true_type { };
         template <class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct _IsSet<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc> > : std::true_type { };
+        struct _IsSetImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc> > : std::true_type { };
+
+        template <class _Tp> struct _IsSet
+            : _IsSetImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
         // _IsMap
-        template <class _Tp> struct _IsMap : std::false_type { };
-
+        template <class _Tp> struct _IsMapImpl : std::false_type { };
         template <class _Key, class _Value, class _Compare, class _Alloc>
-        struct _IsMap<std::map<_Key, _Value, _Compare, _Alloc> > : std::true_type { };
-
+        struct _IsMapImpl<std::map<_Key, _Value, _Compare, _Alloc> > : std::true_type { };
         template <class _Key, class _Value, class _Compare, class _Alloc>
-        struct _IsMap<std::multimap<_Key, _Value, _Compare, _Alloc> > : std::true_type { };
-
+        struct _IsMapImpl<std::multimap<_Key, _Value, _Compare, _Alloc> > : std::true_type { };
         template <class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct _IsMap<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc> > : std::true_type { };
-
+        struct _IsMapImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc> > : std::true_type { };
         template <class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct _IsMap<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc> > : std::true_type { };
+        struct _IsMapImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc> > : std::true_type { };
+
+        template <class _Tp> struct _IsMap
+            : _IsMapImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
     }
 
     template <class _Integer, class _Float, class _CharTraits, class _Allocator>
