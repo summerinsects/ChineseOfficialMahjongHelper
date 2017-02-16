@@ -85,6 +85,96 @@ namespace jw {
         static inline const char *_FixString(const std::basic_string<char, _CharTraits, _Allocator> &str) {
             return str.c_str();
         }
+
+        // _IsCString
+        template <class _Tp> struct _IsCString : std::false_type { };
+        template <size_t _Size> struct _IsCString<char [_Size]> : std::true_type { };
+        template <size_t _Size> struct _IsCString<const char [_Size]> : std::true_type { };
+        template <size_t _Size> struct _IsCString<char (&)[_Size]> : std::true_type { };
+        template <size_t _Size> struct _IsCString<const char (&)[_Size]> : std::true_type { };
+        template <> struct _IsCString<char *> : std::true_type { };
+        template <> struct _IsCString<const char *> : std::true_type { };
+        template <> struct _IsCString<const char *const> : std::true_type { };
+
+        // _IsSTLString
+        template <class _Tp> struct _IsSTLString : std::false_type { };
+        template <class _CharTraits, class _Allocator>
+        struct _IsSTLString<std::basic_string<char, _CharTraits, _Allocator> > : std::true_type { };
+
+        template <class _CharTraits, class _Allocator>
+        struct _IsSTLString<std::basic_string<char, _CharTraits, _Allocator> &> : std::true_type { };
+
+        template <class _CharTraits, class _Allocator>
+        struct _IsSTLString<const std::basic_string<char, _CharTraits, _Allocator> &> : std::true_type { };
+
+        template <class _CharTraits, class _Allocator>
+        struct _IsSTLString<std::basic_string<char, _CharTraits, _Allocator> &&> : std::true_type { };
+
+        // _IsCArray
+        template <class _Tp> struct _IsCArray : std::false_type { };
+
+        template <class _Elem, size_t _Size>
+        struct _IsCArray<_Elem [_Size]> : std::true_type { };
+
+        template <class _Elem, size_t _Size>
+        struct _IsCArray<const _Elem [_Size]> : std::true_type { };
+
+        template <class _Elem, size_t _Size>
+        struct _IsCArray<_Elem (&)[_Size]> : std::true_type { };
+
+        template <class _Elem, size_t _Size>
+        struct _IsCArray<const _Elem (&)[_Size]> : std::true_type { };
+
+        // _IsElemModifiableContainer
+        template <class _Tp> struct _IsElemModifiableContainer : std::false_type { };
+
+        template <class _Tp, class _Alloc>
+        struct _IsElemModifiableContainer<std::vector<_Tp, _Alloc> > : std::true_type { };
+
+        template <class _Tp, class _Alloc>
+        struct _IsElemModifiableContainer<std::list<_Tp, _Alloc> > : std::true_type { };
+
+        template <class _Tp, class _Alloc>
+        struct _IsElemModifiableContainer<std::forward_list<_Tp, _Alloc> > : std::true_type { };
+
+        template <class _Tp, class _Alloc>
+        struct _IsElemModifiableContainer<std::deque<_Tp, _Alloc> > : std::true_type { };
+
+        template <class _Tp, size_t _Size>
+        struct _IsElemModifiableContainer<std::array<_Tp, _Size> > : std::true_type { };
+
+        template <class _Tp>
+        struct _IsElemModifiableContainer<std::initializer_list<_Tp> > : std::true_type { };
+
+        // _IsSet
+        template <class _Tp> struct _IsSet : std::false_type { };
+
+        template <class _Tp, class _Compare, class _Alloc>
+        struct _IsSet<std::set<_Tp, _Compare, _Alloc> > : std::true_type { };
+
+        template <class _Tp, class _Compare, class _Alloc>
+        struct _IsSet<std::multiset<_Tp, _Compare, _Alloc> > : std::true_type { };
+
+        template <class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct _IsSet<std::unordered_set<_Tp, _Hash, _Pred, _Alloc> > : std::true_type { };
+
+        template <class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct _IsSet<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc> > : std::true_type { };
+
+        // _IsMap
+        template <class _Tp> struct _IsMap : std::false_type { };
+
+        template <class _Key, class _Value, class _Compare, class _Alloc>
+        struct _IsMap<std::map<_Key, _Value, _Compare, _Alloc> > : std::true_type { };
+
+        template <class _Key, class _Value, class _Compare, class _Alloc>
+        struct _IsMap<std::multimap<_Key, _Value, _Compare, _Alloc> > : std::true_type { };
+
+        template <class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct _IsMap<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc> > : std::true_type { };
+
+        template <class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct _IsMap<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc> > : std::true_type { };
     }
 
     template <class _Integer, class _Float, class _CharTraits, class _Allocator>
@@ -194,19 +284,19 @@ namespace jw {
         template <class _Tp>
         explicit BasicJSON(_Tp &&val) {
             reset();
-            AssignImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type, void>::invoke(*this, std::forward<_Tp>(val));
+            Assign<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type>(std::forward<_Tp>(val));
         }
 
         template <class _Tp>
         explicit BasicJSON(const std::initializer_list<_Tp> &il) {
             reset();
-            AssignImpl<std::initializer_list<_Tp>, void>::invoke(*this, il);
+            Assign<std::initializer_list<_Tp> >(il);
         }
 
         template <class _Tp>
         explicit BasicJSON(std::initializer_list<_Tp> &&il) {
             reset();
-            AssignImpl<std::initializer_list<_Tp>, void>::invoke(*this, il);
+            Assign<std::initializer_list<_Tp> >(il);
         }
 
         // 复制构造
@@ -272,7 +362,7 @@ namespace jw {
 
         // as
         template <class _Tp> _Tp as() const {
-            return AsImpl<_Tp, void>::invoke(*this);
+            return As<_Tp>();
         }
 
         bool empty() const {
@@ -300,7 +390,7 @@ namespace jw {
             prev->_next = prev->_prev = prev;
             for (; first != last; ++first) {
                 BasicJSON *item = New();
-                AssignImpl<typename std::iterator_traits<_Iterator>::value_type, void>::invoke(*item, *first);
+                item->Assign<typename std::iterator_traits<_Iterator>::value_type>(*first);
                 prev->_next = item;
                 item->_prev = prev;
                 item->_next = this->_child;
@@ -320,7 +410,7 @@ namespace jw {
             for (; first != last; ++first) {
                 BasicJSON *item = New();
                 item->_key = __cpp_basic_json_impl::_FixString((*first).first);
-                AssignImpl<typename std::iterator_traits<_Iterator>::value_type::second_type, void>::invoke(*item, (*first).second);
+                item->Assign<typename std::iterator_traits<_Iterator>::value_type::second_type>((*first).second);
                 prev->_next = item;
                 item->_prev = prev;
                 item->_next = this->_child;
@@ -330,242 +420,133 @@ namespace jw {
             }
         }
 
-        // Assign的实现类，这里内部类貌似无法全特化，所以加了个_Dummy模板参数，使之变为偏特化
-        template <class _SourceType, class _Dummy>
-        struct AssignImpl;
-
         // 自己
-        template <class _Dummy>
-        struct AssignImpl<JsonType, _Dummy> {
-            static inline void invoke(JsonType &ref, const JsonType &arg) {
-                Duplicate(ref, arg, true);
-            }
-        };
+        template <class _Tp>
+        void Assign(const typename std::enable_if<std::is_same<BasicJSON, _Tp>::value, _Tp>::type &arg) {
+            Duplicate(*this, arg, true);
+        }
+
+        template <class _Tp>
+        void Assign(typename std::enable_if<std::is_same<BasicJSON, _Tp>::value, _Tp>::type &&arg) {
+            //TODO swap
+            *this = std::move(arg);
+        }
 
         // nullptr
-        template <class _Dummy>
-        struct AssignImpl<std::nullptr_t, _Dummy> {
-            static inline void invoke(JsonType &ref, std::nullptr_t) {
-                ref.AssignFromNull();
-            }
-        };
+        template <class _Tp>
+        void Assign(typename std::enable_if<std::is_same<std::nullptr_t, _Tp>::value, _Tp>::type arg) {
+            _valueType = ValueType::Null;
+        }
 
         // bool
-        template <class _Dummy>
-        struct AssignImpl<bool, _Dummy> {
-            static inline void invoke(JsonType &ref, bool arg) {
-                ref._valueType = arg ? ValueType::True : ValueType::False;
-            }
-        };
+        template <class _Tp>
+        void Assign(typename std::enable_if<std::is_same<_Tp, bool>::value, _Tp>::type arg) {
+            _valueType = arg ? ValueType::True : ValueType::False;
+        }
 
         // 整数
-        template <class _Int>
-        struct AssignFromIntegerImpl {
-            static inline void invoke(JsonType &ref, _Int arg) {
-                ref._valueType = ValueType::Integer;
-                ref._valueInt = static_cast<IntegerType>(arg);
-            }
-        };
-
-        template <class _Dummy>
-        struct AssignImpl<char, _Dummy> : AssignFromIntegerImpl<char> { };
-
-        template <class _Dummy>
-        struct AssignImpl<signed char, _Dummy> : AssignFromIntegerImpl<signed char> { };
-
-        template <class _Dummy>
-        struct AssignImpl<unsigned char, _Dummy> : AssignFromIntegerImpl<unsigned char> { };
-
-        template <class _Dummy>
-        struct AssignImpl<short, _Dummy> : AssignFromIntegerImpl<short> { };
-
-        template <class _Dummy>
-        struct AssignImpl<unsigned short, _Dummy> : AssignFromIntegerImpl<unsigned short> { };
-
-        template <class _Dummy>
-        struct AssignImpl<int, _Dummy> : AssignFromIntegerImpl<int> { };
-
-        template <class _Dummy>
-        struct AssignImpl<unsigned, _Dummy> : AssignFromIntegerImpl<unsigned> { };
-
-        template <class _Dummy>
-        struct AssignImpl<long, _Dummy> : AssignFromIntegerImpl<long> { };
-
-        template <class _Dummy>
-        struct AssignImpl<unsigned long, _Dummy> : AssignFromIntegerImpl<unsigned long> { };
-
-        template <class _Dummy>
-        struct AssignImpl<int64_t, _Dummy> : AssignFromIntegerImpl<int64_t> { };
-
-        template <class _Dummy>
-        struct AssignImpl<uint64_t, _Dummy> : AssignFromIntegerImpl<uint64_t> { };
+        template <class _Tp>
+        void Assign(typename std::enable_if<std::is_integral<_Tp>::value
+            && !std::is_same<_Tp, bool>::value, _Tp>::type arg) {
+            _valueType = ValueType::Integer;
+            _valueInt = static_cast<IntegerType>(arg);
+        }
 
         // 枚举
-        template <class _Tp, class = typename std::enable_if<std::is_enum<_Tp>::value>::type>
-        struct AssignFromEnumImpl {
-            static inline void invoke(JsonType &ref, _Tp arg) {
-                ref._valueType = ValueType::Integer;
-                ref._valueInt = static_cast<IntegerType>(arg);
-            }
-        };
-
-        template <class _SourceType, class _Dummy>
-        struct AssignImpl : AssignFromEnumImpl<_SourceType> { };
+        template <class _Tp>
+        void Assign(typename std::enable_if<std::is_enum<_Tp>::value, _Tp>::type arg) {
+            _valueType = ValueType::Integer;
+            _valueInt = static_cast<IntegerType>(arg);
+        }
 
         // 浮点数
-        template <class _Flt>
-        struct AssignFromFloatImpl {
-            static inline void invoke(JsonType &ref, _Flt arg) {
-                ref._valueType = ValueType::Float;
-                ref._valueFloat = static_cast<FloatType>(arg);
-            }
-        };
-
-        template <class _Dummy>
-        struct AssignImpl<float, _Dummy> : AssignFromFloatImpl<float> { };
-
-        template <class _Dummy>
-        struct AssignImpl<double, _Dummy> : AssignFromFloatImpl<double> { };
-
-        //template <class _Dummy>
-        //struct AssignImpl<long double, _Dummy> : AssignFromFloatImpl<long double> { };
+        template <class _Tp>
+        void Assign(typename std::enable_if<std::is_floating_point<_Tp>::value, _Tp>::type arg) {
+            _valueType = ValueType::Float;
+            _valueFloat = static_cast<FloatType>(arg);
+        }
 
         // 字符串
-        template <class _Str>
-        struct AssignFromStringImpl {
-            static inline void invoke(JsonType &ref, const _Str &arg) {
-                ref._valueType = ValueType::String;
-                ref._valueString = __cpp_basic_json_impl::_FixString(arg);
-            }
+        template <class _Tp>
+        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsCString<_Tp>::value, _Tp>::type &arg) {
+            _valueType = ValueType::String;
+            _valueString = __cpp_basic_json_impl::_FixString(arg);
+        }
+
+        template <class _Tp>
+        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsSTLString<_Tp>::value, _Tp>::type &arg) {
+            _valueType = ValueType::String;
+            _valueString = __cpp_basic_json_impl::_FixString(arg);
+        }
+
+        template <class _Tp>
+        void Assign(typename std::enable_if<std::is_same<StringType, _Tp>::value, _Tp>::type &&arg) {
+            _valueType = ValueType::String;
+            _valueString = std::move(arg);
+        }
+
+        // 数组
+        template <class _Tp>
+        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsCArray<_Tp>::value
+            && !__cpp_basic_json_impl::_IsCString<_Tp>::value, _Tp>::type &arg) {
+            AssignFromArrayIterator(std::begin(arg), std::end(arg));
+        }
+
+        template <class _Tp>
+        void Assign(typename std::enable_if<__cpp_basic_json_impl::_IsCArray<_Tp>::value
+            && !__cpp_basic_json_impl::_IsCString<_Tp>::value, _Tp>::type &&arg) {
+            AssignFromArrayIterator(std::make_move_iterator(std::begin(arg)), std::make_move_iterator(std::end(arg)));
+        }
+
+        template <class _Tp>
+        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsElemModifiableContainer<_Tp>::value
+                || __cpp_basic_json_impl::_IsSet<_Tp>::value, _Tp>::type &arg) {
+            AssignFromArrayIterator(std::begin(arg), std::end(arg));
+        }
+
+        template <class _Tp>
+        void Assign(typename std::enable_if<__cpp_basic_json_impl::_IsElemModifiableContainer<_Tp>::value, _Tp>::type &&arg) {
+            AssignFromArrayIterator(std::make_move_iterator(std::begin(arg)), std::make_move_iterator(std::end(arg)));
+        }
+
+        // 键值对
+        template <class _Tp>
+        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsMap<_Tp>::value, _Tp>::type &arg) {
+            AssignFromMapIterator(arg.begin(), arg.end());
+        }
+
+        template <class _Tp>
+        void Assign(typename std::enable_if<__cpp_basic_json_impl::_IsMap<_Tp>::value, _Tp>::type &&arg) {
+            AssignFromMapIterator(std::make_move_iterator(arg.begin()), std::make_move_iterator(arg.end()));
+        }
+
+
+
+        // AS成自己的指针
+        template <class _Tp>
+        typename std::enable_if<std::is_same<const JsonType *, _Tp>::value, _Tp>::type As() const {
+            return this;
         };
 
-        // C风格字符串
-        template <class _Dummy, size_t _Size>
-        struct AssignImpl<char [_Size], _Dummy> : AssignFromStringImpl<char [_Size]> { };
-        template <class _Dummy>
-        struct AssignImpl<char *, _Dummy> : AssignFromStringImpl<char *> { };
-        template <class _Dummy>
-        struct AssignImpl<const char *, _Dummy> : AssignFromStringImpl<const char *> { };
-
-        template <class _Dummy>
-        struct AssignImpl<StringType, _Dummy> {
-            static inline void invoke(JsonType &ref, const StringType &arg) {
-                ref._valueType = ValueType::String;
-                ref._valueString = arg;
-            }
-            static inline void invoke(JsonType &ref, StringType &&arg) {
-                ref._valueType = ValueType::String;
-                ref._valueString = std::move(arg);
-            }
+        template <class _Tp>
+        typename std::enable_if<std::is_same<JsonType *, _Tp>::value, _Tp>::type As() {
+            return this;
         };
 
-        // STL字符串
-        template <class _Dummy, class _Traits, class _Alloc>
-        struct AssignImpl<std::basic_string<char, _Traits, _Alloc>, _Dummy>
-            : AssignFromStringImpl<std::basic_string<char, _Traits, _Alloc> > { };
+        // AS成自己的引用
+        template <class _Tp>
+        typename std::enable_if<std::is_same<const JsonType &, _Tp>::value, _Tp>::type As() const {
+            return *this;
+        }
 
-        // 传统数组
-        template <class _Dummy, class _Elem, size_t _Size>
-        struct AssignImpl<_Elem [_Size], _Dummy> {
-            static void invoke(JsonType &ref, const _Elem (&arg)[_Size]) {
-                ref.AssignFromArrayIterator(std::begin(arg), std::end(arg));
-            }
-            static void invoke(JsonType &ref, _Elem (&&arg)[_Size]) {
-                ref.AssignFromArrayIterator(std::make_move_iterator(std::begin(arg)), std::make_move_iterator(std::end(arg)));
-            }
-        };
+        template <class _Tp>
+        typename std::enable_if<std::is_same<JsonType &, _Tp>::value, _Tp>::type As() {
+            return *this;
+        }
 
-        // 数组类容器
-        template <class _Array>
-        struct AssignFromImmovableArrayImpl {
-            static void invoke(JsonType &ref, const _Array &arg) {
-                ref.AssignFromArrayIterator(arg.begin(), arg.end());
-            }
-        };
-
-        template <class _Array>
-        struct AssignFromMoveableArrayImpl : AssignFromImmovableArrayImpl<_Array> {
-            using AssignFromImmovableArrayImpl<_Array>::invoke;
-            static void invoke(JsonType &ref, _Array &&arg) {
-                ref.AssignFromArrayIterator(std::make_move_iterator(arg.begin()), std::make_move_iterator(arg.end()));
-            }
-        };
-
-        template <class _Dummy, class _Tp, class _Alloc>
-        struct AssignImpl<std::vector<_Tp, _Alloc>, _Dummy>
-            : AssignFromMoveableArrayImpl<std::vector<_Tp, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Alloc>
-        struct AssignImpl<std::list<_Tp, _Alloc>, _Dummy>
-            : AssignFromMoveableArrayImpl<std::list<_Tp, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Alloc>
-        struct AssignImpl<std::forward_list<_Tp, _Alloc>, _Dummy>
-            : AssignFromMoveableArrayImpl<std::forward_list<_Tp, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Alloc>
-        struct AssignImpl<std::deque<_Tp, _Alloc>, _Dummy>
-            : AssignFromMoveableArrayImpl<std::deque<_Tp, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, size_t _Size>
-        struct AssignImpl<std::array<_Tp, _Size>, _Dummy>
-            : AssignFromMoveableArrayImpl<std::array<_Tp, _Size> > { };
-
-        template <class _Dummy, class _Tp, class _Compare, class _Alloc>
-        struct AssignImpl<std::set<_Tp, _Compare, _Alloc>, _Dummy>
-            : AssignFromImmovableArrayImpl<std::set<_Tp, _Compare, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Compare, class _Alloc>
-        struct AssignImpl<std::multiset<_Tp, _Compare, _Alloc>, _Dummy>
-            : AssignFromImmovableArrayImpl<std::multiset<_Tp, _Compare, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc>, _Dummy>
-            : AssignFromImmovableArrayImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc>, _Dummy>
-            : AssignFromImmovableArrayImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc> > { };
-
-        // 键值对类容器
-        template <class _Map>
-        struct AssignFromMapImpl {
-            static void invoke(JsonType &ref, const _Map &arg) {
-                static_assert(std::is_convertible<const char *, typename _Map::key_type>::value,
-                    "key_type must be able to convert to const char *");
-                ref.AssignFromMapIterator(arg.begin(), arg.end());
-            }
-
-            static void invoke(JsonType &ref, _Map &&arg) {
-                static_assert(std::is_convertible<const char *, typename _Map::key_type>::value,
-                    "key_type must be able to convert to const char *");
-                ref.AssignFromMapIterator(std::make_move_iterator(arg.begin()), std::make_move_iterator(arg.end()));
-            }
-        };
-
-        template <class _Dummy, class _Key, class _Value, class _Compare, class _Alloc>
-        struct AssignImpl<std::map<_Key, _Value, _Compare, _Alloc>, _Dummy>
-            : AssignFromMapImpl<std::map<_Key, _Value, _Compare, _Alloc>> { };
-
-        template <class _Dummy, class _Key, class _Value, class _Compare, class _Alloc>
-        struct AssignImpl<std::multimap<_Key, _Value, _Compare, _Alloc>, _Dummy >
-            : AssignFromMapImpl<std::multimap<_Key, _Value, _Compare, _Alloc> > { };
-
-        template <class _Dummy, class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc>, _Dummy>
-            : AssignFromMapImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc> > { };
-
-        template <class _Dummy, class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc>, _Dummy>
-            : AssignFromMapImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc> > { };
-
-        // C++11初始化列表
-        template <class _Dummy, class _Tp>
-        struct AssignImpl<std::initializer_list<_Tp>, _Dummy>
-            : AssignFromMoveableArrayImpl<std::initializer_list<_Tp> > { };
-
-        // AS成Bool
-        bool AsBoolean() const {
+        // As成bool
+        template <class _Tp>
+        typename std::enable_if<std::is_same<bool, _Tp>::value, _Tp>::type As() const {
             switch (_valueType) {
             case ValueType::Null: return false;
             case ValueType::False: return false;
@@ -593,15 +574,32 @@ namespace jw {
         }
 
         // AS成整数
-        template <class _Int>
-        _Int AsInteger() const {
+        template <class _Tp>
+        typename std::enable_if<std::is_integral<_Tp>::value
+            && !std::is_same<_Tp, bool>::value, _Tp>::type As() const {
             switch (_valueType) {
-            case ValueType::Null: return _Int(0);
-            case ValueType::False: return _Int(0);
-            case ValueType::True: return _Int(1);
-            case ValueType::Integer: return static_cast<_Int>(_valueInt);
-            case ValueType::Float: return static_cast<_Int>(_valueFloat);
-            case ValueType::String: return static_cast<_Int>(atoll(_valueString.c_str()));
+            case ValueType::Null: return _Tp(0);
+            case ValueType::False: return _Tp(0);
+            case ValueType::True: return _Tp(1);
+            case ValueType::Integer: return static_cast<_Tp>(_valueInt);
+            case ValueType::Float: return static_cast<_Tp>(_valueFloat);
+            case ValueType::String: return static_cast<_Tp>(atoll(_valueString.c_str()));
+            case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Integer"); break;
+            case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Integer"); break;
+            default: throw std::out_of_range("JSON type out of range"); break;
+            }
+        }
+
+        // AS成整数或枚举
+        template <class _Tp>
+        typename std::enable_if<std::is_enum<_Tp>::value, _Tp>::type As() const {
+            switch (_valueType) {
+            case ValueType::Null: return _Tp(0);
+            case ValueType::False: return _Tp(0);
+            case ValueType::True: return _Tp(1);
+            case ValueType::Integer: return static_cast<_Tp>(_valueInt);
+            case ValueType::Float: return static_cast<_Tp>((IntegerType)_valueFloat);
+            case ValueType::String: return static_cast<_Tp>(atoll(_valueString.c_str()));
             case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Integer"); break;
             case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Integer"); break;
             default: throw std::out_of_range("JSON type out of range"); break;
@@ -609,15 +607,15 @@ namespace jw {
         }
 
         // AS成浮点数
-        template <class _Flt>
-        _Flt AsFloat() const {
+        template <class _Tp>
+        typename std::enable_if<std::is_floating_point<_Tp>::value, _Tp>::type As() const {
             switch (_valueType) {
-            case ValueType::Null: return _Flt(0);
-            case ValueType::False: return _Flt(0);
-            case ValueType::True: return _Flt(1);
-            case ValueType::Integer: return static_cast<_Flt>(_valueInt);
-            case ValueType::Float: return static_cast<_Flt>(_valueFloat);
-            case ValueType::String: return static_cast<_Flt>(atof(_valueString.c_str()));
+            case ValueType::Null: return _Tp(0);
+            case ValueType::False: return _Tp(0);
+            case ValueType::True: return _Tp(1);
+            case ValueType::Integer: return static_cast<_Tp>(_valueInt);
+            case ValueType::Float: return static_cast<_Tp>(_valueFloat);
+            case ValueType::String: return static_cast<_Tp>(atof(_valueString.c_str()));
             case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Float"); break;
             case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Float"); break;
             default: throw std::out_of_range("JSON type out of range"); break;
@@ -625,43 +623,50 @@ namespace jw {
         }
 
         // AS成STL字符串
-        template <class _Str>
-        _Str AsString() const {
+        template <class _Tp>
+        typename std::enable_if<__cpp_basic_json_impl::_IsSTLString<_Tp>::value, _Tp>::type As() const {
             switch (_valueType) {
-            case ValueType::Null: return _Str();
-            case ValueType::False: return _Str("false");
-            case ValueType::True: return _Str("true");
+            case ValueType::Null: return _Tp();
+            case ValueType::False: return _Tp("false");
+            case ValueType::True: return _Tp("true");
             case ValueType::Integer: {
                 char str[21];  // 2^64+1 can be represented in 21 chars.
                 snprintf(str, 21, "%" PRId64, (int64_t)_valueInt);
-                return _Str(str);
+                return _Tp(str);
             }
             case ValueType::Float: {
-                std::basic_ostringstream<typename _Str::value_type, typename _Str::traits_type, typename _Str::allocator_type> ss;
+                std::basic_ostringstream<typename _Tp::value_type, typename _Tp::traits_type, typename _Tp::allocator_type> ss;
                 ss << _valueFloat;
                 return ss.str();
             }
-            case ValueType::String: return _Str(_valueString.begin(), _valueString.end());
+            case ValueType::String: return _Tp(_valueString.begin(), _valueString.end());
             case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to String"); break;
             case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to String"); break;
             default: throw std::out_of_range("JSON type out of range"); break;
             }
         }
 
+        template <class _Tp> struct AsImpl {
+            static inline _Tp invoke(const JsonType &ref) {
+                return ref.As<_Tp>();
+            }
+        };
+
         // AS成数组类容器
-        template <class _Array>
-        _Array AsArray() const {
+        template <class _Tp>
+        typename std::enable_if<__cpp_basic_json_impl::_IsElemModifiableContainer<_Tp>::value
+            || __cpp_basic_json_impl::_IsSet<_Tp>::value, _Tp>::type As() const {
             switch (_valueType) {
-            case ValueType::Null: return _Array();
+            case ValueType::Null: return _Tp();
             case ValueType::False: throw std::logic_error("Cannot convert JSON_False to Array"); break;
             case ValueType::True: throw std::logic_error("Cannot convert JSON_True to Array"); break;
             case ValueType::Integer: throw std::logic_error("Cannot convert JSON_Integer to Array"); break;
             case ValueType::Float: throw std::logic_error("Cannot convert JSON_Float to Array"); break;
             case ValueType::String: throw std::logic_error("Cannot convert JSON_String to Array"); break;
             case ValueType::Array: {
-                _Array ret = _Array();
+                _Tp ret = _Tp();
                 std::transform(this->begin(), this->end(), std::inserter(ret, ret.begin()),
-                    &AsImpl<typename _Array::value_type, void>::invoke);
+                    &AsImpl<typename _Tp::value_type>::invoke);
                 return ret;
             }
             case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Array"); break;
@@ -673,15 +678,15 @@ namespace jw {
         static inline typename _Map::value_type _make_value(const JsonType &json) {
             // 这里用构造第一个参数如果用typename _Map::key_type(json._key.begin(), json._key.end())会有问题
             return typename _Map::value_type(typename _Map::key_type(json._key.c_str()),
-                AsImpl<typename _Map::mapped_type, void>::invoke(json));
+                json.As<typename _Map::mapped_type>());
         }
 
         // AS成键值对类容器
-        template <class _Map>
-        _Map AsMap() const {
-            static_assert(std::is_convertible<const char *, typename _Map::key_type>::value, "key_type must be able to convert to const char *");
+        template <class _Tp>
+        typename std::enable_if<__cpp_basic_json_impl::_IsMap<_Tp>::value, _Tp>::type As() const {
+            static_assert(std::is_convertible<const char *, typename _Tp::key_type>::value, "key_type must be able to convert to const char *");
             switch (_valueType) {
-            case ValueType::Null: return _Map();
+            case ValueType::Null: return _Tp();
             case ValueType::False: throw std::logic_error("Cannot convert JSON_False to Object"); break;
             case ValueType::True: throw std::logic_error("Cannot convert JSON_True to Object"); break;
             case ValueType::Integer: throw std::logic_error("Cannot convert JSON_Integer to Object"); break;
@@ -689,145 +694,13 @@ namespace jw {
             case ValueType::String: throw std::logic_error("Cannot convert JSON_String to Object"); break;
             case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Object"); break;
             case ValueType::Object: {
-                _Map ret = _Map();
-                std::transform(this->begin(), this->end(), std::inserter(ret, ret.begin()), _make_value<_Map>);
+                _Tp ret = _Tp();
+                std::transform(this->begin(), this->end(), std::inserter(ret, ret.begin()), _make_value<_Tp>);
                 return ret;
             }
             default: throw std::out_of_range("JSON type out of range"); break;
             }
         }
-
-        // AS
-        template <class _Tp, class _Dummy> struct AsImpl;
-
-        // AS成自己的指针
-        template <class _Dummy> struct AsImpl<const JsonType *, _Dummy> {
-            static inline const JsonType *invoke(const JsonType &ref) {
-                return &ref;
-            }
-        };
-
-        // AS成自己的常引用
-        template <class _Dummy> struct AsImpl<const JsonType &, _Dummy> {
-            static inline const JsonType &invoke(const JsonType &ref) {
-                return ref;
-            }
-        };
-
-        // AS成Bool
-        template <class _Dummy> struct AsImpl<bool, _Dummy> {
-            static inline bool invoke(const JsonType &ref) {
-                return ref.AsBool();
-            }
-        };
-
-        // AS成整数
-        template <class _Int> struct AsIntegerImpl {
-            static inline _Int invoke(const JsonType &ref) {
-                return ref.AsInteger<_Int>();
-            }
-        };
-
-        template <class _Dummy> struct AsImpl<char,           _Dummy> : AsIntegerImpl<char> { };
-        template <class _Dummy> struct AsImpl<signed char,    _Dummy> : AsIntegerImpl<signed char> { };
-        template <class _Dummy> struct AsImpl<unsigned char,  _Dummy> : AsIntegerImpl<unsigned char> { };
-        template <class _Dummy> struct AsImpl<short,          _Dummy> : AsIntegerImpl<short> { };
-        template <class _Dummy> struct AsImpl<unsigned short, _Dummy> : AsIntegerImpl<unsigned short> { };
-        template <class _Dummy> struct AsImpl<int,            _Dummy> : AsIntegerImpl<int> { };
-        template <class _Dummy> struct AsImpl<unsigned,       _Dummy> : AsIntegerImpl<unsigned> { };
-        template <class _Dummy> struct AsImpl<long,           _Dummy> : AsIntegerImpl<long> { };
-        template <class _Dummy> struct AsImpl<unsigned long,  _Dummy> : AsIntegerImpl<unsigned long> { };
-        template <class _Dummy> struct AsImpl<int64_t,        _Dummy> : AsIntegerImpl<int64_t> { };
-        template <class _Dummy> struct AsImpl<uint64_t,       _Dummy> : AsIntegerImpl<uint64_t> { };
-
-        // AS成枚举
-        template <class _Tp, class = typename std::enable_if<std::is_enum<_Tp>::value>::type>
-        struct AsEnumImpl {
-            static inline _Tp invoke(const JsonType &ref) {
-                return ref.AsInteger<_Tp>();
-            }
-        };
-
-        template <class _Tp, class _Dummy> struct AsImpl: AsEnumImpl<_Tp> { };
-
-        // AS成浮点数
-        template <class _Flt> struct AsFloatImpl {
-            static inline _Flt invoke(const JsonType &ref) {
-                return ref.AsFloat<_Flt>();
-            }
-        };
-
-        template <class _Dummy> struct AsImpl<float,  _Dummy> : AsFloatImpl<float> { };
-        template <class _Dummy> struct AsImpl<double, _Dummy> : AsFloatImpl<double> { };
-
-        // AS成STL字符串
-        template <class _Str> struct AsStringImpl {
-            static inline _Str invoke(const JsonType &ref) {
-                return ref.AsString<_Str>();
-            }
-        };
-
-        template <class _Dummy, class _Char, class _Traits, class _Alloc>
-        struct AsImpl<std::basic_string<_Char, _Traits, _Alloc>, _Dummy>
-            : AsStringImpl<std::basic_string<_Char, _Traits, _Alloc> > { };
-
-        // AS成数组类容器
-        template <class _Array> struct AsArrayImpl {
-            static inline _Array invoke(const JsonType &ref) {
-                return ref.AsArray<_Array>();
-            }
-        };
-
-        template <class _Dummy, class _Tp, class _Alloc>
-        struct AsImpl<std::vector<_Tp, _Alloc>, _Dummy>
-            : AsArrayImpl<std::vector<_Tp, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Alloc>
-        struct AsImpl<std::list<_Tp, _Alloc>, _Dummy>
-            : AsArrayImpl<std::list<_Tp, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Alloc>
-        struct AsImpl<std::deque<_Tp, _Alloc>, _Dummy>
-            : AsArrayImpl<std::deque<_Tp, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Compare, class _Alloc>
-        struct AsImpl<std::set<_Tp, _Compare, _Alloc>, _Dummy>
-            : AsArrayImpl<std::set<_Tp, _Compare, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Compare, class _Alloc>
-        struct AsImpl<std::multiset<_Tp, _Compare, _Alloc>, _Dummy>
-            : AsArrayImpl<std::multiset<_Tp, _Compare, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc>, _Dummy>
-            : AsArrayImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc> > { };
-
-        template <class _Dummy, class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc>, _Dummy>
-            : AsArrayImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc> > { };
-
-        // AS成键值对类容器
-        template <class _Map> struct AsMapImpl {
-            static inline _Map invoke(const JsonType &ref) {
-                return ref.AsMap<_Map>();
-            }
-        };
-
-        template <class _Dummy, class _String, class _Value, class _Compare, class _Alloc>
-        struct AsImpl<std::map<_String, _Value, _Compare, _Alloc>, _Dummy>
-            : AsMapImpl<std::map<_String, _Value, _Compare, _Alloc> > { };
-
-        template <class _Dummy, class _String, class _Value, class _Compare, class _Alloc>
-        struct AsImpl<std::multimap<_String, _Value, _Compare, _Alloc>, _Dummy>
-            : AsMapImpl<std::multimap<_String, _Value, _Compare, _Alloc> > { };
-
-        template <class _Dummy, class _String, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_map<_String, _Value, _Hash, _Pred, _Alloc>, _Dummy>
-            : AsMapImpl<std::unordered_map<_String, _Value, _Hash, _Pred, _Alloc> > { };
-
-        template <class _Dummy, class _String, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_multimap<_String, _Value, _Hash, _Pred, _Alloc>, _Dummy>
-            : AsMapImpl<std::unordered_multimap<_String, _Value, _Hash, _Pred, _Alloc> > { };
 
     public:
         // 迭代器相关
@@ -991,7 +864,7 @@ namespace jw {
             }
         }
 
-        template <class _Tp> iterator insert(const_iterator where, std::initializer_list<_Tp> il) {
+        template <class _Tp> iterator insert(const_iterator where, const std::initializer_list<_Tp> &il) {
             if (_valueType != ValueType::Array) {
                 throw std::logic_error("Only Array support with position specified by iterator!");
             }
@@ -1006,7 +879,7 @@ namespace jw {
             return iterator(ptr);
         }
 
-        template <class _Tp> void insert(std::initializer_list<_Tp> il) {
+        template <class _Tp> void insert(const std::initializer_list<_Tp> &il) {
             for (typename std::initializer_list<_Tp>::iterator it = il.begin(); it != il.end(); ++it) {
                 _DoInsertForMap(*it);
             }
@@ -1144,7 +1017,7 @@ namespace jw {
 
         template <class _Tp> iterator _DoInsertForArray(pointer ptr, _Tp &&val) {
             pointer item = New();
-            AssignImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type, void>::invoke(*item, std::forward<_Tp>(val));
+            item->Assign<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type>(std::forward<_Tp>(val));
             if (_child->_next != _child && _child->_next->_valueType != item->_valueType) {
                 Delete(item);
                 throw std::logic_error("Cannot insert a difference type into an Array.");
@@ -1165,7 +1038,7 @@ namespace jw {
             typedef typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type _PairType;
             static_assert(std::is_convertible<const char *, typename _PairType::first_type>::value, "key_type must be able to convert to const char *");
             pointer item = New();
-            AssignImpl<typename _PairType::second_type, void>::invoke(*item, val.second);
+            item->Assign<typename _PairType::second_type>(val.second);
             if (item->_prev != nullptr || item->_next != nullptr || !item->_key.empty()) {
                 Delete(item);
                 throw std::logic_error("Item already added. It can't be added again");
