@@ -1071,7 +1071,7 @@ namespace jw {
         static inline pointer cJSON_New_Item() {
             typedef typename _Allocator::template rebind<JsonType>::other AllocatorType;
             AllocatorType allocator;
-            typename AllocatorType::pointer p = allocator.allocate(sizeof(JsonType));
+            typename AllocatorType::pointer p = allocator.allocate(1);
             allocator.construct(p);
             return (pointer)p;
         }
@@ -1080,7 +1080,7 @@ namespace jw {
             typedef typename _Allocator::template rebind<JsonType>::other AllocatorType;
             AllocatorType allocator;
             allocator.destroy(p);
-            allocator.deallocate(p, sizeof(JsonType));
+            allocator.deallocate(p, 1);
         }
 
         static const char *skip(const char *in) {
