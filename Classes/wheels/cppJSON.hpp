@@ -183,28 +183,28 @@ namespace jw {
         typedef std::basic_string<char, _CharTraits, typename _Allocator::template rebind<char>::other> StringType;
 
     private:
-        ValueType _valueType;  // The type of the item, as above.
-        _Integer _valueInt;  // The item's number, if type==Integer
-        _Float _valueFloat;  // The item's number, if type==Float
-        StringType _valueString;  // The item's string, if type==String
+        ValueType _type;  // The type of the item, as above.
+        _Integer _valueint;  // The item's number, if type==Integer
+        _Float _valuefloat;  // The item's number, if type==Float
+        StringType _valuestring;  // The item's string, if type==String
 
-        StringType _key;  // The item's name string, if this item is the child of, or is in the list of subitems of an object.
+        StringType _keystring;  // The item's name string, if this item is the child of, or is in the list of subitems of an object.
         pointer _child;  // An array or object item will have a child pointer pointing to a chain of the items in the array/object.
         pointer _next;  // next/prev allow you to walk array/object chains.
         pointer _prev;
 
         // 原本cJSON的实现是用的双向非循环键表，
-        // 这里为了实现迭代器，增加一个头结点，用_child指向它，将头结点的_valueInt64用来表示链表结点数，
+        // 这里为了实现迭代器，增加一个头结点，用_child指向它，将头结点的_valueint用来表示链表结点数，
         // 改成了循环键表
 
     private:
         inline void reset() {
-            _valueType = ValueType::Null;
-            _valueInt = _Integer();
-            _valueFloat = _Float();
-            _valueString.clear();
+            _type = ValueType::Null;
+            _valueint = _Integer();
+            _valuefloat = _Float();
+            _valuestring.clear();
 
-            _key.clear();
+            _keystring.clear();
             _child = nullptr;
             _next = nullptr;
             _prev = nullptr;
@@ -215,8 +215,8 @@ namespace jw {
         BasicJSON() { reset(); }
         ~BasicJSON() { clear(); }
 
-        ValueType GetValueType() const { return _valueType; }
-        const StringType &key() const { return _key; }
+        ValueType GetValueType() const { return _type; }
+        const StringType &key() const { return _keystring; }
 
         inline bool Parse(const char *src) { return ParseWithOpts(src, nullptr, false); }
 
@@ -254,8 +254,8 @@ namespace jw {
         // 带参构造
         BasicJSON(ValueType valueType) {
             reset();
-            _valueType = valueType;
-            if (_valueType == ValueType::Array || _valueType == ValueType::Object) {
+            _type = valueType;
+            if (_type == ValueType::Array || _type == ValueType::Object) {
                 _child = cJSON_New_Item();
                 if (_child == nullptr) throw std::bad_alloc();
                 _child->_next = _child->_prev = _child;
@@ -288,12 +288,12 @@ namespace jw {
 
         // 移动构造
         BasicJSON(BasicJSON &&other) {
-            _valueType = other._valueType;
-            _valueInt = other._valueInt;
-            _valueFloat = other._valueFloat;
-            _valueString = std::move(other._valueString);
+            _type = other._type;
+            _valueint = other._valueint;
+            _valuefloat = other._valuefloat;
+            _valuestring = std::move(other._valuestring);
 
-            _key = std::move(other._key);
+            _keystring = std::move(other._keystring);
             _child = other._child;
             _next = other._next;
             _prev = other._prev;
@@ -317,12 +317,12 @@ namespace jw {
         BasicJSON &operator=(BasicJSON &&other) {
             clear();
 
-            _valueType = other._valueType;
-            _valueInt = other._valueInt;
-            _valueFloat = other._valueFloat;
-            _valueString = std::move(other._valueString);
+            _type = other._type;
+            _valueint = other._valueint;
+            _valuefloat = other._valuefloat;
+            _valuestring = std::move(other._valuestring);
 
-            _key = std::move(other._key);
+            _keystring = std::move(other._keystring);
             _child = other._child;
             _next = other._next;
             _prev = other._prev;
@@ -338,8 +338,8 @@ namespace jw {
         }
 
         // 重载与nullptr的比较
-        inline bool operator==(std::nullptr_t) const { return (_valueType == ValueType::Null); }
-        inline bool operator!=(std::nullptr_t) const { return (_valueType != ValueType::Null); }
+        inline bool operator==(std::nullptr_t) const { return (_type == ValueType::Null); }
+        inline bool operator!=(std::nullptr_t) const { return (_type != ValueType::Null); }
 
         // as
         template <class _Tp> _Tp as() const {
@@ -351,17 +351,17 @@ namespace jw {
         }
 
         bool empty() const {
-            if (_valueType != ValueType::Array && _valueType != ValueType::Object) {
+            if (_type != ValueType::Array && _type != ValueType::Object) {
                 throw std::logic_error("Only Array and Object support function empty!");
             }
             return (_child->_next == _child);
         }
 
         typename std::make_unsigned<IntegerType>::type size() const {
-            if (_valueType != ValueType::Array && _valueType != ValueType::Object) {
+            if (_type != ValueType::Array && _type != ValueType::Object) {
                 throw std::logic_error("Only Array and Object support function size!");
             }
-            return static_cast<typename std::make_unsigned<IntegerType>::type>(_child->_valueInt);
+            return static_cast<typename std::make_unsigned<IntegerType>::type>(_child->_valueint);
         }
 
     private:
@@ -369,7 +369,7 @@ namespace jw {
         // 从数组类容器迭代器赋值
         template <class _Iterator>
         inline void AssignFromArrayIterator(_Iterator first, _Iterator last) {
-            this->_valueType = ValueType::Array;
+            this->_type = ValueType::Array;
             this->_child = cJSON_New_Item();
             BasicJSON *prev = this->_child;
             prev->_next = prev->_prev = prev;
@@ -380,7 +380,7 @@ namespace jw {
                 item->_prev = prev;
                 item->_next = this->_child;
                 this->_child->_prev = item;
-                ++this->_child->_valueInt;
+                ++this->_child->_valueint;
                 prev = item;
             }
         }
@@ -388,19 +388,19 @@ namespace jw {
         // 从键值对类容器迭代器赋值
         template <class _Iterator>
         void AssignFromMapIterator(_Iterator first, _Iterator last) {
-            this->_valueType = ValueType::Object;
+            this->_type = ValueType::Object;
             this->_child = cJSON_New_Item();
             BasicJSON *prev = this->_child;
             prev->_next = prev->_prev = prev;
             for (; first != last; ++first) {
                 BasicJSON *item = cJSON_New_Item();
-                item->_key = __basic_json_helper::_FixString((*first).first);
+                item->_keystring = __basic_json_helper::_FixString((*first).first);
                 item->Assign<typename std::iterator_traits<_Iterator>::value_type::second_type>((*first).second);
                 prev->_next = item;
                 item->_prev = prev;
                 item->_next = this->_child;
                 this->_child->_prev = item;
-                ++this->_child->_valueInt;
+                ++this->_child->_valueint;
                 prev = item;
             }
         }
@@ -420,54 +420,54 @@ namespace jw {
         // nullptr
         template <class _Tp>
         void Assign(typename std::enable_if<std::is_same<std::nullptr_t, _Tp>::value, _Tp>::type arg) {
-            _valueType = ValueType::Null;
+            _type = ValueType::Null;
         }
 
         // bool
         template <class _Tp>
         void Assign(typename std::enable_if<std::is_same<_Tp, bool>::value, _Tp>::type arg) {
-            _valueType = arg ? ValueType::True : ValueType::False;
+            _type = arg ? ValueType::True : ValueType::False;
         }
 
         // 整数
         template <class _Tp>
         void Assign(typename std::enable_if<std::is_integral<_Tp>::value
             && !std::is_same<_Tp, bool>::value, _Tp>::type arg) {
-            _valueType = ValueType::Integer;
-            _valueInt = static_cast<IntegerType>(arg);
+            _type = ValueType::Integer;
+            _valueint = static_cast<IntegerType>(arg);
         }
 
         // 枚举
         template <class _Tp>
         void Assign(typename std::enable_if<std::is_enum<_Tp>::value, _Tp>::type arg) {
-            _valueType = ValueType::Integer;
-            _valueInt = static_cast<IntegerType>(arg);
+            _type = ValueType::Integer;
+            _valueint = static_cast<IntegerType>(arg);
         }
 
         // 浮点数
         template <class _Tp>
         void Assign(typename std::enable_if<std::is_floating_point<_Tp>::value, _Tp>::type arg) {
-            _valueType = ValueType::Float;
-            _valueFloat = static_cast<FloatType>(arg);
+            _type = ValueType::Float;
+            _valuefloat = static_cast<FloatType>(arg);
         }
 
         // 字符串
         template <class _Tp>
         void Assign(const typename std::enable_if<__basic_json_helper::_IsCString<_Tp>::value, _Tp>::type &arg) {
-            _valueType = ValueType::String;
-            _valueString = __basic_json_helper::_FixString(arg);
+            _type = ValueType::String;
+            _valuestring = __basic_json_helper::_FixString(arg);
         }
 
         template <class _Tp>
         void Assign(const typename std::enable_if<__basic_json_helper::_IsSTLString<_Tp>::value, _Tp>::type &arg) {
-            _valueType = ValueType::String;
-            _valueString = __basic_json_helper::_FixString(arg);
+            _type = ValueType::String;
+            _valuestring = __basic_json_helper::_FixString(arg);
         }
 
         template <class _Tp>
         void Assign(typename std::enable_if<std::is_same<StringType, _Tp>::value, _Tp>::type &&arg) {
-            _valueType = ValueType::String;
-            _valueString = std::move(arg);
+            _type = ValueType::String;
+            _valuestring = std::move(arg);
         }
 
         // 数组
@@ -532,20 +532,20 @@ namespace jw {
         // As成bool
         template <class _Tp>
         typename std::enable_if<std::is_same<bool, _Tp>::value, _Tp>::type As() const {
-            switch (_valueType) {
+            switch (_type) {
             case ValueType::Null: return false;
             case ValueType::False: return false;
             case ValueType::True: return true;
-            case ValueType::Integer: return !!_valueInt;
-            case ValueType::Float: return !!_valueFloat;
+            case ValueType::Integer: return !!_valueint;
+            case ValueType::Float: return !!_valuefloat;
             case ValueType::String: {
                 // 不支持tRUE trUE之类的奇葩输入
-                if (strcmp(_valueString.c_str(), "true") == 0 || strcmp(_valueString.c_str(), "True") == 0
-                    || strcmp(_valueString.c_str(), "TRUE") == 0 || strcmp(_valueString.c_str(), "1")) {
+                if (strcmp(_valuestring.c_str(), "true") == 0 || strcmp(_valuestring.c_str(), "True") == 0
+                    || strcmp(_valuestring.c_str(), "TRUE") == 0 || strcmp(_valuestring.c_str(), "1")) {
                     return true;
                 }
-                else if (strcmp(_valueString.c_str(), "false") == 0 || strcmp(_valueString.c_str(), "False") == 0
-                         || strcmp(_valueString.c_str(), "FALSE") == 0 || strcmp(_valueString.c_str(), "0")) {
+                else if (strcmp(_valuestring.c_str(), "false") == 0 || strcmp(_valuestring.c_str(), "False") == 0
+                         || strcmp(_valuestring.c_str(), "FALSE") == 0 || strcmp(_valuestring.c_str(), "0")) {
                     return false;
                 }
                 else {
@@ -562,13 +562,13 @@ namespace jw {
         template <class _Tp>
         typename std::enable_if<std::is_integral<_Tp>::value
             && !std::is_same<_Tp, bool>::value, _Tp>::type As() const {
-            switch (_valueType) {
+            switch (_type) {
             case ValueType::Null: return _Tp(0);
             case ValueType::False: return _Tp(0);
             case ValueType::True: return _Tp(1);
-            case ValueType::Integer: return static_cast<_Tp>(_valueInt);
-            case ValueType::Float: return static_cast<_Tp>(_valueFloat);
-            case ValueType::String: return static_cast<_Tp>(atoll(_valueString.c_str()));
+            case ValueType::Integer: return static_cast<_Tp>(_valueint);
+            case ValueType::Float: return static_cast<_Tp>(_valuefloat);
+            case ValueType::String: return static_cast<_Tp>(atoll(_valuestring.c_str()));
             case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Integer"); break;
             case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Integer"); break;
             default: throw std::out_of_range("JSON type out of range"); break;
@@ -578,13 +578,13 @@ namespace jw {
         // AS成整数或枚举
         template <class _Tp>
         typename std::enable_if<std::is_enum<_Tp>::value, _Tp>::type As() const {
-            switch (_valueType) {
+            switch (_type) {
             case ValueType::Null: return _Tp(0);
             case ValueType::False: return _Tp(0);
             case ValueType::True: return _Tp(1);
-            case ValueType::Integer: return static_cast<_Tp>(_valueInt);
-            case ValueType::Float: return static_cast<_Tp>((IntegerType)_valueFloat);
-            case ValueType::String: return static_cast<_Tp>(atoll(_valueString.c_str()));
+            case ValueType::Integer: return static_cast<_Tp>(_valueint);
+            case ValueType::Float: return static_cast<_Tp>((IntegerType)_valuefloat);
+            case ValueType::String: return static_cast<_Tp>(atoll(_valuestring.c_str()));
             case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Integer"); break;
             case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Integer"); break;
             default: throw std::out_of_range("JSON type out of range"); break;
@@ -594,13 +594,13 @@ namespace jw {
         // AS成浮点数
         template <class _Tp>
         typename std::enable_if<std::is_floating_point<_Tp>::value, _Tp>::type As() const {
-            switch (_valueType) {
+            switch (_type) {
             case ValueType::Null: return _Tp(0);
             case ValueType::False: return _Tp(0);
             case ValueType::True: return _Tp(1);
-            case ValueType::Integer: return static_cast<_Tp>(_valueInt);
-            case ValueType::Float: return static_cast<_Tp>(_valueFloat);
-            case ValueType::String: return static_cast<_Tp>(atof(_valueString.c_str()));
+            case ValueType::Integer: return static_cast<_Tp>(_valueint);
+            case ValueType::Float: return static_cast<_Tp>(_valuefloat);
+            case ValueType::String: return static_cast<_Tp>(atof(_valuestring.c_str()));
             case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to Float"); break;
             case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to Float"); break;
             default: throw std::out_of_range("JSON type out of range"); break;
@@ -610,21 +610,21 @@ namespace jw {
         // AS成STL字符串
         template <class _Tp>
         typename std::enable_if<__basic_json_helper::_IsSTLString<_Tp>::value, _Tp>::type As() const {
-            switch (_valueType) {
+            switch (_type) {
             case ValueType::Null: return _Tp();
             case ValueType::False: return _Tp("false");
             case ValueType::True: return _Tp("true");
             case ValueType::Integer: {
                 char str[21];  // 2^64+1 can be represented in 21 chars.
-                snprintf(str, 21, "%" PRId64, (int64_t)_valueInt);
+                snprintf(str, 21, "%" PRId64, (int64_t)_valueint);
                 return _Tp(str);
             }
             case ValueType::Float: {
                 std::basic_ostringstream<typename _Tp::value_type, typename _Tp::traits_type, typename _Tp::allocator_type> ss;
-                ss << _valueFloat;
+                ss << _valuefloat;
                 return ss.str();
             }
-            case ValueType::String: return _Tp(_valueString.begin(), _valueString.end());
+            case ValueType::String: return _Tp(_valuestring.begin(), _valuestring.end());
             case ValueType::Array: throw std::logic_error("Cannot convert JSON_Array to String"); break;
             case ValueType::Object: throw std::logic_error("Cannot convert JSON_Object to String"); break;
             default: throw std::out_of_range("JSON type out of range"); break;
@@ -641,7 +641,7 @@ namespace jw {
         template <class _Tp>
         typename std::enable_if<__basic_json_helper::_IsSequential<_Tp>::value
             || __basic_json_helper::_IsSet<_Tp>::value, _Tp>::type As() const {
-            switch (_valueType) {
+            switch (_type) {
             case ValueType::Null: return _Tp();
             case ValueType::False: throw std::logic_error("Cannot convert JSON_False to Array"); break;
             case ValueType::True: throw std::logic_error("Cannot convert JSON_True to Array"); break;
@@ -661,8 +661,8 @@ namespace jw {
 
         template <class _Map>
         static inline typename _Map::value_type _make_value(const JsonType &json) {
-            // 这里用构造第一个参数如果用typename _Map::key_type(json._key.begin(), json._key.end())会有问题
-            return typename _Map::value_type(typename _Map::key_type(json._key.c_str()),
+            // 这里用构造第一个参数如果用typename _Map::key_type(json._keystring.begin(), json._keystring.end())会有问题
+            return typename _Map::value_type(typename _Map::key_type(json._keystring.c_str()),
                 json.As<typename _Map::mapped_type>());
         }
 
@@ -670,7 +670,7 @@ namespace jw {
         template <class _Tp>
         typename std::enable_if<__basic_json_helper::_IsMap<_Tp>::value, _Tp>::type As() const {
             static_assert(std::is_convertible<const char *, typename _Tp::key_type>::value, "key_type must be able to convert to const char *");
-            switch (_valueType) {
+            switch (_type) {
             case ValueType::Null: return _Tp();
             case ValueType::False: throw std::logic_error("Cannot convert JSON_False to Object"); break;
             case ValueType::True: throw std::logic_error("Cannot convert JSON_True to Object"); break;
@@ -799,7 +799,7 @@ namespace jw {
         inline const_reverse_iterator crend() const { return const_reverse_iterator(_child->_next); }
 
         template <class _Tp> iterator insert(const_iterator where, _Tp &&val) {
-            if (_valueType != ValueType::Array) {
+            if (_type != ValueType::Array) {
                 throw std::logic_error("Only Array support insert with position specified by iterator!");
             }
             pointer ptr = where._ptr;
@@ -814,7 +814,7 @@ namespace jw {
         }
 
         template <class _Tp> iterator insert(const_iterator where, size_t n, const _Tp &val) {
-            if (_valueType != ValueType::Array) {
+            if (_type != ValueType::Array) {
                 throw std::logic_error("Only Array support with position specified by iterator!");
             }
             pointer ptr = where._ptr;
@@ -829,7 +829,7 @@ namespace jw {
         }
 
         template <class _InputIterator> iterator insert(const_iterator where, _InputIterator first, _InputIterator last) {
-            if (_valueType != ValueType::Array) {
+            if (_type != ValueType::Array) {
                 throw std::logic_error("Only Array support with position specified by iterator!");
             }
             pointer ptr = where._ptr;
@@ -850,7 +850,7 @@ namespace jw {
         }
 
         template <class _Tp> iterator insert(const_iterator where, const std::initializer_list<_Tp> &il) {
-            if (_valueType != ValueType::Array) {
+            if (_type != ValueType::Array) {
                 throw std::logic_error("Only Array support with position specified by iterator!");
             }
             pointer ptr = where._ptr;
@@ -872,7 +872,7 @@ namespace jw {
 
         template <class _Tp>
         inline void push_back(_Tp &&val) {
-            if (_valueType != ValueType::Array) {
+            if (_type != ValueType::Array) {
                 throw std::logic_error("Only Array support push_back!");
             }
             _DoInsertForArray(_child, std::forward<_Tp>(val));
@@ -880,14 +880,14 @@ namespace jw {
 
         template <class _Tp>
         inline void push_front(_Tp &&val) {
-            if (_valueType != ValueType::Array) {
+            if (_type != ValueType::Array) {
                 throw std::logic_error("Only Array support push_front!");
             }
             _DoInsertForArray(_child->_next, std::forward<_Tp>(val));
         }
 
         iterator erase(const_iterator where) {
-            if (_valueType != ValueType::Array && _valueType != ValueType::Object) {
+            if (_type != ValueType::Array && _type != ValueType::Object) {
                 throw std::logic_error("Only Array and Object support erase!");
             }
             pointer ptr = where._ptr;
@@ -902,21 +902,21 @@ namespace jw {
         }
 
         inline void pop_back() {
-            if (_valueType != ValueType::Array) {
+            if (_type != ValueType::Array) {
                 throw std::logic_error("Only Array support pop_back!");
             }
             _DoErase(_child->_prev);
         }
 
         inline void pop_front() {
-            if (_valueType != ValueType::Array) {
+            if (_type != ValueType::Array) {
                 throw std::logic_error("Only Array support pop_front!");
             }
             _DoErase(_child->_next);
         }
 
         template <class _String> inline IntegerType erase(const _String &key) {
-            if (_valueType != ValueType::Object) {
+            if (_type != ValueType::Object) {
                 throw std::logic_error("Only Object support erase by key!");
             }
             pointer ptr = _DoFind(__basic_json_helper::_FixString(key));
@@ -928,7 +928,7 @@ namespace jw {
         }
 
         iterator erase(const_iterator first, const_iterator last) {
-            if (_valueType != ValueType::Array && _valueType != ValueType::Object) {
+            if (_type != ValueType::Array && _type != ValueType::Object) {
                 throw std::logic_error("Only Array and Object support erase by iterators!");
             }
             pointer ptr = first._ptr;
@@ -1003,7 +1003,7 @@ namespace jw {
         template <class _Tp> iterator _DoInsertForArray(pointer ptr, _Tp &&val) {
             pointer item = cJSON_New_Item();
             item->Assign<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type>(std::forward<_Tp>(val));
-            if (_child->_next != _child && _child->_next->_valueType != item->_valueType) {
+            if (_child->_next != _child && _child->_next->_type != item->_type) {
                 cJSON_Delete(item);
                 throw std::logic_error("Cannot insert a difference type into an Array.");
             }
@@ -1015,7 +1015,7 @@ namespace jw {
             item->_prev = ptr->_prev;
             item->_next = ptr;  // 连接item和ptr的后继
             ptr->_prev = item;
-            ++_child->_valueInt;
+            ++_child->_valueint;
             return iterator(item);
         }
 
@@ -1024,7 +1024,7 @@ namespace jw {
             static_assert(std::is_convertible<const char *, typename _PairType::first_type>::value, "key_type must be able to convert to const char *");
             pointer item = cJSON_New_Item();
             item->Assign<typename _PairType::second_type>(val.second);
-            if (item->_prev != nullptr || item->_next != nullptr || !item->_key.empty()) {
+            if (item->_prev != nullptr || item->_next != nullptr || !item->_keystring.empty()) {
                 cJSON_Delete(item);
                 throw std::logic_error("Item already added. It can't be added again");
             }
@@ -1034,13 +1034,13 @@ namespace jw {
                 snprintf(err, 255, "Key: [%s] is already used.", key);
                 throw std::logic_error(err);
             }
-            item->_key = key;
+            item->_keystring = key;
             pointer ptr = _child;  // 直接插入到末尾
             ptr->_prev->_next = item;  // 连接ptr的前驱和item
             item->_prev = ptr->_prev;
             item->_next = ptr;  // 连接item和ptr的后继
             ptr->_prev = item;
-            ++_child->_valueInt;
+            ++_child->_valueint;
             return std::make_pair(iterator(item), true);
         }
 
@@ -1051,17 +1051,17 @@ namespace jw {
             ptr->_prev = nullptr;
             ptr->_next = nullptr;  // 设置为nullptr防止将后继结点都释放了
             cJSON_Delete(ptr);
-            --_child->_valueInt;
+            --_child->_valueint;
             return ret;
         }
 
         pointer _DoFind(const char *key) const {
-            if (_valueType != ValueType::Object) {
+            if (_type != ValueType::Object) {
                 throw std::logic_error("Only Object support find by key!");
             }
             if (key == nullptr || *key == '\0') return nullptr;
             for (const_iterator it = begin(); it != end(); ++it) {
-                if (strcmp(it->_key.c_str(), key) == 0) {  // 这里用it->_key.compare有问题，原因未知
+                if (strcmp(it->_keystring.c_str(), key) == 0) {  // 这里用it->_keystring.compare有问题，原因未知
                     return it._ptr;
                 }
             }
@@ -1090,9 +1090,9 @@ namespace jw {
 
         const char *parse_value(const char *value) {
             if (value == nullptr) return 0; // Fail on null.
-            if (!strncmp(value, "null", 4)) { _valueType = ValueType::Null;  return value + 4; }
-            if (!strncmp(value, "false", 5)) { _valueType = ValueType::False; return value + 5; }
-            if (!strncmp(value, "true", 4)) { _valueType = ValueType::True; _valueInt = 1; return value + 4; }
+            if (!strncmp(value, "null", 4)) { _type = ValueType::Null;  return value + 4; }
+            if (!strncmp(value, "false", 5)) { _type = ValueType::False; return value + 5; }
+            if (!strncmp(value, "true", 4)) { _type = ValueType::True; _valueint = 1; return value + 4; }
             if (*value == '\"') { return parse_string(value); }
             if (*value == '-' || (*value >= '0' && *value <= '9')) { return parse_number(value); }
             if (*value == '[') { return parse_array(value); }
@@ -1132,8 +1132,8 @@ namespace jw {
 
             while (*ptr != '\"' && *ptr && ++len) if (*ptr++ == '\\') ++ptr;    // Skip escaped quotes.
 
-            _valueString.resize(len + 1);    // This is how long we need for the string, roughly.
-            typename StringType::iterator ptr2 = _valueString.begin();
+            _valuestring.resize(len + 1);    // This is how long we need for the string, roughly.
+            typename StringType::iterator ptr2 = _valuestring.begin();
 
             ptr = str + 1;
             while (*ptr != '\"' && *ptr) {
@@ -1175,7 +1175,7 @@ namespace jw {
             }
             *ptr2 = 0;
             if (*ptr == '\"') ++ptr;
-            _valueType = ValueType::String;
+            _type = ValueType::String;
             return ptr;
         }
 
@@ -1196,15 +1196,15 @@ namespace jw {
 
             if (point || subscale > 0) {
                 n = sign * n * pow(10.0, (scale + subscale * signsubscale));    // number = +/- number.fraction * 10^+/- exponent
-                _valueFloat = static_cast<_Float>(n);
-                _valueType = ValueType::Float;
+                _valuefloat = static_cast<_Float>(n);
+                _type = ValueType::Float;
             } else {
                 ll *= sign;
 				if (std::numeric_limits<_Integer>::min() <= ll && ll <= std::numeric_limits<_Integer>::max()) {
-					_valueInt = static_cast<_Integer>(ll); _valueType = ValueType::Integer;
+					_valueint = static_cast<_Integer>(ll); _type = ValueType::Integer;
 				} else {
-				    _valueFloat = static_cast<_Float>(ll);
-				    _valueType = ValueType::Float;
+				    _valuefloat = static_cast<_Float>(ll);
+				    _type = ValueType::Float;
 				}
             }
             return num;
@@ -1217,7 +1217,7 @@ namespace jw {
             value = skip(value + 1);
             if (*value == ']') return value + 1;    // empty array.
 
-            _valueType = ValueType::Array;
+            _type = ValueType::Array;
             this->_child = cJSON_New_Item();
             if (this->_child == nullptr) return nullptr;        // memory fail
             this->_child->_next = child = cJSON_New_Item();
@@ -1226,7 +1226,7 @@ namespace jw {
             if (value == nullptr) return nullptr;
             child->_next = this->_child;
             child->_prev = this->_child;
-            ++this->_child->_valueInt;
+            ++this->_child->_valueint;
 
             while (*value == ',') {
                 pointer new_item = cJSON_New_Item();
@@ -1236,7 +1236,7 @@ namespace jw {
                 if (value == nullptr) return nullptr; // memory fail
                 new_item->_next = this->_child;
                 this->_child->_prev = new_item;
-                ++this->_child->_valueInt;
+                ++this->_child->_valueint;
             }
 
             if (*value == ']') return value + 1;    // end of array
@@ -1250,37 +1250,37 @@ namespace jw {
             value = skip(value + 1);
             if (*value == '}') return value + 1;    // empty array.
 
-            _valueType = ValueType::Object;
+            _type = ValueType::Object;
             pointer child;
             this->_child = cJSON_New_Item();
             if (this->_child == nullptr) return nullptr;        // memory fail
             this->_child->_next = child = cJSON_New_Item();
             if (child == nullptr) return nullptr;        // memory fail
             value = skip(child->parse_string(skip(value)));
-            child->_valueType = ValueType::Null;
+            child->_type = ValueType::Null;
             if (value == nullptr) return nullptr;
-            child->_key = std::move(child->_valueString); child->_valueString.clear();
+            child->_keystring = std::move(child->_valuestring); child->_valuestring.clear();
             if (*value != ':') { ep = value; return nullptr; }  // fail!
             value = skip(child->parse_value(skip(value + 1)));  // skip any spacing, get the value.
             if (value == nullptr) return nullptr;
             child->_next = this->_child;
             child->_prev = this->_child;
-            ++this->_child->_valueInt;
+            ++this->_child->_valueint;
 
             while (*value == ',') {
                 pointer new_item = cJSON_New_Item();
                 if (new_item == nullptr)   return nullptr; // memory fail
                 child->_next = new_item; new_item->_prev = child; child = new_item;
                 value = skip(child->parse_string(skip(value + 1)));
-                child->_valueType = ValueType::Null;
+                child->_type = ValueType::Null;
                 if (value == nullptr) return nullptr;
-                child->_key = std::move(child->_valueString); child->_valueString.clear();
+                child->_keystring = std::move(child->_valuestring); child->_valuestring.clear();
                 if (*value != ':') { ep = value; return nullptr; }  // fail!
                 value = skip(child->parse_value(skip(value + 1)));  // skip any spacing, get the value.
                 if (value == nullptr) return nullptr;
                 new_item->_next = this->_child;
                 this->_child->_prev = new_item;
-                ++this->_child->_valueInt;
+                ++this->_child->_valueint;
             }
 
             if (*value == '}') return value + 1;    // end of array
@@ -1302,7 +1302,7 @@ namespace jw {
         }
 
         template <class _CharSequence> void print_value(_CharSequence &ret, int depth, bool fmt) const {
-            switch (_valueType) {
+            switch (_type) {
             case ValueType::Null: _AppendString(ret, "null"); break;
             case ValueType::False: _AppendString(ret, "false"); break;
             case ValueType::True: _AppendString(ret, "true"); break;
@@ -1317,13 +1317,13 @@ namespace jw {
 
         template <class _CharSequence> void print_integer(_CharSequence &ret) const {
             char str[21];  // 2^64+1 can be represented in 21 chars.
-            snprintf(str, 21, "%" PRId64, (int64_t)_valueInt);
+            snprintf(str, 21, "%" PRId64, (int64_t)_valueint);
             _AppendString(ret, str);
         }
 
         template <class _CharSequence> void print_float(_CharSequence &ret) const {
             char str[64];  // This is a nice tradeoff.
-            double d = static_cast<double>(_valueFloat);
+            double d = static_cast<double>(_valuefloat);
             if (fabs(floor(d) - d) <= std::numeric_limits<double>::epsilon() && fabs(d) < 1.0e60) snprintf(str, 64, "%.0f", d);
             else if (fabs(d) < 1.0e-6 || fabs(d) > 1.0e9) snprintf(str, 64, "%e", d);
             else snprintf(str, 64, "%f", d);
@@ -1363,14 +1363,14 @@ namespace jw {
         }
 
         template <class _CharSequence> void print_string(_CharSequence &ret) const {
-            print_string_ptr(ret, _valueString);
+            print_string_ptr(ret, _valuestring);
         }
 
         template <class _CharSequence> void print_array(_CharSequence &ret, int depth, bool fmt) const {
-            size_t numentries = static_cast<size_t>(_child->_valueInt);
+            size_t numentries = static_cast<size_t>(_child->_valueint);
 
             // Explicitly handle empty object case
-            if (_child->_valueInt == 0) {
+            if (_child->_valueint == 0) {
                 _AppendString(ret, "[]");
                 return;
             }
@@ -1387,7 +1387,7 @@ namespace jw {
         }
 
         template <class _CharSequence> void print_object(_CharSequence &ret, int depth, bool fmt) const {
-            size_t numentries = static_cast<size_t>(_child->_valueInt);
+            size_t numentries = static_cast<size_t>(_child->_valueint);
 
             // Explicitly handle empty object case
             if (numentries == 0) {
@@ -1403,7 +1403,7 @@ namespace jw {
             ret.push_back('{'); if (fmt) ret.push_back('\n');
             for (size_t i = 0; i < numentries; ++i) {
                 if (fmt) _AppendString(ret, depth, '\t');
-                print_string_ptr(ret, child->_key);
+                print_string_ptr(ret, child->_keystring);
                 ret.push_back(':'); if (fmt) ret.push_back('\t');
                 child->print_value(ret, depth, fmt);
                 if (i != numentries - 1) ret.push_back(',');
@@ -1419,9 +1419,9 @@ namespace jw {
             const_pointer cptr;
             pointer nptr = nullptr, newchild;
             // Copy over all vars
-            newitem._valueType = item._valueType, newitem._valueInt = item._valueInt, newitem._valueFloat = item._valueFloat;
-            newitem._valueString = item._valueString;
-            newitem._key = item._key;
+            newitem._type = item._type, newitem._valueint = item._valueint, newitem._valuefloat = item._valuefloat;
+            newitem._valuestring = item._valuestring;
+            newitem._keystring = item._keystring;
             // If non-recursive, then we're done!
             if (!recurse) return true;
             // Walk the ->next chain for the child.
