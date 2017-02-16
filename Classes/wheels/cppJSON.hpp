@@ -330,29 +330,29 @@ namespace jw {
             }
         }
 
-        // Assign的实现类，这里内部类貌似无法全特化，所以加了个_Unused模板参数，使之变为偏特化
-        template <class _SourceType, class _Unused>
+        // Assign的实现类，这里内部类貌似无法全特化，所以加了个_Dummy模板参数，使之变为偏特化
+        template <class _SourceType, class _Dummy>
         struct AssignImpl;
 
         // 自己
-        template <class _Unused>
-        struct AssignImpl<JsonType, _Unused> {
+        template <class _Dummy>
+        struct AssignImpl<JsonType, _Dummy> {
             static inline void invoke(JsonType &ref, const JsonType &arg) {
                 Duplicate(ref, arg, true);
             }
         };
 
         // nullptr
-        template <class _Unused>
-        struct AssignImpl<std::nullptr_t, _Unused> {
+        template <class _Dummy>
+        struct AssignImpl<std::nullptr_t, _Dummy> {
             static inline void invoke(JsonType &ref, std::nullptr_t) {
                 ref.AssignFromNull();
             }
         };
 
         // bool
-        template <class _Unused>
-        struct AssignImpl<bool, _Unused> {
+        template <class _Dummy>
+        struct AssignImpl<bool, _Dummy> {
             static inline void invoke(JsonType &ref, bool arg) {
                 ref._valueType = arg ? ValueType::True : ValueType::False;
             }
@@ -367,38 +367,38 @@ namespace jw {
             }
         };
 
-        template <class _Unused>
-        struct AssignImpl<char, _Unused> : AssignFromIntegerImpl<char> { };
+        template <class _Dummy>
+        struct AssignImpl<char, _Dummy> : AssignFromIntegerImpl<char> { };
 
-        template <class _Unused>
-        struct AssignImpl<signed char, _Unused> : AssignFromIntegerImpl<signed char> { };
+        template <class _Dummy>
+        struct AssignImpl<signed char, _Dummy> : AssignFromIntegerImpl<signed char> { };
 
-        template <class _Unused>
-        struct AssignImpl<unsigned char, _Unused> : AssignFromIntegerImpl<unsigned char> { };
+        template <class _Dummy>
+        struct AssignImpl<unsigned char, _Dummy> : AssignFromIntegerImpl<unsigned char> { };
 
-        template <class _Unused>
-        struct AssignImpl<short, _Unused> : AssignFromIntegerImpl<short> { };
+        template <class _Dummy>
+        struct AssignImpl<short, _Dummy> : AssignFromIntegerImpl<short> { };
 
-        template <class _Unused>
-        struct AssignImpl<unsigned short, _Unused> : AssignFromIntegerImpl<unsigned short> { };
+        template <class _Dummy>
+        struct AssignImpl<unsigned short, _Dummy> : AssignFromIntegerImpl<unsigned short> { };
 
-        template <class _Unused>
-        struct AssignImpl<int, _Unused> : AssignFromIntegerImpl<int> { };
+        template <class _Dummy>
+        struct AssignImpl<int, _Dummy> : AssignFromIntegerImpl<int> { };
 
-        template <class _Unused>
-        struct AssignImpl<unsigned, _Unused> : AssignFromIntegerImpl<unsigned> { };
+        template <class _Dummy>
+        struct AssignImpl<unsigned, _Dummy> : AssignFromIntegerImpl<unsigned> { };
 
-        template <class _Unused>
-        struct AssignImpl<long, _Unused> : AssignFromIntegerImpl<long> { };
+        template <class _Dummy>
+        struct AssignImpl<long, _Dummy> : AssignFromIntegerImpl<long> { };
 
-        template <class _Unused>
-        struct AssignImpl<unsigned long, _Unused> : AssignFromIntegerImpl<unsigned long> { };
+        template <class _Dummy>
+        struct AssignImpl<unsigned long, _Dummy> : AssignFromIntegerImpl<unsigned long> { };
 
-        template <class _Unused>
-        struct AssignImpl<int64_t, _Unused> : AssignFromIntegerImpl<int64_t> { };
+        template <class _Dummy>
+        struct AssignImpl<int64_t, _Dummy> : AssignFromIntegerImpl<int64_t> { };
 
-        template <class _Unused>
-        struct AssignImpl<uint64_t, _Unused> : AssignFromIntegerImpl<uint64_t> { };
+        template <class _Dummy>
+        struct AssignImpl<uint64_t, _Dummy> : AssignFromIntegerImpl<uint64_t> { };
 
         // 枚举
         template <class _Tp, class = typename std::enable_if<std::is_enum<_Tp>::value>::type>
@@ -409,7 +409,7 @@ namespace jw {
             }
         };
 
-        template <class _SourceType, class _Unused>
+        template <class _SourceType, class _Dummy>
         struct AssignImpl : AssignFromEnumImpl<_SourceType> { };
 
         // 浮点数
@@ -421,14 +421,14 @@ namespace jw {
             }
         };
 
-        template <class _Unused>
-        struct AssignImpl<float, _Unused> : AssignFromFloatImpl<float> { };
+        template <class _Dummy>
+        struct AssignImpl<float, _Dummy> : AssignFromFloatImpl<float> { };
 
-        template <class _Unused>
-        struct AssignImpl<double, _Unused> : AssignFromFloatImpl<double> { };
+        template <class _Dummy>
+        struct AssignImpl<double, _Dummy> : AssignFromFloatImpl<double> { };
 
-        //template <class _Unused>
-        //struct AssignImpl<long double, _Unused> : AssignFromFloatImpl<long double> { };
+        //template <class _Dummy>
+        //struct AssignImpl<long double, _Dummy> : AssignFromFloatImpl<long double> { };
 
         // 字符串
         template <class _Str>
@@ -440,15 +440,15 @@ namespace jw {
         };
 
         // C风格字符串
-        template <class _Unused, size_t _Size>
-        struct AssignImpl<char [_Size], _Unused> : AssignFromStringImpl<char [_Size]> { };
-        template <class _Unused>
-        struct AssignImpl<char *, _Unused> : AssignFromStringImpl<char *> { };
-        template <class _Unused>
-        struct AssignImpl<const char *, _Unused> : AssignFromStringImpl<const char *> { };
+        template <class _Dummy, size_t _Size>
+        struct AssignImpl<char [_Size], _Dummy> : AssignFromStringImpl<char [_Size]> { };
+        template <class _Dummy>
+        struct AssignImpl<char *, _Dummy> : AssignFromStringImpl<char *> { };
+        template <class _Dummy>
+        struct AssignImpl<const char *, _Dummy> : AssignFromStringImpl<const char *> { };
 
-        template <class _Unused>
-        struct AssignImpl<StringType, _Unused> {
+        template <class _Dummy>
+        struct AssignImpl<StringType, _Dummy> {
             static inline void invoke(JsonType &ref, const StringType &arg) {
                 ref._valueType = ValueType::String;
                 ref._valueString = arg;
@@ -460,13 +460,13 @@ namespace jw {
         };
 
         // STL字符串
-        template <class _Unused, class _Traits, class _Alloc>
-        struct AssignImpl<std::basic_string<char, _Traits, _Alloc>, _Unused>
+        template <class _Dummy, class _Traits, class _Alloc>
+        struct AssignImpl<std::basic_string<char, _Traits, _Alloc>, _Dummy>
             : AssignFromStringImpl<std::basic_string<char, _Traits, _Alloc> > { };
 
         // 传统数组
-        template <class _Unused, class _Elem, size_t _Size>
-        struct AssignImpl<_Elem [_Size], _Unused> {
+        template <class _Dummy, class _Elem, size_t _Size>
+        struct AssignImpl<_Elem [_Size], _Dummy> {
             static void invoke(JsonType &ref, const _Elem (&arg)[_Size]) {
                 ref.AssignFromArrayIterator(std::begin(arg), std::end(arg));
             }
@@ -491,40 +491,40 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _Tp, class _Alloc>
-        struct AssignImpl<std::vector<_Tp, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Alloc>
+        struct AssignImpl<std::vector<_Tp, _Alloc>, _Dummy>
             : AssignFromMoveableArrayImpl<std::vector<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Alloc>
-        struct AssignImpl<std::list<_Tp, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Alloc>
+        struct AssignImpl<std::list<_Tp, _Alloc>, _Dummy>
             : AssignFromMoveableArrayImpl<std::list<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Alloc>
-        struct AssignImpl<std::forward_list<_Tp, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Alloc>
+        struct AssignImpl<std::forward_list<_Tp, _Alloc>, _Dummy>
             : AssignFromMoveableArrayImpl<std::forward_list<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Alloc>
-        struct AssignImpl<std::deque<_Tp, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Alloc>
+        struct AssignImpl<std::deque<_Tp, _Alloc>, _Dummy>
             : AssignFromMoveableArrayImpl<std::deque<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _Tp, size_t _Size>
-        struct AssignImpl<std::array<_Tp, _Size>, _Unused>
+        template <class _Dummy, class _Tp, size_t _Size>
+        struct AssignImpl<std::array<_Tp, _Size>, _Dummy>
             : AssignFromMoveableArrayImpl<std::array<_Tp, _Size> > { };
 
-        template <class _Unused, class _Tp, class _Compare, class _Alloc>
-        struct AssignImpl<std::set<_Tp, _Compare, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Compare, class _Alloc>
+        struct AssignImpl<std::set<_Tp, _Compare, _Alloc>, _Dummy>
             : AssignFromImmovableArrayImpl<std::set<_Tp, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Compare, class _Alloc>
-        struct AssignImpl<std::multiset<_Tp, _Compare, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Compare, class _Alloc>
+        struct AssignImpl<std::multiset<_Tp, _Compare, _Alloc>, _Dummy>
             : AssignFromImmovableArrayImpl<std::multiset<_Tp, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc>, _Dummy>
             : AssignFromImmovableArrayImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc>, _Dummy>
             : AssignFromImmovableArrayImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc> > { };
 
         // 键值对类容器
@@ -543,25 +543,25 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _Key, class _Value, class _Compare, class _Alloc>
-        struct AssignImpl<std::map<_Key, _Value, _Compare, _Alloc>, _Unused>
+        template <class _Dummy, class _Key, class _Value, class _Compare, class _Alloc>
+        struct AssignImpl<std::map<_Key, _Value, _Compare, _Alloc>, _Dummy>
             : AssignFromMapImpl<std::map<_Key, _Value, _Compare, _Alloc>> { };
 
-        template <class _Unused, class _Key, class _Value, class _Compare, class _Alloc>
-        struct AssignImpl<std::multimap<_Key, _Value, _Compare, _Alloc>, _Unused >
+        template <class _Dummy, class _Key, class _Value, class _Compare, class _Alloc>
+        struct AssignImpl<std::multimap<_Key, _Value, _Compare, _Alloc>, _Dummy >
             : AssignFromMapImpl<std::multimap<_Key, _Value, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc>, _Unused>
+        template <class _Dummy, class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc>, _Dummy>
             : AssignFromMapImpl<std::unordered_map<_Key, _Value, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct AssignImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc>, _Unused>
+        template <class _Dummy, class _Key, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct AssignImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc>, _Dummy>
             : AssignFromMapImpl<std::unordered_multimap<_Key, _Value, _Hash, _Pred, _Alloc> > { };
 
         // C++11初始化列表
-        template <class _Unused, class _Tp>
-        struct AssignImpl<std::initializer_list<_Tp>, _Unused>
+        template <class _Dummy, class _Tp>
+        struct AssignImpl<std::initializer_list<_Tp>, _Dummy>
             : AssignFromMoveableArrayImpl<std::initializer_list<_Tp> > { };
 
         // AS成Bool
@@ -698,24 +698,24 @@ namespace jw {
         }
 
         // AS
-        template <class _Tp, class _Unused> struct AsImpl;
+        template <class _Tp, class _Dummy> struct AsImpl;
 
         // AS成自己的指针
-        template <class _Unused> struct AsImpl<const JsonType *, _Unused> {
+        template <class _Dummy> struct AsImpl<const JsonType *, _Dummy> {
             static inline const JsonType *invoke(const JsonType &ref) {
                 return &ref;
             }
         };
 
         // AS成自己的常引用
-        template <class _Unused> struct AsImpl<const JsonType &, _Unused> {
+        template <class _Dummy> struct AsImpl<const JsonType &, _Dummy> {
             static inline const JsonType &invoke(const JsonType &ref) {
                 return ref;
             }
         };
 
         // AS成Bool
-        template <class _Unused> struct AsImpl<bool, _Unused> {
+        template <class _Dummy> struct AsImpl<bool, _Dummy> {
             static inline bool invoke(const JsonType &ref) {
                 return ref.AsBool();
             }
@@ -728,17 +728,17 @@ namespace jw {
             }
         };
 
-        template <class _Unused> struct AsImpl<char,           _Unused> : AsIntegerImpl<char> { };
-        template <class _Unused> struct AsImpl<signed char,    _Unused> : AsIntegerImpl<signed char> { };
-        template <class _Unused> struct AsImpl<unsigned char,  _Unused> : AsIntegerImpl<unsigned char> { };
-        template <class _Unused> struct AsImpl<short,          _Unused> : AsIntegerImpl<short> { };
-        template <class _Unused> struct AsImpl<unsigned short, _Unused> : AsIntegerImpl<unsigned short> { };
-        template <class _Unused> struct AsImpl<int,            _Unused> : AsIntegerImpl<int> { };
-        template <class _Unused> struct AsImpl<unsigned,       _Unused> : AsIntegerImpl<unsigned> { };
-        template <class _Unused> struct AsImpl<long,           _Unused> : AsIntegerImpl<long> { };
-        template <class _Unused> struct AsImpl<unsigned long,  _Unused> : AsIntegerImpl<unsigned long> { };
-        template <class _Unused> struct AsImpl<int64_t,        _Unused> : AsIntegerImpl<int64_t> { };
-        template <class _Unused> struct AsImpl<uint64_t,       _Unused> : AsIntegerImpl<uint64_t> { };
+        template <class _Dummy> struct AsImpl<char,           _Dummy> : AsIntegerImpl<char> { };
+        template <class _Dummy> struct AsImpl<signed char,    _Dummy> : AsIntegerImpl<signed char> { };
+        template <class _Dummy> struct AsImpl<unsigned char,  _Dummy> : AsIntegerImpl<unsigned char> { };
+        template <class _Dummy> struct AsImpl<short,          _Dummy> : AsIntegerImpl<short> { };
+        template <class _Dummy> struct AsImpl<unsigned short, _Dummy> : AsIntegerImpl<unsigned short> { };
+        template <class _Dummy> struct AsImpl<int,            _Dummy> : AsIntegerImpl<int> { };
+        template <class _Dummy> struct AsImpl<unsigned,       _Dummy> : AsIntegerImpl<unsigned> { };
+        template <class _Dummy> struct AsImpl<long,           _Dummy> : AsIntegerImpl<long> { };
+        template <class _Dummy> struct AsImpl<unsigned long,  _Dummy> : AsIntegerImpl<unsigned long> { };
+        template <class _Dummy> struct AsImpl<int64_t,        _Dummy> : AsIntegerImpl<int64_t> { };
+        template <class _Dummy> struct AsImpl<uint64_t,       _Dummy> : AsIntegerImpl<uint64_t> { };
 
         // AS成枚举
         template <class _Tp, class = typename std::enable_if<std::is_enum<_Tp>::value>::type>
@@ -748,7 +748,7 @@ namespace jw {
             }
         };
 
-        template <class _Tp, class _Unused> struct AsImpl: AsEnumImpl<_Tp> { };
+        template <class _Tp, class _Dummy> struct AsImpl: AsEnumImpl<_Tp> { };
 
         // AS成浮点数
         template <class _Flt> struct AsFloatImpl {
@@ -757,8 +757,8 @@ namespace jw {
             }
         };
 
-        template <class _Unused> struct AsImpl<float,  _Unused> : AsFloatImpl<float> { };
-        template <class _Unused> struct AsImpl<double, _Unused> : AsFloatImpl<double> { };
+        template <class _Dummy> struct AsImpl<float,  _Dummy> : AsFloatImpl<float> { };
+        template <class _Dummy> struct AsImpl<double, _Dummy> : AsFloatImpl<double> { };
 
         // AS成STL字符串
         template <class _Str> struct AsStringImpl {
@@ -767,8 +767,8 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _Char, class _Traits, class _Alloc>
-        struct AsImpl<std::basic_string<_Char, _Traits, _Alloc>, _Unused>
+        template <class _Dummy, class _Char, class _Traits, class _Alloc>
+        struct AsImpl<std::basic_string<_Char, _Traits, _Alloc>, _Dummy>
             : AsStringImpl<std::basic_string<_Char, _Traits, _Alloc> > { };
 
         // AS成数组类容器
@@ -778,32 +778,32 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _Tp, class _Alloc>
-        struct AsImpl<std::vector<_Tp, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Alloc>
+        struct AsImpl<std::vector<_Tp, _Alloc>, _Dummy>
             : AsArrayImpl<std::vector<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Alloc>
-        struct AsImpl<std::list<_Tp, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Alloc>
+        struct AsImpl<std::list<_Tp, _Alloc>, _Dummy>
             : AsArrayImpl<std::list<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Alloc>
-        struct AsImpl<std::deque<_Tp, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Alloc>
+        struct AsImpl<std::deque<_Tp, _Alloc>, _Dummy>
             : AsArrayImpl<std::deque<_Tp, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Compare, class _Alloc>
-        struct AsImpl<std::set<_Tp, _Compare, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Compare, class _Alloc>
+        struct AsImpl<std::set<_Tp, _Compare, _Alloc>, _Dummy>
             : AsArrayImpl<std::set<_Tp, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Compare, class _Alloc>
-        struct AsImpl<std::multiset<_Tp, _Compare, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Compare, class _Alloc>
+        struct AsImpl<std::multiset<_Tp, _Compare, _Alloc>, _Dummy>
             : AsArrayImpl<std::multiset<_Tp, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc>, _Dummy>
             : AsArrayImpl<std::unordered_set<_Tp, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _Tp, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc>, _Unused>
+        template <class _Dummy, class _Tp, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc>, _Dummy>
             : AsArrayImpl<std::unordered_multiset<_Tp, _Hash, _Pred, _Alloc> > { };
 
         // AS成键值对类容器
@@ -813,20 +813,20 @@ namespace jw {
             }
         };
 
-        template <class _Unused, class _String, class _Value, class _Compare, class _Alloc>
-        struct AsImpl<std::map<_String, _Value, _Compare, _Alloc>, _Unused>
+        template <class _Dummy, class _String, class _Value, class _Compare, class _Alloc>
+        struct AsImpl<std::map<_String, _Value, _Compare, _Alloc>, _Dummy>
             : AsMapImpl<std::map<_String, _Value, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _String, class _Value, class _Compare, class _Alloc>
-        struct AsImpl<std::multimap<_String, _Value, _Compare, _Alloc>, _Unused>
+        template <class _Dummy, class _String, class _Value, class _Compare, class _Alloc>
+        struct AsImpl<std::multimap<_String, _Value, _Compare, _Alloc>, _Dummy>
             : AsMapImpl<std::multimap<_String, _Value, _Compare, _Alloc> > { };
 
-        template <class _Unused, class _String, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_map<_String, _Value, _Hash, _Pred, _Alloc>, _Unused>
+        template <class _Dummy, class _String, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_map<_String, _Value, _Hash, _Pred, _Alloc>, _Dummy>
             : AsMapImpl<std::unordered_map<_String, _Value, _Hash, _Pred, _Alloc> > { };
 
-        template <class _Unused, class _String, class _Value, class _Hash, class _Pred, class _Alloc>
-        struct AsImpl<std::unordered_multimap<_String, _Value, _Hash, _Pred, _Alloc>, _Unused>
+        template <class _Dummy, class _String, class _Value, class _Hash, class _Pred, class _Alloc>
+        struct AsImpl<std::unordered_multimap<_String, _Value, _Hash, _Pred, _Alloc>, _Dummy>
             : AsMapImpl<std::unordered_multimap<_String, _Value, _Hash, _Pred, _Alloc> > { };
 
     public:
