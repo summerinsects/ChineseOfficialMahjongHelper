@@ -74,7 +74,7 @@ namespace jw {
     template <class _Integer, class _Float, class _CharTraits, class _Allocator>
     class BasicJSON;
 
-    namespace __cpp_basic_json_impl {
+    namespace __basic_json_helper {
 
         // _FixString
         static inline const char *_FixString(char *const str) { return str; }
@@ -413,7 +413,7 @@ namespace jw {
             prev->_next = prev->_prev = prev;
             for (; first != last; ++first) {
                 BasicJSON *item = New();
-                item->_key = __cpp_basic_json_impl::_FixString((*first).first);
+                item->_key = __basic_json_helper::_FixString((*first).first);
                 item->Assign<typename std::iterator_traits<_Iterator>::value_type::second_type>((*first).second);
                 prev->_next = item;
                 item->_prev = prev;
@@ -472,15 +472,15 @@ namespace jw {
 
         // 字符串
         template <class _Tp>
-        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsCString<_Tp>::value, _Tp>::type &arg) {
+        void Assign(const typename std::enable_if<__basic_json_helper::_IsCString<_Tp>::value, _Tp>::type &arg) {
             _valueType = ValueType::String;
-            _valueString = __cpp_basic_json_impl::_FixString(arg);
+            _valueString = __basic_json_helper::_FixString(arg);
         }
 
         template <class _Tp>
-        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsSTLString<_Tp>::value, _Tp>::type &arg) {
+        void Assign(const typename std::enable_if<__basic_json_helper::_IsSTLString<_Tp>::value, _Tp>::type &arg) {
             _valueType = ValueType::String;
-            _valueString = __cpp_basic_json_impl::_FixString(arg);
+            _valueString = __basic_json_helper::_FixString(arg);
         }
 
         template <class _Tp>
@@ -491,36 +491,36 @@ namespace jw {
 
         // 数组
         template <class _Tp>
-        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsCArray<_Tp>::value
-            && !__cpp_basic_json_impl::_IsCString<_Tp>::value, _Tp>::type &arg) {
+        void Assign(const typename std::enable_if<__basic_json_helper::_IsCArray<_Tp>::value
+            && !__basic_json_helper::_IsCString<_Tp>::value, _Tp>::type &arg) {
             AssignFromArrayIterator(std::begin(arg), std::end(arg));
         }
 
         template <class _Tp>
-        void Assign(typename std::enable_if<__cpp_basic_json_impl::_IsCArray<_Tp>::value
-            && !__cpp_basic_json_impl::_IsCString<_Tp>::value, _Tp>::type &&arg) {
+        void Assign(typename std::enable_if<__basic_json_helper::_IsCArray<_Tp>::value
+            && !__basic_json_helper::_IsCString<_Tp>::value, _Tp>::type &&arg) {
             AssignFromArrayIterator(std::make_move_iterator(std::begin(arg)), std::make_move_iterator(std::end(arg)));
         }
 
         template <class _Tp>
-        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsElemModifiableContainer<_Tp>::value
-                || __cpp_basic_json_impl::_IsSet<_Tp>::value, _Tp>::type &arg) {
+        void Assign(const typename std::enable_if<__basic_json_helper::_IsElemModifiableContainer<_Tp>::value
+                || __basic_json_helper::_IsSet<_Tp>::value, _Tp>::type &arg) {
             AssignFromArrayIterator(std::begin(arg), std::end(arg));
         }
 
         template <class _Tp>
-        void Assign(typename std::enable_if<__cpp_basic_json_impl::_IsElemModifiableContainer<_Tp>::value, _Tp>::type &&arg) {
+        void Assign(typename std::enable_if<__basic_json_helper::_IsElemModifiableContainer<_Tp>::value, _Tp>::type &&arg) {
             AssignFromArrayIterator(std::make_move_iterator(std::begin(arg)), std::make_move_iterator(std::end(arg)));
         }
 
         // 键值对
         template <class _Tp>
-        void Assign(const typename std::enable_if<__cpp_basic_json_impl::_IsMap<_Tp>::value, _Tp>::type &arg) {
+        void Assign(const typename std::enable_if<__basic_json_helper::_IsMap<_Tp>::value, _Tp>::type &arg) {
             AssignFromMapIterator(arg.begin(), arg.end());
         }
 
         template <class _Tp>
-        void Assign(typename std::enable_if<__cpp_basic_json_impl::_IsMap<_Tp>::value, _Tp>::type &&arg) {
+        void Assign(typename std::enable_if<__basic_json_helper::_IsMap<_Tp>::value, _Tp>::type &&arg) {
             AssignFromMapIterator(std::make_move_iterator(arg.begin()), std::make_move_iterator(arg.end()));
         }
 
@@ -628,7 +628,7 @@ namespace jw {
 
         // AS成STL字符串
         template <class _Tp>
-        typename std::enable_if<__cpp_basic_json_impl::_IsSTLString<_Tp>::value, _Tp>::type As() const {
+        typename std::enable_if<__basic_json_helper::_IsSTLString<_Tp>::value, _Tp>::type As() const {
             switch (_valueType) {
             case ValueType::Null: return _Tp();
             case ValueType::False: return _Tp("false");
@@ -658,8 +658,8 @@ namespace jw {
 
         // AS成数组类容器
         template <class _Tp>
-        typename std::enable_if<__cpp_basic_json_impl::_IsElemModifiableContainer<_Tp>::value
-            || __cpp_basic_json_impl::_IsSet<_Tp>::value, _Tp>::type As() const {
+        typename std::enable_if<__basic_json_helper::_IsElemModifiableContainer<_Tp>::value
+            || __basic_json_helper::_IsSet<_Tp>::value, _Tp>::type As() const {
             switch (_valueType) {
             case ValueType::Null: return _Tp();
             case ValueType::False: throw std::logic_error("Cannot convert JSON_False to Array"); break;
@@ -687,7 +687,7 @@ namespace jw {
 
         // AS成键值对类容器
         template <class _Tp>
-        typename std::enable_if<__cpp_basic_json_impl::_IsMap<_Tp>::value, _Tp>::type As() const {
+        typename std::enable_if<__basic_json_helper::_IsMap<_Tp>::value, _Tp>::type As() const {
             static_assert(std::is_convertible<const char *, typename _Tp::key_type>::value, "key_type must be able to convert to const char *");
             switch (_valueType) {
             case ValueType::Null: return _Tp();
@@ -938,7 +938,7 @@ namespace jw {
             if (_valueType != ValueType::Object) {
                 throw std::logic_error("Only Object support erase by key!");
             }
-            pointer ptr = _DoFind(__cpp_basic_json_impl::_FixString(key));
+            pointer ptr = _DoFind(__basic_json_helper::_FixString(key));
             if (ptr != nullptr) {
                 _DoErase(ptr);
                 return 1;
@@ -968,7 +968,7 @@ namespace jw {
                 const typename std::remove_extent<_String>::type *,
                 typename std::remove_cv<_String>::type>::type FixedCStringType;
             static_assert(std::is_convertible<const char *, FixedCStringType>::value, "key_type must be able to convert to const char *");
-            pointer ptr = _DoFind(__cpp_basic_json_impl::_FixString(key));
+            pointer ptr = _DoFind(__basic_json_helper::_FixString(key));
             return ptr != nullptr ? iterator(ptr) : end();
         }
 
@@ -977,7 +977,7 @@ namespace jw {
                 const typename std::remove_extent<_String>::type *,
                 typename std::remove_cv<_String>::type>::type FixedCStringType;
             static_assert(std::is_convertible<const char *, FixedCStringType>::value, "key_type must be able to convert to const char *");
-            pointer ptr = _DoFind(__cpp_basic_json_impl::_FixString(key));
+            pointer ptr = _DoFind(__basic_json_helper::_FixString(key));
             return ptr != nullptr ? const_iterator(ptr) : end();
         }
 
@@ -986,7 +986,7 @@ namespace jw {
                 const typename std::remove_extent<_String>::type *,
                 typename std::remove_cv<_String>::type>::type FixedCStringType;
             static_assert(std::is_convertible<const char *, FixedCStringType>::value, "key_type must be able to convert to const char *");
-            const char *str = __cpp_basic_json_impl::_FixString(key);
+            const char *str = __basic_json_helper::_FixString(key);
             pointer ptr = _DoFind(str);
             if (ptr == nullptr) {
                 char err[256];
@@ -1047,7 +1047,7 @@ namespace jw {
                 Delete(item);
                 throw std::logic_error("Item already added. It can't be added again");
             }
-            const char *key = __cpp_basic_json_impl::_FixString(val.first);
+            const char *key = __basic_json_helper::_FixString(val.first);
             if (_DoFind(key) != nullptr) {
                 char err[256];
                 snprintf(err, 255, "Key: [%s] is already used.", key);
