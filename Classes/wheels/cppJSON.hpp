@@ -104,12 +104,8 @@ namespace jw {
             : _IsSTLStringImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
         // _IsCArray
-        template <class _Tp> struct _IsCArrayImpl : std::false_type { };
-        template <class _Elem, size_t _Size>
-        struct _IsCArrayImpl<_Elem [_Size]> : std::true_type { };
-
         template <class _Tp> struct _IsCArray
-            : _IsCArrayImpl<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
+            : std::is_array<typename std::remove_cv<typename std::remove_reference<_Tp>::type>::type> { };
 
         // _IsSequential
         template <class _Tp> struct _IsSequentialImpl : std::false_type { };
