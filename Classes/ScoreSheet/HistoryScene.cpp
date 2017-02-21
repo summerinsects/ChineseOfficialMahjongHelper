@@ -243,15 +243,20 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
     AlertView::showWithMessage("删除记录", "删除后无法找回，确认删除？", [this, idx]() {
+        LoadingView *loadingView = LoadingView::create();
+        this->addChild(loadingView);
+        loadingView->setPosition(Director::getInstance()->getVisibleSize());
+
         g_records.erase(g_records.begin() + idx);
         auto thiz = RefPtr<HistoryScene>(this);
 
         std::vector<Record> temp = g_records;
-        std::thread([thiz, temp](){
+        std::thread([thiz, temp, loadingView](){
             std::lock_guard<std::mutex> lg(g_mutex);
             saveRecords(temp);
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz]() {
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
                 if (LIKELY(thiz->getParent() != nullptr)) {
+                    loadingView->removeFromParent();
                     thiz->_tableView->reloadData();
                 }
             });
