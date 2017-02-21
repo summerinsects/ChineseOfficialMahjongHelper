@@ -22,6 +22,16 @@ public:
     static void modifyRecord(const Record &record);
 
 private:
+    struct RecordText {
+        char startTime[32];
+        char endTime[32];
+        char score[255];
+    };
+
+    std::vector<RecordText> _recordTexts;
+
+    void updateRecordTexts();
+
     cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
     void onDeleteButton(cocos2d::Ref *sender);
     void onViewButton(cocos2d::Ref *sender);

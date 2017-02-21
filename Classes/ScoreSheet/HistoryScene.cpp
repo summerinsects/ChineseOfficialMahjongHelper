@@ -70,10 +70,57 @@ static void saveRecords(const std::vector<Record> &records) {
     }
 }
 
+void HistoryScene::updateRecordTexts() {
+    _recordTexts.clear();
+    _recordTexts.reserve(g_records.size());
+
+    std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record) {
+        typedef std::pair<int, int> SeatScore;
+        SeatScore seatscore[4];
+        seatscore[0].first = 0; seatscore[0].second = 0;
+        seatscore[1].first = 1, seatscore[1].second = 0;
+        seatscore[2].first = 2, seatscore[2].second = 0;
+        seatscore[3].first = 3, seatscore[3].second = 0;
+        for (int i = 0; i < 16; ++i) {
+            int s[4];
+            translateDetailToScoreTable(record.detail[i], s);
+            seatscore[0].second += s[0];
+            seatscore[1].second += s[1];
+            seatscore[2].second += s[2];
+            seatscore[3].second += s[3];
+        }
+
+        std::stable_sort(std::begin(seatscore), std::end(seatscore),
+            [](const SeatScore &left, const SeatScore &right) {
+            return left.second > right.second;
+        });
+
+        RecordText rt;
+
+        strftime(rt.startTime, sizeof(rt.startTime), "%Y-%m-%d %H:%M", localtime(&record.start_time));
+        if (record.end_time != 0) {
+            strftime(rt.endTime, sizeof(rt.endTime), "%Y-%m-%d %H:%M", localtime(&record.end_time));
+        }
+        else {
+            rt.endTime[0] = '\0';
+        }
+
+        static const char *seatText[] = { "东", "南", "西", "北" };
+        snprintf(rt.score, sizeof(rt.score), "%s: %s(%+d)\n%s: %s(%+d)\n%s: %s(%+d)\n%s: %s(%+d)",
+            seatText[seatscore[0].first], record.name[seatscore[0].first], seatscore[0].second,
+            seatText[seatscore[1].first], record.name[seatscore[1].first], seatscore[1].second,
+            seatText[seatscore[2].first], record.name[seatscore[2].first], seatscore[2].second,
+            seatText[seatscore[3].first], record.name[seatscore[3].first], seatscore[3].second);
+        return rt;
+    });
+}
+
 bool HistoryScene::init() {
     if (!BaseLayer::initWithTitle("历史记录")) {
         return false;
     }
+
+    updateRecordTexts();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -89,7 +136,7 @@ bool HistoryScene::init() {
         case cw::TableView::CallbackType::CELL_AT_INDEX:
             return (intptr_t)tableCellAtIndex(table, param1);
         case cw::TableView::CallbackType::NUMBER_OF_CELLS:
-            return (intptr_t)g_records.size();
+            return (intptr_t)_recordTexts.size();
         }
         return 0;
     });
@@ -119,6 +166,7 @@ bool HistoryScene::init() {
                 g_records.swap(temp);
 
                 if (LIKELY(thiz->getParent() != nullptr)) {
+                    thiz->updateRecordTexts();
                     loadingView->removeFromParent();
                     thiz->_tableView->reloadData();
                 }
@@ -187,7 +235,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         delBtn->setTitleText("删除");
         delBtn->addClickEventListener(std::bind(&HistoryScene::onDeleteButton, this, std::placeholders::_1));
         cell->addChild(delBtn);
-        delBtn->setPosition(Vec2(width - 22.0f, 35.0f));
+        delBtn->setPosition(Vec2(width - 25.0f, 50.0f));
 
         viewBtn = ui::Button::create(normalImage, selectedImage);
         viewBtn->setScale9Enabled(true);
@@ -197,7 +245,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         viewBtn->setTitleText("查看");
         viewBtn->addClickEventListener(std::bind(&HistoryScene::onViewButton, this, std::placeholders::_1));
         cell->addChild(viewBtn);
-        viewBtn->setPosition(Vec2(width - 66.0f, 35.0f));
+        viewBtn->setPosition(Vec2(width - 25.0f, 20.0f));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -212,28 +260,16 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
     delBtn->setUserData(reinterpret_cast<void *>(idx));
     viewBtn->setUserData(reinterpret_cast<void *>(idx));
 
-    const Record &record = g_records[idx];
-    int scores[4] = { 0 };
-    for (int i = 0; i < 16; ++i) {
-        int s[4];
-        translateDetailToScoreTable(record.detail[i], s);
-        scores[0] += s[0];
-        scores[1] += s[1];
-        scores[2] += s[2];
-        scores[3] += s[3];
-    }
+    const RecordText &rt = _recordTexts[idx];
 
-    char str[255];
-    size_t len = 0;
-    len += strftime(str, sizeof(str), "%Y-%m-%d %H:%M", localtime(&record.start_time));
-    if (record.end_time != 0) {
-        strcpy(str + len, " -- ");
-        len += 4;
-        len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&record.end_time));
+    std::string str = rt.startTime;
+    if (rt.endTime[0] != '\0') {
+        str.append(" -- ");
+        str.append(rt.endTime);
     }
+    str.append("\n");
+    str.append(rt.score);
 
-    snprintf(str + len, sizeof(str) - len, "\n%s(%+d)\n%s(%+d)\n%s(%+d)\n%s(%+d)",
-        record.name[0], scores[0], record.name[1], scores[1], record.name[2], scores[2], record.name[3], scores[3]);
     label->setString(str);
 
     return cell;
@@ -256,6 +292,7 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
             saveRecords(temp);
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
                 if (LIKELY(thiz->getParent() != nullptr)) {
+                    thiz->updateRecordTexts();
                     loadingView->removeFromParent();
                     thiz->_tableView->reloadData();
                 }
