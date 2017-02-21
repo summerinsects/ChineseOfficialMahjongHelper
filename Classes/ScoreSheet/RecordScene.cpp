@@ -220,6 +220,8 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
             return (intptr_t)tableCellAtIndex(table, param1);
         case cw::TableView::CallbackType::NUMBER_OF_CELLS:
             return (intptr_t)10;
+        default:
+            break;
         }
         return 0;
     });

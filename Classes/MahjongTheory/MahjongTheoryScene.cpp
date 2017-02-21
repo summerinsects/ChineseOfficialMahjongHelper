@@ -175,6 +175,8 @@ bool MahjongTheoryScene::init() {
             return (intptr_t)tableCellAtIndex(table, param1);
         case cw::TableView::CallbackType::NUMBER_OF_CELLS:
             return (intptr_t)_orderedIndices.size();
+        default:
+            break;
         }
         return 0;
     });
