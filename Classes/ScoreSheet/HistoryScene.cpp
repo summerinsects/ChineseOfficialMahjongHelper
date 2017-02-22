@@ -269,6 +269,9 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         str.append(" -- ");
         str.append(rt.endTime);
     }
+    else {
+        str.append(" (未结束)");
+    }
     str.append("\n");
     str.append(rt.score);
 
