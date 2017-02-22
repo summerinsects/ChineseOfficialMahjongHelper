@@ -122,7 +122,7 @@ bool ScoreSheetScene::init() {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
-    button->setTitleText("重置");
+    button->setTitleText("重置/清空");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
 
