@@ -81,7 +81,7 @@ static bool divide_tail(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, one_d
 }
 
 static bool is_division_branch_exist(long fixed_cnt, long step, const one_division_t *work_division, const divisions_t *result) {
-    if (result->count <= 0) {
+    if (result->count <= 0 || step == 1) {
         return false;
     }
 
@@ -113,16 +113,14 @@ static bool divide_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt
         // 刻子
         if (cnt_table[t] > 2) {
             work_division->packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);
-            if (is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
-                continue;
+            if (!is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
+                // 削减这组刻子，递归
+                cnt_table[t] -= 3;
+                if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
+                    ret = true;
+                }
+                cnt_table[t] += 3;
             }
-
-            // 削减这组刻子，递归
-            cnt_table[t] -= 3;
-            if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
-                ret = true;
-            }
-            cnt_table[t] += 3;
         }
 
         // 顺子（只能是数牌）
@@ -130,20 +128,18 @@ static bool divide_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt
         if (is_numbered) {
             if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
                 work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, t + 1);
-                if (is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
-                    continue;
+                if (!is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
+                    // 削减这组顺子，递归
+                    --cnt_table[t];
+                    --cnt_table[t + 1];
+                    --cnt_table[t + 2];
+                    if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
+                        ret = true;
+                    }
+                    ++cnt_table[t];
+                    ++cnt_table[t + 1];
+                    ++cnt_table[t + 2];
                 }
-
-                // 削减这组顺子，递归
-                --cnt_table[t];
-                --cnt_table[t + 1];
-                --cnt_table[t + 2];
-                if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
-                    ret = true;
-                }
-                ++cnt_table[t];
-                ++cnt_table[t + 1];
-                ++cnt_table[t + 2];
             }
         }
     }
