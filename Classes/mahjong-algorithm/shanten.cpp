@@ -138,7 +138,7 @@ struct work_state_t {
 
 // 路径是否来过了
 static bool is_basic_type_branch_exist(const long fixed_cnt, const work_path_t *work_path, const work_state_t *work_state) {
-    if (work_state->count <= 0) {
+    if (work_state->count <= 0 || work_path->depth == 0) {
         return false;
     }
 
@@ -224,31 +224,27 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
         // 雀头
         if (!has_pair && cnt_table[t] > 1) {
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PAIR, t);
-            if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
-                continue;
+            if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
+                // 削减雀头，递归
+                cnt_table[t] -= 2;
+                int ret = basic_type_shanten_recursively(cnt_table, true, pack_cnt, incomplete_cnt,
+                    fixed_cnt, work_path, work_state);
+                result = std::min(ret, result);
+                cnt_table[t] += 2;
             }
-
-            // 削减雀头，递归
-            cnt_table[t] -= 2;
-            int ret = basic_type_shanten_recursively(cnt_table, true, pack_cnt, incomplete_cnt,
-                fixed_cnt, work_path, work_state);
-            result = std::min(ret, result);
-            cnt_table[t] += 2;
         }
 
         // 刻子
         if (cnt_table[t] > 2) {
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PUNG, t);
-            if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
-                continue;
+            if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
+                // 削减这组刻子，递归
+                cnt_table[t] -= 3;
+                int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
+                    fixed_cnt, work_path, work_state);
+                result = std::min(ret, result);
+                cnt_table[t] += 3;
             }
-
-            // 削减这组刻子，递归
-            cnt_table[t] -= 3;
-            int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
-                fixed_cnt, work_path, work_state);
-            result = std::min(ret, result);
-            cnt_table[t] += 3;
         }
 
         // 顺子（只能是数牌）
@@ -256,20 +252,18 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
         // 顺子t t+1 t+2，显然t不能是8点以上的数牌
         if (is_numbered && tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW, t);
-            if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
-                continue;
+            if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
+                // 削减这组顺子，递归
+                --cnt_table[t];
+                --cnt_table[t + 1];
+                --cnt_table[t + 2];
+                int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
+                    fixed_cnt, work_path, work_state);
+                result = std::min(ret, result);
+                ++cnt_table[t];
+                ++cnt_table[t + 1];
+                ++cnt_table[t + 2];
             }
-
-            // 削减这组顺子，递归
-            --cnt_table[t];
-            --cnt_table[t + 1];
-            --cnt_table[t + 2];
-            int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
-                fixed_cnt, work_path, work_state);
-            result = std::min(ret, result);
-            ++cnt_table[t];
-            ++cnt_table[t + 1];
-            ++cnt_table[t + 2];
         }
 
         // 如果已经通过削减雀头/面子降低了上听数，再按搭子计算的上听数肯定不会更少
@@ -281,15 +275,13 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
         if (cnt_table[t] > 1) {
             // 削减刻子搭子，递归
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_INCOMPLETE_PUNG, t);
-            if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
-                continue;
+            if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
+                cnt_table[t] -= 2;
+                int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
+                    fixed_cnt, work_path, work_state);
+                result = std::min(ret, result);
+                cnt_table[t] += 2;
             }
-
-            cnt_table[t] -= 2;
-            int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
-                fixed_cnt, work_path, work_state);
-            result = std::min(ret, result);
-            cnt_table[t] += 2;
         }
 
         // 顺子搭子（只能是数牌）
@@ -298,32 +290,28 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
             // 两面或者边张搭子t t+1，显然t不能是9点以上的数牌
             if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
                 work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_OPEN_END, t);
-                if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
-                    continue;
+                if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
+                    --cnt_table[t];
+                    --cnt_table[t + 1];
+                    int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
+                        fixed_cnt, work_path, work_state);
+                    result = std::min(ret, result);
+                    ++cnt_table[t];
+                    ++cnt_table[t + 1];
                 }
-
-                --cnt_table[t];
-                --cnt_table[t + 1];
-                int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
-                    fixed_cnt, work_path, work_state);
-                result = std::min(ret, result);
-                ++cnt_table[t];
-                ++cnt_table[t + 1];
             }
             // 坎张搭子t t+2，显然t不能是8点以上的数牌
             if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 坎张
                 work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_CLOSED, t);
-                if (is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
-                    continue;
+                if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
+                    --cnt_table[t];
+                    --cnt_table[t + 2];
+                    int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
+                        fixed_cnt, work_path, work_state);
+                    result = std::min(ret, result);
+                    ++cnt_table[t];
+                    ++cnt_table[t + 2];
                 }
-
-                --cnt_table[t];
-                --cnt_table[t + 2];
-                int ret = basic_type_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
-                    fixed_cnt, work_path, work_state);
-                result = std::min(ret, result);
-                ++cnt_table[t];
-                ++cnt_table[t + 2];
             }
         }
     }
