@@ -98,7 +98,7 @@ static bool is_division_branch_exist(long fixed_cnt, long step, const one_divisi
 }
 
 static bool divide_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, long step, one_division_t *work_division, divisions_t *result) {
-    long idx = step + fixed_cnt;
+    const long idx = step + fixed_cnt;
     if (idx == 4) {  // 4组面子都有了
         return divide_tail(cnt_table, fixed_cnt, work_division, result);
     }
