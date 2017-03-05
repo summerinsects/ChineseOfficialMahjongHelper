@@ -194,17 +194,17 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     }
 
     // 说明
-    label = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
-    label->setColor(textColor);
-    this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 220));
+    Label *maskLabel1 = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
+    maskLabel1->setColor(textColor);
+    this->addChild(maskLabel1);
+    maskLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    maskLabel1->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 220));
 
-    label = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。", "Arial", 10);
-    label->setColor(textColor);
-    this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 240));
+    Label *maskLabel2 = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。", "Arial", 10);
+    maskLabel2->setColor(textColor);
+    this->addChild(maskLabel2);
+    maskLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    maskLabel2->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 240));
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 300));
