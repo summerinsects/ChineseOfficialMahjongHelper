@@ -24,18 +24,20 @@ bool HelloWorld::init() {
 
     Color4B bgColor;
     const char *normalImage, *selectedImage;
-    Color3B textColor;
+    Color3B textColor, textColor2;
     if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
         bgColor = Color4B(32, 37, 40, 255);
         normalImage = "source_material/btn_square_normal.png";
         selectedImage = "source_material/btn_square_highlighted.png";
         textColor = Color3B::BLACK;
+        textColor2 = Color3B::WHITE;
     }
     else {
         bgColor = Color4B(245, 245, 245, 255);
         normalImage = "source_material/btn_square_highlighted.png";
         selectedImage = "source_material/btn_square_selected.png";
         textColor = Color3B::WHITE;
+        textColor2 = Color3B::BLACK;
     }
 
     LayerColor *background = LayerColor::create(bgColor);
@@ -134,5 +136,9 @@ bool HelloWorld::init() {
     });
     scaleLabelToFitWidth(button->getTitleLabel(), 70);
 
+    Label *label = Label::createWithSystemFont("Built  " __DATE__ "  " __TIME__, "Arial", 10);
+    label->setColor(textColor2);
+    this->addChild(label);
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 10));
     return true;
 }
