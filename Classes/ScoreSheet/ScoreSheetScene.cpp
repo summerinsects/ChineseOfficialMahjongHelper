@@ -345,33 +345,31 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     _detailButton[handIdx]->setEnabled(true);
 
     Label *label = _fanNameLabel[handIdx];
-    bool fanNameVisible = false;
+    const char *fanName = nullptr;
     if (detail.score == 0) {
-        label->setString("荒庄");
-        label->setVisible(true);
-        fanNameVisible = true;
+        fanName = "荒庄";
     }
 
     // 选取标记的最大番种显示出来
-
     uint64_t fanFlag = detail.fan_flag;
     if (fanFlag != 0) {
         for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
             if (TEST_FAN(fanFlag, n)) {
                 unsigned idx = n;
-                label->setString(mahjong::fan_name[idx]);
-                label->setVisible(true);
-                fanNameVisible = true;
+                fanName = mahjong::fan_name[idx];
                 break;
             }
         }
     }
-    if (!fanNameVisible) {
-        label->setVisible(false);
+
+    // 将未标记番种的显示为其他凑番
+    if (fanName == nullptr) {
+        fanName = "其他凑番";
     }
-    else {
-        scaleLabelToFitWidth(label, _cellWidth - 4);
-    }
+
+    label->setString(fanName);
+    label->setVisible(true);
+    scaleLabelToFitWidth(label, _cellWidth - 4);
 }
 
 void ScoreSheetScene::refreshStartTime() {
