@@ -297,8 +297,8 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
     for (size_t k = 0; k < currentLevelCount; ++k) {
-        size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
+        size_t idx0 = eachLevelBeginIndex[idx] + k;
         button->setTitleText(mahjong::fan_name[idx0]);
         button->setUserData(reinterpret_cast<void *>(idx0));
         button->setVisible(true);
@@ -316,8 +316,9 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     }
 
     for (size_t k = currentLevelCount; k < 9; ++k) {
-        buttons[k]->setVisible(false);
-        buttons[k]->setEnabled(false);
+        ui::Button *button = buttons[k];
+        button->setVisible(false);
+        button->setEnabled(false);
     }
 
     return cell;
