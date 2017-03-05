@@ -41,12 +41,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         memset(&_detail, 0, sizeof(_detail));
     }
 
-    Color3B textColor, nameColor, scoreColor;
+    Color3B textColor, nameColor, scoreColor, bgColor, titleColor;
     const char *normalImage, *selectedImage;
     if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
         textColor = Color3B::WHITE;
         nameColor = Color3B::YELLOW;
         scoreColor = Color3B(208, 208, 208);
+        bgColor = Color3B(32, 37, 40);
+        titleColor = Color3B::BLACK;
         normalImage = "source_material/btn_square_normal.png";
         selectedImage = "source_material/btn_square_highlighted.png";
     }
@@ -54,6 +56,8 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         textColor = Color3B::BLACK;
         nameColor = Color3B::ORANGE;
         scoreColor = Color3B(80, 80, 80);
+        bgColor = Color3B(245, 245, 245);
+        titleColor = Color3B::WHITE;
         normalImage = "source_material/btn_square_highlighted.png";
         selectedImage = "source_material/btn_square_selected.png";
     }
@@ -193,21 +197,34 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 190));
     }
 
+    // 根结点
+    ui::Layout *rootLayout = ui::Layout::create();
+    rootLayout->setBackGroundColorType(ui::Layout::BackGroundColorType::SOLID);
+    rootLayout->setBackGroundColor(bgColor);
+    this->addChild(rootLayout);
+    rootLayout->setPosition(Vec2(origin.x, origin.y + 35));
+    rootLayout->setTouchEnabled(true);
+
     // 说明
     Label *maskLabel1 = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
     maskLabel1->setColor(textColor);
-    this->addChild(maskLabel1);
+    rootLayout->addChild(maskLabel1);
     maskLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    maskLabel1->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 220));
 
     Label *maskLabel2 = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。", "Arial", 10);
     maskLabel2->setColor(textColor);
-    this->addChild(maskLabel2);
+    rootLayout->addChild(maskLabel2);
     maskLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    maskLabel2->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 240));
+
+    // 展开/收起
+    ui::Button *button = ui::Button::create(normalImage, selectedImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(40.0f, 20.0f));
+    button->setTitleColor(titleColor);
+    button->setTitleFontSize(12);
+    rootLayout->addChild(button);
 
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 300));
     tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
         switch (type) {
         case cw::TableView::CallbackType::CELL_SIZE: {
@@ -230,10 +247,36 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
-    tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 110.0f));
-    tableView->reloadData();
-    this->addChild(tableView);
+    tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
+    tableView->setPosition(Vec2(visibleSize.width * 0.5f, 0));
+    rootLayout->addChild(tableView);
+
+    std::function<void (Ref *)> layoutChildren = [rootLayout, maskLabel1, maskLabel2, tableView](Ref *sender) {
+        ui::Button *button = (ui::Button *)sender;
+
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        Size layoutSize;
+        layoutSize.width = visibleSize.width;
+        if (button->getUserData()) {
+            layoutSize.height = visibleSize.height - 155;
+            button->setUserData(reinterpret_cast<void *>(false));
+            button->setTitleText("收起");
+        }
+        else {
+            layoutSize.height = visibleSize.height - 245;
+            button->setUserData(reinterpret_cast<void *>(true));
+            button->setTitleText("展开");
+        }
+
+        rootLayout->setContentSize(layoutSize);
+        maskLabel1->setPosition(Vec2(5.0f, layoutSize.height - 10));
+        maskLabel2->setPosition(Vec2(5.0f, layoutSize.height - 30));
+        button->setPosition(Vec2(visibleSize.width - 30.0f, layoutSize.height - 20));
+        tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 45));
+        tableView->reloadData();
+    };
+    layoutChildren(button);
+    button->addClickEventListener(layoutChildren);
 
     // 确定按钮
     _okButton = ui::Button::create(normalImage, selectedImage, "source_material/btn_square_disabled.png");
@@ -293,6 +336,14 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     Label *label = std::get<0>(ext);
     ui::Button *const (&buttons)[9] = std::get<1>(ext);
 
+    for (size_t k = 0; k < 9; ++k) {
+        ui::Button *button = buttons[k];
+        button->setVisible(false);
+        button->setEnabled(false);
+        button->setHighlighted(false);
+        button->setTag(false);
+    }
+
     label->setString(StringUtils::format("%d番", fanLevel[idx]));
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
@@ -308,17 +359,12 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         size_t row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
-        bool selected = TEST_FAN(_detail.fan_flag, idx0);
-        button->setHighlighted(selected);
-        button->setTag(selected);
+        if (TEST_FAN(_detail.fan_flag, idx0)) {
+            button->setHighlighted(true);
+            button->setTag(true);
+        }
 
         scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
-    }
-
-    for (size_t k = currentLevelCount; k < 9; ++k) {
-        ui::Button *button = buttons[k];
-        button->setVisible(false);
-        button->setEnabled(false);
     }
 
     return cell;
