@@ -133,7 +133,7 @@ bool ScoreSheetScene::init() {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
-    button->setTitleText("追分与保位");
+    button->setTitleText("追分/保位");
     button->setPosition(Vec2(origin.x + 28, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
     scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
