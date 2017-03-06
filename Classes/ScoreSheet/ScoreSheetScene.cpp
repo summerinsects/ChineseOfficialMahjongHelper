@@ -436,6 +436,7 @@ void ScoreSheetScene::recover() {
     else {
         refreshEndTime();
     }
+    this->unschedule(schedule_selector(ScoreSheetScene::onTimeScheduler));
 }
 
 void ScoreSheetScene::reset() {
