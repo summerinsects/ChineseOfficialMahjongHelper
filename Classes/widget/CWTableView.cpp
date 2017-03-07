@@ -213,6 +213,11 @@ namespace cw {
 
         this->_updateCellPositions(countOfItems);
         this->_updateContentSize(countOfItems);
+
+        if (countOfItems > 0) {
+            _scrollViewDidScroll(countOfItems);
+            this->processScrollingEvent();
+        }
     }
 
     void TableView::removeCellAtIndex(ssize_t idx) {
@@ -237,10 +242,16 @@ namespace cw {
 
         _indices.erase(idx);
         this->_updateCellPositions(countOfItems);
+        this->_updateContentSize(countOfItems);
 
         for (ssize_t i = _cellsUsed.size() - 1; i > newIdx; --i) {
             cell = _cellsUsed.at(i);
             this->_setIndexForCell(cell->getIdx() - 1, cell);
+        }
+
+        if (countOfItems > 0) {
+            _scrollViewDidScroll(countOfItems);
+            this->processScrollingEvent();
         }
     }
 
