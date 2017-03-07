@@ -572,7 +572,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
             else {
                 g_currentRecord.end_time = time(nullptr);
                 refreshEndTime();
-                HistoryScene::addRecord(g_currentRecord);
+                HistoryScene::modifyRecord(g_currentRecord);
             }
         }
         writeToJson();

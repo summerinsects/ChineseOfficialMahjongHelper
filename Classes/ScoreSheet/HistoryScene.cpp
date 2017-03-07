@@ -307,39 +307,9 @@ void HistoryScene::onViewButton(cocos2d::Ref *sender) {
     }
 }
 
-static void __addRecord(const Record &record) {
-    if (g_records.end() == std::find(g_records.begin(), g_records.end(), record)) {
-        g_records.push_back(record);
-        std::vector<Record> temp = g_records;
-        std::thread([temp]() {
-            std::lock_guard<std::mutex> lg(g_mutex);
-            saveRecords(temp);
-        }).detach();
-    }
-}
-
-void HistoryScene::addRecord(const Record &record) {
-    if (g_records.empty()) {
-        std::thread([record]() {
-            std::vector<Record> temp;
-            std::lock_guard<std::mutex> lg(g_mutex);
-            loadRecords(temp);
-
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([record, temp]() mutable {
-                g_records.swap(temp);
-                __addRecord(record);
-            });
-        }).detach();
-    }
-    else {
-        __addRecord(record);
-    }
-}
-
 static void __modifyRecord(const Record &record) {
     auto it = std::find_if(g_records.begin(), g_records.end(), [&record](const Record &r) {
-        return (r.start_time == record.start_time
-            && r.end_time == record.end_time);
+        return (r.start_time == record.start_time);  // 我们认为开始时间相同的为同一个记录
     });
 
     if (it == g_records.end()) {
