@@ -119,7 +119,7 @@ namespace cw {
          * reloads data from data source.  the view will be refreshed.
          */
         void reloadData();
-        void inplaceReloadData();
+        void reloadDataInplacement();
 
         /**
          * Dequeues a free cell if available. nil if not.

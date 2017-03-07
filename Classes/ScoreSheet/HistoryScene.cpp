@@ -299,7 +299,7 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
                 if (LIKELY(thiz->getParent() != nullptr)) {
                     thiz->updateRecordTexts();
                     loadingView->removeFromParent();
-                    thiz->_tableView->reloadData();
+                    thiz->_tableView->reloadDataInplacement();
                 }
             });
         }).detach();

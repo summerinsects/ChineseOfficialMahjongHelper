@@ -107,7 +107,10 @@ namespace cw {
         }
     }
 
-    void TableView::inplaceReloadData() {
+    void TableView::reloadDataInplacement() {
+        Vec2 pos = getInnerContainerPosition();
+        const Vec2 offset1 = minContainerOffset();
+
         _oldDirection = _direction;
 
         for (const auto &cell : _cellsUsed) {
@@ -126,6 +129,25 @@ namespace cw {
         ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
         this->_updateCellPositions(cellsCount);
         this->_updateContentSize(cellsCount);
+
+        const Vec2 offset2 = minContainerOffset();
+        if (_direction == Direction::HORIZONTAL) {
+            pos.x = std::max(pos.x, offset2.x);
+            setInnerContainerPosition(pos);
+        }
+        else {
+            if (_vordering == VerticalFillOrder::BOTTOM_UP) {
+                pos.y = std::max(pos.y, offset2.y);
+                setInnerContainerPosition(pos);
+            }
+            else {
+                float temp = offset1.y - pos.y;
+                pos.y = offset2.y - temp;
+                pos.y = std::min(pos.y, 0.0f);
+                setInnerContainerPosition(pos);
+            }
+        }
+
         if (cellsCount > 0) {
             _scrollViewDidScroll(cellsCount);
             this->processScrollingEvent();
