@@ -165,22 +165,7 @@ bool MahjongTheoryScene::init() {
 
     _tableView = cw::TableView::create();
     _tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 120 - widgetSize.height));
-    _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
-        switch (type) {
-        case cw::TableView::CallbackType::CELL_SIZE: {
-            *(Size *)param2 = tableCellSizeAtIndex(table, param1);
-            return 0;
-        }
-        case cw::TableView::CallbackType::CELL_AT_INDEX:
-            return (intptr_t)tableCellAtIndex(table, param1);
-        case cw::TableView::CallbackType::NUMBER_OF_CELLS:
-            return (intptr_t)_orderedIndices.size();
-        default:
-            break;
-        }
-        return 0;
-    });
-
+    _tableView->setDelegate(this);
     _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
@@ -680,7 +665,11 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
 #define SPACE 2
 #define TILE_WIDTH 15
 
-cocos2d::Size MahjongTheoryScene::tableCellSizeAtIndex(cw::TableView *table, ssize_t idx) {
+ssize_t MahjongTheoryScene::numberOfCellsInTableView(cw::TableView *table) {
+    return _orderedIndices.size();
+}
+
+cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
     size_t realIdx = _orderedIndices[idx];
     const ResultEx *result = &_resultSources[realIdx];  // 当前cell的数据
 
@@ -810,7 +799,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     Label *cntLabel1 = std::get<6>(ext);
     Label *cntLabel2 = std::get<7>(ext);
 
-    const Size cellSize = tableCellSizeAtIndex(table, idx);
+    const Size cellSize = tableCellSizeForIndex(table, idx);
     size_t realIdx = _orderedIndices[idx];
     const ResultEx *result = &_resultSources[realIdx];
 

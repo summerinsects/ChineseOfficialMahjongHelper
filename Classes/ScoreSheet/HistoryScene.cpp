@@ -127,22 +127,7 @@ bool HistoryScene::init() {
 
     _tableView = cw::TableView::create();
     _tableView->setContentSize(Size(visibleSize.width - 10.0f, visibleSize.height - 35));
-    _tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
-        switch (type) {
-        case cw::TableView::CallbackType::CELL_SIZE: {
-            *(Size *)param2 = Size(0, 70);
-            return 0;
-        }
-        case cw::TableView::CallbackType::CELL_AT_INDEX:
-            return (intptr_t)tableCellAtIndex(table, param1);
-        case cw::TableView::CallbackType::NUMBER_OF_CELLS:
-            return (intptr_t)_recordTexts.size();
-        default:
-            break;
-        }
-        return 0;
-    });
-
+    _tableView->setDelegate(this);
     _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
@@ -177,6 +162,14 @@ bool HistoryScene::init() {
     }
 
     return true;
+}
+
+ssize_t HistoryScene::numberOfCellsInTableView(cw::TableView *table) {
+    return _recordTexts.size();
+}
+
+cocos2d::Size HistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+    return Size(0, 70);
 }
 
 cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {

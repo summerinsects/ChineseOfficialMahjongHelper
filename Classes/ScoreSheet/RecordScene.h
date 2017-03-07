@@ -2,19 +2,15 @@
 #define _RECORD_SCENE_H_
 
 #include "../BaseLayer.h"
+#include "../widget/CWTableView.h"
 #include "Record.h"
 #include "../mahjong-algorithm/fan_calculator.h"
-
-namespace cw {
-    class TableViewCell;
-    class TableView;
-}
 
 #define SET_FAN(flag_, fan_) ((flag_) |= (1ULL << (mahjong::LAST_TILE - (fan_))))
 #define RESET_FAN(flag_, fan_) ((flag_) &= ~(1ULL << (mahjong::LAST_TILE - (fan_))))
 #define TEST_FAN(flag_, fan_) !!((flag_) & (1ULL << (mahjong::LAST_TILE - (fan_))))
 
-class RecordScene : public BaseLayer, public cocos2d::ui::EditBoxDelegate {
+class RecordScene : public BaseLayer, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
 public:
     static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback);
 
@@ -39,7 +35,9 @@ private:
     Record::Detail _detail;
     std::function<void (const Record::Detail &)> _okCallback;
 
-    cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
+    virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
+    virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
+    virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
     void refresh();
     void updateScoreLabel();

@@ -55,6 +55,55 @@ namespace cw {
         std::tuple<_ARGS...> _extData;
     };
 
+    class TableView;
+
+    /**
+     * Data source that governs table backend data.
+     */
+    class TableViewDelegate {
+    public:
+        /**
+         * @js NA
+         * @lua NA
+         */
+        virtual ~TableViewDelegate() { }
+
+        /**
+         * Returns number of cells in a given table view.
+         *
+         * @return number of cells
+         */
+        virtual ssize_t numberOfCellsInTableView(TableView *table) = 0;
+
+        /**
+         * cell size for a given index
+         *
+         * @param idx the index of a cell to get a size
+         * @return size of a cell at given index
+         */
+        virtual cocos2d::Size tableCellSizeForIndex(TableView *table, ssize_t idx) { return cocos2d::Size::ZERO; }
+
+        /**
+         * a cell instance at a given index
+         *
+         * @param idx index to search for a cell
+         * @return cell found at idx
+         */
+        virtual TableViewCell* tableCellAtIndex(TableView *table, ssize_t idx) = 0;
+
+        /**
+         * Delegate called when the cell is about to be recycled. Immediately
+         * after this call the cell will be removed from the scene graph and
+         * recycled.
+         *
+         * @param table table contains the given cell
+         * @param cell  cell that is pressed
+         * @js NA
+         * @lua NA
+         */
+        virtual void tableCellWillRecycle(TableView *table, TableViewCell *cell) { }
+    };
+
     class TableView : public cocos2d::ui::ScrollView {
         DECLARE_CLASS_GUI_INFO
 
@@ -63,15 +112,6 @@ namespace cw {
             TOP_DOWN,
             BOTTOM_UP
         };
-
-        enum class CallbackType {
-            CELL_SIZE,  // param1 is for idx, param2 is for pointer to Size
-            CELL_AT_INDEX,  // param1 is for idx, param2 is unused, returns TableViewCell*
-            NUMBER_OF_CELLS, // params are unused, returns size_t
-            CELL_WILL_RECYCLE  // param1 is for cell, param2 is unused
-        };
-
-        typedef std::function<intptr_t (TableView *table, CallbackType, intptr_t param1, intptr_t param2)> ccTableViewCallback;
 
         /**
          * Default constructor
@@ -89,7 +129,11 @@ namespace cw {
         static TableView *create();
         virtual bool init() override;
 
-        void setTableViewCallback(const ccTableViewCallback &callback);
+        /**
+         * delegate
+         */
+        TableViewDelegate *getDelegate() { return _delegate; }
+        void setDelegate(TableViewDelegate *pDelegate) { _delegate = pDelegate; }
 
         /**
          * determines how cell is ordered and filled in the view.
@@ -182,7 +226,7 @@ namespace cw {
          */
         cocos2d::Vector<TableViewCell *> _cellsFreed;
 
-        ccTableViewCallback _tableViewCallback;
+        TableViewDelegate *_delegate;
 
         bool _isUsedCellsDirty;
 

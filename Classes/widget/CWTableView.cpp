@@ -6,7 +6,8 @@ using namespace cocos2d::ui;
 namespace cw {
     TableView::TableView()
     : _vordering(VerticalFillOrder::BOTTOM_UP)
-    , _isUsedCellsDirty(false) {
+    , _isUsedCellsDirty(false)
+    , _delegate(nullptr) {
 
     }
 
@@ -47,10 +48,6 @@ namespace cw {
         }
     }
 
-    void TableView::setTableViewCallback(const ccTableViewCallback &callback) {
-        _tableViewCallback = callback;
-    }
-
     void TableView::setVerticalFillOrder(VerticalFillOrder fillOrder) {
         if (_vordering != fillOrder) {
             _vordering = fillOrder;
@@ -82,7 +79,7 @@ namespace cw {
 
     void TableView::reloadData() {
         for (const auto &cell : _cellsUsed) {
-            _tableViewCallback(this, CallbackType::CELL_WILL_RECYCLE, (intptr_t)cell, 0);
+            _delegate->tableCellWillRecycle(this, cell);
             _cellsFreed.pushBack(cell);
 
             cell->reset();
@@ -94,7 +91,7 @@ namespace cw {
         _indices.clear();
         _cellsUsed.clear();
 
-        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
+        ssize_t cellsCount = _delegate->numberOfCellsInTableView(this);
         this->_updateCellPositions(cellsCount);
         this->_updateContentSize(cellsCount);
         if (cellsCount > 0) {
@@ -108,7 +105,7 @@ namespace cw {
         const Vec2 offset1 = minContainerOffset();
 
         for (const auto &cell : _cellsUsed) {
-            _tableViewCallback(this, CallbackType::CELL_WILL_RECYCLE, (intptr_t)cell, 0);
+            _delegate->tableCellWillRecycle(this, cell);
             _cellsFreed.pushBack(cell);
 
             cell->reset();
@@ -120,7 +117,7 @@ namespace cw {
         _indices.clear();
         _cellsUsed.clear();
 
-        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
+        ssize_t cellsCount = _delegate->numberOfCellsInTableView(this);
         this->_updateCellPositions(cellsCount);
         this->_updateContentSize(cellsCount);
 
@@ -164,7 +161,7 @@ namespace cw {
         if (idx == CC_INVALID_INDEX) {
             return;
         }
-        ssize_t countOfItems = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
+        ssize_t countOfItems = _delegate->numberOfCellsInTableView(this);
         if (0 == countOfItems || idx > countOfItems-1) {
             return;
         }
@@ -173,7 +170,7 @@ namespace cw {
         if (cell != nullptr) {
             this->_moveCellOutOfSight(cell);
         }
-        cell = (TableViewCell *)_tableViewCallback(this, CallbackType::CELL_AT_INDEX, idx, 0);
+        cell = _delegate->tableCellAtIndex(this, idx);
         this->_setIndexForCell(idx, cell);
         this->_addCellIfNecessary(cell);
     }
@@ -183,7 +180,7 @@ namespace cw {
             return;
         }
 
-        ssize_t countOfItems = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
+        ssize_t countOfItems = _delegate->numberOfCellsInTableView(this);
         if (0 == countOfItems || idx > countOfItems-1) {
             return;
         }
@@ -201,7 +198,7 @@ namespace cw {
         }
 
         //insert a new cell
-        cell = (TableViewCell *)_tableViewCallback(this, CallbackType::CELL_AT_INDEX, idx, 0);
+        cell = _delegate->tableCellAtIndex(this, idx);
         this->_setIndexForCell(idx, cell);
         this->_addCellIfNecessary(cell);
 
@@ -219,7 +216,7 @@ namespace cw {
             return;
         }
 
-        ssize_t countOfItems = (size_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
+        ssize_t countOfItems = _delegate->numberOfCellsInTableView(this);
         if (0 == countOfItems || idx + 1 > countOfItems) {
             return;
         }
@@ -286,8 +283,7 @@ namespace cw {
     Vec2 TableView::_offsetFromIndex(ssize_t index) {
         Vec2 offset = this->__offsetFromIndex(index);
 
-        Size cellSize;
-        _tableViewCallback(this, CallbackType::CELL_SIZE, index, (intptr_t)&cellSize);
+        Size cellSize = _delegate->tableCellSizeForIndex(this, index);
         if (_vordering == VerticalFillOrder::TOP_DOWN) {
             offset.y = _innerContainer->getContentSize().height - offset.y - cellSize.height;
         }
@@ -343,7 +339,7 @@ namespace cw {
     }
 
     void TableView::_moveCellOutOfSight(TableViewCell *cell) {
-        _tableViewCallback(this, CallbackType::CELL_WILL_RECYCLE, (intptr_t)cell, 0);
+        _delegate->tableCellWillRecycle(this, cell);
         _cellsFreed.pushBack(cell);
         _cellsUsed.eraseObject(cell);
         _isUsedCellsDirty = true;
@@ -370,7 +366,7 @@ namespace cw {
             Size cellSize;
             for (ssize_t i = 0; i < cellsCount; ++i) {
                 _cellsPositions[i] = currentPos;
-                _tableViewCallback(this, CallbackType::CELL_SIZE, i, (intptr_t)&cellSize);
+                cellSize = _delegate->tableCellSizeForIndex(this, i);
                 currentPos += (_direction == Direction::HORIZONTAL ? cellSize.width : cellSize.height);
             }
             _cellsPositions[cellsCount] = currentPos;//1 extra value allows us to get right/bottom of the last cell
@@ -481,7 +477,7 @@ namespace cw {
 
     void TableView::moveInnerContainer(const Vec2& deltaMove, bool canStartBounceBack) {
         ScrollView::moveInnerContainer(deltaMove, canStartBounceBack);
-        ssize_t cellsCount = (ssize_t)_tableViewCallback(this, CallbackType::NUMBER_OF_CELLS, 0, 0);
+        ssize_t cellsCount = _delegate->numberOfCellsInTableView(this);
         _scrollViewDidScroll(cellsCount);
     }
 }

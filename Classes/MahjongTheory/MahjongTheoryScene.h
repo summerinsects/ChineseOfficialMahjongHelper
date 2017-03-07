@@ -3,16 +3,12 @@
 
 #include "../BaseLayer.h"
 #include "../mahjong-algorithm/shanten.h"
+#include "../widget/CWTableView.h"
 #include <unordered_map>
-
-namespace cw {
-    class TableViewCell;
-    class TableView;
-}
 
 class HandTilesWidget;
 
-class MahjongTheoryScene : public BaseLayer, cocos2d::ui::EditBoxDelegate {
+class MahjongTheoryScene : public BaseLayer, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
 public:
     static cocos2d::Scene *createScene();
 
@@ -68,8 +64,10 @@ private:
     float _waitingLabelWidth2;
     float _totalLabelWidth;
     std::unordered_map<uint16_t, int> _cellHeightMap;
-    cocos2d::Size tableCellSizeAtIndex(cw::TableView *table, ssize_t idx);
-    cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
+
+    virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
+    virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
+    virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 };
 
 #endif

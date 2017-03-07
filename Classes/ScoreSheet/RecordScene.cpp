@@ -225,24 +225,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(button);
 
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setTableViewCallback([this](cw::TableView *table, cw::TableView::CallbackType type, intptr_t param1, intptr_t param2)->intptr_t {
-        switch (type) {
-        case cw::TableView::CallbackType::CELL_SIZE: {
-            size_t cnt = eachLevelCounts[param1];
-            float height = computeRowsAlign4(cnt) * 25.0f;
-            *(Size *)param2 = Size(0, height + 15.0f);
-            return 0;
-        }
-        case cw::TableView::CallbackType::CELL_AT_INDEX:
-            return (intptr_t)tableCellAtIndex(table, param1);
-        case cw::TableView::CallbackType::NUMBER_OF_CELLS:
-            return (intptr_t)10;
-        default:
-            break;
-        }
-        return 0;
-    });
-
+    tableView->setDelegate(this);
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
@@ -293,6 +276,16 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         refresh();
     }
     return true;
+}
+
+ssize_t RecordScene::numberOfCellsInTableView(cw::TableView *table) {
+    return 10;
+}
+
+cocos2d::Size RecordScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+    size_t cnt = eachLevelCounts[idx];
+    float height = computeRowsAlign4(cnt) * 25.0f;
+    return Size(0, height + 15.0f);
 }
 
 cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
