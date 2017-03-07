@@ -184,8 +184,6 @@ namespace cw {
 
         ccTableViewCallback _tableViewCallback;
 
-        cocos2d::ui::ScrollView::Direction _oldDirection;
-
         bool _isUsedCellsDirty;
 
     //public:

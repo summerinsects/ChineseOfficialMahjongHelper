@@ -6,7 +6,6 @@ using namespace cocos2d::ui;
 namespace cw {
     TableView::TableView()
     : _vordering(VerticalFillOrder::BOTTOM_UP)
-    , _oldDirection(Direction::NONE)
     , _isUsedCellsDirty(false) {
 
     }
@@ -28,7 +27,6 @@ namespace cw {
         if (!ScrollView::init()) {
             return false;
         }
-        _oldDirection = Direction::NONE;
         _cellsPositions.clear();
 
         _cellsUsed.clear();
@@ -83,8 +81,6 @@ namespace cw {
     }
 
     void TableView::reloadData() {
-        _oldDirection = Direction::NONE;
-
         for (const auto &cell : _cellsUsed) {
             _tableViewCallback(this, CallbackType::CELL_WILL_RECYCLE, (intptr_t)cell, 0);
             _cellsFreed.pushBack(cell);
@@ -110,8 +106,6 @@ namespace cw {
     void TableView::reloadDataInplacement() {
         Vec2 pos = getInnerContainerPosition();
         const Vec2 offset1 = minContainerOffset();
-
-        _oldDirection = _direction;
 
         for (const auto &cell : _cellsUsed) {
             _tableViewCallback(this, CallbackType::CELL_WILL_RECYCLE, (intptr_t)cell, 0);
@@ -287,17 +281,6 @@ namespace cw {
         }
 
         this->setInnerContainerSize(size);
-
-        if (_oldDirection != _direction) {
-            if (_direction == Direction::HORIZONTAL) {
-                _innerContainer->setPositionX(0.0f);
-            }
-            else {
-                Vec2 minOffset = this->minContainerOffset();
-                _innerContainer->setPositionY(minOffset.y);
-            }
-            _oldDirection = _direction;
-        }
     }
 
     Vec2 TableView::_offsetFromIndex(ssize_t index) {
