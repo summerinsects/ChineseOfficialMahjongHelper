@@ -2,13 +2,9 @@
 #define __FAN_TABLE_H__
 
 #include "../BaseLayer.h"
+#include "../widget/CWTableView.h"
 
-namespace cw {
-    class TableViewCell;
-    class TableView;
-}
-
-class FanTableScene : public BaseLayer {
+class FanTableScene : public BaseLayer, cw::TableViewDelegate {
 public:
     static cocos2d::Scene *createScene();
 
@@ -17,7 +13,10 @@ public:
     CREATE_FUNC(FanTableScene);
 
 private:
-    cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx);
+    virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
+    virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
+    virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
+
     void onPointsNameButton(cocos2d::Ref *sender);
 };
 
