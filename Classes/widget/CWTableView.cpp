@@ -305,7 +305,7 @@ namespace cw {
         }
         index = this->__indexFromOffset(offset, cellsCount);
         if (index != -1) {
-            index = MAX(0, index);
+            index = std::max(0L, index);
             if (index > maxIdx) {
                 index = CC_INVALID_INDEX;
             }
