@@ -280,6 +280,11 @@ namespace cw {
         this->setInnerContainerSize(size);
     }
 
+    void TableView::updateInnerContainerSize() {
+        ssize_t cellsCount = _delegate->numberOfCellsInTableView(this);
+        this->_updateCellPositions(cellsCount);
+    }
+
     Vec2 TableView::_offsetFromIndex(ssize_t index) {
         Vec2 offset = this->__offsetFromIndex(index);
 
