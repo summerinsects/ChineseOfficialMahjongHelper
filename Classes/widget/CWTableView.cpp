@@ -93,7 +93,7 @@ namespace cw {
 
         ssize_t cellsCount = _delegate->numberOfCellsInTableView(this);
         this->_updateCellPositions(cellsCount);
-        this->_updateContentSize(cellsCount);
+        this->_updateInnerContainerSize(cellsCount);
         if (cellsCount > 0) {
             _scrollViewDidScroll(cellsCount);
             this->processScrollingEvent();
@@ -119,7 +119,7 @@ namespace cw {
 
         ssize_t cellsCount = _delegate->numberOfCellsInTableView(this);
         this->_updateCellPositions(cellsCount);
-        this->_updateContentSize(cellsCount);
+        this->_updateInnerContainerSize(cellsCount);
 
         const Vec2 offset2 = minContainerOffset();
         if (_direction == Direction::HORIZONTAL) {
@@ -203,7 +203,7 @@ namespace cw {
         this->_addCellIfNecessary(cell);
 
         this->_updateCellPositions(countOfItems);
-        this->_updateContentSize(countOfItems);
+        this->_updateInnerContainerSize(countOfItems);
 
         if (countOfItems > 0) {
             _scrollViewDidScroll(countOfItems);
@@ -233,7 +233,7 @@ namespace cw {
 
         _indices.erase(idx);
         this->_updateCellPositions(countOfItems);
-        this->_updateContentSize(countOfItems);
+        this->_updateInnerContainerSize(countOfItems);
 
         for (ssize_t i = _cellsUsed.size() - 1; i > newIdx; --i) {
             cell = _cellsUsed.at(i);
@@ -269,7 +269,7 @@ namespace cw {
         _isUsedCellsDirty = true;
     }
 
-    void TableView::_updateContentSize(ssize_t cellsCount) {
+    void TableView::_updateInnerContainerSize(ssize_t cellsCount) {
         Size size = Size::ZERO;
         if (cellsCount > 0) {
             float maxPosition = _cellsPositions[cellsCount];

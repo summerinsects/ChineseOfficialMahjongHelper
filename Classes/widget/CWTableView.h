@@ -231,7 +231,7 @@ namespace cw {
         bool _isUsedCellsDirty;
 
     //public:
-        void _updateContentSize(ssize_t cellsCount);
+        void _updateInnerContainerSize(ssize_t cellsCount);
 
     private:
         using cocos2d::ui::ScrollView::setInnerContainerSize;
