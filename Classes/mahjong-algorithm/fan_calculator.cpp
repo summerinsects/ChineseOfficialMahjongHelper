@@ -372,7 +372,7 @@ static forceinline bool is_big_three_winds(tile_t t0, tile_t t1, tile_t t2) {
 
 // 双箭刻
 static forceinline bool is_two_dragons_pungs(tile_t t0, tile_t t1) {
-    return (is_winds(t0) && is_winds(t1));
+    return (is_dragons(t0) && is_dragons(t1));
 }
 
 // 双同刻
