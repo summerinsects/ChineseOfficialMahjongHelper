@@ -762,19 +762,19 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
     drawNode->drawLine(Vec2(width, 0), Vec2(width, 200), Color4F::BLACK);
 
     Label *label = Label::createWithSystemFont("追者", "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 0.5f, 190));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     label = Label::createWithSystemFont("被追", "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 190));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     label = Label::createWithSystemFont("分差", "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 190));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -799,14 +799,14 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 4位
     label = Label::createWithSystemFont(g_currentRecord.name[indices[3]], "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 0.5f, 130));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 追1位
     label = Label::createWithSystemFont(g_currentRecord.name[indices[0]], "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 150));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -819,7 +819,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 分差
     label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 150));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -847,7 +847,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 追2位
     label = Label::createWithSystemFont(g_currentRecord.name[indices[1]], "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 130));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -860,7 +860,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 分差
     label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 130));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -888,7 +888,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 追3位
     label = Label::createWithSystemFont(g_currentRecord.name[indices[2]], "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 110));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -901,7 +901,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 分差
     label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 110));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -929,14 +929,14 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 3位
     label = Label::createWithSystemFont(g_currentRecord.name[indices[2]], "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 0.5f, 60));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 追1位
     label = Label::createWithSystemFont(g_currentRecord.name[indices[0]], "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 70));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -949,7 +949,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 分差
     label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 70));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -977,7 +977,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 追2位
     label = Label::createWithSystemFont(g_currentRecord.name[indices[1]], "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 50));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -990,7 +990,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 分差
     label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 50));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -1018,14 +1018,14 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 2位
     label = Label::createWithSystemFont(g_currentRecord.name[indices[1]], "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 0.5f, 10));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 追1位
     label = Label::createWithSystemFont(g_currentRecord.name[indices[0]], "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 10));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
@@ -1038,7 +1038,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 
     // 分差
     label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 10));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
