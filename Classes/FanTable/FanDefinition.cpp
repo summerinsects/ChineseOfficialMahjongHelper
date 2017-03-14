@@ -107,7 +107,7 @@ void FanDefinitionScene::createContentView(size_t idx) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    const std::string &text = idx < 99 ? g_definitions[idx] : g_principles[idx - 99];
+    const std::string &text = idx < 100 ? g_definitions[idx] : g_principles[idx - 100];
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
