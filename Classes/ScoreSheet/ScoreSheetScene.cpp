@@ -126,14 +126,14 @@ bool ScoreSheetScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
 
-    // 追分与保位按钮
+    // 追分策略按钮
     button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
-    button->setTitleText("追分/保位");
+    button->setTitleText("追分策略");
     button->setPosition(Vec2(origin.x + 28, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
     scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
@@ -720,6 +720,353 @@ static void showPursuit(int delta) {
     AlertView::showWithMessage("追分与保位", msg, nullptr, nullptr);
 }
 
+static DrawNode *createTable(const int (&totalScores)[4]) {
+    // 下标
+    int indices[4] = { 0, 1, 2, 3 };
+    // 按分数排序
+    std::stable_sort(std::begin(indices), std::end(indices), [&totalScores](int a, int b) {
+        return totalScores[a] > totalScores[b];
+    });
+
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+
+    const float width = visibleSize.width * 0.8f - 20;
+    const float height = 10 * 20;
+    const float gap = width / 6;
+
+    DrawNode *drawNode = DrawNode::create();
+    drawNode->setContentSize(Size(width, height));
+
+    // 横线
+    drawNode->drawLine(Vec2(0, 0), Vec2(width, 0), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0, 20), Vec2(width, 20), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0, 40), Vec2(width, 40), Color4F::BLACK);
+    drawNode->drawLine(Vec2(gap, 60), Vec2(width, 60), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0, 80), Vec2(width, 80), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0, 100), Vec2(width, 100), Color4F::BLACK);
+    drawNode->drawLine(Vec2(gap, 120), Vec2(width, 120), Color4F::BLACK);
+    drawNode->drawLine(Vec2(gap, 140), Vec2(width, 140), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0, 160), Vec2(width, 160), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0, 180), Vec2(width, 180), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0, 200), Vec2(width, 200), Color4F::BLACK);
+
+    // 竖线
+    drawNode->drawLine(Vec2(0, 0), Vec2(0, 200), Color4F::BLACK);
+    for (int i = 1; i < 6; ++i) {
+        const float x = i * gap;
+        drawNode->drawLine(Vec2(x, 0), Vec2(x, 20), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 40), Vec2(x, 80), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 100), Vec2(x, 160), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 180), Vec2(x, 200), Color4F::BLACK);
+    }
+    drawNode->drawLine(Vec2(width, 0), Vec2(width, 200), Color4F::BLACK);
+
+    Label *label = Label::createWithSystemFont("追者", "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 0.5f, 190));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    label = Label::createWithSystemFont("被追", "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 1.5f, 190));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    label = Label::createWithSystemFont("分差", "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 2.5f, 190));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    label = Label::createWithSystemFont("自摸", "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 3.5f, 190));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    label = Label::createWithSystemFont("对点", "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 4.5f, 190));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    label = Label::createWithSystemFont("旁点", "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 5.5f, 190));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 4位
+    label = Label::createWithSystemFont(g_currentRecord.name[indices[3]], "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 0.5f, 130));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 追1位
+    label = Label::createWithSystemFont(g_currentRecord.name[indices[0]], "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 1.5f, 150));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    int delta = totalScores[indices[0]] - totalScores[indices[3]];
+    int d = delta - 32;
+    int d1 = d + 1;
+    int d2 = (d >> 1) + 1;
+    int d4 = (d >> 2) + 1;
+
+    // 分差
+    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 2.5f, 150));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 自摸
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 3.5f, 150));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 对点
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 4.5f, 150));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 旁点
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 5.5f, 150));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 追2位
+    label = Label::createWithSystemFont(g_currentRecord.name[indices[1]], "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 1.5f, 130));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    delta = totalScores[indices[1]] - totalScores[indices[3]];
+    d = delta - 32;
+    d1 = d + 1;
+    d2 = (d >> 1) + 1;
+    d4 = (d >> 2) + 1;
+
+    // 分差
+    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 2.5f, 130));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 自摸
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 3.5f, 130));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 对点
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 4.5f, 130));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 旁点
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 5.5f, 130));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 追3位
+    label = Label::createWithSystemFont(g_currentRecord.name[indices[2]], "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 1.5f, 110));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    delta = totalScores[indices[2]] - totalScores[indices[3]];
+    d = delta - 32;
+    d1 = d + 1;
+    d2 = (d >> 1) + 1;
+    d4 = (d >> 2) + 1;
+
+    // 分差
+    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 2.5f, 110));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 自摸
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 3.5f, 110));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 对点
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 4.5f, 110));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 旁点
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 5.5f, 110));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 3位
+    label = Label::createWithSystemFont(g_currentRecord.name[indices[2]], "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 0.5f, 60));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 追1位
+    label = Label::createWithSystemFont(g_currentRecord.name[indices[0]], "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 1.5f, 70));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    delta = totalScores[indices[0]] - totalScores[indices[2]];
+    d = delta - 32;
+    d1 = d + 1;
+    d2 = (d >> 1) + 1;
+    d4 = (d >> 2) + 1;
+
+    // 分差
+    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 2.5f, 70));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 自摸
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 3.5f, 70));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 对点
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 4.5f, 70));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 旁点
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 5.5f, 70));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 追2位
+    label = Label::createWithSystemFont(g_currentRecord.name[indices[1]], "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 1.5f, 50));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    delta = totalScores[indices[1]] - totalScores[indices[2]];
+    d = delta - 32;
+    d1 = d + 1;
+    d2 = (d >> 1) + 1;
+    d4 = (d >> 2) + 1;
+
+    // 分差
+    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 2.5f, 50));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 自摸
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 3.5f, 50));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 对点
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 4.5f, 50));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 旁点
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 5.5f, 50));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 2位
+    label = Label::createWithSystemFont(g_currentRecord.name[indices[1]], "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 0.5f, 10));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 追1位
+    label = Label::createWithSystemFont(g_currentRecord.name[indices[0]], "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 1.5f, 10));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    delta = totalScores[indices[0]] - totalScores[indices[1]];
+    d = delta - 32;
+    d1 = d + 1;
+    d2 = (d >> 1) + 1;
+    d4 = (d >> 2) + 1;
+
+    // 分差
+    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 2.5f, 10));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 自摸
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 3.5f, 10));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 对点
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 4.5f, 10));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    // 旁点
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(gap * 5.5f, 10));
+    drawNode->addChild(label);
+    scaleLabelToFitWidth(label, gap - 4);
+
+    return drawNode;
+}
+
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     const char (&name)[4][255] = g_currentRecord.name;
     ui::Widget *rootWidget = nullptr;
@@ -728,55 +1075,17 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     if (std::none_of(std::begin(name), std::end(name), &isCStringEmpty)
         && g_currentRecord.current_index < 16) {
         rootWidget = ui::Widget::create();
-        rootWidget->setContentSize(Size(150.0f, 200.0f));
 
-        Label *label = Label::createWithSystemFont("快捷选择当前局面分差", "Arial", 12);
-        label->setColor(Color3B::BLACK);
-        rootWidget->addChild(label);
-        label->setPosition(Vec2(75.0f, 190.0f));
+        DrawNode *drawNode = createTable(_totalScores);
+        const Size &drawNodeSize = drawNode->getContentSize();
 
-        const char *normalImage, *selectedImage;
-        if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-            normalImage = "source_material/btn_square_selected.png";
-            selectedImage = "source_material/btn_square_highlighted.png";
-        }
-        else {
-            normalImage = "source_material/btn_square_highlighted.png";
-            selectedImage = "source_material/btn_square_selected.png";
-        }
-
-        static std::pair<int, int> pairwise[6] = {
-            std::make_pair(0, 1), std::make_pair(0, 2), std::make_pair(0, 3),
-            std::make_pair(1, 2), std::make_pair(1, 3), std::make_pair(2, 3),
-        };
-
-        for (int i = 0; i < 6; ++i) {
-            int delta = _totalScores[pairwise[i].first] - _totalScores[pairwise[i].second];
-
-            ui::Button *button = ui::Button::create(normalImage, selectedImage);
-            button->setScale9Enabled(true);
-            button->setContentSize(Size(150.0f, 20.0f));
-            button->setTitleFontSize(12);
-            if (delta > 0) {
-                button->setTitleText(StringUtils::format("「%s」领先「%s」%d分", name[pairwise[i].first], name[pairwise[i].second], delta));
-            }
-            else if (delta < 0) {
-                button->setTitleText(StringUtils::format("「%s」落后「%s」%d分", name[pairwise[i].first], name[pairwise[i].second], -delta));
-            }
-            else {
-                button->setTitleText(StringUtils::format("「%s」与「%s」平分", name[pairwise[i].first], name[pairwise[i].second]));
-            }
-            scaleLabelToFitWidth(button->getTitleLabel(), 148.0f);
-            rootWidget->addChild(button);
-            button->setPosition(Vec2(75.0f, 170.0f - i * 25.0f));
-            button->addClickEventListener([delta](Ref *) {
-                showPursuit(delta);
-            });
-        }
+        rootWidget->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30));
+        rootWidget->addChild(drawNode);
+        drawNode->setPosition(Vec2(0, 30));
     }
 
     // 自定义分差输入
-    ui::EditBox *editBox = ui::EditBox::create(Size(100.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox = ui::EditBox::create(Size(120.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
     editBox->setFontColor(Color4B::BLACK);
@@ -786,7 +1095,8 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
 
     if (rootWidget != nullptr) {
         rootWidget->addChild(editBox);
-        editBox->setPosition(Vec2(75.0f, 10.0f));
+        const Size &rootSize = rootWidget->getContentSize();
+        editBox->setPosition(Vec2(rootSize.width * 0.5f, 10.0f));
     }
     else {
         rootWidget = editBox;
@@ -804,7 +1114,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     editBox->setDelegate(delegate.get());
 
     // 使这个代理随AlertView一起析构
-    AlertView::showWithNode("追分与保位", rootWidget, [editBox, delegate]() {
+    AlertView::showWithNode("追分策略", rootWidget, [editBox, delegate]() {
         const char *text = editBox->getText();
         if (*text != '\0') {
             int delta = atoi(text);
