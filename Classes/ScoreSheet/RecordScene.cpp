@@ -206,7 +206,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->setTouchEnabled(true);
 
     // 说明
-    Label *maskLabel1 = Label::createWithSystemFont("标记番种（未做排斥检测）", "Arial", 12);
+    Label *maskLabel1 = Label::createWithSystemFont("标记4番以上番种（未做排斥检测）", "Arial", 12);
     maskLabel1->setColor(textColor);
     rootLayout->addChild(maskLabel1);
     maskLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
