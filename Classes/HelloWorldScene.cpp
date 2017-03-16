@@ -4,6 +4,7 @@
 #include "FanTable/FanTable.h"
 #include "Other/OtherScene.h"
 #include "MahjongTheory/MahjongTheoryScene.h"
+#include "widget/AlertView.h"
 #include "common.h"
 
 #pragma execution_character_set("utf-8")
@@ -44,11 +45,13 @@ bool HelloWorld::init() {
     this->addChild(background, -100);
 
     auto listener = EventListenerKeyboard::create();
-    listener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* unused_event) {
-        Director::getInstance()->end();
+    listener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event *unused_event) {
+        AlertView::showWithMessage("提示", "是否确定退出国标小助手？", []() {
+            Director::getInstance()->end();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-        exit(0);
+            exit(0);
 #endif
+        }, nullptr);
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
