@@ -27,7 +27,7 @@ Scene *MahjongTheoryScene::createScene() {
 }
 
 bool MahjongTheoryScene::init() {
-    if (!BaseLayer::initWithTitle("牌理（测试版）")) {
+    if (!BaseLayer::initWithTitle("牌理")) {
         return false;
     }
 
@@ -166,6 +166,7 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
     const float width = visibleSize.width * 0.8f - 10;
 
     Label *label = Label::createWithSystemFont(
+        "牌理功能未经严格测试，可能存在bug。\n\n"
         "1." INPUT_GUIDE_STRING_1 "\n"
         "2." INPUT_GUIDE_STRING_2 "\n"
         "3." INPUT_GUIDE_STRING_3 "\n"
