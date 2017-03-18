@@ -101,19 +101,7 @@ bool ScoreSheetScene::init() {
     button->setTitleColor(textColor2);
     button->setTitleText("历史记录");
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 45));
-    button->addClickEventListener([this](Ref *) {
-        Director::getInstance()->pushScene(HistoryScene::createScene([this](const Record &record) {
-            const char (&name)[4][255] = g_currentRecord.name;
-            if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)
-                || g_currentRecord.current_index == 16) {
-                memcpy(&g_currentRecord, &record, sizeof(g_currentRecord));
-                recover();
-                return true;
-            }
-            AlertView::showWithMessage("提示", "当前一局尚未完成时不支持查看历史记录", nullptr, nullptr);
-            return false;
-        }));
-    });
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onHistoryButton, this, std::placeholders::_1));
 
     // 重置按钮
     button = ui::Button::create(normalImage, selectedImage);
@@ -653,6 +641,20 @@ void ScoreSheetScene::onTimeScheduler(float dt) {
     time_t t = time(nullptr);
     strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&t));
     _timeLabel->setString(str);
+}
+
+void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
+    Director::getInstance()->pushScene(HistoryScene::createScene([this](const Record &record) {
+        const char (&name)[4][255] = g_currentRecord.name;
+        if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)
+            || g_currentRecord.current_index == 16) {
+            memcpy(&g_currentRecord, &record, sizeof(g_currentRecord));
+            recover();
+            return true;
+        }
+        AlertView::showWithMessage("提示", "当前一局尚未完成时不支持查看历史记录", nullptr, nullptr);
+        return false;
+    }));
 }
 
 void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
