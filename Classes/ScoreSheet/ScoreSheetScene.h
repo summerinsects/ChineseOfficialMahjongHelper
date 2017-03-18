@@ -36,6 +36,7 @@ private:
     void onDetailButton(cocos2d::Ref *sender, size_t handIdx);
     void editRecord(size_t handIdx, bool modify);
     void onTimeScheduler(float dt);
+    void onInstructionButton(cocos2d::Ref *sender);
     void onHistoryButton(cocos2d::Ref *sender);
     void onResetButton(cocos2d::Ref *sender);
     void onPursuitButton(cocos2d::Ref *sender);

@@ -92,15 +92,26 @@ bool ScoreSheetScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    // 历史记录按钮
+    // 使用说明按钮
     ui::Button *button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
-    button->setTitleText("历史记录");
+    button->setTitleText("使用说明");
     button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 45));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onInstructionButton, this, std::placeholders::_1));
+
+    // 历史记录按钮
+    button = ui::Button::create(normalImage, selectedImage);
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(textColor2);
+    button->setTitleText("历史记录");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 44, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onHistoryButton, this, std::placeholders::_1));
 
     // 重置按钮
@@ -111,7 +122,7 @@ bool ScoreSheetScene::init() {
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
     button->setTitleText("重置/清空");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 44, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
 
     // 追分策略按钮
@@ -641,6 +652,16 @@ void ScoreSheetScene::onTimeScheduler(float dt) {
     time_t t = time(nullptr);
     strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&t));
     _timeLabel->setString(str);
+}
+
+void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
+    AlertView::showWithMessage("使用说明",
+        "1. 使用步骤：点击选手姓名一栏的空白处->输入选手姓名->点击锁定->开始记分。\n"
+        "2. 对于已经记分的，点击备注一栏可修改记录。\n"
+        "3. 点击累计分处，可快捷计算追分。\n"
+        "3. 北风北记录完成后，会自动添加入历史记录。\n"
+        "4. 历史记录里的内容只要不卸载程序就会一直保存。",
+        nullptr, nullptr);
 }
 
 void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
