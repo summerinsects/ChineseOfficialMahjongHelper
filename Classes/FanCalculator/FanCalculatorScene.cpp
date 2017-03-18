@@ -20,19 +20,6 @@ bool FanCalculatorScene::init() {
         return false;
     }
 
-    Color3B textColor;
-    const char *normalImage, *selectedImage;
-    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-        textColor = Color3B::WHITE;
-        normalImage = "source_material/btn_square_normal.png";
-        selectedImage = "source_material/btn_square_highlighted.png";
-    }
-    else {
-        textColor = Color3B::BLACK;
-        normalImage = "source_material/btn_square_highlighted.png";
-        selectedImage = "source_material/btn_square_selected.png";
-    }
-
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -85,7 +72,7 @@ bool FanCalculatorScene::init() {
     _winTypeGroup->addRadioButton(radioButton);
 
     Label *label = Label::createWithSystemFont("点和", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     infoWidget->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f, 105.0f));
@@ -100,7 +87,7 @@ bool FanCalculatorScene::init() {
     _winTypeGroup->addRadioButton(radioButton);
 
     label = Label::createWithSystemFont("自摸", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     infoWidget->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f + gapX, 105.0f));
@@ -116,7 +103,7 @@ bool FanCalculatorScene::init() {
     _fourthTileBox->addEventListener(std::bind(&FanCalculatorScene::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("绝张", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     infoWidget->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f + gapX * 2, 105.0f));
@@ -131,7 +118,7 @@ bool FanCalculatorScene::init() {
     _replacementBox->setEnabled(false);
 
     label = Label::createWithSystemFont("杠开", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     infoWidget->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f, 75.0f));
@@ -147,7 +134,7 @@ bool FanCalculatorScene::init() {
     _robKongBox->addEventListener(std::bind(&FanCalculatorScene::onRobKongBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("抢杠", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     infoWidget->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f + gapX, 75.0f));
@@ -162,7 +149,7 @@ bool FanCalculatorScene::init() {
     _lastTileBox->addEventListener(std::bind(&FanCalculatorScene::onLastTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("海底", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     infoWidget->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f + gapX * 2, 75.0f));
@@ -171,7 +158,7 @@ bool FanCalculatorScene::init() {
 
     // 圈风
     label = Label::createWithSystemFont("圈风", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     infoWidget->addChild(label);
     label->setPosition(Vec2(20.0f, 45.0f));
 
@@ -195,7 +182,7 @@ bool FanCalculatorScene::init() {
 
     // 门风
     label = Label::createWithSystemFont("门风", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     infoWidget->addChild(label);
     label->setPosition(Vec2(20.0f, 15.0f));
 
@@ -218,7 +205,7 @@ bool FanCalculatorScene::init() {
     }
 
     // 直接输入
-    ui::Button *button = ui::Button::create(normalImage, selectedImage);
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -230,7 +217,7 @@ bool FanCalculatorScene::init() {
 
     // 花牌数
     label = Label::createWithSystemFont("花牌数", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     infoWidget->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     label->setPosition(Vec2(visibleSize.width - 50, 45.0f));
@@ -245,7 +232,7 @@ bool FanCalculatorScene::init() {
     _editBox->setPosition(Vec2(visibleSize.width - 30, 45.0f));
 
     // 番算按钮
-    button = ui::Button::create(normalImage, selectedImage);
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -512,10 +499,9 @@ void FanCalculatorScene::calculate() {
     ext_cond.seat_wind = seat_wind;
     int fan = calculate_fan(&hand_tiles, win_tile, &ext_cond, fan_table);
 
-    Color3B textColor = UserDefault::getInstance()->getBoolForKey("night_mode") ? Color3B::WHITE : Color3B::BLACK;
     if (fan == ERROR_NOT_WIN) {
         Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", FONT_SIZE);
-        errorLabel->setColor(textColor);
+        errorLabel->setColor(Color3B::BLACK);
         _fanAreaNode->addChild(errorLabel);
         errorLabel->setPosition(pos);
         return;
@@ -555,7 +541,7 @@ void FanCalculatorScene::calculate() {
 
         // 创建label，每行排2个
         Label *fanName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
-        fanName->setColor(textColor);
+        fanName->setColor(Color3B::BLACK);
         innerNode->addChild(fanName);
         fanName->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
         div_t ret = div(i, 2);
@@ -563,7 +549,7 @@ void FanCalculatorScene::calculate() {
     }
 
     Label *fanTotal = Label::createWithSystemFont(StringUtils::format("总计：%d番", fan), "Arial", FONT_SIZE);
-    fanTotal->setColor(textColor);
+    fanTotal->setColor(Color3B::BLACK);
     innerNode->addChild(fanTotal);
     fanTotal->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
     fanTotal->setPosition(Vec2(5.0f, FONT_SIZE + 2));

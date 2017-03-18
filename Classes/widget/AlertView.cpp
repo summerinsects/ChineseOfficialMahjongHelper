@@ -48,19 +48,6 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, con
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener, this);
 
-    const char *normalImage, *selectedImage;
-    Color3B titleColor;
-    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-        normalImage = "source_material/btn_square_selected.png";
-        selectedImage = "source_material/btn_square_highlighted.png";
-        titleColor = Color3B(0, 114, 197);
-    }
-    else {
-        normalImage = "source_material/btn_square_highlighted.png";
-        selectedImage = "source_material/btn_square_selected.png";
-        titleColor = Color3B(51, 204, 255);
-    }
-
     // 遮罩
     this->addChild(LayerColor::create(Color4B(0, 0, 0, 127)));
 
@@ -77,7 +64,7 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, con
 
     // 标题
     Label *label = Label::createWithSystemFont(title, "Arail", 14);
-    label->setColor(titleColor);
+    label->setColor(Color3B(51, 204, 255));
     background->addChild(label);
     label->setPosition(Vec2(width * 0.5f, 62.0f + nodeSize.height));
 
@@ -101,7 +88,7 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, con
     node->setPosition(Vec2(width * 0.5f, 35.0f + nodeSize.height * 0.5f));
 
     // 取消按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_disabled.png", selectedImage);
+    ui::Button *button = ui::Button::create("source_material/btn_square_disabled.png", "source_material/btn_square_selected.png");
     background->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(width * 0.5f, 30.0f));
@@ -111,7 +98,7 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, con
     button->addClickEventListener(std::bind(&AlertView::onCancelButton, this, std::placeholders::_1));
 
     // 确定按钮
-    button = ui::Button::create(normalImage, selectedImage);
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     background->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(width * 0.5f, 30.0f));

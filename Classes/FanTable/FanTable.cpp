@@ -36,9 +36,7 @@ bool FanTableScene::init() {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 40));
-    if (!UserDefault::getInstance()->getBoolForKey("night_mode")) {
-        label->setColor(Color3B::BLACK);
-    }
+    label->setColor(Color3B::BLACK);
 
     for (size_t i = 0; i < 5; ++i) {
         ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -100,9 +98,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         label = Label::createWithSystemFont("1番", "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
-        if (!UserDefault::getInstance()->getBoolForKey("night_mode")) {
-            label->setColor(Color3B::BLACK);
-        }
+        label->setColor(Color3B::BLACK);
 
         for (size_t k = 0; k < 13; ++k) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");

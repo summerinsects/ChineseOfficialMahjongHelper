@@ -116,13 +116,7 @@ void FanDefinitionScene::createContentView(size_t idx) {
     this->addChild(webView);
     webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
 #else
-    ui::RichText *richText;
-    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-        richText = ui::RichText::createWithXML(text);
-    }
-    else {
-        richText = ui::RichText::createWithXML("<font face=\"Verdana\" size=\"12\" color=\"#000000\">" + text + "</font>");
-    }
+    ui::RichText *richText = ui::RichText::createWithXML("<font face=\"Verdana\" size=\"12\" color=\"#000000\">" + text + "</font>");
     richText->setContentSize(Size(visibleSize.width - 10, 0));
     richText->ignoreContentAdaptWithSize(false);
     richText->setVerticalSpace(2);

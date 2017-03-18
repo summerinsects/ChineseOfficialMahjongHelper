@@ -31,21 +31,6 @@ bool MahjongTheoryScene::init() {
         return false;
     }
 
-    Color3B titleColor, textColor;
-    const char *normalImage, *selectedImage;
-    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-        titleColor = Color3B::BLACK;
-        textColor = Color3B::WHITE;
-        normalImage = "source_material/btn_square_normal.png";
-        selectedImage = "source_material/btn_square_highlighted.png";
-    }
-    else {
-        titleColor = Color3B::WHITE;
-        textColor = Color3B::BLACK;
-        normalImage = "source_material/btn_square_highlighted.png";
-        selectedImage = "source_material/btn_square_selected.png";
-    }
-
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -60,22 +45,20 @@ bool MahjongTheoryScene::init() {
     _editBox->setDelegate(this);
     _editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40, origin.y + visibleSize.height - 50));
 
-    ui::Button *button = ui::Button::create(normalImage, selectedImage);
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("随机");
-    button->setTitleColor(titleColor);
     this->addChild(button);
     button->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 50));
     button->addClickEventListener([this](Ref *) { setRandomInput(); });
 
-    button = ui::Button::create(normalImage, selectedImage);
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("说明");
-    button->setTitleColor(titleColor);
     this->addChild(button);
     button->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 50));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
@@ -95,23 +78,21 @@ bool MahjongTheoryScene::init() {
     _handTilesWidget->setPosition(Vec2(origin.x + widgetSize.width * 0.5f, origin.y + visibleSize.height - 65 - widgetSize.height * 0.5f));
 
 #if 0
-    _undoButton = ui::Button::create(normalImage, selectedImage);
+    _undoButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     _undoButton->setScale9Enabled(true);
     _undoButton->setContentSize(Size(35.0f, 20.0f));
     _undoButton->setTitleFontSize(12);
     _undoButton->setTitleText("撤销");
-    _undoButton->setTitleColor(titleColor);
     this->addChild(_undoButton);
     _undoButton->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 75 - widgetSize.height));
     _undoButton->addClickEventListener(std::bind(&MahjongTheoryScene::onUndoButton, this, std::placeholders::_1));
     _undoButton->setEnabled(false);
 
-    _redoButton = ui::Button::create(normalImage, selectedImage);
+    _redoButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     _redoButton->setScale9Enabled(true);
     _redoButton->setContentSize(Size(35.0f, 20.0f));
     _redoButton->setTitleFontSize(12);
     _redoButton->setTitleText("重做");
-    _redoButton->setTitleColor(titleColor);
     this->addChild(_redoButton);
     _redoButton->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 75 - widgetSize.height));
     _redoButton->addClickEventListener(std::bind(&MahjongTheoryScene::onRedoButton, this, std::placeholders::_1));
@@ -119,7 +100,7 @@ bool MahjongTheoryScene::init() {
 #endif
 
     Label *label = Label::createWithSystemFont("考虑特殊和型", "Arial", 12);
-    label->setColor(textColor);
+    label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 80 - widgetSize.height));
@@ -142,7 +123,7 @@ bool MahjongTheoryScene::init() {
         });
 
         label = Label::createWithSystemFont(title[i], "Arial", 12);
-        label->setColor(textColor);
+        label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(xPos, yPos));
@@ -715,19 +696,6 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     if (cell == nullptr) {
         cell = CustomCell::create();
 
-        Color4B bgColor0, bgColor1;
-        Color3B textColor;
-        if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-            bgColor0 = Color4B(22, 22, 22, 255);
-            bgColor1 = Color4B(32, 32, 32, 255);
-            textColor = Color3B(208, 208, 208);
-        }
-        else {
-            bgColor0 = Color4B::WHITE;
-            bgColor1 = Color4B(239, 243, 247, 255);
-            textColor = Color3B(80, 80, 80);
-        }
-
         CustomCell::ExtDataType &ext = cell->getExtData();
         LayerColor *(&layerColor)[2] = std::get<0>(ext);
         Label *&typeLabel = std::get<1>(ext);
@@ -738,21 +706,21 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         Label *&cntLabel1 = std::get<6>(ext);
         Label *&cntLabel2 = std::get<7>(ext);
 
-        layerColor[0] = LayerColor::create(bgColor0, _cellWidth, 0);
+        layerColor[0] = LayerColor::create(Color4B::WHITE, _cellWidth, 0);
         cell->addChild(layerColor[0]);
         layerColor[0]->setPosition(Vec2(0, 1));
 
-        layerColor[1] = LayerColor::create(bgColor1, _cellWidth, 0);
+        layerColor[1] = LayerColor::create(Color4B(239, 243, 247, 255), _cellWidth, 0);
         cell->addChild(layerColor[1]);
         layerColor[1]->setPosition(Vec2(0, 1));
 
         typeLabel = Label::createWithSystemFont("", "Arial", 12);
-        typeLabel->setColor(textColor);
+        typeLabel->setColor(Color3B(80, 80, 80));
         typeLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(typeLabel);
 
         discardLabel = Label::createWithSystemFont("", "Arial", 12);
-        discardLabel->setColor(textColor);
+        discardLabel->setColor(Color3B(80, 80, 80));
         discardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(discardLabel);
 
@@ -763,7 +731,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardButton->addClickEventListener(std::bind(&MahjongTheoryScene::onTileButton, this, std::placeholders::_1));
 
         usefulLabel = Label::createWithSystemFont("", "Arial", 12);
-        usefulLabel->setColor(textColor);
+        usefulLabel->setColor(Color3B(80, 80, 80));
         usefulLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(usefulLabel);
 
@@ -778,12 +746,12 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         }
 
         cntLabel1 = Label::createWithSystemFont("", "Arial", 12);
-        cntLabel1->setColor(textColor);
+        cntLabel1->setColor(Color3B(80, 80, 80));
         cntLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(cntLabel1);
 
         cntLabel2 = Label::createWithSystemFont("", "Arial", 12);
-        cntLabel2->setColor(textColor);
+        cntLabel2->setColor(Color3B(80, 80, 80));
         cntLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(cntLabel2);
         cntLabel2->setPosition(Vec2(SPACE, TILE_WIDTH));
@@ -816,12 +784,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
     typeLabel->setString(getResultTypeString(result->form_flag, result->shanten));
     typeLabel->setPosition(Vec2(SPACE, cellSize.height - 10));
-    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-        typeLabel->setColor(result->shanten != -1 ? Color3B(208, 208, 208) : Color3B::YELLOW);
-    }
-    else {
-        typeLabel->setColor(result->shanten != -1 ? Color3B(80, 80, 80) : Color3B::ORANGE);
-    }
+    typeLabel->setColor(result->shanten != -1 ? Color3B(80, 80, 80) : Color3B::ORANGE);
 
     float xPos = SPACE;
     float yPos = cellSize.height - 35;

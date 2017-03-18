@@ -72,15 +72,8 @@ bool TilePickWidget::init() {
             std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
     }
 
-    const char *normalImage, *selectedImage;
-    if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-        normalImage = "source_material/btn_square_normal.png";
-        selectedImage = "source_material/btn_square_highlighted.png";
-    }
-    else {
-        normalImage = "source_material/btn_square_highlighted.png";
-        selectedImage = "source_material/btn_square_selected.png";
-    }
+    const char *normalImage = "source_material/btn_square_highlighted.png";
+    const char *selectedImage = "source_material/btn_square_selected.png";
     const char *disableImage = "source_material/btn_square_disabled.png";
 
     // 吃(_XX) 为23吃1这种类型

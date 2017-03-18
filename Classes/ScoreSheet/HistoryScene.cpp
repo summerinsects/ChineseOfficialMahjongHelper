@@ -179,26 +179,6 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
     if (cell == nullptr) {
         cell = CustomCell::create();
 
-        Color4B bgColor0, bgColor1;
-        const char *normalImage, *selectedImage;
-        Color3B textColor, titleColor;
-        if (UserDefault::getInstance()->getBoolForKey("night_mode")) {
-            bgColor0 = Color4B(22, 22, 22, 255);
-            bgColor1 = Color4B(32, 32, 32, 255);
-            normalImage = "source_material/btn_square_normal.png";
-            selectedImage = "source_material/btn_square_highlighted.png";
-            textColor = Color3B::WHITE;
-            titleColor = Color3B::BLACK;
-        }
-        else {
-            bgColor0 = Color4B::WHITE;
-            bgColor1 = Color4B(239, 243, 247, 255);
-            normalImage = "source_material/btn_square_highlighted.png";
-            selectedImage = "source_material/btn_square_selected.png";
-            textColor = Color3B::BLACK;
-            titleColor = Color3B::WHITE;
-        }
-
         Size visibleSize = Director::getInstance()->getVisibleSize();
         const float width = visibleSize.width - 10.0f;
 
@@ -208,34 +188,32 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         ui::Button *&delBtn = std::get<2>(ext);
         ui::Button *&viewBtn = std::get<3>(ext);
 
-        layerColor[0] = LayerColor::create(bgColor0, width, 68);
+        layerColor[0] = LayerColor::create(Color4B::WHITE, width, 68);
         cell->addChild(layerColor[0]);
         layerColor[0]->setPosition(Vec2(0, 1));
 
-        layerColor[1] = LayerColor::create(bgColor1, width, 68);
+        layerColor[1] = LayerColor::create(Color4B(239, 243, 247, 255), width, 68);
         cell->addChild(layerColor[1]);
         layerColor[1]->setPosition(Vec2(0, 1));
 
         label = Label::createWithSystemFont("", "Arail", 10);
-        label->setColor(textColor);
+        label->setColor(Color3B::BLACK);
         cell->addChild(label);
         label->setPosition(Vec2(2.0f, 35.0f));
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
-        delBtn = ui::Button::create(normalImage, selectedImage);
+        delBtn = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         delBtn->setScale9Enabled(true);
         delBtn->setContentSize(Size(40.0f, 20.0f));
-        delBtn->setTitleColor(titleColor);
         delBtn->setTitleFontSize(12);
         delBtn->setTitleText("删除");
         delBtn->addClickEventListener(std::bind(&HistoryScene::onDeleteButton, this, std::placeholders::_1));
         cell->addChild(delBtn);
         delBtn->setPosition(Vec2(width - 25.0f, 50.0f));
 
-        viewBtn = ui::Button::create(normalImage, selectedImage);
+        viewBtn = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         viewBtn->setScale9Enabled(true);
         viewBtn->setContentSize(Size(40.0f, 20.0f));
-        viewBtn->setTitleColor(titleColor);
         viewBtn->setTitleFontSize(12);
         viewBtn->setTitleText("查看");
         viewBtn->addClickEventListener(std::bind(&HistoryScene::onViewButton, this, std::placeholders::_1));
