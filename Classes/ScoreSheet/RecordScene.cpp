@@ -211,7 +211,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(maskLabel1);
     maskLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
-    Label *maskLabel2 = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。", "Arial", 10);
+    Label *maskLabel2 = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
     maskLabel2->setColor(textColor);
     rootLayout->addChild(maskLabel2);
     maskLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -253,9 +253,9 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
         rootLayout->setContentSize(layoutSize);
         maskLabel1->setPosition(Vec2(5.0f, layoutSize.height - 10));
-        maskLabel2->setPosition(Vec2(5.0f, layoutSize.height - 30));
+        maskLabel2->setPosition(Vec2(5.0f, layoutSize.height - 35));
         button->setPosition(Vec2(visibleSize.width - 30.0f, layoutSize.height - 20));
-        tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 45));
+        tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 55));
         tableView->reloadData();
     };
     layoutChildren(button);
