@@ -92,6 +92,9 @@ bool ScoreSheetScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    const float buttonWidth = 54;
+    const float buttonGap = (visibleSize.width - 4 - buttonWidth) / 3;
+
     // 使用说明按钮
     ui::Button *button = ui::Button::create(normalImage, selectedImage);
     this->addChild(button);
@@ -100,7 +103,7 @@ bool ScoreSheetScene::init() {
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
     button->setTitleText("使用说明");
-    button->setPosition(Vec2(origin.x + visibleSize.width - 28, origin.y + visibleSize.height - 45));
+    button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap * 3, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onInstructionButton, this, std::placeholders::_1));
 
     // 历史记录按钮
@@ -111,7 +114,7 @@ bool ScoreSheetScene::init() {
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
     button->setTitleText("历史记录");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 44, origin.y + visibleSize.height - 45));
+    button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap * 2, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onHistoryButton, this, std::placeholders::_1));
 
     // 重置按钮
@@ -122,7 +125,7 @@ bool ScoreSheetScene::init() {
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
     button->setTitleText("重置");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 44, origin.y + visibleSize.height - 45));
+    button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
 
     // 追分策略按钮
@@ -133,7 +136,7 @@ bool ScoreSheetScene::init() {
     button->setTitleFontSize(12);
     button->setTitleColor(textColor2);
     button->setTitleText("追分策略");
-    button->setPosition(Vec2(origin.x + 28, origin.y + visibleSize.height - 45));
+    button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
     scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
 
