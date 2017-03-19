@@ -7,8 +7,6 @@
 #include "widget/AlertView.h"
 #include "common.h"
 
-#pragma execution_character_set("utf-8")
-
 USING_NS_CC;
 
 Scene* HelloWorld::createScene() {

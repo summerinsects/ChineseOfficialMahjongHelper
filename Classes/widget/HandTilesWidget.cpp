@@ -1,6 +1,5 @@
 ﻿#include "HandTilesWidget.h"
 #include "../common.h"
-#include "../compiler.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 
 USING_NS_CC;

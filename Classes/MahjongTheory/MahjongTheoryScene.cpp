@@ -8,14 +8,9 @@
 #include "../mahjong-algorithm/fan_calculator.h"
 
 #include "../common.h"
-#include "../compiler.h"
 #include "../widget/HandTilesWidget.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
-
-#ifdef _MSC_VER
-#pragma execution_character_set("utf-8")
-#endif
 
 USING_NS_CC;
 

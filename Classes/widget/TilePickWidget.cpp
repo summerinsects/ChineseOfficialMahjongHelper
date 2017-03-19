@@ -1,7 +1,6 @@
 ﻿#include "TilePickWidget.h"
 #include "HandTilesWidget.h"
 #include "../common.h"
-#include "../compiler.h"
 
 USING_NS_CC;
 

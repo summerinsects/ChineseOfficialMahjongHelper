@@ -158,6 +158,9 @@
     <ClInclude Include="..\Classes\widget\LoadingView.h">
       <Filter>src\widget</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\compiler.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">

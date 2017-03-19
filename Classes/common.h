@@ -3,8 +3,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
-
-#pragma execution_character_set("utf-8")
+#include "compiler.h"
 
 static const char *tilesImageName[] = {
     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",

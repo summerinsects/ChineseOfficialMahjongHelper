@@ -1,6 +1,10 @@
 ﻿#ifndef _COMPILER_H_
 #define _COMPILER_H_
 
+#ifdef _MSC_VER
+#pragma execution_character_set("utf-8")
+#endif
+
 // cdecl
 #ifndef CDECL
 #if defined(_MSC_VER)

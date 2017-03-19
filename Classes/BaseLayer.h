@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
+#include "compiler.h"
 
 class BaseLayer : public cocos2d::Layer {
 public:

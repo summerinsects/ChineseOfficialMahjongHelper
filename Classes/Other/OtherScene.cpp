@@ -1,7 +1,5 @@
 ﻿#include "OtherScene.h"
 
-#pragma execution_character_set("utf-8")
-
 USING_NS_CC;
 
 static std::unordered_map<std::string, std::string> g_map;

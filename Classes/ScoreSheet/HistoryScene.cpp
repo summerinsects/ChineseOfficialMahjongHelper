@@ -7,11 +7,8 @@
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
 #include "../widget/CWTableView.h"
-#include "../compiler.h"
 #include <thread>
 #include <mutex>
-
-#pragma execution_character_set("utf-8")
 
 USING_NS_CC;
 
