@@ -191,7 +191,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     maskLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
     Label *maskLabel2 = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
-    maskLabel2->setColor(Color3B::GRAY);
+    maskLabel2->setColor(Color3B(80, 80, 80));
     rootLayout->addChild(maskLabel2);
     maskLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
