@@ -49,7 +49,7 @@ static void saveRecords(const std::vector<Record> &records) {
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
     FILE *file = fopen(fileName.c_str(), "wb");
-    if (file != nullptr) {
+    if (LIKELY(file != nullptr)) {
         try {
             jw::cppJSON json(jw::cppJSON::ValueType::Array);
             std::transform(records.begin(), records.end(), std::back_inserter(json), [](const Record &record) {
@@ -113,7 +113,7 @@ void HistoryScene::updateRecordTexts() {
 }
 
 bool HistoryScene::init() {
-    if (!BaseLayer::initWithTitle("历史记录")) {
+    if (UNLIKELY(!BaseLayer::initWithTitle("历史记录"))) {
         return false;
     }
 

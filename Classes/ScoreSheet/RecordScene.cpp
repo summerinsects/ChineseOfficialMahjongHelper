@@ -29,7 +29,7 @@ static inline size_t computeRowsAlign4(size_t cnt) {
 }
 
 bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail) {
-    if (!BaseLayer::initWithTitle(handNameText[handIdx])) {
+    if (UNLIKELY(!BaseLayer::initWithTitle(handNameText[handIdx]))) {
         return false;
     }
 

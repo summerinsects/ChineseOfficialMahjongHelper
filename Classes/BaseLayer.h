@@ -8,7 +8,7 @@
 class BaseLayer : public cocos2d::Layer {
 public:
     bool initWithTitle(const std::string &title) {
-        if (!cocos2d::Layer::init()) {
+        if (UNLIKELY(!cocos2d::Layer::init())) {
             return false;
         }
 

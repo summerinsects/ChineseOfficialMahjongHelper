@@ -16,7 +16,7 @@ Scene *FanCalculatorScene::createScene() {
 }
 
 bool FanCalculatorScene::init() {
-    if (!BaseLayer::initWithTitle("国标麻将算番器")) {
+    if (UNLIKELY(!BaseLayer::initWithTitle("国标麻将算番器"))) {
         return false;
     }
 

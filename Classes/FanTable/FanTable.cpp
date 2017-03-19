@@ -25,7 +25,7 @@ static inline size_t computeRowsAlign4(size_t cnt) {
 }
 
 bool FanTableScene::init() {
-    if (!BaseLayer::initWithTitle("国标麻将番种表")) {
+    if (UNLIKELY(!BaseLayer::initWithTitle("国标麻将番种表"))) {
         return false;
     }
 

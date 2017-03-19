@@ -12,11 +12,11 @@ Scene *OtherScene::createScene() {
 }
 
 bool OtherScene::init() {
-    if (!BaseLayer::initWithTitle("其他")) {
+    if (UNLIKELY(!BaseLayer::initWithTitle("其他"))) {
         return false;
     }
 
-    if (g_map.empty()) {
+    if (UNLIKELY(g_map.empty())) {
         ValueMap valueMap = FileUtils::getInstance()->getValueMapFromFile("other.xml");
         std::for_each(valueMap.begin(), valueMap.end(), [](const ValueMap::value_type &value) {
             g_map.insert(std::make_pair(value.first, value.second.asString()));

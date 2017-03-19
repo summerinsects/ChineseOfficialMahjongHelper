@@ -17,7 +17,7 @@ Scene* HelloWorld::createScene() {
 }
 
 bool HelloWorld::init() {
-    if (!Layer::init()) {
+    if (UNLIKELY(!Layer::init())) {
         return false;
     }
 

@@ -51,7 +51,7 @@ Scene *FanDefinitionScene::createScene(size_t idx) {
 
 bool FanDefinitionScene::initWithIndex(size_t idx) {
     const char *title = idx < 100 ? mahjong::fan_name[idx] : principle_title[idx - 100];
-    if (!BaseLayer::initWithTitle(title)) {
+    if (UNLIKELY(!BaseLayer::initWithTitle(title))) {
         return false;
     }
 

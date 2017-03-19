@@ -59,7 +59,7 @@ Scene *ScoreSheetScene::createScene() {
 }
 
 bool ScoreSheetScene::init() {
-    if (!BaseLayer::initWithTitle("国标麻将记分器")) {
+    if (UNLIKELY(!BaseLayer::initWithTitle("国标麻将记分器"))) {
         return false;
     }
 

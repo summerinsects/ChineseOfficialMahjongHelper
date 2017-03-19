@@ -22,7 +22,7 @@ Scene *MahjongTheoryScene::createScene() {
 }
 
 bool MahjongTheoryScene::init() {
-    if (!BaseLayer::initWithTitle("牌理")) {
+    if (UNLIKELY(!BaseLayer::initWithTitle("牌理"))) {
         return false;
     }
 

@@ -1,5 +1,6 @@
 ﻿#include "AppDelegate.h"
 #include "HelloWorldScene.h"
+#include "compiler.h"
 
 USING_NS_CC;
 
@@ -38,7 +39,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // initialize director
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
-    if(!glview) {
+    if (LIKELY(glview == nullptr)) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
         glview = GLViewImpl::createWithRect("ChineseOfficialMahjongHelper", Rect(0, 0, designResolutionSize.width, designResolutionSize.height));
 #else
