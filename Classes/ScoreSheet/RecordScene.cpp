@@ -116,7 +116,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);
         _scoreLabel[i]->setColor(Color3B(80, 80, 80));
         this->addChild(_scoreLabel[i]);
-        _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 105));
+        _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 100));
 
         // 和
         ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
@@ -125,14 +125,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 130));
+        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 125));
         _winGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("和", "Arial", 12);
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 130));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 125));
 
         // 点炮或自摸
         button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
@@ -141,21 +141,21 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 160));
+        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 155));
         _claimGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 160));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 155));
         _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 160));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 155));
         _selfDrawnLabel[i] = label;
         label->setVisible(false);
 
@@ -166,14 +166,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         _falseWinBox[i]->setZoomScale(0.0f);
         _falseWinBox[i]->ignoreContentAdaptWithSize(false);
         _falseWinBox[i]->setContentSize(Size(20.0f, 20.0f));
-        _falseWinBox[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 190));
+        _falseWinBox[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 185));
         _falseWinBox[i]->addEventListener(std::bind(&RecordScene::onFalseWinBox, this, std::placeholders::_1, std::placeholders::_2));
 
         label = Label::createWithSystemFont("错和", "Arial", 12);
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 190));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 185));
     }
 
     // 根结点
@@ -219,12 +219,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         Size layoutSize;
         layoutSize.width = visibleSize.width;
         if (button->getUserData()) {
-            layoutSize.height = visibleSize.height - 155;
+            layoutSize.height = visibleSize.height - 150;
             button->setUserData(reinterpret_cast<void *>(false));
             button->setTitleText("收起");
         }
         else {
-            layoutSize.height = visibleSize.height - 245;
+            layoutSize.height = visibleSize.height - 240;
             button->setUserData(reinterpret_cast<void *>(true));
             button->setTitleText("展开");
         }
