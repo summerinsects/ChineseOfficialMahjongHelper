@@ -1,11 +1,14 @@
-# Chinese Official Mahjong Helper
+Chinese Official Mahjong Helper
+=========
+
 **国标小助手**
 
 1. 本程序以cocos2dx引擎为UI写成，包含算番器、计分器、番种详细说明、牌理等内容
 2. 算番逻辑在mahjong-algorithm文件夹下，可提取出来单独使用
 3. 由于cocos2dx引擎自身的源码较为庞大，这里就不上传了，请按如下步骤配置
 
-## 配置步骤 ##
+配置步骤
+---------
 1. 下载cocos2dx v3.14.1
 2. clone本项目
 3. 随便创建一个c++工程（命令行：cocos new -l cpp --portrait 工程名）
@@ -20,7 +23,7 @@
 
 **Android版(使用Eclipse ADT)**
 1. shift+右键“在此处打开命令行窗口”
-2. cocos compile -p android（如果要编译release版本，请加参数-m release)
+2. cocos compile -p android（如果要编译release版本，请加参数-m release）
 
 **Android版(使用Android Studio)**
 * 暂未打理，需要的可参考Eclipse ADT的相关文件
