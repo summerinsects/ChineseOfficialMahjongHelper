@@ -114,7 +114,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
         // 得分
         _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);
-        _scoreLabel[i]->setColor(Color3B(80, 80, 80));
+        _scoreLabel[i]->setColor(Color3B(0x60, 0x60, 0x60));
         this->addChild(_scoreLabel[i]);
         _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 100));
 
@@ -191,7 +191,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     maskLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
     Label *maskLabel2 = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
-    maskLabel2->setColor(Color3B(80, 80, 80));
+    maskLabel2->setColor(Color3B(0x60, 0x60, 0x60));
     rootLayout->addChild(maskLabel2);
     maskLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
@@ -416,7 +416,7 @@ void RecordScene::updateScoreLabel() {
             _scoreLabel[i]->setColor(Color3B(37, 153, 14));
         }
         else {
-            _scoreLabel[i]->setColor(Color3B(80, 80, 80));
+            _scoreLabel[i]->setColor(Color3B(0x60, 0x60, 0x60));
         }
     }
 

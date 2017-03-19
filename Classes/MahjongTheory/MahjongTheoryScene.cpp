@@ -716,12 +716,12 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         layerColor[1]->setPosition(Vec2(0, 1));
 
         typeLabel = Label::createWithSystemFont("", "Arial", 12);
-        typeLabel->setColor(Color3B(80, 80, 80));
+        typeLabel->setColor(Color3B(0x60, 0x60, 0x60));
         typeLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(typeLabel);
 
         discardLabel = Label::createWithSystemFont("", "Arial", 12);
-        discardLabel->setColor(Color3B(80, 80, 80));
+        discardLabel->setColor(Color3B(0x60, 0x60, 0x60));
         discardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(discardLabel);
 
@@ -732,7 +732,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardButton->addClickEventListener(std::bind(&MahjongTheoryScene::onTileButton, this, std::placeholders::_1));
 
         usefulLabel = Label::createWithSystemFont("", "Arial", 12);
-        usefulLabel->setColor(Color3B(80, 80, 80));
+        usefulLabel->setColor(Color3B(0x60, 0x60, 0x60));
         usefulLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(usefulLabel);
 
@@ -747,12 +747,12 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         }
 
         cntLabel1 = Label::createWithSystemFont("", "Arial", 12);
-        cntLabel1->setColor(Color3B(80, 80, 80));
+        cntLabel1->setColor(Color3B(0x60, 0x60, 0x60));
         cntLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(cntLabel1);
 
         cntLabel2 = Label::createWithSystemFont("", "Arial", 12);
-        cntLabel2->setColor(Color3B(80, 80, 80));
+        cntLabel2->setColor(Color3B(0x60, 0x60, 0x60));
         cntLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(cntLabel2);
         cntLabel2->setPosition(Vec2(SPACE, TILE_WIDTH));
@@ -785,7 +785,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
     typeLabel->setString(getResultTypeString(result->form_flag, result->shanten));
     typeLabel->setPosition(Vec2(SPACE, cellSize.height - 10));
-    typeLabel->setColor(result->shanten != -1 ? Color3B(80, 80, 80) : Color3B::ORANGE);
+    typeLabel->setColor(result->shanten != -1 ? Color3B(0x60, 0x60, 0x60) : Color3B::ORANGE);
 
     float xPos = SPACE;
     float yPos = cellSize.height - 35;
