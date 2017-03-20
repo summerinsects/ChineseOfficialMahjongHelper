@@ -79,7 +79,7 @@ bool MahjongTheoryScene::init() {
     _undoButton->setTitleFontSize(12);
     _undoButton->setTitleText("撤销");
     this->addChild(_undoButton);
-    _undoButton->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 77 - widgetSize.height));
+    _undoButton->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 80 - widgetSize.height));
     _undoButton->addClickEventListener(std::bind(&MahjongTheoryScene::onUndoButton, this, std::placeholders::_1));
     _undoButton->setEnabled(false);
 
@@ -89,7 +89,7 @@ bool MahjongTheoryScene::init() {
     _redoButton->setTitleFontSize(12);
     _redoButton->setTitleText("重做");
     this->addChild(_redoButton);
-    _redoButton->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 77 - widgetSize.height));
+    _redoButton->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 80 - widgetSize.height));
     _redoButton->addClickEventListener(std::bind(&MahjongTheoryScene::onRedoButton, this, std::placeholders::_1));
     _redoButton->setEnabled(false);
 #endif
@@ -101,7 +101,7 @@ bool MahjongTheoryScene::init() {
     label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 80 - widgetSize.height));
 
     static const char *title[] = { "七对", "十三幺", "全不靠", "组合龙" };
-    const float yPos = origin.y + visibleSize.height - 100 - widgetSize.height;
+    const float yPos = origin.y + visibleSize.height - 105 - widgetSize.height;
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float xPos = origin.x + gap * (i + 0.5f);
@@ -140,14 +140,14 @@ bool MahjongTheoryScene::init() {
     _totalLabelWidth = tempLabel->getContentSize().width;
 
     _tableView = cw::TableView::create();
-    _tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 120 - widgetSize.height));
+    _tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 130 - widgetSize.height));
     _tableView->setDelegate(this);
     _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     _tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
     _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 55));
+    _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 60));
     this->addChild(_tableView);
 
     srand((unsigned)time(nullptr));
