@@ -79,7 +79,7 @@ bool MahjongTheoryScene::init() {
     _undoButton->setTitleFontSize(12);
     _undoButton->setTitleText("撤销");
     this->addChild(_undoButton);
-    _undoButton->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 75 - widgetSize.height));
+    _undoButton->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 77 - widgetSize.height));
     _undoButton->addClickEventListener(std::bind(&MahjongTheoryScene::onUndoButton, this, std::placeholders::_1));
     _undoButton->setEnabled(false);
 
@@ -89,7 +89,7 @@ bool MahjongTheoryScene::init() {
     _redoButton->setTitleFontSize(12);
     _redoButton->setTitleText("重做");
     this->addChild(_redoButton);
-    _redoButton->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 75 - widgetSize.height));
+    _redoButton->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 77 - widgetSize.height));
     _redoButton->addClickEventListener(std::bind(&MahjongTheoryScene::onRedoButton, this, std::placeholders::_1));
     _redoButton->setEnabled(false);
 #endif
@@ -220,6 +220,13 @@ void MahjongTheoryScene::setRandomInput() {
 
     _tableView->reloadData();
 
+#if 0
+    _undoCache.clear();
+    _redoCache.clear();
+    _undoButton->setEnabled(false);
+    _redoButton->setEnabled(false);
+#endif
+
     calculate();
 }
 
@@ -230,6 +237,13 @@ void MahjongTheoryScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
         _orderedIndices.clear();
 
         _tableView->reloadData();
+
+#if 0
+        _undoCache.clear();
+        _redoCache.clear();
+        _undoButton->setEnabled(false);
+        _redoButton->setEnabled(false);
+#endif
 
         calculate();
     }
@@ -464,13 +478,14 @@ void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {
         servingTile = serveRandomTile(discardTile);
     }
 
-    deduce(discardTile, servingTile);
 #if 0
     _undoCache.push_back(std::make_pair(discardTile, servingTile));
     _redoCache.clear();
     _undoButton->setEnabled(true);
     _redoButton->setEnabled(false);
 #endif
+
+    deduce(discardTile, servingTile);
 }
 
 void MahjongTheoryScene::onStandingTileEvent() {
@@ -481,19 +496,19 @@ void MahjongTheoryScene::onStandingTileEvent() {
 
     mahjong::tile_t servingTile = serveRandomTile(discardTile);
 
-    // 推演
-    deduce(discardTile, servingTile);
 #if 0
     _undoCache.push_back(std::make_pair(discardTile, servingTile));
     _redoCache.clear();
     _undoButton->setEnabled(true);
     _redoButton->setEnabled(false);
 #endif
+
+    deduce(discardTile, servingTile);
 }
 
 #if 0
 void MahjongTheoryScene::onUndoButton(cocos2d::Ref *sender) {
-    if (!_undoCache.empty()) {
+    if (LIKELY(!_undoCache.empty())) {
         deduce(_undoCache.back().second, _undoCache.back().first);
         _redoCache.push_back(_undoCache.back());
         _undoCache.pop_back();
@@ -503,7 +518,7 @@ void MahjongTheoryScene::onUndoButton(cocos2d::Ref *sender) {
 }
 
 void MahjongTheoryScene::onRedoButton(cocos2d::Ref *sender) {
-    if (!_redoCache.empty()) {
+    if (LIKELY(!_redoCache.empty())) {
         deduce(_redoCache.back().first, _redoCache.back().second);
         _undoCache.push_back(_redoCache.back());
         _redoCache.pop_back();
