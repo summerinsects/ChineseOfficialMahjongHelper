@@ -36,8 +36,13 @@ private:
     std::vector<ResultEx> _resultSources;
     std::vector<size_t> _orderedIndices;
 #if 0
-    std::vector<std::pair<mahjong::tile_t, mahjong::tile_t> > _undoCache;
-    std::vector<std::pair<mahjong::tile_t, mahjong::tile_t> > _redoCache;
+    typedef struct {
+        mahjong::hand_tiles_t handTiles;
+        mahjong::tile_t servingTile;
+        std::vector<mahjong::enum_result_t> allResults;
+    } StateData;
+    std::vector<StateData> _undoCache;
+    std::vector<StateData> _redoCache;
 #endif
 
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
@@ -51,6 +56,7 @@ private:
     void onTileButton(cocos2d::Ref *sender);
     void onStandingTileEvent();
 #if 0
+    void recoverFromState(StateData &state);
     void onUndoButton(cocos2d::Ref *sender);
     void onRedoButton(cocos2d::Ref *sender);
 #endif
