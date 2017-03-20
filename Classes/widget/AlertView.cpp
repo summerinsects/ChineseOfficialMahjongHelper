@@ -27,7 +27,7 @@ void AlertView::showWithMessage(const std::string &title, const std::string &mes
 }
 
 bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
-    if (!Layer::init()) {
+    if (UNLIKELY(!Layer::init())) {
         return false;
     }
 

@@ -2,13 +2,14 @@
 #define __LOADING_VIEW_H__
 
 #include "cocos2d.h"
+#include "../compiler.h"
 
 class LoadingView : public cocos2d::Layer {
 public:
     CREATE_FUNC(LoadingView);
 
     virtual bool init() override {
-        if (!cocos2d::Layer::init()) {
+        if (UNLIKELY(!cocos2d::Layer::init())) {
             return false;
         }
 

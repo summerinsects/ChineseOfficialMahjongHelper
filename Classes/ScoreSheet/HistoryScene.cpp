@@ -302,7 +302,7 @@ static void __modifyRecord(const Record &record) {
 }
 
 void HistoryScene::modifyRecord(const Record &record) {
-    if (g_records.empty()) {
+    if (UNLIKELY(g_records.empty())) {
         std::thread([record]() {
             std::vector<Record> temp;
             std::lock_guard<std::mutex> lg(g_mutex);
