@@ -108,7 +108,7 @@ bool MahjongTheoryScene::init() {
         _checkBoxes[i]->setZoomScale(0.0f);
         _checkBoxes[i]->ignoreContentAdaptWithSize(false);
         _checkBoxes[i]->setContentSize(Size(20.0f, 20.0f));
-        _checkBoxes[i]->setPosition(Vec2(xPos - 15, yPos));
+        _checkBoxes[i]->setPosition(Vec2(xPos - 20, yPos));
         _checkBoxes[i]->setSelected(true);
         _checkBoxes[i]->addEventListener([this](Ref *sender, ui::CheckBox::EventType event) {
             filterResultsByFlag(getFilterFlag());
@@ -119,7 +119,7 @@ bool MahjongTheoryScene::init() {
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(xPos, yPos));
+        label->setPosition(Vec2(xPos - 5, yPos));
     }
 
     // 预先算好Cell及各label的Size
