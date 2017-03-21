@@ -22,6 +22,7 @@ private:
     void onFixedPacksChanged();
     void onWinTileChanged();
 
+    void onInstructionButton(cocos2d::Ref *sender);
     void showInputAlert(const char *prevInput);
     void parseInput(const char *input);
     void calculate();

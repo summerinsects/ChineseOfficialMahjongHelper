@@ -212,8 +212,19 @@ bool FanCalculatorScene::init() {
     button->setTitleText("直接输入");
     button->setTitleColor(Color3B::BLACK);
     infoWidget->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40, 75.0f));
+    button->setPosition(Vec2(visibleSize.width - 40, 105.0f));
     button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
+
+    // 使用说明
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("使用说明");
+    button->setTitleColor(Color3B::BLACK);
+    infoWidget->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 40, 75.0f));
+    button->addClickEventListener(std::bind(&FanCalculatorScene::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
     label = Label::createWithSystemFont("花牌数", "Arial", 12);
@@ -364,6 +375,27 @@ void FanCalculatorScene::onWinTileChanged() {
         && !_lastTileBox->isSelected()
         && !_fourthTileBox->isSelected());
     _lastTileBox->setEnabled(!_robKongBox->isSelected());
+}
+
+void FanCalculatorScene::onInstructionButton(cocos2d::Ref *sender) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float width = visibleSize.width * 0.8f - 10;
+
+    Label *label = Label::createWithSystemFont(
+        "1. 本算番器遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式。\n"
+        "2. 绿一色、清幺九、混幺九、全大、全中、全小、大于五、小于五均可复合七对。\n"
+        "3. 全双刻不可复合七对，对于由仅偶数牌组成的七对，只计七对+断幺。\n"
+        "4. 大三元、小三元、三风刻、一色四同顺、一色四节高、一色四步高可计缺一门。\n"
+        "5. 大四喜、小四喜可计混一色。\n"
+        "6. 清幺九不计双同刻，可计三同刻；当与七对复合时，不克扣四归一。\n"
+        "7. 边坎钓必须严格独听时才计；对于可解释为组合龙龙身部分的牌，一律不计边坎钓。\n"
+        "8. 必然门前清的番种自摸和牌时只计自摸，不计不求人。如七对、全不靠、七星不靠、十三幺、四暗刻、连七对、九莲宝灯等。\n"
+        "9. 不重复原则不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，要计断幺。\n"
+        "10. 暗杠的加计遵循国家体育总局社会体育指导中心1999年3月16~19日召开的专家会议讨论结果，详见「番种表」-「32番」-「三杠」。",
+        "Arial", 10);
+    label->setColor(Color3B::BLACK);
+    label->setDimensions(width, 0);
+    AlertView::showWithNode("使用说明", label, nullptr, nullptr);
 }
 
 void FanCalculatorScene::showInputAlert(const char *prevInput) {
