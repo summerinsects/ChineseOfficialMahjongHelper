@@ -14,6 +14,8 @@
 
 USING_NS_CC;
 
+static mahjong::tile_t serveRandomTile(const int (&usedTable)[mahjong::TILE_TABLE_SIZE], mahjong::tile_t discardTile);
+
 Scene *MahjongTheoryScene::createScene() {
     auto scene = Scene::create();
     auto layer = MahjongTheoryScene::create();
@@ -438,10 +440,10 @@ void MahjongTheoryScene::calculate() {
     }).detach();
 }
 
-mahjong::tile_t MahjongTheoryScene::serveRandomTile(mahjong::tile_t discardTile) const {
+mahjong::tile_t serveRandomTile(const int (&usedTable)[mahjong::TILE_TABLE_SIZE], mahjong::tile_t discardTile) {
     // 没用到的牌表
     int remainTable[mahjong::TILE_TABLE_SIZE];
-    std::transform(std::begin(_handTilesTable), std::end(_handTilesTable), std::begin(remainTable),
+    std::transform(std::begin(usedTable), std::end(usedTable), std::begin(remainTable),
         [](int n) { return 4 - n; });
     //--remainTable[discardTile];  // 有必要吗？
 
@@ -469,7 +471,7 @@ void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {
         servingTile = mahjong::all_tiles[tag];
     }
     else {
-        servingTile = serveRandomTile(discardTile);
+        servingTile = serveRandomTile(_handTilesTable, discardTile);
     }
 
     _undoCache.push_back(StateData());
@@ -489,7 +491,7 @@ void MahjongTheoryScene::onStandingTileEvent() {
         return;
     }
 
-    mahjong::tile_t servingTile = serveRandomTile(discardTile);
+    mahjong::tile_t servingTile = serveRandomTile(_handTilesTable, discardTile);
 
     _undoCache.push_back(StateData());
     _redoCache.clear();
