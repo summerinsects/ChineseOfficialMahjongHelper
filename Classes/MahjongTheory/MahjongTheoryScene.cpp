@@ -105,17 +105,18 @@ bool MahjongTheoryScene::init() {
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float xPos = origin.x + gap * (i + 0.5f);
-        _checkBoxes[i] = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-        this->addChild(_checkBoxes[i]);
-        _checkBoxes[i]->setZoomScale(0.0f);
-        _checkBoxes[i]->ignoreContentAdaptWithSize(false);
-        _checkBoxes[i]->setContentSize(Size(20.0f, 20.0f));
-        _checkBoxes[i]->setPosition(Vec2(xPos - 20, yPos));
-        _checkBoxes[i]->setSelected(true);
-        _checkBoxes[i]->addEventListener([this](Ref *sender, ui::CheckBox::EventType event) {
+        ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        this->addChild(checkBox);
+        checkBox->setZoomScale(0.0f);
+        checkBox->ignoreContentAdaptWithSize(false);
+        checkBox->setContentSize(Size(20.0f, 20.0f));
+        checkBox->setPosition(Vec2(xPos - 20, yPos));
+        checkBox->setSelected(true);
+        checkBox->addEventListener([this](Ref *sender, ui::CheckBox::EventType event) {
             filterResultsByFlag(getFilterFlag());
             _tableView->reloadData();
         });
+        _checkBoxes[i] = checkBox;
 
         label = Label::createWithSystemFont(title[i], "Arial", 12);
         label->setColor(Color3B::BLACK);

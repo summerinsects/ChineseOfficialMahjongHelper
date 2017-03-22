@@ -26,45 +26,45 @@ bool TilePickWidget::init() {
     // 万
     for (int i = 0; i < 9; ++i) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, i + 1);
-        _characterButtons[i] = ui::Button::create(tilesImageName[tile]);
-        _characterButtons[i]->setScale(27 / _characterButtons[i]->getContentSize().width);
-        tableWidget->addChild(_characterButtons[i]);
-        _characterButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 136.5f));
-        _characterButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
+        ui::Button *button = ui::Button::create(tilesImageName[tile]);
+        button->setScale(27 / button->getContentSize().width);
+        tableWidget->addChild(button);
+        button->setPosition(Vec2(27 * (i + 0.5f), 136.5f));
+        button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
+        _characterButtons[i] = button;
     }
 
     // 条
     for (int i = 0; i < 9; ++i) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_BAMBOO, i + 1);
-        _bambooButtons[i] = ui::Button::create(tilesImageName[tile]);
-        _bambooButtons[i]->setScale(27 / _bambooButtons[i]->getContentSize().width);
-        tableWidget->addChild(_bambooButtons[i]);
-        _bambooButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 97.5f));
-        _bambooButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
+        ui::Button *button = ui::Button::create(tilesImageName[tile]);
+        button->setScale(27 / button->getContentSize().width);
+        tableWidget->addChild(button);
+        button->setPosition(Vec2(27 * (i + 0.5f), 97.5f));
+        button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
+        _bambooButtons[i] = button;
     }
 
     // 饼
     for (int i = 0; i < 9; ++i) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DOTS, i + 1);
-        _dotsButtons[i] = ui::Button::create(tilesImageName[tile]);
-        _dotsButtons[i]->setScale(27 / _dotsButtons[i]->getContentSize().width);
-        tableWidget->addChild(_dotsButtons[i]);
-        _dotsButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 58.5f));
-        _dotsButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
+        ui::Button *button = ui::Button::create(tilesImageName[tile]);
+        button->setScale(27 / button->getContentSize().width);
+        tableWidget->addChild(button);
+        button->setPosition(Vec2(27 * (i + 0.5f), 58.5f));
+        button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
+        _dotsButtons[i] = button;
     }
 
     // 字牌
     for (int i = 0; i < 7; ++i) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_HONORS, i + 1);
-        _honorButtons[i] = ui::Button::create(tilesImageName[tile]);
-        _honorButtons[i]->setScale(27 / _honorButtons[i]->getContentSize().width);
-        tableWidget->addChild(_honorButtons[i]);
-        _honorButtons[i]->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
-        _honorButtons[i]->addClickEventListener(
-            std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
+        ui::Button *button = ui::Button::create(tilesImageName[tile]);
+        button->setScale(27 / button->getContentSize().width);
+        tableWidget->addChild(button);
+        button->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
+        button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
+        _honorButtons[i] = button;
     }
 
     const char *normalImage = "source_material/btn_square_highlighted.png";
@@ -72,92 +72,98 @@ bool TilePickWidget::init() {
     const char *disableImage = "source_material/btn_square_disabled.png";
 
     // 吃(_XX) 为23吃1这种类型
-    _chow_XXButton = ui::Button::create(normalImage, selectedImage, disableImage);
-    _chow_XXButton->setScale9Enabled(true);
-    _chow_XXButton->setContentSize(Size(45.0f, 20.0f));
-    _chow_XXButton->setTitleFontSize(12);
-    _chow_XXButton->setTitleColor(Color3B::BLACK);
-    _chow_XXButton->setTitleText("吃(_XX)");
-    this->addChild(_chow_XXButton);
-    _chow_XXButton->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 140));
-    _chow_XXButton->addClickEventListener(std::bind(&TilePickWidget::onChow_XXButton, this, std::placeholders::_1));
+    ui::Button *button = ui::Button::create(normalImage, selectedImage, disableImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(45.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("吃(_XX)");
+    this->addChild(button);
+    button->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 140));
+    button->addClickEventListener(std::bind(&TilePickWidget::onChow_XXButton, this, std::placeholders::_1));
+    _chow_XXButton = button;
 
     // 吃(X_X) 为13吃2这种类型
-    _chowX_XButton = ui::Button::create(normalImage, selectedImage, disableImage);
-    _chowX_XButton->setScale9Enabled(true);
-    _chowX_XButton->setContentSize(Size(45.0f, 20.0f));
-    _chowX_XButton->setTitleFontSize(12);
-    _chowX_XButton->setTitleColor(Color3B::BLACK);
-    _chowX_XButton->setTitleText("吃(X_X)");
-    this->addChild(_chowX_XButton);
-    _chowX_XButton->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 100));
-    _chowX_XButton->addClickEventListener(std::bind(&TilePickWidget::onChowX_XButton, this, std::placeholders::_1));
+    button = ui::Button::create(normalImage, selectedImage, disableImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(45.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("吃(X_X)");
+    this->addChild(button);
+    button->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 100));
+    button->addClickEventListener(std::bind(&TilePickWidget::onChowX_XButton, this, std::placeholders::_1));
+    _chowX_XButton = button;
 
     // 吃(XX_) 为12吃3这种类型
-    _chowXX_Button = ui::Button::create(normalImage, selectedImage, disableImage);
-    _chowXX_Button->setScale9Enabled(true);
-    _chowXX_Button->setContentSize(Size(45.0f, 20.0f));
-    _chowXX_Button->setTitleFontSize(12);
-    _chowXX_Button->setTitleColor(Color3B::BLACK);
-    _chowXX_Button->setTitleText("吃(XX_)");
-    this->addChild(_chowXX_Button);
-    _chowXX_Button->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 60));
-    _chowXX_Button->addClickEventListener(std::bind(&TilePickWidget::onChowXX_Button, this, std::placeholders::_1));
+    button = ui::Button::create(normalImage, selectedImage, disableImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(45.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("吃(XX_)");
+    this->addChild(button);
+    button->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 60));
+    button->addClickEventListener(std::bind(&TilePickWidget::onChowXX_Button, this, std::placeholders::_1));
+    _chowXX_Button = button;
 
     // 碰
-    _pungButton = ui::Button::create(normalImage, selectedImage, disableImage);
-    _pungButton->setScale9Enabled(true);
-    _pungButton->setContentSize(Size(45.0f, 20.0f));
-    _pungButton->setTitleFontSize(12);
-    _pungButton->setTitleColor(Color3B::BLACK);
-    _pungButton->setTitleText("碰");
-    this->addChild(_pungButton);
-    _pungButton->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 140));
-    _pungButton->addClickEventListener(std::bind(&TilePickWidget::onPungButton, this, std::placeholders::_1));
+    button = ui::Button::create(normalImage, selectedImage, disableImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(45.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("碰");
+    this->addChild(button);
+    button->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 140));
+    button->addClickEventListener(std::bind(&TilePickWidget::onPungButton, this, std::placeholders::_1));
+    _pungButton = button;
 
     // 明杠
-    _meldedKongButton = ui::Button::create(normalImage, selectedImage, disableImage);
-    _meldedKongButton->setScale9Enabled(true);
-    _meldedKongButton->setContentSize(Size(45.0f, 20.0f));
-    _meldedKongButton->setTitleFontSize(12);
-    _meldedKongButton->setTitleColor(Color3B::BLACK);
-    _meldedKongButton->setTitleText("明杠");
-    this->addChild(_meldedKongButton);
-    _meldedKongButton->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 100));
-    _meldedKongButton->addClickEventListener(std::bind(&TilePickWidget::onMeldedKongButton, this, std::placeholders::_1));
+    button = ui::Button::create(normalImage, selectedImage, disableImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(45.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("明杠");
+    this->addChild(button);
+    button->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 100));
+    button->addClickEventListener(std::bind(&TilePickWidget::onMeldedKongButton, this, std::placeholders::_1));
+    _meldedKongButton = button;
 
     // 暗杠
-    _concealedKongButton = ui::Button::create(normalImage, selectedImage, disableImage);
-    _concealedKongButton->setScale9Enabled(true);
-    _concealedKongButton->setContentSize(Size(45.0f, 20.0f));
-    _concealedKongButton->setTitleFontSize(12);
-    _concealedKongButton->setTitleColor(Color3B::BLACK);
-    _concealedKongButton->setTitleText("暗杠");
-    this->addChild(_concealedKongButton);
-    _concealedKongButton->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 60));
-    _concealedKongButton->addClickEventListener(std::bind(&TilePickWidget::onConcealedKongButton, this, std::placeholders::_1));
+    button = ui::Button::create(normalImage, selectedImage, disableImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(45.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("暗杠");
+    this->addChild(button);
+    button->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 60));
+    button->addClickEventListener(std::bind(&TilePickWidget::onConcealedKongButton, this, std::placeholders::_1));
+    _concealedKongButton = button;
 
     // 排序
-    ui::Button *sortButton = ui::Button::create(normalImage, selectedImage, disableImage);
-    sortButton->setScale9Enabled(true);
-    sortButton->setContentSize(Size(45.0f, 20.0f));
-    sortButton->setTitleFontSize(12);
-    sortButton->setTitleColor(Color3B::BLACK);
-    sortButton->setTitleText("排序");
-    this->addChild(sortButton);
-    sortButton->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 20));
-    sortButton->addClickEventListener([this](Ref *) {  sort(); });
+    button = ui::Button::create(normalImage, selectedImage, disableImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(45.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("排序");
+    this->addChild(button);
+    button->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 20));
+    button->addClickEventListener([this](Ref *) {  sort(); });
 
     // 重置
-    ui::Button *clearButton = ui::Button::create(normalImage, selectedImage, disableImage);
-    clearButton->setScale9Enabled(true);
-    clearButton->setContentSize(Size(45.0f, 20.0f));
-    clearButton->setTitleFontSize(12);
-    clearButton->setTitleColor(Color3B::BLACK);
-    clearButton->setTitleText("重置");
-    this->addChild(clearButton);
-    clearButton->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 20));
-    clearButton->addClickEventListener([this](Ref *) { reset(); });
+    button = ui::Button::create(normalImage, selectedImage, disableImage);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(45.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("重置");
+    this->addChild(button);
+    button->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 20));
+    button->addClickEventListener([this](Ref *) { reset(); });
 
     reset();
 

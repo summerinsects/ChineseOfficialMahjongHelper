@@ -234,33 +234,36 @@ bool ScoreSheetScene::init() {
         }
 
         // 计分按钮
-        _recordButton[k] = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-        node->addChild(_recordButton[k]);
-        _recordButton[k]->setScale9Enabled(true);
-        _recordButton[k]->setContentSize(Size(gap, 20.0f));
-        _recordButton[k]->setTitleFontSize(12);
-        _recordButton[k]->setTitleText("计分");
-        _recordButton[k]->setPosition(Vec2(gap * 5.5f, y));
-        _recordButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::onRecordButton, this, std::placeholders::_1, k));
-        _recordButton[k]->setEnabled(false);
-        _recordButton[k]->setVisible(false);
+        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        node->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(gap, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText("计分");
+        button->setPosition(Vec2(gap * 5.5f, y));
+        button->addClickEventListener(std::bind(&ScoreSheetScene::onRecordButton, this, std::placeholders::_1, k));
+        button->setEnabled(false);
+        button->setVisible(false);
+        _recordButton[k] = button;
 
         // 备注的番种label
-        _fanNameLabel[k] = Label::createWithSystemFont("", "Arail", 12);
-        _fanNameLabel[k]->setColor(Color3B(0x60, 0x60, 0x60));
-        _fanNameLabel[k]->setPosition(Vec2(gap * 5.5f, y));
-        node->addChild(_fanNameLabel[k]);
-        _fanNameLabel[k]->setVisible(false);
+        Label *label = Label::createWithSystemFont("", "Arail", 12);
+        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setPosition(Vec2(gap * 5.5f, y));
+        node->addChild(label);
+        label->setVisible(false);
+        _fanNameLabel[k] = label;
 
         // 查看详情按钮
-        _detailButton[k] = ui::Button::create();
-        node->addChild(_detailButton[k]);
-        _detailButton[k]->setScale9Enabled(true);
-        _detailButton[k]->setContentSize(Size(gap, 20.0f));
-        _detailButton[k]->setTitleFontSize(12);
-        _detailButton[k]->setPosition(Vec2(gap * 5.5f, y));
-        _detailButton[k]->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1, k));
-        _detailButton[k]->setEnabled(false);
+        button = ui::Button::create();
+        node->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(gap, 20.0f));
+        button->setTitleFontSize(12);
+        button->setPosition(Vec2(gap * 5.5f, y));
+        button->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1, k));
+        button->setEnabled(false);
+        _detailButton[k] = button;
     }
 
     // 从json中读，并恢复界面数据
