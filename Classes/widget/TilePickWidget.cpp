@@ -76,8 +76,8 @@ bool TilePickWidget::init() {
     _chow_XXButton->setScale9Enabled(true);
     _chow_XXButton->setContentSize(Size(45.0f, 20.0f));
     _chow_XXButton->setTitleFontSize(12);
-    _chow_XXButton->setTitleText("吃(_XX)");
     _chow_XXButton->setTitleColor(Color3B::BLACK);
+    _chow_XXButton->setTitleText("吃(_XX)");
     this->addChild(_chow_XXButton);
     _chow_XXButton->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 140));
     _chow_XXButton->addClickEventListener(std::bind(&TilePickWidget::onChow_XXButton, this, std::placeholders::_1));
@@ -87,8 +87,8 @@ bool TilePickWidget::init() {
     _chowX_XButton->setScale9Enabled(true);
     _chowX_XButton->setContentSize(Size(45.0f, 20.0f));
     _chowX_XButton->setTitleFontSize(12);
-    _chowX_XButton->setTitleText("吃(X_X)");
     _chowX_XButton->setTitleColor(Color3B::BLACK);
+    _chowX_XButton->setTitleText("吃(X_X)");
     this->addChild(_chowX_XButton);
     _chowX_XButton->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 100));
     _chowX_XButton->addClickEventListener(std::bind(&TilePickWidget::onChowX_XButton, this, std::placeholders::_1));
@@ -98,8 +98,8 @@ bool TilePickWidget::init() {
     _chowXX_Button->setScale9Enabled(true);
     _chowXX_Button->setContentSize(Size(45.0f, 20.0f));
     _chowXX_Button->setTitleFontSize(12);
-    _chowXX_Button->setTitleText("吃(XX_)");
     _chowXX_Button->setTitleColor(Color3B::BLACK);
+    _chowXX_Button->setTitleText("吃(XX_)");
     this->addChild(_chowXX_Button);
     _chowXX_Button->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 60));
     _chowXX_Button->addClickEventListener(std::bind(&TilePickWidget::onChowXX_Button, this, std::placeholders::_1));
@@ -109,8 +109,8 @@ bool TilePickWidget::init() {
     _pungButton->setScale9Enabled(true);
     _pungButton->setContentSize(Size(45.0f, 20.0f));
     _pungButton->setTitleFontSize(12);
-    _pungButton->setTitleText("碰");
     _pungButton->setTitleColor(Color3B::BLACK);
+    _pungButton->setTitleText("碰");
     this->addChild(_pungButton);
     _pungButton->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 140));
     _pungButton->addClickEventListener(std::bind(&TilePickWidget::onPungButton, this, std::placeholders::_1));
@@ -120,8 +120,8 @@ bool TilePickWidget::init() {
     _meldedKongButton->setScale9Enabled(true);
     _meldedKongButton->setContentSize(Size(45.0f, 20.0f));
     _meldedKongButton->setTitleFontSize(12);
-    _meldedKongButton->setTitleText("明杠");
     _meldedKongButton->setTitleColor(Color3B::BLACK);
+    _meldedKongButton->setTitleText("明杠");
     this->addChild(_meldedKongButton);
     _meldedKongButton->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 100));
     _meldedKongButton->addClickEventListener(std::bind(&TilePickWidget::onMeldedKongButton, this, std::placeholders::_1));
@@ -131,8 +131,8 @@ bool TilePickWidget::init() {
     _concealedKongButton->setScale9Enabled(true);
     _concealedKongButton->setContentSize(Size(45.0f, 20.0f));
     _concealedKongButton->setTitleFontSize(12);
-    _concealedKongButton->setTitleText("暗杠");
     _concealedKongButton->setTitleColor(Color3B::BLACK);
+    _concealedKongButton->setTitleText("暗杠");
     this->addChild(_concealedKongButton);
     _concealedKongButton->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 60));
     _concealedKongButton->addClickEventListener(std::bind(&TilePickWidget::onConcealedKongButton, this, std::placeholders::_1));
@@ -142,8 +142,8 @@ bool TilePickWidget::init() {
     sortButton->setScale9Enabled(true);
     sortButton->setContentSize(Size(45.0f, 20.0f));
     sortButton->setTitleFontSize(12);
-    sortButton->setTitleText("排序");
     sortButton->setTitleColor(Color3B::BLACK);
+    sortButton->setTitleText("排序");
     this->addChild(sortButton);
     sortButton->setPosition(Vec2(handTilesSize.width - 90, tableBottom + 20));
     sortButton->addClickEventListener([this](Ref *) {  sort(); });
@@ -153,8 +153,8 @@ bool TilePickWidget::init() {
     clearButton->setScale9Enabled(true);
     clearButton->setContentSize(Size(45.0f, 20.0f));
     clearButton->setTitleFontSize(12);
-    clearButton->setTitleText("重置");
     clearButton->setTitleColor(Color3B::BLACK);
+    clearButton->setTitleText("重置");
     this->addChild(clearButton);
     clearButton->setPosition(Vec2(handTilesSize.width - 40, tableBottom + 20));
     clearButton->addClickEventListener([this](Ref *) { reset(); });

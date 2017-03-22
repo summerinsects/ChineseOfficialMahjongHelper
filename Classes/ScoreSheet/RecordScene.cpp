@@ -243,9 +243,10 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     _okButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     this->addChild(_okButton);
     _okButton->setScale9Enabled(true);
-    _okButton->setContentSize(Size(52.0f, 22.0f));
-    _okButton->setTitleText("确定");
+    _okButton->setContentSize(Size(50.0f, 20.0f));
+    _okButton->setTitleFontSize(12);
     _okButton->setTitleColor(Color3B::BLACK);
+    _okButton->setTitleText("确定");
     _okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15));
     _okButton->addClickEventListener(std::bind(&RecordScene::onOkButton, this, std::placeholders::_1));
     _okButton->setEnabled(false);
