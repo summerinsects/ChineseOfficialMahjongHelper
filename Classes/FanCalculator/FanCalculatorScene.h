@@ -15,9 +15,6 @@ public:
     CREATE_FUNC(FanCalculatorScene);
 
 private:
-    void onFixedPacksChanged();
-    void onWinTileChanged();
-
     void calculate();
 
     TilePickWidget *_tilePicker = nullptr;

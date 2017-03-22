@@ -23,30 +23,29 @@ bool FanCalculatorScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 选牌面板
-    _tilePicker = TilePickWidget::create();
-    const Size &widgetSize = _tilePicker->getContentSize();
-    this->addChild(_tilePicker);
-    _tilePicker->setFixedPacksChangedCallback(std::bind(&FanCalculatorScene::onFixedPacksChanged, this));
-    _tilePicker->setWinTileChangedCallback(std::bind(&FanCalculatorScene::onWinTileChanged, this));
+    TilePickWidget *tilePicker = TilePickWidget::create();
+    const Size &widgetSize = tilePicker->getContentSize();
+    this->addChild(tilePicker);
+    _tilePicker = tilePicker;
 
     // 根据情况缩放
     float y = origin.y + visibleSize.height - 10;
     if (widgetSize.width - 4 > visibleSize.width) {
         float scale = (visibleSize.width - 4) / widgetSize.width;
-        _tilePicker->setScale(scale);
+        tilePicker->setScale(scale);
         y -= widgetSize.height * scale;
-        _tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 25 + widgetSize.height * scale * 0.5f));
+        tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 25 + widgetSize.height * scale * 0.5f));
     }
     else {
         y -= widgetSize.height;
-        _tilePicker->setPosition(Vec2(origin.x + widgetSize.width * 0.5f, y - 25 + widgetSize.height * 0.5f));
+        tilePicker->setPosition(Vec2(origin.x + widgetSize.width * 0.5f, y - 25 + widgetSize.height * 0.5f));
     }
 
     // 其他信息的相关控件
-    _extraInfo = ExtraInfoWidget::create();
-    this->addChild(_extraInfo);
-    _extraInfo->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 85));
-    _extraInfo->setParseCallback(std::bind(&TilePickWidget::setData, _tilePicker, std::placeholders::_1, std::placeholders::_2));
+    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
+    this->addChild(extraInfo);
+    extraInfo->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 85));
+    _extraInfo = extraInfo;
 
     // 番种显示的Node
     _fanAreaNode = Node::create();
@@ -66,19 +65,20 @@ bool FanCalculatorScene::init() {
     button->setPosition(Vec2(visibleSize.width - 30, 15.0f));
     button->addClickEventListener([this](Ref *) { calculate(); });
 
+    tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {
+        extraInfo->refreshByKong(tilePicker->isFixedPacksContainsKong());
+    });
+
+    tilePicker->setWinTileChangedCallback([tilePicker, extraInfo]() {
+        ExtraInfoWidget::RefreshByWinTile rt;
+        rt.getWinTile = std::bind(&TilePickWidget::getServingTile, tilePicker);
+        rt.isStandingTilesContainsServingTile = std::bind(&TilePickWidget::isStandingTilesContainsServingTile, tilePicker);
+        rt.countServingTileInFixedPacks = std::bind(&TilePickWidget::countServingTileInFixedPacks, tilePicker);
+        extraInfo->refreshByWinTile(rt);
+    });
+    _extraInfo->setParseCallback(std::bind(&TilePickWidget::setData, _tilePicker, std::placeholders::_1, std::placeholders::_2));
+
     return true;
-}
-
-void FanCalculatorScene::onFixedPacksChanged() {
-    _extraInfo->refreshByKong(_tilePicker->isFixedPacksContainsKong());
-}
-
-void FanCalculatorScene::onWinTileChanged() {
-    ExtraInfoWidget::RefreshByWinTile rt;
-    rt.getWinTile = std::bind(&TilePickWidget::getServingTile, _tilePicker);
-    rt.isStandingTilesContainsServingTile = std::bind(&TilePickWidget::isStandingTilesContainsServingTile, _tilePicker);
-    rt.countServingTileInFixedPacks = std::bind(&TilePickWidget::countServingTileInFixedPacks, _tilePicker);
-    _extraInfo->refreshByWinTile(rt);
 }
 
 #define FONT_SIZE 14
