@@ -6,6 +6,8 @@
 #include "../common.h"
 #include "../widget/AlertView.h"
 #include "../widget/CWTableView.h"
+#include "../widget/TilePickWidget.h"
+#include "../widget/ExtraInfoWidget.h"
 
 USING_NS_CC;
 
@@ -196,11 +198,20 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     maskLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
     // 展开/收起
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(40.0f, 20.0f));
-    button->setTitleFontSize(12);
-    rootLayout->addChild(button);
+    ui::Button *spreadButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    spreadButton->setScale9Enabled(true);
+    spreadButton->setContentSize(Size(40.0f, 20.0f));
+    spreadButton->setTitleFontSize(12);
+    rootLayout->addChild(spreadButton);
+
+    // 输入牌按钮
+    ui::Button *tilesButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    tilesButton->setScale9Enabled(true);
+    tilesButton->setContentSize(Size(40.0f, 20.0f));
+    spreadButton->setTitleFontSize(12);
+    tilesButton->setTitleText("记录和牌");
+    tilesButton->addClickEventListener(std::bind(&RecordScene::onTilesButton, this, std::placeholders::_1));
+    rootLayout->addChild(tilesButton);
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDelegate(this);
@@ -212,32 +223,33 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     tableView->setPosition(Vec2(visibleSize.width * 0.5f, 0));
     rootLayout->addChild(tableView);
 
-    std::function<void (Ref *)> layoutChildren = [rootLayout, maskLabel1, maskLabel2, tableView](Ref *sender) {
-        ui::Button *button = (ui::Button *)sender;
+    std::function<void (Ref *)> layoutChildren = [rootLayout, maskLabel1, maskLabel2, tilesButton, tableView](Ref *sender) {
+        ui::Button *spreadButton = (ui::Button *)sender;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Size layoutSize;
         layoutSize.width = visibleSize.width;
-        if (button->getUserData()) {
+        if (spreadButton->getUserData()) {
             layoutSize.height = visibleSize.height - 150;
-            button->setUserData(reinterpret_cast<void *>(false));
-            button->setTitleText("收起");
+            spreadButton->setUserData(reinterpret_cast<void *>(false));
+            spreadButton->setTitleText("收起");
         }
         else {
             layoutSize.height = visibleSize.height - 240;
-            button->setUserData(reinterpret_cast<void *>(true));
-            button->setTitleText("展开");
+            spreadButton->setUserData(reinterpret_cast<void *>(true));
+            spreadButton->setTitleText("展开");
         }
 
         rootLayout->setContentSize(layoutSize);
         maskLabel1->setPosition(Vec2(5.0f, layoutSize.height - 10));
         maskLabel2->setPosition(Vec2(5.0f, layoutSize.height - 35));
-        button->setPosition(Vec2(visibleSize.width - 30.0f, layoutSize.height - 20));
+        spreadButton->setPosition(Vec2(visibleSize.width - 30.0f, layoutSize.height - 10));
+        tilesButton->setPosition(Vec2(visibleSize.width - 30.0f, layoutSize.height - 35));
         tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 55));
         tableView->reloadData();
     };
-    layoutChildren(button);
-    button->addClickEventListener(layoutChildren);
+    layoutChildren(spreadButton);
+    spreadButton->addClickEventListener(layoutChildren);
 
     // 确定按钮
     _okButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
@@ -450,6 +462,39 @@ void RecordScene::onPlusButton(cocos2d::Ref *sender) {
     ++winScore;
     _editBox->setText(StringUtils::format("%d", winScore).c_str());
     updateScoreLabel();
+}
+
+void RecordScene::onTilesButton(cocos2d::Ref *sender) {
+    // 选牌面板和其他信息的相关控件
+    TilePickWidget *tilePicker = TilePickWidget::create();
+    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
+
+    tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {
+        extraInfo->refreshByKong(tilePicker->isFixedPacksContainsKong());
+    });
+
+    tilePicker->setWinTileChangedCallback([tilePicker, extraInfo]() {
+        ExtraInfoWidget::RefreshByWinTile rt;
+        rt.getWinTile = std::bind(&TilePickWidget::getServingTile, tilePicker);
+        rt.isStandingTilesContainsServingTile = std::bind(&TilePickWidget::isStandingTilesContainsServingTile, tilePicker);
+        rt.countServingTileInFixedPacks = std::bind(&TilePickWidget::countServingTileInFixedPacks, tilePicker);
+        extraInfo->refreshByWinTile(rt);
+    });
+
+    extraInfo->setParseCallback(std::bind(&TilePickWidget::setData, tilePicker, std::placeholders::_1, std::placeholders::_2));
+
+    const Size &tilePickerSize = tilePicker->getContentSize();
+    const Size &extraInfoSize = extraInfo->getContentSize();
+    const float maxWidth = std::max(tilePickerSize.width, extraInfoSize.width);
+
+    ui::Widget *rootWidget = ui::Widget::create();
+    rootWidget->setContentSize(Size(maxWidth, tilePickerSize.height + extraInfoSize.height + 5));
+    rootWidget->addChild(tilePicker);
+    tilePicker->setPosition(Vec2(maxWidth * 0.5f, tilePickerSize.height * 0.5f + extraInfoSize.height + 5));
+    rootWidget->addChild(extraInfo);
+    extraInfo->setPosition(Vec2(maxWidth * 0.5f, extraInfoSize.height * 0.5f));
+
+    AlertView::showWithNode("记录和牌", rootWidget, nullptr, nullptr);
 }
 
 void RecordScene::onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
