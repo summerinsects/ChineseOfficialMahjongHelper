@@ -5,14 +5,11 @@
 USING_NS_CC;
 
 bool TilePickWidget::init() {
-    if (UNLIKELY(!ui::Widget::init())) {
+    if (UNLIKELY(!HandTilesWidget::init())) {
         return false;
     }
 
-    _handTilesWidget = HandTilesWidget::create();
-    this->addChild(_handTilesWidget);
-
-    const Size &handTilesSize = _handTilesWidget->getContentSize();
+    const Size &handTilesSize = this->getContentSize();
 
     // 一张牌的尺寸：27 * 39
     // 27 * 9 = 243
@@ -25,7 +22,6 @@ bool TilePickWidget::init() {
     tableWidget->setPosition(Vec2(tableSize.width * 0.5f + 10, tableBottom + tableSize.height * 0.5f));
 
     this->setContentSize(Size(handTilesSize.width, handTilesSize.height + tableSize.height + 4));
-    _handTilesWidget->setPosition(Vec2(handTilesSize.width * 0.5f, handTilesSize.height * 0.5f));
 
     // 万
     for (int i = 0; i < 9; ++i) {
@@ -165,13 +161,13 @@ bool TilePickWidget::init() {
 
     reset();
 
-    _handTilesWidget->setCurrentIdxChangedCallback(std::bind(&TilePickWidget::refreshActionButtons, this));
+    _currentIdxChangedCallback = std::bind(&TilePickWidget::refreshActionButtons, this);
 
     return true;
 }
 
 void TilePickWidget::reset() {
-    _handTilesWidget->reset();
+    HandTilesWidget::reset();
 
     // 所有牌按钮都启用
     for (int i = 0; i < 9; ++i) {
@@ -200,7 +196,7 @@ void TilePickWidget::reset() {
 }
 
 void TilePickWidget::sort() {
-    _handTilesWidget->sortStandingTiles();
+    this->sortStandingTiles();
 
     if (LIKELY(_fixedPacksChangedCallback)) {
         _fixedPacksChangedCallback();
@@ -211,7 +207,7 @@ void TilePickWidget::sort() {
 }
 
 void TilePickWidget::setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile) {
-    _handTilesWidget->setData(hand_tiles, winTile);
+    HandTilesWidget::setData(hand_tiles, winTile);
     refreshAllTilesTableButton();
     refreshActionButtons();
 
@@ -226,7 +222,7 @@ void TilePickWidget::setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::t
 // 刷新选牌按钮
 void TilePickWidget::refreshTilesTableButton(mahjong::tile_t tile) {
     // 如果某张牌已经使用了4张，就禁用相应按钮
-    int n = _handTilesWidget->getUsedTileCount(tile);
+    int n = this->getUsedTileCount(tile);
     mahjong::suit_t suit = mahjong::tile_suit(tile);
     mahjong::rank_t rank = mahjong::tile_rank(tile);
     switch (suit) {
@@ -243,37 +239,37 @@ void TilePickWidget::refreshAllTilesTableButton() {
     // 数牌都是1-9，放在同一个循环里
     for (mahjong::rank_t rank = 1; rank < 10; ++rank) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, rank);
-        int n = _handTilesWidget->getUsedTileCount(tile);
+        int n = this->getUsedTileCount(tile);
         _characterButtons[rank - 1]->setEnabled(n < 4);
 
         tile = mahjong::make_tile(TILE_SUIT_BAMBOO, rank);
-        n = _handTilesWidget->getUsedTileCount(tile);
+        n = this->getUsedTileCount(tile);
         _bambooButtons[rank - 1]->setEnabled(n < 4);
 
         tile = mahjong::make_tile(TILE_SUIT_DOTS, rank);
-        n = _handTilesWidget->getUsedTileCount(tile);
+        n = this->getUsedTileCount(tile);
         _dotsButtons[rank - 1]->setEnabled(n < 4);
     }
 
     // 字牌7种
     for (mahjong::rank_t rank = 1; rank < 8; ++rank) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_HONORS, rank);
-        int n = _handTilesWidget->getUsedTileCount(tile);
+        int n = this->getUsedTileCount(tile);
         _honorButtons[rank - 1]->setEnabled(n < 4);
     }
 }
 
 void TilePickWidget::refreshActionButtons() {
-    _chow_XXButton->setEnabled(_handTilesWidget->canChow_XX());
-    _chowX_XButton->setEnabled(_handTilesWidget->canChowX_X());
-    _chowXX_Button->setEnabled(_handTilesWidget->canChowXX_());
-    _pungButton->setEnabled(_handTilesWidget->canPung());
-    _meldedKongButton->setEnabled(_handTilesWidget->canKong());
+    _chow_XXButton->setEnabled(this->canChow_XX());
+    _chowX_XButton->setEnabled(this->canChowX_X());
+    _chowXX_Button->setEnabled(this->canChowXX_());
+    _pungButton->setEnabled(this->canPung());
+    _meldedKongButton->setEnabled(this->canKong());
     _concealedKongButton->setEnabled(_meldedKongButton->isEnabled());
 }
 
 void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t tile) {
-    mahjong::tile_t prevTile = _handTilesWidget->putTile(tile);
+    mahjong::tile_t prevTile = this->putTile(tile);
     if (prevTile != 0 && prevTile != tile) {  // 如果是替换牌，则会删了一张旧的牌
         refreshTilesTableButton(prevTile);
     }
@@ -284,7 +280,7 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t til
 }
 
 void TilePickWidget::onChow_XXButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedChow_XXPack())) {
+    if (LIKELY(this->makeFixedChow_XXPack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }
@@ -292,7 +288,7 @@ void TilePickWidget::onChow_XXButton(cocos2d::Ref *sender) {
 }
 
 void TilePickWidget::onChowX_XButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedChowX_XPack())) {
+    if (LIKELY(this->makeFixedChowX_XPack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }
@@ -300,7 +296,7 @@ void TilePickWidget::onChowX_XButton(cocos2d::Ref *sender) {
 }
 
 void TilePickWidget::onChowXX_Button(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedChowXX_Pack())) {
+    if (LIKELY(this->makeFixedChowXX_Pack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }
@@ -308,7 +304,7 @@ void TilePickWidget::onChowXX_Button(cocos2d::Ref *sender) {
 }
 
 void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedPungPack())) {
+    if (LIKELY(this->makeFixedPungPack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }
@@ -316,7 +312,7 @@ void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
 }
 
 void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedMeldedKongPack())) {
+    if (LIKELY(this->makeFixedMeldedKongPack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }
@@ -324,7 +320,7 @@ void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
 }
 
 void TilePickWidget::onConcealedKongButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedConcealedKongPack())) {
+    if (LIKELY(this->makeFixedConcealedKongPack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }

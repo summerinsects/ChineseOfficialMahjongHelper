@@ -1,13 +1,9 @@
 ﻿#ifndef _TILE_PICK_WIDGET_H_
 #define _TILE_PICK_WIDGET_H_
 
-#include "cocos2d.h"
-#include "ui/CocosGUI.h"
-#include "../mahjong-algorithm/tile.h"
+#include "HandTilesWidget.h"
 
-class HandTilesWidget;
-
-class TilePickWidget : public cocos2d::ui::Widget {
+class TilePickWidget : public HandTilesWidget {
 public:
     CREATE_FUNC(TilePickWidget);
 
@@ -15,14 +11,10 @@ public:
     void setWinTileChangedCallback(const std::function<void ()> &callback) { _winTileChangedCallback = callback; }
     void setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile);
 
-    const HandTilesWidget *getHandTilesWidget() const { return _handTilesWidget; }
-
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
 private:
-    HandTilesWidget *_handTilesWidget;
-
     cocos2d::ui::Button *_characterButtons[9];
     cocos2d::ui::Button *_bambooButtons[9];
     cocos2d::ui::Button *_dotsButtons[9];
@@ -49,6 +41,10 @@ private:
     void onPungButton(cocos2d::Ref *sender);
     void onMeldedKongButton(cocos2d::Ref *sender);
     void onConcealedKongButton(cocos2d::Ref *sender);
+
+    using HandTilesWidget::setCurrentIdxChangedCallback;
+    using HandTilesWidget::reset;
+    using HandTilesWidget::setData;
 };
 
 #endif

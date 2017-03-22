@@ -3,7 +3,6 @@
 #include "../mahjong-algorithm/fan_calculator.h"
 
 #include "../widget/TilePickWidget.h"
-#include "../widget/HandTilesWidget.h"
 #include "../widget/AlertView.h"
 
 USING_NS_CC;
@@ -332,7 +331,7 @@ void FanCalculatorScene::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckB
 
 void FanCalculatorScene::onFixedPacksChanged() {
     // 当副露不包含杠的时候，杠开是禁用状态
-    _hasKong = _tilePicker->getHandTilesWidget()->isFixedPacksContainsKong();
+    _hasKong = _tilePicker->isFixedPacksContainsKong();
     if (_winTypeGroup->getSelectedButtonIndex() == 1) {
         // 杠开：有杠
         _replacementBox->setEnabled(_hasKong);
@@ -346,7 +345,7 @@ void FanCalculatorScene::onFixedPacksChanged() {
 void FanCalculatorScene::onWinTileChanged() {
     _maybeFourthTile = false;
     _winTileCountInFixedPacks = 0;
-    mahjong::tile_t winTile = _tilePicker->getHandTilesWidget()->getServingTile();
+    mahjong::tile_t winTile = _tilePicker->getServingTile();
     if (winTile == 0) {  // 没有和牌张
         _fourthTileBox->setEnabled(false);
         _robKongBox->setEnabled(false);
@@ -355,10 +354,10 @@ void FanCalculatorScene::onWinTileChanged() {
     }
 
     // 立牌中不包含和牌张，则可能为绝张
-    _maybeFourthTile = !_tilePicker->getHandTilesWidget()->isStandingTilesContainsServingTile();
+    _maybeFourthTile = !_tilePicker->isStandingTilesContainsServingTile();
 
     // 一定为绝张
-    _winTileCountInFixedPacks = _tilePicker->getHandTilesWidget()->countServingTileInFixedPacks();
+    _winTileCountInFixedPacks = _tilePicker->countServingTileInFixedPacks();
     if (_maybeFourthTile && _winTileCountInFixedPacks == 3) {
         _fourthTileBox->setEnabled(true);
         _robKongBox->setEnabled(false);
@@ -502,7 +501,7 @@ void FanCalculatorScene::calculate() {
 
     mahjong::hand_tiles_t hand_tiles;
     mahjong::tile_t win_tile;
-    _tilePicker->getHandTilesWidget()->getData(&hand_tiles, &win_tile);
+    _tilePicker->getData(&hand_tiles, &win_tile);
     if (win_tile == 0) {
         AlertView::showWithMessage("算番", "缺少和牌张", nullptr, nullptr);
         return;
