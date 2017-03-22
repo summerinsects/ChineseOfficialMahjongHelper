@@ -52,7 +52,14 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, con
 
     const float width = visibleSize.width * 0.8f;
 
-    const Size &nodeSize = node->getContentSize();
+    Size nodeSize = node->getContentSize();
+    if (nodeSize.width > width - 10) {
+        float scale = (width - 10) / nodeSize.width;
+        node->setScale(scale);
+
+        nodeSize.width = width - 10;
+        nodeSize.height *= scale;
+    }
     const float height = nodeSize.height + 78.0f;
 
     // 背景
