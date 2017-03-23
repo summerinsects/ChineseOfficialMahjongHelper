@@ -35,6 +35,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         return false;
     }
 
+    _handIdx = handIdx;
     _winIndex = -1;
     if (detail != nullptr) {
         memcpy(&_detail, detail, sizeof(_detail));
@@ -222,6 +223,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     tableView->setPosition(Vec2(visibleSize.width * 0.5f, 0));
     rootLayout->addChild(tableView);
+    _tableView = tableView;
 
     std::function<void (Ref *)> layoutChildren = [rootLayout, maskLabel1, maskLabel2, tilesButton, tableView](Ref *sender) {
         ui::Button *spreadButton = (ui::Button *)sender;
@@ -387,6 +389,8 @@ void RecordScene::refresh() {
     else {
         updateScoreLabel();
     }
+
+    _tableView->reloadDataInplacement();
 }
 
 void RecordScene::updateScoreLabel() {

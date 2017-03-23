@@ -29,8 +29,10 @@ private:
     cocos2d::Label *_selfDrawnLabel[4];
     cocos2d::ui::CheckBox *_falseWinBox[4];
     cocos2d::Label *_scoreLabel[4];
+    cw::TableView *_tableView;
     cocos2d::ui::Button *_okButton = nullptr;
 
+    size_t _handIdx = 0;
     int _winIndex = -1;
     Record::Detail _detail;
     std::function<void (const Record::Detail &)> _okCallback;
