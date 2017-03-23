@@ -5,7 +5,7 @@
 
 USING_NS_CC;
 
-void AlertView::showWithNode(const std::string &title, cocos2d::Node *node, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
+void AlertView::showWithNode(const std::string &title, cocos2d::Node *node, const std::function<void (AlertView *)> &confirmCallback, const std::function<void (AlertView *)> &cancelCallback) {
     AlertView *alert = new (std::nothrow) AlertView();
     if (alert != nullptr && alert->initWithTitle(title, node, confirmCallback, cancelCallback)) {
         alert->autorelease();
@@ -15,7 +15,7 @@ void AlertView::showWithNode(const std::string &title, cocos2d::Node *node, cons
     CC_SAFE_DELETE(alert);
 }
 
-void AlertView::showWithMessage(const std::string &title, const std::string &message, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
+void AlertView::showWithMessage(const std::string &title, const std::string &message, const std::function<void (AlertView *)> &confirmCallback, const std::function<void (AlertView *)> &cancelCallback) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float maxWidth = visibleSize.width * 0.8f - 10;
     Label *label = Label::createWithSystemFont(message, "Arail", 12);
@@ -26,7 +26,7 @@ void AlertView::showWithMessage(const std::string &title, const std::string &mes
     AlertView::showWithNode(title, label, confirmCallback, cancelCallback);
 }
 
-bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
+bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, const std::function<void (AlertView *)> &confirmCallback, const std::function<void (AlertView *)> &cancelCallback) {
     if (UNLIKELY(!Layer::init())) {
         return false;
     }
@@ -133,14 +133,14 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, con
 
 void AlertView::onCancelButton(cocos2d::Ref *sender) {
     if (_cancelCallback) {
-        _cancelCallback();
+        _cancelCallback(this);
     }
     this->removeFromParent();
 }
 
 void AlertView::onConfirmButton(cocos2d::Ref *sender) {
     if (_confirmCallback) {
-        _confirmCallback();
+        _confirmCallback(this);
     }
     this->removeFromParent();
 }

@@ -251,7 +251,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
 void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
-    AlertView::showWithMessage("删除记录", "删除后无法找回，确认删除？", [this, idx]() {
+    AlertView::showWithMessage("删除记录", "删除后无法找回，确认删除？", [this, idx](AlertView *) {
         LoadingView *loadingView = LoadingView::create();
         this->addChild(loadingView);
         loadingView->setPosition(Director::getInstance()->getVisibleSize());
