@@ -200,15 +200,15 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     // 展开/收起
     ui::Button *spreadButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     spreadButton->setScale9Enabled(true);
-    spreadButton->setContentSize(Size(40.0f, 20.0f));
+    spreadButton->setContentSize(Size(55.0f, 20.0f));
     spreadButton->setTitleFontSize(12);
     rootLayout->addChild(spreadButton);
 
     // 输入牌按钮
     ui::Button *tilesButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     tilesButton->setScale9Enabled(true);
-    tilesButton->setContentSize(Size(40.0f, 20.0f));
-    spreadButton->setTitleFontSize(12);
+    tilesButton->setContentSize(Size(55.0f, 20.0f));
+    tilesButton->setTitleFontSize(12);
     tilesButton->setTitleText("记录和牌");
     tilesButton->addClickEventListener(std::bind(&RecordScene::onTilesButton, this, std::placeholders::_1));
     rootLayout->addChild(tilesButton);
@@ -232,19 +232,19 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         if (spreadButton->getUserData()) {
             layoutSize.height = visibleSize.height - 150;
             spreadButton->setUserData(reinterpret_cast<void *>(false));
-            spreadButton->setTitleText("收起");
+            spreadButton->setTitleText("收起列表");
         }
         else {
             layoutSize.height = visibleSize.height - 240;
             spreadButton->setUserData(reinterpret_cast<void *>(true));
-            spreadButton->setTitleText("展开");
+            spreadButton->setTitleText("展开列表");
         }
 
         rootLayout->setContentSize(layoutSize);
         maskLabel1->setPosition(Vec2(5.0f, layoutSize.height - 10));
         maskLabel2->setPosition(Vec2(5.0f, layoutSize.height - 35));
-        spreadButton->setPosition(Vec2(visibleSize.width - 30.0f, layoutSize.height - 10));
-        tilesButton->setPosition(Vec2(visibleSize.width - 30.0f, layoutSize.height - 35));
+        spreadButton->setPosition(Vec2(visibleSize.width - 35.0f, layoutSize.height - 10));
+        tilesButton->setPosition(Vec2(visibleSize.width - 35.0f, layoutSize.height - 35));
         tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 55));
         tableView->reloadData();
     };
