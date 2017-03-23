@@ -9,14 +9,17 @@ class ExtraInfoWidget : public cocos2d::ui::Widget {
 public:
     CREATE_FUNC(ExtraInfoWidget);
 
-    int getFlowerCount() const { return atoi(_editBox->getText()); }
+    int getFlowerCount() const;
+    void setFlowerCount(int cnt);
+
     mahjong::win_flag_t getWinFlag() const;
-    mahjong::wind_t getPrevalentWind() const {
-        return static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _prevalentWindGroup->getSelectedButtonIndex());
-    }
-    mahjong::wind_t getSeatWind() const {
-        return static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _seatWindGroup->getSelectedButtonIndex());
-    }
+    void setWinFlag(mahjong::win_flag_t flag);
+
+    mahjong::wind_t getPrevalentWind() const;
+    void setPrevalentWind(mahjong::wind_t wind);
+
+    mahjong::wind_t getSeatWind() const;
+    void setSeatWind(mahjong::wind_t wind);
 
     struct RefreshByWinTile {
         std::function<mahjong::tile_t ()> getWinTile;

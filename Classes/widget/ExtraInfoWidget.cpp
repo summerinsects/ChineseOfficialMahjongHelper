@@ -204,6 +204,14 @@ bool ExtraInfoWidget::init() {
     return true;
 }
 
+int ExtraInfoWidget::getFlowerCount() const {
+    return atoi(_editBox->getText());
+}
+
+void ExtraInfoWidget::setFlowerCount(int cnt) {
+    _editBox->setText(StringUtils::format("%d", cnt).c_str());
+}
+
 mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
     mahjong::win_flag_t ret = WIN_FLAG_DISCARD;
     if (_winTypeGroup->getSelectedButtonIndex() == 1) ret |= WIN_FLAG_SELF_DRAWN;
@@ -212,6 +220,37 @@ mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
     if (_replacementBox->isEnabled() && _replacementBox->isSelected()) ret |= (WIN_FLAG_ABOUT_KONG | WIN_FLAG_SELF_DRAWN);
     if (_lastTileBox->isEnabled() && _lastTileBox->isSelected()) ret |= WIN_FLAG_WALL_LAST;
     return ret;
+}
+
+void ExtraInfoWidget::setWinFlag(mahjong::win_flag_t flag) {
+    if (flag & WIN_FLAG_SELF_DRAWN) _winTypeGroup->setSelectedButton(1);
+    if (flag & WIN_FLAG_WALL_LAST) _lastTileBox->setSelected(true);
+}
+
+mahjong::wind_t ExtraInfoWidget::getPrevalentWind() const {
+    return static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _prevalentWindGroup->getSelectedButtonIndex());
+}
+
+void ExtraInfoWidget::setPrevalentWind(mahjong::wind_t wind) {
+    switch (wind) {
+    case mahjong::wind_t::EAST: _prevalentWindGroup->setSelectedButton(0); break;
+    case mahjong::wind_t::SOUTH: _prevalentWindGroup->setSelectedButton(1); break;
+    case mahjong::wind_t::WEST: _prevalentWindGroup->setSelectedButton(2); break;
+    case mahjong::wind_t::NORTH: _prevalentWindGroup->setSelectedButton(3); break;
+    }
+}
+
+mahjong::wind_t ExtraInfoWidget::getSeatWind() const {
+    return static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _seatWindGroup->getSelectedButtonIndex());
+}
+
+void ExtraInfoWidget::setSeatWind(mahjong::wind_t wind) {
+    switch (wind) {
+    case mahjong::wind_t::EAST: _seatWindGroup->setSelectedButton(0); break;
+    case mahjong::wind_t::SOUTH: _seatWindGroup->setSelectedButton(1); break;
+    case mahjong::wind_t::WEST: _seatWindGroup->setSelectedButton(2); break;
+    case mahjong::wind_t::NORTH: _seatWindGroup->setSelectedButton(3); break;
+    }
 }
 
 void ExtraInfoWidget::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
