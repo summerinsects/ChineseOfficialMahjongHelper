@@ -727,13 +727,27 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     // 有n个番种，每行排2个
     long n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
     long rows = (n >> 1) + (n & 1);  // 需要这么多行
+    float fanAreaHeight = (FONT_SIZE + 2) * (rows + 2);  // 每行间隔2像素，留空1行，另一行给“总计”用
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
     // 排列
     Node *innerNode = Node::create();
-    float fanAreaHeight = (FONT_SIZE + 2) * (rows + 2);  // 每行间隔2像素，留空1行，另一行给“总计”用
-    innerNode->setContentSize(Size(visibleSize.width, fanAreaHeight));
+
+    // 手牌
+    HandTilesWidget *tilesWidget = HandTilesWidget::create();
+    tilesWidget->setData(hand_tiles, win_tile);
+    Size tilesWidgetSize = tilesWidget->getContentSize();
+    if (tilesWidgetSize.width > visibleSize.width) {
+        const float scale = visibleSize.width / tilesWidgetSize.width;
+        tilesWidget->setScale(scale);
+        tilesWidgetSize.width = visibleSize.width;
+        tilesWidgetSize.height *= scale;
+    }
+    innerNode->addChild(tilesWidget);
+    tilesWidget->setPosition(Vec2(visibleSize.width * 0.5f, fanAreaHeight + 5 + tilesWidgetSize.height * 0.5f));
+
+    innerNode->setContentSize(Size(visibleSize.width, fanAreaHeight + tilesWidgetSize.height));
 
     for (int i = 0, j = 0; i < n; ++i) {
         while (fan_table[++j] == 0) continue;
