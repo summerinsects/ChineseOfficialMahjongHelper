@@ -298,7 +298,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
     } while (0);
 
     if (errorStr != nullptr) {
-        AlertView::showWithMessage("提示", errorStr, [this](AlertView *) {
+        AlertView::showWithMessage("提示", errorStr, [this]() {
             _editBox->touchDownAction(_editBox, ui::Widget::TouchEventType::ENDED);
         }, nullptr);
     }

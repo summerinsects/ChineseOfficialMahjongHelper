@@ -30,7 +30,7 @@ bool HelloWorld::init() {
 
     auto listener = EventListenerKeyboard::create();
     listener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event *unused_event) {
-        AlertView::showWithMessage("提示", "是否确定退出国标小助手？", [](AlertView *) {
+        AlertView::showWithMessage("提示", "是否确定退出国标小助手？", []() {
             Director::getInstance()->end();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
             exit(0);

@@ -393,7 +393,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     editBox->setPosition(Vec2(width * 0.5f, 10));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
 
-    AlertView::showWithNode("直接输入", rootWidget, [this, editBox](AlertView *) {
+    AlertView::showWithNode("直接输入", rootWidget, [this, editBox]() {
         parseInput(editBox->getText());
     }, nullptr);
 }
@@ -440,7 +440,7 @@ void ExtraInfoWidget::parseInput(const char *input) {
     } while (0);
 
     if (errorStr != nullptr) {
-        AlertView::showWithMessage("直接输入牌", errorStr, [this, str](AlertView *) {
+        AlertView::showWithMessage("直接输入牌", errorStr, [this, str]() {
             showInputAlert(str.c_str());
         }, nullptr);
     }

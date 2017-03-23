@@ -430,11 +430,11 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *sender, size_t idx) {
     else {
         if (g_currentRecord.current_index < 16) {
             AlertView::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？",
-                [this, idx](AlertView *) { editName(idx); }, nullptr);
+                std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
         }
         else {
             AlertView::showWithMessage("提示", "对局已经结束，是否要修改选手姓名？",
-                [this, idx](AlertView *) { editName(idx); }, nullptr);
+                std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
         }
     }
 }
@@ -453,7 +453,7 @@ void ScoreSheetScene::editName(size_t idx) {
     const char *wind[] = { "东", "南", "西", "北" };
     char title[64];
     snprintf(title, sizeof(title), "开局座位「%s」", wind[idx]);
-    AlertView::showWithNode(title, editBox, [this, editBox, idx](AlertView *) {
+    AlertView::showWithNode(title, editBox, [this, editBox, idx]() {
         const char *text = editBox->getText();
         if (*text != '\0') {
             strncpy(g_currentRecord.name[idx], text, 255);
@@ -607,7 +607,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     str = handNameText[handIdx];
     str.append("详情");
     AlertView::showWithMessage(str, message,
-        [this, handIdx](AlertView *) { editRecord(handIdx, true); }, nullptr);
+        std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
 }
 
 void ScoreSheetScene::onTimeScheduler(float dt) {
@@ -662,7 +662,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
     }
 
     AlertView::showWithMessage("重置", "重置操作会清空当前已记录的信息，未打满北风北的记录将会丢失，确定要这样做吗？",
-        [this](AlertView *) { reset(); }, nullptr);
+        std::bind(&ScoreSheetScene::reset, this), nullptr);
 }
 
 static void showPursuit(int delta) {
@@ -1108,7 +1108,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     editBox->setDelegate(delegate.get());
 
     // 使这个代理随AlertView一起析构
-    AlertView::showWithNode("追分策略", rootWidget, [editBox, delegate](AlertView *) {
+    AlertView::showWithNode("追分策略", rootWidget, [editBox, delegate]() {
         const char *text = editBox->getText();
         if (*text != '\0') {
             int delta = atoi(text);
