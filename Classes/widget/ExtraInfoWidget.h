@@ -42,7 +42,7 @@ private:
     void onInstructionButton(cocos2d::Ref *sender);
     void showInputAlert(const char *prevInput);
     void parseInput(const char *input);
-    
+
     cocos2d::ui::RadioButtonGroup *_winTypeGroup = nullptr;
     cocos2d::ui::CheckBox *_fourthTileBox = nullptr;
     cocos2d::ui::CheckBox *_replacementBox = nullptr;
