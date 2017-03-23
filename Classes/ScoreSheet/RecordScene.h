@@ -10,6 +10,9 @@
 #define RESET_FAN(flag_, fan_) ((flag_) &= ~(1ULL << (mahjong::LAST_TILE - (fan_))))
 #define TEST_FAN(flag_, fan_) !!((flag_) & (1ULL << (mahjong::LAST_TILE - (fan_))))
 
+class TilePickWidget;
+class ExtraInfoWidget;
+
 class RecordScene : public BaseLayer, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
 public:
     static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback);
@@ -54,6 +57,10 @@ private:
 
     void onPointsNameButton(cocos2d::Ref *sender);
     void onOkButton(cocos2d::Ref *sender);
+
+    void showCalculator(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t winTile, int flowerCnt);
+    void calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo,
+        const mahjong::hand_tiles_t &handTiles, mahjong::tile_t winTile, int flowerCnt);
 };
 
 #endif
