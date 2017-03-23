@@ -465,6 +465,9 @@ void RecordScene::onPlusButton(cocos2d::Ref *sender) {
 }
 
 void RecordScene::onTilesButton(cocos2d::Ref *sender) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float maxWidth = visibleSize.width * 0.8f - 10;
+
     // 选牌面板和其他信息的相关控件
     TilePickWidget *tilePicker = TilePickWidget::create();
     ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
@@ -483,9 +486,15 @@ void RecordScene::onTilesButton(cocos2d::Ref *sender) {
 
     extraInfo->setParseCallback(std::bind(&TilePickWidget::setData, tilePicker, std::placeholders::_1, std::placeholders::_2));
 
-    const Size &tilePickerSize = tilePicker->getContentSize();
-    const Size &extraInfoSize = extraInfo->getContentSize();
-    const float maxWidth = std::max(tilePickerSize.width, extraInfoSize.width);
+    Size tilePickerSize = tilePicker->getContentSize();
+    const float tilePickerScale = maxWidth / tilePickerSize.width;
+    tilePicker->setScale(tilePickerScale);
+    tilePickerSize = Size(maxWidth, tilePickerSize.height * tilePickerScale);
+
+    Size extraInfoSize = extraInfo->getContentSize();
+    const float extraInfoScale = maxWidth / extraInfoSize.width;
+    extraInfo->setScale(extraInfoScale);
+    extraInfoSize = Size(maxWidth, extraInfoSize.height * extraInfoScale);
 
     ui::Widget *rootWidget = ui::Widget::create();
     rootWidget->setContentSize(Size(maxWidth, tilePickerSize.height + extraInfoSize.height + 5));
