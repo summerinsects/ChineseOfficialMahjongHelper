@@ -23,6 +23,16 @@ public:
 
     const Record::Detail &getDetail() const { return _detail; }
 
+    typedef struct {
+        mahjong::hand_tiles_t hand_tiles;
+        mahjong::tile_t win_tile;
+        int flower_count;
+        mahjong::extra_condition_t ext_cond;
+    } CalculateParam;
+
+    static void _WinHandToCalculateParam(const Record::Detail::WinHand &winHand, CalculateParam &param);
+    static void _CalculateParamToWinHand(const CalculateParam &param, Record::Detail::WinHand &winHand);
+
 private:
     cocos2d::ui::EditBox *_editBox = nullptr;
     cocos2d::ui::CheckBox *_drawBox = nullptr;
@@ -57,13 +67,6 @@ private:
 
     void onPointsNameButton(cocos2d::Ref *sender);
     void onOkButton(cocos2d::Ref *sender);
-
-    typedef struct {
-        mahjong::hand_tiles_t hand_tiles;
-        mahjong::tile_t win_tile;
-        int flower_count;
-        mahjong::extra_condition_t ext_cond;
-    } CalculateParam;
 
     void showCalculator(const CalculateParam &param);
     void calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const CalculateParam &param);

@@ -468,8 +468,36 @@ void RecordScene::onPlusButton(cocos2d::Ref *sender) {
     updateScoreLabel();
 }
 
+void RecordScene::_WinHandToCalculateParam(const Record::Detail::WinHand &winHand, RecordScene::CalculateParam &param) {
+    memset(&param, 0, sizeof(CalculateParam));
+    std::copy(winHand.fixed_packs, winHand.fixed_packs + winHand.pack_count,
+        param.hand_tiles.fixed_packs);
+    param.hand_tiles.pack_count = winHand.pack_count;
+    std::copy(winHand.standing_tiles, winHand.standing_tiles + winHand.tile_count,
+        param.hand_tiles.standing_tiles);
+    param.hand_tiles.tile_count = winHand.tile_count;
+    param.win_tile = winHand.win_tile;
+    param.flower_count = winHand.flower_count;
+    param.ext_cond.win_flag = winHand.win_flag;
+}
+
+void RecordScene::_CalculateParamToWinHand(const RecordScene::CalculateParam &param, Record::Detail::WinHand &winHand) {
+    memset(&winHand, 0, sizeof(Record::Detail::WinHand));
+    std::copy(param.hand_tiles.fixed_packs, param.hand_tiles.fixed_packs + param.hand_tiles.pack_count,
+        winHand.fixed_packs);
+    winHand.pack_count = param.hand_tiles.pack_count;
+    std::copy(param.hand_tiles.standing_tiles, param.hand_tiles.standing_tiles + param.hand_tiles.tile_count,
+        winHand.standing_tiles);
+    winHand.tile_count = param.hand_tiles.tile_count;
+    winHand.win_tile = param.win_tile;
+    winHand.flower_count = param.flower_count;
+    winHand.win_flag = param.ext_cond.win_flag;
+}
+
 void RecordScene::onTilesButton(cocos2d::Ref *sender) {
-    showCalculator(CalculateParam());
+    CalculateParam param;
+    _WinHandToCalculateParam(_detail.win_hand, param);
+    showCalculator(param);
 }
 
 void RecordScene::onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
@@ -788,6 +816,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
             }
         }
 
+        _CalculateParamToWinHand(temp, _detail.win_hand);
         refresh();
     }, std::bind(&RecordScene::showCalculator, this, temp));
 }

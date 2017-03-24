@@ -13,6 +13,16 @@ struct Record {
         uint8_t false_win;
         uint32_t score;
         uint64_t fan_flag;
+
+        struct WinHand {
+            uint16_t fixed_packs[5];
+            uint8_t pack_count;
+            uint8_t standing_tiles[13];
+            uint8_t tile_count;
+            uint8_t win_tile;
+            uint8_t win_flag;
+            uint8_t flower_count;
+        } win_hand;
     } detail[16];
     size_t current_index;
     time_t start_time;

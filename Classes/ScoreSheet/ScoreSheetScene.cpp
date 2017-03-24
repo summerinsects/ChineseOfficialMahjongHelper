@@ -4,6 +4,7 @@
 #include "HistoryScene.h"
 #include "../widget/AlertView.h"
 #include "../widget/CWEditBoxDelegate.h"
+#include "../widget/HandTilesWidget.h"
 #include "../common.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 
@@ -606,8 +607,48 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
 
     str = handNameText[handIdx];
     str.append("详情");
-    AlertView::showWithMessage(str, message,
-        std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
+
+    if (detail.win_hand.tile_count != 0 && detail.win_hand.win_tile != 0) {
+        RecordScene::CalculateParam param;
+        RecordScene::_WinHandToCalculateParam(detail.win_hand, param);
+
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        const float maxWidth = visibleSize.width * 0.8f - 10;
+
+        Label *label = Label::createWithSystemFont(message, "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
+            label->setDimensions(maxWidth, 0);
+        }
+        const Size &labelSize = label->getContentSize();
+
+        // 手牌
+        HandTilesWidget *tilesWidget = HandTilesWidget::create();
+        tilesWidget->setData(param.hand_tiles, param.win_tile);
+        Size tilesWidgetSize = tilesWidget->getContentSize();
+        if (tilesWidgetSize.width > maxWidth) {
+            const float scale = maxWidth / tilesWidgetSize.width;
+            tilesWidget->setScale(scale);
+            tilesWidgetSize.width = maxWidth;
+            tilesWidgetSize.height *= scale;
+        }
+
+        Node *innerNode = Node::create();
+        innerNode->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesWidgetSize.height));
+
+        innerNode->addChild(tilesWidget);
+        tilesWidget->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 10 + tilesWidgetSize.height * 0.5f));
+
+        innerNode->addChild(label);
+        label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f));
+
+        AlertView::showWithNode(str, innerNode,
+            std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
+    }
+    else {
+        AlertView::showWithMessage(str, message,
+            std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
+    }
 }
 
 void ScoreSheetScene::onTimeScheduler(float dt) {
