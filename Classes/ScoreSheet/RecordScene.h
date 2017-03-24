@@ -58,9 +58,15 @@ private:
     void onPointsNameButton(cocos2d::Ref *sender);
     void onOkButton(cocos2d::Ref *sender);
 
-    void showCalculator(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t winTile, int flowerCnt);
-    void calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo,
-        const mahjong::hand_tiles_t &handTiles, mahjong::tile_t winTile, int flowerCnt);
+    typedef struct {
+        mahjong::hand_tiles_t hand_tiles;
+        mahjong::tile_t win_tile;
+        int flower_cnt;
+        mahjong::extra_condition_t ext_cond;
+    } CalculateParam;
+
+    void showCalculator(const CalculateParam &param);
+    void calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const CalculateParam &param);
 };
 
 #endif
