@@ -483,7 +483,6 @@ void RecordScene::onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventTy
             button->setEnabled(false);
             _falseWinBox[i]->setEnabled(true);
         }
-
     }
     else {
         _winIndex = _winGroup->getSelectedButtonIndex();
@@ -495,7 +494,6 @@ void RecordScene::onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventTy
             button->setEnabled(true);
             _falseWinBox[i]->setEnabled(i != _winIndex);
         }
-
     }
     updateScoreLabel();
 }
