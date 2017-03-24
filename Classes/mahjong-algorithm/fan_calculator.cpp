@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
+#include <algorithm>
 
 #define MAX_DIVISION_CNT 20  // 一副牌最多也没有20种划分吧，够用了
 

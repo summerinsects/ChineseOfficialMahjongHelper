@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <limits>
-
+#include <algorithm>
 
 namespace mahjong {
 

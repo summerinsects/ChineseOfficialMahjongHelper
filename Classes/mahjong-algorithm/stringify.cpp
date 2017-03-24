@@ -1,4 +1,5 @@
 ﻿#include "stringify.h"
+#include <string.h>
 
 namespace mahjong {
 
