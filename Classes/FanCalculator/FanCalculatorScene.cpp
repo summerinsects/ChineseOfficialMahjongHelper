@@ -104,7 +104,7 @@ void FanCalculatorScene::calculate() {
         return;
     }
 
-    mahjong::sort_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count);
+    std::sort(hand_tiles.standing_tiles, hand_tiles.standing_tiles + hand_tiles.tile_count);
 
     long fan_table[mahjong::FAN_TABLE_SIZE] = { 0 };
 

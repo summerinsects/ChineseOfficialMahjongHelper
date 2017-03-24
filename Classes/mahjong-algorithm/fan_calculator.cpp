@@ -1249,7 +1249,7 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     // 恢复成一张一张的牌
     tile_t standing_tiles[14];
     long tile_cnt = packs_to_tiles(concealed_packs, pack_cnt, standing_tiles, 14);
-    sort_tiles(standing_tiles, tile_cnt);
+    std::sort(standing_tiles, standing_tiles + tile_cnt);
     remove_win_tile(standing_tiles, tile_cnt, win_tile);
     --tile_cnt;
 
@@ -2040,7 +2040,7 @@ int calculate_fan(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_c
     // 合并得到14张牌
     memcpy(standing_tiles, hand_tiles->standing_tiles, standing_cnt * sizeof(tile_t));
     standing_tiles[standing_cnt] = win_tile;
-    sort_tiles(standing_tiles, standing_cnt + 1);
+    std::sort(standing_tiles, standing_tiles + standing_cnt + 1);
 
     divide_win_hand(standing_tiles, hand_tiles->fixed_packs, fixed_cnt, &result);
 

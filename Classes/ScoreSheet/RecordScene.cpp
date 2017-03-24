@@ -682,7 +682,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
         return;
     }
 
-    mahjong::sort_tiles(temp.hand_tiles.standing_tiles, temp.hand_tiles.tile_count);
+    std::sort(temp.hand_tiles.standing_tiles, temp.hand_tiles.standing_tiles + temp.hand_tiles.tile_count);
 
     long fan_table[mahjong::FAN_TABLE_SIZE] = { 0 };
 

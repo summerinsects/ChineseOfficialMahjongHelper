@@ -2,7 +2,6 @@
 #define _TILE_H_
 
 #include <stdint.h>
-#include <algorithm>
 
 #ifdef _MSC_VER  // for MSVC
 #define forceinline __forceinline
@@ -89,15 +88,6 @@ static forceinline suit_t tile_suit(tile_t tile) {
  */
 static forceinline rank_t tile_rank(tile_t tile) {
     return (tile & 0xF);
-}
-
-/**
- * @brief 排序牌
- * @param [in] tiles 牌
- * @param [in] cnt 牌的数量
- */
-static forceinline void sort_tiles(tile_t *tiles, long cnt) {
-    std::sort(tiles, tiles + cnt);
 }
 
 /**
