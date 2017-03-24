@@ -61,7 +61,7 @@ private:
     typedef struct {
         mahjong::hand_tiles_t hand_tiles;
         mahjong::tile_t win_tile;
-        int flower_cnt;
+        int flower_count;
         mahjong::extra_condition_t ext_cond;
     } CalculateParam;
 

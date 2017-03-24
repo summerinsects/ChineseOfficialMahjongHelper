@@ -605,7 +605,7 @@ void RecordScene::showCalculator(const CalculateParam &param) {
     TilePickWidget *tilePicker = TilePickWidget::create();
     ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
 
-    extraInfo->setFlowerCount(param.flower_cnt);
+    extraInfo->setFlowerCount(param.flower_count);
     extraInfo->setWinFlag(param.ext_cond.win_flag);
 
     // 设置圈风
@@ -668,8 +668,8 @@ void RecordScene::showCalculator(const CalculateParam &param) {
 
 void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const CalculateParam &param) {
     CalculateParam temp = { 0 };
-    temp.flower_cnt = extraInfo->getFlowerCount();
-    if (temp.flower_cnt > 8) {
+    temp.flower_count = extraInfo->getFlowerCount();
+    if (temp.flower_count > 8) {
         AlertView::showWithMessage("算番", "花牌数的范围为0~8", std::bind(&RecordScene::showCalculator, this, param), nullptr);
         return;
     }
@@ -708,8 +708,8 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     }
 
     // 加花牌
-    fan += temp.flower_cnt;
-    fan_table[mahjong::FLOWER_TILES] = temp.flower_cnt;
+    fan += temp.flower_count;
+    fan_table[mahjong::FLOWER_TILES] = temp.flower_count;
 
     // 有n个番种，每行排2个
     long n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
