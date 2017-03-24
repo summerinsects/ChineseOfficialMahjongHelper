@@ -608,6 +608,7 @@ void RecordScene::showCalculator(const CalculateParam &param) {
     ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
 
     extraInfo->setFlowerCount(param.flower_cnt);
+    extraInfo->setWinFlag(param.ext_cond.win_flag);
 
     // 设置圈风
     extraInfo->setPrevalentWind(static_cast<mahjong::wind_t>(_handIdx / 4));
