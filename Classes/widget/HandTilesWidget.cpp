@@ -75,11 +75,12 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
 
     // 添加副露
     for (long i = 0; i < handTiles.pack_count; ++i) {
-        _fixedPacks.push_back(handTiles.fixed_packs[i]);
-        mahjong::tile_t tile = mahjong::pack_tile(_fixedPacks[i]);
-        switch (mahjong::pack_type(_fixedPacks[i])) {
+        mahjong::pack_t pack = handTiles.fixed_packs[i];
+        _fixedPacks.push_back(pack);
+        mahjong::tile_t tile = mahjong::pack_tile(pack);
+        switch (mahjong::pack_type(pack)) {
         case PACK_TYPE_CHOW:
-            switch (mahjong::pack_offer(_fixedPacks[i])) {
+            switch (mahjong::pack_offer(pack)) {
             default: addFixedChowPack(tile - 1, 0); break;
             case 2: addFixedChowPack(tile, 1); break;
             case 3: addFixedChowPack(tile + 1, 2); break;
@@ -89,7 +90,7 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
             ++_usedTilesTable[tile + 1];
             break;
         case PACK_TYPE_PUNG:
-            switch (mahjong::pack_offer(_fixedPacks[i])) {
+            switch (mahjong::pack_offer(pack)) {
             default: addFixedPungPack(tile, 0); break;
             case 2: addFixedPungPack(tile, 1); break;
             case 3: addFixedPungPack(tile, 2); break;
@@ -97,7 +98,7 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
             _usedTilesTable[tile] += 3;
             break;
         case PACK_TYPE_KONG:
-            switch (mahjong::pack_offer(_fixedPacks[i])) {
+            switch (mahjong::pack_offer(pack)) {
             case 0: addFixedConcealedKongPack(tile); break;
             default: addFixedMeldedKongPack(tile, 0); break;
             case 2: addFixedMeldedKongPack(tile, 1); break;
