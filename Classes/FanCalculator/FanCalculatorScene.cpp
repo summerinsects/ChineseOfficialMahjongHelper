@@ -38,7 +38,7 @@ bool FanCalculatorScene::init() {
     }
     else {
         y -= widgetSize.height;
-        tilePicker->setPosition(Vec2(origin.x + widgetSize.width * 0.5f, y - 25 + widgetSize.height * 0.5f));
+        tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 25 + widgetSize.height * 0.5f));
     }
 
     // 其他信息的相关控件
