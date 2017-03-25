@@ -5,16 +5,15 @@
 
 USING_NS_CC;
 
+#define GAP 4
+
 bool HandTilesWidget::init() {
     if (UNLIKELY(!ui::Widget::init())) {
         return false;
     }
 
-    // 一张牌的尺寸：27 * 39
-
-    // 14张牌宽度：27 * 14 = 378
-    // 加间距：378 + 4 = 382
-    Size tilesSize = Size(382 + 4, TILE_HEIGHT + 4);
+    // 14张牌宽度：TILE_WIDTH * 14
+    Size tilesSize = Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT + GAP);
     _standingWidget = ui::Widget::create();
     _standingWidget->setContentSize(tilesSize);
     this->addChild(_standingWidget);
@@ -30,19 +29,14 @@ bool HandTilesWidget::init() {
     _highlightBox->drawLine(Vec2(0, TILE_HEIGHT), Vec2(0, 0), Color4F::RED);
     _standingWidget->addChild(_highlightBox, 2);
 
-    // 一个直杠的宽度：39 + 27 * 3 = 120
-    // 两个直杠的宽度：120 * 2 = 240
-    // 加间距：240 + 4 = 244
-
-    // 高度：39 * 2 = 78
-    // 加间距：78 + 4 = 82
-    Size fixedSize = Size(244, 82);
+    // 一个直杠的宽度：(TILE_HEIGHT + TILE_WIDTH * 3)
+    Size fixedSize = Size((TILE_HEIGHT + TILE_WIDTH * 3) * 2 + GAP, TILE_HEIGHT * 2 + GAP);
     _fixedWidget = ui::Widget::create();
     _fixedWidget->setContentSize(fixedSize);
     this->addChild(_fixedWidget);
-    _fixedWidget->setPosition(Vec2(tilesSize.width * 0.5f, tilesSize.height + fixedSize.height * 0.5f + 4));
+    _fixedWidget->setPosition(Vec2(tilesSize.width * 0.5f, tilesSize.height + fixedSize.height * 0.5f + GAP));
 
-    this->setContentSize(Size(tilesSize.width, tilesSize.height + fixedSize.height + 4));
+    this->setContentSize(Size(tilesSize.width, tilesSize.height + fixedSize.height + GAP));
 
     _standingTiles.reserve(14);
     _fixedPacks.reserve(4);
@@ -176,13 +170,13 @@ size_t HandTilesWidget::countServingTileInFixedPacks() const {
 
 cocos2d::Vec2 HandTilesWidget::calcStandingTilePos(size_t idx) const {
     Vec2 pos;
-    pos.y = 19.5f + 2;
+    pos.y = 19.5f + GAP / 2;
     switch (_fixedPacks.size()) {
-    default: pos.x = TILE_WIDTH * (idx + 0.5f) + 2; break;
-    case 1: pos.x = TILE_WIDTH * (idx + 2) + 2; break;
-    case 2: pos.x = TILE_WIDTH * (idx + 3.5f) + 2; break;
-    case 3: pos.x = TILE_WIDTH * (idx + 5) + 2; break;
-    case 4: pos.x = TILE_WIDTH * (idx + 6.5f) + 2; break;
+    default: pos.x = TILE_WIDTH * (idx + 0.5f) + GAP / 2; break;
+    case 1: pos.x = TILE_WIDTH * (idx + 2) + GAP / 2; break;
+    case 2: pos.x = TILE_WIDTH * (idx + 3.5f) + GAP / 2; break;
+    case 3: pos.x = TILE_WIDTH * (idx + 5) + GAP / 2; break;
+    case 4: pos.x = TILE_WIDTH * (idx + 6.5f) + GAP / 2; break;
     }
     return pos;
 }
@@ -228,7 +222,7 @@ void HandTilesWidget::addTile(mahjong::tile_t tile) {
         ++_standingTilesTable[tile];
     }
     else {
-        button->setPosition(Vec2(pos.x + 4, pos.y));  // 和牌张与立牌间隔4像素
+        button->setPosition(Vec2(pos.x + GAP, pos.y));  // 和牌张与立牌间隔4像素
     }
 
     _standingTileButtons.push_back(button);
@@ -290,7 +284,7 @@ void HandTilesWidget::refreshHighlightPos() {
         _highlightBox->setPosition(pos);
     }
     else {
-        _highlightBox->setPosition(Vec2(pos.x + 4, pos.y));
+        _highlightBox->setPosition(Vec2(pos.x + GAP, pos.y));
     }
 
     if (_currentIdxChangedCallback) {
@@ -346,7 +340,7 @@ void HandTilesWidget::refreshStandingTilesPos() {
             button->setPosition(pos);
         }
         else {
-            button->setPosition(Vec2(pos.x + 4, pos.y));
+            button->setPosition(Vec2(pos.x + GAP, pos.y));
         }
     }
 }
@@ -829,8 +823,6 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
     bool rotated[18] = { false };
     long tile_cnt = 0;
     int totalWidth = 0;
-
-#define GAP 4
 
     // 副露
     for (long i = 0; i < handTiles.pack_count; ++i) {
