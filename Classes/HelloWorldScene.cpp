@@ -112,6 +112,7 @@ bool HelloWorld::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 10));
+
     return true;
 }
 
