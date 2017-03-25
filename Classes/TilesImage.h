@@ -10,4 +10,7 @@ static const char *tilesImageName[] = {
     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 };
 
+#define TILE_WIDTH  27
+#define TILE_HEIGHT 39
+
 #endif

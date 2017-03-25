@@ -763,7 +763,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(discardLabel);
 
-        const float tileScale = CC_CONTENT_SCALE_FACTOR() / 27 * TILE_WIDTH_SMALL;
+        const float tileScale = CC_CONTENT_SCALE_FACTOR() / TILE_WIDTH * TILE_WIDTH_SMALL;
         discardButton = ui::Button::create("tiles/bg.png");
         discardButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         discardButton->setScale(tileScale);

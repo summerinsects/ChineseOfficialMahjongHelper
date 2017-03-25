@@ -14,7 +14,7 @@ bool HandTilesWidget::init() {
 
     // 14张牌宽度：27 * 14 = 378
     // 加间距：378 + 4 = 382
-    Size tilesSize = Size(382 + 4, 39 + 4);
+    Size tilesSize = Size(382 + 4, TILE_HEIGHT + 4);
     _standingWidget = ui::Widget::create();
     _standingWidget->setContentSize(tilesSize);
     this->addChild(_standingWidget);
@@ -22,12 +22,12 @@ bool HandTilesWidget::init() {
 
     // 高亮方框
     _highlightBox = DrawNode::create();
-    _highlightBox->setContentSize(Size(27, 39));
+    _highlightBox->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
     _highlightBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _highlightBox->drawLine(Vec2(0, 0), Vec2(27, 0), Color4F::RED);
-    _highlightBox->drawLine(Vec2(27, 0), Vec2(27, 39), Color4F::RED);
-    _highlightBox->drawLine(Vec2(27, 39), Vec2(0, 39), Color4F::RED);
-    _highlightBox->drawLine(Vec2(0, 39), Vec2(0, 0), Color4F::RED);
+    _highlightBox->drawLine(Vec2(0, 0), Vec2(TILE_WIDTH, 0), Color4F::RED);
+    _highlightBox->drawLine(Vec2(TILE_WIDTH, 0), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
+    _highlightBox->drawLine(Vec2(TILE_WIDTH, TILE_HEIGHT), Vec2(0, TILE_HEIGHT), Color4F::RED);
+    _highlightBox->drawLine(Vec2(0, TILE_HEIGHT), Vec2(0, 0), Color4F::RED);
     _standingWidget->addChild(_highlightBox, 2);
 
     // 一个直杠的宽度：39 + 27 * 3 = 120
@@ -178,11 +178,11 @@ cocos2d::Vec2 HandTilesWidget::calcStandingTilePos(size_t idx) const {
     Vec2 pos;
     pos.y = 19.5f + 2;
     switch (_fixedPacks.size()) {
-    default: pos.x = 27 * (idx + 0.5f) + 2; break;
-    case 1: pos.x = 27 * (idx + 2) + 2; break;
-    case 2: pos.x = 27 * (idx + 3.5f) + 2; break;
-    case 3: pos.x = 27 * (idx + 5) + 2; break;
-    case 4: pos.x = 27 * (idx + 6.5f) + 2; break;
+    default: pos.x = TILE_WIDTH * (idx + 0.5f) + 2; break;
+    case 1: pos.x = TILE_WIDTH * (idx + 2) + 2; break;
+    case 2: pos.x = TILE_WIDTH * (idx + 3.5f) + 2; break;
+    case 3: pos.x = TILE_WIDTH * (idx + 5) + 2; break;
+    case 4: pos.x = TILE_WIDTH * (idx + 6.5f) + 2; break;
     }
     return pos;
 }
@@ -840,9 +840,9 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
         case PACK_TYPE_CHOW:
             rotated[tile_cnt + 0] = true;
 
-            pos[tile_cnt + 0] = Vec2(totalWidth + 39 * 0.5f, 27 * 0.5f);
-            pos[tile_cnt + 1] = Vec2(totalWidth + 39 + 27 * 0.5f, 39 * 0.5f);
-            pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
+            pos[tile_cnt + 0] = Vec2(totalWidth + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+            pos[tile_cnt + 1] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+            pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
 
             switch (mahjong::pack_offer(pack)) {
             default:
@@ -861,7 +861,7 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
                 image[tile_cnt + 2] = tilesImageName[tile];
                 break;
             }
-            totalWidth += (27 * 2 + 39 + GAP);
+            totalWidth += (TILE_WIDTH * 2 + TILE_HEIGHT + GAP);
             tile_cnt += 3;
             break;
 
@@ -874,26 +874,26 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
             default:
                 rotated[tile_cnt + 0] = true;
 
-                pos[tile_cnt + 0] = Vec2(totalWidth + 39 * 0.5f, 27 * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + 39 + 27 * 0.5f, 39 * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
+                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
                 break;
             case 2:
                 rotated[tile_cnt + 1] = true;
 
-                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + 27 + 39 * 0.5f, 27 * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
+                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
                 break;
             case 3:
                 rotated[tile_cnt + 2] = true;
 
-                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + 27 * 1.5f, 39 * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + 27 * 2 + 39 * 0.5f, 27 * 0.5f);
+                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_WIDTH * 2 + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
                 break;
             }
-            totalWidth += (27 * 2 + 39 + GAP);
+            totalWidth += (TILE_WIDTH * 2 + TILE_HEIGHT + GAP);
             tile_cnt += 3;
             break;
 
@@ -908,41 +908,41 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
                 image[tile_cnt + 0] = "tiles/bg.png";
                 image[tile_cnt + 3] = "tiles/bg.png";
 
-                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + 27 * 1.5f, 39 * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + 27 * 2.5f, 39 * 0.5f);
-                pos[tile_cnt + 3] = Vec2(totalWidth + 27 * 3.5f, 39 * 0.5f);
+                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 3] = Vec2(totalWidth + TILE_WIDTH * 3.5f, TILE_HEIGHT * 0.5f);
 
-                totalWidth += (27 * 4 + GAP);
+                totalWidth += (TILE_WIDTH * 4 + GAP);
                 break;
             default:
                 rotated[tile_cnt + 0] = true;
 
-                pos[tile_cnt + 0] = Vec2(totalWidth + 39 * 0.5f, 27 * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + 39 + 27 * 0.5f, 39 * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
-                pos[tile_cnt + 3] = Vec2(totalWidth + 39 + 27 * 2.5f, 39 * 0.5f);
+                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 3] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
 
-                totalWidth += (27 * 3 + 39 + GAP);
+                totalWidth += (TILE_WIDTH * 3 + TILE_HEIGHT + GAP);
                 break;
             case 2:
                 rotated[tile_cnt + 1] = true;
 
-                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + 27 + 39 * 0.5f, 27 * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
-                pos[tile_cnt + 3] = Vec2(totalWidth + 39 + 27 * 2.5f, 39 * 0.5f);
+                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 3] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
 
-                totalWidth += (27 * 3 + 39 + GAP);
+                totalWidth += (TILE_WIDTH * 3 + TILE_HEIGHT + GAP);
                 break;
             case 3:
                 rotated[tile_cnt + 3] = true;
-                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + 27 * 1.5f, 39 * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + 27 * 2.5f, 39 * 0.5f);
-                pos[tile_cnt + 3] = Vec2(totalWidth + 27 * 3 + 39 * 0.5f, 27 * 0.5f);
+                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
+                pos[tile_cnt + 3] = Vec2(totalWidth + TILE_WIDTH * 3 + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
 
-                totalWidth += (27 * 3 + 39 + GAP);
+                totalWidth += (TILE_WIDTH * 3 + TILE_HEIGHT + GAP);
                 break;
             }
             tile_cnt += 4;
@@ -957,8 +957,8 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
     for (long i = 0; i < handTiles.tile_count; ++i) {
         mahjong::tile_t tile = handTiles.standing_tiles[i];
         image[tile_cnt] = tilesImageName[tile];
-        pos[tile_cnt] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
-        totalWidth += 27;
+        pos[tile_cnt] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+        totalWidth += TILE_WIDTH;
         ++tile_cnt;
     }
 
@@ -967,13 +967,13 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
         totalWidth += GAP;
 
         image[tile_cnt] = tilesImageName[servingTile];
-        pos[tile_cnt] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
-        totalWidth += 27;
+        pos[tile_cnt] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+        totalWidth += TILE_WIDTH;
         ++tile_cnt;
     }
 
     Node *node = Node::create();
-    node->setContentSize(Size(totalWidth, 39));
+    node->setContentSize(Size(totalWidth, TILE_HEIGHT));
     node->setIgnoreAnchorPointForPosition(false);
     node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 

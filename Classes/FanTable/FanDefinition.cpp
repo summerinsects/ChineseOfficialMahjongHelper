@@ -28,7 +28,7 @@ static void replaceTilesToImage(std::string &text, float scale) {
             for (long i = 0; i < tilesCnt; ++i) {
                 int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
                     "<img src=\"%s\" width=\"%d\" height=\"%d\"/>",
-                    tilesImageName[tiles[i]], (int)(27 * scale), (int)(39 * scale));
+                    tilesImageName[tiles[i]], (int)(TILE_WIDTH * scale), (int)(TILE_HEIGHT * scale));
                 totalWriteLen += writeLen;
             }
             text.replace(pos, readLen + 2, imgStr);

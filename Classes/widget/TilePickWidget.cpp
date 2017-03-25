@@ -32,7 +32,7 @@ bool TilePickWidget::init() {
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tableWidget->addChild(button);
-        button->setPosition(Vec2(27 * (i + 0.5f), 136.5f));
+        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), 136.5f));
         button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
         _characterButtons[i] = button;
     }
@@ -43,7 +43,7 @@ bool TilePickWidget::init() {
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tableWidget->addChild(button);
-        button->setPosition(Vec2(27 * (i + 0.5f), 97.5f));
+        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), 97.5f));
         button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
         _bambooButtons[i] = button;
     }
@@ -54,7 +54,7 @@ bool TilePickWidget::init() {
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tableWidget->addChild(button);
-        button->setPosition(Vec2(27 * (i + 0.5f), 58.5f));
+        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), 58.5f));
         button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
         _dotsButtons[i] = button;
     }
@@ -65,7 +65,7 @@ bool TilePickWidget::init() {
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tableWidget->addChild(button);
-        button->setPosition(Vec2(27 * (i + 0.5f), 19.5f));
+        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), 19.5f));
         button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
         _honorButtons[i] = button;
     }
