@@ -13,7 +13,7 @@ bool HandTilesWidget::init() {
     }
 
     // 14张牌宽度：TILE_WIDTH * 14
-    Size standingSize = Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT + GAP);
+    Size standingSize = Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT);
     _standingContainer = ui::Widget::create();
     _standingContainer->setContentSize(standingSize);
     this->addChild(_standingContainer);
