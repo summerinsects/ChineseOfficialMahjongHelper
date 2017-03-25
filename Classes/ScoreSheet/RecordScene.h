@@ -6,6 +6,11 @@
 #include "Record.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 
+static const char *handNameText[] = {
+    "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
+    "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北"
+};
+
 #define SET_FAN(flag_, fan_) ((flag_) |= (1ULL << (mahjong::LAST_TILE - (fan_))))
 #define RESET_FAN(flag_, fan_) ((flag_) &= ~(1ULL << (mahjong::LAST_TILE - (fan_))))
 #define TEST_FAN(flag_, fan_) !!((flag_) & (1ULL << (mahjong::LAST_TILE - (fan_))))
