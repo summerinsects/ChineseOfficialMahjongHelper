@@ -23,10 +23,7 @@ bool HandTilesWidget::init() {
     _highlightBox = DrawNode::create();
     _highlightBox->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
     _highlightBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _highlightBox->drawLine(Vec2(0, 0), Vec2(TILE_WIDTH, 0), Color4F::RED);
-    _highlightBox->drawLine(Vec2(TILE_WIDTH, 0), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
-    _highlightBox->drawLine(Vec2(TILE_WIDTH, TILE_HEIGHT), Vec2(0, TILE_HEIGHT), Color4F::RED);
-    _highlightBox->drawLine(Vec2(0, TILE_HEIGHT), Vec2(0, 0), Color4F::RED);
+    _highlightBox->drawRect(Vec2(0, 0), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
     _standingWidget->addChild(_highlightBox, 2);
 
     // 一个直杠的宽度：(TILE_HEIGHT + TILE_WIDTH * 3)
