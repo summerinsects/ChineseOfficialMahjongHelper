@@ -12,7 +12,7 @@ USING_NS_CC;
 
 static Record g_currentRecord;
 
-static inline bool isCStringEmpty(const char *str) {
+static forceinline bool isCStringEmpty(const char *str) {
     return *str == '\0';
 }
 
@@ -42,7 +42,7 @@ static void writeToJson() {
         std::string path = FileUtils::getInstance()->getWritablePath();
         path.append("record.json");
         FILE *file = fopen(path.c_str(), "wb");
-        if (file != nullptr) {
+        if (LIKELY(file != nullptr)) {
             fwrite(str.c_str(), 1, str.length(), file);
             fclose(file);
         }
@@ -456,7 +456,7 @@ void ScoreSheetScene::editName(size_t idx) {
     snprintf(title, sizeof(title), "开局座位「%s」", wind[idx]);
     AlertView::showWithNode(title, editBox, [this, editBox, idx]() {
         const char *text = editBox->getText();
-        if (*text != '\0') {
+        if (!isCStringEmpty(text)) {
             strncpy(g_currentRecord.name[idx], text, 255);
             _nameLabel[idx]->setVisible(true);
             _nameLabel[idx]->setString(text);
@@ -1140,7 +1140,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     std::shared_ptr<cw::EditBoxDelegate> delegate = std::make_shared<cw::EditBoxDelegate>(
         [](ui::EditBox *editBox) {
         const char *text = editBox->getText();
-        if (*text != '\0') {
+        if (!isCStringEmpty(text)) {
             int delta = atoi(text);
             showPursuit(delta);
         }
@@ -1150,7 +1150,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     // 使这个代理随AlertView一起析构
     AlertView::showWithNode("追分策略", rootWidget, [editBox, delegate]() {
         const char *text = editBox->getText();
-        if (*text != '\0') {
+        if (!isCStringEmpty(text)) {
             int delta = atoi(text);
             showPursuit(delta);
         }
