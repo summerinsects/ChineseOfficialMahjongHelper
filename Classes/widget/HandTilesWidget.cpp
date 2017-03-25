@@ -13,11 +13,11 @@ bool HandTilesWidget::init() {
     }
 
     // 14张牌宽度：TILE_WIDTH * 14
-    Size tilesSize = Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT + GAP);
+    Size standingSize = Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT + GAP);
     _standingWidget = ui::Widget::create();
-    _standingWidget->setContentSize(tilesSize);
+    _standingWidget->setContentSize(standingSize);
     this->addChild(_standingWidget);
-    _standingWidget->setPosition(Vec2(tilesSize.width * 0.5f, tilesSize.height * 0.5f));
+    _standingWidget->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height * 0.5f));
 
     // 高亮方框
     _highlightBox = DrawNode::create();
@@ -26,14 +26,13 @@ bool HandTilesWidget::init() {
     _highlightBox->drawRect(Vec2(0, 0), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
     _standingWidget->addChild(_highlightBox, 2);
 
-    // 一个直杠的宽度：(TILE_HEIGHT + TILE_WIDTH * 3)
-    Size fixedSize = Size((TILE_HEIGHT + TILE_WIDTH * 3) * 2 + GAP, TILE_HEIGHT * 2 + GAP);
+    const float fixedHeight = TILE_HEIGHT;
     _fixedWidget = ui::Widget::create();
-    _fixedWidget->setContentSize(fixedSize);
+    _fixedWidget->setContentSize(Size(0, fixedHeight));
     this->addChild(_fixedWidget);
-    _fixedWidget->setPosition(Vec2(tilesSize.width * 0.5f, tilesSize.height + fixedSize.height * 0.5f + GAP));
+    _fixedWidget->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height + fixedHeight * 0.5f + GAP));
 
-    this->setContentSize(Size(tilesSize.width, tilesSize.height + fixedSize.height + GAP));
+    this->setContentSize(Size(standingSize.width, standingSize.height + fixedHeight + GAP));
 
     _standingTiles.reserve(14);
     _fixedPacks.reserve(4);
@@ -56,10 +55,13 @@ void HandTilesWidget::reset() {
         _standingWidget->removeChild(_standingTileButtons.back());
         _standingTileButtons.pop_back();
     }
-    _highlightBox->setPosition(calcStandingTilePos(0));
+    _standingWidget->setContentSize(Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT));
+    _highlightBox->setPosition(Vec2(TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f));
 
     // 清除之前残留的副露
     _fixedWidget->removeAllChildren();
+    _fixedWidget->setContentSize(Size(0, _fixedWidget->getContentSize().height));
+    _fixedWidget->setScale(1);
 }
 
 void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile) {
@@ -102,6 +104,8 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
             break;
         }
     }
+
+    refreshStandingTilesPos();
 
     // 添加立牌
     for (long i = 0; i < handTiles.tile_count; ++i) {
@@ -165,32 +169,6 @@ size_t HandTilesWidget::countServingTileInFixedPacks() const {
         &_fixedPacks.front(), _fixedPacks.size(), servingTile);
 }
 
-cocos2d::Vec2 HandTilesWidget::calcStandingTilePos(size_t idx) const {
-    Vec2 pos;
-    pos.y = 19.5f + GAP / 2;
-    switch (_fixedPacks.size()) {
-    default: pos.x = TILE_WIDTH * (idx + 0.5f) + GAP / 2; break;
-    case 1: pos.x = TILE_WIDTH * (idx + 2) + GAP / 2; break;
-    case 2: pos.x = TILE_WIDTH * (idx + 3.5f) + GAP / 2; break;
-    case 3: pos.x = TILE_WIDTH * (idx + 5) + GAP / 2; break;
-    case 4: pos.x = TILE_WIDTH * (idx + 6.5f) + GAP / 2; break;
-    }
-    return pos;
-}
-
-cocos2d::Vec2 HandTilesWidget::calcFixedPackPos(size_t idx) const {
-    const Size &fixedSize = _fixedWidget->getContentSize();
-    Vec2 pos = Vec2(fixedSize.width * 0.25f, fixedSize.height * 0.25f);
-    switch (idx) {
-    case 1: pos.y *= 3; break;
-    case 2: pos.x *= 3; pos.y *= 3; break;
-    case 3: break;
-    case 4: pos.x *= 3; break;
-    default: return Vec2::ZERO;
-    }
-    return pos;
-}
-
 void HandTilesWidget::onTileButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     _currentIdx = reinterpret_cast<size_t>(button->getUserData());
@@ -211,7 +189,7 @@ void HandTilesWidget::addTile(mahjong::tile_t tile) {
     button->setTag(tile);
     button->addClickEventListener(std::bind(&HandTilesWidget::onTileButton, this, std::placeholders::_1));
 
-    Vec2 pos = calcStandingTilePos(tilesCnt);
+    Vec2 pos = Vec2(TILE_WIDTH * (tilesCnt + 0.5f), TILE_HEIGHT * 0.5f);
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
     if (LIKELY(tilesCnt < maxCnt)) {
         button->setPosition(pos);
@@ -276,7 +254,7 @@ mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
 // 刷新高亮位置
 void HandTilesWidget::refreshHighlightPos() {
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    Vec2 pos = calcStandingTilePos(_currentIdx);
+    Vec2 pos = Vec2(TILE_WIDTH * (_currentIdx + 0.5f), TILE_HEIGHT * 0.5f);
     if (LIKELY(_currentIdx < maxCnt)) {
         _highlightBox->setPosition(pos);
     }
@@ -326,13 +304,14 @@ void HandTilesWidget::refreshStandingTiles() {
 // 刷新立牌位置
 void HandTilesWidget::refreshStandingTilesPos() {
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    _standingWidget->setContentSize(Size(TILE_WIDTH * (maxCnt + 1) + GAP, TILE_HEIGHT));
 
     // 重新设置UserData及位置
     for (size_t i = 0, cnt = _standingTileButtons.size(); i < cnt; ++i) {
         ui::Button *button = _standingTileButtons[i];
         button->setUserData(reinterpret_cast<void *>(i));
 
-        Vec2 pos = calcStandingTilePos(i);
+        Vec2 pos = Vec2(TILE_WIDTH * (i + 0.5f), TILE_HEIGHT * 0.5f);
         if (LIKELY(i < maxCnt)) {
             button->setPosition(pos);
         }
@@ -358,9 +337,16 @@ void HandTilesWidget::sortStandingTiles() {
 
 // 添加一组吃
 void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
-    Vec2 center = calcFixedPackPos(_fixedPacks.size());
+    const Size fixedSize = _fixedWidget->getContentSize();
+    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
+    const float startX = fixedSize.width + offsetX;
+    const float totalWidth = fixedSize.width + offsetX + TILE_HEIGHT + TILE_WIDTH * 2;
+    _fixedWidget->setContentSize(Size(totalWidth, fixedSize.height));
+    const float maxWidth = TILE_WIDTH * 14 + GAP;
+    if (totalWidth > maxWidth) {
+        _fixedWidget->setScale(maxWidth / totalWidth);
+    }
 
-    // 一张牌的尺寸：27 * 39
     const char *image[3];
     switch (meldedIdx) {
     default:
@@ -381,9 +367,9 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
     }
 
     Vec2 pos[3];
-    pos[0] = Vec2(center.x - 27, center.y - 6);
-    pos[1] = Vec2(center.x + 6, center.y);
-    pos[2] = Vec2(center.x + 33, center.y);
+    pos[0] = Vec2(startX + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+    pos[1] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+    pos[2] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
 
     const float contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
     for (int i = 0; i < 3; ++i) {
@@ -399,25 +385,32 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
 
 // 添加一组碰
 void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
-    Vec2 center = calcFixedPackPos(_fixedPacks.size());
+    const Size fixedSize = _fixedWidget->getContentSize();
+    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
+    const float startX = fixedSize.width + offsetX;
+    const float totalWidth = fixedSize.width + offsetX + TILE_HEIGHT + TILE_WIDTH * 2;
+    _fixedWidget->setContentSize(Size(totalWidth, fixedSize.height));
+    const float maxWidth = TILE_WIDTH * 14 + GAP;
+    if (totalWidth > maxWidth) {
+        _fixedWidget->setScale(maxWidth / totalWidth);
+    }
 
-    // 一张牌的尺寸：27 * 39，横放一张
     Vec2 pos[3];
     switch (meldedIdx) {
     default:
-        pos[0] = Vec2(center.x - 27, center.y - 6);
-        pos[1] = Vec2(center.x + 6, center.y);
-        pos[2] = Vec2(center.x + 33, center.y);
+        pos[0] = Vec2(startX + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+        pos[1] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+        pos[2] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
         break;
     case 1:
-        pos[0] = Vec2(center.x - 33, center.y);
-        pos[1] = Vec2(center.x, center.y - 6);
-        pos[2] = Vec2(center.x + 33, center.y);
+        pos[0] = Vec2(startX + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+        pos[1] = Vec2(startX + TILE_WIDTH + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+        pos[2] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
         break;
     case 2:
-        pos[0] = Vec2(center.x - 33, center.y);
-        pos[1] = Vec2(center.x - 6, center.y);
-        pos[2] = Vec2(center.x + 27, center.y - 6);
+        pos[0] = Vec2(startX + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+        pos[1] = Vec2(startX + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+        pos[2] = Vec2(startX + TILE_WIDTH * 2 + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
         break;
     }
 
@@ -435,34 +428,36 @@ void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
 
 // 添加一组明杠
 void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx) {
-    Vec2 center = calcFixedPackPos(_fixedPacks.size());
+    const Size fixedSize = _fixedWidget->getContentSize();
+    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
+    const float startX = fixedSize.width + offsetX;
+    const float totalWidth = fixedSize.width + offsetX + TILE_HEIGHT + TILE_WIDTH * 3;
+    _fixedWidget->setContentSize(Size(totalWidth, fixedSize.height));
+    const float maxWidth = TILE_WIDTH * 14 + GAP;
+    if (totalWidth > maxWidth) {
+        _fixedWidget->setScale(maxWidth / totalWidth);
+    }
 
-    // 一张牌的尺寸：27 * 39，横放一张
     Vec2 pos[4];
     switch (meldedIdx) {
     default:
-        pos[0] = Vec2(center.x - 40.5f, center.y - 6);
-        pos[1] = Vec2(center.x -  7.5f, center.y);
-        pos[2] = Vec2(center.x + 19.5f, center.y);
-        pos[3] = Vec2(center.x + 46.5f, center.y);
+        pos[0] = Vec2(startX + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+        pos[1] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+        pos[2] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+        pos[3] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
         break;
     case 1:
-        pos[0] = Vec2(center.x - 46.5f, center.y);
-        pos[1] = Vec2(center.x - 13.5f, center.y - 6);
-        pos[2] = Vec2(center.x + 19.5f, center.y);
-        pos[3] = Vec2(center.x + 46.5f, center.y);
-        break;
     case 2:
-        pos[0] = Vec2(center.x - 46.5f, center.y);
-        pos[1] = Vec2(center.x - 19.5f, center.y);
-        pos[2] = Vec2(center.x + 13.5f, center.y - 6);
-        pos[3] = Vec2(center.x + 46.5f, center.y);
+        pos[0] = Vec2(startX + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+        pos[1] = Vec2(startX + TILE_WIDTH + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+        pos[2] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+        pos[3] = Vec2(startX + TILE_HEIGHT + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
         break;
     case 3:
-        pos[0] = Vec2(center.x - 46.5f, center.y);
-        pos[1] = Vec2(center.x - 19.5f, center.y);
-        pos[2] = Vec2(center.x +  7.5f, center.y);
-        pos[3] = Vec2(center.x + 40.5f, center.y - 6);
+        pos[0] = Vec2(startX + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+        pos[1] = Vec2(startX + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+        pos[2] = Vec2(startX + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
+        pos[3] = Vec2(startX + TILE_WIDTH * 3 + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
         break;
     }
 
@@ -480,9 +475,16 @@ void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx
 
 // 添加一组暗杠
 void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
-    Vec2 center = calcFixedPackPos(_fixedPacks.size());
+    const Size fixedSize = _fixedWidget->getContentSize();
+    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
+    const float startX = fixedSize.width + offsetX;
+    const float totalWidth = fixedSize.width + offsetX + TILE_WIDTH * 4;
+    _fixedWidget->setContentSize(Size(totalWidth, fixedSize.height));
+    const float maxWidth = TILE_WIDTH * 14 + GAP;
+    if (totalWidth > maxWidth) {
+        _fixedWidget->setScale(maxWidth / totalWidth);
+    }
 
-    // 一张牌的尺寸：27 * 39，横放一张
     const char *image[4];
     image[0] = "tiles/bg.png";
     image[1] = tilesImageName[tile];
@@ -490,10 +492,10 @@ void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
     image[3] = "tiles/bg.png";
 
     Vec2 pos[4];
-    pos[0] = Vec2(center.x - 40.5f, center.y);
-    pos[1] = Vec2(center.x - 13.5f, center.y);
-    pos[2] = Vec2(center.x + 13.5f, center.y);
-    pos[3] = Vec2(center.x + 40.5f, center.y);
+    pos[0] = Vec2(startX + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+    pos[1] = Vec2(startX + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+    pos[2] = Vec2(startX + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
+    pos[3] = Vec2(startX + TILE_WIDTH * 3.5f, TILE_HEIGHT * 0.5f);
 
     const float contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
     for (int i = 0; i < 4; ++i) {

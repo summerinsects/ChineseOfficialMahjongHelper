@@ -67,9 +67,6 @@ protected:
     std::function<void ()> _tileClickCallback;
 
 private:
-    cocos2d::Vec2 calcStandingTilePos(size_t idx) const;
-    cocos2d::Vec2 calcFixedPackPos(size_t idx) const;
-
     void addTile(mahjong::tile_t tile);
     void replaceTile(mahjong::tile_t tile);
     void refreshHighlightPos();
