@@ -51,7 +51,7 @@ public:
     bool makeFixedMeldedKongPack();
     bool makeFixedConcealedKongPack();
 
-protected:
+private:
     cocos2d::ui::Widget *_fixedContainer;
     cocos2d::ui::Widget *_standingContainer;
     std::vector<cocos2d::ui::Button *> _standingTileButtons;

@@ -3,7 +3,7 @@
 
 #include "HandTilesWidget.h"
 
-class TilePickWidget : public HandTilesWidget {
+class TilePickWidget : public cocos2d::ui::Widget {
 public:
     CREATE_FUNC(TilePickWidget);
 
@@ -15,6 +15,8 @@ CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
 private:
+    HandTilesWidget *_handTilesWidget;
+
     cocos2d::ui::Button *_characterButtons[9];
     cocos2d::ui::Button *_bambooButtons[9];
     cocos2d::ui::Button *_dotsButtons[9];
@@ -42,9 +44,15 @@ private:
     void onMeldedKongButton(cocos2d::Ref *sender);
     void onConcealedKongButton(cocos2d::Ref *sender);
 
-    using HandTilesWidget::setCurrentIdxChangedCallback;
-    using HandTilesWidget::reset;
-    using HandTilesWidget::setData;
+public:
+    void getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *servingTile) const {
+        _handTilesWidget->getData(handTiles, servingTile);
+    }
+
+    mahjong::tile_t getServingTile() const { return _handTilesWidget->getServingTile(); }
+    bool isFixedPacksContainsKong() const { return _handTilesWidget->isFixedPacksContainsKong(); }
+    bool isStandingTilesContainsServingTile() const { return _handTilesWidget->isStandingTilesContainsServingTile(); }
+    size_t countServingTileInFixedPacks() const { return _handTilesWidget->countServingTileInFixedPacks(); }
 };
 
 #endif
