@@ -8,6 +8,9 @@
 #include "../common.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 
+#include "json/stringbuffer.h"
+#include "json/prettywriter.h"
+
 USING_NS_CC;
 
 static Record g_currentRecord;
@@ -22,9 +25,13 @@ static void readFromJson() {
     std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
     CCLOG("%s", str.c_str());
     try {
-        jw::cppJSON json;
-        json.Parse(str.c_str());
-        fromJson(&g_currentRecord, json);
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError()) {
+            return;
+        }
+
+        JsonToRecord(doc, g_currentRecord);
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
@@ -33,17 +40,20 @@ static void readFromJson() {
 
 static void writeToJson() {
     try {
-        jw::cppJSON json(jw::cppJSON::ValueType::Object);
-        toJson(g_currentRecord, &json);
+        rapidjson::Document doc(rapidjson::Type::kObjectType);
+        RecordToJson(g_currentRecord, doc, doc.GetAllocator());
 
-        std::string str = json.stringfiy();
-        CCLOG("%s", str.c_str());
+        rapidjson::StringBuffer buf;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+        doc.Accept(writer);
+
+        CCLOG("%.*s", buf.GetSize(), buf.GetString());
 
         std::string path = FileUtils::getInstance()->getWritablePath();
         path.append("record.json");
         FILE *file = fopen(path.c_str(), "wb");
         if (LIKELY(file != nullptr)) {
-            fwrite(str.c_str(), 1, str.length(), file);
+            fwrite(buf.GetString(), 1, buf.GetSize(), file);
             fclose(file);
         }
     }

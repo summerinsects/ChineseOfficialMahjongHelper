@@ -10,6 +10,9 @@
 #include <thread>
 #include <mutex>
 
+#include "json/stringbuffer.h"
+#include "json/prettywriter.h"
+
 USING_NS_CC;
 
 static std::vector<Record> g_records;
@@ -29,14 +32,17 @@ static void loadRecords(std::vector<Record> &records) {
     std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
 
     try {
-        jw::cppJSON json;
-        json.Parse(str.c_str());
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError() || !doc.IsArray()) {
+            return;
+        }
 
         records.clear();
-        records.reserve(json.size());
-        std::transform(json.begin(), json.end(), std::back_inserter(records), [](const jw::cppJSON &json) {
+        records.reserve(doc.Size());
+        std::transform(doc.Begin(), doc.End(), std::back_inserter(records), [](const rapidjson::Value &json) {
             Record record;
-            fromJson(&record, json);
+            JsonToRecord(json, record);
             return record;
         });
     }
@@ -51,14 +57,18 @@ static void saveRecords(const std::vector<Record> &records) {
     FILE *file = fopen(fileName.c_str(), "wb");
     if (LIKELY(file != nullptr)) {
         try {
-            jw::cppJSON json(jw::cppJSON::ValueType::Array);
-            std::transform(records.begin(), records.end(), std::back_inserter(json), [](const Record &record) {
-                jw::cppJSON json(jw::cppJSON::ValueType::Object);
-                toJson(record, &json);
-                return json;
+            rapidjson::Document doc(rapidjson::Type::kArrayType);
+            std::for_each(records.begin(), records.end(), [&doc](const Record &record) {
+                rapidjson::Value json(rapidjson::Type::kObjectType);
+                RecordToJson(record, json, doc.GetAllocator());
+                doc.PushBack(std::move(json), doc.GetAllocator());
             });
-            std::string str = json.stringfiy();
-            fwrite(str.c_str(), 1, str.length(), file);
+
+            rapidjson::StringBuffer buf;
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+            doc.Accept(writer);
+
+            fwrite(buf.GetString(), 1, buf.GetSize(), file);
         }
         catch (std::exception &e) {
             CCLOG("%s %s", __FUNCTION__, e.what());
