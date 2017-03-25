@@ -683,7 +683,7 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
 }
 
 #define SPACE 2
-#define TILE_WIDTH 15
+#define TILE_WIDTH_SMALL 15
 
 ssize_t MahjongTheoryScene::numberOfCellsInTableView(cw::TableView *table) {
     return _orderedIndices.size();
@@ -702,7 +702,7 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ss
     const float cellWidth = _cellWidth - SPACE * 2;  // 前后各留2像素
     float remainWidth;  // 第一行除了前面一些label之后剩下宽度
     if (result->discard_tile != 0) {
-        remainWidth = cellWidth - _discardLabelWidth - TILE_WIDTH -
+        remainWidth = cellWidth - _discardLabelWidth - TILE_WIDTH_SMALL -
             (result->shanten > 0 ? _servingLabelWidth1 : _waitingLabelWidth1);
     }
     else {
@@ -713,10 +713,10 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ss
     int lineCnt = 1;
     int remainCnt = result->count_in_tiles;
     do {
-        int limitedCnt = (int)remainWidth / TILE_WIDTH;  // 第N行可以排这么多
+        int limitedCnt = (int)remainWidth / TILE_WIDTH_SMALL;  // 第N行可以排这么多
         if (limitedCnt >= remainCnt) {  // 排得下
             // 包括后面的字是否排得下
-            bool inOneLine = remainCnt * TILE_WIDTH + _totalLabelWidth <= remainWidth;
+            bool inOneLine = remainCnt * TILE_WIDTH_SMALL + _totalLabelWidth <= remainWidth;
             int height = 25 + 25 * (inOneLine ? lineCnt : lineCnt + 1);
             _cellHeightMap.insert(std::make_pair(key, height));
             return Size(0, height);
@@ -763,7 +763,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(discardLabel);
 
-        const float tileScale = CC_CONTENT_SCALE_FACTOR() / 27 * TILE_WIDTH;
+        const float tileScale = CC_CONTENT_SCALE_FACTOR() / 27 * TILE_WIDTH_SMALL;
         discardButton = ui::Button::create("tiles/bg.png");
         discardButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         discardButton->setScale(tileScale);
@@ -794,7 +794,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         cntLabel2->setColor(Color3B(0x60, 0x60, 0x60));
         cntLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(cntLabel2);
-        cntLabel2->setPosition(Vec2(SPACE, TILE_WIDTH));
+        cntLabel2->setPosition(Vec2(SPACE, TILE_WIDTH_SMALL));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -840,7 +840,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardButton->loadTextureNormal(tilesImageName[result->discard_tile]);
         discardButton->setUserData(reinterpret_cast<void *>(realIdx));
         discardButton->setPosition(Vec2(xPos, yPos));
-        xPos += TILE_WIDTH;
+        xPos += TILE_WIDTH_SMALL;
 
         if (result->shanten > 0) {
             usefulLabel->setString("」摸「");
@@ -876,12 +876,12 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         usefulButton[i]->setUserData(reinterpret_cast<void *>(realIdx));
         usefulButton[i]->setVisible(true);
 
-        if (xPos + TILE_WIDTH > _cellWidth - SPACE * 2) {
+        if (xPos + TILE_WIDTH_SMALL > _cellWidth - SPACE * 2) {
             xPos = SPACE;
             yPos -= 25;
         }
         usefulButton[i]->setPosition(Vec2(xPos, yPos));
-        xPos += TILE_WIDTH;
+        xPos += TILE_WIDTH_SMALL;
     }
 
     std::string str = StringUtils::format("」共%d种，%d枚", result->count_in_tiles, result->count_total);
