@@ -9,6 +9,8 @@ class HandTilesWidget : public cocos2d::ui::Widget {
 public:
     CREATE_FUNC(HandTilesWidget);
 
+    static cocos2d::Node *createStaticNode(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile);
+
     const std::vector<mahjong::tile_t> &getStandingTiles() const { return _standingTiles; }
     const std::vector<mahjong::pack_t> &getFixedPacks() const { return _fixedPacks; }
 

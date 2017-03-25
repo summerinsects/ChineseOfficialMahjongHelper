@@ -750,19 +750,18 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     Node *innerNode = Node::create();
 
     // 手牌
-    HandTilesWidget *tilesWidget = HandTilesWidget::create();
-    tilesWidget->setData(temp.hand_tiles, temp.win_tile);
-    Size tilesWidgetSize = tilesWidget->getContentSize();
-    if (tilesWidgetSize.width > visibleSize.width) {
-        const float scale = visibleSize.width / tilesWidgetSize.width;
-        tilesWidget->setScale(scale);
-        tilesWidgetSize.width = visibleSize.width;
-        tilesWidgetSize.height *= scale;
+    Node *tilesNode = HandTilesWidget::createStaticNode(temp.hand_tiles, temp.win_tile);
+    Size tilesNodeSize = tilesNode->getContentSize();
+    if (tilesNodeSize.width > visibleSize.width) {
+        const float scale = visibleSize.width / tilesNodeSize.width;
+        tilesNode->setScale(scale);
+        tilesNodeSize.width = visibleSize.width;
+        tilesNodeSize.height *= scale;
     }
-    innerNode->addChild(tilesWidget);
-    tilesWidget->setPosition(Vec2(visibleSize.width * 0.5f, fanAreaHeight + 5 + tilesWidgetSize.height * 0.5f));
+    innerNode->addChild(tilesNode);
+    tilesNode->setPosition(Vec2(visibleSize.width * 0.5f, fanAreaHeight + 5 + tilesNodeSize.height * 0.5f));
 
-    innerNode->setContentSize(Size(visibleSize.width, fanAreaHeight + tilesWidgetSize.height));
+    innerNode->setContentSize(Size(visibleSize.width, fanAreaHeight + tilesNodeSize.height));
 
     for (int i = 0, j = 0; i < n; ++i) {
         while (fan_table[++j] == 0) continue;

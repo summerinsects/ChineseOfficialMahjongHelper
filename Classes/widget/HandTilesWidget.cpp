@@ -817,3 +817,169 @@ bool HandTilesWidget::makeFixedConcealedKongPack() {
     refreshStandingTiles();
     return true;
 }
+
+cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile) {
+    const char *image[18];
+    Vec2 pos[18];
+    bool rotated[18] = { false };
+    long tile_cnt = 0;
+    int totalWidth = 0;
+
+#define GAP 4
+
+    // 副露
+    for (long i = 0; i < handTiles.pack_count; ++i) {
+        mahjong::pack_t pack = handTiles.fixed_packs[i];
+        mahjong::tile_t tile = mahjong::pack_tile(pack);
+        switch (mahjong::pack_type(pack)) {
+        case PACK_TYPE_CHOW:
+            rotated[tile_cnt + 0] = true;
+
+            pos[tile_cnt + 0] = Vec2(totalWidth + 39 * 0.5f, 27 * 0.5f);
+            pos[tile_cnt + 1] = Vec2(totalWidth + 39 + 27 * 0.5f, 39 * 0.5f);
+            pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
+
+            switch (mahjong::pack_offer(pack)) {
+            default:
+                image[tile_cnt + 0] = tilesImageName[tile - 1];
+                image[tile_cnt + 1] = tilesImageName[tile];
+                image[tile_cnt + 2] = tilesImageName[tile + 1];
+                break;
+            case 2:
+                image[tile_cnt + 0] = tilesImageName[tile];
+                image[tile_cnt + 1] = tilesImageName[tile - 1];
+                image[tile_cnt + 2] = tilesImageName[tile + 1];
+                break;
+            case 3:
+                image[tile_cnt + 0] = tilesImageName[tile + 1];
+                image[tile_cnt + 1] = tilesImageName[tile - 1];
+                image[tile_cnt + 2] = tilesImageName[tile];
+                break;
+            }
+            totalWidth += (27 * 2 + 39 + GAP);
+            tile_cnt += 3;
+            break;
+
+        case PACK_TYPE_PUNG:
+            image[tile_cnt + 0] = tilesImageName[tile];
+            image[tile_cnt + 1] = tilesImageName[tile];
+            image[tile_cnt + 2] = tilesImageName[tile];
+
+            switch (mahjong::pack_offer(pack)) {
+            default:
+                rotated[tile_cnt + 0] = true;
+
+                pos[tile_cnt + 0] = Vec2(totalWidth + 39 * 0.5f, 27 * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + 39 + 27 * 0.5f, 39 * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
+                break;
+            case 2:
+                rotated[tile_cnt + 1] = true;
+
+                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + 27 + 39 * 0.5f, 27 * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
+                break;
+            case 3:
+                rotated[tile_cnt + 2] = true;
+
+                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + 27 * 1.5f, 39 * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + 27 * 2 + 39 * 0.5f, 27 * 0.5f);
+                break;
+            }
+            totalWidth += (27 * 2 + 39 + GAP);
+            tile_cnt += 3;
+            break;
+
+        case PACK_TYPE_KONG:
+            image[tile_cnt + 0] = tilesImageName[tile];
+            image[tile_cnt + 1] = tilesImageName[tile];
+            image[tile_cnt + 2] = tilesImageName[tile];
+            image[tile_cnt + 3] = tilesImageName[tile];
+
+            switch (mahjong::pack_offer(pack)) {
+            case 0:
+                image[tile_cnt + 0] = "tiles/bg.png";
+                image[tile_cnt + 3] = "tiles/bg.png";
+
+                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + 27 * 1.5f, 39 * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + 27 * 2.5f, 39 * 0.5f);
+                pos[tile_cnt + 3] = Vec2(totalWidth + 27 * 3.5f, 39 * 0.5f);
+
+                totalWidth += (27 * 4 + GAP);
+                break;
+            default:
+                rotated[tile_cnt + 0] = true;
+
+                pos[tile_cnt + 0] = Vec2(totalWidth + 39 * 0.5f, 27 * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + 39 + 27 * 0.5f, 39 * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
+                pos[tile_cnt + 3] = Vec2(totalWidth + 39 + 27 * 2.5f, 39 * 0.5f);
+
+                totalWidth += (27 * 3 + 39 + GAP);
+                break;
+            case 2:
+                rotated[tile_cnt + 1] = true;
+
+                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + 27 + 39 * 0.5f, 27 * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + 39 + 27 * 1.5f, 39 * 0.5f);
+                pos[tile_cnt + 3] = Vec2(totalWidth + 39 + 27 * 2.5f, 39 * 0.5f);
+
+                totalWidth += (27 * 3 + 39 + GAP);
+                break;
+            case 3:
+                rotated[tile_cnt + 3] = true;
+                pos[tile_cnt + 0] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
+                pos[tile_cnt + 1] = Vec2(totalWidth + 27 * 1.5f, 39 * 0.5f);
+                pos[tile_cnt + 2] = Vec2(totalWidth + 27 * 2.5f, 39 * 0.5f);
+                pos[tile_cnt + 3] = Vec2(totalWidth + 27 * 3 + 39 * 0.5f, 27 * 0.5f);
+
+                totalWidth += (27 * 3 + 39 + GAP);
+                break;
+            }
+            tile_cnt += 4;
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    // 立牌
+    for (long i = 0; i < handTiles.tile_count; ++i) {
+        mahjong::tile_t tile = handTiles.standing_tiles[i];
+        image[tile_cnt] = tilesImageName[tile];
+        pos[tile_cnt] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
+        totalWidth += 27;
+        ++tile_cnt;
+    }
+
+    // 上牌
+    if (servingTile != 0 && totalWidth > 0) {
+        totalWidth += GAP;
+
+        image[tile_cnt] = tilesImageName[servingTile];
+        pos[tile_cnt] = Vec2(totalWidth + 27 * 0.5f, 39 * 0.5f);
+        totalWidth += 27;
+        ++tile_cnt;
+    }
+
+    Node *node = Node::create();
+    node->setContentSize(Size(totalWidth, 39));
+    node->setIgnoreAnchorPointForPosition(false);
+    node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    for (long i = 0; i < tile_cnt; ++i) {
+        Sprite *sprite = Sprite::create(image[i]);
+        sprite->setScale(27 / sprite->getContentSize().width);
+        node->addChild(sprite);
+        sprite->setPosition(pos[i]);
+        if (rotated[i]) {
+            sprite->setRotation(90);
+        }
+    }
+
+    return node;
+}

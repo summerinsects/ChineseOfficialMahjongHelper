@@ -623,21 +623,20 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
         const Size &labelSize = label->getContentSize();
 
         // 手牌
-        HandTilesWidget *tilesWidget = HandTilesWidget::create();
-        tilesWidget->setData(param.hand_tiles, param.win_tile);
-        Size tilesWidgetSize = tilesWidget->getContentSize();
-        if (tilesWidgetSize.width > maxWidth) {
-            const float scale = maxWidth / tilesWidgetSize.width;
-            tilesWidget->setScale(scale);
-            tilesWidgetSize.width = maxWidth;
-            tilesWidgetSize.height *= scale;
+        Node *tilesNode = HandTilesWidget::createStaticNode(param.hand_tiles, param.win_tile);
+        Size tilesNodeSize = tilesNode->getContentSize();
+        if (tilesNodeSize.width > maxWidth) {
+            const float scale = maxWidth / tilesNodeSize.width;
+            tilesNode->setScale(scale);
+            tilesNodeSize.width = maxWidth;
+            tilesNodeSize.height *= scale;
         }
 
         Node *innerNode = Node::create();
-        innerNode->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesWidgetSize.height));
+        innerNode->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height));
 
-        innerNode->addChild(tilesWidget);
-        tilesWidget->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 10 + tilesWidgetSize.height * 0.5f));
+        innerNode->addChild(tilesNode);
+        tilesNode->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 10 + tilesNodeSize.height * 0.5f));
 
         innerNode->addChild(label);
         label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f));
