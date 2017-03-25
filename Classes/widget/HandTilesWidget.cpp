@@ -212,7 +212,7 @@ void HandTilesWidget::onTileButton(cocos2d::Ref *sender) {
 // 添加一张牌
 void HandTilesWidget::addTile(mahjong::tile_t tile) {
     ui::Button *button = ui::Button::create(tilesImageName[tile]);
-    button->setScale(27 / button->getContentSize().width);
+    button->setScale(CC_CONTENT_SCALE_FACTOR());
     _standingWidget->addChild(button);
 
     size_t tilesCnt = _standingTiles.size();
@@ -394,9 +394,10 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
     pos[1] = Vec2(center.x + 6, center.y);
     pos[2] = Vec2(center.x + 33, center.y);
 
+    const float contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
     for (int i = 0; i < 3; ++i) {
         Sprite *sprite = Sprite::create(image[i]);
-        sprite->setScale(27 / sprite->getContentSize().width);
+        sprite->setScale(contentScaleFactor);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == 0) {
@@ -429,9 +430,10 @@ void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
         break;
     }
 
+    const float contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
     for (int i = 0; i < 3; ++i) {
         Sprite *sprite = Sprite::create(tilesImageName[tile]);
-        sprite->setScale(27 / sprite->getContentSize().width);
+        sprite->setScale(contentScaleFactor);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == meldedIdx) {
@@ -473,9 +475,10 @@ void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx
         break;
     }
 
+    const float contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
     for (int i = 0; i < 4; ++i) {
         Sprite *sprite = Sprite::create(tilesImageName[tile]);
-        sprite->setScale(27 / sprite->getContentSize().width);
+        sprite->setScale(contentScaleFactor);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == meldedIdx) {
@@ -501,9 +504,10 @@ void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
     pos[2] = Vec2(center.x + 13.5f, center.y);
     pos[3] = Vec2(center.x + 40.5f, center.y);
 
+    const float contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
     for (int i = 0; i < 4; ++i) {
         Sprite *sprite = Sprite::create(image[i]);
-        sprite->setScale(27 / sprite->getContentSize().width);
+        sprite->setScale(contentScaleFactor);
         _fixedWidget->addChild(sprite);
         sprite->setPosition(pos[i]);
     }
@@ -972,9 +976,11 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
     node->setContentSize(Size(totalWidth, 39));
     node->setIgnoreAnchorPointForPosition(false);
     node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+
+    const float contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
     for (long i = 0; i < tile_cnt; ++i) {
         Sprite *sprite = Sprite::create(image[i]);
-        sprite->setScale(27 / sprite->getContentSize().width);
+        sprite->setScale(contentScaleFactor);
         node->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (rotated[i]) {

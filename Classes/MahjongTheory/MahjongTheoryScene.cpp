@@ -763,9 +763,10 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(discardLabel);
 
+        const float tileScale = CC_CONTENT_SCALE_FACTOR() / 27 * TILE_WIDTH;
         discardButton = ui::Button::create("tiles/bg.png");
         discardButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        discardButton->setScale(TILE_WIDTH / discardButton->getContentSize().width);
+        discardButton->setScale(tileScale);
         cell->addChild(discardButton);
         discardButton->addClickEventListener(std::bind(&MahjongTheoryScene::onTileButton, this, std::placeholders::_1));
 
@@ -776,7 +777,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
         for (int i = 0; i < 34; ++i) {
             ui::Button *button = ui::Button::create(tilesImageName[mahjong::all_tiles[i]]);
-            button->setScale(TILE_WIDTH / button->getContentSize().width);
+            button->setScale(tileScale);
             button->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
             cell->addChild(button);
             button->setTag(i);
