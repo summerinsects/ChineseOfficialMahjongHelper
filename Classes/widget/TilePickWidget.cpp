@@ -52,7 +52,7 @@ bool TilePickWidget::init() {
     for (int i = 0; i < 9; ++i) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DOTS, i + 1);
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
-        button->setScale(27 / button->getContentSize().width);
+        button->setScale(contentScaleFactor);
         tableWidget->addChild(button);
         button->setPosition(Vec2(27 * (i + 0.5f), 58.5f));
         button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
