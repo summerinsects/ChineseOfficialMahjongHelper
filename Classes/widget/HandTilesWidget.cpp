@@ -737,10 +737,9 @@ bool HandTilesWidget::makeFixedPungPack() {
         return false;
     }
 
-    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_PUNG, tile);  // TODO: 这里丢失了供牌信息
-    _fixedPacks.push_back(pack);
-
     int meldedIdx = calcMeldedIdx(2);
+    mahjong::pack_t pack = mahjong::make_pack(meldedIdx + 1, PACK_TYPE_PUNG, tile);
+    _fixedPacks.push_back(pack);
 
     // 这里迭代器可以连续使用，因为移除的是同一种牌
     std::vector<mahjong::tile_t>::iterator it = _standingTiles.begin();
@@ -770,10 +769,9 @@ bool HandTilesWidget::makeFixedMeldedKongPack() {
         return false;
     }
 
-    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_KONG, tile);  // TODO: 这里丢失了供牌信息
-    _fixedPacks.push_back(pack);
-
     int meldedIdx = calcMeldedIdx(3);
+    mahjong::pack_t pack = mahjong::make_pack(std::min(meldedIdx + 1, 3), PACK_TYPE_KONG, tile);
+    _fixedPacks.push_back(pack);
 
     // 这里迭代器可以连续使用，因为移除的是同一种牌
     std::vector<mahjong::tile_t>::iterator it = _standingTiles.begin();
