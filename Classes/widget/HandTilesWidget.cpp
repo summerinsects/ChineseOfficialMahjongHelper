@@ -14,23 +14,23 @@ bool HandTilesWidget::init() {
 
     // 14张牌宽度：TILE_WIDTH * 14
     Size standingSize = Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT + GAP);
-    _standingWidget = ui::Widget::create();
-    _standingWidget->setContentSize(standingSize);
-    this->addChild(_standingWidget);
-    _standingWidget->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height * 0.5f));
+    _standingContainer = ui::Widget::create();
+    _standingContainer->setContentSize(standingSize);
+    this->addChild(_standingContainer);
+    _standingContainer->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height * 0.5f));
 
     // 高亮方框
     _highlightBox = DrawNode::create();
     _highlightBox->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
     _highlightBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     _highlightBox->drawRect(Vec2(0, 0), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
-    _standingWidget->addChild(_highlightBox, 2);
+    _standingContainer->addChild(_highlightBox, 2);
 
     const float fixedHeight = TILE_HEIGHT;
-    _fixedWidget = ui::Widget::create();
-    _fixedWidget->setContentSize(Size(0, fixedHeight));
-    this->addChild(_fixedWidget);
-    _fixedWidget->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height + fixedHeight * 0.5f + GAP));
+    _fixedContainer = ui::Widget::create();
+    _fixedContainer->setContentSize(Size(0, fixedHeight));
+    this->addChild(_fixedContainer);
+    _fixedContainer->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height + fixedHeight * 0.5f + GAP));
 
     this->setContentSize(Size(standingSize.width, standingSize.height + fixedHeight + GAP));
 
@@ -52,16 +52,16 @@ void HandTilesWidget::reset() {
 
     // 清除之前的残留的立牌
     while (!_standingTileButtons.empty()) {
-        _standingWidget->removeChild(_standingTileButtons.back());
+        _standingContainer->removeChild(_standingTileButtons.back());
         _standingTileButtons.pop_back();
     }
-    _standingWidget->setContentSize(Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT));
+    _standingContainer->setContentSize(Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT));
     _highlightBox->setPosition(Vec2(TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f));
 
     // 清除之前残留的副露
-    _fixedWidget->removeAllChildren();
-    _fixedWidget->setContentSize(Size(0, _fixedWidget->getContentSize().height));
-    _fixedWidget->setScale(1);
+    _fixedContainer->removeAllChildren();
+    _fixedContainer->setContentSize(Size(0, _fixedContainer->getContentSize().height));
+    _fixedContainer->setScale(1);
 }
 
 void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile) {
@@ -182,7 +182,7 @@ void HandTilesWidget::onTileButton(cocos2d::Ref *sender) {
 void HandTilesWidget::addTile(mahjong::tile_t tile) {
     ui::Button *button = ui::Button::create(tilesImageName[tile]);
     button->setScale(CC_CONTENT_SCALE_FACTOR());
-    _standingWidget->addChild(button);
+    _standingContainer->addChild(button);
 
     size_t tilesCnt = _standingTiles.size();
     button->setUserData(reinterpret_cast<void *>(tilesCnt));
@@ -274,7 +274,7 @@ void HandTilesWidget::refreshStandingTiles() {
         ui::Button *button = _standingTileButtons[i];
         mahjong::tile_t tile = static_cast<mahjong::tile_t>(button->getTag());
         if (i >= _standingTiles.size() || tile != _standingTiles[i]) {  // 已经被删除的
-            _standingWidget->removeChild(button);
+            _standingContainer->removeChild(button);
             _standingTileButtons.erase(_standingTileButtons.begin() + i);
             --cnt;
         }
@@ -304,7 +304,7 @@ void HandTilesWidget::refreshStandingTiles() {
 // 刷新立牌位置
 void HandTilesWidget::refreshStandingTilesPos() {
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    _standingWidget->setContentSize(Size(TILE_WIDTH * (maxCnt + 1) + GAP, TILE_HEIGHT));
+    _standingContainer->setContentSize(Size(TILE_WIDTH * (maxCnt + 1) + GAP, TILE_HEIGHT));
 
     // 重新设置UserData及位置
     for (size_t i = 0, cnt = _standingTileButtons.size(); i < cnt; ++i) {
@@ -337,14 +337,14 @@ void HandTilesWidget::sortStandingTiles() {
 
 // 添加一组吃
 void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
-    const Size fixedSize = _fixedWidget->getContentSize();
+    const Size fixedSize = _fixedContainer->getContentSize();
     const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
     const float startX = fixedSize.width + offsetX;
     const float totalWidth = fixedSize.width + offsetX + TILE_HEIGHT + TILE_WIDTH * 2;
-    _fixedWidget->setContentSize(Size(totalWidth, fixedSize.height));
+    _fixedContainer->setContentSize(Size(totalWidth, fixedSize.height));
     const float maxWidth = TILE_WIDTH * 14 + GAP;
     if (totalWidth > maxWidth) {
-        _fixedWidget->setScale(maxWidth / totalWidth);
+        _fixedContainer->setScale(maxWidth / totalWidth);
     }
 
     const char *image[3];
@@ -375,7 +375,7 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
     for (int i = 0; i < 3; ++i) {
         Sprite *sprite = Sprite::create(image[i]);
         sprite->setScale(contentScaleFactor);
-        _fixedWidget->addChild(sprite);
+        _fixedContainer->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == 0) {
             sprite->setRotation(-90);
@@ -385,14 +385,14 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
 
 // 添加一组碰
 void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
-    const Size fixedSize = _fixedWidget->getContentSize();
+    const Size fixedSize = _fixedContainer->getContentSize();
     const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
     const float startX = fixedSize.width + offsetX;
     const float totalWidth = fixedSize.width + offsetX + TILE_HEIGHT + TILE_WIDTH * 2;
-    _fixedWidget->setContentSize(Size(totalWidth, fixedSize.height));
+    _fixedContainer->setContentSize(Size(totalWidth, fixedSize.height));
     const float maxWidth = TILE_WIDTH * 14 + GAP;
     if (totalWidth > maxWidth) {
-        _fixedWidget->setScale(maxWidth / totalWidth);
+        _fixedContainer->setScale(maxWidth / totalWidth);
     }
 
     Vec2 pos[3];
@@ -418,7 +418,7 @@ void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
     for (int i = 0; i < 3; ++i) {
         Sprite *sprite = Sprite::create(tilesImageName[tile]);
         sprite->setScale(contentScaleFactor);
-        _fixedWidget->addChild(sprite);
+        _fixedContainer->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == meldedIdx) {
             sprite->setRotation(-90);
@@ -428,14 +428,14 @@ void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
 
 // 添加一组明杠
 void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx) {
-    const Size fixedSize = _fixedWidget->getContentSize();
+    const Size fixedSize = _fixedContainer->getContentSize();
     const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
     const float startX = fixedSize.width + offsetX;
     const float totalWidth = fixedSize.width + offsetX + TILE_HEIGHT + TILE_WIDTH * 3;
-    _fixedWidget->setContentSize(Size(totalWidth, fixedSize.height));
+    _fixedContainer->setContentSize(Size(totalWidth, fixedSize.height));
     const float maxWidth = TILE_WIDTH * 14 + GAP;
     if (totalWidth > maxWidth) {
-        _fixedWidget->setScale(maxWidth / totalWidth);
+        _fixedContainer->setScale(maxWidth / totalWidth);
     }
 
     Vec2 pos[4];
@@ -465,7 +465,7 @@ void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx
     for (int i = 0; i < 4; ++i) {
         Sprite *sprite = Sprite::create(tilesImageName[tile]);
         sprite->setScale(contentScaleFactor);
-        _fixedWidget->addChild(sprite);
+        _fixedContainer->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == meldedIdx) {
             sprite->setRotation(-90);
@@ -475,14 +475,14 @@ void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx
 
 // 添加一组暗杠
 void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
-    const Size fixedSize = _fixedWidget->getContentSize();
+    const Size fixedSize = _fixedContainer->getContentSize();
     const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
     const float startX = fixedSize.width + offsetX;
     const float totalWidth = fixedSize.width + offsetX + TILE_WIDTH * 4;
-    _fixedWidget->setContentSize(Size(totalWidth, fixedSize.height));
+    _fixedContainer->setContentSize(Size(totalWidth, fixedSize.height));
     const float maxWidth = TILE_WIDTH * 14 + GAP;
     if (totalWidth > maxWidth) {
-        _fixedWidget->setScale(maxWidth / totalWidth);
+        _fixedContainer->setScale(maxWidth / totalWidth);
     }
 
     const char *image[4];
@@ -501,7 +501,7 @@ void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
     for (int i = 0; i < 4; ++i) {
         Sprite *sprite = Sprite::create(image[i]);
         sprite->setScale(contentScaleFactor);
-        _fixedWidget->addChild(sprite);
+        _fixedContainer->addChild(sprite);
         sprite->setPosition(pos[i]);
     }
 }

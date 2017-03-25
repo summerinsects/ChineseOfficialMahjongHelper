@@ -52,8 +52,8 @@ public:
     bool makeFixedConcealedKongPack();
 
 protected:
-    cocos2d::ui::Widget *_fixedWidget;
-    cocos2d::ui::Widget *_standingWidget;
+    cocos2d::ui::Widget *_fixedContainer;
+    cocos2d::ui::Widget *_standingContainer;
     std::vector<cocos2d::ui::Button *> _standingTileButtons;
     cocos2d::DrawNode *_highlightBox;
 
