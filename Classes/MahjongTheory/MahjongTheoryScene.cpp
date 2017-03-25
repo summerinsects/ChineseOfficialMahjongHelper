@@ -6,8 +6,8 @@
 #include "../widget/CWTableView.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
-
-#include "../common.h"
+#include "../compiler.h"
+#include "../TilesImage.h"
 #include "../widget/HandTilesWidget.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"

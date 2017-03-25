@@ -1,6 +1,7 @@
 ﻿#include "FanDefinition.h"
 #include "ui/UIWebView.h"
-#include "../common.h"
+#include "../compiler.h"
+#include "../TilesImage.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../widget/LoadingView.h"
