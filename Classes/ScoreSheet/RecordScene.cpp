@@ -777,11 +777,6 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
                     _claimGroup->setSelectedButton(winIndex);
                 }
             }
-            else {
-                //if (ext_cond.win_flag & WIN_FLAG_SELF_DRAWN) {  // 点和
-                //    _claimGroup->setSelectedButton(-1);
-                //}
-            }
         }
 
         _CalculateParamToWinHand(temp, _detail.win_hand);
