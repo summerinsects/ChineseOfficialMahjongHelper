@@ -39,7 +39,7 @@ bool FanCalculatorScene::init() {
     _extraInfo = extraInfo;
 
     // 番种显示的Node
-    Size areaSize(visibleSize.width, visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height - 10);
+    Size areaSize(visibleSize.width, visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height - 5);
     _fanAreaNode = Node::create();
     _fanAreaNode->setContentSize(areaSize);
     _fanAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
@@ -74,12 +74,49 @@ bool FanCalculatorScene::init() {
     return true;
 }
 
-#define FONT_SIZE 14
+cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SIZE], int fontSize, float resultAreaWidth) {
+    // 有n个番种，每行排2个
+    long n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
+    long rows = (n >> 1) + (n & 1);  // 需要这么多行
+
+    // 排列
+    Node *node = Node::create();
+    const int lineHeight = fontSize + 2;
+    long resultAreaHeight = lineHeight * rows;  // 每行间隔2像素
+    resultAreaHeight += (3 + lineHeight);  // 总计
+    node->setContentSize(Size(resultAreaWidth, resultAreaHeight));
+
+    long fan = 0;
+    for (int i = 0, j = 0; i < n; ++i) {
+        while (fan_table[++j] == 0) continue;
+
+        int f = mahjong::fan_value_table[j];
+        long n = fan_table[j];
+        fan += f * n;
+        std::string str = (n == 1) ? StringUtils::format("%s %d番\n", mahjong::fan_name[j], f)
+            : StringUtils::format("%s %d番x%ld\n", mahjong::fan_name[j], f, fan_table[j]);
+
+        // 创建label，每行排2个
+        Label *fanName = Label::createWithSystemFont(str, "Arial", fontSize);
+        fanName->setColor(Color3B(0x60, 0x60, 0x60));
+        node->addChild(fanName);
+        fanName->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        div_t ret = div(i, 2);
+        fanName->setPosition(Vec2(ret.rem == 0 ? 10.0f : resultAreaWidth * 0.5f, resultAreaHeight - lineHeight * (ret.quot + 1)));
+    }
+
+    Label *fanTotal = Label::createWithSystemFont(StringUtils::format("总计：%ld番", fan), "Arial", fontSize);
+    fanTotal->setColor(Color3B::BLACK);
+    node->addChild(fanTotal);
+    fanTotal->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    fanTotal->setPosition(Vec2(10.0f, lineHeight * 0.5f));
+
+    return node;
+}
 
 void FanCalculatorScene::calculate() {
     _fanAreaNode->removeAllChildren();
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
     const Size &fanAreaSize = _fanAreaNode->getContentSize();
     Vec2 pos(fanAreaSize.width * 0.5f, fanAreaSize.height * 0.5f);
 
@@ -116,7 +153,7 @@ void FanCalculatorScene::calculate() {
     int fan = calculate_fan(&hand_tiles, win_tile, &ext_cond, fan_table);
 
     if (fan == ERROR_NOT_WIN) {
-        Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", FONT_SIZE);
+        Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", 14);
         errorLabel->setColor(Color3B::BLACK);
         _fanAreaNode->addChild(errorLabel);
         errorLabel->setPosition(pos);
@@ -135,43 +172,10 @@ void FanCalculatorScene::calculate() {
     fan += flowerCnt;
     fan_table[mahjong::FLOWER_TILES] = flowerCnt;
 
-    // 有n个番种，每行排2个
-    long n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
-    long rows = (n >> 1) + (n & 1);  // 需要这么多行
-
-    // 排列
-    Node *innerNode = Node::create();
-    float fanAreaHeight = (FONT_SIZE + 2) * (rows + 2);  // 每行间隔2像素，留空1行，另一行给“总计”用
-    innerNode->setContentSize(Size(fanAreaSize.width, fanAreaHeight));
-
-    for (int i = 0, j = 0; i < n; ++i) {
-        while (fan_table[++j] == 0) continue;
-
-        std::string str;
-        if (fan_table[j] == 1) {
-            str = StringUtils::format("%s %d番\n", mahjong::fan_name[j], mahjong::fan_value_table[j]);
-        }
-        else {
-            str = StringUtils::format("%s %d番x%ld\n", mahjong::fan_name[j], mahjong::fan_value_table[j], fan_table[j]);
-        }
-
-        // 创建label，每行排2个
-        Label *fanName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
-        fanName->setColor(Color3B::BLACK);
-        innerNode->addChild(fanName);
-        fanName->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-        div_t ret = div(i, 2);
-        fanName->setPosition(Vec2(ret.rem == 0 ? 5.0f : visibleSize.width * 0.5f + 5.0f, (FONT_SIZE + 2) * (rows - ret.quot + 2)));
-    }
-
-    Label *fanTotal = Label::createWithSystemFont(StringUtils::format("总计：%d番", fan), "Arial", FONT_SIZE);
-    fanTotal->setColor(Color3B::BLACK);
-    innerNode->addChild(fanTotal);
-    fanTotal->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-    fanTotal->setPosition(Vec2(5.0f, FONT_SIZE + 2));
+    Node *innerNode = createFanResultNode(fan_table, 14, fanAreaSize.width);
 
     // 超出高度就使用ScrollView
-    if (fanAreaHeight <= fanAreaSize.height) {
+    if (innerNode->getContentSize().height <= fanAreaSize.height) {
         _fanAreaNode->addChild(innerNode);
         innerNode->setAnchorPoint(Vec2(0.5f, 0.5f));
         innerNode->setPosition(pos);

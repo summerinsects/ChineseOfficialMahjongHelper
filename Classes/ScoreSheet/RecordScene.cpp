@@ -692,6 +692,9 @@ void RecordScene::showCalculator(const CalculateParam &param) {
         std::bind(&RecordScene::calculate, this, tilePicker, extraInfo, param), nullptr);
 }
 
+// in FanCalculatorScene.cpp
+cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SIZE], int fontSize, float resultAreaWidth);
+
 #define FONT_SIZE 12
 
 void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const CalculateParam &param) {
@@ -739,15 +742,9 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     fan += temp.flower_count;
     fan_table[mahjong::FLOWER_TILES] = temp.flower_count;
 
-    // 有n个番种，每行排2个
-    long n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
-    long rows = (n >> 1) + (n & 1);  // 需要这么多行
-    float fanAreaHeight = (FONT_SIZE + 2) * (rows + 2);  // 每行间隔2像素，留空1行，另一行给“总计”用
-
     Size visibleSize = Director::getInstance()->getVisibleSize();
-
-    // 排列
-    Node *innerNode = Node::create();
+    Node *innerNode = createFanResultNode(fan_table, 12, visibleSize.width);
+    const Size &fanResultSize = innerNode->getContentSize();
 
     // 手牌
     Node *tilesNode = HandTilesWidget::createStaticNode(temp.hand_tiles, temp.win_tile);
@@ -759,35 +756,8 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
         tilesNodeSize.height *= scale;
     }
     innerNode->addChild(tilesNode);
-    tilesNode->setPosition(Vec2(visibleSize.width * 0.5f, fanAreaHeight + 5 + tilesNodeSize.height * 0.5f));
-
-    innerNode->setContentSize(Size(visibleSize.width, fanAreaHeight + tilesNodeSize.height));
-
-    for (int i = 0, j = 0; i < n; ++i) {
-        while (fan_table[++j] == 0) continue;
-
-        std::string str;
-        if (fan_table[j] == 1) {
-            str = StringUtils::format("%s %d番\n", mahjong::fan_name[j], mahjong::fan_value_table[j]);
-        }
-        else {
-            str = StringUtils::format("%s %d番x%ld\n", mahjong::fan_name[j], mahjong::fan_value_table[j], fan_table[j]);
-        }
-
-        // 创建label，每行排2个
-        Label *fanName = Label::createWithSystemFont(str, "Arial", FONT_SIZE);
-        fanName->setColor(Color3B::BLACK);
-        innerNode->addChild(fanName);
-        fanName->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-        div_t ret = div(i, 2);
-        fanName->setPosition(Vec2(ret.rem == 0 ? 5.0f : visibleSize.width * 0.5f + 5.0f, (FONT_SIZE + 2) * (rows - ret.quot + 2)));
-    }
-
-    Label *fanTotal = Label::createWithSystemFont(StringUtils::format("总计：%d番", fan), "Arial", FONT_SIZE);
-    fanTotal->setColor(Color3B::BLACK);
-    innerNode->addChild(fanTotal);
-    fanTotal->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-    fanTotal->setPosition(Vec2(5.0f, FONT_SIZE + 2));
+    tilesNode->setPosition(Vec2(visibleSize.width * 0.5f, fanResultSize.height + 5 + tilesNodeSize.height * 0.5f));
+    innerNode->setContentSize(Size(visibleSize.width, fanResultSize.height + 5 + tilesNodeSize.height));
 
     uint64_t fanFlag = 0;
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
