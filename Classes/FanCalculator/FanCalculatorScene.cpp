@@ -38,15 +38,6 @@ bool FanCalculatorScene::init() {
         origin.y + visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height * 0.5f));
     _extraInfo = extraInfo;
 
-    // 番种显示的Node
-    Size areaSize(visibleSize.width, visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height - 10);
-    _fanAreaNode = Node::create();
-    _fanAreaNode->setContentSize(areaSize);
-    _fanAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _fanAreaNode->setIgnoreAnchorPointForPosition(false);
-    this->addChild(_fanAreaNode);
-    _fanAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + areaSize.height * 0.5f + 5));
-
     // 番算按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
@@ -56,6 +47,15 @@ bool FanCalculatorScene::init() {
     extraInfo->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35, 10.0f));
     button->addClickEventListener([this](Ref *) { calculate(); });
+
+    // 番种显示的Node
+    Size areaSize(visibleSize.width, visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height - 10);
+    _fanAreaNode = Node::create();
+    _fanAreaNode->setContentSize(areaSize);
+    _fanAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    _fanAreaNode->setIgnoreAnchorPointForPosition(false);
+    this->addChild(_fanAreaNode);
+    _fanAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + areaSize.height * 0.5f + 5));
 
     tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {
         extraInfo->refreshByKong(tilePicker->isFixedPacksContainsKong());
