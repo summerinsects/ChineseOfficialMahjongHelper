@@ -706,7 +706,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
 
     tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
     if (temp.win_tile == 0) {
-        AlertView::showWithMessage("算番", "缺少和牌张", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        AlertView::showWithMessage("算番", "牌张数错误", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
 

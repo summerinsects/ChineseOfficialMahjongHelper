@@ -129,7 +129,7 @@ void FanCalculatorScene::calculate() {
     mahjong::tile_t win_tile;
     _tilePicker->getData(&hand_tiles, &win_tile);
     if (win_tile == 0) {
-        AlertView::showWithMessage("算番", "缺少和牌张", nullptr, nullptr);
+        AlertView::showWithMessage("算番", "牌张数错误", nullptr, nullptr);
         return;
     }
 
