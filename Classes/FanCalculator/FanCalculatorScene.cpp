@@ -39,7 +39,7 @@ bool FanCalculatorScene::init() {
     _extraInfo = extraInfo;
 
     // 番种显示的Node
-    Size areaSize(visibleSize.width, visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height - 5);
+    Size areaSize(visibleSize.width, visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height - 10);
     _fanAreaNode = Node::create();
     _fanAreaNode->setContentSize(areaSize);
     _fanAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
@@ -54,7 +54,7 @@ bool FanCalculatorScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText("算番");
     _extraInfo->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 30, 15.0f));
+    button->setPosition(Vec2(visibleSize.width - 30, 10.0f));
     button->addClickEventListener([this](Ref *) { calculate(); });
 
     tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {

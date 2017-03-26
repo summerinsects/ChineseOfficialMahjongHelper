@@ -13,7 +13,7 @@ bool ExtraInfoWidget::init() {
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
-    this->setContentSize(Size(visibleSize.width, 120));
+    this->setContentSize(Size(visibleSize.width, 110));
 
     // 点和与自摸互斥
     _winTypeGroup = ui::RadioButtonGroup::create();
@@ -27,14 +27,14 @@ bool ExtraInfoWidget::init() {
     radioButton->setZoomScale(0.0f);
     radioButton->ignoreContentAdaptWithSize(false);
     radioButton->setContentSize(Size(20.0f, 20.0f));
-    radioButton->setPosition(Vec2(20.0f, 105.0f));
+    radioButton->setPosition(Vec2(20.0f, 100.0f));
     _winTypeGroup->addRadioButton(radioButton);
 
     Label *label = Label::createWithSystemFont("点和", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f, 105.0f));
+    label->setPosition(Vec2(35.0f, 100.0f));
 
     // 自摸
     radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -42,14 +42,14 @@ bool ExtraInfoWidget::init() {
     radioButton->setZoomScale(0.0f);
     radioButton->ignoreContentAdaptWithSize(false);
     radioButton->setContentSize(Size(20.0f, 20.0f));
-    radioButton->setPosition(Vec2(20.0f + gapX, 105.0f));
+    radioButton->setPosition(Vec2(20.0f + gapX, 100.0f));
     _winTypeGroup->addRadioButton(radioButton);
 
     label = Label::createWithSystemFont("自摸", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f + gapX, 105.0f));
+    label->setPosition(Vec2(35.0f + gapX, 100.0f));
 
     // 绝张
     _fourthTileBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
@@ -57,7 +57,7 @@ bool ExtraInfoWidget::init() {
     _fourthTileBox->setZoomScale(0.0f);
     _fourthTileBox->ignoreContentAdaptWithSize(false);
     _fourthTileBox->setContentSize(Size(20.0f, 20.0f));
-    _fourthTileBox->setPosition(Vec2(20.0f + gapX * 2, 105.0f));
+    _fourthTileBox->setPosition(Vec2(20.0f + gapX * 2, 100.0f));
     _fourthTileBox->setEnabled(false);
     _fourthTileBox->addEventListener(std::bind(&ExtraInfoWidget::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
@@ -65,7 +65,7 @@ bool ExtraInfoWidget::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f + gapX * 2, 105.0f));
+    label->setPosition(Vec2(35.0f + gapX * 2, 100.0f));
 
     // 杠开
     _replacementBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
@@ -73,14 +73,14 @@ bool ExtraInfoWidget::init() {
     _replacementBox->setZoomScale(0.0f);
     _replacementBox->ignoreContentAdaptWithSize(false);
     _replacementBox->setContentSize(Size(20.0f, 20.0f));
-    _replacementBox->setPosition(Vec2(20.0f, 75.0f));
+    _replacementBox->setPosition(Vec2(20.0f, 70.0f));
     _replacementBox->setEnabled(false);
 
     label = Label::createWithSystemFont("杠开", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f, 75.0f));
+    label->setPosition(Vec2(35.0f, 70.0f));
 
     // 抢杠
     _robKongBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
@@ -88,7 +88,7 @@ bool ExtraInfoWidget::init() {
     _robKongBox->setZoomScale(0.0f);
     _robKongBox->ignoreContentAdaptWithSize(false);
     _robKongBox->setContentSize(Size(20.0f, 20.0f));
-    _robKongBox->setPosition(Vec2(20.0f + gapX, 75.0f));
+    _robKongBox->setPosition(Vec2(20.0f + gapX, 70.0f));
     _robKongBox->setEnabled(false);
     _robKongBox->addEventListener(std::bind(&ExtraInfoWidget::onRobKongBox, this, std::placeholders::_1, std::placeholders::_2));
 
@@ -96,7 +96,7 @@ bool ExtraInfoWidget::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f + gapX, 75.0f));
+    label->setPosition(Vec2(35.0f + gapX, 70.0f));
 
     // 海底
     _lastTileBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
@@ -104,14 +104,14 @@ bool ExtraInfoWidget::init() {
     _lastTileBox->setZoomScale(0.0f);
     _lastTileBox->ignoreContentAdaptWithSize(false);
     _lastTileBox->setContentSize(Size(20.0f, 20.0f));
-    _lastTileBox->setPosition(Vec2(20.0f + gapX * 2, 75.0f));
+    _lastTileBox->setPosition(Vec2(20.0f + gapX * 2, 70.0f));
     _lastTileBox->addEventListener(std::bind(&ExtraInfoWidget::onLastTileBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("海底", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f + gapX * 2, 75.0f));
+    label->setPosition(Vec2(35.0f + gapX * 2, 70.0f));
 
     const char *windName[4] = { "东", "南", "西", "北" };
 
@@ -119,7 +119,7 @@ bool ExtraInfoWidget::init() {
     label = Label::createWithSystemFont("圈风", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(20.0f, 45.0f));
+    label->setPosition(Vec2(20.0f, 40.0f));
 
     _prevalentWindGroup = ui::RadioButtonGroup::create();
     this->addChild(_prevalentWindGroup);
@@ -129,7 +129,7 @@ bool ExtraInfoWidget::init() {
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(50.0f + i * 30, 45.0f));
+        button->setPosition(Vec2(50.0f + i * 30, 40.0f));
         this->addChild(button);
         _prevalentWindGroup->addRadioButton(button);
 
@@ -143,7 +143,7 @@ bool ExtraInfoWidget::init() {
     label = Label::createWithSystemFont("门风", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(20.0f, 15.0f));
+    label->setPosition(Vec2(20.0f, 10.0f));
 
     _seatWindGroup = ui::RadioButtonGroup::create();
     this->addChild(_seatWindGroup);
@@ -153,7 +153,7 @@ bool ExtraInfoWidget::init() {
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(50.0f + i * 30, 15.0f));
+        button->setPosition(Vec2(50.0f + i * 30, 10.0f));
         this->addChild(button);
         _seatWindGroup->addRadioButton(button);
 
@@ -170,7 +170,7 @@ bool ExtraInfoWidget::init() {
     button->setTitleFontSize(12);
     button->setTitleText("直接输入");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40, 105.0f));
+    button->setPosition(Vec2(visibleSize.width - 40, 100.0f));
     button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
 
     // 使用说明
@@ -180,7 +180,7 @@ bool ExtraInfoWidget::init() {
     button->setTitleFontSize(12);
     button->setTitleText("使用说明");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40, 75.0f));
+    button->setPosition(Vec2(visibleSize.width - 40, 70.0f));
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
@@ -188,7 +188,7 @@ bool ExtraInfoWidget::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(visibleSize.width - 50, 45.0f));
+    label->setPosition(Vec2(visibleSize.width - 50, 40.0f));
 
     _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     this->addChild(_editBox);
@@ -197,7 +197,7 @@ bool ExtraInfoWidget::init() {
     _editBox->setFontColor(Color4B::BLACK);
     _editBox->setFontSize(12);
     _editBox->setText("0");
-    _editBox->setPosition(Vec2(visibleSize.width - 30, 45.0f));
+    _editBox->setPosition(Vec2(visibleSize.width - 30, 40.0f));
 
     return true;
 }
