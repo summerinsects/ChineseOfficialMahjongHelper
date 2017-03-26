@@ -26,33 +26,26 @@ bool FanCalculatorScene::init() {
     TilePickWidget *tilePicker = TilePickWidget::create();
     const Size &widgetSize = tilePicker->getContentSize();
     this->addChild(tilePicker);
+    tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
+        origin.y + visibleSize.height - 35 - widgetSize.height * 0.5f));
     _tilePicker = tilePicker;
-
-    // 根据情况缩放
-    float y = origin.y + visibleSize.height - 10;
-    if (widgetSize.width - 4 > visibleSize.width) {
-        float scale = (visibleSize.width - 4) / widgetSize.width;
-        tilePicker->setScale(scale);
-        y -= widgetSize.height * scale;
-        tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 25 + widgetSize.height * scale * 0.5f));
-    }
-    else {
-        y -= widgetSize.height;
-        tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 25 + widgetSize.height * 0.5f));
-    }
 
     // 其他信息的相关控件
     ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
+    const Size &extraSize = extraInfo->getContentSize();
     this->addChild(extraInfo);
-    extraInfo->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, y - 85));
+    extraInfo->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
+        origin.y + visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height * 0.5f));
     _extraInfo = extraInfo;
 
     // 番种显示的Node
+    Size areaSize(visibleSize.width, visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height - 10);
     _fanAreaNode = Node::create();
-    _fanAreaNode->setContentSize(Size(visibleSize.width, y - 145));
+    _fanAreaNode->setContentSize(areaSize);
     _fanAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    _fanAreaNode->setIgnoreAnchorPointForPosition(false);
     this->addChild(_fanAreaNode);
-    _fanAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + y * 0.5f - 70));
+    _fanAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + areaSize.height * 0.5f + 5));
 
     // 番算按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -149,7 +142,7 @@ void FanCalculatorScene::calculate() {
     // 排列
     Node *innerNode = Node::create();
     float fanAreaHeight = (FONT_SIZE + 2) * (rows + 2);  // 每行间隔2像素，留空1行，另一行给“总计”用
-    innerNode->setContentSize(Size(visibleSize.width, fanAreaHeight));
+    innerNode->setContentSize(Size(fanAreaSize.width, fanAreaHeight));
 
     for (int i = 0, j = 0; i < n; ++i) {
         while (fan_table[++j] == 0) continue;
