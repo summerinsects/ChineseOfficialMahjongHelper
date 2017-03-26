@@ -1917,7 +1917,8 @@ static bool calculate_special_type_fan(const tile_t (&standing_tiles)[14], win_f
         && standing_tiles[10] == standing_tiles[11]
         && standing_tiles[12] == standing_tiles[13]) {
 
-        if (standing_tiles[0] + 1 == standing_tiles[2]
+        if (is_numbered_suit_quick(standing_tiles[0])
+            && standing_tiles[0] + 1 == standing_tiles[2]
             && standing_tiles[2] + 1 == standing_tiles[4]
             && standing_tiles[4] + 1 == standing_tiles[6]
             && standing_tiles[6] + 1 == standing_tiles[8]
