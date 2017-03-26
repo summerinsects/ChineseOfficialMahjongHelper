@@ -168,7 +168,6 @@ bool ExtraInfoWidget::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleColor(Color3B::BLACK);
     button->setTitleText("直接输入");
     this->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 40, 105.0f));
@@ -179,7 +178,6 @@ bool ExtraInfoWidget::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleColor(Color3B::BLACK);
     button->setTitleText("使用说明");
     this->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 40, 75.0f));

@@ -52,7 +52,6 @@ bool FanCalculatorScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleColor(Color3B::BLACK);
     button->setTitleText("算番");
     _extraInfo->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 30, 15.0f));
