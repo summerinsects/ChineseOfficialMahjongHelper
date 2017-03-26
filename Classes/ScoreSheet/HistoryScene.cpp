@@ -180,7 +180,7 @@ cocos2d::Size HistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t 
 }
 
 cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<LayerColor *[2], Label *, ui::Button *, ui::Button *> CustomCell;
+    typedef cw::TableViewCellEx<LayerColor *[2], Label *, ui::Button *> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
@@ -193,7 +193,6 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         LayerColor *(&layerColor)[2] = std::get<0>(ext);
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
-        ui::Button *&viewBtn = std::get<3>(ext);
 
         layerColor[0] = LayerColor::create(Color4B::WHITE, width, 68);
         cell->addChild(layerColor[0]);
@@ -216,29 +215,22 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         delBtn->setTitleText("删除");
         delBtn->addClickEventListener(std::bind(&HistoryScene::onDeleteButton, this, std::placeholders::_1));
         cell->addChild(delBtn);
-        delBtn->setPosition(Vec2(width - 25.0f, 50.0f));
+        delBtn->setPosition(Vec2(width - 25.0f, 35.0f));
 
-        viewBtn = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-        viewBtn->setScale9Enabled(true);
-        viewBtn->setContentSize(Size(40.0f, 20.0f));
-        viewBtn->setTitleFontSize(12);
-        viewBtn->setTitleText("查看");
-        viewBtn->addClickEventListener(std::bind(&HistoryScene::onViewButton, this, std::placeholders::_1));
-        cell->addChild(viewBtn);
-        viewBtn->setPosition(Vec2(width - 25.0f, 20.0f));
+        cell->setContentSize(Size(width, 70));
+        cell->setTouchEnabled(true);
+        cell->addTouchEventListener(std::bind(&HistoryScene::onCellEvent, this, std::placeholders::_1, std::placeholders::_2));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
     LayerColor *const (&layerColor)[2] = std::get<0>(ext);
     Label *label = std::get<1>(ext);
     ui::Button *delBtn = std::get<2>(ext);
-    ui::Button *viewBtn = std::get<3>(ext);
 
     layerColor[0]->setVisible(!(idx & 1));
     layerColor[1]->setVisible(!!(idx & 1));
 
     delBtn->setUserData(reinterpret_cast<void *>(idx));
-    viewBtn->setUserData(reinterpret_cast<void *>(idx));
 
     const RecordText &rt = _recordTexts[idx];
 
@@ -284,10 +276,13 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     }, nullptr);
 }
 
-void HistoryScene::onViewButton(cocos2d::Ref *sender) {
-    ui::Button *button = (ui::Button *)sender;
-    size_t idx = reinterpret_cast<size_t>(button->getUserData());
-    if (_viewCallback(g_records[idx])) {
+void HistoryScene::onCellEvent(cocos2d::Ref *sender, cocos2d::ui::Widget::TouchEventType event) {
+    if (event != ui::Widget::TouchEventType::ENDED) {
+        return;
+    }
+
+    cw::TableViewCell *cell = (cw::TableViewCell *)sender;
+    if (_viewCallback(g_records[cell->getIdx()])) {
         Director::getInstance()->popScene();
     }
 }

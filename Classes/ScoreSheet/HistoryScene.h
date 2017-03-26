@@ -32,7 +32,7 @@ private:
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
     void onDeleteButton(cocos2d::Ref *sender);
-    void onViewButton(cocos2d::Ref *sender);
+    void onCellEvent(cocos2d::Ref *sender, cocos2d::ui::Widget::TouchEventType event);
 
     cw::TableView *_tableView = nullptr;
     std::function<bool (const Record &)> _viewCallback;
