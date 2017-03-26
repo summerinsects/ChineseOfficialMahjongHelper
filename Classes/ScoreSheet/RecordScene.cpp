@@ -700,13 +700,13 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     CalculateParam temp = { 0 };
     temp.flower_count = extraInfo->getFlowerCount();
     if (temp.flower_count > 8) {
-        AlertView::showWithMessage("算番", "花牌数的范围为0~8", std::bind(&RecordScene::showCalculator, this, param), nullptr);
+        AlertView::showWithMessage("记录和牌", "花牌数的范围为0~8", std::bind(&RecordScene::showCalculator, this, param), nullptr);
         return;
     }
 
     tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
     if (temp.win_tile == 0) {
-        AlertView::showWithMessage("算番", "牌张数错误", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        AlertView::showWithMessage("记录和牌", "牌张数错误", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
 
@@ -725,15 +725,15 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     int fan = calculate_fan(&temp.hand_tiles, temp.win_tile, &temp.ext_cond, fan_table);
 
     if (fan == ERROR_NOT_WIN) {
-        AlertView::showWithMessage("算番", "诈和", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        AlertView::showWithMessage("记录和牌", "诈和", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
     if (fan == ERROR_WRONG_TILES_COUNT) {
-        AlertView::showWithMessage("算番", "牌张数错误", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        AlertView::showWithMessage("记录和牌", "牌张数错误", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
     if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
-        AlertView::showWithMessage("算番", "同一种牌最多只能使用4枚", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        AlertView::showWithMessage("记录和牌", "同一种牌最多只能使用4枚", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
 
@@ -765,7 +765,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
         }
     }
 
-    AlertView::showWithNode("算番", innerNode, [this, temp, fan, fanFlag]() {
+    AlertView::showWithNode("记录和牌", innerNode, [this, temp, fan, fanFlag]() {
         _detail.score = std::max(fan, 8);
         _detail.fan_flag = fanFlag;
 
