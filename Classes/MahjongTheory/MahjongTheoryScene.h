@@ -17,12 +17,12 @@ public:
     CREATE_FUNC(MahjongTheoryScene);
 
 private:
-    cocos2d::ui::EditBox *_editBox;
-    HandTilesWidget *_handTilesWidget;
-    cocos2d::ui::Button *_undoButton;
-    cocos2d::ui::Button *_redoButton;
+    cocos2d::ui::EditBox *_editBox = nullptr;
+    HandTilesWidget *_handTilesWidget = nullptr;
+    cocos2d::ui::Button *_undoButton = nullptr;
+    cocos2d::ui::Button *_redoButton = nullptr;
     cocos2d::ui::CheckBox *_checkBoxes[4];
-    cw::TableView *_tableView;
+    cw::TableView *_tableView = nullptr;
 
     int _handTilesTable[mahjong::TILE_TABLE_SIZE];
 
@@ -56,13 +56,13 @@ private:
     void onRedoButton(cocos2d::Ref *sender);
     void deduce(mahjong::tile_t discardTile, mahjong::tile_t servingTile);
 
-    float _cellWidth;
-    float _discardLabelWidth;
-    float _servingLabelWidth1;
-    float _servingLabelWidth2;
-    float _waitingLabelWidth1;
-    float _waitingLabelWidth2;
-    float _totalLabelWidth;
+    float _cellWidth = 0.0f;
+    float _discardLabelWidth = 0.0f;
+    float _servingLabelWidth1 = 0.0f;
+    float _servingLabelWidth2 = 0.0f;
+    float _waitingLabelWidth1 = 0.0f;
+    float _waitingLabelWidth2 = 0.0f;
+    float _totalLabelWidth = 0.0f;
     std::unordered_map<uint16_t, int> _cellHeightMap;
 
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;

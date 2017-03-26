@@ -15,18 +15,18 @@ CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
 private:
-    HandTilesWidget *_handTilesWidget;
+    HandTilesWidget *_handTilesWidget = nullptr;
 
     cocos2d::ui::Button *_characterButtons[9];
     cocos2d::ui::Button *_bambooButtons[9];
     cocos2d::ui::Button *_dotsButtons[9];
     cocos2d::ui::Button *_honorButtons[7];
-    cocos2d::ui::Button *_chow_XXButton;
-    cocos2d::ui::Button *_chowX_XButton;
-    cocos2d::ui::Button *_chowXX_Button;
-    cocos2d::ui::Button *_pungButton;
-    cocos2d::ui::Button *_meldedKongButton;
-    cocos2d::ui::Button *_concealedKongButton;
+    cocos2d::ui::Button *_chow_XXButton = nullptr;
+    cocos2d::ui::Button *_chowX_XButton = nullptr;
+    cocos2d::ui::Button *_chowXX_Button = nullptr;
+    cocos2d::ui::Button *_pungButton = nullptr;
+    cocos2d::ui::Button *_meldedKongButton = nullptr;
+    cocos2d::ui::Button *_concealedKongButton = nullptr;
 
     std::function<void ()> _fixedPacksChangedCallback;
     std::function<void ()> _winTileChangedCallback;

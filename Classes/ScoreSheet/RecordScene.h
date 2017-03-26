@@ -47,7 +47,7 @@ private:
     cocos2d::Label *_selfDrawnLabel[4];
     cocos2d::ui::CheckBox *_falseWinBox[4];
     cocos2d::Label *_scoreLabel[4];
-    cw::TableView *_tableView;
+    cw::TableView *_tableView = nullptr;
     cocos2d::ui::Button *_okButton = nullptr;
 
     size_t _handIdx = 0;

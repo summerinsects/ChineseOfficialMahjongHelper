@@ -52,16 +52,16 @@ public:
     bool makeFixedConcealedKongPack();
 
 private:
-    cocos2d::ui::Widget *_fixedContainer;
-    cocos2d::ui::Widget *_standingContainer;
+    cocos2d::ui::Widget *_fixedContainer = nullptr;
+    cocos2d::ui::Widget *_standingContainer = nullptr;
     std::vector<cocos2d::ui::Button *> _standingTileButtons;
-    cocos2d::DrawNode *_highlightBox;
+    cocos2d::DrawNode *_highlightBox = nullptr;
 
     int _usedTilesTable[mahjong::TILE_TABLE_SIZE];
     int _standingTilesTable[mahjong::TILE_TABLE_SIZE];
     std::vector<mahjong::tile_t> _standingTiles;
     std::vector<mahjong::pack_t> _fixedPacks;
-    size_t _currentIdx;
+    size_t _currentIdx = 0;
 
     std::function<void ()> _currentIdxChangedCallback;
     std::function<void ()> _tileClickCallback;
