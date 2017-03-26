@@ -121,11 +121,12 @@ void showAbout() {
     const float width = visibleSize.width * 0.8f - 10;
 
     Label *label = Label::createWithSystemFont(
-        "1. 本软件开源，高端玩家可下载源代码自行编译。\n"
-        "2. 本软件可跨平台，由于作者无力承担苹果上架相关费用，故没有推出iOS版本，如您有苹果电脑又愿意折腾的话，可以使用源代码打包出iOS版本。\n"
+        "1. 特别鸣谢：逍遥宫国标麻将群。\n"
+        "2. BUG反馈请发邮件至「wohaaitinciu@163.com」。\n"
         "3. 如果您觉得好用，可多多帮我推广。\n"
-        "4. BUG反馈请发邮件至wohaaitinciu@163.com\n"
-        "5. 源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
+        "4. 本软件开源，高端玩家可下载源代码自行编译。\n"
+        "5. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
+        "6. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
         "Arial", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0);
