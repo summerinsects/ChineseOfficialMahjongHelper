@@ -50,11 +50,11 @@ bool FanCalculatorScene::init() {
     // 番算按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
-    button->setContentSize(Size(35.0f, 20.0f));
+    button->setContentSize(Size(45.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("算番");
-    _extraInfo->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 30, 10.0f));
+    extraInfo->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 35, 10.0f));
     button->addClickEventListener([this](Ref *) { calculate(); });
 
     tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {
