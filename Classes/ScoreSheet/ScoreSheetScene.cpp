@@ -554,110 +554,117 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
     Director::getInstance()->pushScene(scene);
 }
 
-void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
-    std::string message = handNameText[handIdx], str;
-    const Record::Detail &detail = g_currentRecord.detail[handIdx];
-    if (detail.score == 0) {
-        message.append("荒庄。\n");
+static std::string stringifyDetail(const Record::Detail &detail) {
+    std::string ret;
+
+    int wc = detail.win_claim;
+    int winIndex = WIN_INDEX(wc);
+    int claimIndex = CLAIM_INDEX(wc);
+    if (winIndex == claimIndex) {
+        ret.append(StringUtils::format("「%s」自摸%d番。\n", g_currentRecord.name[winIndex], detail.score));
     }
     else {
-        int wc = detail.win_claim;
-        int winIndex = WIN_INDEX(wc);
-        int claimIndex = CLAIM_INDEX(wc);
-        if (winIndex == claimIndex) {
-            message.append("「");
-            message.append(g_currentRecord.name[winIndex]);
-            message.append(StringUtils::format("」自摸%d番。\n", detail.score));
-        }
-        else {
-            message.append("「");
-            message.append(g_currentRecord.name[winIndex]);
-            message.append(StringUtils::format("」和%d番，「", detail.score));
-            message.append(g_currentRecord.name[claimIndex]);
-            message.append("」放炮。\n");
-        }
+        ret.append(StringUtils::format("「%s」和%d番，「%s」放炮。\n", g_currentRecord.name[winIndex], detail.score, g_currentRecord.name[claimIndex]));
+    }
 
-        uint64_t fanFlag = detail.fan_flag;
-        if (fanFlag != 0) {
-            for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-                if (TEST_FAN(fanFlag, n)) {
-                    unsigned idx = n;
-                    if (!str.empty()) {
-                        str.append("、");
-                    }
-                    str.append(mahjong::fan_name[idx]);
-                }
+    uint64_t fanFlag = detail.fan_flag;
+    if (fanFlag != 0) {
+        std::string fanText;
+        for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
+            if (TEST_FAN(fanFlag, n)) {
+                unsigned idx = n;
+                fanText.append("「");
+                //if (LIKELY(!fanText.empty())) {
+                //    fanText.append("、");
+                //}
+                fanText.append(mahjong::fan_name[idx]);
+                fanText.append("」");
             }
         }
 
-        if (!str.empty()) {
-            message.append("和出番种：");
-            message.append(str);
-            message.append("。\n");
+        if (!fanText.empty()) {
+            ret.append("和出番种：");
+            ret.append(fanText);
+            ret.append("等。\n");
         }
     }
 
     if (detail.false_win != 0) {
-        str.clear();
         for (int i = 0; i < 4; ++i) {
             if (TEST_FALSE_WIN(detail.false_win, i)) {
-                if (!str.empty()) {
-                    str.append("、");
-                }
-                str.append("「");
-                str.append(g_currentRecord.name[i]);
-                str.append("」");
+                ret.append("「");
+                ret.append(g_currentRecord.name[i]);
+                ret.append("」");
             }
         }
-        message.append(str);
-        message.append("错和。\n");
+        ret.append("错和。\n");
     }
 
+    return ret;
+}
+
+void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
+    const Record::Detail &detail = g_currentRecord.detail[handIdx];
+    if (detail.score == 0) {
+        AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"),
+            "荒庄。\n\n是否需要修改这盘的记录？",
+            std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
+        return;
+    }
+
+    std::string message = stringifyDetail(detail);
     message.append("\n是否需要修改这盘的记录？");
 
-    str = handNameText[handIdx];
-    str.append("详情");
-
-    if (detail.win_hand.tile_count != 0 && detail.win_hand.win_tile != 0) {
-        RecordScene::CalculateParam param;
-        RecordScene::_WinHandToCalculateParam(detail.win_hand, param);
-
-        Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float maxWidth = visibleSize.width * 0.8f - 10;
-
-        Label *label = Label::createWithSystemFont(message, "Arial", 12);
-        label->setColor(Color3B::BLACK);
-        if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
-            label->setDimensions(maxWidth, 0);
-        }
-        const Size &labelSize = label->getContentSize();
-
-        // 手牌
-        Node *tilesNode = HandTilesWidget::createStaticNode(param.hand_tiles, param.win_tile);
-        Size tilesNodeSize = tilesNode->getContentSize();
-        if (tilesNodeSize.width > maxWidth) {
-            const float scale = maxWidth / tilesNodeSize.width;
-            tilesNode->setScale(scale);
-            tilesNodeSize.width = maxWidth;
-            tilesNodeSize.height *= scale;
-        }
-
-        Node *innerNode = Node::create();
-        innerNode->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height));
-
-        innerNode->addChild(tilesNode);
-        tilesNode->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 10 + tilesNodeSize.height * 0.5f));
-
-        innerNode->addChild(label);
-        label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f));
-
-        AlertView::showWithNode(str, innerNode,
+    if (detail.win_hand.tile_count == 0 || detail.win_hand.win_tile == 0) {
+        AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"), message,
             std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
+        return;
     }
-    else {
-        AlertView::showWithMessage(str, message,
-            std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
+
+    RecordScene::CalculateParam param;
+    RecordScene::_WinHandToCalculateParam(detail.win_hand, param);
+
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float maxWidth = visibleSize.width * 0.8f - 10;
+
+    // 花（使用emoji代码）
+    Label *flowerLabel = Label::createWithSystemFont(StringUtils::format("\xE2\x9D\x80x%d", param.flower_count), "Arial", 12);
+    flowerLabel->setColor(Color3B(224, 45, 45));
+    const Size &flowerSize = flowerLabel->getContentSize();
+
+    // 手牌
+    Node *tilesNode = HandTilesWidget::createStaticNode(param.hand_tiles, param.win_tile);
+    Size tilesNodeSize = tilesNode->getContentSize();
+    if (tilesNodeSize.width > maxWidth) {
+        const float scale = maxWidth / tilesNodeSize.width;
+        tilesNode->setScale(scale);
+        tilesNodeSize.width = maxWidth;
+        tilesNodeSize.height *= scale;
     }
+
+    // 描述文本
+    Label *label = Label::createWithSystemFont(message, "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
+        label->setDimensions(maxWidth, 0);
+    }
+    const Size &labelSize = label->getContentSize();
+
+    Node *container = Node::create();
+    container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height));
+
+    container->addChild(flowerLabel);
+    flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    flowerLabel->setPosition(Vec2(0, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
+
+    container->addChild(tilesNode);
+    tilesNode->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 10 + tilesNodeSize.height * 0.5f));
+
+    container->addChild(label);
+    label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f));
+
+    AlertView::showWithNode(std::string(handNameText[handIdx]).append("详情"), container,
+        std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
 }
 
 void ScoreSheetScene::onTimeScheduler(float dt) {
