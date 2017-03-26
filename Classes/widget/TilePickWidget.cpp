@@ -32,7 +32,7 @@ bool TilePickWidget::init() {
     tilesContainer->setContentSize(tableSize);
     this->addChild(tilesContainer);
 
-#define BUTTON_WIDHT 45
+#define BUTTON_WIDHT 40
 #define BUTTON_HEIGHT 20
 #define FONT_SIZE 12
 #define GAP_H (GAP * 2)
@@ -113,7 +113,7 @@ bool TilePickWidget::init() {
     button->setContentSize(Size(BUTTON_WIDHT, BUTTON_HEIGHT));
     button->setTitleFontSize(FONT_SIZE);
     button->setTitleColor(Color3B::BLACK);
-    button->setTitleText("吃(_XX)");
+    button->setTitleText("吃 _XX");
     buttonsContainer->addChild(button);
     button->setPosition(Vec2(BUTTON_WIDHT / 2, (BUTTON_HEIGHT + GAP_H) * 3 + BUTTON_HEIGHT / 2));
     button->addClickEventListener(std::bind(&TilePickWidget::onChow_XXButton, this, std::placeholders::_1));
@@ -125,7 +125,7 @@ bool TilePickWidget::init() {
     button->setContentSize(Size(BUTTON_WIDHT, BUTTON_HEIGHT));
     button->setTitleFontSize(FONT_SIZE);
     button->setTitleColor(Color3B::BLACK);
-    button->setTitleText("吃(X_X)");
+    button->setTitleText("吃 X_X");
     buttonsContainer->addChild(button);
     button->setPosition(Vec2(BUTTON_WIDHT / 2, (BUTTON_HEIGHT + GAP_H) * 2 + BUTTON_HEIGHT / 2));
     button->addClickEventListener(std::bind(&TilePickWidget::onChowX_XButton, this, std::placeholders::_1));
@@ -137,7 +137,7 @@ bool TilePickWidget::init() {
     button->setContentSize(Size(BUTTON_WIDHT, BUTTON_HEIGHT));
     button->setTitleFontSize(FONT_SIZE);
     button->setTitleColor(Color3B::BLACK);
-    button->setTitleText("吃(XX_)");
+    button->setTitleText("吃 XX_");
     buttonsContainer->addChild(button);
     button->setPosition(Vec2(BUTTON_WIDHT / 2, (BUTTON_HEIGHT + GAP_H) + BUTTON_HEIGHT / 2));
     button->addClickEventListener(std::bind(&TilePickWidget::onChowXX_Button, this, std::placeholders::_1));
