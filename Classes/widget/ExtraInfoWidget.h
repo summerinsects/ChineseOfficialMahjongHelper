@@ -42,6 +42,7 @@ private:
     void onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
+    void onFlowerButton(cocos2d::Ref *sender);
     void onInstructionButton(cocos2d::Ref *sender);
     void showInputAlert(const char *prevInput);
     void parseInput(const char *input);
@@ -51,7 +52,7 @@ private:
     cocos2d::ui::CheckBox *_replacementBox = nullptr;
     cocos2d::ui::CheckBox *_robKongBox = nullptr;
     cocos2d::ui::CheckBox *_lastTileBox = nullptr;
-    cocos2d::ui::EditBox *_editBox = nullptr;
+    cocos2d::ui::Button *_flowerButton = nullptr;
     cocos2d::ui::RadioButtonGroup *_prevalentWindGroup = nullptr;
     cocos2d::ui::RadioButtonGroup *_seatWindGroup = nullptr;
 

@@ -3,6 +3,7 @@
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../widget/AlertView.h"
+#include "../widget/CWEditBoxDelegate.h"
 
 USING_NS_CC;
 
@@ -190,24 +191,26 @@ bool ExtraInfoWidget::init() {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     label->setPosition(Vec2(visibleSize.width - 50, 40.0f));
 
-    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    this->addChild(_editBox);
-    _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    _editBox->setFontColor(Color4B::BLACK);
-    _editBox->setFontSize(12);
-    _editBox->setText("0");
-    _editBox->setPosition(Vec2(visibleSize.width - 30, 40.0f));
+    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_normal.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleColor(Color3B::BLACK);
+    button->setTitleText("0");
+    this->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 30, 40.0f));
+    button->addClickEventListener(std::bind(&ExtraInfoWidget::onFlowerButton, this, std::placeholders::_1));
+    _flowerButton = button;
 
     return true;
 }
 
 int ExtraInfoWidget::getFlowerCount() const {
-    return atoi(_editBox->getText());
+    return atoi(_flowerButton->getTitleText().c_str());
 }
 
 void ExtraInfoWidget::setFlowerCount(int cnt) {
-    _editBox->setText(StringUtils::format("%d", cnt).c_str());
+    _flowerButton->setTitleText(StringUtils::format("%d", cnt));
 }
 
 mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
@@ -372,6 +375,73 @@ void ExtraInfoWidget::refreshByWinTile(const RefreshByWinTile &rt) {
     _lastTileBox->setEnabled(!_robKongBox->isSelected());
 }
 
+void ExtraInfoWidget::onFlowerButton(cocos2d::Ref *sender) {
+    std::string prevText = _flowerButton->getTitleText();
+    ui::Widget *rootWidget = ui::Widget::create();
+    rootWidget->setContentSize(Size(140, 40));
+
+    // 番数输入框
+    ui::EditBox *editBox = ui::EditBox::create(Size(34.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    rootWidget->addChild(editBox);
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setText(prevText.c_str());
+    editBox->setPosition(Vec2(70, 20));
+
+    std::shared_ptr<cw::EditBoxDelegate> delegate = std::make_shared<cw::EditBoxDelegate>(
+        [prevText](ui::EditBox *editBox) {
+        int n = atoi(editBox->getText());
+        if (n < 0) {
+            AlertView::showWithMessage("提示", "花牌数不得小于0",
+                std::bind(&ui::EditBox::setText, editBox, "0"),
+                std::bind(&ui::EditBox::setText, editBox, prevText.c_str()));
+        }
+        else if (n > 8) {
+            AlertView::showWithMessage("提示", "花牌数不得超过8",
+                std::bind(&ui::EditBox::setText, editBox, "8"),
+                std::bind(&ui::EditBox::setText, editBox, prevText.c_str()));
+        }
+    });
+    editBox->setDelegate(delegate.get());
+
+    // +-按钮
+    ui::Button *minusButton = ui::Button::create("source_material/stepper_dec_n.png", "source_material/stepper_dec_h.png");
+    rootWidget->addChild(minusButton);
+    minusButton->setScale(20.0f / minusButton->getContentSize().height);
+    minusButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+    minusButton->setPosition(Vec2(70 - 17, 20));
+    minusButton->addClickEventListener([editBox](Ref *) {
+        int n = atoi(editBox->getText());
+        if (n > 0) --n;
+        else n = 0;
+        char str[32];
+        snprintf(str, sizeof(str), "%d", n);
+        editBox->setText(str);
+    });
+
+    ui::Button *plusButton = ui::Button::create("source_material/stepper_inc_n.png", "source_material/stepper_inc_h.png");
+    rootWidget->addChild(plusButton);
+    plusButton->setScale(20.0f / plusButton->getContentSize().height);
+    plusButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    plusButton->setPosition(Vec2(70 + 17, 20));
+    plusButton->addClickEventListener([editBox](Ref *) {
+        int n = atoi(editBox->getText());
+        if (n < 8) ++n;
+        else n = 8;
+        char str[32];
+        snprintf(str, sizeof(str), "%d", n);
+        editBox->setText(str);
+    });
+
+    AlertView::showWithNode("花牌数", rootWidget, [this, editBox, delegate]() {
+        int n = atoi(editBox->getText());
+        char str[32];
+        snprintf(str, sizeof(str), "%d", n);
+        _flowerButton->setTitleText(str);
+    }, nullptr);
+}
 
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
