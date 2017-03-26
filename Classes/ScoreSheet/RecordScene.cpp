@@ -698,13 +698,24 @@ cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SI
 
 void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const CalculateParam &param) {
     CalculateParam temp = { 0 };
+    tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
+    if (temp.win_tile == 0 && temp.hand_tiles.tile_count == 0 && temp.hand_tiles.pack_count == 0) {
+        AlertView::showWithMessage("记录和牌", "确定不记录和牌吗？",
+            [this]() {
+                memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
+                _detail.fan_flag = 0;
+                refresh();
+            },
+            std::bind(&RecordScene::showCalculator, this, param));
+        return;
+    }
+
     temp.flower_count = extraInfo->getFlowerCount();
     if (temp.flower_count > 8) {
         AlertView::showWithMessage("记录和牌", "花牌数的范围为0~8", std::bind(&RecordScene::showCalculator, this, param), nullptr);
         return;
     }
 
-    tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
     if (temp.win_tile == 0) {
         AlertView::showWithMessage("记录和牌", "牌张数错误", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
