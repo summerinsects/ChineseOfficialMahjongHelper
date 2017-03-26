@@ -122,7 +122,7 @@ void showAbout() {
 
     Label *label = Label::createWithSystemFont(
         "1. 特别鸣谢：逍遥宫国标麻将群。\n"
-        "2. BUG反馈请发邮件至「wohaaitinciu@163.com」。\n"
+        "2. BUG反馈请发邮件至wohaaitinciu@163.com。\n"
         "3. 如果您觉得好用，可多多帮我推广。\n"
         "4. 本软件开源，高端玩家可下载源代码自行编译。\n"
         "5. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
