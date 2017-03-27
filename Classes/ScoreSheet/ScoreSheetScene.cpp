@@ -574,9 +574,6 @@ static std::string stringifyDetail(const Record::Detail &detail) {
             if (TEST_FAN(fanFlag, n)) {
                 unsigned idx = n;
                 fanText.append("「");
-                //if (LIKELY(!fanText.empty())) {
-                //    fanText.append("、");
-                //}
                 fanText.append(mahjong::fan_name[idx]);
                 fanText.append("」");
             }
@@ -628,9 +625,14 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     const float maxWidth = visibleSize.width * 0.8f - 10;
 
     // 花（使用emoji代码）
-    Label *flowerLabel = Label::createWithSystemFont(StringUtils::format("\xE2\x9D\x80x%d", param.flower_count), "Arial", 12);
-    flowerLabel->setColor(Color3B(224, 45, 45));
-    const Size &flowerSize = flowerLabel->getContentSize();
+    Label *flowerLabel = nullptr;
+    if (param.flower_count > 0) {
+        flowerLabel = Label::createWithSystemFont(std::string(EMOJI_FLOWER_8, param.flower_count * (sizeof(EMOJI_FLOWER) - 1)), "Arial", 12);
+        flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+        flowerLabel->setColor(Color3B(224, 45, 45));
+#endif
+    }
 
     // 手牌
     Node *tilesNode = HandTilesWidget::createStaticNode(param.hand_tiles, param.win_tile);
@@ -651,11 +653,16 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     const Size &labelSize = label->getContentSize();
 
     Node *container = Node::create();
-    container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height));
+    if (param.flower_count > 0) {
+        const Size &flowerSize = flowerLabel->getContentSize();
+        container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height));
 
-    container->addChild(flowerLabel);
-    flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    flowerLabel->setPosition(Vec2(0, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
+        container->addChild(flowerLabel);
+        flowerLabel->setPosition(Vec2(0, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
+    }
+    else {
+        container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height));
+    }
 
     container->addChild(tilesNode);
     tilesNode->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 10 + tilesNodeSize.height * 0.5f));

@@ -756,6 +756,16 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     Node *innerNode = createFanResultNode(fan_table, 12, visibleSize.width);
     const Size &fanResultSize = innerNode->getContentSize();
 
+    // 花（使用emoji代码）
+    Label *flowerLabel = nullptr;
+    if (param.flower_count > 0) {
+        flowerLabel = Label::createWithSystemFont(std::string(EMOJI_FLOWER_8, param.flower_count * (sizeof(EMOJI_FLOWER) - 1)), "Arial", 12);
+        flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+        flowerLabel->setColor(Color3B(224, 45, 45));
+#endif
+    }
+
     // 手牌
     Node *tilesNode = HandTilesWidget::createStaticNode(temp.hand_tiles, temp.win_tile);
     Size tilesNodeSize = tilesNode->getContentSize();
@@ -767,7 +777,17 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     }
     innerNode->addChild(tilesNode);
     tilesNode->setPosition(Vec2(visibleSize.width * 0.5f, fanResultSize.height + 5 + tilesNodeSize.height * 0.5f));
-    innerNode->setContentSize(Size(visibleSize.width, fanResultSize.height + 5 + tilesNodeSize.height));
+
+    if (param.flower_count > 0) {
+        innerNode->addChild(flowerLabel);
+        const Size &flowerSize = flowerLabel->getContentSize();
+        flowerLabel->setPosition(Vec2(0, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
+
+        innerNode->setContentSize(Size(visibleSize.width, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height));
+    }
+    else {
+        innerNode->setContentSize(Size(visibleSize.width, fanResultSize.height + 5 + tilesNodeSize.height));
+    }
 
     uint64_t fanFlag = 0;
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {

@@ -15,6 +15,10 @@ static const char *handNameText[] = {
 #define RESET_FAN(flag_, fan_) ((flag_) &= ~(1ULL << (mahjong::LAST_TILE - (fan_))))
 #define TEST_FAN(flag_, fan_) !!((flag_) & (1ULL << (mahjong::LAST_TILE - (fan_))))
 
+#define EMOJI_FLOWER "\xF0\x9F\x8C\xB8"
+
+#define EMOJI_FLOWER_8 EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER
+
 class TilePickWidget;
 class ExtraInfoWidget;
 
