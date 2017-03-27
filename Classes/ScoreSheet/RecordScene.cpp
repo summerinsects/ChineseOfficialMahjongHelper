@@ -627,7 +627,7 @@ static const mahjong::wind_t seatWindTable[16][4] = {
 
 void RecordScene::showCalculator(const CalculateParam &param) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width * 0.8f - 10;
+    const float maxWidth = visibleSize.width - 20;
 
     // 选牌面板和其他信息的相关控件
     TilePickWidget *tilePicker = TilePickWidget::create();
@@ -688,7 +688,7 @@ void RecordScene::showCalculator(const CalculateParam &param) {
     }
 
     // 通过AlertView显示出来
-    AlertView::showWithNode("记录和牌", rootWidget,
+    AlertView::showWithNode("记录和牌", rootWidget, maxWidth,
         std::bind(&RecordScene::calculate, this, tilePicker, extraInfo, param), nullptr);
 }
 

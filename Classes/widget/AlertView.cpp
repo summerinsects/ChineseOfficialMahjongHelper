@@ -5,9 +5,9 @@
 
 USING_NS_CC;
 
-void AlertView::showWithNode(const std::string &title, cocos2d::Node *node, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
+void AlertView::showWithNode(const std::string &title, cocos2d::Node *node, float maxWidth, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
     AlertView *alert = new (std::nothrow) AlertView();
-    if (alert != nullptr && alert->initWithTitle(title, node, confirmCallback, cancelCallback)) {
+    if (alert != nullptr && alert->initWithTitle(title, node, maxWidth, confirmCallback, cancelCallback)) {
         alert->autorelease();
         Director::getInstance()->getRunningScene()->addChild(alert, 100);
         return;
@@ -23,10 +23,10 @@ void AlertView::showWithMessage(const std::string &title, const std::string &mes
     if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
         label->setDimensions(maxWidth, 0);
     }
-    AlertView::showWithNode(title, label, confirmCallback, cancelCallback);
+    AlertView::showWithNode(title, label, maxWidth, confirmCallback, cancelCallback);
 }
 
-bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
+bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, float maxWidth, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
     if (UNLIKELY(!Layer::init())) {
         return false;
     }
@@ -50,14 +50,14 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, con
     // 遮罩
     this->addChild(LayerColor::create(Color4B(0, 0, 0, 127)));
 
-    const float width = visibleSize.width * 0.8f;
+    const float width = maxWidth + 10;
 
     Size nodeSize = node->getContentSize();
-    if (nodeSize.width > width - 10) {
-        float scale = (width - 10) / nodeSize.width;
+    if (nodeSize.width > maxWidth) {
+        float scale = maxWidth / nodeSize.width;
         node->setScale(scale);
 
-        nodeSize.width = width - 10;
+        nodeSize.width = maxWidth;
         nodeSize.height *= scale;
     }
     const float height = nodeSize.height + 78.0f;
