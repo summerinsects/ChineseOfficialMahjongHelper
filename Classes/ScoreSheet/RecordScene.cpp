@@ -694,8 +694,6 @@ void RecordScene::showCalculator(const CalculateParam &param) {
 // in FanCalculatorScene.cpp
 cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SIZE], int fontSize, float resultAreaWidth);
 
-#define FONT_SIZE 12
-
 void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const CalculateParam &param) {
     CalculateParam temp = { 0 };
     tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
@@ -753,7 +751,9 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     fan_table[mahjong::FLOWER_TILES] = temp.flower_count;
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    Node *innerNode = createFanResultNode(fan_table, 12, visibleSize.width);
+    const float maxWidth = visibleSize.width * 0.8f - 10;
+
+    Node *innerNode = createFanResultNode(fan_table, 12, maxWidth);
     const Size &fanResultSize = innerNode->getContentSize();
 
     // 花（使用emoji代码）
@@ -769,24 +769,24 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     // 手牌
     Node *tilesNode = HandTilesWidget::createStaticNode(temp.hand_tiles, temp.win_tile);
     Size tilesNodeSize = tilesNode->getContentSize();
-    if (tilesNodeSize.width > visibleSize.width) {
-        const float scale = visibleSize.width / tilesNodeSize.width;
+    if (tilesNodeSize.width > maxWidth) {
+        const float scale = maxWidth / tilesNodeSize.width;
         tilesNode->setScale(scale);
-        tilesNodeSize.width = visibleSize.width;
+        tilesNodeSize.width = maxWidth;
         tilesNodeSize.height *= scale;
     }
     innerNode->addChild(tilesNode);
-    tilesNode->setPosition(Vec2(visibleSize.width * 0.5f, fanResultSize.height + 5 + tilesNodeSize.height * 0.5f));
+    tilesNode->setPosition(Vec2(maxWidth * 0.5f, fanResultSize.height + 5 + tilesNodeSize.height * 0.5f));
 
     if (param.flower_count > 0) {
         innerNode->addChild(flowerLabel);
         const Size &flowerSize = flowerLabel->getContentSize();
         flowerLabel->setPosition(Vec2(0, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
 
-        innerNode->setContentSize(Size(visibleSize.width, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height));
+        innerNode->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height));
     }
     else {
-        innerNode->setContentSize(Size(visibleSize.width, fanResultSize.height + 5 + tilesNodeSize.height));
+        innerNode->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height));
     }
 
     uint64_t fanFlag = 0;
