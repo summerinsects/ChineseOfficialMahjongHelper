@@ -185,32 +185,60 @@ bool ExtraInfoWidget::init() {
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
-    label = Label::createWithSystemFont("花牌数", "Arial", 12);
+    label = Label::createWithSystemFont("花", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(visibleSize.width - 50, 40.0f));
+    label->setPosition(Vec2(visibleSize.width - 80, 40.0f));
 
-    button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_normal.png");
+    Sprite *sprite = Sprite::create("source_material/btn_square_normal.png");
+    sprite->setScale(20 / sprite->getContentSize().width);
+    this->addChild(sprite);
+    sprite->setPosition(Vec2(visibleSize.width - 45, 40.0f));
+
+    label = Label::createWithSystemFont("0", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    this->addChild(label);
+    label->setPosition(Vec2(visibleSize.width - 45, 40.0f));
+    _flowerLabel = label;
+
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
-    button->setContentSize(Size(35.0f, 20.0f));
+    button->setContentSize(Size(20.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleColor(Color3B::BLACK);
-    button->setTitleText("0");
+    button->setTitleText("\xE2\x97\x80");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 30, 40.0f));
-    button->addClickEventListener(std::bind(&ExtraInfoWidget::onFlowerButton, this, std::placeholders::_1));
-    _flowerButton = button;
+    button->setPosition(Vec2(visibleSize.width - 67.5f, 40.0f));
+    button->addClickEventListener([label](Ref *) {
+        int n = atoi(label->getString().c_str());
+        if (n > 0) {
+            label->setString(StringUtils::format("%d", n - 1));
+        }
+    });
+
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(20.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("\xE2\x96\xB6");
+    this->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 22.5f, 40.0f));
+    button->addClickEventListener([label](Ref *) {
+        int n = atoi(label->getString().c_str());
+        if (n < 8) {
+            label->setString(StringUtils::format("%d", n + 1));
+        }
+    });
 
     return true;
 }
 
 int ExtraInfoWidget::getFlowerCount() const {
-    return atoi(_flowerButton->getTitleText().c_str());
+    return atoi(_flowerLabel->getString().c_str());
 }
 
 void ExtraInfoWidget::setFlowerCount(int cnt) {
-    _flowerButton->setTitleText(StringUtils::format("%d", cnt));
+    _flowerLabel->setString(StringUtils::format("%d", cnt));
 }
 
 mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
@@ -373,74 +401,6 @@ void ExtraInfoWidget::refreshByWinTile(const RefreshByWinTile &rt) {
         && !_lastTileBox->isSelected()
         && !_fourthTileBox->isSelected());
     _lastTileBox->setEnabled(!_robKongBox->isSelected());
-}
-
-void ExtraInfoWidget::onFlowerButton(cocos2d::Ref *sender) {
-    std::string prevText = _flowerButton->getTitleText();
-    ui::Widget *rootWidget = ui::Widget::create();
-    rootWidget->setContentSize(Size(140, 40));
-
-    // 番数输入框
-    ui::EditBox *editBox = ui::EditBox::create(Size(34.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    rootWidget->addChild(editBox);
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setText(prevText.c_str());
-    editBox->setPosition(Vec2(70, 20));
-
-    std::shared_ptr<cw::EditBoxDelegate> delegate = std::make_shared<cw::EditBoxDelegate>(
-        [prevText](ui::EditBox *editBox) {
-        int n = atoi(editBox->getText());
-        if (n < 0) {
-            AlertView::showWithMessage("提示", "花牌数不得小于0", 12,
-                std::bind(&ui::EditBox::setText, editBox, "0"),
-                std::bind(&ui::EditBox::setText, editBox, prevText.c_str()));
-        }
-        else if (n > 8) {
-            AlertView::showWithMessage("提示", "花牌数不得超过8", 12,
-                std::bind(&ui::EditBox::setText, editBox, "8"),
-                std::bind(&ui::EditBox::setText, editBox, prevText.c_str()));
-        }
-    });
-    editBox->setDelegate(delegate.get());
-
-    // +-按钮
-    ui::Button *minusButton = ui::Button::create("source_material/stepper_dec_n.png", "source_material/stepper_dec_h.png");
-    rootWidget->addChild(minusButton);
-    minusButton->setScale(20.0f / minusButton->getContentSize().height);
-    minusButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    minusButton->setPosition(Vec2(70 - 17, 20));
-    minusButton->addClickEventListener([editBox](Ref *) {
-        int n = atoi(editBox->getText());
-        if (n > 0) --n;
-        else n = 0;
-        char str[32];
-        snprintf(str, sizeof(str), "%d", n);
-        editBox->setText(str);
-    });
-
-    ui::Button *plusButton = ui::Button::create("source_material/stepper_inc_n.png", "source_material/stepper_inc_h.png");
-    rootWidget->addChild(plusButton);
-    plusButton->setScale(20.0f / plusButton->getContentSize().height);
-    plusButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    plusButton->setPosition(Vec2(70 + 17, 20));
-    plusButton->addClickEventListener([editBox](Ref *) {
-        int n = atoi(editBox->getText());
-        if (n < 8) ++n;
-        else n = 8;
-        char str[32];
-        snprintf(str, sizeof(str), "%d", n);
-        editBox->setText(str);
-    });
-
-    AlertView::showWithNode("花牌数", rootWidget, [this, editBox, delegate]() {
-        int n = atoi(editBox->getText());
-        char str[32];
-        snprintf(str, sizeof(str), "%d", n);
-        _flowerButton->setTitleText(str);
-    }, nullptr);
 }
 
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
