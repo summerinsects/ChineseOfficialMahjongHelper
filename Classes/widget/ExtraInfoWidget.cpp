@@ -444,11 +444,8 @@ void ExtraInfoWidget::onFlowerButton(cocos2d::Ref *sender) {
 }
 
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10;
-
-    Label *label = Label::createWithSystemFont(
-        "1. 本算番器遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式。\n"
+    AlertView::showWithMessage("使用说明",
+        "1. 本算番器遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式。如果这些争议之处与通行做法不一致，请遵守您所参加的比赛细则中之规定。\n"
         "2. 绿一色、清幺九、混幺九、全大、全中、全小、大于五、小于五均可复合七对。\n"
         "3. 全双刻不可复合七对，对于由仅偶数牌组成的七对，只计七对+断幺。\n"
         "4. 大三元、小三元、三风刻、一色四同顺、一色四节高、一色四步高可计缺一门。\n"
@@ -458,10 +455,7 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
         "8. 必然门前清的番种自摸和牌时只计自摸，不计不求人。如七对、全不靠、七星不靠、十三幺、四暗刻、连七对、九莲宝灯等。\n"
         "9. 不重复原则不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，要计断幺。\n"
         "10. 暗杠的加计遵循国家体育总局社会体育指导中心1999年3月16~19日召开的专家会议讨论结果，详见「番种表」-「32番」-「三杠」。",
-        "Arial", 10);
-    label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0);
-    AlertView::showWithNode("使用说明", label, nullptr, nullptr);
+        10, nullptr, nullptr);
 }
 
 void ExtraInfoWidget::showInputAlert(const char *prevInput) {

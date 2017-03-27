@@ -158,10 +158,7 @@ bool MahjongTheoryScene::init() {
 }
 
 void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10;
-
-    Label *label = Label::createWithSystemFont(
+    AlertView::showWithMessage("使用说明",
         "牌理功能未经严格测试，可能存在bug。\n\n"
         "1." INPUT_GUIDE_STRING_1 "\n"
         "2." INPUT_GUIDE_STRING_2 "\n"
@@ -172,10 +169,8 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
         "7.点击手牌可切出对应牌，随机上牌。\n"
         "输入范例1：[EEEE]288s349pSCFF2p\n"
         "输入范例2：123p 345s 999s 6m6pEW1m\n"
-        "输入范例3：356m18s1579pWNFF9p\n", "Arial", 10);
-    label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0);
-    AlertView::showWithNode("使用说明", label, nullptr, nullptr);
+        "输入范例3：356m18s1579pWNFF9p",
+        10, nullptr, nullptr);
 }
 
 void MahjongTheoryScene::setRandomInput() {
