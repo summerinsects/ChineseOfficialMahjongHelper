@@ -121,7 +121,7 @@ void FanCalculatorScene::calculate() {
 
     int flowerCnt = _extraInfo->getFlowerCount();
     if (flowerCnt > 8) {
-        AlertView::showWithMessage("算番", "花牌数的范围为0~8", nullptr, nullptr);
+        AlertView::showWithMessage("算番", "花牌数的范围为0~8", 12, nullptr, nullptr);
         return;
     }
 
@@ -129,7 +129,7 @@ void FanCalculatorScene::calculate() {
     mahjong::tile_t win_tile;
     _tilePicker->getData(&hand_tiles, &win_tile);
     if (win_tile == 0) {
-        AlertView::showWithMessage("算番", "牌张数错误", nullptr, nullptr);
+        AlertView::showWithMessage("算番", "牌张数错误", 12, nullptr, nullptr);
         return;
     }
 
@@ -159,11 +159,11 @@ void FanCalculatorScene::calculate() {
         return;
     }
     if (fan == ERROR_WRONG_TILES_COUNT) {
-        AlertView::showWithMessage("算番", "牌张数错误", nullptr, nullptr);
+        AlertView::showWithMessage("算番", "牌张数错误", 12, nullptr, nullptr);
         return;
     }
     if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
-        AlertView::showWithMessage("算番", "同一种牌最多只能使用4枚", nullptr, nullptr);
+        AlertView::showWithMessage("算番", "同一种牌最多只能使用4枚", 12, nullptr, nullptr);
         return;
     }
 

@@ -590,7 +590,8 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
 
 void RecordScene::onOkButton(cocos2d::Ref *sender) {
     if (_drawBox->isSelected() && _detail.fan_flag != 0) {
-        AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", [this]() {
+        AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", 12,
+            [this]() {
             _detail.fan_flag = 0;
             _okCallback(_detail);
             Director::getInstance()->popScene();
@@ -698,7 +699,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     CalculateParam temp = { 0 };
     tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
     if (temp.win_tile == 0 && temp.hand_tiles.tile_count == 0 && temp.hand_tiles.pack_count == 0) {
-        AlertView::showWithMessage("记录和牌", "确定不记录和牌吗？",
+        AlertView::showWithMessage("记录和牌", "确定不记录和牌吗？", 12,
             [this]() {
                 memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
                 _detail.fan_flag = 0;
@@ -710,12 +711,12 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
 
     temp.flower_count = extraInfo->getFlowerCount();
     if (temp.flower_count > 8) {
-        AlertView::showWithMessage("记录和牌", "花牌数的范围为0~8", std::bind(&RecordScene::showCalculator, this, param), nullptr);
+        AlertView::showWithMessage("记录和牌", "花牌数的范围为0~8", 12, std::bind(&RecordScene::showCalculator, this, param), nullptr);
         return;
     }
 
     if (temp.win_tile == 0) {
-        AlertView::showWithMessage("记录和牌", "牌张数错误", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        AlertView::showWithMessage("记录和牌", "牌张数错误", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
 
@@ -734,15 +735,15 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     int fan = calculate_fan(&temp.hand_tiles, temp.win_tile, &temp.ext_cond, fan_table);
 
     if (fan == ERROR_NOT_WIN) {
-        AlertView::showWithMessage("记录和牌", "诈和", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        AlertView::showWithMessage("记录和牌", "诈和", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
     if (fan == ERROR_WRONG_TILES_COUNT) {
-        AlertView::showWithMessage("记录和牌", "牌张数错误", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        AlertView::showWithMessage("记录和牌", "牌张数错误", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
     if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
-        AlertView::showWithMessage("记录和牌", "同一种牌最多只能使用4枚", std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        AlertView::showWithMessage("记录和牌", "同一种牌最多只能使用4枚", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
 

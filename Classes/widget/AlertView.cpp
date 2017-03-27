@@ -15,10 +15,10 @@ void AlertView::showWithNode(const std::string &title, cocos2d::Node *node, cons
     CC_SAFE_DELETE(alert);
 }
 
-void AlertView::showWithMessage(const std::string &title, const std::string &message, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
+void AlertView::showWithMessage(const std::string &title, const std::string &message, float fontSize, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float maxWidth = visibleSize.width * 0.8f - 10;
-    Label *label = Label::createWithSystemFont(message, "Arail", 12);
+    Label *label = Label::createWithSystemFont(message, "Arail", fontSize);
     label->setColor(Color3B::BLACK);
     if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
         label->setDimensions(maxWidth, 0);

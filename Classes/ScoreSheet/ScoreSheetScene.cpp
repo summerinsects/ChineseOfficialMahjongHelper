@@ -440,11 +440,11 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *sender, size_t idx) {
     }
     else {
         if (g_currentRecord.current_index < 16) {
-            AlertView::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？",
+            AlertView::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？", 12,
                 std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
         }
         else {
-            AlertView::showWithMessage("提示", "对局已经结束，是否要修改选手姓名？",
+            AlertView::showWithMessage("提示", "对局已经结束，是否要修改选手姓名？", 12,
                 std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
         }
     }
@@ -479,7 +479,7 @@ void ScoreSheetScene::editName(size_t idx) {
 void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
     const char (&name)[4][255] = g_currentRecord.name;
     if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)) {
-        AlertView::showWithMessage("锁定", "请先录入四位参赛选手姓名", nullptr, nullptr);
+        AlertView::showWithMessage("锁定", "请先录入四位参赛选手姓名", 12, nullptr, nullptr);
         return;
     }
 
@@ -604,7 +604,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     const Record::Detail &detail = g_currentRecord.detail[handIdx];
     if (detail.score == 0) {
         AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"),
-            "荒庄。\n\n是否需要修改这盘的记录？",
+            "荒庄。\n\n是否需要修改这盘的记录？", 12,
             std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
         return;
     }
@@ -613,7 +613,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     message.append("\n是否需要修改这盘的记录？");
 
     if (detail.win_hand.tile_count == 0 || detail.win_hand.win_tile == 0) {
-        AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"), message,
+        AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"), message, 12,
             std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
         return;
     }
@@ -708,7 +708,7 @@ void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
             recover();
             return true;
         }
-        AlertView::showWithMessage("提示", "当前一局尚未完成时不支持查看历史记录", nullptr, nullptr);
+        AlertView::showWithMessage("提示", "当前一局尚未完成时不支持查看历史记录", 12, nullptr, nullptr);
         return false;
     }));
 }
@@ -725,13 +725,13 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         return;
     }
 
-    AlertView::showWithMessage("重置", "重置操作会清空当前已记录的信息，未打满北风北的记录将会丢失，确定要这样做吗？",
+    AlertView::showWithMessage("重置", "重置操作会清空当前已记录的信息，未打满北风北的记录将会丢失，确定要这样做吗？", 12,
         std::bind(&ScoreSheetScene::reset, this), nullptr);
 }
 
 static void showPursuit(int delta) {
     if (delta == 0) {
-        AlertView::showWithMessage("追分与保位", "平分", nullptr, nullptr);
+        AlertView::showWithMessage("追分与保位", "平分", 12, nullptr, nullptr);
         return;
     }
 
@@ -775,7 +775,7 @@ static void showPursuit(int delta) {
         }
     }
 
-    AlertView::showWithMessage("追分与保位", msg, nullptr, nullptr);
+    AlertView::showWithMessage("追分与保位", msg, 12, nullptr, nullptr);
 }
 
 static DrawNode *createTable(const int (&totalScores)[4]) {

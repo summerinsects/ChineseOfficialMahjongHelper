@@ -394,12 +394,12 @@ void ExtraInfoWidget::onFlowerButton(cocos2d::Ref *sender) {
         [prevText](ui::EditBox *editBox) {
         int n = atoi(editBox->getText());
         if (n < 0) {
-            AlertView::showWithMessage("提示", "花牌数不得小于0",
+            AlertView::showWithMessage("提示", "花牌数不得小于0", 12,
                 std::bind(&ui::EditBox::setText, editBox, "0"),
                 std::bind(&ui::EditBox::setText, editBox, prevText.c_str()));
         }
         else if (n > 8) {
-            AlertView::showWithMessage("提示", "花牌数不得超过8",
+            AlertView::showWithMessage("提示", "花牌数不得超过8", 12,
                 std::bind(&ui::EditBox::setText, editBox, "8"),
                 std::bind(&ui::EditBox::setText, editBox, prevText.c_str()));
         }
@@ -547,7 +547,7 @@ void ExtraInfoWidget::parseInput(const char *input) {
     } while (0);
 
     if (errorStr != nullptr) {
-        AlertView::showWithMessage("直接输入牌", errorStr, [this, str]() {
+        AlertView::showWithMessage("直接输入牌", errorStr, 12, [this, str]() {
             showInputAlert(str.c_str());
         }, nullptr);
     }
