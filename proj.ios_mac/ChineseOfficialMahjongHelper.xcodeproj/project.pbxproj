@@ -346,11 +346,11 @@
 			children = (
 				1FDD943C1C8337140031BC38 /* fan_calculator.cpp */,
 				1FDD943D1C8337140031BC38 /* fan_calculator.h */,
+				1FDD943F1C8337140031BC38 /* shanten.cpp */,
+				1FDD94401C8337140031BC38 /* shanten.h */,
 				1F154E3F1E440A160083F8B3 /* stringify.cpp */,
 				1F154E401E440A160083F8B3 /* stringify.h */,
 				1FDD943E1C8337140031BC38 /* tile.h */,
-				1FDD943F1C8337140031BC38 /* shanten.cpp */,
-				1FDD94401C8337140031BC38 /* shanten.h */,
 			);
 			path = "mahjong-algorithm";
 			sourceTree = "<group>";
