@@ -69,10 +69,10 @@ bool MahjongTheoryScene::init() {
     if (widgetSize.width - 4 > visibleSize.width) {
         float scale = (visibleSize.width - 4) / widgetSize.width;
         _handTilesWidget->setScale(scale);
-        widgetSize.width *= scale;
+        widgetSize.width = visibleSize.width - 4;
         widgetSize.height *= scale;
     }
-    _handTilesWidget->setPosition(Vec2(origin.x + widgetSize.width * 0.5f, origin.y + visibleSize.height - 65 - widgetSize.height * 0.5f));
+    _handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 65 - widgetSize.height * 0.5f));
 
     _undoButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     _undoButton->setScale9Enabled(true);
