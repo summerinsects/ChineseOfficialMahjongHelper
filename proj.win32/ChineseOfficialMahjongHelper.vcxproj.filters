@@ -90,6 +90,9 @@
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\widget\TilesKeyboard.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -169,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\TilesImage.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\TilesKeyboard.h">
+      <Filter>src\widget</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

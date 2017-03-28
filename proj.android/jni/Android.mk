@@ -28,6 +28,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/widget/ExtraInfoWidget.cpp \
                    ../../Classes/widget/HandTilesWidget.cpp \
                    ../../Classes/widget/TilePickWidget.cpp \
+                   ../../Classes/widget/TilesKeyboard.cpp \
                    ../../Classes/AppDelegate.cpp \
                    ../../Classes/HelloWorldScene.cpp
 
