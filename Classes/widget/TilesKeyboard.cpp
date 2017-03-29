@@ -100,7 +100,7 @@ bool TilesKeyboard::init() {
 
 void TilesKeyboard::onKeyboardButton(cocos2d::Ref *sender) {
     const std::string &originText = _textLabel->getString();
-    Keyboard n = (Keyboard)reinterpret_cast<int>(((ui::Button *)sender)->getUserData());
+    Keyboard n = (Keyboard)reinterpret_cast<intptr_t>(((ui::Button *)sender)->getUserData());
     switch (n) {
     case KEY_1: case KEY_2: case KEY_3:
     case KEY_4: case KEY_5: case KEY_6:
