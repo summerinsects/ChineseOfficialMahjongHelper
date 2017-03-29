@@ -330,7 +330,7 @@ void TilesKeyboard::onBackspace() {
 
 void TilesKeyboard::onSpace() {
     const std::string &originText = _textLabel->getString();
-    if (!originText.empty() && originText.back() == ' ') {
+    if (originText.empty() || isdigit(originText.back()) || originText.back() == ' ') {
         return;
     }
 
