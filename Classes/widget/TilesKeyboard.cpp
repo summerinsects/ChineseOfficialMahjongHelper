@@ -39,23 +39,37 @@ bool TilesKeyboard::init() {
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
+    // 监听返回键
+    EventListenerKeyboard *keyboardListener = EventListenerKeyboard::create();
+    keyboardListener->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event *event) {
+        if (keyCode == EventKeyboard::KeyCode::KEY_BACK) {
+            event->stopPropagation();
+            this->removeFromParent();
+        }
+    };
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener, this);
+
     const int width = BUTTON_WIDTH * 5 + GAP * 6;
     const int buttonAreaHeight = BUTTON_HEIGHT * 5 + GAP * 6;
     const int height = buttonAreaHeight + 12 + TILE_HEIGHT;
 
+    // 背景
     LayerColor *background = LayerColor::create(Color4B::GRAY, width, height);
     background->setIgnoreAnchorPointForPosition(false);
 
+    // 文本
     _textLabel = Label::createWithSystemFont("", "Arial", 10);
     background->addChild(_textLabel);
     _textLabel->setPosition(Vec2(width * 0.5f, height - TILE_HEIGHT - 6));
 
+    // 牌的根结点
     _tilesContainer = Node::create();
     _tilesContainer->setIgnoreAnchorPointForPosition(false);
     _tilesContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     background->addChild(_tilesContainer);
     _tilesContainer->setPosition(Vec2(width * 0.5f, height - TILE_HEIGHT * 0.5f));
 
+    // 排列按钮
     for (int i = 0; i < 24; ++i) {
         Keyboard key = keyIdx[i];
         div_t ret = div(i, 5);
@@ -78,6 +92,7 @@ bool TilesKeyboard::init() {
         button->addClickEventListener(std::bind(&TilesKeyboard::onKeyboardButton, this, std::placeholders::_1));
     }
 
+    // 缩放背景
     this->addChild(background);
     Size bgSize = background->getContentSize();
     if (bgSize.width > visibleSize.width) {
@@ -92,6 +107,21 @@ bool TilesKeyboard::init() {
 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     background->setPosition(Vec2(origin.x + bgSize.width * 0.5f, origin.y + bgSize.height * 0.5f));
+
+    // 触摸监听，点击background以外的部分按按下取消键处理
+    EventListenerTouchOneByOne *touchListener = EventListenerTouchOneByOne::create();
+    touchListener->setSwallowTouches(true);
+    touchListener->onTouchBegan = [this, background](Touch *touch, Event *event) {
+        Vec2 pos = this->convertTouchToNodeSpace(touch);
+        if (background->getBoundingBox().containsPoint(pos)) {
+            return true;
+        }
+        event->stopPropagation();
+        this->removeFromParent();
+        return true;
+    };
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
+    _touchListener = touchListener;
 
     _tilesSprite.reserve(18);
 
