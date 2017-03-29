@@ -54,11 +54,11 @@ bool TilesKeyboard::init() {
     const int height = buttonAreaHeight + 12 + TILE_HEIGHT;
 
     // 背景
-    LayerColor *background = LayerColor::create(Color4B::GRAY, width, height);
+    LayerColor *background = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0xFF), width, height);
     background->setIgnoreAnchorPointForPosition(false);
 
     // 文本
-    _textLabel = Label::createWithSystemFont("", "Arial", 10);
+    _textLabel = Label::createWithSystemFont("", "Arial", 12);
     background->addChild(_textLabel);
     _textLabel->setPosition(Vec2(width * 0.5f, height - TILE_HEIGHT - 6));
 
@@ -176,6 +176,7 @@ void TilesKeyboard::addTiles(const mahjong::tile_t *tiles, size_t count) {
     for (size_t i = 0; i < count; ++i) {
         Sprite *sprite = Sprite::create(tilesImageName[tiles[i]]);
         sprite->setScale(contentScaleFactor);
+        sprite->setColor(_inBracket ? Color3B(51, 204, 255) : Color3B::WHITE);
         _tilesContainer->addChild(sprite);
         sprite->setPosition(Vec2(containerSize.width + TILE_WIDTH * (i + 0.5f), TILE_HEIGHT * 0.5f));
         _tilesSprite.push_back(sprite);
