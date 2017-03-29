@@ -19,9 +19,9 @@ enum Keyboard {
 static const char *buttonFace[] = {
     "OK",
     "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "m", "s", "p",
-    "E", "S", "W", "N", "C", "F", "P",
-    "_", "[", "]", "\xE2\x9D\x8C"
+    "万", "条", "饼",
+    "东", "南", "西", "北", "中", "发", "白",
+    "空格", "[", "]", "\xE2\x9D\x8C"
 };
 
 static const Keyboard keyIdx[] = {
