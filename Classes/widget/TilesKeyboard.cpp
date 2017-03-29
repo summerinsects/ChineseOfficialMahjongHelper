@@ -130,6 +130,10 @@ void TilesKeyboard::onKeyboardButton(cocos2d::Ref *sender) {
         onRightBracket();
         break;
     case KEY_OK:
+        if (_returnCallback) {
+            _returnCallback(_textLabel->getString());
+        }
+        this->removeFromParent();
         break;
     default:
         break;

@@ -9,6 +9,8 @@ class TilesKeyboard : public cocos2d::Layer {
 public:
     CREATE_FUNC(TilesKeyboard);
 
+    void setReturnCallback(const std::function<void (const std::string &)> &callback) { _returnCallback = callback; }
+
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
@@ -31,6 +33,8 @@ private:
     cocos2d::Node *_tilesContainer = nullptr;
     std::vector<cocos2d::Sprite *> _tilesSprite;
     bool _inBracket = false;
+
+    std::function<void (const std::string &)> _returnCallback;
 };
 
 #endif
