@@ -280,9 +280,11 @@ void TilesKeyboard::onBackspace() {
         break;
     case '[':
         _inBracket = false;
+        removeSpaceTile();
         break;
     case ']':
         _inBracket = true;
+        removeSpaceTile();
         break;
     case ' ':
         removeSpaceTile();
@@ -319,6 +321,8 @@ void TilesKeyboard::onLeftBracket() {
     std::string str = _textLabel->getString();
     str.append(1, '[');
     _textLabel->setString(str);
+
+    addSpaceTile();
 }
 
 void TilesKeyboard::onRightBracket() {
@@ -335,4 +339,6 @@ void TilesKeyboard::onRightBracket() {
     std::string str = _textLabel->getString();
     str.append(1, ']');
     _textLabel->setString(str);
+
+    addSpaceTile();
 }
