@@ -11,6 +11,7 @@
 #include "../widget/HandTilesWidget.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
+#include "../widget/TilesKeyboard.h"
 
 USING_NS_CC;
 
@@ -41,6 +42,8 @@ bool MahjongTheoryScene::init() {
     _editBox->setPlaceHolder("在此处输入");
     _editBox->setDelegate(this);
     _editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40, origin.y + visibleSize.height - 50));
+
+    TilesKeyboard::hookEditBox(_editBox);
 
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
@@ -294,7 +297,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
 
     if (errorStr != nullptr) {
         AlertView::showWithMessage("提示", errorStr, 12, [this]() {
-            _editBox->touchDownAction(_editBox, ui::Widget::TouchEventType::ENDED);
+            TilesKeyboard::showByEditBox(_editBox);
         }, nullptr);
     }
     return false;

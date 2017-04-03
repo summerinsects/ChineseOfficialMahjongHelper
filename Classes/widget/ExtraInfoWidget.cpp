@@ -2,8 +2,8 @@
 #include "../compiler.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
-#include "../widget/AlertView.h"
-#include "../widget/CWEditBoxDelegate.h"
+#include "AlertView.h"
+#include "TilesKeyboard.h"
 
 USING_NS_CC;
 
@@ -446,7 +446,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     if (prevInput != nullptr) {
         editBox->setText(prevInput);
     }
-
+    TilesKeyboard::hookEditBox(editBox);
     rootWidget->addChild(editBox);
 
     const Size &labelSize = label->getContentSize();

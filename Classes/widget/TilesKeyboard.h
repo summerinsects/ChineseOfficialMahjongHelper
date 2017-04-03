@@ -7,21 +7,31 @@
 
 class TilesKeyboard : public cocos2d::Layer {
 public:
-    CREATE_FUNC(TilesKeyboard);
+    static void hookEditBox(cocos2d::ui::EditBox *editBox);
+    static void showByEditBox(cocos2d::ui::EditBox *editBox);
 
-    void setReturnCallback(const std::function<void (const std::string &)> &callback) { _returnCallback = callback; }
+    CREATE_FUNC(TilesKeyboard);
 
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
 private:
+    enum class DismissEvent {
+        OK, CANCEL, GLOBAL
+    };
+
+    void associateWithEditBox(cocos2d::ui::EditBox *editBox);
+
     void onKeyboardButton(cocos2d::Ref *sender);
+
+    void setTilesText(const char *text);
 
     void addTiles(const mahjong::tile_t *tiles, size_t count);
     void removeTiles(size_t count);
     void addSpaceTile();
     void removeSpaceTile();
 
+    void dismissWithEvent(DismissEvent event);
     void onNumberedSuffix(int suit);
     void onHonor(int honor);
     void onBackspace();
@@ -29,12 +39,16 @@ private:
     void onLeftBracket();
     void onRightBracket();
 
-    cocos2d::Label *_textLabel = nullptr;
+    std::string _tilesText;
+
+    cocos2d::LayerColor *_background = nullptr;
     cocos2d::Node *_tilesContainer = nullptr;
     std::vector<cocos2d::Sprite *> _tilesSprite;
+
     bool _inBracket = false;
 
-    std::function<void (const std::string &)> _returnCallback;
+    std::function<void (const char *)> _onTextChange;
+    std::function<void (DismissEvent)> _onDismiss;
 };
 
 #endif
