@@ -56,7 +56,7 @@ bool TilesKeyboard::init() {
     const int height = buttonAreaHeight + TILE_HEIGHT;
 
     // 背景
-    LayerColor *background = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0xFF), width, height);
+    LayerColor *background = LayerColor::create(Color4B(38, 50, 56, 0xFF), width, height);
     background->setIgnoreAnchorPointForPosition(false);
 
     // 牌的根结点
