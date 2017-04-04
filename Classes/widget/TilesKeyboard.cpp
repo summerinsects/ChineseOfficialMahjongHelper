@@ -52,7 +52,7 @@ bool TilesKeyboard::init() {
     _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener, this);
 
     const int width = BUTTON_WIDTH * 5 + GAP * 6;
-    const int buttonAreaHeight = BUTTON_HEIGHT * 5 + GAP * 6;
+    const int buttonAreaHeight = BUTTON_HEIGHT * 5 + GAP * 7;
     const int height = buttonAreaHeight + TILE_HEIGHT;
 
     // 背景
@@ -64,7 +64,7 @@ bool TilesKeyboard::init() {
     _tilesContainer->setIgnoreAnchorPointForPosition(false);
     _tilesContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     background->addChild(_tilesContainer);
-    _tilesContainer->setPosition(Vec2(width * 0.5f, height - TILE_HEIGHT * 0.5f));
+    _tilesContainer->setPosition(Vec2(width * 0.5f, height - TILE_HEIGHT * 0.5f - GAP));
 
     // 排列按钮
     for (int i = 0; i < 25; ++i) {
