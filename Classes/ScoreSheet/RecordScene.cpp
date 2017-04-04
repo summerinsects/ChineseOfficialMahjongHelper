@@ -6,7 +6,7 @@
 #include "../common.h"
 #include "../widget/AlertView.h"
 #include "../widget/CWTableView.h"
-#include "../widget/TilePickWidget.h"
+#include "../widget/HandTilesWidget.h"
 #include "../widget/ExtraInfoWidget.h"
 
 USING_NS_CC;
@@ -636,7 +636,7 @@ void RecordScene::showCalculator(const CalculateParam &param) {
     const float maxWidth = visibleSize.width - 20;
 
     // 选牌面板和其他信息的相关控件
-    TilePickWidget *tilePicker = TilePickWidget::create();
+    HandTilesWidget *handTiles = HandTilesWidget::create();
     ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
 
     extraInfo->setFlowerCount(param.flower_count);
@@ -655,26 +655,23 @@ void RecordScene::showCalculator(const CalculateParam &param) {
         extraInfo->setWinFlag(claimIndex != winIndex ? WIN_FLAG_DISCARD : WIN_FLAG_SELF_DRAWN);
     }
 
-    // 设置回调函数
-    tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {
-        extraInfo->refreshByKong(tilePicker->isFixedPacksContainsKong());
-    });
+    extraInfo->setParseCallback(std::bind(&HandTilesWidget::setData, handTiles, std::placeholders::_1, std::placeholders::_2));
 
-    tilePicker->setWinTileChangedCallback([tilePicker, extraInfo]() {
+    extraInfo->setParseCallback([handTiles, extraInfo](const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t serving_tile) {
+        handTiles->setData(hand_tiles, serving_tile);
+
         ExtraInfoWidget::RefreshByWinTile rt;
-        rt.getWinTile = std::bind(&TilePickWidget::getServingTile, tilePicker);
-        rt.isStandingTilesContainsServingTile = std::bind(&TilePickWidget::isStandingTilesContainsServingTile, tilePicker);
-        rt.countServingTileInFixedPacks = std::bind(&TilePickWidget::countServingTileInFixedPacks, tilePicker);
+        rt.getWinTile = std::bind(&HandTilesWidget::getServingTile, handTiles);
+        rt.isStandingTilesContainsServingTile = std::bind(&HandTilesWidget::isStandingTilesContainsServingTile, handTiles);
+        rt.countServingTileInFixedPacks = std::bind(&HandTilesWidget::countServingTileInFixedPacks, handTiles);
         extraInfo->refreshByWinTile(rt);
     });
 
-    extraInfo->setParseCallback(std::bind(&TilePickWidget::setData, tilePicker, std::placeholders::_1, std::placeholders::_2));
-
     // 缩放
-    Size tilePickerSize = tilePicker->getContentSize();
-    const float tilePickerScale = maxWidth / tilePickerSize.width;
-    tilePicker->setScale(tilePickerScale);
-    tilePickerSize = Size(maxWidth, tilePickerSize.height * tilePickerScale);
+    Size handTilesSize = handTiles->getContentSize();
+    const float handTilesScale = maxWidth / handTilesSize.width;
+    handTiles->setScale(handTilesScale);
+    handTilesSize = Size(maxWidth, handTilesSize.height * handTilesScale);
 
     Size extraInfoSize = extraInfo->getContentSize();
     const float extraInfoScale = maxWidth / extraInfoSize.width;
@@ -683,27 +680,27 @@ void RecordScene::showCalculator(const CalculateParam &param) {
 
     // 布局在rootWidget上
     ui::Widget *rootWidget = ui::Widget::create();
-    rootWidget->setContentSize(Size(maxWidth, tilePickerSize.height + extraInfoSize.height + 5));
-    rootWidget->addChild(tilePicker);
-    tilePicker->setPosition(Vec2(maxWidth * 0.5f, tilePickerSize.height * 0.5f + extraInfoSize.height + 5));
+    rootWidget->setContentSize(Size(maxWidth, handTilesSize.height + extraInfoSize.height + 5));
+    rootWidget->addChild(handTiles);
+    handTiles->setPosition(Vec2(maxWidth * 0.5f, handTilesSize.height * 0.5f + extraInfoSize.height + 5));
     rootWidget->addChild(extraInfo);
     extraInfo->setPosition(Vec2(maxWidth * 0.5f, extraInfoSize.height * 0.5f));
 
     if (param.hand_tiles.tile_count != 0 && param.win_tile != 0) {
-        tilePicker->setData(param.hand_tiles, param.win_tile);
+        handTiles->setData(param.hand_tiles, param.win_tile);
     }
 
     // 通过AlertView显示出来
     AlertView::showWithNode("记录和牌", rootWidget, maxWidth,
-        std::bind(&RecordScene::calculate, this, tilePicker, extraInfo, param), nullptr);
+        std::bind(&RecordScene::calculate, this, handTiles, extraInfo, param), nullptr);
 }
 
 // in FanCalculatorScene.cpp
 cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SIZE], int fontSize, float resultAreaWidth);
 
-void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const CalculateParam &param) {
+void RecordScene::calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraInfo, const CalculateParam &param) {
     CalculateParam temp = { 0 };
-    tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
+    handTiles->getData(&temp.hand_tiles, &temp.win_tile);
     if (temp.win_tile == 0 && temp.hand_tiles.tile_count == 0 && temp.hand_tiles.pack_count == 0) {
         AlertView::showWithMessage("记录和牌", "确定不记录和牌吗？", 12,
             [this]() {

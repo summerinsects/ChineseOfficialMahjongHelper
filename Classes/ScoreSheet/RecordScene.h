@@ -19,7 +19,7 @@ static const char *handNameText[] = {
 
 #define EMOJI_FLOWER_8 EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER
 
-class TilePickWidget;
+class HandTilesWidget;
 class ExtraInfoWidget;
 
 class RecordScene : public BaseLayer, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
@@ -78,7 +78,7 @@ private:
     void onOkButton(cocos2d::Ref *sender);
 
     void showCalculator(const CalculateParam &param);
-    void calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const CalculateParam &param);
+    void calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraInfo, const CalculateParam &param);
 };
 
 #endif
