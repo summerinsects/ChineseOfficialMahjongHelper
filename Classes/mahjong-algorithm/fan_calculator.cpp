@@ -631,15 +631,15 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, long (&fan_
 
     // 规则
     // 三杠
-    // 明杠 明杠 暗杠 暗刻 -> 三杠+暗杠+双暗刻+碰碰和
-    // 明杠 暗杠 暗杠 明刻 -> 三杠+双暗杠+碰碰和
-    // 明杠 暗杠 暗杠 暗刻 -> 三杠+三暗刻+双暗杠+碰碰和
+    // 明杠 明杠 暗杠 暗刻 -> 三杠+双暗刻+碰碰和
+    // 明杠 暗杠 暗杠 明刻 -> 三杠+双暗刻+碰碰和
+    // 明杠 暗杠 暗杠 暗刻 -> 三杠+三暗刻+碰碰和
     // 暗杠 暗杠 暗杠 明刻 -> 三杠+三暗刻+碰碰和
     // 暗杠 暗杠 暗杠 暗刻 -> 三杠+四暗刻
     //
     // 四杠
-    // 暗杠 明杠 明杠 明杠 -> 四杠+暗杠
-    // 暗杠 暗杠 明杠 明杠 -> 四杠+双暗杠
+    // 暗杠 明杠 明杠 明杠 -> 四杠
+    // 暗杠 暗杠 明杠 明杠 -> 四杠+双暗刻
     // 暗杠 暗杠 暗杠 明杠 -> 四杠+三暗刻
     // 暗杠 暗杠 暗杠 暗杠 -> 四杠+四暗刻
     //
@@ -722,21 +722,13 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, long (&fan_
         switch (concealed_kong_cnt) {  // 暗刻的个数
         case 0: break;
         case 1:
-            if (concealed_pung_cnt == 0) {
-                fan_table[CONCEALED_KONG] = 1;
-            }
-            else {
-                fan_table[CONCEALED_KONG] = 1;
+            if (concealed_pung_cnt > 0) {
                 fan_table[TWO_CONCEALED_PUNGS] = 1;
             }
             break;
         case 2:
-            if (concealed_pung_cnt == 0) {
-                fan_table[TWO_CONCEALED_KONGS] = 1;
-            }
-            else {
+            if (concealed_pung_cnt > 0) {
                 fan_table[THREE_CONCEALED_PUNGS] = 1;
-                fan_table[TWO_CONCEALED_KONGS] = 1;
             }
             break;
         case 3:
@@ -756,8 +748,8 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, long (&fan_
         fan_table[FOUR_KONGS] = 1;
         switch (concealed_kong_cnt) {
         case 0: break;
-        case 1: fan_table[CONCEALED_KONG] = 1; break;
-        case 2: fan_table[TWO_CONCEALED_KONGS] = 1; break;
+        case 1: break;
+        case 2: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
         case 3: fan_table[THREE_CONCEALED_PUNGS] = 1; break;
         case 4: fan_table[FOUR_CONCEALED_PUNGS] = 1; break;
         default: assert(0); break;
