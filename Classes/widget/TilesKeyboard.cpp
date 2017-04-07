@@ -83,6 +83,20 @@ bool TilesKeyboard::init() {
         button->addClickEventListener(std::bind(&TilesKeyboard::onKeyboardButton, this, std::placeholders::_1));
     }
 
+    // 输入文本的背景
+    LayerColor *inputBg = LayerColor::create(Color4B(38, 50, 56, 224), 0, 16);
+    _inputBg = inputBg;
+    background->addChild(inputBg);
+    inputBg->setPosition(Vec2(0, height));
+
+    // 输入文本
+    Label *inputLabel = Label::createWithSystemFont("", "Arial", 12);
+    inputBg->addChild(inputLabel);
+    inputLabel->setColor(Color3B(120, 188, 183));
+    inputLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    inputLabel->setPosition(Vec2(GAP, 8));
+    _inputLabel = inputLabel;
+
     // 缩放背景
     this->addChild(background);
     Size bgSize = background->getContentSize();
@@ -127,7 +141,7 @@ void TilesKeyboard::onKeyboardButton(cocos2d::Ref *sender) {
     case KEY_4: case KEY_5: case KEY_6:
     case KEY_7: case KEY_8: case KEY_9: {
         _tilesText.append(1, '0' + n);
-        _onTextChange(_tilesText.c_str());
+        refreshInputLabel();
         break;
     }
     case KEY_m: case KEY_s: case KEY_p:
@@ -161,6 +175,18 @@ void TilesKeyboard::onKeyboardButton(cocos2d::Ref *sender) {
     }
 }
 
+void TilesKeyboard::refreshInputLabel() {
+    _inputLabel->setString(_tilesText);
+    if (UNLIKELY(_tilesText.empty())) {
+        _inputBg->setContentSize(Size(0, 16));
+    }
+    else {
+        _inputBg->setContentSize(Size(GAP * 2 + _inputLabel->getContentSize().width, 16));
+    }
+
+    _onTextChange(_tilesText.c_str());
+}
+
 void TilesKeyboard::setTilesText(const char *text) {
     for (char ch = *text; ch != '\0'; ++text, ch = *text) {
         switch (ch) {
@@ -168,7 +194,7 @@ void TilesKeyboard::setTilesText(const char *text) {
         case '4': case '5': case '6':
         case '7': case '8': case '9':
             _tilesText.append(1, ch);
-            _onTextChange(_tilesText.c_str());
+            refreshInputLabel();
             break;
         case 'm': onNumberedSuffix(0); break;
         case 's': onNumberedSuffix(1); break;
@@ -293,7 +319,7 @@ void TilesKeyboard::onNumberedSuffix(int suit) {
 
     const char *suitFace = "msp";
     _tilesText.append(1, suitFace[suit]);
-    _onTextChange(_tilesText.c_str());
+    refreshInputLabel();
 
     std::vector<mahjong::tile_t> tiles;
     for (size_t i = lastSuffixPos; i < len; ++i) {
@@ -309,7 +335,7 @@ void TilesKeyboard::onHonor(int honor) {
 
     const char *honorFace = "ESWNCFP";
     _tilesText.append(1, honorFace[honor]);
-    _onTextChange(_tilesText.c_str());
+    refreshInputLabel();
 
     mahjong::tile_t tile = mahjong::TILE_E + honor;
     addTiles(&tile, 1);
@@ -322,7 +348,7 @@ void TilesKeyboard::onBackspace() {
 
     char ch = _tilesText.back();
     _tilesText.pop_back();
-    _onTextChange(_tilesText.c_str());
+    refreshInputLabel();
 
     switch (ch) {
     case 'm': case 's': case 'p': {
@@ -358,7 +384,7 @@ void TilesKeyboard::onSpace() {
     }
 
     _tilesText.append(1, ' ');
-    _onTextChange(_tilesText.c_str());
+    refreshInputLabel();
 
     addSpaceTile();
 }
@@ -374,7 +400,7 @@ void TilesKeyboard::onLeftBracket() {
 
     _inBracket = true;
     _tilesText.append(1, '[');
-    _onTextChange(_tilesText.c_str());
+    refreshInputLabel();
 
     addSpaceTile();
 }
@@ -390,7 +416,7 @@ void TilesKeyboard::onRightBracket() {
 
     _inBracket = false;
     _tilesText.append(1, ']');
-    _onTextChange(_tilesText.c_str());
+    refreshInputLabel();
 
     addSpaceTile();
 }

@@ -24,6 +24,7 @@ private:
 
     void onKeyboardButton(cocos2d::Ref *sender);
 
+    void refreshInputLabel();
     void setTilesText(const char *text);
 
     void addTiles(const mahjong::tile_t *tiles, size_t count);
@@ -42,6 +43,8 @@ private:
     std::string _tilesText;
 
     cocos2d::LayerColor *_background = nullptr;
+    cocos2d::Label *_inputLabel = nullptr;
+    cocos2d::LayerColor *_inputBg = nullptr;
     cocos2d::Node *_tilesContainer = nullptr;
     std::vector<cocos2d::Sprite *> _tilesSprite;
 
