@@ -349,7 +349,7 @@ static int basic_type_shanten_from_table(int (&cnt_table)[TILE_TABLE_SIZE], long
     // 穷举所有的牌，获取能减少上听数的牌
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
-        if (cnt_table[t] == 4) {
+        if (cnt_table[t] == 4 && result > 0) {
             continue;
         }
 
