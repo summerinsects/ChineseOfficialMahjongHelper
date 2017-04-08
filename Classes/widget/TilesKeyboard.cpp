@@ -26,7 +26,7 @@ static const char *buttonFace[] = {
     "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "万 m", "条 s", "饼 p",
     "东 E", "南 S", "西 W", "北 N", "中 C", "发 F", "白 P",
-    "[", "空格", "]", "\xE2\x9D\x8C", "\xF0\x9F\x8C\x90"
+    "[", "", "]", "\xE2\x9D\x8C", "\xF0\x9F\x8C\x90"
 };
 
 static const Keyboard keyIdx[] = {
