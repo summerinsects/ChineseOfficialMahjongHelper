@@ -8,6 +8,9 @@ USING_NS_CC;
 #define BUTTON_HEIGHT 35
 #define GAP 4
 
+#define INPUT_GAP 8
+#define INPUT_HEIGHT 20
+
 #define MOVE_DURATION 0.2f
 
 enum Keyboard {
@@ -52,74 +55,87 @@ bool TilesKeyboard::init() {
     _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener, this);
 
     const int width = BUTTON_WIDTH * 5 + GAP * 6;
-    const int buttonAreaHeight = BUTTON_HEIGHT * 5 + GAP * 7;
-    const int height = buttonAreaHeight + TILE_HEIGHT;
+    const int buttonAreaHeight = BUTTON_HEIGHT * 5 + GAP * 6;
+    const int height = buttonAreaHeight + TILE_HEIGHT + GAP * 2;
+
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(width, height));
+    rootNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 
     // 背景
-    LayerColor *background = LayerColor::create(Color4B(38, 50, 56, 0xFF), width, height);
-    background->setIgnoreAnchorPointForPosition(false);
+    LayerColor *background = LayerColor::create(Color4B(238, 238, 238, 0xFF), width, buttonAreaHeight);
+    rootNode->addChild(background);
+
+    background = LayerColor::create(Color4B(224, 224, 224, 0xFF), width, TILE_HEIGHT + GAP * 2);
+    rootNode->addChild(background);
+    background->setPosition(Vec2(0, buttonAreaHeight));
 
     // 牌的根结点
     _tilesContainer = Node::create();
     _tilesContainer->setIgnoreAnchorPointForPosition(false);
     _tilesContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    background->addChild(_tilesContainer);
+    rootNode->addChild(_tilesContainer);
     _tilesContainer->setPosition(Vec2(width * 0.5f, height - TILE_HEIGHT * 0.5f - GAP));
 
     // 排列按钮
+    ui::Button *buttons[25];
     for (int i = 0; i < 25; ++i) {
         Keyboard key = keyIdx[i];
         div_t ret = div(i, 5);
         int x = ret.rem;
         int y = ret.quot;
-        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-        background->addChild(button);
+        ui::Button *button = ui::Button::create("source_material/tabBar_selected_bg.png");
+        rootNode->addChild(button);
         button->setScale9Enabled(true);
-        button->setTitleFontSize(20);
+        button->setTitleFontSize(18);
+        button->setTitleColor(Color3B::BLACK);
         button->setTitleText(buttonFace[key]);
         button->setContentSize(Size(BUTTON_WIDTH, BUTTON_HEIGHT));
         button->setPosition(Vec2(BUTTON_WIDTH * (x + 0.5f) + GAP * (x + 1), BUTTON_HEIGHT * (5 - y - 0.5f) + GAP * (5 - y)));
         button->setUserData(reinterpret_cast<void *>(key));
         button->addClickEventListener(std::bind(&TilesKeyboard::onKeyboardButton, this, std::placeholders::_1));
+        buttons[i] = button;
     }
+    buttons[24]->loadTextureNormal("source_material/btn_square_highlighted.png");
+    buttons[24]->setTitleColor(Color3B::WHITE);
 
     // 输入文本的背景
-    LayerColor *inputBg = LayerColor::create(Color4B(38, 50, 56, 224), 0, 16);
+    LayerColor *inputBg = LayerColor::create(Color4B(238, 238, 238, 238), 0, INPUT_HEIGHT);
     _inputBg = inputBg;
-    background->addChild(inputBg);
+    rootNode->addChild(inputBg);
     inputBg->setPosition(Vec2(0, height));
 
     // 输入文本
     Label *inputLabel = Label::createWithSystemFont("", "Arial", 12);
     inputBg->addChild(inputLabel);
-    inputLabel->setColor(Color3B(120, 188, 183));
+    inputLabel->setColor(Color3B::BLACK);
     inputLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    inputLabel->setPosition(Vec2(GAP, 8));
+    inputLabel->setPosition(Vec2(INPUT_GAP, INPUT_HEIGHT / 2));
     _inputLabel = inputLabel;
 
-    // 缩放背景
-    this->addChild(background);
-    Size bgSize = background->getContentSize();
-    if (bgSize.width > visibleSize.width) {
-        const float scale = visibleSize.width / bgSize.width;
-        background->setScale(scale);
-        bgSize.width = visibleSize.width;
-        bgSize.height *= scale;
+    // 缩放
+    this->addChild(rootNode);
+    Size rootSize = rootNode->getContentSize();
+    if (rootSize.width > visibleSize.width) {
+        const float scale = visibleSize.width / rootSize.width;
+        rootNode->setScale(scale);
+        rootSize.width = visibleSize.width;
+        rootSize.height *= scale;
     }
     else {
-        bgSize.width = visibleSize.width;
+        rootSize.width = visibleSize.width;
     }
 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    background->setPosition(Vec2(origin.x + bgSize.width * 0.5f, origin.y + bgSize.height * 0.5f));
-    _background = background;
+    rootNode->setPosition(Vec2(origin.x + rootSize.width * 0.5f, origin.y + rootSize.height * 0.5f));
+    _rootNode = rootNode;
 
     // 触摸监听，点击background以外的部分按按下取消键处理
     EventListenerTouchOneByOne *touchListener = EventListenerTouchOneByOne::create();
     touchListener->setSwallowTouches(true);
     touchListener->onTouchBegan = [this](Touch *touch, Event *event) {
         Vec2 pos = this->convertTouchToNodeSpace(touch);
-        if (_background->getBoundingBox().containsPoint(pos)) {
+        if (_rootNode->getBoundingBox().containsPoint(pos)) {
             return true;
         }
         event->stopPropagation();
@@ -178,10 +194,10 @@ void TilesKeyboard::onKeyboardButton(cocos2d::Ref *sender) {
 void TilesKeyboard::refreshInputLabel() {
     _inputLabel->setString(_tilesText);
     if (UNLIKELY(_tilesText.empty())) {
-        _inputBg->setContentSize(Size(0, 16));
+        _inputBg->setContentSize(Size(0, INPUT_HEIGHT));
     }
     else {
-        _inputBg->setContentSize(Size(GAP * 2 + _inputLabel->getContentSize().width, 16));
+        _inputBg->setContentSize(Size(INPUT_GAP * 2 + _inputLabel->getContentSize().width, INPUT_HEIGHT));
     }
 
     _onTextChange(_tilesText.c_str());
@@ -220,8 +236,8 @@ void TilesKeyboard::dismissWithEvent(DismissEvent event) {
     }
 
     _onDismiss(event);
-    _background->runAction(
-        MoveBy::create(MOVE_DURATION, Vec2(0, -_background->getContentSize().height * _background->getScale())));
+    _rootNode->runAction(
+        MoveBy::create(MOVE_DURATION, Vec2(0, -_rootNode->getContentSize().height * _rootNode->getScale())));
     this->runAction(Sequence::create(DelayTime::create(MOVE_DURATION), RemoveSelf::create(), nullptr));
 }
 
@@ -447,7 +463,7 @@ void TilesKeyboard::showByEditBox(cocos2d::ui::EditBox *editBox) {
 }
 
 void TilesKeyboard::associateWithEditBox(cocos2d::ui::EditBox *editBox) {
-    Vec2 keyboardTopPos = _background->convertToWorldSpace(_background->getContentSize());
+    Vec2 keyboardTopPos = _rootNode->convertToWorldSpace(_rootNode->getContentSize());
     Vec2 editBottomPos = editBox->convertToWorldSpace(Vec2::ZERO);
     float delta = editBottomPos.y - keyboardTopPos.y;
     Node *movedNode = editBox->getParent();
