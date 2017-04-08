@@ -18,7 +18,7 @@ namespace mahjong {
 #define PARSE_NO_ERROR 0                                ///< 无错误
 #define PARSE_ERROR_ILLEGAL_CHARACTER -1                ///< 非法字符
 #define PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT -2            ///< 数字后面缺少后缀
-#define PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK -3    ///< 副露包含过多的牌
+#define PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK -3 ///< 副露包含错误的牌数目
 #define PARSE_ERROR_CANNOT_MAKE_FIXED_PACK -4           ///< 无法正确解析副露
 #define PARSE_ERROR_TOO_MANY_FIXED_PACKS -5             ///< 过多组副露（一副合法手牌最多4副露）
 /**
@@ -43,7 +43,7 @@ long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
  * @retval PARSE_NO_ERROR 无错误
  * @retval PARSE_ERROR_ILLEGAL_CHARACTER 非法字符
  * @retval PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT 数字后面缺少后缀
- * @retval PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK 副露包含过多的牌
+ * @retval PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK 副露包含错误的牌数目
  * @retval PARSE_ERROR_CANNOT_MAKE_FIXED_PACK 无法正确解析副露
  * @retval PARSE_ERROR_TOO_MANY_FIXED_PACKS 过多组副露（一副合法手牌最多4副露）
  */

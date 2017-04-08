@@ -95,7 +95,7 @@ long parse_tiles(const char *str, tile_t *tiles, long max_cnt) {
 static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
     if (tile_cnt > 0) {
         if (tile_cnt != 3 && tile_cnt != 4) {
-            return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK;
+            return PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK;
         }
         if (tile_cnt == 3) {
             if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
@@ -183,7 +183,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
                 return PARSE_ERROR_ILLEGAL_CHARACTER;
             }
             if (tile_cnt != 4) {
-                return PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK;
+                return PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK;
             }
             q = ++p;
             packs[pack_cnt] = make_pack(0, PACK_TYPE_KONG, tiles[0]);

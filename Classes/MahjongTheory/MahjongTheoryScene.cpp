@@ -260,7 +260,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             switch (ret) {
             case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
             case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = "数字后面需有后缀"; break;
-            case PARSE_ERROR_TOO_MANY_TILES_FOR_FIXED_PACK: errorStr = "一组副露包含了过多的牌"; break;
+            case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: errorStr = "一组副露包含了错误的牌数目"; break;
             case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = "无法正确解析副露"; break;
             default: break;
             }
