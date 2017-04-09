@@ -727,7 +727,10 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, long (&fan_
             }
             break;
         case 2:
-            if (concealed_pung_cnt > 0) {
+            if (concealed_pung_cnt == 0) {
+                fan_table[TWO_CONCEALED_PUNGS] = 1;
+            }
+            else {
                 fan_table[THREE_CONCEALED_PUNGS] = 1;
             }
             break;
