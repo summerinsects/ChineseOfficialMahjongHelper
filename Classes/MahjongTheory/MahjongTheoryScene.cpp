@@ -166,10 +166,13 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
         "1." INPUT_GUIDE_STRING_1 "\n"
         "2." INPUT_GUIDE_STRING_2 "\n"
         "3." INPUT_GUIDE_STRING_3 "\n"
-        "4.基本和型暂不考虑国标番型。\n"
-        "5.暂不考虑吃碰杠操作。\n"
-        "6.点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n"
-        "7.点击手牌可切出对应牌，随机上牌。\n"
+        "4.输入牌的总数不能超过14张。\n"
+        "5.当输入牌的数量为(n*3+2)时，最后一张牌作为摸上来的牌。\n"
+        "6.当输入牌的数量为(n*3+1)时，系统会随机补一张摸上来的牌。\n"
+        "7.基本和型暂不考虑国标番型。\n"
+        "8.暂不考虑吃碰杠操作。\n"
+        "9.点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n"
+        "10.点击手牌可切出对应牌，随机上牌。\n"
         "输入范例1：[EEEE]288s349pSCFF2p\n"
         "输入范例2：123p 345s 999s 6m6pEW1m\n"
         "输入范例3：356m18s1579pWNFF9p",
@@ -250,7 +253,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
     }
 
     const char *errorStr = nullptr;
-    const std::string str = input;
+    std::string str = input;
 
     do {
         mahjong::hand_tiles_t hand_tiles = { 0 };
@@ -279,6 +282,18 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             default:
                 break;
             }
+        }
+
+        // 随机上牌
+        if (serving_tile == 0) {
+            int cnt_table[mahjong::TILE_TABLE_SIZE];
+            mahjong::map_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count, cnt_table);
+            serving_tile = serveRandomTile(cnt_table, 0);
+
+            char temp[64];
+            mahjong::tiles_to_string(&serving_tile, 1, temp, sizeof(temp));
+            str.append(temp);
+            _editBox->setText(str.c_str());
         }
 
         ret = mahjong::check_calculator_input(&hand_tiles, serving_tile);
