@@ -7,7 +7,15 @@
 #include "widget/AlertView.h"
 #include "common.h"
 
+#include "network/HttpClient.h"
+#include "json/document.h"
+#include "json/stringbuffer.h"
+
+#define VERSION 0x010000
+
 USING_NS_CC;
+
+static bool checkVersion(const std::vector<char> *buffer, bool manual);
 
 Scene* HelloWorld::createScene() {
     auto scene = Scene::create();
@@ -102,21 +110,176 @@ bool HelloWorld::init() {
     button->setTitleFontSize(20);
     button->setTitleText("关于");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 100));
-    button->addClickEventListener([](Ref *) {
-        AlertView::showWithMessage("关于",
-            "1. 特别鸣谢：逍遥宫国标麻将群。\n"
-            "2. 本软件未上架任何安卓应用市场，获取最新版请联系逍遥宫。如果您觉得好用，可多多帮我推广。\n"
-            "3. BUG反馈请发邮件至wohaaitinciu@163.com。\n"
-            "4. 本软件开源，高端玩家可下载源代码自行编译。\n"
-            "5. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
-            "6. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
-            10, nullptr, nullptr);
-    });
+    button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
     Label *label = Label::createWithSystemFont("Built  " __DATE__ "  " __TIME__, "Arial", 10);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 10));
 
+    requestVersion(false);
+
     return true;
+}
+
+void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float width = visibleSize.width * 0.8f - 10;
+
+    ui::Widget *rootWidget = ui::Widget::create();
+
+    Label *label = Label::createWithSystemFont(
+        "1. 特别鸣谢：逍遥宫国标麻将群。\n"
+        "2. 本软件未上架任何安卓应用市场，获取最新版请联系逍遥宫。如果您觉得好用，可多多帮我推广。\n"
+        "3. BUG反馈请发邮件至wohaaitinciu@163.com。\n"
+        "4. 本软件开源，高端玩家可下载源代码自行编译。\n"
+        "5. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
+        "6. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
+        "Arail", 10);
+    label->setColor(Color3B::BLACK);
+    label->setDimensions(width, 0);
+    rootWidget->addChild(label);
+
+    // 检测新版本
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(65.0, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("检测新版本");
+    button->addClickEventListener([this](Ref *sender) { requestVersion(true); });
+    rootWidget->addChild(button);
+
+    const Size &labelSize = label->getContentSize();
+    rootWidget->setContentSize(Size(width, labelSize.height + 30));
+    button->setPosition(Vec2(width * 0.5f, 10));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
+
+    AlertView::showWithNode("关于", rootWidget, nullptr, nullptr);
+}
+
+void HelloWorld::requestVersion(bool manual) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+    static bool checking = false;
+    if (checking) {
+        return;
+    }
+
+    checking = true;
+
+    network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
+    request->setRequestType(network::HttpRequest::Type::GET);
+    request->setUrl("https://api.github.com/repos/summerinsects/ChineseOfficialMahjongHelper/releases");
+
+    request->setResponseCallback([manual](network::HttpClient *client, network::HttpResponse *response) {
+        checking = false;
+
+        if (response == nullptr) {
+            return;
+        }
+
+        log("HTTP Status Code: %ld", response->getResponseCode());
+
+        if (!response->isSucceed()) {
+            log("response failed");
+            log("error buffer: %s", response->getErrorBuffer());
+            if (manual) {
+                AlertView::showWithMessage("提示", "获取最新版本失败", 12, nullptr, nullptr);
+            }
+            return;
+        }
+
+        std::vector<char> *buffer = response->getResponseData();
+        if (!checkVersion(buffer, manual)) {
+            if (manual) {
+                AlertView::showWithMessage("提示", "获取最新版本失败", 12, nullptr, nullptr);
+            }
+        }
+    });
+
+    network::HttpClient::getInstance()->send(request);
+    request->release();
+#else
+    if (manual) {
+        AlertView::showWithMessage("提示", "获取最新版本失败", 12, nullptr, nullptr);
+    }
+#endif
+}
+
+bool checkVersion(const std::vector<char> *buffer, bool manual) {
+    if (buffer == nullptr) {
+        return false;
+    }
+
+    try {
+        do {
+            std::string str(buffer->begin(), buffer->end());
+            rapidjson::Document doc;
+            doc.Parse<0>(str.c_str());
+            if (doc.HasParseError() || !doc.IsArray() || doc.Size() == 0) {
+                break;
+            }
+
+            const rapidjson::Value &json = *doc.Begin();
+            if (!json.IsObject()) {
+                break;
+            }
+
+            rapidjson::Value::ConstMemberIterator it = json.FindMember("tag_name");
+            if (it == json.MemberEnd() || !it->value.IsString()) {
+                break;
+            }
+            std::string tag = it->value.GetString();
+
+            it = json.FindMember("assets");
+            if (it == json.MemberEnd() || !it->value.IsArray()) {
+                break;
+            }
+
+            rapidjson::Value::ConstArray assets = it->value.GetArray();
+            if (assets.Size() == 0) {
+                break;
+            }
+
+            const rapidjson::Value &asset = *assets.Begin();
+            if (!asset.IsObject()) {
+                break;
+            }
+
+            it = asset.FindMember("browser_download_url");
+            if (it == asset.MemberEnd() || !it->value.IsString()) {
+                break;
+            }
+            std::string url = it->value.GetString();
+
+            it = asset.FindMember("size");
+            unsigned size = 0;
+            if (it != asset.MemberEnd() && it->value.IsUint()) {
+                size = it->value.GetUint();
+            }
+
+            int a, b, c;
+            if (sscanf(tag.c_str(), "v%d.%d.%d", &a, &b, &c) != 3) {
+                break;
+            }
+
+            if (((a << 16) | (b << 8) | c) <= VERSION) {
+                if (manual) {
+                    AlertView::showWithMessage("提示", "已经是最新版本", 12, nullptr, nullptr);
+                }
+                return true;
+            }
+
+            AlertView::showWithMessage("提示",
+                StringUtils::format("检测到新版本%s，大小%.2fM，是否下载？", tag.c_str(), size / 1048576.0f), 12, [url]() {
+                Application::getInstance()->openURL(url);
+            }, nullptr);
+
+            return true;
+        } while (0);
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+    }
+
+    return false;
 }

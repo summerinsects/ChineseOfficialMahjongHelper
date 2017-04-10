@@ -9,6 +9,10 @@ public:
     virtual bool init() override;
 
     CREATE_FUNC(HelloWorld);
+
+private:
+    void onAboutButton(cocos2d::Ref *sender);
+    void requestVersion(bool manual);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
