@@ -168,7 +168,7 @@ void HelloWorld::requestVersion(bool manual) {
 
     network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
     request->setRequestType(network::HttpRequest::Type::GET);
-    request->setUrl("https://api.github.com/repos/summerinsects/ChineseOfficialMahjongHelper/releases");
+    request->setUrl("https://api.github.com/repos/summerinsects/ChineseOfficialMahjongHelper/releases/latest");
 
     request->setResponseCallback([manual](network::HttpClient *client, network::HttpResponse *response) {
         checking = false;
@@ -215,23 +215,18 @@ bool checkVersion(const std::vector<char> *buffer, bool manual) {
             std::string str(buffer->begin(), buffer->end());
             rapidjson::Document doc;
             doc.Parse<0>(str.c_str());
-            if (doc.HasParseError() || !doc.IsArray() || doc.Size() == 0) {
+            if (doc.HasParseError() || !doc.IsObject()) {
                 break;
             }
 
-            const rapidjson::Value &json = *doc.Begin();
-            if (!json.IsObject()) {
-                break;
-            }
-
-            rapidjson::Value::ConstMemberIterator it = json.FindMember("tag_name");
-            if (it == json.MemberEnd() || !it->value.IsString()) {
+            rapidjson::Value::ConstMemberIterator it = doc.FindMember("tag_name");
+            if (it == doc.MemberEnd() || !it->value.IsString()) {
                 break;
             }
             std::string tag = it->value.GetString();
 
-            it = json.FindMember("assets");
-            if (it == json.MemberEnd() || !it->value.IsArray()) {
+            it = doc.FindMember("assets");
+            if (it == doc.MemberEnd() || !it->value.IsArray()) {
                 break;
             }
 
