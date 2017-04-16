@@ -82,7 +82,7 @@ static bool divide_tail(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, one_d
 }
 
 static bool is_division_branch_exist(long fixed_cnt, long step, const one_division_t *work_division, const divisions_t *result) {
-    if (result->count <= 0 || step == 1) {
+    if (result->count <= 0 || fixed_cnt + step < 3) {
         return false;
     }
 
