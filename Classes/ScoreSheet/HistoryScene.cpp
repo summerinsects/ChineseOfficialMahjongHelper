@@ -45,6 +45,8 @@ static void loadRecords(std::vector<Record> &records) {
             JsonToRecord(json, record);
             return record;
         });
+
+        std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
@@ -298,6 +300,8 @@ static void __modifyRecord(const Record &record) {
     else {
         memcpy(&*it, &record, sizeof(Record));
     }
+
+    std::sort(g_records.begin(), g_records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
 
     std::vector<Record> temp = g_records;
     std::thread([temp]() {
