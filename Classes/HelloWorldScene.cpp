@@ -11,7 +11,7 @@
 #include "json/document.h"
 #include "json/stringbuffer.h"
 
-#define VERSION 0x010001
+#define VERSION 0x010002
 
 USING_NS_CC;
 
@@ -112,10 +112,13 @@ bool HelloWorld::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 100));
     button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
-    Label *label = Label::createWithSystemFont("Built  " __DATE__ "  " __TIME__, "Arial", 10);
+    Label *label = Label::createWithSystemFont(
+        StringUtils::format("v%d.%d.%d\n%s", (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, "Built  " __DATE__ "  " __TIME__),
+        "Arial", 10);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 10));
+    label->setAlignment(TextHAlignment::CENTER);
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15));
 
     requestVersion(false);
 
@@ -130,11 +133,10 @@ void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
 
     Label *label = Label::createWithSystemFont(
         "1. 特别鸣谢：逍遥宫国标麻将群。\n"
-        "2. 本软件未上架任何安卓应用市场，获取最新版请联系逍遥宫。如果您觉得好用，可多多帮我推广。\n"
-        "3. BUG反馈请发邮件至wohaaitinciu@163.com。\n"
-        "4. 本软件开源，高端玩家可下载源代码自行编译。\n"
-        "5. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
-        "6. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
+        "2. BUG反馈请发邮件至wohaaitinciu@163.com。\n"
+        "3. 本软件开源，高端玩家可下载源代码自行编译。\n"
+        "4. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
+        "5. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
         "Arail", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0);
