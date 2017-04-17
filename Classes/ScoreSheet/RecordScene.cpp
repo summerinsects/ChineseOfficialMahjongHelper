@@ -209,32 +209,41 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->setPosition(Vec2(origin.x, origin.y + 35));
     rootLayout->setTouchEnabled(true);
 
-    // 说明
-    Label *maskLabel1 = Label::createWithSystemFont("标记4番以上番种（未做排斥检测）", "Arial", 12);
-    maskLabel1->setColor(Color3B::BLACK);
-    rootLayout->addChild(maskLabel1);
-    maskLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    // 上方所有东西
+    ui::Widget *topWidget = ui::Widget::create();
+    topWidget->setContentSize(Size(visibleSize.width, 70));
+    rootLayout->addChild(topWidget);
 
-    Label *maskLabel2 = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
-    maskLabel2->setColor(Color3B(0x60, 0x60, 0x60));
-    rootLayout->addChild(maskLabel2);
-    maskLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    // 说明
+    label = Label::createWithSystemFont("标记4番以上番种（未做排斥检测）", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    topWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 65.0f));
+
+    label = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
+    label->setColor(Color3B(0x60, 0x60, 0x60));
+    topWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 40.0f));
 
     // 展开/收起
     ui::Button *spreadButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     spreadButton->setScale9Enabled(true);
     spreadButton->setContentSize(Size(55.0f, 20.0f));
     spreadButton->setTitleFontSize(12);
-    rootLayout->addChild(spreadButton);
+    topWidget->addChild(spreadButton);
+    spreadButton->setPosition(Vec2(visibleSize.width - 35.0f, 65.0f));
 
     // 输入牌按钮
-    ui::Button *tilesButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    tilesButton->setScale9Enabled(true);
-    tilesButton->setContentSize(Size(55.0f, 20.0f));
-    tilesButton->setTitleFontSize(12);
-    tilesButton->setTitleText("记录和牌");
-    tilesButton->addClickEventListener(std::bind(&RecordScene::onTilesButton, this, std::placeholders::_1));
-    rootLayout->addChild(tilesButton);
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("记录和牌");
+    button->addClickEventListener(std::bind(&RecordScene::onTilesButton, this, std::placeholders::_1));
+    topWidget->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 35.0f, 40.0f));
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDelegate(this);
@@ -247,7 +256,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(tableView);
     _tableView = tableView;
 
-    std::function<void (Ref *)> layoutChildren = [rootLayout, maskLabel1, maskLabel2, tilesButton, tableView](Ref *sender) {
+    std::function<void (Ref *)> layoutChildren = [rootLayout, topWidget, tableView](Ref *sender) {
         ui::Button *spreadButton = (ui::Button *)sender;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -265,15 +274,57 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         }
 
         rootLayout->setContentSize(layoutSize);
-        maskLabel1->setPosition(Vec2(5.0f, layoutSize.height - 10));
-        maskLabel2->setPosition(Vec2(5.0f, layoutSize.height - 35));
-        spreadButton->setPosition(Vec2(visibleSize.width - 35.0f, layoutSize.height - 10));
-        tilesButton->setPosition(Vec2(visibleSize.width - 35.0f, layoutSize.height - 35));
-        tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 55));
+        topWidget->setPosition(Vec2(visibleSize.width * 0.5f, layoutSize.height - 35));
+        tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 75));
         tableView->reloadData();
     };
     layoutChildren(spreadButton);
     spreadButton->addClickEventListener(layoutChildren);
+
+    // 快速定位
+    label = Label::createWithSystemFont("快速定位到", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    topWidget->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 10.0f));
+
+    // 8 16 32 64
+    const float labelPosX = label->getContentSize().width + 5;
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("8番");
+    button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(2); });
+    topWidget->addChild(button);
+    button->setPosition(Vec2(labelPosX + 5 + 45.0f * 0.5f, 10.0f));
+
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("16番");
+    button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(4); });
+    topWidget->addChild(button);
+    button->setPosition(Vec2(labelPosX + 5 + 45.0f * 1.5f, 10.0f));
+
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("32番");
+    button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(6); });
+    topWidget->addChild(button);
+    button->setPosition(Vec2(labelPosX + 5 + 45.0f * 2.5f, 10.0f));
+
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("64番");
+    button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(8); });
+    topWidget->addChild(button);
+    button->setPosition(Vec2(labelPosX + 5 + 45.0f * 3.5f, 10.0f));
 
     // 确定按钮
     _okButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
@@ -473,18 +524,18 @@ void RecordScene::updateScoreLabel() {
     }
 }
 
-void RecordScene::onMinusButton(cocos2d::Ref *sender) {
+void RecordScene::onMinusButton(cocos2d::Ref *sender, int delta) {
     int winScore = atoi(_editBox->getText());
-    if (winScore > 8) {
-        --winScore;
+    if (winScore >= 8 + delta) {
+        winScore -= delta;
         _editBox->setText(StringUtils::format("%d", winScore).c_str());
         updateScoreLabel();
     }
 }
 
-void RecordScene::onPlusButton(cocos2d::Ref *sender) {
+void RecordScene::onPlusButton(cocos2d::Ref *sender, int delta) {
     int winScore = atoi(_editBox->getText());
-    ++winScore;
+    winScore += delta;
     _editBox->setText(StringUtils::format("%d", winScore).c_str());
     updateScoreLabel();
 }
