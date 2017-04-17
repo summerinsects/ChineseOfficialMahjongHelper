@@ -975,7 +975,7 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
         node->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (rotated[i]) {
-            sprite->setRotation(90);
+            sprite->setRotation(-90);
         }
     }
 
