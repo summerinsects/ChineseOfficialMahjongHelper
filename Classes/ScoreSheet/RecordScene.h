@@ -70,8 +70,8 @@ private:
     void refresh();
     void updateScoreLabel();
 
-    void onMinusButton(cocos2d::Ref *sender);
-    void onPlusButton(cocos2d::Ref *sender);
+    void onMinusButton(cocos2d::Ref *sender, int delta);
+    void onPlusButton(cocos2d::Ref *sender, int delta);
     void onTilesButton(cocos2d::Ref *sender);
     void onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
