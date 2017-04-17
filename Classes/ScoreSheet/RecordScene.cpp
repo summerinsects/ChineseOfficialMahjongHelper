@@ -8,6 +8,10 @@
 #include "../widget/CWTableView.h"
 #include "../widget/HandTilesWidget.h"
 #include "../widget/ExtraInfoWidget.h"
+#include "../widget/TilesKeyboard.h"
+#include "../widget/CWEditBoxDelegate.h"
+#include "../mahjong-algorithm/stringify.h"
+#include "../mahjong-algorithm/fan_calculator.h"
 
 USING_NS_CC;
 
@@ -265,12 +269,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         if (spreadButton->getUserData()) {
             layoutSize.height = visibleSize.height - 150;
             spreadButton->setUserData(reinterpret_cast<void *>(false));
-            spreadButton->setTitleText("收起列表");
+            spreadButton->setTitleText("收起\xE2\xAC\x87");
         }
         else {
             layoutSize.height = visibleSize.height - 240;
             spreadButton->setUserData(reinterpret_cast<void *>(true));
-            spreadButton->setTitleText("展开列表");
+            spreadButton->setTitleText("展开\xE2\xAC\x86");
         }
 
         rootLayout->setContentSize(layoutSize);
@@ -708,6 +712,14 @@ void RecordScene::showCalculator(const CalculateParam &param) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float maxWidth = visibleSize.width - 20;
 
+    ui::EditBox *editBox = ui::EditBox::create(Size(maxWidth, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setPlaceholderFontColor(Color4B::GRAY);
+    editBox->setPlaceHolder("输入手牌");
+
     // 选牌面板和其他信息的相关控件
     HandTilesWidget *handTiles = HandTilesWidget::create();
     ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
@@ -728,18 +740,6 @@ void RecordScene::showCalculator(const CalculateParam &param) {
         extraInfo->setWinFlag(claimIndex != winIndex ? WIN_FLAG_DISCARD : WIN_FLAG_SELF_DRAWN);
     }
 
-    extraInfo->setParseCallback(std::bind(&HandTilesWidget::setData, handTiles, std::placeholders::_1, std::placeholders::_2));
-
-    extraInfo->setParseCallback([handTiles, extraInfo](const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t serving_tile) {
-        handTiles->setData(hand_tiles, serving_tile);
-
-        ExtraInfoWidget::RefreshByWinTile rt;
-        rt.getWinTile = std::bind(&HandTilesWidget::getServingTile, handTiles);
-        rt.isStandingTilesContainsServingTile = std::bind(&HandTilesWidget::isStandingTilesContainsServingTile, handTiles);
-        rt.countServingTileInFixedPacks = std::bind(&HandTilesWidget::countServingTileInFixedPacks, handTiles);
-        extraInfo->refreshByWinTile(rt);
-    });
-
     // 缩放
     Size handTilesSize = handTiles->getContentSize();
     const float handTilesScale = maxWidth / handTilesSize.width;
@@ -753,7 +753,9 @@ void RecordScene::showCalculator(const CalculateParam &param) {
 
     // 布局在rootWidget上
     ui::Widget *rootWidget = ui::Widget::create();
-    rootWidget->setContentSize(Size(maxWidth, handTilesSize.height + extraInfoSize.height + 5));
+    rootWidget->setContentSize(Size(maxWidth, handTilesSize.height + extraInfoSize.height + 5 + 25));
+    rootWidget->addChild(editBox);
+    editBox->setPosition(Vec2(maxWidth * 0.5f, handTilesSize.height + extraInfoSize.height + 20));
     rootWidget->addChild(handTiles);
     handTiles->setPosition(Vec2(maxWidth * 0.5f, handTilesSize.height * 0.5f + extraInfoSize.height + 5));
     rootWidget->addChild(extraInfo);
@@ -761,11 +763,47 @@ void RecordScene::showCalculator(const CalculateParam &param) {
 
     if (param.hand_tiles.tile_count != 0 && param.win_tile != 0) {
         handTiles->setData(param.hand_tiles, param.win_tile);
+
+        char str[64];
+        long ret = mahjong::hand_tiles_to_string(&param.hand_tiles, str, sizeof(str));
+        mahjong::tiles_to_string(&param.win_tile, 1, str + ret, sizeof(str) - ret);
+        editBox->setText(str);
+
+        ExtraInfoWidget::RefreshByWinTile rt;
+        rt.getWinTile = [&param]() { return param.win_tile; };
+        rt.isStandingTilesContainsServingTile = std::bind(&HandTilesWidget::isStandingTilesContainsServingTile, handTiles);
+        rt.countServingTileInFixedPacks = std::bind(&HandTilesWidget::countServingTileInFixedPacks, handTiles);
+        extraInfo->refreshByWinTile(rt);
     }
 
+    TilesKeyboard::hookEditBox(editBox);
+
+    // EditBox的代理
+    std::shared_ptr<cw::EditBoxDelegate> delegate = std::make_shared<cw::EditBoxDelegate>(
+        [handTiles, extraInfo](ui::EditBox *editBox) {
+        const char *input = editBox->getText();
+        const char *errorStr = TilesKeyboard::parseInput(input,
+            [handTiles, extraInfo](const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t serving_tile) {
+            handTiles->setData(hand_tiles, serving_tile);
+
+            ExtraInfoWidget::RefreshByWinTile rt;
+            rt.getWinTile = std::bind(&HandTilesWidget::getServingTile, handTiles);
+            rt.isStandingTilesContainsServingTile = std::bind(&HandTilesWidget::isStandingTilesContainsServingTile, handTiles);
+            rt.countServingTileInFixedPacks = std::bind(&HandTilesWidget::countServingTileInFixedPacks, handTiles);
+            extraInfo->refreshByWinTile(rt);
+        });
+
+        if (errorStr != nullptr) {
+            const std::string str = input;
+            AlertView::showWithMessage("直接输入牌", errorStr, 12, nullptr, nullptr);
+        }
+    });
+    editBox->setDelegate(delegate.get());
+
     // 通过AlertView显示出来
-    AlertView::showWithNode("记录和牌", rootWidget, maxWidth,
-        std::bind(&RecordScene::calculate, this, handTiles, extraInfo, param), nullptr);
+    AlertView::showWithNode("记录和牌", rootWidget, maxWidth, [this, handTiles, extraInfo, param, delegate]() {
+        calculate(handTiles, extraInfo, param);
+    }, nullptr);
 }
 
 // in FanCalculatorScene.cpp

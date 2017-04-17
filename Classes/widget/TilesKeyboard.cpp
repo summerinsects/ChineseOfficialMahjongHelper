@@ -1,6 +1,8 @@
 ﻿#include "TilesKeyboard.h"
 #include "../compiler.h"
 #include "../TilesImage.h"
+#include "../mahjong-algorithm/stringify.h"
+#include "../mahjong-algorithm/fan_calculator.h"
 
 USING_NS_CC;
 
@@ -490,4 +492,40 @@ void TilesKeyboard::associateWithEditBox(cocos2d::ui::EditBox *editBox) {
             }
         }
     };
+}
+
+const char *TilesKeyboard::parseInput(const char *input, const std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> &callback) {
+    if (*input == '\0') {
+        return nullptr;
+    }
+
+    mahjong::hand_tiles_t hand_tiles;
+    mahjong::tile_t win_tile;
+    long ret = mahjong::string_to_tiles(input, &hand_tiles, &win_tile);
+    if (ret != PARSE_NO_ERROR) {
+        switch (ret) {
+        case PARSE_ERROR_ILLEGAL_CHARACTER: return "无法解析的字符";
+        case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: return "数字后面需有后缀";
+        case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: return "一组副露包含了错误的牌数目";
+        case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: return "无法正确解析副露";
+        default: break;
+        }
+        return nullptr;
+    }
+    if (win_tile == 0) {
+        return "缺少和牌张";
+    }
+
+    ret = mahjong::check_calculator_input(&hand_tiles, win_tile);
+    if (ret != 0) {
+        switch (ret) {
+        case ERROR_WRONG_TILES_COUNT: return "牌张数错误";
+        case ERROR_TILE_COUNT_GREATER_THAN_4: return "同一种牌最多只能使用4枚";
+        default: break;
+        }
+        return nullptr;
+    }
+
+    callback(hand_tiles, win_tile);
+    return nullptr;
 }

@@ -4,6 +4,7 @@
 #include "../widget/TilePickWidget.h"
 #include "../widget/ExtraInfoWidget.h"
 #include "../widget/AlertView.h"
+#include "../widget/TilesKeyboard.h"
 
 USING_NS_CC;
 
@@ -38,8 +39,18 @@ bool FanCalculatorScene::init() {
         origin.y + visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height * 0.5f));
     _extraInfo = extraInfo;
 
-    // 番算按钮
+    // 直接输入
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("直接输入");
+    extraInfo->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 40, 100.0f));
+    button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
+
+    // 番算按钮
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(45.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -68,7 +79,6 @@ bool FanCalculatorScene::init() {
         rt.countServingTileInFixedPacks = std::bind(&TilePickWidget::countServingTileInFixedPacks, tilePicker);
         extraInfo->refreshByWinTile(rt);
     });
-    _extraInfo->setParseCallback(std::bind(&TilePickWidget::setData, _tilePicker, std::placeholders::_1, std::placeholders::_2));
 
     return true;
 }
@@ -111,6 +121,55 @@ cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SI
     fanTotal->setPosition(Vec2(10.0f, lineHeight * 0.5f));
 
     return node;
+}
+
+void FanCalculatorScene::showInputAlert(const char *prevInput) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float width = visibleSize.width * 0.8f - 10;
+
+    ui::Widget *rootWidget = ui::Widget::create();
+
+    Label *label = Label::createWithSystemFont("使用说明：\n"
+        "1." INPUT_GUIDE_STRING_1 "\n"
+        "2." INPUT_GUIDE_STRING_2 "\n"
+        "3." INPUT_GUIDE_STRING_3 "\n"
+        "输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
+        "输入范例2：1112345678999s9s\n"
+        "输入范例3：WWWW 444s 45m678pFF6m\n", "Arial", 10);
+    label->setColor(Color3B::BLACK);
+    label->setDimensions(width, 0);
+    rootWidget->addChild(label);
+
+    // 输入手牌
+    ui::EditBox *editBox = ui::EditBox::create(Size(width - 10, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setPlaceholderFontColor(Color4B::GRAY);
+    editBox->setPlaceHolder("输入手牌");
+    if (prevInput != nullptr) {
+        editBox->setText(prevInput);
+    }
+    TilesKeyboard::hookEditBox(editBox);
+    rootWidget->addChild(editBox);
+
+    const Size &labelSize = label->getContentSize();
+    rootWidget->setContentSize(Size(width, labelSize.height + 30));
+    editBox->setPosition(Vec2(width * 0.5f, 10));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
+
+    AlertView::showWithNode("直接输入", rootWidget, [this, editBox]() {
+        const char *input = editBox->getText();
+        const char *errorStr = TilesKeyboard::parseInput(input,
+            std::bind(&TilePickWidget::setData, _tilePicker, std::placeholders::_1, std::placeholders::_2));
+        if (errorStr != nullptr) {
+            const std::string str = input;
+            AlertView::showWithMessage("直接输入牌", errorStr, 12, [this, str]() {
+                showInputAlert(str.c_str());
+            }, nullptr);
+        }
+    }, nullptr);
 }
 
 void FanCalculatorScene::calculate() {

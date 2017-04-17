@@ -1,9 +1,6 @@
 ﻿#include "ExtraInfoWidget.h"
 #include "../compiler.h"
-#include "../mahjong-algorithm/stringify.h"
-#include "../mahjong-algorithm/fan_calculator.h"
 #include "AlertView.h"
-#include "TilesKeyboard.h"
 
 USING_NS_CC;
 
@@ -164,18 +161,8 @@ bool ExtraInfoWidget::init() {
         label->setPosition(Vec2(10.0f, 10.0f));
     }
 
-    // 直接输入
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("直接输入");
-    this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40, 100.0f));
-    button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
-
     // 使用说明
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -417,93 +404,4 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
         "10. 不重复原则只适用A番种必然包含B时不计B。不适用于A+B必然包含C时不计C。例如，绿一色+清一色，必然断幺，但要计断幺。\n"
         "11. 1明杠1暗杠计5番。暗杠的加计遵循国际麻将联盟（MIL）的规则，杠系列和暗刻系列最多各取一个番种计分。",
         10, nullptr, nullptr);
-}
-
-void ExtraInfoWidget::showInputAlert(const char *prevInput) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10;
-
-    ui::Widget *rootWidget = ui::Widget::create();
-
-    Label *label = Label::createWithSystemFont("使用说明：\n"
-        "1." INPUT_GUIDE_STRING_1 "\n"
-        "2." INPUT_GUIDE_STRING_2 "\n"
-        "3." INPUT_GUIDE_STRING_3 "\n"
-        "输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
-        "输入范例2：1112345678999s9s\n"
-        "输入范例3：WWWW 444s 45m678pFF6m\n", "Arial", 10);
-    label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0);
-    rootWidget->addChild(label);
-
-    // 输入手牌
-    ui::EditBox *editBox = ui::EditBox::create(Size(width - 10, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setPlaceholderFontColor(Color4B::GRAY);
-    editBox->setPlaceHolder("输入手牌");
-    if (prevInput != nullptr) {
-        editBox->setText(prevInput);
-    }
-    TilesKeyboard::hookEditBox(editBox);
-    rootWidget->addChild(editBox);
-
-    const Size &labelSize = label->getContentSize();
-    rootWidget->setContentSize(Size(width, labelSize.height + 30));
-    editBox->setPosition(Vec2(width * 0.5f, 10));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
-
-    AlertView::showWithNode("直接输入", rootWidget, [this, editBox]() {
-        parseInput(editBox->getText());
-    }, nullptr);
-}
-
-void ExtraInfoWidget::parseInput(const char *input) {
-    if (*input == '\0') {
-        return;
-    }
-
-    const char *errorStr = nullptr;
-    const std::string str = input;
-
-    do {
-        mahjong::hand_tiles_t hand_tiles;
-        mahjong::tile_t win_tile;
-        long ret = mahjong::string_to_tiles(input, &hand_tiles, &win_tile);
-        if (ret != PARSE_NO_ERROR) {
-            switch (ret) {
-            case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
-            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = "数字后面需有后缀"; break;
-            case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: errorStr = "一组副露包含了错误的牌数目"; break;
-            case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = "无法正确解析副露"; break;
-            default: break;
-            }
-            break;
-        }
-        if (win_tile == 0) {
-            errorStr = "缺少和牌张";
-            break;
-        }
-
-        ret = mahjong::check_calculator_input(&hand_tiles, win_tile);
-        if (ret != 0) {
-            switch (ret) {
-            case ERROR_WRONG_TILES_COUNT: errorStr = "牌张数错误"; break;
-            case ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = "同一种牌最多只能使用4枚"; break;
-            default: break;
-            }
-            break;
-        }
-        if (LIKELY(_parseCallback)) {
-            _parseCallback(hand_tiles, win_tile);
-        }
-    } while (0);
-
-    if (errorStr != nullptr) {
-        AlertView::showWithMessage("直接输入牌", errorStr, 12, [this, str]() {
-            showInputAlert(str.c_str());
-        }, nullptr);
-    }
 }

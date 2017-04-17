@@ -29,10 +29,6 @@ public:
     void refreshByKong(bool hasKong);
     void refreshByWinTile(const RefreshByWinTile &rt);
 
-    void setParseCallback(const std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> &callback) {
-        _parseCallback = callback;
-    }
-
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
@@ -43,8 +39,6 @@ private:
     void onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
     void onInstructionButton(cocos2d::Ref *sender);
-    void showInputAlert(const char *prevInput);
-    void parseInput(const char *input);
 
     cocos2d::ui::RadioButtonGroup *_winTypeGroup = nullptr;
     cocos2d::ui::CheckBox *_fourthTileBox = nullptr;
@@ -58,8 +52,6 @@ private:
     bool _maybeFourthTile = false;
     bool _hasKong = false;
     size_t _winTileCountInFixedPacks = 0;
-
-    std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> _parseCallback;
 };
 
 #endif

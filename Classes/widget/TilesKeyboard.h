@@ -9,6 +9,7 @@ class TilesKeyboard : public cocos2d::Layer {
 public:
     static void hookEditBox(cocos2d::ui::EditBox *editBox);
     static void showByEditBox(cocos2d::ui::EditBox *editBox);
+    static const char *parseInput(const char *input, const std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> &callback);
 
     CREATE_FUNC(TilesKeyboard);
 
