@@ -185,6 +185,20 @@ namespace cw {
         cocos2d::Vec2 maxContainerOffset();
         cocos2d::Vec2 minContainerOffset();
 
+        /**
+         * @brief Jump to specific cell
+         * @param cellIndex Specifies the cell's index
+         */
+        void jumpToCell(ssize_t cellIndex);
+
+        /**
+         * @brief Scroll to specific cell
+         * @param cellIndex Specifies the cell's index
+         * @param timeInSec Scroll time
+         * @param attenuated Whether scroll speed attenuate or not
+         */
+        void scrollToCell(ssize_t cellIndex, float timeInSec, bool attenuated);
+
     protected:
         virtual void onSizeChanged() override;
 
@@ -201,6 +215,8 @@ namespace cw {
 
         void _updateCellPositions(ssize_t cellsCount);
         void _scrollViewDidScroll(ssize_t cellsCount);
+
+        cocos2d::Vec2 _destinationFromIndex(ssize_t index);
 
         /**
          * vertical direction of cell filling

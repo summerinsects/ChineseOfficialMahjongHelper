@@ -288,8 +288,8 @@ namespace cw {
     Vec2 TableView::_offsetFromIndex(ssize_t index) {
         Vec2 offset = this->__offsetFromIndex(index);
 
-        Size cellSize = _delegate->tableCellSizeForIndex(this, index);
         if (_vordering == VerticalFillOrder::TOP_DOWN) {
+            Size cellSize = _delegate->tableCellSizeForIndex(this, index);
             offset.y = _innerContainer->getContentSize().height - offset.y - cellSize.height;
         }
         return offset;
@@ -484,5 +484,29 @@ namespace cw {
         ScrollView::moveInnerContainer(deltaMove, canStartBounceBack);
         ssize_t cellsCount = _delegate->numberOfCellsInTableView(this);
         _scrollViewDidScroll(cellsCount);
+    }
+
+    cocos2d::Vec2 TableView::_destinationFromIndex(ssize_t index) {
+        Vec2 offset = __offsetFromIndex(index);
+        if (_vordering == VerticalFillOrder::TOP_DOWN) {
+            offset.y = _innerContainer->getContentSize().height - offset.y - _contentSize.height / _innerContainer->getScaleY();
+        }
+
+        Vec2 temp = maxContainerOffset();
+        if (offset < temp) {
+            offset = temp;
+        }
+
+        return -offset;
+    }
+
+    void TableView::jumpToCell(ssize_t cellIndex) {
+        Vec2 des = _destinationFromIndex(cellIndex);
+        this->jumpToDestination(des);
+    }
+
+    void TableView::scrollToCell(ssize_t cellIndex, float timeInSec, bool attenuated) {
+        Vec2 des = _destinationFromIndex(cellIndex);
+        this->startAutoScrollToDestination(des, timeInSec, attenuated);
     }
 }
