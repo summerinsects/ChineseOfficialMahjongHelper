@@ -45,6 +45,7 @@ private:
 
     cocos2d::Node *_rootNode = nullptr;
     cocos2d::Label *_inputLabel = nullptr;
+    cocos2d::Label *_countLabel = nullptr;
     cocos2d::LayerColor *_inputBg = nullptr;
     cocos2d::Node *_tilesContainer = nullptr;
     std::vector<cocos2d::Sprite *> _tilesSprite;

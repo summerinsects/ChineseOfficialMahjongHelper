@@ -58,7 +58,7 @@ bool TilesKeyboard::init() {
 
     const int width = BUTTON_WIDTH * 5 + GAP * 6;
     const int buttonAreaHeight = BUTTON_HEIGHT * 5 + GAP * 6;
-    const int height = buttonAreaHeight + TILE_HEIGHT + GAP * 2;
+    const int height = buttonAreaHeight + TILE_HEIGHT + GAP * 3 + 10;
 
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(width, height));
@@ -68,16 +68,24 @@ bool TilesKeyboard::init() {
     LayerColor *background = LayerColor::create(Color4B(238, 238, 238, 0xFF), width, buttonAreaHeight);
     rootNode->addChild(background);
 
-    background = LayerColor::create(Color4B(224, 224, 224, 0xFF), width, TILE_HEIGHT + GAP * 2);
+    background = LayerColor::create(Color4B(224, 224, 224, 0xFF), width, TILE_HEIGHT + GAP * 3 + 10);
     rootNode->addChild(background);
     background->setPosition(Vec2(0, buttonAreaHeight));
+
+    // 牌数量label
+    Label *label = Label::createWithSystemFont("当前牌数目：0", "Arial", 10);
+    rootNode->addChild(label);
+    label->setColor(Color3B::BLACK);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(INPUT_GAP, buttonAreaHeight + TILE_HEIGHT + GAP * 2 + 5));
+    _countLabel = label;
 
     // 牌的根结点
     _tilesContainer = Node::create();
     _tilesContainer->setIgnoreAnchorPointForPosition(false);
     _tilesContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     rootNode->addChild(_tilesContainer);
-    _tilesContainer->setPosition(Vec2(width * 0.5f, height - TILE_HEIGHT * 0.5f - GAP));
+    _tilesContainer->setPosition(Vec2(width * 0.5f, buttonAreaHeight + GAP + TILE_HEIGHT * 0.5f));
 
     // 排列按钮
     ui::Button *buttons[25];
@@ -108,12 +116,12 @@ bool TilesKeyboard::init() {
     inputBg->setPosition(Vec2(0, height));
 
     // 输入文本
-    Label *inputLabel = Label::createWithSystemFont("", "Arial", 12);
-    inputBg->addChild(inputLabel);
-    inputLabel->setColor(Color3B::BLACK);
-    inputLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    inputLabel->setPosition(Vec2(INPUT_GAP, INPUT_HEIGHT / 2));
-    _inputLabel = inputLabel;
+    label = Label::createWithSystemFont("", "Arial", 12);
+    inputBg->addChild(label);
+    label->setColor(Color3B::BLACK);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(INPUT_GAP, INPUT_HEIGHT / 2));
+    _inputLabel = label;
 
     // 缩放
     this->addChild(rootNode);
@@ -253,6 +261,7 @@ void TilesKeyboard::addTiles(const mahjong::tile_t *tiles, size_t count) {
         _tilesContainer->addChild(sprite);
         sprite->setPosition(Vec2(containerSize.width + TILE_WIDTH * (i + 0.5f), TILE_HEIGHT * 0.5f));
         _tilesSprite.push_back(sprite);
+        sprite->setTag(tiles[i]);
     }
 
     containerSize.width += TILE_WIDTH * count;
@@ -263,6 +272,11 @@ void TilesKeyboard::addTiles(const mahjong::tile_t *tiles, size_t count) {
         const float scale = maxWidth / containerSize.width;
         _tilesContainer->setScale(scale);
     }
+
+    _countLabel->setString(StringUtils::format("当前牌数目：%lu",
+        std::count_if(_tilesSprite.begin(), _tilesSprite.end(), [](Sprite *s) {
+        return s->getTag() != INVALID_TAG;
+    })));
 }
 
 void TilesKeyboard::removeTiles(size_t count) {
@@ -286,6 +300,11 @@ void TilesKeyboard::removeTiles(size_t count) {
     else {
         _tilesContainer->setScale(1.0f);
     }
+
+    _countLabel->setString(StringUtils::format("当前牌数目：%lu",
+        std::count_if(_tilesSprite.begin(), _tilesSprite.end(), [](Sprite *s) {
+        return s->getTag() != INVALID_TAG;
+    })));
 }
 
 void TilesKeyboard::addSpaceTile() {
