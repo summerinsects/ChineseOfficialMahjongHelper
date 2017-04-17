@@ -274,7 +274,7 @@ void TilesKeyboard::addTiles(const mahjong::tile_t *tiles, size_t count) {
     }
 
     _countLabel->setString(StringUtils::format("当前牌数目：%lu",
-        std::count_if(_tilesSprite.begin(), _tilesSprite.end(), [](Sprite *s) {
+        (unsigned long)std::count_if(_tilesSprite.begin(), _tilesSprite.end(), [](Sprite *s) {
         return s->getTag() != INVALID_TAG;
     })));
 }
@@ -302,7 +302,7 @@ void TilesKeyboard::removeTiles(size_t count) {
     }
 
     _countLabel->setString(StringUtils::format("当前牌数目：%lu",
-        std::count_if(_tilesSprite.begin(), _tilesSprite.end(), [](Sprite *s) {
+        (unsigned long)std::count_if(_tilesSprite.begin(), _tilesSprite.end(), [](Sprite *s) {
         return s->getTag() != INVALID_TAG;
     })));
 }
