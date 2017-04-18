@@ -231,21 +231,21 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 40.0f));
 
-    // 展开/收起
-    ui::Button *spreadButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    spreadButton->setScale9Enabled(true);
-    spreadButton->setContentSize(Size(55.0f, 20.0f));
-    spreadButton->setTitleFontSize(12);
-    topWidget->addChild(spreadButton);
-    spreadButton->setPosition(Vec2(visibleSize.width - 35.0f, 65.0f));
-
-    // 输入牌按钮
+    // 记录和牌
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("记录和牌");
     button->addClickEventListener(std::bind(&RecordScene::onTilesButton, this, std::placeholders::_1));
+    topWidget->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 35.0f, 65.0f));
+
+    // 展开/收起
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
     topWidget->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35.0f, 40.0f));
 
@@ -261,20 +261,20 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     _tableView = tableView;
 
     std::function<void (Ref *)> layoutChildren = [rootLayout, topWidget, tableView](Ref *sender) {
-        ui::Button *spreadButton = (ui::Button *)sender;
+        ui::Button *button = (ui::Button *)sender;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Size layoutSize;
         layoutSize.width = visibleSize.width;
-        if (spreadButton->getUserData()) {
+        if (button->getUserData()) {
             layoutSize.height = visibleSize.height - 150;
-            spreadButton->setUserData(reinterpret_cast<void *>(false));
-            spreadButton->setTitleText("收起\xE2\xAC\x87");
+            button->setUserData(reinterpret_cast<void *>(false));
+            button->setTitleText("收起\xE2\xAC\x87");
         }
         else {
             layoutSize.height = visibleSize.height - 240;
-            spreadButton->setUserData(reinterpret_cast<void *>(true));
-            spreadButton->setTitleText("展开\xE2\xAC\x86");
+            button->setUserData(reinterpret_cast<void *>(true));
+            button->setTitleText("展开\xE2\xAC\x86");
         }
 
         rootLayout->setContentSize(layoutSize);
@@ -282,8 +282,8 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 75));
         tableView->reloadData();
     };
-    layoutChildren(spreadButton);
-    spreadButton->addClickEventListener(layoutChildren);
+    layoutChildren(button);
+    button->addClickEventListener(layoutChildren);
 
     // 转到
     label = Label::createWithSystemFont("转到", "Arial", 12);
