@@ -269,12 +269,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         if (button->getUserData()) {
             layoutSize.height = visibleSize.height - 150;
             button->setUserData(reinterpret_cast<void *>(false));
-            button->setTitleText("收起\xE2\xAC\x87");
+            button->setTitleText("\xE2\xAC\x87收起");
         }
         else {
             layoutSize.height = visibleSize.height - 240;
             button->setUserData(reinterpret_cast<void *>(true));
-            button->setTitleText("展开\xE2\xAC\x86");
+            button->setTitleText("\xE2\xAC\x86展开");
         }
 
         rootLayout->setContentSize(layoutSize);
