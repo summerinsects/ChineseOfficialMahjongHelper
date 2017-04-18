@@ -207,6 +207,12 @@ void HelloWorld::requestVersion(bool manual) {
 #endif
 }
 
+static inline bool string_has_suffix(const char *str, const char *suffix) {
+    size_t suffix_len = strlen(suffix);
+    size_t str_len = strlen(str);
+    return (str_len >= suffix_len) && (strcmp(suffix, str + (str_len - suffix_len)) == 0);
+}
+
 bool checkVersion(const std::vector<char> *buffer, bool manual) {
     if (buffer == nullptr) {
         return false;
@@ -237,20 +243,27 @@ bool checkVersion(const std::vector<char> *buffer, bool manual) {
                 break;
             }
 
-            const rapidjson::Value &asset = *assets.Begin();
-            if (!asset.IsObject()) {
+            rapidjson::Value::ConstArray::ValueIterator asset = std::find_if(assets.Begin(), assets.End(),
+                [](const rapidjson::Value &value) {
+                if (!value.IsObject()) return false;
+                rapidjson::Value::ConstMemberIterator it = value.FindMember("name");
+                if (it == value.MemberEnd() || !it->value.IsString()) return false;
+                return string_has_suffix(it->value.GetString(), ".apk");
+            });
+
+            if (asset == assets.End()) {
                 break;
             }
 
-            it = asset.FindMember("browser_download_url");
-            if (it == asset.MemberEnd() || !it->value.IsString()) {
+            it = asset->FindMember("browser_download_url");
+            if (it == asset->MemberEnd() || !it->value.IsString()) {
                 break;
             }
             std::string url = it->value.GetString();
 
-            it = asset.FindMember("size");
+            it = asset->FindMember("size");
             unsigned size = 0;
-            if (it != asset.MemberEnd() && it->value.IsUint()) {
+            if (it != asset->MemberEnd() && it->value.IsUint()) {
                 size = it->value.GetUint();
             }
 
@@ -266,8 +279,15 @@ bool checkVersion(const std::vector<char> *buffer, bool manual) {
                 return true;
             }
 
-            AlertView::showWithMessage("提示",
-                StringUtils::format("检测到新版本%s，大小%.2fM，是否下载？", tag.c_str(), size / 1048576.0f), 12, [url]() {
+            it = doc.FindMember("body");
+            std::string body;
+            if (it != doc.MemberEnd() && it->value.IsString()) {
+                body = it->value.GetString();
+            }
+
+            AlertView::showWithMessage(
+                "检测到新版本",
+                StringUtils::format("%s，大小%.2fM，是否下载？\n%s", tag.c_str(), size / 1048576.0f, body.c_str()), 12, [url]() {
                 Application::getInstance()->openURL(url);
             }, nullptr);
 
