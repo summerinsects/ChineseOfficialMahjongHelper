@@ -293,7 +293,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setPosition(Vec2(5.0f, 10.0f));
 
     // 6 8 12 16 24
-    const float labelPosX = label->getContentSize().width + 5;
+    const float labelPosX = label->getContentSize().width + 5 + 2;
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
@@ -301,7 +301,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleText("6番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(1); });
     topWidget->addChild(button);
-    button->setPosition(Vec2(labelPosX + 5 + 45.0f * 0.5f, 10.0f));
+    button->setPosition(Vec2(labelPosX + 40.0f * 0.5f, 10.0f));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
@@ -310,7 +310,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleText("8番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(2); });
     topWidget->addChild(button);
-    button->setPosition(Vec2(labelPosX + 5 + 45.0f * 1.5f, 10.0f));
+    button->setPosition(Vec2(labelPosX + 40.0f * 1.5f, 10.0f));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
@@ -319,7 +319,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleText("12番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(3); });
     topWidget->addChild(button);
-    button->setPosition(Vec2(labelPosX + 5 + 45.0f * 2.5f, 10.0f));
+    button->setPosition(Vec2(labelPosX + 40.0f * 2.5f, 10.0f));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
@@ -328,7 +328,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleText("16番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(4); });
     topWidget->addChild(button);
-    button->setPosition(Vec2(labelPosX + 5 + 45.0f * 3.5f, 10.0f));
+    button->setPosition(Vec2(labelPosX + 40.0f * 3.5f, 10.0f));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
@@ -337,7 +337,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleText("24番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(5); });
     topWidget->addChild(button);
-    button->setPosition(Vec2(labelPosX + 5 + 45.0f * 4.5f, 10.0f));
+    button->setPosition(Vec2(labelPosX + 40.0f * 4.5f, 10.0f));
 
     // 确定按钮
     _okButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
