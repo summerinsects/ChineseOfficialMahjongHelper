@@ -174,7 +174,7 @@ bool ScoreSheetScene::init() {
     }
 
     _lockButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    node->addChild(_lockButton);
+    node->addChild(_lockButton, -1);
     _lockButton->setScale9Enabled(true);
     _lockButton->setContentSize(Size(gap, 20.0f));
     _lockButton->setTitleFontSize(12);
@@ -246,7 +246,7 @@ bool ScoreSheetScene::init() {
 
         // 计分按钮
         ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-        node->addChild(button);
+        node->addChild(button, -1);
         button->setScale9Enabled(true);
         button->setContentSize(Size(gap, 20.0f));
         button->setTitleFontSize(12);
