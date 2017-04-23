@@ -473,6 +473,12 @@ void ScoreSheetScene::editName(size_t idx) {
             _nameLabel[idx]->setVisible(true);
             _nameLabel[idx]->setString(text);
             scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4);
+
+            if (g_currentRecord.current_index >= 16) {
+                HistoryScene::modifyRecord(g_currentRecord);
+            }
+
+            writeToJson();
         }
     }, nullptr);
     editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
