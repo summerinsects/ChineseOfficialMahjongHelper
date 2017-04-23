@@ -36,7 +36,10 @@ static bool operator==(const Record &left, const Record &right) {
 }
 
 #define SET_WIN(wc_, n_) ((wc_) |= (1 << ((n_) + 4)))
+#define TEST_WIN(wc_, n_) !!((wc_) & (1 << ((n_) + 4)))
+
 #define SET_CLAIM(wc_, n_) ((wc_) |= (1 << (n_)))
+#define TEST_CLAIM(wc_, n_) !!((wc_) & (1 << (n_)))
 
 #define WIN_INDEX(wc_) (((wc_) & 0x80) ? 3 : ((wc_) & 0x40) ? 2 : ((wc_) & 0x20) ? 1 : ((wc_) & 0x10) ? 0 : -1)
 #define CLAIM_INDEX(wc_) (((wc_) & 0x8) ? 3 : ((wc_) & 0x4) ? 2 : ((wc_) & 0x2) ? 1 : ((wc_) & 0x1) ? 0 : -1)
