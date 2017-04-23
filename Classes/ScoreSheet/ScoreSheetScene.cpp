@@ -369,7 +369,9 @@ void ScoreSheetScene::refreshEndTime() {
     len += 4;
     strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.end_time));
     _timeLabel->setString(str);
-    scaleLabelToFitWidth(_timeLabel, _cellWidth - 4);
+
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    scaleLabelToFitWidth(_timeLabel, visibleSize.width - 10);
 }
 
 void ScoreSheetScene::recover() {
