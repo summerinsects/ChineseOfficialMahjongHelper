@@ -513,11 +513,16 @@ void RecordScene::updateScoreLabel() {
         _scoreLabel[i]->setString(StringUtils::format("%+d", scoreTable[i]));
 
         if (scoreTable[i] != 0) {
-            if (TEST_WIN(_detail.win_claim, i)) {
+            if (TEST_WIN(_detail.win_claim, i)) {  // 和牌：红色
                 _scoreLabel[i]->setColor(Color3B(254, 87, 110));
             }
             else {
-                _scoreLabel[i]->setColor(!TEST_CLAIM(_detail.win_claim, i) ? Color3B(101, 196, 59) : Color3B(44, 121, 178));
+                if (UNLIKELY(TEST_CLAIM(_detail.win_claim, i) || TEST_FALSE_WIN(_detail.false_win, i))) {  // 点炮或者错和：蓝色
+                    _scoreLabel[i]->setColor(Color3B(44, 121, 178));
+                }
+                else {  // 其他：绿色
+                    _scoreLabel[i]->setColor(Color3B(101, 196, 59));
+                }
             }
         }
         else {
