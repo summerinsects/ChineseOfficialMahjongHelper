@@ -302,11 +302,13 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     for (int i = 0; i < 4; ++i) {
         _scoreLabels[handIdx][i]->setString(StringUtils::format("%+d", scoreTable[i]));
         _totalScores[i] += scoreTable[i];  // 更新总分
-        if (scoreTable[i] > 0) {
-            _scoreLabels[handIdx][i]->setColor(Color3B(224, 45, 45));
-        }
-        else if (scoreTable[i] < 0) {
-            _scoreLabels[handIdx][i]->setColor(Color3B(37, 153, 14));
+        if (scoreTable[i] != 0) {
+            if (TEST_WIN(detail.win_claim, i)) {
+                _scoreLabels[handIdx][i]->setColor(Color3B(254, 87, 110));
+            }
+            else {
+                _scoreLabels[handIdx][i]->setColor(!TEST_CLAIM(detail.win_claim, i) ? Color3B(101, 196, 59) : Color3B(44, 121, 178));
+            }
         }
         else {
             _scoreLabels[handIdx][i]->setColor(Color3B(0x60, 0x60, 0x60));

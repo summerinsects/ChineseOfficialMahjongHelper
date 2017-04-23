@@ -508,14 +508,17 @@ void RecordScene::updateScoreLabel() {
     int scoreTable[4];
     translateDetailToScoreTable(_detail, scoreTable);
 
-    // 正负0分使用不同颜色
+    // 使用不同颜色
     for (int i = 0; i < 4; ++i) {
         _scoreLabel[i]->setString(StringUtils::format("%+d", scoreTable[i]));
-        if (scoreTable[i] > 0) {
-            _scoreLabel[i]->setColor(Color3B(224, 45, 45));
-        }
-        else if (scoreTable[i] < 0) {
-            _scoreLabel[i]->setColor(Color3B(37, 153, 14));
+
+        if (scoreTable[i] != 0) {
+            if (TEST_WIN(_detail.win_claim, i)) {
+                _scoreLabel[i]->setColor(Color3B(254, 87, 110));
+            }
+            else {
+                _scoreLabel[i]->setColor(!TEST_CLAIM(_detail.win_claim, i) ? Color3B(101, 196, 59) : Color3B(44, 121, 178));
+            }
         }
         else {
             _scoreLabel[i]->setColor(Color3B(0x60, 0x60, 0x60));
