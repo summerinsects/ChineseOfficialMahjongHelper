@@ -102,13 +102,13 @@ bool ScoreSheetScene::init() {
     button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap * 2, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onHistoryButton, this, std::placeholders::_1));
 
-    // 重置按钮
+    // 清空表格按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("重置");
+    button->setTitleText("清空表格");
     button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
 
@@ -718,8 +718,7 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
         "3. 对于已经记分的，点击「备注」一栏可修改记录。\n"
         "4. 对局未完成时，点击「累计」一栏处，可显示分差并有快捷计算追分选项。\n"
         "5. 「北风北」记分完成后，会自动添加入「历史记录」。\n"
-        "6. 「历史记录」里的内容只要不卸载程序就会一直保存。\n"
-        "7. 「重置」可清空表格。",
+        "6. 「历史记录」里的内容只要不卸载程序就会一直保存。",
         10, nullptr, nullptr);
 }
 
