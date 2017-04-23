@@ -358,6 +358,7 @@ void ScoreSheetScene::refreshStartTime() {
     size_t len = strlen(str);
     strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.start_time));
     _timeLabel->setString(str);
+    _timeLabel->setScale(1);
 }
 
 void ScoreSheetScene::refreshEndTime() {
@@ -368,6 +369,7 @@ void ScoreSheetScene::refreshEndTime() {
     len += 4;
     strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.end_time));
     _timeLabel->setString(str);
+    scaleLabelToFitWidth(_timeLabel, _cellWidth - 4);
 }
 
 void ScoreSheetScene::recover() {
@@ -693,6 +695,7 @@ void ScoreSheetScene::onTimeScheduler(float dt) {
     time_t t = time(nullptr);
     strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&t));
     _timeLabel->setString(str);
+    _timeLabel->setScale(1);
 }
 
 void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
