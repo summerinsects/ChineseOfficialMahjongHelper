@@ -748,7 +748,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         return;
     }
 
-    AlertView::showWithMessage("重置", "重置操作会清空当前已记录的信息，未打满北风北的记录将会丢失，确定要这样做吗？", 12,
+    AlertView::showWithMessage("清空表格", "该操作会清空当前已记录的信息，若未打满北风北，对局记录将会丢失，确定要这样做吗？", 12,
         std::bind(&ScoreSheetScene::reset, this), nullptr);
 }
 
