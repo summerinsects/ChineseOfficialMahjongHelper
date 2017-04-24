@@ -748,8 +748,17 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         return;
     }
 
-    AlertView::showWithMessage("清空表格", "该操作会清空当前已记录的信息，若未打满北风北，对局记录将会丢失，确定要这样做吗？", 12,
-        std::bind(&ScoreSheetScene::reset, this), nullptr);
+    AlertView::showWithMessage("清空表格", "请选择保存当前记录或丢弃当前记录", 12,
+        [this]() {
+        AlertView::showWithMessage("清空表格", "点击确认将余下盘数标记为荒庄，并保存到历史记录，\n点击取消则不保存到历史记录。", 12,
+            [this]() {
+            g_currentRecord.current_index = 16;
+            g_currentRecord.end_time = time(nullptr);
+            HistoryScene::modifyRecord(g_currentRecord);
+
+            reset();
+        }, std::bind(&ScoreSheetScene::reset, this));
+    }, nullptr);
 }
 
 static void showPursuit(int delta) {
