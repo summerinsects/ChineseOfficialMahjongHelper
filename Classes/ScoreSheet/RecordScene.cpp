@@ -547,9 +547,10 @@ void RecordScene::updateScoreLabel() {
 
 void RecordScene::onMinusButton(cocos2d::Ref *sender, int delta) {
     int winScore = atoi(_editBox->getText());
-    if (winScore >= 8 + delta) {
-        winScore -= delta;
-        _editBox->setText(StringUtils::format("%d", winScore).c_str());
+    int temp = winScore - delta;
+    if (temp < 8) temp = 8;
+    if (winScore != temp) {
+        _editBox->setText(StringUtils::format("%d", temp).c_str());
         updateScoreLabel();
     }
 }
