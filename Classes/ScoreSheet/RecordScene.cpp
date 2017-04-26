@@ -52,18 +52,31 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 番数输入框
-    _editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    this->addChild(_editBox);
-    _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    _editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    _editBox->setFontColor(Color4B::BLACK);
-    _editBox->setFontSize(12);
-    _editBox->setText("8");
-    _editBox->setPosition(Vec2(origin.x + 95.0f, origin.y + visibleSize.height - 50));
-    _editBox->setDelegate(this);
+    ui::EditBox *editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    this->addChild(editBox);
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setText("8");
+    editBox->setPosition(Vec2(origin.x + 95.0f, origin.y + visibleSize.height - 50));
+    editBox->setDelegate(this);
+    _editBox = editBox;
+
+    // 输入框同位置的按钮，以实现点击后清除内容的效果
+    ui::Button *button = ui::Button::create();
+    editBox->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setPosition(Vec2(35.0f * 0.5f, 20.0f * 0.5f));
+    button->addClickEventListener([editBox](Ref *) {
+        editBox->setPlaceHolder(editBox->getText());
+        editBox->setText("");
+        editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
+    });
 
     // +-按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(30.0f, 20.0f));
@@ -440,6 +453,17 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 }
 
 void RecordScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
+    const char *text = _editBox->getText();
+    if (*text == '\0') {
+        const char *placeholder = _editBox->getPlaceHolder();
+        _editBox->setText(placeholder);
+        text = placeholder;
+    }
+
+    if (atoi(text) < 8) {
+        _editBox->setText("8");
+    }
+
     updateScoreLabel();
 }
 
