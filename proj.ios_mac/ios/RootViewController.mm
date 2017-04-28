@@ -43,7 +43,7 @@
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView {
     // Initialize the CCEAGLView
-    CCEAGLView *eaglView = [CCEAGLView viewWithFrame: [UIScreen mainScreen].bounds
+    CCEAGLView *eaglView = [CCEAGLView viewWithFrame: [UIScreen mainScreen].applicationFrame
                                          pixelFormat: (__bridge NSString *)cocos2d::GLViewImpl::_pixelFormat
                                          depthFormat: cocos2d::GLViewImpl::_depthFormat
                                   preserveBackbuffer: NO
@@ -102,7 +102,11 @@
 
 //fix not hide status on ios7
 - (BOOL)prefersStatusBarHidden {
-    return YES;
+    return NO;
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
 }
 
 - (void)didReceiveMemoryWarning {
