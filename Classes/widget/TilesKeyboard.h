@@ -40,6 +40,7 @@ private:
     void onSpace();
     void onLeftBracket();
     void onRightBracket();
+    void onClear();
 
     std::string _tilesText;
 
@@ -50,6 +51,8 @@ private:
     cocos2d::Node *_tilesContainer = nullptr;
     std::vector<cocos2d::Sprite *> _tilesSprite;
 
+    cocos2d::ui::Button *_suitButton = nullptr;
+    int _currentSuit = 0;
     bool _inBracket = false;
 
     std::function<void (const char *)> _onTextChange;
