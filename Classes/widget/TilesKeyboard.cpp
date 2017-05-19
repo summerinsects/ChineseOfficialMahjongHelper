@@ -18,25 +18,25 @@ USING_NS_CC;
 enum Keyboard {
     KEY_OK = 0,
     KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9,
-    KEY_m, KEY_s, KEY_p,
+    KEY_SUIT,
     KEY_E, KEY_S, KEY_W, KEY_N, KEY_C, KEY_F, KEY_P,
-    KEY_LEFT_BRACKET, KEY_SPACE, KEY_RIGHT_BRACKET, KEY_DELETE, KEY_GLOBAL
+    KEY_LEFT_BRACKET, KEY_SPACE, KEY_RIGHT_BRACKET, KEY_DELETE, KEY_CLEAR, KEY_GLOBAL
 };
 
 static const char *buttonFace[] = {
     "\xE2\x8F\x8E",
     "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "万 m", "条 s", "饼 p",
+    "",
     "东 E", "南 S", "西 W", "北 N", "中 C", "发 F", "白 P",
-    "[", "", "]", "\xE2\x9D\x8C", "\xF0\x9F\x8C\x90"
+    "[", "", "]", "\xE2\x9D\x8C", "清空", "\xF0\x9F\x8C\x90"
 };
 
 static const Keyboard keyIdx[] = {
-    KEY_E, KEY_1, KEY_2, KEY_3, KEY_m,
-    KEY_S, KEY_4, KEY_5, KEY_6, KEY_s,
-    KEY_W, KEY_7, KEY_8, KEY_9, KEY_p,
+    KEY_E, KEY_1, KEY_2, KEY_3, KEY_SUIT,
+    KEY_S, KEY_4, KEY_5, KEY_6, KEY_LEFT_BRACKET,
+    KEY_W, KEY_7, KEY_8, KEY_9, KEY_RIGHT_BRACKET,
     KEY_N, KEY_C, KEY_F, KEY_P, KEY_DELETE,
-    KEY_GLOBAL, KEY_LEFT_BRACKET, KEY_SPACE, KEY_RIGHT_BRACKET, KEY_OK
+    KEY_GLOBAL, KEY_SPACE, KEY_SPACE, KEY_CLEAR, KEY_OK
 };
 
 bool TilesKeyboard::init() {
@@ -109,6 +109,15 @@ bool TilesKeyboard::init() {
     buttons[24]->loadTextureNormal("source_material/btn_square_highlighted.png");
     buttons[24]->setTitleColor(Color3B::WHITE);
 
+    _suitButton = buttons[4];
+    _suitButton->loadTextureNormal("source_material/btn_square_highlighted.png");
+    _suitButton->setTitleColor(Color3B::WHITE);
+
+    buttons[22]->removeFromParent();
+    ui::Button *spaceButton = buttons[21];
+    spaceButton->setContentSize(Size(BUTTON_WIDTH * 2 + GAP, BUTTON_HEIGHT));
+    spaceButton->setPosition(Vec2((BUTTON_WIDTH + GAP) * 0.5f, 0) + spaceButton->getPosition());
+
     // 输入文本的背景
     LayerColor *inputBg = LayerColor::create(Color4B(238, 238, 238, 238), 0, INPUT_HEIGHT);
     _inputBg = inputBg;
@@ -157,6 +166,8 @@ bool TilesKeyboard::init() {
 
     _tilesSprite.reserve(18);
 
+    _currentSuit = 0;
+    _suitButton->setTitleText("万 m");
     return true;
 }
 
@@ -166,12 +177,27 @@ void TilesKeyboard::onKeyboardButton(cocos2d::Ref *sender) {
     case KEY_1: case KEY_2: case KEY_3:
     case KEY_4: case KEY_5: case KEY_6:
     case KEY_7: case KEY_8: case KEY_9: {
+        std::string temp = _tilesText;
         _tilesText.append(1, '0' + n);
-        refreshInputLabel();
+        onNumberedSuffix(_currentSuit);
+
+        // 合并后缀
+        if (!temp.empty() && "msp"[_currentSuit] == temp.back()) {
+            size_t len = temp.length();
+            _tilesText.erase(_tilesText.begin() + len - 1, _tilesText.begin() + len);
+            refreshInputLabel();
+        }
         break;
     }
-    case KEY_m: case KEY_s: case KEY_p:
-        onNumberedSuffix(n - KEY_m);
+    case KEY_SUIT:
+        ++_currentSuit;
+        if (_currentSuit > 2) _currentSuit = 0;
+        switch (_currentSuit) {
+        case 0: _suitButton->setTitleText("万 m"); break;
+        case 1: _suitButton->setTitleText("条 s"); break;
+        case 2: _suitButton->setTitleText("饼 p"); break;
+        default: break;
+        }
         break;
     case KEY_E: case KEY_S: case KEY_W: case KEY_N:
     case KEY_C: case KEY_F: case KEY_P:
@@ -188,6 +214,9 @@ void TilesKeyboard::onKeyboardButton(cocos2d::Ref *sender) {
         break;
     case KEY_RIGHT_BRACKET:
         onRightBracket();
+        break;
+    case KEY_CLEAR:
+        onClear();
         break;
     case KEY_OK:
         dismissWithEvent(DismissEvent::OK);
@@ -385,15 +414,14 @@ void TilesKeyboard::onBackspace() {
 
     char ch = _tilesText.back();
     _tilesText.pop_back();
-    refreshInputLabel();
 
     switch (ch) {
     case 'm': case 's': case 'p': {
-        std::string::size_type len = _tilesText.length();
-        std::string::size_type lastSuffixPos
-            = std::find_if_not(_tilesText.rbegin(), _tilesText.rend(), isdigit).base() - _tilesText.begin();
-
-        removeTiles(len - lastSuffixPos);
+        _tilesText.pop_back();
+        if (!_tilesText.empty() && isdigit(_tilesText.back())) {
+            _tilesText.push_back(ch);
+        }
+        removeTiles(1);
         break;
     }
     case 'E': case 'S': case 'W': case 'N': case 'C': case 'F': case 'P':
@@ -413,6 +441,8 @@ void TilesKeyboard::onBackspace() {
     default:
         break;
     }
+
+    refreshInputLabel();
 }
 
 void TilesKeyboard::onSpace() {
@@ -456,6 +486,19 @@ void TilesKeyboard::onRightBracket() {
     refreshInputLabel();
 
     addSpaceTile();
+}
+
+void TilesKeyboard::onClear() {
+    _tilesText.clear();
+    refreshInputLabel();
+
+    _tilesContainer->removeAllChildren();
+    _tilesSprite.clear();
+
+    _tilesContainer->setContentSize(Size(0, TILE_HEIGHT));
+    _tilesContainer->setScale(1.0f);
+
+    _countLabel->setString("当前牌数目：0");
 }
 
 void TilesKeyboard::hookEditBox(cocos2d::ui::EditBox *editBox) {

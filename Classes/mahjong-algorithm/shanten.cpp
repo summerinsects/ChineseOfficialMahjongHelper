@@ -122,7 +122,7 @@ typedef uint16_t path_unit_t;
 #define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
 #define UNIT_TILE(unit_) ((unit_) & 0xFF)
 
-#define MAX_STATE 256
+#define MAX_STATE 512
 #define UNIT_SIZE 7
 
 // 一条路径
