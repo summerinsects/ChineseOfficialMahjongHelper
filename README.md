@@ -9,7 +9,7 @@ Chinese Official Mahjong Helper
 
 配置步骤
 ---------
-1. 下载cocos2dx v3.14.1
+1. 下载cocos2dx v3.15
 2. clone本项目
 3. 随便创建一个c++工程（命令行：cocos new -l cpp --portrait 工程名）
 4. 将生成的工程下的cocos2d目录拷贝到Classes的同一级目录下
