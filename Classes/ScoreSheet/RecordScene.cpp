@@ -502,6 +502,30 @@ void RecordScene::refresh() {
     _tableView->reloadDataInplacement();
 }
 
+void RecordScene::_SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, uint8_t false_win) {
+    for (int i = 0; i < 4; ++i) {
+        if (scoreTable[i] != 0) {
+            if (TEST_WIN(win_claim, i)) {  // 和牌：红色
+                scoreLabel[i]->setColor(Color3B(254, 87, 110));
+            }
+            else {
+                if (UNLIKELY(TEST_FALSE_WIN(false_win, i))) {  // 错和：紫色
+                    scoreLabel[i]->setColor(Color3B(89, 16, 89));
+                }
+                else if (UNLIKELY(TEST_CLAIM(win_claim, i))) {  // 点炮：蓝色
+                    scoreLabel[i]->setColor(Color3B(44, 121, 178));
+                }
+                else {  // 其他：绿色
+                    scoreLabel[i]->setColor(Color3B(101, 196, 59));
+                }
+            }
+        }
+        else {
+            scoreLabel[i]->setColor(Color3B(0x60, 0x60, 0x60));
+        }
+    }
+}
+
 void RecordScene::updateScoreLabel() {
     _detail.win_claim = 0;
     int claimIndex = -1;
@@ -532,27 +556,11 @@ void RecordScene::updateScoreLabel() {
     int scoreTable[4];
     translateDetailToScoreTable(_detail, scoreTable);
 
-    // 使用不同颜色
     for (int i = 0; i < 4; ++i) {
         _scoreLabel[i]->setString(StringUtils::format("%+d", scoreTable[i]));
-
-        if (scoreTable[i] != 0) {
-            if (TEST_WIN(_detail.win_claim, i)) {  // 和牌：红色
-                _scoreLabel[i]->setColor(Color3B(254, 87, 110));
-            }
-            else {
-                if (UNLIKELY(TEST_CLAIM(_detail.win_claim, i) || TEST_FALSE_WIN(_detail.false_win, i))) {  // 点炮或者错和：蓝色
-                    _scoreLabel[i]->setColor(Color3B(44, 121, 178));
-                }
-                else {  // 其他：绿色
-                    _scoreLabel[i]->setColor(Color3B(101, 196, 59));
-                }
-            }
-        }
-        else {
-            _scoreLabel[i]->setColor(Color3B(0x60, 0x60, 0x60));
-        }
     }
+    // 使用不同颜色
+    _SetScoreLabelColor(_scoreLabel, scoreTable, _detail.win_claim, _detail.false_win);
 
     // 四位选手的总分加起来和为0
     if (scoreTable[0] + scoreTable[1] + scoreTable[2] + scoreTable[3] == 0) {

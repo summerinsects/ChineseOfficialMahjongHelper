@@ -46,6 +46,8 @@ public:
     static void _WinHandToCalculateParam(const Record::Detail::WinHand &winHand, CalculateParam &param);
     static void _CalculateParamToWinHand(const CalculateParam &param, Record::Detail::WinHand &winHand);
 
+    static void _SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, uint8_t false_win);
+
 private:
     cocos2d::ui::EditBox *_editBox = nullptr;
     cocos2d::ui::CheckBox *_drawBox = nullptr;

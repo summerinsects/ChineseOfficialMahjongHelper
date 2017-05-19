@@ -313,23 +313,10 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     for (int i = 0; i < 4; ++i) {
         _scoreLabels[handIdx][i]->setString(StringUtils::format("%+d", scoreTable[i]));
         _totalScores[i] += scoreTable[i];  // 更新总分
-        if (scoreTable[i] != 0) {
-            if (TEST_WIN(detail.win_claim, i)) {  // 和牌：红色
-                _scoreLabels[handIdx][i]->setColor(Color3B(254, 87, 110));
-            }
-            else {
-                if (UNLIKELY(TEST_CLAIM(detail.win_claim, i) || TEST_FALSE_WIN(detail.false_win, i))) {  // 点炮或者错和：蓝色
-                    _scoreLabels[handIdx][i]->setColor(Color3B(44, 121, 178));
-                }
-                else {  // 其他：绿色
-                    _scoreLabels[handIdx][i]->setColor(Color3B(101, 196, 59));
-                }
-            }
-        }
-        else {
-            _scoreLabels[handIdx][i]->setColor(Color3B(0x60, 0x60, 0x60));
-        }
     }
+
+    // 使用不同颜色
+    RecordScene::_SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_claim, detail.false_win);
 
     // 禁用并隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
