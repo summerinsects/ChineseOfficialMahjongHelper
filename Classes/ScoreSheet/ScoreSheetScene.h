@@ -3,7 +3,7 @@
 
 #include "../BaseLayer.h"
 
-class Record;
+struct Record;
 
 class ScoreSheetScene : public BaseLayer {
 public:
