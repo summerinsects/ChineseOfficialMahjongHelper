@@ -24,11 +24,11 @@ enum Keyboard {
 };
 
 static const char *buttonFace[] = {
-    "\xE2\x8F\x8E",
+    "",
     "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "",
     "东 E", "南 S", "西 W", "北 N", "中 C", "发 F", "白 P",
-    "[", "", "]", "\xE2\x9D\x8C", "清空", "\xF0\x9F\x8C\x90"
+    "[", "", "]", "", "清空", "\xF0\x9F\x8C\x90"
 };
 
 static const Keyboard keyIdx[] = {
@@ -106,17 +106,38 @@ bool TilesKeyboard::init() {
         button->addClickEventListener(std::bind(&TilesKeyboard::onKeyboardButton, this, std::placeholders::_1));
         buttons[i] = button;
     }
-    buttons[24]->loadTextureNormal("source_material/btn_square_highlighted.png");
-    buttons[24]->setTitleColor(Color3B::WHITE);
 
+    // 返回键
+    ui::Button *button = buttons[24];
+    button->loadTextureNormal("source_material/btn_square_highlighted.png");
+    button->setTitleColor(Color3B::WHITE);
+    Sprite *sprite = Sprite::create("drawable/sym_keyboard_return.png");
+    sprite->setPosition(Vec2(BUTTON_WIDTH * 0.5f, BUTTON_HEIGHT * 0.5f));
+    sprite->setScale(30 / sprite->getContentSize().height);
+    button->getRendererNormal()->addChild(sprite);
+
+    // 花色
     _suitButton = buttons[4];
     _suitButton->loadTextureNormal("source_material/btn_square_highlighted.png");
     _suitButton->setTitleColor(Color3B::WHITE);
 
+    // 删除键
+    sprite = Sprite::create("drawable/sym_keyboard_feedback_delete.png");
+    sprite->setPosition(Vec2(BUTTON_WIDTH * 0.5f, BUTTON_HEIGHT * 0.5f));
+    sprite->setScale(30 / sprite->getContentSize().height);
+    buttons[19]->getRendererNormal()->addChild(sprite);
+
+    // 多余的空格键
     buttons[22]->removeFromParent();
-    ui::Button *spaceButton = buttons[21];
-    spaceButton->setContentSize(Size(BUTTON_WIDTH * 2 + GAP, BUTTON_HEIGHT));
-    spaceButton->setPosition(Vec2((BUTTON_WIDTH + GAP) * 0.5f, 0) + spaceButton->getPosition());
+
+    // 空格键
+    button = buttons[21];
+    button->setContentSize(Size(BUTTON_WIDTH * 2 + GAP, BUTTON_HEIGHT));
+    button->setPosition(Vec2((BUTTON_WIDTH + GAP) * 0.5f, 0) + button->getPosition());
+    sprite = Sprite::create("drawable/sym_keyboard_feedback_space.png");
+    sprite->setPosition(Vec2(BUTTON_WIDTH + GAP * 0.5f, BUTTON_HEIGHT * 0.5f));
+    sprite->setScale(30 / sprite->getContentSize().height);
+    button->getRendererNormal()->addChild(sprite);
 
     // 输入文本的背景
     LayerColor *inputBg = LayerColor::create(Color4B(238, 238, 238, 238), 0, INPUT_HEIGHT);
