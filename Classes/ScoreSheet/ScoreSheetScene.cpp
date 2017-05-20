@@ -1,5 +1,4 @@
 ﻿#include "ScoreSheetScene.h"
-#include "Record.h"
 #include "RecordScene.h"
 #include "HistoryScene.h"
 #include "../widget/AlertView.h"
@@ -13,13 +12,11 @@
 
 USING_NS_CC;
 
-static Record g_currentRecord;
-
 static forceinline bool isCStringEmpty(const char *str) {
     return *str == '\0';
 }
 
-static void readFromJson() {
+static void readFromJson(Record &record) {
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("record.json");
     std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
@@ -31,17 +28,17 @@ static void readFromJson() {
             return;
         }
 
-        JsonToRecord(doc, g_currentRecord);
+        JsonToRecord(doc, record);
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
     }
 }
 
-static void writeToJson() {
+static void writeToJson(const Record &record) {
     try {
         rapidjson::Document doc(rapidjson::Type::kObjectType);
-        RecordToJson(g_currentRecord, doc, doc.GetAllocator());
+        RecordToJson(record, doc, doc.GetAllocator());
 
         rapidjson::StringBuffer buf;
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
@@ -70,6 +67,12 @@ Scene *ScoreSheetScene::createScene() {
 }
 
 bool ScoreSheetScene::init() {
+    Record record;
+    readFromJson(record);
+    return ScoreSheetScene::initWithRecord(record);
+}
+
+bool ScoreSheetScene::initWithRecord(const Record &record) {
     if (UNLIKELY(!BaseLayer::initWithTitle("国标麻将记分器"))) {
         return false;
     }
@@ -288,8 +291,8 @@ bool ScoreSheetScene::init() {
         _detailButton[k] = button;
     }
 
-    // 从json中读，并恢复界面数据
-    readFromJson();
+    // 恢复界面数据
+    memcpy(&_record, &record, sizeof(_record));
     recover();
     return true;
 }
@@ -306,7 +309,7 @@ void ScoreSheetScene::cleanRow(size_t handIdx) {
 
 void ScoreSheetScene::fillRow(size_t handIdx) {
     int scoreTable[4];
-    const Record::Detail &detail = g_currentRecord.detail[handIdx];
+    const Record::Detail &detail = _record.detail[handIdx];
     translateDetailToScoreTable(detail, scoreTable);
 
     // 填入这一盘四位选手的得分
@@ -354,7 +357,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 void ScoreSheetScene::refreshStartTime() {
     char str[255] = "开始时间：";
     size_t len = strlen(str);
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.start_time));
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&_record.start_time));
     _timeLabel->setString(str);
     _timeLabel->setScale(1);
 }
@@ -362,10 +365,10 @@ void ScoreSheetScene::refreshStartTime() {
 void ScoreSheetScene::refreshEndTime() {
     char str[255] = "起止时间：";
     size_t len = strlen(str);
-    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.start_time));
+    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&_record.start_time));
     strcpy(str + len, " -- ");
     len += 4;
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&g_currentRecord.end_time));
+    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&_record.end_time));
     _timeLabel->setString(str);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -374,9 +377,9 @@ void ScoreSheetScene::refreshEndTime() {
 
 void ScoreSheetScene::recover() {
     // 有选手名字为空，则清空数据
-    const char (&name)[4][255] = g_currentRecord.name;
+    const char (&name)[4][255] = _record.name;
     if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)) {
-        memset(&g_currentRecord, 0, sizeof(g_currentRecord));
+        memset(&_record, 0, sizeof(_record));
         onTimeScheduler(0.0f);
         this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
         return;
@@ -397,10 +400,10 @@ void ScoreSheetScene::recover() {
     memset(_totalScores, 0, sizeof(_totalScores));
 
     // 逐行填入数据
-    for (size_t i = 0; i < g_currentRecord.current_index; ++i) {
+    for (size_t i = 0; i < _record.current_index; ++i) {
         fillRow(i);
     }
-    for (size_t i = g_currentRecord.current_index; i < 16; ++i) {
+    for (size_t i = _record.current_index; i < 16; ++i) {
         cleanRow(i);
     }
 
@@ -410,9 +413,9 @@ void ScoreSheetScene::recover() {
     }
 
     // 如果不是北风北，则显示下一行的计分按钮
-    if (g_currentRecord.current_index < 16) {
-        _recordButton[g_currentRecord.current_index]->setVisible(true);
-        _recordButton[g_currentRecord.current_index]->setEnabled(true);
+    if (_record.current_index < 16) {
+        _recordButton[_record.current_index]->setVisible(true);
+        _recordButton[_record.current_index]->setEnabled(true);
 
         refreshStartTime();
     }
@@ -423,8 +426,8 @@ void ScoreSheetScene::recover() {
 }
 
 void ScoreSheetScene::reset() {
-    memset(&g_currentRecord, 0, sizeof(g_currentRecord));
-    writeToJson();
+    memset(&_record, 0, sizeof(_record));
+    writeToJson(_record);
 
     memset(_totalScores, 0, sizeof(_totalScores));
 
@@ -448,7 +451,7 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *sender, size_t idx) {
         editName(idx);
     }
     else {
-        if (g_currentRecord.current_index < 16) {
+        if (_record.current_index < 16) {
             AlertView::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？", 12,
                 std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
         }
@@ -463,7 +466,7 @@ void ScoreSheetScene::editName(size_t idx) {
     ui::EditBox *editBox = ui::EditBox::create(Size(120.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setFontColor(Color3B::BLACK);
     editBox->setFontSize(12);
-    editBox->setText(g_currentRecord.name[idx]);
+    editBox->setText(_record.name[idx]);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -476,23 +479,23 @@ void ScoreSheetScene::editName(size_t idx) {
     AlertView::showWithNode(title, editBox, [this, editBox, idx]() {
         const char *text = editBox->getText();
         if (!isCStringEmpty(text)) {
-            strncpy(g_currentRecord.name[idx], text, 255);
+            strncpy(_record.name[idx], text, 255);
             _nameLabel[idx]->setVisible(true);
             _nameLabel[idx]->setString(text);
             scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4);
 
-            if (g_currentRecord.current_index >= 16) {
-                HistoryScene::modifyRecord(g_currentRecord);
+            if (_record.current_index >= 16) {
+                HistoryScene::modifyRecord(_record);
             }
 
-            writeToJson();
+            writeToJson(_record);
         }
     }, nullptr);
     editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
 }
 
 void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
-    const char (&name)[4][255] = g_currentRecord.name;
+    const char (&name)[4][255] = _record.name;
     if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)) {
         AlertView::showWithMessage("锁定", "请先录入四位参赛选手姓名", 12, nullptr, nullptr);
         return;
@@ -502,7 +505,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
 
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setVisible(true);
-        _nameLabel[i]->setString(g_currentRecord.name[i]);
+        _nameLabel[i]->setString(_record.name[i]);
         scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4);
     }
 
@@ -513,10 +516,10 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
 
     this->unschedule(schedule_selector(ScoreSheetScene::onTimeScheduler));
 
-    g_currentRecord.start_time = time(nullptr);
+    _record.start_time = time(nullptr);
     refreshStartTime();
 
-    writeToJson();
+    writeToJson(_record);
 }
 
 void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
@@ -524,22 +527,22 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
 }
 
 void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
-    const char *name[] = { g_currentRecord.name[0], g_currentRecord.name[1], g_currentRecord.name[2], g_currentRecord.name[3] };
-    auto scene = RecordScene::createScene(handIdx, name, modify ? &g_currentRecord.detail[handIdx] : nullptr,
+    const char *name[] = { _record.name[0], _record.name[1], _record.name[2], _record.name[3] };
+    auto scene = RecordScene::createScene(handIdx, name, modify ? &_record.detail[handIdx] : nullptr,
         [this, handIdx](const Record::Detail &detail) {
-        bool isModify = (handIdx != g_currentRecord.current_index);
+        bool isModify = (handIdx != _record.current_index);
 
         // 更新数据时，要先删除原来的记录
         if (isModify) {
             int scores[4];
-            translateDetailToScoreTable(g_currentRecord.detail[handIdx], scores);
+            translateDetailToScoreTable(_record.detail[handIdx], scores);
             for (int i = 0; i < 4; ++i) {
                 _totalScores[i] -= scores[i];
             }
         }
 
         // 将计分面板的数据更新到当前数据中
-        memcpy(&g_currentRecord.detail[handIdx], &detail, sizeof(Record::Detail));
+        memcpy(&_record.detail[handIdx], &detail, sizeof(Record::Detail));
 
         // 填入当前行
         fillRow(handIdx);
@@ -550,36 +553,38 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
         }
 
         if (isModify) {
-            HistoryScene::modifyRecord(g_currentRecord);
+            HistoryScene::modifyRecord(_record);
         }
         else {
             // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
-            if (++g_currentRecord.current_index < 16) {
-                _recordButton[g_currentRecord.current_index]->setVisible(true);
-                _recordButton[g_currentRecord.current_index]->setEnabled(true);
+            if (++_record.current_index < 16) {
+                _recordButton[_record.current_index]->setVisible(true);
+                _recordButton[_record.current_index]->setEnabled(true);
             }
             else {
-                g_currentRecord.end_time = time(nullptr);
+                _record.end_time = time(nullptr);
                 refreshEndTime();
-                HistoryScene::modifyRecord(g_currentRecord);
+                HistoryScene::modifyRecord(_record);
             }
         }
-        writeToJson();
+        writeToJson(_record);
     });
     Director::getInstance()->pushScene(scene);
 }
 
-static std::string stringifyDetail(const Record::Detail &detail) {
+static std::string stringifyDetail(const Record &record, size_t handIdx) {
+    const Record::Detail &detail = record.detail[handIdx];
+
     std::string ret;
 
     int wc = detail.win_claim;
     int winIndex = WIN_INDEX(wc);
     int claimIndex = CLAIM_INDEX(wc);
     if (winIndex == claimIndex) {
-        ret.append(StringUtils::format("「%s」自摸%d番。\n", g_currentRecord.name[winIndex], detail.score));
+        ret.append(StringUtils::format("「%s」自摸%d番。\n", record.name[winIndex], detail.score));
     }
     else {
-        ret.append(StringUtils::format("「%s」和%d番，「%s」放炮。\n", g_currentRecord.name[winIndex], detail.score, g_currentRecord.name[claimIndex]));
+        ret.append(StringUtils::format("「%s」和%d番，「%s」放炮。\n", record.name[winIndex], detail.score, record.name[claimIndex]));
     }
 
     uint64_t fanFlag = detail.fan_flag;
@@ -605,7 +610,7 @@ static std::string stringifyDetail(const Record::Detail &detail) {
         for (int i = 0; i < 4; ++i) {
             if (TEST_FALSE_WIN(detail.false_win, i)) {
                 ret.append("「");
-                ret.append(g_currentRecord.name[i]);
+                ret.append(record.name[i]);
                 ret.append("」");
             }
         }
@@ -616,7 +621,7 @@ static std::string stringifyDetail(const Record::Detail &detail) {
 }
 
 void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
-    const Record::Detail &detail = g_currentRecord.detail[handIdx];
+    const Record::Detail &detail = _record.detail[handIdx];
     if (detail.score == 0) {
         AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"),
             "荒庄。\n\n是否需要修改这盘的记录？", 12,
@@ -624,7 +629,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
         return;
     }
 
-    std::string message = stringifyDetail(detail);
+    std::string message = stringifyDetail(_record, handIdx);
     message.append("\n是否需要修改这盘的记录？");
 
     if (detail.win_hand.tile_count == 0 || detail.win_hand.win_tile == 0) {
@@ -711,10 +716,10 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
 
 void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
     Director::getInstance()->pushScene(HistoryScene::createScene([this](const Record &record) {
-        const char (&name)[4][255] = g_currentRecord.name;
+        const char (&name)[4][255] = _record.name;
         if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)
-            || g_currentRecord.current_index == 16) {
-            memcpy(&g_currentRecord, &record, sizeof(g_currentRecord));
+            || _record.current_index == 16) {
+            memcpy(&_record, &record, sizeof(_record));
             recover();
             return true;
         }
@@ -724,13 +729,13 @@ void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
-    const char (&name)[4][255] = g_currentRecord.name;
+    const char (&name)[4][255] = _record.name;
     if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)) {
         reset();
         return;
     }
 
-    if (g_currentRecord.current_index == 16) {
+    if (_record.current_index == 16) {
         reset();
         return;
     }
@@ -739,9 +744,9 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         [this]() {
         AlertView::showWithMessage("清空表格", "点击确认将余下盘数标记为荒庄，并保存到历史记录，\n点击取消则不保存到历史记录。", 12,
             [this]() {
-            g_currentRecord.current_index = 16;
-            g_currentRecord.end_time = time(nullptr);
-            HistoryScene::modifyRecord(g_currentRecord);
+            _record.current_index = 16;
+            _record.end_time = time(nullptr);
+            HistoryScene::modifyRecord(_record);
 
             reset();
         }, std::bind(&ScoreSheetScene::reset, this));
@@ -797,7 +802,7 @@ static void showPursuit(int delta) {
     AlertView::showWithMessage("追分与保位", msg, 12, nullptr, nullptr);
 }
 
-static DrawNode *createTable(const int (&totalScores)[4]) {
+static DrawNode *createTable(const char (&name)[4][255], const int (&totalScores)[4]) {
     // 下标
     int indices[4] = { 0, 1, 2, 3 };
     // 按分数排序
@@ -875,14 +880,14 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
     scaleLabelToFitWidth(label, gap - 4);
 
     // 4位
-    label = Label::createWithSystemFont(g_currentRecord.name[indices[3]], "Arail", 12);
+    label = Label::createWithSystemFont(name[indices[3]], "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 0.5f, 130));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 追1位
-    label = Label::createWithSystemFont(g_currentRecord.name[indices[0]], "Arail", 12);
+    label = Label::createWithSystemFont(name[indices[0]], "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 150));
     drawNode->addChild(label);
@@ -923,7 +928,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
     scaleLabelToFitWidth(label, gap - 4);
 
     // 追2位
-    label = Label::createWithSystemFont(g_currentRecord.name[indices[1]], "Arail", 12);
+    label = Label::createWithSystemFont(name[indices[1]], "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 130));
     drawNode->addChild(label);
@@ -964,7 +969,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
     scaleLabelToFitWidth(label, gap - 4);
 
     // 追3位
-    label = Label::createWithSystemFont(g_currentRecord.name[indices[2]], "Arail", 12);
+    label = Label::createWithSystemFont(name[indices[2]], "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 110));
     drawNode->addChild(label);
@@ -1005,14 +1010,14 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
     scaleLabelToFitWidth(label, gap - 4);
 
     // 3位
-    label = Label::createWithSystemFont(g_currentRecord.name[indices[2]], "Arail", 12);
+    label = Label::createWithSystemFont(name[indices[2]], "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 0.5f, 60));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 追1位
-    label = Label::createWithSystemFont(g_currentRecord.name[indices[0]], "Arail", 12);
+    label = Label::createWithSystemFont(name[indices[0]], "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 70));
     drawNode->addChild(label);
@@ -1053,7 +1058,7 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
     scaleLabelToFitWidth(label, gap - 4);
 
     // 追2位
-    label = Label::createWithSystemFont(g_currentRecord.name[indices[1]], "Arail", 12);
+    label = Label::createWithSystemFont(name[indices[1]], "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 50));
     drawNode->addChild(label);
@@ -1094,14 +1099,14 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
     scaleLabelToFitWidth(label, gap - 4);
 
     // 2位
-    label = Label::createWithSystemFont(g_currentRecord.name[indices[1]], "Arail", 12);
+    label = Label::createWithSystemFont(name[indices[1]], "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 0.5f, 10));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 追1位
-    label = Label::createWithSystemFont(g_currentRecord.name[indices[0]], "Arail", 12);
+    label = Label::createWithSystemFont(name[indices[0]], "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 1.5f, 10));
     drawNode->addChild(label);
@@ -1145,15 +1150,15 @@ static DrawNode *createTable(const int (&totalScores)[4]) {
 }
 
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
-    const char (&name)[4][255] = g_currentRecord.name;
+    const char (&name)[4][255] = _record.name;
     ui::Widget *rootWidget = nullptr;
 
     // 当当前一局比赛未结束时，显示快捷分差按钮
     if (std::none_of(std::begin(name), std::end(name), &isCStringEmpty)
-        && g_currentRecord.current_index < 16) {
+        && _record.current_index < 16) {
         rootWidget = ui::Widget::create();
 
-        DrawNode *drawNode = createTable(_totalScores);
+        DrawNode *drawNode = createTable(_record.name, _totalScores);
         const Size &drawNodeSize = drawNode->getContentSize();
 
         rootWidget->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30));
@@ -1201,9 +1206,9 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
-    const char (&name)[4][255] = g_currentRecord.name;
+    const char (&name)[4][255] = _record.name;
     if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)
-        || g_currentRecord.current_index == 16) {
+        || _record.current_index == 16) {
         return;
     }
 

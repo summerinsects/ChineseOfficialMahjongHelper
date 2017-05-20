@@ -2,6 +2,7 @@
 #define __SCORE_SHEET_SCENE_H__
 
 #include "../BaseLayer.h"
+#include "Record.h"
 
 class ScoreSheetScene : public BaseLayer {
 public:
@@ -22,6 +23,9 @@ private:
     cocos2d::ui::Button *_detailButton[16];
     cocos2d::Label *_fanNameLabel[16];
     cocos2d::Label *_timeLabel = nullptr;
+
+    Record _record;
+    bool initWithRecord(const Record &record);
 
     void fillRow(size_t handIdx);
     void cleanRow(size_t handIdx);
