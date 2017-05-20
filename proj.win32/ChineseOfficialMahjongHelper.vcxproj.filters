@@ -93,6 +93,9 @@
     <ClCompile Include="..\Classes\widget\TilesKeyboard.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\ScoreSheet\Record.cpp">
+      <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">

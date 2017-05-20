@@ -21,6 +21,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/MahjongTheory/MahjongTheoryScene.cpp \
                    ../../Classes/Other/OtherScene.cpp \
                    ../../Classes/ScoreSheet/HistoryScene.cpp \
+                   ../../Classes/ScoreSheet/Record.cpp \
                    ../../Classes/ScoreSheet/RecordScene.cpp \
                    ../../Classes/ScoreSheet/ScoreSheetScene.cpp \
                    ../../Classes/widget/AlertView.cpp \

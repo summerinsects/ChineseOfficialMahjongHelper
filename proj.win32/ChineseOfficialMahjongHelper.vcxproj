@@ -152,6 +152,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\Other\OtherScene.cpp" />
     <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp" />
+    <ClCompile Include="..\Classes\ScoreSheet\Record.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\ScoreSheetScene.cpp" />
     <ClCompile Include="..\Classes\FanTable\FanDefinition.cpp" />
