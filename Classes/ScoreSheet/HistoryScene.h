@@ -8,13 +8,13 @@ struct Record;
 
 class HistoryScene : public BaseLayer, cw::TableViewDelegate {
 public:
-    static cocos2d::Scene *createScene(const std::function<bool (const Record &)> &viewCallback);
+    static cocos2d::Scene *createScene(const std::function<void (Record *)> &viewCallback);
 
     virtual bool init() override;
 
     CREATE_FUNC(HistoryScene);
 
-    static void modifyRecord(const Record &record);
+    static void modifyRecord(const Record *record);
 
 private:
     struct RecordText {
@@ -35,7 +35,7 @@ private:
     void onCellEvent(cocos2d::Ref *sender, cocos2d::ui::Widget::TouchEventType event);
 
     cw::TableView *_tableView = nullptr;
-    std::function<bool (const Record &)> _viewCallback;
+    std::function<void (Record *)> _viewCallback;
 };
 
 #endif

@@ -106,6 +106,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setTitleText("历史记录");
     button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap * 2, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onHistoryButton, this, std::placeholders::_1));
+    button->setEnabled(record == &g_currentRecord);
 
     // 清空表格按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -116,6 +117,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setTitleText("清空表格");
     button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap, origin.y + visibleSize.height - 45));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
+    button->setEnabled(record == &g_currentRecord);
 
     // 追分策略按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -487,10 +489,12 @@ void ScoreSheetScene::editName(size_t idx) {
             scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4);
 
             if (_record->current_index >= 16) {
-                HistoryScene::modifyRecord(*_record);
+                HistoryScene::modifyRecord(_record);
             }
-            
-            writeToJson(*_record);
+
+            if (_record == &g_currentRecord) {
+                writeToJson(*_record);
+            }
         }
     }, nullptr);
     editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
@@ -521,7 +525,9 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
     _record->start_time = time(nullptr);
     refreshStartTime();
 
-    writeToJson(*_record);
+    if (_record == &g_currentRecord) {
+        writeToJson(*_record);
+    }
 }
 
 void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
@@ -555,7 +561,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
         }
 
         if (isModify) {
-            HistoryScene::modifyRecord(*_record);
+            HistoryScene::modifyRecord(_record);
         }
         else {
             // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
@@ -566,10 +572,13 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
             else {
                 _record->end_time = time(nullptr);
                 refreshEndTime();
-                HistoryScene::modifyRecord(*_record);
+                HistoryScene::modifyRecord(_record);
             }
         }
-        writeToJson(*_record);
+
+        if (_record == &g_currentRecord) {
+            writeToJson(*_record);
+        }
     });
     Director::getInstance()->pushScene(scene);
 }
@@ -717,16 +726,18 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
-    Director::getInstance()->pushScene(HistoryScene::createScene([this](const Record &record) {
-        const char (&name)[4][255] = _record->name;
-        if (std::any_of(std::begin(name), std::end(name), &isCStringEmpty)
-            || _record->current_index == 16) {
-            memcpy(_record, &record, sizeof(*_record));
-            recover();
-            return true;
+    Director::getInstance()->pushScene(HistoryScene::createScene([this](Record *record) {
+        if (UNLIKELY(g_currentRecord.start_time == record->start_time)) {  // 我们认为开始时间相同的为同一个记录
+            Director::getInstance()->popScene();
         }
-        AlertView::showWithMessage("提示", "当前一局尚未完成时不支持查看历史记录", 12, nullptr, nullptr);
-        return false;
+        else {
+            auto scene = Scene::create();
+            auto layer = new (std::nothrow) ScoreSheetScene();
+            layer->initWithRecord(record);
+            layer->autorelease();
+            scene->addChild(layer);
+            Director::getInstance()->pushScene(scene);
+        }
     }));
 }
 
@@ -748,7 +759,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
             [this]() {
             _record->current_index = 16;
             _record->end_time = time(nullptr);
-            HistoryScene::modifyRecord(*_record);
+            HistoryScene::modifyRecord(_record);
 
             reset();
         }, std::bind(&ScoreSheetScene::reset, this));

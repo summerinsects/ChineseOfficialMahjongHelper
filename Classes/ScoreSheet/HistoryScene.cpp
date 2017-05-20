@@ -18,7 +18,7 @@ USING_NS_CC;
 static std::vector<Record> g_records;
 static std::mutex g_mutex;
 
-Scene *HistoryScene::createScene(const std::function<bool (const Record &)> &viewCallback) {
+Scene *HistoryScene::createScene(const std::function<void (Record *)> &viewCallback) {
     auto scene = Scene::create();
     auto layer = HistoryScene::create();
     layer->_viewCallback = viewCallback;
@@ -284,21 +284,16 @@ void HistoryScene::onCellEvent(cocos2d::Ref *sender, cocos2d::ui::Widget::TouchE
     }
 
     cw::TableViewCell *cell = (cw::TableViewCell *)sender;
-    if (_viewCallback(g_records[cell->getIdx()])) {
-        Director::getInstance()->popScene();
-    }
+    _viewCallback(&g_records[cell->getIdx()]);
 }
 
-static void __modifyRecord(const Record &record) {
+static void __modifyRecord(const Record *record) {
     auto it = std::find_if(g_records.begin(), g_records.end(), [&record](const Record &r) {
-        return (r.start_time == record.start_time);  // 我们认为开始时间相同的为同一个记录
+        return (&r == record);  // 同一个记录
     });
 
     if (it == g_records.end()) {
-        g_records.push_back(record);
-    }
-    else {
-        memcpy(&*it, &record, sizeof(Record));
+        g_records.push_back(*record);
     }
 
     std::sort(g_records.begin(), g_records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
@@ -310,7 +305,7 @@ static void __modifyRecord(const Record &record) {
     }).detach();
 }
 
-void HistoryScene::modifyRecord(const Record &record) {
+void HistoryScene::modifyRecord(const Record *record) {
     if (UNLIKELY(g_records.empty())) {
         std::thread([record]() {
             std::vector<Record> temp;
