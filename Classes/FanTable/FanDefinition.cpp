@@ -67,11 +67,15 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
         this->addChild(loadingView);
         loadingView->setPosition(origin);
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
         float scale = 1.0f;
         float maxWidth = (visibleSize.width - 10) / 18;
         if (maxWidth < 25) {
-            scale = maxWidth / 27;
+            scale = maxWidth / TILE_WIDTH;
         }
+#else
+        float scale = 1.0f / Director::getInstance()->getContentScaleFactor();
+#endif
 
         auto thiz = RefPtr<FanDefinitionScene>(this);
         std::thread([thiz, idx, scale, loadingView]() {
