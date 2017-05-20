@@ -173,6 +173,15 @@ bool HistoryScene::init() {
     return true;
 }
 
+void HistoryScene::onEnter() {
+    Layer::onEnter();
+
+    if (LIKELY(!g_records.empty())) {
+        updateRecordTexts();
+        _tableView->reloadData();
+    }
+}
+
 ssize_t HistoryScene::numberOfCellsInTableView(cw::TableView *table) {
     return _recordTexts.size();
 }

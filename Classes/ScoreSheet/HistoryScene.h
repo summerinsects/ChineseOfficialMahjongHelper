@@ -14,6 +14,8 @@ public:
 
     CREATE_FUNC(HistoryScene);
 
+    virtual void onEnter() override;
+
     static void modifyRecord(const Record *record);
 
 private:
