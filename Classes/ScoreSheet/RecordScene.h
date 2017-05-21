@@ -15,10 +15,6 @@ static const char *packedFanNames[] = {
     "门断平", "门清平和", "四番风", "门清双暗", "断幺平和", "双同幺九", "双暗暗杠", "番牌暗杠"
 };
 
-#define SET_FAN(flag_, fan_) ((flag_) |= (1ULL << (mahjong::LAST_TILE - (fan_))))
-#define RESET_FAN(flag_, fan_) ((flag_) &= ~(1ULL << (mahjong::LAST_TILE - (fan_))))
-#define TEST_FAN(flag_, fan_) !!((flag_) & (1ULL << (mahjong::LAST_TILE - (fan_))))
-
 #define EMOJI_FLOWER "\xF0\x9F\x8C\xB8"
 
 #define EMOJI_FLOWER_8 EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER

@@ -47,9 +47,14 @@ static bool operator==(const Record &left, const Record &right) {
 #define SET_FALSE_WIN(fw_, n_) ((fw_) |= (1 << (n_)))
 #define TEST_FALSE_WIN(fw_, n_) !!((fw_) & (1 << (n_)))
 
+#define SET_FAN(flag_, fan_) ((flag_) |= (1ULL << (mahjong::LAST_TILE - (fan_))))
+#define RESET_FAN(flag_, fan_) ((flag_) &= ~(1ULL << (mahjong::LAST_TILE - (fan_))))
+#define TEST_FAN(flag_, fan_) !!((flag_) & (1ULL << (mahjong::LAST_TILE - (fan_))))
+
 void JsonToRecord(const rapidjson::Value &json, Record &record);
 void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
+std::string GetFanText(const Record::Detail &detail);
 
 #endif

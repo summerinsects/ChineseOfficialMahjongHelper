@@ -6,7 +6,6 @@
 #include "../widget/CWEditBoxDelegate.h"
 #include "../widget/HandTilesWidget.h"
 #include "../common.h"
-#include "../mahjong-algorithm/fan_calculator.h"
 
 #include "json/stringbuffer.h"
 #include "json/prettywriter.h"
@@ -331,29 +330,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     _detailButton[handIdx]->setEnabled(true);
 
     Label *label = _fanNameLabel[handIdx];
-    const char *fanName = nullptr;
-    if (detail.score == 0) {
-        fanName = "荒庄";
-    }
-
-    // 选取标记的最大番种显示出来
-    uint64_t fanFlag = detail.fan_flag;
-    if (fanFlag != 0) {
-        for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-            if (TEST_FAN(fanFlag, n)) {
-                unsigned idx = n;
-                fanName = mahjong::fan_name[idx];
-                break;
-            }
-        }
-    }
-
-    // 将未标记番种的显示为其他凑番
-    if (fanName == nullptr) {
-        fanName = "其他凑番";
-    }
-
-    label->setString(fanName);
+    label->setString(GetFanText(detail));
     label->setVisible(true);
     scaleLabelToFitWidth(label, _cellWidth - 4);
 }
