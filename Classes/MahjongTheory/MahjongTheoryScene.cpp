@@ -758,11 +758,11 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         Label *&cntLabel1 = std::get<6>(ext);
         Label *&cntLabel2 = std::get<7>(ext);
 
-        layerColor[0] = LayerColor::create(Color4B::WHITE, _cellWidth, 0);
+        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), _cellWidth, 0);
         cell->addChild(layerColor[0]);
         layerColor[0]->setPosition(Vec2(0, 1));
 
-        layerColor[1] = LayerColor::create(Color4B(239, 243, 247, 255), _cellWidth, 0);
+        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), _cellWidth, 0);
         cell->addChild(layerColor[1]);
         layerColor[1]->setPosition(Vec2(0, 1));
 

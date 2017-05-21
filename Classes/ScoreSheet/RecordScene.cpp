@@ -143,6 +143,9 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     this->addChild(_claimGroup);
     _claimGroup->addEventListener(std::bind(&RecordScene::onClaimGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
+    Node *radioNode = Node::create();
+    this->addChild(radioNode);
+
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float x = origin.x + gap * (i + 0.5f);
@@ -163,7 +166,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         // 和
         ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
             "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-        this->addChild(button);
+        radioNode->addChild(button);
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
@@ -172,14 +175,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
         label = Label::createWithSystemFont("和", "Arial", 12);
         label->setColor(Color3B::BLACK);
-        this->addChild(label);
+        radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 125));
 
         // 点炮或自摸
         button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
             "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-        this->addChild(button);
+        radioNode->addChild(button);
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
@@ -188,14 +191,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
         label->setColor(Color3B::BLACK);
-        this->addChild(label);
+        radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 155));
         _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         label->setColor(Color3B::BLACK);
-        this->addChild(label);
+        radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 155));
         _selfDrawnLabel[i] = label;
@@ -204,7 +207,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         // 错和
         _falseWinBox[i] = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
             "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-        this->addChild(_falseWinBox[i]);
+        radioNode->addChild(_falseWinBox[i]);
         _falseWinBox[i]->setZoomScale(0.0f);
         _falseWinBox[i]->ignoreContentAdaptWithSize(false);
         _falseWinBox[i]->setContentSize(Size(20.0f, 20.0f));
@@ -213,15 +216,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
         label = Label::createWithSystemFont("错和", "Arial", 12);
         label->setColor(Color3B::BLACK);
-        this->addChild(label);
+        radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 185));
     }
 
     // 根结点
     ui::Layout *rootLayout = ui::Layout::create();
-    rootLayout->setBackGroundColorType(ui::Layout::BackGroundColorType::SOLID);
-    rootLayout->setBackGroundColor(Color3B(245, 245, 245));
     this->addChild(rootLayout);
     rootLayout->setPosition(Vec2(origin.x, origin.y + 35));
     rootLayout->setTouchEnabled(true);
@@ -273,7 +274,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(tableView);
     _tableView = tableView;
 
-    std::function<void (Ref *)> layoutChildren = [rootLayout, topWidget, tableView](Ref *sender) {
+    std::function<void (Ref *)> layoutChildren = [radioNode, rootLayout, topWidget, tableView](Ref *sender) {
         ui::Button *button = (ui::Button *)sender;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -283,11 +284,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
             layoutSize.height = visibleSize.height - 150;
             button->setUserData(reinterpret_cast<void *>(false));
             button->setTitleText("\xE2\xAC\x87收起");
+            radioNode->setVisible(false);
         }
         else {
             layoutSize.height = visibleSize.height - 240;
             button->setUserData(reinterpret_cast<void *>(true));
             button->setTitleText("\xE2\xAC\x86展开");
+            radioNode->setVisible(true);
         }
 
         rootLayout->setContentSize(layoutSize);
