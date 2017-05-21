@@ -92,7 +92,7 @@ void HistoryScene::updateRecordTexts() {
         seatscore[3].first = 3, seatscore[3].second = 0;
         for (int i = 0; i < 16; ++i) {
             int s[4];
-            translateDetailToScoreTable(record.detail[i], s);
+            TranslateDetailToScoreTable(record.detail[i], s);
             seatscore[0].second += s[0];
             seatscore[1].second += s[1];
             seatscore[2].second += s[2];

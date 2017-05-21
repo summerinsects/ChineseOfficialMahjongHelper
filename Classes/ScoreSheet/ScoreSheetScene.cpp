@@ -314,7 +314,7 @@ void ScoreSheetScene::cleanRow(size_t handIdx) {
 void ScoreSheetScene::fillRow(size_t handIdx) {
     int scoreTable[4];
     const Record::Detail &detail = _record->detail[handIdx];
-    translateDetailToScoreTable(detail, scoreTable);
+    TranslateDetailToScoreTable(detail, scoreTable);
 
     // 填入这一盘四位选手的得分
     for (int i = 0; i < 4; ++i) {
@@ -543,7 +543,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
         // 更新数据时，要先删除原来的记录
         if (isModify) {
             int scores[4];
-            translateDetailToScoreTable(_record->detail[handIdx], scores);
+            TranslateDetailToScoreTable(_record->detail[handIdx], scores);
             for (int i = 0; i < 4; ++i) {
                 _totalScores[i] -= scores[i];
             }

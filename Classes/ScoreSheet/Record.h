@@ -50,6 +50,6 @@ static bool operator==(const Record &left, const Record &right) {
 void JsonToRecord(const rapidjson::Value &json, Record &record);
 void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 
-void translateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
+void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
 
 #endif

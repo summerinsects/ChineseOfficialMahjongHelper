@@ -554,7 +554,7 @@ void RecordScene::updateScoreLabel() {
     }
 
     int scoreTable[4];
-    translateDetailToScoreTable(_detail, scoreTable);
+    TranslateDetailToScoreTable(_detail, scoreTable);
 
     for (int i = 0; i < 4; ++i) {
         _scoreLabel[i]->setString(StringUtils::format("%+d", scoreTable[i]));

@@ -140,7 +140,7 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
     json.AddMember("end_time", rapidjson::Value((uint64_t)record.end_time), alloc);
 }
 
-void translateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
+void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
     memset(scoreTable, 0, sizeof(scoreTable));
     int winScore = detail.score;
     if (winScore >= 8 && !!(detail.win_claim & 0xF0)) {
