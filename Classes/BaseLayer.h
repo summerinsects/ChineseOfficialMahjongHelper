@@ -5,6 +5,11 @@
 #include "ui/CocosGUI.h"
 #include "compiler.h"
 
+#define COLOR4B_BG          cocos2d::Color4B(245, 245, 245, 255)
+#define COLOR4B_NAVIGATION  cocos2d::Color4B(51, 204, 255, 255)
+
+#define ENABLE_LOGO 1
+
 class BaseLayer : public cocos2d::Layer {
 public:
     bool initWithTitle(const std::string &title) {
@@ -13,7 +18,7 @@ public:
         }
 
         // 背景色
-        cocos2d::LayerColor *background = cocos2d::LayerColor::create(cocos2d::Color4B(245, 245, 245, 255));
+        cocos2d::LayerColor *background = cocos2d::LayerColor::create(COLOR4B_BG);
         this->addChild(background, -100);
 
         // 监听返回键
@@ -29,8 +34,19 @@ public:
         cocos2d::Size visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
         cocos2d::Vec2 origin = cocos2d::Director::getInstance()->getVisibleOrigin();
 
+#if ENABLE_LOGO
+        for (int i = 0; i < 3; ++i) {
+            cocos2d::Sprite *sprite = cocos2d::Sprite::create("xyg.png");
+            this->addChild(sprite);
+            sprite->setOpacity(0x10);
+            sprite->setRotation(-45);
+            sprite->setScale(256 / sprite->getContentSize().width);
+            sprite->setPosition(cocos2d::Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 200 * (1 - i)));
+        }
+#endif
+
         // 导航栏
-        cocos2d::LayerColor *navigation = cocos2d::LayerColor::create(cocos2d::Color4B(51, 204, 255, 255), visibleSize.width, 30);
+        cocos2d::LayerColor *navigation = cocos2d::LayerColor::create(COLOR4B_NAVIGATION, visibleSize.width, 30);
         this->addChild(navigation);
         navigation->setPosition(cocos2d::Vec2(origin.x, origin.y + visibleSize.height - 30));
 

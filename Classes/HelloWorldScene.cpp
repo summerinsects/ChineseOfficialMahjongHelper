@@ -31,7 +31,7 @@ bool HelloWorld::init() {
 
     UserDefault::getInstance()->deleteValueForKey("night_mode");
 
-    LayerColor *background = LayerColor::create(Color4B(245, 245, 245, 255));
+    LayerColor *background = LayerColor::create(COLOR4B_BG);
     this->addChild(background, -100);
 
     auto listener = EventListenerKeyboard::create();
@@ -47,6 +47,17 @@ bool HelloWorld::init() {
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+#if ENABLE_LOGO
+    for (int i = 0; i < 3; ++i) {
+        Sprite *sprite = Sprite::create("xyg.png");
+        this->addChild(sprite);
+        sprite->setOpacity(0x10);
+        sprite->setRotation(-45);
+        sprite->setScale(256 / sprite->getContentSize().width);
+        sprite->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 200 * (1 - i)));
+    }
+#endif
 
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
@@ -132,11 +143,9 @@ void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
     ui::Widget *rootWidget = ui::Widget::create();
 
     Label *label = Label::createWithSystemFont(
-        "1. 特别鸣谢：逍遥宫国标麻将群。\n"
-        "2. BUG反馈请发邮件至wohaaitinciu@163.com。\n"
-        "3. 本软件开源，高端玩家可下载源代码自行编译。\n"
-        "4. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
-        "5. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
+        "1. 本软件开源，高端玩家可下载源代码自行编译。\n"
+        "2. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
+        "3. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
         "Arail", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0);
