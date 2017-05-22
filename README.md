@@ -23,6 +23,7 @@ Chinese Official Mahjong Helper 国标小助手
 1. shift+右键“在此处打开命令行窗口”
 2. cocos compile -p android（如果要编译release版本，请加参数-m release）
 
+---
 
 ### 其他说明
 
