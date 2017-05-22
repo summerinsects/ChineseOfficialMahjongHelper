@@ -6,6 +6,12 @@
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../widget/LoadingView.h"
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
+#define HAS_WEBVIEW 1
+#else
+#define HAS_WEBVIEW 0
+#endif
+
 USING_NS_CC;
 
 static std::vector<std::string> g_principles;
@@ -67,7 +73,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
         this->addChild(loadingView);
         loadingView->setPosition(origin);
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
+#if HAS_WEBVIEW
         float scale = 1.0f;
         float maxWidth = (visibleSize.width - 10) / 18;
         if (maxWidth < 25) {
@@ -113,10 +119,10 @@ void FanDefinitionScene::createContentView(size_t idx) {
 
     const std::string &text = idx < 100 ? g_definitions[idx] : g_principles[idx - 100];
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
+#if HAS_WEBVIEW
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
     webView->setContentSize(Size(visibleSize.width, visibleSize.height - 35));
-    webView->loadHTMLString(text, "");
+    webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, text, ""));
     this->addChild(webView);
     webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
 #else
