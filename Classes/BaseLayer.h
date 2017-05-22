@@ -57,9 +57,8 @@ public:
             origin.y + visibleSize.height - 15));
 
         // 返回按钮
-        cocos2d::ui::Button *backBtn = cocos2d::ui::Button::create("source_material/btn_left_white.png", "source_material/btn_left_blue.png");
+        cocos2d::ui::Button *backBtn = cocos2d::ui::Button::create("source_material/btn_left_white.png");
         this->addChild(backBtn);
-        backBtn->setScale9Enabled(true);
         backBtn->setScale(24 / backBtn->getContentSize().width);
         backBtn->setPosition(cocos2d::Vec2(origin.x + 15, origin.y + visibleSize.height - 15));
         backBtn->addClickEventListener([](cocos2d::Ref *) {
