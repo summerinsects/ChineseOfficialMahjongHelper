@@ -33,7 +33,8 @@ Chinese Official Mahjong Helper 国标小助手
   - 删除Cocos2dxActivity.hideVirtualButton方法
   - 删除所有对Cocos2dxActivity.hideVirtualButton方法的调用
 
-#### 如何使WebView透明
+#### 如何使WebView透明（cocos2dx v3.15及之前的版本）
+参见：https://github.com/cocos2d/cocos2d-x/pull/17831 仅针对本项目亦可使用如下简单改法：
 - iOS
   - 打开cocos2d/cocos/ui/UIWebViewImpl-ios.mm
   - 在138行后，添加代码：
@@ -45,5 +46,5 @@ Chinese Official Mahjong Helper 国标小助手
   - 打开cocos2d/cocos/platform/android/java/src/org/cocos2dx/lib/Cocos2dxWebView.java
   - 在第58行后，添加代码：
 ```
-    this.setBackgroundColor(0);
+    this.setBackgroundColor(Color.TRANSPARENT);
 ```
