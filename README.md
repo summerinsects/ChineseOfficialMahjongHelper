@@ -26,13 +26,13 @@ Chinese Official Mahjong Helper 国标小助手
 
 ### 其他说明
 
-##### 如何非全屏
+#### 如何非全屏
 - Android
   - 打开cocos2d/cocos/platform/android/java/src/org/cocos2dx/lib/Cocos2dxActivity.java
   - 删除Cocos2dxActivity.hideVirtualButton方法
   - 删除所有对Cocos2dxActivity.hideVirtualButton方法的调用
 
-##### 如何使WebView透明
+#### 如何使WebView透明
 - iOS
   - 打开cocos2d/cocos/ui/UIWebViewImpl-ios.mm
   - 在138行后，添加代码：
