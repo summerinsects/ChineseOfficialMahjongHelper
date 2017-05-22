@@ -13,6 +13,8 @@
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		1F0828A51ED26F8C00F4C424 /* Record.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F0828A41ED26F8C00F4C424 /* Record.cpp */; };
 		1F0828A61ED26F8C00F4C424 /* Record.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F0828A41ED26F8C00F4C424 /* Record.cpp */; };
+		1F0828A81ED2756500F4C424 /* drawable in Resources */ = {isa = PBXBuildFile; fileRef = 1F0828A71ED2756500F4C424 /* drawable */; };
+		1F0828A91ED2756500F4C424 /* drawable in Resources */ = {isa = PBXBuildFile; fileRef = 1F0828A71ED2756500F4C424 /* drawable */; };
 		1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */; };
 		1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */; };
 		1F154E411E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
@@ -148,6 +150,7 @@
 		1D6058910D05DD3D006BFB54 /* ChineseOfficialMahjongHelper-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ChineseOfficialMahjongHelper-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1F0828A41ED26F8C00F4C424 /* Record.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Record.cpp; sourceTree = "<group>"; };
+		1F0828A71ED2756500F4C424 /* drawable */ = {isa = PBXFileReference; lastKnownFileType = folder; path = drawable; sourceTree = "<group>"; };
 		1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MahjongTheoryScene.cpp; sourceTree = "<group>"; };
 		1F154E3B1E4409420083F8B3 /* MahjongTheoryScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MahjongTheoryScene.h; sourceTree = "<group>"; };
 		1F154E3F1E440A160083F8B3 /* stringify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stringify.cpp; sourceTree = "<group>"; };
@@ -451,6 +454,7 @@
 		46880B7519C43A67006E1F66 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1F0828A71ED2756500F4C424 /* drawable */,
 				521A8EA819F11F5000D177D7 /* fonts */,
 				46880B7A19C43A67006E1F66 /* xyg.png */,
 				1FBC7B4F1CCB4CD100A782A4 /* other.xml */,
@@ -634,6 +638,7 @@
 				5087E77D17EB970100C73F5D /* Default-568h@2x.png in Resources */,
 				5087E78517EB970100C73F5D /* Icon-72.png in Resources */,
 				521A8E6519F0C34300D177D7 /* Default-736h@3x.png in Resources */,
+				1F0828A81ED2756500F4C424 /* drawable in Resources */,
 				1FE232941E1DE92400F2CC4D /* score_principles.xml in Resources */,
 				1FE5D0481CAE046300A5C38B /* tiles in Resources */,
 				521A8EA919F11F5000D177D7 /* fonts in Resources */,
@@ -661,6 +666,7 @@
 				1FE5D0491CAE046300A5C38B /* tiles in Resources */,
 				1FE2A3F91CBB32D6008C45C5 /* score_definition.xml in Resources */,
 				1FBC7B511CCB4CD100A782A4 /* other.xml in Resources */,
+				1F0828A91ED2756500F4C424 /* drawable in Resources */,
 				1FDD950F1C8338700031BC38 /* source_material in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
