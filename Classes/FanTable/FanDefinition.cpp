@@ -79,7 +79,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
 
         auto thiz = RefPtr<FanDefinitionScene>(this);
         std::thread([thiz, idx, scale, loadingView]() {
-            ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_definition.xml");
+            ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
             g_definitions.reserve(valueVec.size());
             std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions), [scale](const Value &value) {
                 std::string ret = value.asString();
@@ -87,7 +87,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
                 return std::move(ret);
             });
 
-            valueVec = FileUtils::getInstance()->getValueVectorFromFile("score_principles.xml");
+            valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
             g_principles.reserve(valueVec.size());
             std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_principles), [scale](const Value &value) {
                 std::string ret = value.asString();

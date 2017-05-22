@@ -17,7 +17,7 @@ bool OtherScene::init() {
     }
 
     if (UNLIKELY(g_map.empty())) {
-        ValueMap valueMap = FileUtils::getInstance()->getValueMapFromFile("other.xml");
+        ValueMap valueMap = FileUtils::getInstance()->getValueMapFromFile("text/other.xml");
         std::for_each(valueMap.begin(), valueMap.end(), [](const ValueMap::value_type &value) {
             g_map.insert(std::make_pair(value.first, value.second.asString()));
         });

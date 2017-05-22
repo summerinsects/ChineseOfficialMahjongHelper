@@ -15,6 +15,8 @@
 		1F0828A61ED26F8C00F4C424 /* Record.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F0828A41ED26F8C00F4C424 /* Record.cpp */; };
 		1F0828A81ED2756500F4C424 /* drawable in Resources */ = {isa = PBXBuildFile; fileRef = 1F0828A71ED2756500F4C424 /* drawable */; };
 		1F0828A91ED2756500F4C424 /* drawable in Resources */ = {isa = PBXBuildFile; fileRef = 1F0828A71ED2756500F4C424 /* drawable */; };
+		1F0828AB1ED276D200F4C424 /* text in Resources */ = {isa = PBXBuildFile; fileRef = 1F0828AA1ED276D200F4C424 /* text */; };
+		1F0828AC1ED276D200F4C424 /* text in Resources */ = {isa = PBXBuildFile; fileRef = 1F0828AA1ED276D200F4C424 /* text */; };
 		1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */; };
 		1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */; };
 		1F154E411E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
@@ -27,8 +29,6 @@
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1FA6933A1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
 		1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
-		1FBC7B501CCB4CD100A782A4 /* other.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FBC7B4F1CCB4CD100A782A4 /* other.xml */; };
-		1FBC7B511CCB4CD100A782A4 /* other.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FBC7B4F1CCB4CD100A782A4 /* other.xml */; };
 		1FCC3C021CC47200001C9555 /* HistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */; };
 		1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */; };
 		1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */; };
@@ -47,14 +47,10 @@
 		1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
 		1FE0DAAE1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */; };
 		1FE0DAAF1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */; };
-		1FE232941E1DE92400F2CC4D /* score_principles.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FE232931E1DE92400F2CC4D /* score_principles.xml */; };
-		1FE232951E1DE92400F2CC4D /* score_principles.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FE232931E1DE92400F2CC4D /* score_principles.xml */; };
 		1FE2A3EB1CBB30D1008C45C5 /* FanDefinition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinition.cpp */; };
 		1FE2A3EC1CBB30D1008C45C5 /* FanDefinition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinition.cpp */; };
 		1FE2A3ED1CBB30D1008C45C5 /* FanTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTable.cpp */; };
 		1FE2A3EE1CBB30D1008C45C5 /* FanTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTable.cpp */; };
-		1FE2A3F81CBB32D6008C45C5 /* score_definition.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FE2A3F71CBB32D6008C45C5 /* score_definition.xml */; };
-		1FE2A3F91CBB32D6008C45C5 /* score_definition.xml in Resources */ = {isa = PBXBuildFile; fileRef = 1FE2A3F71CBB32D6008C45C5 /* score_definition.xml */; };
 		1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */; };
 		1FE5CFDE1CAE029200A5C38B /* TilePickWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */; };
 		1FE5D0481CAE046300A5C38B /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = 1FE5D0471CAE046300A5C38B /* tiles */; };
@@ -151,6 +147,7 @@
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1F0828A41ED26F8C00F4C424 /* Record.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Record.cpp; sourceTree = "<group>"; };
 		1F0828A71ED2756500F4C424 /* drawable */ = {isa = PBXFileReference; lastKnownFileType = folder; path = drawable; sourceTree = "<group>"; };
+		1F0828AA1ED276D200F4C424 /* text */ = {isa = PBXFileReference; lastKnownFileType = folder; path = text; sourceTree = "<group>"; };
 		1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MahjongTheoryScene.cpp; sourceTree = "<group>"; };
 		1F154E3B1E4409420083F8B3 /* MahjongTheoryScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MahjongTheoryScene.h; sourceTree = "<group>"; };
 		1F154E3F1E440A160083F8B3 /* stringify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stringify.cpp; sourceTree = "<group>"; };
@@ -165,7 +162,6 @@
 		1F764BEA1CC5DB1F00844DAF /* OtherScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OtherScene.h; sourceTree = "<group>"; };
 		1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtraInfoWidget.cpp; sourceTree = "<group>"; };
 		1FA693391E83552300E839CC /* ExtraInfoWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtraInfoWidget.h; sourceTree = "<group>"; };
-		1FBC7B4F1CCB4CD100A782A4 /* other.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = other.xml; sourceTree = "<group>"; };
 		1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HistoryScene.cpp; sourceTree = "<group>"; };
 		1FCC3C001CC47200001C9555 /* HistoryScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HistoryScene.h; sourceTree = "<group>"; };
 		1FCC3C011CC47200001C9555 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Record.h; sourceTree = "<group>"; };
@@ -185,12 +181,10 @@
 		1FE04ADD1C94682A008401EA /* ScoreSheetScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreSheetScene.h; sourceTree = "<group>"; };
 		1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilesKeyboard.cpp; sourceTree = "<group>"; };
 		1FE0DAAD1E8A0C94008BCC2F /* TilesKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilesKeyboard.h; sourceTree = "<group>"; };
-		1FE232931E1DE92400F2CC4D /* score_principles.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = score_principles.xml; sourceTree = "<group>"; };
 		1FE2A3E71CBB30D1008C45C5 /* FanDefinition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanDefinition.cpp; sourceTree = "<group>"; };
 		1FE2A3E81CBB30D1008C45C5 /* FanDefinition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanDefinition.h; sourceTree = "<group>"; };
 		1FE2A3E91CBB30D1008C45C5 /* FanTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanTable.cpp; sourceTree = "<group>"; };
 		1FE2A3EA1CBB30D1008C45C5 /* FanTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanTable.h; sourceTree = "<group>"; };
-		1FE2A3F71CBB32D6008C45C5 /* score_definition.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = score_definition.xml; sourceTree = "<group>"; };
 		1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilePickWidget.cpp; sourceTree = "<group>"; };
 		1FE5CFDC1CAE029200A5C38B /* TilePickWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilePickWidget.h; sourceTree = "<group>"; };
 		1FE5D0471CAE046300A5C38B /* tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tiles; sourceTree = "<group>"; };
@@ -456,12 +450,10 @@
 			children = (
 				1F0828A71ED2756500F4C424 /* drawable */,
 				521A8EA819F11F5000D177D7 /* fonts */,
-				46880B7A19C43A67006E1F66 /* xyg.png */,
-				1FBC7B4F1CCB4CD100A782A4 /* other.xml */,
-				1FE2A3F71CBB32D6008C45C5 /* score_definition.xml */,
-				1FE232931E1DE92400F2CC4D /* score_principles.xml */,
 				1FDD950D1C8338700031BC38 /* source_material */,
+				1F0828AA1ED276D200F4C424 /* text */,
 				1FE5D0471CAE046300A5C38B /* tiles */,
+				46880B7A19C43A67006E1F66 /* xyg.png */,
 			);
 			name = Resources;
 			path = ../Resources;
@@ -629,17 +621,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				5087E78117EB970100C73F5D /* Icon-120.png in Resources */,
-				1FE2A3F81CBB32D6008C45C5 /* score_definition.xml in Resources */,
 				5087E78617EB970100C73F5D /* Icon-76.png in Resources */,
 				5087E77F17EB970100C73F5D /* Default@2x.png in Resources */,
 				50EF629917ECD46A001EB2F8 /* Icon-100.png in Resources */,
-				1FBC7B501CCB4CD100A782A4 /* other.xml in Resources */,
 				46880B8119C43A67006E1F66 /* xyg.png in Resources */,
 				5087E77D17EB970100C73F5D /* Default-568h@2x.png in Resources */,
 				5087E78517EB970100C73F5D /* Icon-72.png in Resources */,
 				521A8E6519F0C34300D177D7 /* Default-736h@3x.png in Resources */,
 				1F0828A81ED2756500F4C424 /* drawable in Resources */,
-				1FE232941E1DE92400F2CC4D /* score_principles.xml in Resources */,
+				1F0828AB1ED276D200F4C424 /* text in Resources */,
 				1FE5D0481CAE046300A5C38B /* tiles in Resources */,
 				521A8EA919F11F5000D177D7 /* fonts in Resources */,
 				50EF62A317ECD613001EB2F8 /* Icon-50.png in Resources */,
@@ -660,14 +650,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				46880B8219C43A67006E1F66 /* xyg.png in Resources */,
-				1FE232951E1DE92400F2CC4D /* score_principles.xml in Resources */,
 				503AE0F817EB97AB00D1A890 /* Icon.icns in Resources */,
 				521A8EAA19F11F5000D177D7 /* fonts in Resources */,
 				1FE5D0491CAE046300A5C38B /* tiles in Resources */,
-				1FE2A3F91CBB32D6008C45C5 /* score_definition.xml in Resources */,
-				1FBC7B511CCB4CD100A782A4 /* other.xml in Resources */,
 				1F0828A91ED2756500F4C424 /* drawable in Resources */,
 				1FDD950F1C8338700031BC38 /* source_material in Resources */,
+				1F0828AC1ED276D200F4C424 /* text in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
