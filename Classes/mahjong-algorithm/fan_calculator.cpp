@@ -452,6 +452,31 @@ static fan_t get_1_pung_fan(tile_t mid_tile) {
     return FAN_NONE;
 }
 
+// 存在3组顺子的番种时，余下的第4组顺子最多算1番
+static fan_t get_1_chow_extra(tile_t tile0, tile_t tile1, tile_t tile2, tile_t tile_extra) {
+    bool pure_double_chow = false;
+    bool mixed_double_chow = false;
+    bool short_straight = false;
+    bool two_terminal_chows = false;
+
+    fan_t fan0 = get_2_chows_fan(tile0, tile_extra);
+    fan_t fan1 = get_2_chows_fan(tile1, tile_extra);
+    fan_t fan2 = get_2_chows_fan(tile2, tile_extra);
+    if (fan0 == PURE_DOUBLE_CHOW || fan1 == PURE_DOUBLE_CHOW || fan2 == PURE_DOUBLE_CHOW) {
+        return PURE_DOUBLE_CHOW;
+    }
+    if (fan0 == MIXED_DOUBLE_CHOW || fan1 == MIXED_DOUBLE_CHOW || fan2 == MIXED_DOUBLE_CHOW) {
+        return MIXED_DOUBLE_CHOW;
+    }
+    if (fan0 == SHORT_STRAIGHT || fan1 == SHORT_STRAIGHT || fan2 == SHORT_STRAIGHT) {
+        return SHORT_STRAIGHT;
+    }
+    if (fan0 == TWO_TERMINAL_CHOWS || fan1 == TWO_TERMINAL_CHOWS || fan2 == TWO_TERMINAL_CHOWS) {
+        return TWO_TERMINAL_CHOWS;
+    }
+    return FAN_NONE;
+}
+
 template <long _Size>
 static fan_t *pairwise_test_chows(const tile_t (&chows_mid_tile)[_Size], fan_t *selected_fan) {
     fan_t all_fan[_Size][_Size] = { { FAN_NONE } };
@@ -518,44 +543,35 @@ static void calculate_4_chows(const pack_t chow_packs[4], long (&fan_table)[FAN_
     }
 
     // 3组顺子判断
-    bool _3_chows_has_fan = false;
-    long free_pack_idx = -1;  // 未使用的1组顺子
     // 012构成3组顺子的番种
     if ((fan = get_3_chows_fan(tiles[0], tiles[1], tiles[2])) != FAN_NONE) {
         fan_table[fan] = 1;
-        free_pack_idx = 3;
-        _3_chows_has_fan = true;
+        if ((fan = get_1_chow_extra(tiles[0], tiles[1], tiles[2], tiles[3])) != FAN_NONE) {
+            fan_table[fan] = 1;
+        }
+        return;
     }
     // 013构成3组顺子的番种
     else if ((fan = get_3_chows_fan(tiles[0], tiles[1], tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
-        free_pack_idx = 2;
-        _3_chows_has_fan = true;
+        if ((fan = get_1_chow_extra(tiles[0], tiles[1], tiles[3], tiles[2])) != FAN_NONE) {
+            fan_table[fan] = 1;
+        }
+        return;
     }
     // 023构成3组顺子的番种
     else if ((fan = get_3_chows_fan(tiles[0], tiles[2], tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
-        free_pack_idx = 1;
-        _3_chows_has_fan = true;
+        if ((fan = get_1_chow_extra(tiles[0], tiles[2], tiles[3], tiles[1])) != FAN_NONE) {
+            fan_table[fan] = 1;
+        }
+        return;
     }
     // 123构成3组顺子的番种
     else if ((fan = get_3_chows_fan(tiles[1], tiles[2], tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
-        free_pack_idx = 0;
-        _3_chows_has_fan = true;
-    }
-
-    // 存在3组顺子的番种时，余下的第4组顺子最多算1番
-    if (_3_chows_has_fan) {
-        for (long i = 0; i < 4; ++i) {
-            if (i == free_pack_idx) {
-                continue;
-            }
-            // 依次与未使用的这组顺子测试番种，一旦有则不再计算了（套算一次原则）
-            if ((fan = get_2_chows_fan(tiles[i], tiles[free_pack_idx])) != FAN_NONE) {
-                ++fan_table[fan];
-                break;
-            }
+        if ((fan = get_1_chow_extra(tiles[1], tiles[2], tiles[3], tiles[0])) != FAN_NONE) {
+            fan_table[fan] = 1;
         }
         return;
     }
