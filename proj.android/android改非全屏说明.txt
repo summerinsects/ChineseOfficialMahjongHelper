@@ -1,2 +1,0 @@
-﻿1. 删除Cocos2dxActivity.hideVirtualButton方法
-2. 删除所有对Cocos2dxActivity.hideVirtualButton方法的调用
