@@ -32,7 +32,9 @@ bool OtherScene::init() {
         std::thread([thiz, loadingView]() {
             // 读文件
             ValueMap valueMap = FileUtils::getInstance()->getValueMapFromFile("text/other.xml");
-            g_text = valueMap.begin()->second.asString();
+            if (LIKELY(!valueMap.empty())) {
+                g_text = valueMap.begin()->second.asString();
+            }
 
             // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
