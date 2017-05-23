@@ -151,8 +151,7 @@ bool HistoryScene::init() {
         this->addChild(loadingView);
         loadingView->setPosition(origin);
 
-        auto thiz = RefPtr<HistoryScene>(this);
-
+        auto thiz = makeRefPtr(this);
         std::thread([thiz, loadingView]() {
             std::vector<Record> temp;
             std::lock_guard<std::mutex> lg(g_mutex);
@@ -267,8 +266,7 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         loadingView->setPosition(Director::getInstance()->getVisibleSize());
 
         g_records.erase(g_records.begin() + idx);
-        auto thiz = RefPtr<HistoryScene>(this);
-
+        auto thiz = makeRef(this);
         std::vector<Record> temp = g_records;
         std::thread([thiz, temp, loadingView](){
             std::lock_guard<std::mutex> lg(g_mutex);

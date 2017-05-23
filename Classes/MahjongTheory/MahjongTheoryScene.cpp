@@ -432,7 +432,7 @@ void MahjongTheoryScene::calculate() {
     this->addChild(loadingView);
     loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
 
-    auto thiz = RefPtr<MahjongTheoryScene>(this);  // 保证线程回来之前不析构
+    auto thiz = makeRef(this);  // 保证线程回来之前不析构
     std::thread([thiz, hand_tiles, serving_tile, loadingView]() {
         mahjong::enum_discard_tile(&hand_tiles, serving_tile, FORM_FLAG_ALL, thiz.get(),
             [](void *context, const mahjong::enum_result_t *result) {
