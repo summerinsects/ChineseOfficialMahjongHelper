@@ -85,21 +85,26 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
 
         auto thiz = makeRef(this);  // 保证线程回来之前不析构
         std::thread([thiz, idx, scale, loadingView]() {
-            ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
-            g_definitions.reserve(valueVec.size());
-            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions), [scale](const Value &value) {
-                std::string ret = value.asString();
-                replaceTilesToImage(ret, scale);
-                return std::move(ret);
-            });
+            // 读文件
+            if (g_definitions.empty()) {
+                ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
+                g_definitions.reserve(valueVec.size());
+                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions), [scale](const Value &value) {
+                    std::string ret = value.asString();
+                    replaceTilesToImage(ret, scale);
+                    return std::move(ret);
+                });
+            }
 
-            valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
-            g_principles.reserve(valueVec.size());
-            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_principles), [scale](const Value &value) {
-                std::string ret = value.asString();
-                replaceTilesToImage(ret, scale);
-                return std::move(ret);
-            });
+            if (g_principles.empty()) {
+                ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
+                g_principles.reserve(valueVec.size());
+                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_principles), [scale](const Value &value) {
+                    std::string ret = value.asString();
+                    replaceTilesToImage(ret, scale);
+                    return std::move(ret);
+                });
+            }
 
             // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView]() {
@@ -123,7 +128,7 @@ void FanDefinitionScene::createContentView(size_t idx) {
 #if HAS_WEBVIEW
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
     webView->setContentSize(Size(visibleSize.width, visibleSize.height - 35));
-    webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, text, ""));
+    webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(text), ""));
     this->addChild(webView);
     webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
 #else
