@@ -83,7 +83,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
         float scale = 1.0f / Director::getInstance()->getContentScaleFactor();
 #endif
 
-        auto thiz = makeRef(this);
+        auto thiz = makeRef(this);  // 保证线程回来之前不析构
         std::thread([thiz, idx, scale, loadingView]() {
             ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
             g_definitions.reserve(valueVec.size());
@@ -101,6 +101,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
                 return std::move(ret);
             });
 
+            // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView]() {
                 if (LIKELY(thiz->getParent() != nullptr)) {
                     loadingView->removeFromParent();
