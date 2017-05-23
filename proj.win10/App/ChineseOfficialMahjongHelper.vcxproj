@@ -219,7 +219,32 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Classes\AppDelegate.h" />
+    <ClInclude Include="..\..\Classes\BaseLayer.h" />
+    <ClInclude Include="..\..\Classes\common.h" />
+    <ClInclude Include="..\..\Classes\compiler.h" />
+    <ClInclude Include="..\..\Classes\FanCalculator\FanCalculatorScene.h" />
+    <ClInclude Include="..\..\Classes\FanTable\FanDefinition.h" />
+    <ClInclude Include="..\..\Classes\FanTable\FanTable.h" />
     <ClInclude Include="..\..\Classes\HelloWorldScene.h" />
+    <ClInclude Include="..\..\Classes\mahjong-algorithm\fan_calculator.h" />
+    <ClInclude Include="..\..\Classes\mahjong-algorithm\shanten.h" />
+    <ClInclude Include="..\..\Classes\mahjong-algorithm\stringify.h" />
+    <ClInclude Include="..\..\Classes\mahjong-algorithm\tile.h" />
+    <ClInclude Include="..\..\Classes\MahjongTheory\MahjongTheoryScene.h" />
+    <ClInclude Include="..\..\Classes\Other\OtherScene.h" />
+    <ClInclude Include="..\..\Classes\ScoreSheet\HistoryScene.h" />
+    <ClInclude Include="..\..\Classes\ScoreSheet\Record.h" />
+    <ClInclude Include="..\..\Classes\ScoreSheet\RecordScene.h" />
+    <ClInclude Include="..\..\Classes\ScoreSheet\ScoreSheetScene.h" />
+    <ClInclude Include="..\..\Classes\TilesImage.h" />
+    <ClInclude Include="..\..\Classes\widget\AlertView.h" />
+    <ClInclude Include="..\..\Classes\widget\CWEditBoxDelegate.h" />
+    <ClInclude Include="..\..\Classes\widget\CWTableView.h" />
+    <ClInclude Include="..\..\Classes\widget\ExtraInfoWidget.h" />
+    <ClInclude Include="..\..\Classes\widget\HandTilesWidget.h" />
+    <ClInclude Include="..\..\Classes\widget\LoadingView.h" />
+    <ClInclude Include="..\..\Classes\widget\TilePickWidget.h" />
+    <ClInclude Include="..\..\Classes\widget\TilesKeyboard.h" />
     <ClInclude Include="App.xaml.h">
       <DependentUpon>App.xaml</DependentUpon>
     </ClInclude>
@@ -243,7 +268,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\..\Classes\FanCalculator\FanCalculatorScene.cpp" />
+    <ClCompile Include="..\..\Classes\FanTable\FanDefinition.cpp" />
+    <ClCompile Include="..\..\Classes\FanTable\FanTable.cpp" />
     <ClCompile Include="..\..\Classes\HelloWorldScene.cpp" />
+    <ClCompile Include="..\..\Classes\mahjong-algorithm\fan_calculator.cpp" />
+    <ClCompile Include="..\..\Classes\mahjong-algorithm\shanten.cpp" />
+    <ClCompile Include="..\..\Classes\mahjong-algorithm\stringify.cpp" />
+    <ClCompile Include="..\..\Classes\MahjongTheory\MahjongTheoryScene.cpp" />
+    <ClCompile Include="..\..\Classes\Other\OtherScene.cpp" />
+    <ClCompile Include="..\..\Classes\ScoreSheet\HistoryScene.cpp" />
+    <ClCompile Include="..\..\Classes\ScoreSheet\Record.cpp" />
+    <ClCompile Include="..\..\Classes\ScoreSheet\RecordScene.cpp" />
+    <ClCompile Include="..\..\Classes\ScoreSheet\ScoreSheetScene.cpp" />
+    <ClCompile Include="..\..\Classes\widget\AlertView.cpp" />
+    <ClCompile Include="..\..\Classes\widget\CWTableView.cpp" />
+    <ClCompile Include="..\..\Classes\widget\ExtraInfoWidget.cpp" />
+    <ClCompile Include="..\..\Classes\widget\HandTilesWidget.cpp" />
+    <ClCompile Include="..\..\Classes\widget\TilePickWidget.cpp" />
+    <ClCompile Include="..\..\Classes\widget\TilesKeyboard.cpp" />
     <ClCompile Include="App.xaml.cpp">
       <DependentUpon>App.xaml</DependentUpon>
     </ClCompile>
