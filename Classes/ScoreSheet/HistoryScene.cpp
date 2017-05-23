@@ -219,14 +219,11 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         label->setPosition(Vec2(2.0f, 35.0f));
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
-        delBtn = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-        delBtn->setScale9Enabled(true);
-        delBtn->setContentSize(Size(40.0f, 20.0f));
-        delBtn->setTitleFontSize(12);
-        delBtn->setTitleText("删除");
+        delBtn = ui::Button::create("drawable/btn_trash_bin.png");
+        delBtn->setScale(Director::getInstance()->getContentScaleFactor() * 0.5f);
         delBtn->addClickEventListener(std::bind(&HistoryScene::onDeleteButton, this, std::placeholders::_1));
         cell->addChild(delBtn);
-        delBtn->setPosition(Vec2(width - 25.0f, 35.0f));
+        delBtn->setPosition(Vec2(width - 20.0f, 35.0f));
 
         cell->setContentSize(Size(width, 70));
         cell->setTouchEnabled(true);
