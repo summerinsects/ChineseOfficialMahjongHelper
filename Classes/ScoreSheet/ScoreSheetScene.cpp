@@ -730,9 +730,9 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         return;
     }
 
-    AlertView::showWithMessage("清空表格", "请选择保存当前记录或丢弃当前记录", 12,
+    AlertView::showWithMessage("清空表格", "在清空表格之前，请选择「保存当前记录」或「丢弃当前记录」", 12,
         [this]() {
-        AlertView::showWithMessage("清空表格", "点击确认将余下盘数标记为荒庄，并保存到历史记录，\n点击取消则不保存到历史记录。", 12,
+        AlertView::showWithMessage("清空表格", "点击「确认」将余下盘数标记为荒庄，并保存到历史记录，\n点击「取消」则直接丢弃当前记录，不保存。", 12,
             [this]() {
             _record->current_index = 16;
             _record->end_time = time(nullptr);
