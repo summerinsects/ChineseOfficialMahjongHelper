@@ -23,12 +23,54 @@ enum Keyboard {
     KEY_LEFT_BRACKET, KEY_SPACE, KEY_RIGHT_BRACKET, KEY_DELETE, KEY_CLEAR, KEY_GLOBAL
 };
 
-static const char *buttonFace[] = {
-    "",
-    "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "",
-    "东 E", "南 S", "西 W", "北 N", "中 C", "发 F", "白 P",
-    "[", "", "]", "", "清空", "\xF0\x9F\x8C\x90"
+#define BG_WHITE "source_material/tabBar_selected_bg.png"
+#define BG_BLUE  "source_material/btn_square_highlighted.png"
+
+#define IMG_DEL "drawable/sym_keyboard_feedback_delete.png"
+#define IMG_SPACE "drawable/sym_keyboard_feedback_space.png"
+#define IMG_RETURN "drawable/sym_keyboard_return.png"
+
+#define CH_GLOBAL "\xF0\x9F\x8C\x90"
+
+#define SIZE_1 Size(BUTTON_WIDTH, BUTTON_HEIGHT)
+#define SIZE_2 Size(BUTTON_WIDTH * 2 + GAP, BUTTON_HEIGHT)
+
+static const struct ButtonInfo {
+    const char *buttonFace;  // fontSize==0时，为图片路径，否则为文本
+    int fontSize;
+    const char *buttonImage;
+    Color3B fontColor;
+    Size contentSize;
+    Vec2 pos;
+} buttonsInfo[] = {
+    { "东 E", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 4.5f + GAP * 5) },
+    { "1", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 4.5f + GAP * 5) },
+    { "2", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 4.5f + GAP * 5) },
+    { "3", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 4.5f + GAP * 5) },
+    { "万 m", 16, BG_BLUE, Color3B::WHITE, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 4.5f + GAP * 5) },
+
+    { "南 S", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 3.5f + GAP * 4) },
+    { "4", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 3.5f + GAP * 4) },
+    { "5", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 3.5f + GAP * 4) },
+    { "6", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 3.5f + GAP * 4) },
+    { "[", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 3.5f + GAP * 4) },
+
+    { "西 W", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 2.5f + GAP * 3) },
+    { "7", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 2.5f + GAP * 3) },
+    { "8", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 2.5f + GAP * 3) },
+    { "9", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 2.5f + GAP * 3) },
+    { "]", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 2.5f + GAP * 3) },
+
+    { "北 N", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 1.5f + GAP * 2) },
+    { "中 C", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 1.5f + GAP * 2) },
+    { "发 F", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 1.5f + GAP * 2) },
+    { "白 P", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 1.5f + GAP * 2) },
+    { IMG_DEL, 0, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 1.5f + GAP * 2) },
+
+    { CH_GLOBAL, 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 0.5f + GAP) },
+    { IMG_SPACE, 0, BG_WHITE, Color3B::BLACK, SIZE_2, Vec2(BUTTON_WIDTH * 2.0f + GAP * 2.5f, BUTTON_HEIGHT * 0.5f + GAP) },
+    { "清空", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 0.5f + GAP) },
+    { IMG_RETURN, 0, BG_BLUE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 0.5f + GAP) },
 };
 
 static const Keyboard keyIdx[] = {
@@ -88,56 +130,33 @@ bool TilesKeyboard::init() {
     _tilesContainer->setPosition(Vec2(width * 0.5f, buttonAreaHeight + GAP + TILE_HEIGHT * 0.5f));
 
     // 排列按钮
-    ui::Button *buttons[25];
-    for (int i = 0; i < 25; ++i) {
+    ui::Button *buttons[24];
+    for (int i = 0; i < 24; ++i) {
         Keyboard key = keyIdx[i];
-        div_t ret = div(i, 5);
-        int x = ret.rem;
-        int y = ret.quot;
-        ui::Button *button = ui::Button::create("source_material/tabBar_selected_bg.png");
+        const ButtonInfo &buttonInfo = buttonsInfo[i];
+        ui::Button *button = ui::Button::create(buttonInfo.buttonImage);
         rootNode->addChild(button);
         button->setScale9Enabled(true);
-        button->setTitleFontSize(18);
-        button->setTitleColor(Color3B::BLACK);
-        button->setTitleText(buttonFace[key]);
-        button->setContentSize(Size(BUTTON_WIDTH, BUTTON_HEIGHT));
-        button->setPosition(Vec2(BUTTON_WIDTH * (x + 0.5f) + GAP * (x + 1), BUTTON_HEIGHT * (5 - y - 0.5f) + GAP * (5 - y)));
+        if (buttonInfo.fontSize > 0) {
+            button->setTitleFontSize(buttonInfo.fontSize);
+            button->setTitleColor(buttonInfo.fontColor);
+            button->setTitleText(buttonInfo.buttonFace);
+        }
+        else {
+            Sprite *sprite = Sprite::create(buttonInfo.buttonFace);
+            sprite->setPosition(Vec2(buttonInfo.contentSize) *= 0.5f);
+            sprite->setScale(30 / sprite->getContentSize().height);
+            button->getRendererNormal()->addChild(sprite);
+        }
+        button->setContentSize(buttonInfo.contentSize);
+        button->setPosition(buttonInfo.pos);
         button->setUserData(reinterpret_cast<void *>(key));
         button->addClickEventListener(std::bind(&TilesKeyboard::onKeyboardButton, this, std::placeholders::_1));
         buttons[i] = button;
     }
 
-    // 返回键
-    ui::Button *button = buttons[24];
-    button->loadTextureNormal("source_material/btn_square_highlighted.png");
-    button->setTitleColor(Color3B::WHITE);
-    Sprite *sprite = Sprite::create("drawable/sym_keyboard_return.png");
-    sprite->setPosition(Vec2(BUTTON_WIDTH * 0.5f, BUTTON_HEIGHT * 0.5f));
-    sprite->setScale(30 / sprite->getContentSize().height);
-    button->getRendererNormal()->addChild(sprite);
-
     // 花色
     _suitButton = buttons[4];
-    _suitButton->loadTextureNormal("source_material/btn_square_highlighted.png");
-    _suitButton->setTitleColor(Color3B::WHITE);
-
-    // 删除键
-    sprite = Sprite::create("drawable/sym_keyboard_feedback_delete.png");
-    sprite->setPosition(Vec2(BUTTON_WIDTH * 0.5f, BUTTON_HEIGHT * 0.5f));
-    sprite->setScale(30 / sprite->getContentSize().height);
-    buttons[19]->getRendererNormal()->addChild(sprite);
-
-    // 多余的空格键
-    buttons[22]->removeFromParent();
-
-    // 空格键
-    button = buttons[21];
-    button->setContentSize(Size(BUTTON_WIDTH * 2 + GAP, BUTTON_HEIGHT));
-    button->setPosition(Vec2((BUTTON_WIDTH + GAP) * 0.5f, 0) + button->getPosition());
-    sprite = Sprite::create("drawable/sym_keyboard_feedback_space.png");
-    sprite->setPosition(Vec2(BUTTON_WIDTH + GAP * 0.5f, BUTTON_HEIGHT * 0.5f));
-    sprite->setScale(30 / sprite->getContentSize().height);
-    button->getRendererNormal()->addChild(sprite);
 
     // 输入文本的背景
     LayerColor *inputBg = LayerColor::create(Color4B(238, 238, 238, 238), 0, INPUT_HEIGHT);
