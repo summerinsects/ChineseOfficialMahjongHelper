@@ -78,7 +78,7 @@ static const Keyboard keyIdx[] = {
     KEY_S, KEY_4, KEY_5, KEY_6, KEY_LEFT_BRACKET,
     KEY_W, KEY_7, KEY_8, KEY_9, KEY_RIGHT_BRACKET,
     KEY_N, KEY_C, KEY_F, KEY_P, KEY_DELETE,
-    KEY_GLOBAL, KEY_SPACE, KEY_SPACE, KEY_CLEAR, KEY_OK
+    KEY_GLOBAL, KEY_SPACE, KEY_CLEAR, KEY_OK
 };
 
 bool TilesKeyboard::init() {
