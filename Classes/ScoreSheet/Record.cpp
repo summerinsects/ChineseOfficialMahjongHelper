@@ -21,7 +21,7 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
 
         for (size_t i = 0; i < record.current_index; ++i) {
             Record::Detail &detail_data = record.detail[i];
-            const rapidjson::Value &detail_json = detail[i];
+            const rapidjson::Value &detail_json = detail[static_cast<rapidjson::SizeType>(i)];
 
             it = detail_json.FindMember("win_claim");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {

@@ -21,7 +21,6 @@ bool OtherScene::init() {
         createContentView();
     }
     else {
-        Size visibleSize = Director::getInstance()->getVisibleSize();
         Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
         LoadingView *loadingView = LoadingView::create();

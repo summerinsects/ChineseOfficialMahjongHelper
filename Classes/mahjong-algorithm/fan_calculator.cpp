@@ -454,11 +454,6 @@ static fan_t get_1_pung_fan(tile_t mid_tile) {
 
 // 存在3组顺子的番种时，余下的第4组顺子最多算1番
 static fan_t get_1_chow_extra(tile_t tile0, tile_t tile1, tile_t tile2, tile_t tile_extra) {
-    bool pure_double_chow = false;
-    bool mixed_double_chow = false;
-    bool short_straight = false;
-    bool two_terminal_chows = false;
-
     fan_t fan0 = get_2_chows_fan(tile0, tile_extra);
     fan_t fan1 = get_2_chows_fan(tile1, tile_extra);
     fan_t fan2 = get_2_chows_fan(tile2, tile_extra);
