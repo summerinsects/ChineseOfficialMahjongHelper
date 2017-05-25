@@ -44,22 +44,22 @@ static const struct ButtonInfo {
     Vec2 pos;
 } buttonsInfo[] = {
     { "东 E", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 4.5f + GAP * 5) },
-    { "1", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 4.5f + GAP * 5) },
-    { "2", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 4.5f + GAP * 5) },
-    { "3", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 4.5f + GAP * 5) },
+    { "1m", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 4.5f + GAP * 5) },
+    { "2m", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 4.5f + GAP * 5) },
+    { "3m", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 4.5f + GAP * 5) },
     { "万 m", 16, BG_BLUE, Color3B::WHITE, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 4.5f + GAP * 5) },
 
     { "南 S", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 3.5f + GAP * 4) },
-    { "4", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 3.5f + GAP * 4) },
-    { "5", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 3.5f + GAP * 4) },
-    { "6", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 3.5f + GAP * 4) },
-    { "[", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 3.5f + GAP * 4) },
+    { "4m", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 3.5f + GAP * 4) },
+    { "5m", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 3.5f + GAP * 4) },
+    { "6m", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 3.5f + GAP * 4) },
+    { "[", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 3.5f + GAP * 4) },
 
     { "西 W", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 2.5f + GAP * 3) },
-    { "7", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 2.5f + GAP * 3) },
-    { "8", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 2.5f + GAP * 3) },
-    { "9", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 2.5f + GAP * 3) },
-    { "]", 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 2.5f + GAP * 3) },
+    { "7m", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 2.5f + GAP * 3) },
+    { "8m", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 2.5f + GAP * 3, BUTTON_HEIGHT * 2.5f + GAP * 3) },
+    { "9m", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 2.5f + GAP * 3) },
+    { "]", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 2.5f + GAP * 3) },
 
     { "北 N", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 1.5f + GAP * 2) },
     { "中 C", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 1.5f + GAP * 2, BUTTON_HEIGHT * 1.5f + GAP * 2) },
@@ -67,7 +67,7 @@ static const struct ButtonInfo {
     { "白 P", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 1.5f + GAP * 2) },
     { IMG_DEL, 0, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 1.5f + GAP * 2) },
 
-    { CH_GLOBAL, 18, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 0.5f + GAP) },
+    { CH_GLOBAL, 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 0.5f + GAP * 1, BUTTON_HEIGHT * 0.5f + GAP) },
     { IMG_SPACE, 0, BG_WHITE, Color3B::BLACK, SIZE_2, Vec2(BUTTON_WIDTH * 2.0f + GAP * 2.5f, BUTTON_HEIGHT * 0.5f + GAP) },
     { "清空", 16, BG_WHITE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 3.5f + GAP * 4, BUTTON_HEIGHT * 0.5f + GAP) },
     { IMG_RETURN, 0, BG_BLUE, Color3B::BLACK, SIZE_1, Vec2(BUTTON_WIDTH * 4.5f + GAP * 5, BUTTON_HEIGHT * 0.5f + GAP) },
@@ -158,6 +158,11 @@ bool TilesKeyboard::init() {
     // 花色
     _suitButton = buttons[4];
 
+    // 数字
+    _digitButton[0] = buttons[1], _digitButton[1] = buttons[2], _digitButton[2] = buttons[3];
+    _digitButton[3] = buttons[6], _digitButton[4] = buttons[7], _digitButton[5] = buttons[8];
+    _digitButton[6] = buttons[11], _digitButton[7] = buttons[12], _digitButton[8] = buttons[13];
+
     // 输入文本的背景
     LayerColor *inputBg = LayerColor::create(Color4B(238, 238, 238, 238), 0, INPUT_HEIGHT);
     _inputBg = inputBg;
@@ -207,7 +212,6 @@ bool TilesKeyboard::init() {
     _tilesSprite.reserve(18);
 
     _currentSuit = 0;
-    _suitButton->setTitleText("万 m");
     return true;
 }
 
@@ -232,12 +236,7 @@ void TilesKeyboard::onKeyboardButton(cocos2d::Ref *sender) {
     case KEY_SUIT:
         ++_currentSuit;
         if (_currentSuit > 2) _currentSuit = 0;
-        switch (_currentSuit) {
-        case 0: _suitButton->setTitleText("万 m"); break;
-        case 1: _suitButton->setTitleText("条 s"); break;
-        case 2: _suitButton->setTitleText("饼 p"); break;
-        default: break;
-        }
+        refreshSuit();
         break;
     case KEY_E: case KEY_S: case KEY_W: case KEY_N:
     case KEY_C: case KEY_F: case KEY_P:
@@ -267,6 +266,37 @@ void TilesKeyboard::onKeyboardButton(cocos2d::Ref *sender) {
     default:
         dismissWithEvent(DismissEvent::CANCEL);
         break;
+    }
+}
+
+void TilesKeyboard::refreshSuit() {
+    char str[] = "0m";
+    switch (_currentSuit) {
+    case 0:
+        _suitButton->setTitleText("万 m");
+        str[1] = 'm';
+        for (int i = 0; i < 9; ++i) {
+            str[0] = '1' + i;
+            _digitButton[i]->setTitleText(str);
+        }
+        break;
+    case 1:
+        _suitButton->setTitleText("条 s");
+        str[1] = 's';
+        for (int i = 0; i < 9; ++i) {
+            str[0] = '1' + i;
+            _digitButton[i]->setTitleText(str);
+        }
+        break;
+    case 2:
+        _suitButton->setTitleText("饼 p");
+        str[1] = 'p';
+        for (int i = 0; i < 9; ++i) {
+            str[0] = '1' + i;
+            _digitButton[i]->setTitleText(str);
+        }
+        break;
+    default: break;
     }
 }
 

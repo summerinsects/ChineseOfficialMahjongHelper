@@ -25,6 +25,7 @@ private:
 
     void onKeyboardButton(cocos2d::Ref *sender);
 
+    void refreshSuit();
     void refreshInputLabel();
     void setTilesText(const char *text);
 
@@ -52,6 +53,7 @@ private:
     std::vector<cocos2d::Sprite *> _tilesSprite;
 
     cocos2d::ui::Button *_suitButton = nullptr;
+    cocos2d::ui::Button *_digitButton[9];
     int _currentSuit = 0;
     bool _inBracket = false;
 
