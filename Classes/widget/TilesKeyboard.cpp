@@ -39,7 +39,7 @@ static const struct ButtonInfo {
     const char *buttonFace;  // fontSize==0时，为图片路径，否则为文本
     int fontSize;
     const char *buttonImage;
-    Color3B fontColor;
+    const Color3B &fontColor;  // 这里用引用是为了解决gcc下一个奇葩bug
     Size contentSize;
     Vec2 pos;
 } buttonsInfo[] = {
