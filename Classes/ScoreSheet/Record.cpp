@@ -172,28 +172,22 @@ void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)
     }
 }
 
-std::string GetFanText(const Record::Detail &detail) {
-    const char *fanName = nullptr;
+const char *GetFanText(const Record::Detail &detail) {
     if (detail.score == 0) {
-        fanName = "荒庄";
+        return "荒庄";
     }
 
-    // 选取标记的最大番种显示出来
     uint64_t fanFlag = detail.fan_flag;
     if (fanFlag != 0) {
+        // 选取标记的最大番种显示出来
         for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
             if (TEST_FAN(fanFlag, n)) {
                 unsigned idx = n;
-                fanName = mahjong::fan_name[idx];
-                break;
+                return mahjong::fan_name[idx];
             }
         }
     }
 
     // 将未标记番种的显示为其他凑番
-    if (fanName == nullptr) {
-        fanName = "其他凑番";
-    }
-
-    return fanName;
+    return "其他凑番";
 }
