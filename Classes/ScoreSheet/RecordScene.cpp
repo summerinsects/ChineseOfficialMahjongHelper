@@ -283,13 +283,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         if (button->getUserData()) {
             layoutSize.height = visibleSize.height - 150;
             button->setUserData(reinterpret_cast<void *>(false));
-            button->setTitleText("\xE2\xAC\x87收起");
+            button->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
             radioNode->setVisible(false);
         }
         else {
             layoutSize.height = visibleSize.height - 240;
             button->setUserData(reinterpret_cast<void *>(true));
-            button->setTitleText("\xE2\xAC\x86展开");
+            button->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E展开");
             radioNode->setVisible(true);
         }
 

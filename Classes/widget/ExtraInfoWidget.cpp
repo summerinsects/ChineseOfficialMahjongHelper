@@ -193,7 +193,7 @@ bool ExtraInfoWidget::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(20.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("\xE2\x97\x80");
+    button->setTitleText("\xE2\x97\x80\xEF\xB8\x8E");
     this->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 67.5f, 40.0f));
     button->addClickEventListener([label](Ref *) {
@@ -207,7 +207,7 @@ bool ExtraInfoWidget::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(20.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("\xE2\x96\xB6");
+    button->setTitleText("\xE2\x96\xB6\xEF\xB8\x8E");
     this->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 22.5f, 40.0f));
     button->addClickEventListener([label](Ref *) {
