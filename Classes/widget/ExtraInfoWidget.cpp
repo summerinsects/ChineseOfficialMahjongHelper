@@ -176,26 +176,26 @@ bool ExtraInfoWidget::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(visibleSize.width - 80, 40.0f));
+    label->setPosition(Vec2(visibleSize.width - 90, 40.0f));
 
     Sprite *sprite = Sprite::create("source_material/btn_square_normal.png");
     sprite->setScale(20 / sprite->getContentSize().width);
     this->addChild(sprite);
-    sprite->setPosition(Vec2(visibleSize.width - 45, 40.0f));
+    sprite->setPosition(Vec2(visibleSize.width - 50, 40.0f));
 
     label = Label::createWithSystemFont("0", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(visibleSize.width - 45, 40.0f));
+    label->setPosition(Vec2(visibleSize.width - 50, 40.0f));
     _flowerLabel = label;
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
-    button->setContentSize(Size(20.0f, 20.0f));
+    button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("\xE2\x97\x80\xEF\xB8\x8E");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 67.5f, 40.0f));
+    button->setPosition(Vec2(visibleSize.width - 75, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = atoi(label->getString().c_str());
         if (n > 0) {
@@ -205,11 +205,11 @@ bool ExtraInfoWidget::init() {
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
-    button->setContentSize(Size(20.0f, 20.0f));
+    button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("\xE2\x96\xB6\xEF\xB8\x8E");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 22.5f, 40.0f));
+    button->setPosition(Vec2(visibleSize.width - 25, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = atoi(label->getString().c_str());
         if (n < 8) {
