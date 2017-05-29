@@ -124,14 +124,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     _drawBox->setZoomScale(0.0f);
     _drawBox->ignoreContentAdaptWithSize(false);
     _drawBox->setContentSize(Size(20.0f, 20.0f));
-    _drawBox->setPosition(Vec2(origin.x + visibleSize.width - 60.0f, origin.y + visibleSize.height - 50));
+    _drawBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, origin.y + visibleSize.height - 50));
     _drawBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
 
     label = Label::createWithSystemFont("荒庄", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + visibleSize.width - 45.0f, origin.y + visibleSize.height - 50));
+    label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 50));
 
     _winGroup = ui::RadioButtonGroup::create();
     _winGroup->setAllowedNoSelection(true);
