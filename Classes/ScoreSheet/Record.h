@@ -9,26 +9,26 @@
 #include "json/document.h"
 
 struct Record {
-    char name[4][255];
+    char name[4][255];      // 选手姓名
     struct Detail {
-        uint8_t win_claim;
-        uint8_t false_win;
-        uint32_t score;
-        uint64_t fan_flag;
+        uint8_t win_claim;  // 和牌标记（4567bit）/点炮标记（0123bit）
+        uint8_t false_win;  // 错和标记
+        uint32_t score;     // 番数
+        uint64_t fan_flag;  // 标记番种
 
         struct WinHand {
-            uint16_t fixed_packs[5];
-            uint8_t pack_count;
-            uint8_t standing_tiles[13];
-            uint8_t tile_count;
-            uint8_t win_tile;
-            uint8_t win_flag;
-            uint8_t flower_count;
-        } win_hand;
-    } detail[16];
-    size_t current_index;
-    time_t start_time;
-    time_t end_time;
+            uint16_t fixed_packs[5];    // 副露的面子（包括暗杠）
+            uint8_t pack_count;         // 副露的面子（包括暗杠）数
+            uint8_t standing_tiles[13]; // 立牌
+            uint8_t tile_count;         // 立牌数
+            uint8_t win_tile;           // 和牌张
+            uint8_t win_flag;           // 和牌标记
+            uint8_t flower_count;       // 花牌数
+        } win_hand;         // 和牌
+    } detail[16];           // 每一盘的详情
+    size_t current_index;   // 当前打到第几盘
+    time_t start_time;      // 开始时间
+    time_t end_time;        // 结束时间
 };
 
 static bool operator==(const Record &left, const Record &right) {
