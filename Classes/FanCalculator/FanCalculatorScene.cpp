@@ -93,7 +93,7 @@ cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SI
     Node *node = Node::create();
     const int lineHeight = fontSize + 2;
     long resultAreaHeight = lineHeight * rows;  // 每行间隔2像素
-    resultAreaHeight += (3 + lineHeight);  // 总计
+    resultAreaHeight += (5 + lineHeight);  // 总计
     node->setContentSize(Size(resultAreaWidth, resultAreaHeight));
 
     long fan = 0;
@@ -112,7 +112,7 @@ cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SI
         node->addChild(fanName);
         fanName->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         div_t ret = div(i, 2);
-        fanName->setPosition(Vec2(ret.rem == 0 ? 10.0f : resultAreaWidth * 0.5f, resultAreaHeight - lineHeight * (ret.quot + 0.5f)));
+        fanName->setPosition(Vec2(ret.rem == 0 ? 10.0f : resultAreaWidth * 0.5f, resultAreaHeight - lineHeight * (ret.quot + 1)));
     }
 
     Label *fanTotal = Label::createWithSystemFont(StringUtils::format("总计：%ld番", fan), "Arial", fontSize);
