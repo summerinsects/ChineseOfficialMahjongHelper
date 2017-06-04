@@ -924,8 +924,8 @@ void RecordScene::calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraIn
 
     // 花（使用emoji代码）
     Label *flowerLabel = nullptr;
-    if (param.flower_count > 0) {
-        flowerLabel = Label::createWithSystemFont(std::string(EMOJI_FLOWER_8, param.flower_count * (sizeof(EMOJI_FLOWER) - 1)), "Arial", 12);
+    if (temp.flower_count > 0) {
+        flowerLabel = Label::createWithSystemFont(std::string(EMOJI_FLOWER_8, temp.flower_count * (sizeof(EMOJI_FLOWER) - 1)), "Arial", 12);
         flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
         flowerLabel->setColor(Color3B(224, 45, 45));
@@ -944,7 +944,7 @@ void RecordScene::calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraIn
     innerNode->addChild(tilesNode);
     tilesNode->setPosition(Vec2(maxWidth * 0.5f, fanResultSize.height + 5 + tilesNodeSize.height * 0.5f));
 
-    if (param.flower_count > 0) {
+    if (temp.flower_count > 0) {
         innerNode->addChild(flowerLabel);
         const Size &flowerSize = flowerLabel->getContentSize();
         flowerLabel->setPosition(Vec2(0, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
