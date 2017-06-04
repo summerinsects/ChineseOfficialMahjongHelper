@@ -626,7 +626,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
         return;
     }
 
-    RecordScene::CalculateParam param;
+    mahjong::calculate_param_t param;
     RecordScene::_WinHandToCalculateParam(detail.win_hand, param);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
