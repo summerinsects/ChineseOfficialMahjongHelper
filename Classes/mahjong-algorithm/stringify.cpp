@@ -302,7 +302,7 @@ long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_siz
             break;
         case PACK_TYPE_KONG:
             if (!is_pack_melded(pack) && p < end) *p++ = '[';
-            temp[0] = t; temp[1] = t; temp[2] = t; temp[2] = t;
+            temp[0] = t; temp[1] = t; temp[2] = t; temp[3] = t;
             p += tiles_to_string(temp, 4, p, end - p);
             if (!is_pack_melded(pack) && p < end) *p++ = ']';
             if (p < end) *p++ = ' ';
