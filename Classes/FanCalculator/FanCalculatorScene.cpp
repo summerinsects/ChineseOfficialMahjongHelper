@@ -77,6 +77,7 @@ bool FanCalculatorScene::init() {
         rt.getWinTile = std::bind(&TilePickWidget::getServingTile, tilePicker);
         rt.isStandingTilesContainsServingTile = std::bind(&TilePickWidget::isStandingTilesContainsServingTile, tilePicker);
         rt.countServingTileInFixedPacks = std::bind(&TilePickWidget::countServingTileInFixedPacks, tilePicker);
+        rt.isFixedPacksContainsKong = std::bind(&HandTilesWidget::isFixedPacksContainsKong, tilePicker);
         extraInfo->refreshByWinTile(rt);
     });
 
