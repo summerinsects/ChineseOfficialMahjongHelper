@@ -388,6 +388,9 @@ void ExtraInfoWidget::refreshByWinTile(const RefreshByWinTile &rt) {
         && !_lastTileBox->isSelected()
         && !_fourthTileBox->isSelected());
     _lastTileBox->setEnabled(!_robKongBox->isSelected());
+
+    // 杠开
+    refreshByKong(rt.isFixedPacksContainsKong());
 }
 
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {

@@ -826,6 +826,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
         rt.getWinTile = [&param]() { return param.win_tile; };
         rt.isStandingTilesContainsServingTile = std::bind(&HandTilesWidget::isStandingTilesContainsServingTile, handTiles);
         rt.countServingTileInFixedPacks = std::bind(&HandTilesWidget::countServingTileInFixedPacks, handTiles);
+        rt.isFixedPacksContainsKong = std::bind(&HandTilesWidget::isFixedPacksContainsKong, handTiles);
         extraInfo->refreshByWinTile(rt);
     }
 
@@ -843,6 +844,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
             rt.getWinTile = std::bind(&HandTilesWidget::getServingTile, handTiles);
             rt.isStandingTilesContainsServingTile = std::bind(&HandTilesWidget::isStandingTilesContainsServingTile, handTiles);
             rt.countServingTileInFixedPacks = std::bind(&HandTilesWidget::countServingTileInFixedPacks, handTiles);
+            rt.isFixedPacksContainsKong = std::bind(&HandTilesWidget::isFixedPacksContainsKong, handTiles);
             extraInfo->refreshByWinTile(rt);
         });
 

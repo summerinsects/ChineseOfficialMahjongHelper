@@ -25,6 +25,7 @@ public:
         std::function<mahjong::tile_t ()> getWinTile;
         std::function<bool ()> isStandingTilesContainsServingTile;
         std::function<size_t ()> countServingTileInFixedPacks;
+        std::function<bool ()> isFixedPacksContainsKong;
     };
     void refreshByKong(bool hasKong);
     void refreshByWinTile(const RefreshByWinTile &rt);
