@@ -176,18 +176,26 @@ struct extra_condition_t {
 };
 
 /**
+ * @brief 算番参数
+ */
+struct calculate_param_t {
+    hand_tiles_t hand_tiles;    ///< 手牌信息
+    tile_t win_tile;            ///< 和牌张
+    int flower_count;           ///< 花牌数
+    extra_condition_t ext_cond; ///< 附加信息
+};
+
+/**
  * @brief 算番
  *
- * @param [in] hand_tiles 手牌信息
- * @param [in] win_tile 和牌张
- * @param [in] ext_cond 附加信息
+ * @param [in] calculate_param 算番参数
  * @param [out] fan_table 番表，当有某种番时，相应的会设置为这种番出现的次数
  * @retval >0 番数
  * @retval ERROR_WRONG_TILES_COUNT 错误的张数
  * @retval ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
  * @retval ERROR_NOT_WIN 没和牌
  */
-int calculate_fan(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_TABLE_SIZE]);
+int calculate_fan(const calculate_param_t *calculate_param, long (&fan_table)[FAN_TABLE_SIZE]);
 
 #if 0
 

@@ -32,15 +32,8 @@ public:
 
     const Record::Detail &getDetail() const { return _detail; }
 
-    typedef struct {
-        mahjong::hand_tiles_t hand_tiles;
-        mahjong::tile_t win_tile;
-        int flower_count;
-        mahjong::extra_condition_t ext_cond;
-    } CalculateParam;
-
-    static void _WinHandToCalculateParam(const Record::Detail::WinHand &winHand, CalculateParam &param);
-    static void _CalculateParamToWinHand(const CalculateParam &param, Record::Detail::WinHand &winHand);
+    static void _WinHandToCalculateParam(const Record::Detail::WinHand &winHand, mahjong::calculate_param_t &param);
+    static void _CalculateParamToWinHand(const mahjong::calculate_param_t &param, Record::Detail::WinHand &winHand);
 
     static void _SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, uint8_t false_win);
 
@@ -79,8 +72,8 @@ private:
     void onPointsNameButton(cocos2d::Ref *sender);
     void onOkButton(cocos2d::Ref *sender);
 
-    void showCalculator(const CalculateParam &param);
-    void calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraInfo, const CalculateParam &param);
+    void showCalculator(const mahjong::calculate_param_t &param);
+    void calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraInfo, const mahjong::calculate_param_t &param);
 };
 
 #endif

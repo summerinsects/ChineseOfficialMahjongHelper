@@ -597,8 +597,8 @@ void RecordScene::onPlusButton(cocos2d::Ref *sender, int delta) {
     updateScoreLabel();
 }
 
-void RecordScene::_WinHandToCalculateParam(const Record::Detail::WinHand &winHand, RecordScene::CalculateParam &param) {
-    memset(&param, 0, sizeof(CalculateParam));
+void RecordScene::_WinHandToCalculateParam(const Record::Detail::WinHand &winHand, mahjong::calculate_param_t &param) {
+    memset(&param, 0, sizeof(mahjong::calculate_param_t));
     std::copy(winHand.fixed_packs, winHand.fixed_packs + winHand.pack_count,
         param.hand_tiles.fixed_packs);
     param.hand_tiles.pack_count = winHand.pack_count;
@@ -610,7 +610,7 @@ void RecordScene::_WinHandToCalculateParam(const Record::Detail::WinHand &winHan
     param.ext_cond.win_flag = winHand.win_flag;
 }
 
-void RecordScene::_CalculateParamToWinHand(const RecordScene::CalculateParam &param, Record::Detail::WinHand &winHand) {
+void RecordScene::_CalculateParamToWinHand(const mahjong::calculate_param_t &param, Record::Detail::WinHand &winHand) {
     memset(&winHand, 0, sizeof(Record::Detail::WinHand));
     std::copy(param.hand_tiles.fixed_packs, param.hand_tiles.fixed_packs + param.hand_tiles.pack_count,
         winHand.fixed_packs);
@@ -629,7 +629,7 @@ void RecordScene::onTilesButton(cocos2d::Ref *sender) {
         return;
     }
 
-    CalculateParam param;
+    mahjong::calculate_param_t param;
     _WinHandToCalculateParam(_detail.win_hand, param);
     showCalculator(param);
 }
@@ -761,7 +761,7 @@ static const mahjong::wind_t seatWindTable[16][4] = {
     { mahjong::wind_t::NORTH, mahjong::wind_t::EAST, mahjong::wind_t::WEST, mahjong::wind_t::SOUTH }
 };
 
-void RecordScene::showCalculator(const CalculateParam &param) {
+void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float maxWidth = visibleSize.width - 20;
 
@@ -862,8 +862,8 @@ void RecordScene::showCalculator(const CalculateParam &param) {
 // in FanCalculatorScene.cpp
 cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SIZE], int fontSize, float resultAreaWidth);
 
-void RecordScene::calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraInfo, const CalculateParam &param) {
-    CalculateParam temp = { 0 };
+void RecordScene::calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraInfo, const mahjong::calculate_param_t &param) {
+    mahjong::calculate_param_t temp = { 0 };
     handTiles->getData(&temp.hand_tiles, &temp.win_tile);
     if (temp.win_tile == 0 && temp.hand_tiles.tile_count == 0 && temp.hand_tiles.pack_count == 0) {
         AlertView::showWithMessage("记录和牌", "确定不记录和牌吗？", 12,
@@ -899,7 +899,7 @@ void RecordScene::calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraIn
     temp.ext_cond.seat_wind = extraInfo->getSeatWind();
 
     // 算番
-    int fan = calculate_fan(&temp.hand_tiles, temp.win_tile, &temp.ext_cond, fan_table);
+    int fan = calculate_fan(&temp, fan_table);
 
     if (fan == ERROR_NOT_WIN) {
         AlertView::showWithMessage("记录和牌", "诈和", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
@@ -913,10 +913,6 @@ void RecordScene::calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraIn
         AlertView::showWithMessage("记录和牌", "同一种牌最多只能使用4枚", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
         return;
     }
-
-    // 加花牌
-    fan += temp.flower_count;
-    fan_table[mahjong::FLOWER_TILES] = temp.flower_count;
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float maxWidth = visibleSize.width * 0.8f - 10;

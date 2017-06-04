@@ -2034,7 +2034,11 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     return 0;
 }
 
-int calculate_fan(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_condition_t *ext_cond, long (&fan_table)[FAN_TABLE_SIZE]) {
+int calculate_fan(const calculate_param_t *calculate_param, long (&fan_table)[FAN_TABLE_SIZE]) {
+    const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
+    tile_t win_tile = calculate_param->win_tile;
+    const extra_condition_t *ext_cond = &calculate_param->ext_cond;
+
     if (int ret = check_calculator_input(hand_tiles, win_tile)) {
         return ret;
     }
@@ -2115,6 +2119,11 @@ int calculate_fan(const hand_tiles_t *hand_tiles, tile_t win_tile, const extra_c
     }
 
     memcpy(fan_table, fan_tables[max_idx], sizeof(fan_table));
+
+    // 加花牌
+    max_fan += calculate_param->flower_count;
+    fan_table[FLOWER_TILES] = calculate_param->flower_count;
+
     return max_fan;
 }
 

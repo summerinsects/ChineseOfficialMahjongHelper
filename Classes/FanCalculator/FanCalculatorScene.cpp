@@ -184,16 +184,16 @@ void FanCalculatorScene::calculate() {
         return;
     }
 
-    mahjong::hand_tiles_t hand_tiles;
-    mahjong::tile_t win_tile;
-    _tilePicker->getData(&hand_tiles, &win_tile);
-    if (win_tile == 0) {
+    mahjong::calculate_param_t param;
+    _tilePicker->getData(&param.hand_tiles, &param.win_tile);
+    if (param.win_tile == 0) {
         AlertView::showWithMessage("算番", "牌张数错误", 12, nullptr, nullptr);
         return;
     }
 
-    std::sort(hand_tiles.standing_tiles, hand_tiles.standing_tiles + hand_tiles.tile_count);
+    std::sort(param.hand_tiles.standing_tiles, param.hand_tiles.standing_tiles + param.hand_tiles.tile_count);
 
+    param.flower_count = flowerCnt;
     long fan_table[mahjong::FAN_TABLE_SIZE] = { 0 };
 
     // 获取绝张、杠开、抢杠、海底信息
@@ -204,11 +204,10 @@ void FanCalculatorScene::calculate() {
     mahjong::wind_t seat_wind = _extraInfo->getSeatWind();
 
     // 算番
-    mahjong::extra_condition_t ext_cond;
-    ext_cond.win_flag = win_flag;
-    ext_cond.prevalent_wind = prevalent_wind;
-    ext_cond.seat_wind = seat_wind;
-    int fan = calculate_fan(&hand_tiles, win_tile, &ext_cond, fan_table);
+    param.ext_cond.win_flag = win_flag;
+    param.ext_cond.prevalent_wind = prevalent_wind;
+    param.ext_cond.seat_wind = seat_wind;
+    int fan = calculate_fan(&param, fan_table);
 
     if (fan == ERROR_NOT_WIN) {
         Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", 14);
@@ -225,10 +224,6 @@ void FanCalculatorScene::calculate() {
         AlertView::showWithMessage("算番", "同一种牌最多只能使用4枚", 12, nullptr, nullptr);
         return;
     }
-
-    // 加花牌
-    fan += flowerCnt;
-    fan_table[mahjong::FLOWER_TILES] = flowerCnt;
 
     Node *innerNode = createFanResultNode(fan_table, 14, fanAreaSize.width);
 
