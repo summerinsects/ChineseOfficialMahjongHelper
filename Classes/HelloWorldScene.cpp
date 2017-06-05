@@ -123,6 +123,17 @@ bool HelloWorld::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 100));
     button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(30.0, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("捐赠");
+    button->setPosition(Vec2(origin.x + visibleSize.width - 18, origin.y + 13));
+    button->addClickEventListener([](Ref *) {
+        Application::getInstance()->openURL("https://git.oschina.net/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
+    });
+
     Label *label = Label::createWithSystemFont(
         StringUtils::format("v%d.%d.%d\n%s", (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, "Built  " __DATE__ "  " __TIME__),
         "Arial", 10);
