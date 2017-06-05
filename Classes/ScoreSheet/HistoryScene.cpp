@@ -296,8 +296,8 @@ void HistoryScene::onCellEvent(cocos2d::Ref *sender, cocos2d::ui::Widget::TouchE
 }
 
 static void __modifyRecord(const Record *record) {
-    auto it = std::find_if(g_records.begin(), g_records.end(), [&record](const Record &r) {
-        return (&r == record);  // 同一个记录
+    auto it = std::find_if(g_records.begin(), g_records.end(), [record](const Record &r) {
+        return (r.start_time == record->start_time);  // 我们认为开始时间相同的为同一个记录
     });
 
     if (it == g_records.end()) {

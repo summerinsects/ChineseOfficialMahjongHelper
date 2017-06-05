@@ -538,7 +538,9 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
         }
 
         if (isModify) {
-            HistoryScene::modifyRecord(_record);
+            if (_record->end_time != 0) {
+                HistoryScene::modifyRecord(_record);
+            }
         }
         else {
             // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
