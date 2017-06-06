@@ -46,7 +46,7 @@ static void writeToJson(const Record &record) {
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
         doc.Accept(writer);
 
-        CCLOG("%.*s", buf.GetSize(), buf.GetString());
+        CCLOG("%.*s", (int)buf.GetSize(), buf.GetString());
 
         std::string path = FileUtils::getInstance()->getWritablePath();
         path.append("record.json");
