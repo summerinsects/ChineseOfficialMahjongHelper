@@ -23,7 +23,7 @@
 <string>七星不靠 Greater Honors and Knitted Tiles：&lt;br/&gt;必须有七个单张的东、南、西、北、中、发、白，加上三种花色数位按147、258、369中的七张序数牌组成的没有将牌的特殊和牌型，计24番。不计五门齐、不求人、门前清。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;立牌[14m369p25sESWNFP]自摸和[C]&lt;br/&gt;计：七星不靠、自摸&lt;br/&gt;&lt;br/&gt;【注】七星不靠就是集齐7种字牌的全不靠和型</string>
 <string>全双刻 All Even Pungs：&lt;br/&gt;由序数牌2468的刻子（杠）、将牌组成的基本和型，计24番。不计碰碰和、断幺、无字。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;副露[444m] [666m]&lt;br/&gt;立牌[22244s88p]点和[4s]&lt;br/&gt;计：全双刻、双同刻&lt;br/&gt;&lt;br/&gt;【注】《规则》原文及通行的做法均只接受基本和牌型全双刻，对于全双七对，只应计七对、断幺。</string>
 <string>清一色 Full Flush：&lt;br/&gt;由一种花色的序数牌的和牌，计24番。不计无字。&lt;br/&gt;&lt;br/&gt;【牌例1】&lt;br/&gt;副露[123s] [333s]&lt;br/&gt;立牌[4567899s]自摸和[6s]&lt;br/&gt;计：清一色、四归一、连六、自摸&lt;br/&gt;&lt;br/&gt;【牌例2】&lt;br/&gt;立牌[1122445566889p]自摸和[9p]&lt;br/&gt;计：清一色、七对、自摸</string>
-<string>一色三同顺 Pure Triple Chow：&lt;br/&gt;和牌中，有一种花色三副序数相同的顺子，计24番。不计一色三节高、一般高。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;副露[456m] [456s]&lt;br/&gt;立牌[456s77mCC]点和[C]&lt;br/&gt;计：一色三同顺、箭刻、缺一门</string>
+<string>一色三同顺 Pure Triple Chow：&lt;br/&gt;和牌中，有一种花色三副序数相同的顺子，计24番。不计一色三节高、一般高。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;副露[456s] [456s]&lt;br/&gt;立牌[456s77mCC]点和[C]&lt;br/&gt;计：一色三同顺、箭刻、缺一门</string>
 <string>一色三节高 Pure Shifted Pungs：&lt;br/&gt;和牌中，有一种花色三副依次递增1的刻子（杠），计24番。不计一色三同顺。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;副露[666p]&lt;br/&gt;立牌[77888p678sWW]点和[7p]&lt;br/&gt;计：一色三节高、缺一门</string>
 <string>全大 Upper Tiles：&lt;br/&gt;由序数牌789的和牌，计24番。不计大于五、无字。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;副露[789m] [999s]&lt;br/&gt;立牌[7899p789s]自摸和[9p]&lt;br/&gt;计：全大、三色三同顺、全带幺、四归一、幺九刻、自摸</string>
 <string>全中 Middle Tiles：&lt;br/&gt;由序数牌456的和牌，计24番。不计断幺、无字。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;副露[444m] [666m]&lt;br/&gt;立牌[444p4466s]点和[4s]&lt;br/&gt;计：全中、全双刻、三同刻</string>
