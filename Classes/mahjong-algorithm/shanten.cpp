@@ -115,7 +115,7 @@ typedef uint16_t path_unit_t;
 #define UNIT_TYPE_PUNG 2                // 刻子
 #define UNIT_TYPE_PAIR 4                // 雀头
 #define UNIT_TYPE_CHOW_OPEN_END 5       // 两面或者边张搭子
-#define UNIT_TYPE_CHOW_CLOSED 6         // 坎张搭子
+#define UNIT_TYPE_CHOW_CLOSED 6         // 嵌张搭子
 #define UNIT_TYPE_INCOMPLETE_PUNG 7     // 刻子搭子
 
 #define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
@@ -300,8 +300,8 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
                     ++cnt_table[t + 1];
                 }
             }
-            // 坎张搭子t t+2，显然t不能是8点以上的数牌
-            if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 坎张
+            // 嵌张搭子t t+2，显然t不能是8点以上的数牌
+            if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 嵌张
                 work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_CLOSED, t);
                 if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                     --cnt_table[t];
@@ -444,7 +444,7 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_SIZE], bool (
                     return true;
                 }
             }
-            if (r > 2 && cnt_table[t - 2]) {  // 坎张
+            if (r > 2 && cnt_table[t - 2]) {  // 嵌张
                 if (waiting_table != nullptr) {  // 获取听牌张
                     (*waiting_table)[t - 1] = true;
                     ret = true;

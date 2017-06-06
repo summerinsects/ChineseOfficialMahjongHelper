@@ -1246,9 +1246,9 @@ static void remove_win_tile(tile_t *standing_tiles, long tile_cnt, tile_t win_ti
     }
 }
 
-// 检测边坎钓
+// 检测边嵌钓
 static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pack_cnt, tile_t win_tile, long (&fan_table)[FAN_TABLE_SIZE]) {
-    // 全求人和四杠不计单钓将，也不可能有边张、坎张
+    // 全求人和四杠不计单钓将，也不可能有边张、嵌张
     if (fan_table[MELDED_HAND] || fan_table[FOUR_KONGS]) {
         return;
     }
@@ -1276,7 +1276,7 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     // 统计听牌张数
     long waiting_cnt = std::count(std::begin(waiting_table), std::end(waiting_table), true);
 
-    // 听牌数大于1张，不计边坎钓
+    // 听牌数大于1张，不计边嵌钓
     if (waiting_cnt != 1) {
         return;
     }
@@ -1290,7 +1290,7 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
         switch (pack_type(concealed_packs[i])) {
         case PACK_TYPE_CHOW:
             if (pack_tile(concealed_packs[i]) == win_tile) {
-                maybe_closed = true;  // 坎张
+                maybe_closed = true;  // 嵌张
             }
             else if (pack_tile(concealed_packs[i]) + 1 == win_tile
                 || pack_tile(concealed_packs[i]) - 1 == win_tile) {
@@ -1755,7 +1755,7 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
     check_tiles_rank_range(tiles, tile_cnt, fan_table);
     // 检测四归一
     check_tiles_hog(tiles, tile_cnt, fan_table);
-    // 检测边坎钓
+    // 检测边嵌钓
     check_edge_closed_single_wait(packs + fixed_cnt, 5 - fixed_cnt, win_tile, fan_table);
 
     // 检测圈风刻、门风刻
@@ -1853,7 +1853,7 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
     // 检测四归一
     check_tiles_hog(tiles, tile_cnt, fan_table);
 
-    // 和牌张是组合龙范围的牌，不计边坎钓
+    // 和牌张是组合龙范围的牌，不计边嵌钓
     if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; })) {
         if (fixed_cnt == 0) {
             check_edge_closed_single_wait(temp_pack + 3, 2, win_tile, fan_table);
