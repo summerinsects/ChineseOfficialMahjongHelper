@@ -64,57 +64,57 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
 
     if (LIKELY(!g_definitions.empty() && !g_principles.empty())) {
         createContentView(idx);
+        return true;
     }
-    else {
-        Size visibleSize = Director::getInstance()->getVisibleSize();
-        Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-        LoadingView *loadingView = LoadingView::create();
-        this->addChild(loadingView);
-        loadingView->setPosition(origin);
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    LoadingView *loadingView = LoadingView::create();
+    this->addChild(loadingView);
+    loadingView->setPosition(origin);
 
 #if HAS_WEBVIEW
-        float scale = 1.0f;
-        float maxWidth = (visibleSize.width - 10) / 18;
-        if (maxWidth < 25) {
-            scale = maxWidth / TILE_WIDTH;
-        }
+    float scale = 1.0f;
+    float maxWidth = (visibleSize.width - 10) / 18;
+    if (maxWidth < 25) {
+        scale = maxWidth / TILE_WIDTH;
+    }
 #else
-        float scale = 1.0f / Director::getInstance()->getContentScaleFactor();
+    float scale = 1.0f / Director::getInstance()->getContentScaleFactor();
 #endif
 
-        auto thiz = makeRef(this);  // 保证线程回来之前不析构
-        std::thread([thiz, idx, scale, loadingView]() {
-            // 读文件
-            if (g_definitions.empty()) {
-                ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
-                g_definitions.reserve(valueVec.size());
-                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions), [scale](const Value &value) {
-                    std::string ret = value.asString();
-                    replaceTilesToImage(ret, scale);
-                    return std::move(ret);
-                });
-            }
-
-            if (g_principles.empty()) {
-                ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
-                g_principles.reserve(valueVec.size());
-                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_principles), [scale](const Value &value) {
-                    std::string ret = value.asString();
-                    replaceTilesToImage(ret, scale);
-                    return std::move(ret);
-                });
-            }
-
-            // 切换到cocos线程
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView]() {
-                if (LIKELY(thiz->getParent() != nullptr)) {
-                    loadingView->removeFromParent();
-                    thiz->createContentView(idx);
-                }
+    auto thiz = makeRef(this);  // 保证线程回来之前不析构
+    std::thread([thiz, idx, scale, loadingView]() {
+        // 读文件
+        if (g_definitions.empty()) {
+            ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
+            g_definitions.reserve(valueVec.size());
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions), [scale](const Value &value) {
+                std::string ret = value.asString();
+                replaceTilesToImage(ret, scale);
+                return std::move(ret);
             });
-        }).detach();
-    }
+        }
+
+        if (g_principles.empty()) {
+            ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
+            g_principles.reserve(valueVec.size());
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_principles), [scale](const Value &value) {
+                std::string ret = value.asString();
+                replaceTilesToImage(ret, scale);
+                return std::move(ret);
+            });
+        }
+
+        // 切换到cocos线程
+        Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView]() {
+            if (LIKELY(thiz->getParent() != nullptr)) {
+                loadingView->removeFromParent();
+                thiz->createContentView(idx);
+            }
+        });
+    }).detach();
 
     return true;
 }
