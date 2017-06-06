@@ -445,14 +445,14 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *sender, size_t idx) {
 
 void ScoreSheetScene::editName(size_t idx) {
     ui::EditBox *editBox = ui::EditBox::create(Size(120.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
     editBox->setFontColor(Color3B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(_record->name[idx]);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
-    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
 
     const char *wind[] = { "东", "南", "西", "北" };
     char title[64];
@@ -1162,6 +1162,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     ui::EditBox *editBox = ui::EditBox::create(Size(120.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);

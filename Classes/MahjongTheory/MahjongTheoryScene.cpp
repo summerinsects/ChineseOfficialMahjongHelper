@@ -36,6 +36,7 @@ bool MahjongTheoryScene::init() {
     this->addChild(_editBox);
     _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     _editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    _editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
     _editBox->setFontColor(Color4B::BLACK);
     _editBox->setFontSize(12);
     _editBox->setPlaceholderFontColor(Color4B::GRAY);

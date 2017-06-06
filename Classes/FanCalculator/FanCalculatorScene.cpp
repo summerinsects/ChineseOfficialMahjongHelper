@@ -145,6 +145,7 @@ void FanCalculatorScene::showInputAlert(const char *prevInput) {
     ui::EditBox *editBox = ui::EditBox::create(Size(width - 10, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
