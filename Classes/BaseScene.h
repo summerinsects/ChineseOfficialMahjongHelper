@@ -1,5 +1,5 @@
-﻿#ifndef __BASE_LAYER__
-#define __BASE_LAYER__
+﻿#ifndef __BASE_SCENE__
+#define __BASE_SCENE__
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
@@ -10,10 +10,10 @@
 
 #define ENABLE_LOGO 1
 
-class BaseLayer : public cocos2d::Layer {
+class BaseScene : public cocos2d::Scene {
 public:
     bool initWithTitle(const std::string &title) {
-        if (UNLIKELY(!cocos2d::Layer::init())) {
+        if (UNLIKELY(!cocos2d::Scene::init())) {
             return false;
         }
 
@@ -67,9 +67,6 @@ public:
 
         return true;
     }
-
-private:
-    using cocos2d::Layer::init;
 };
 
 #endif

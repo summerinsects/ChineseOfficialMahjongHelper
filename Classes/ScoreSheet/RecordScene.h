@@ -1,7 +1,7 @@
 ﻿#ifndef _RECORD_SCENE_H_
 #define _RECORD_SCENE_H_
 
-#include "../BaseLayer.h"
+#include "../BaseScene.h"
 #include "../widget/CWTableView.h"
 #include "Record.h"
 #include "../mahjong-algorithm/fan_calculator.h"
@@ -22,9 +22,9 @@ static const char *packedFanNames[] = {
 class HandTilesWidget;
 class ExtraInfoWidget;
 
-class RecordScene : public BaseLayer, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
+class RecordScene : public BaseScene, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
 public:
-    static cocos2d::Scene *createScene(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback);
+    static cocos2d::Scene *create(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback);
 
     bool initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail);
 

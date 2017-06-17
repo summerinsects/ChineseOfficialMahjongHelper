@@ -219,7 +219,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Classes\AppDelegate.h" />
-    <ClInclude Include="..\..\Classes\BaseLayer.h" />
+    <ClInclude Include="..\..\Classes\BaseScene.h" />
     <ClInclude Include="..\..\Classes\common.h" />
     <ClInclude Include="..\..\Classes\compiler.h" />
     <ClInclude Include="..\..\Classes\FanCalculator\FanCalculatorScene.h" />

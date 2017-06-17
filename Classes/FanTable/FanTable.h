@@ -1,13 +1,11 @@
 ﻿#ifndef __FAN_TABLE_H__
 #define __FAN_TABLE_H__
 
-#include "../BaseLayer.h"
+#include "../BaseScene.h"
 #include "../widget/CWTableView.h"
 
-class FanTableScene : public BaseLayer, cw::TableViewDelegate {
+class FanTableScene : public BaseScene, cw::TableViewDelegate {
 public:
-    static cocos2d::Scene *createScene();
-
     virtual bool init() override;
 
     CREATE_FUNC(FanTableScene);

@@ -8,15 +8,8 @@
 
 USING_NS_CC;
 
-Scene *FanCalculatorScene::createScene() {
-    auto scene = Scene::create();
-    auto layer = FanCalculatorScene::create();
-    scene->addChild(layer);
-    return scene;
-}
-
 bool FanCalculatorScene::init() {
-    if (UNLIKELY(!BaseLayer::initWithTitle("国标麻将算番器"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle("国标麻将算番器"))) {
         return false;
     }
 

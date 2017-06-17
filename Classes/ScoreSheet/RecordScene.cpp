@@ -15,14 +15,11 @@
 
 USING_NS_CC;
 
-Scene *RecordScene::createScene(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback) {
-    auto scene = Scene::create();
-    auto layer = new (std::nothrow) RecordScene();
-    layer->initWithIndex(handIdx, playerNames, detail);
-    layer->_okCallback = okCallback;
-    layer->autorelease();
-
-    scene->addChild(layer);
+Scene *RecordScene::create(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback) {
+    auto scene = new (std::nothrow) RecordScene();
+    scene->initWithIndex(handIdx, playerNames, detail);
+    scene->_okCallback = okCallback;
+    scene->autorelease();
     return scene;
 }
 
@@ -35,7 +32,7 @@ static inline size_t computeRowsAlign4(size_t cnt) {
 }
 
 bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail) {
-    if (UNLIKELY(!BaseLayer::initWithTitle(handNameText[handIdx]))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
     }
 

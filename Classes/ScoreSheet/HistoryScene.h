@@ -1,14 +1,14 @@
 ﻿#ifndef __HISTORY_SCENE_H__
 #define __HISTORY_SCENE_H__
 
-#include "../BaseLayer.h"
+#include "../BaseScene.h"
 #include "../widget/CWTableView.h"
 
 struct Record;
 
-class HistoryScene : public BaseLayer, cw::TableViewDelegate {
+class HistoryScene : public BaseScene, cw::TableViewDelegate {
 public:
-    static cocos2d::Scene *createScene(const std::function<void (Record *)> &viewCallback);
+    static cocos2d::Scene *create(const std::function<void (Record *)> &viewCallback);
 
     virtual bool init() override;
 

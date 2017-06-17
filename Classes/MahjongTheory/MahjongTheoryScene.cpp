@@ -17,15 +17,8 @@ USING_NS_CC;
 
 static mahjong::tile_t serveRandomTile(const int (&usedTable)[mahjong::TILE_TABLE_SIZE], mahjong::tile_t discardTile);
 
-Scene *MahjongTheoryScene::createScene() {
-    auto scene = Scene::create();
-    auto layer = MahjongTheoryScene::create();
-    scene->addChild(layer);
-    return scene;
-}
-
 bool MahjongTheoryScene::init() {
-    if (UNLIKELY(!BaseLayer::initWithTitle("牌理"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle("牌理"))) {
         return false;
     }
 

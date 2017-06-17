@@ -1,12 +1,10 @@
 ﻿#ifndef __OTHER_SCENE_H__
 #define __OTHER_SCENE_H__
 
-#include "../BaseLayer.h"
+#include "../BaseScene.h"
 
-class OtherScene : public BaseLayer {
+class OtherScene : public BaseScene {
 public:
-    static cocos2d::Scene *createScene();
-
     virtual bool init() override;
 
     CREATE_FUNC(OtherScene);

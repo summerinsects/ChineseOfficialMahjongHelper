@@ -137,7 +137,7 @@
     <ClInclude Include="..\Classes\common.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\BaseLayer.h">
+    <ClInclude Include="..\Classes\BaseScene.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\ScoreSheet\HistoryScene.h">

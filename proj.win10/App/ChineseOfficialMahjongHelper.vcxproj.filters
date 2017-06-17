@@ -189,7 +189,7 @@
     <ClInclude Include="..\..\Classes\widget\TilesKeyboard.h">
       <Filter>Classes\widget</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\BaseLayer.h">
+    <ClInclude Include="..\..\Classes\BaseScene.h">
       <Filter>Classes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Classes\common.h">

@@ -156,7 +156,7 @@
 		1F2D25861E076FC20071ADE2 /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
 		1F4192721E10A10200CDC47D /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
 		1F4192731E10A10200CDC47D /* CWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWTableView.h; sourceTree = "<group>"; };
-		1F6A373D1CBDD3C9001617E6 /* BaseLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseLayer.h; sourceTree = "<group>"; };
+		1F6A373D1CBDD3C9001617E6 /* BaseScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseScene.h; sourceTree = "<group>"; };
 		1F6A373E1CBDD3C9001617E6 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OtherScene.cpp; sourceTree = "<group>"; };
 		1F764BEA1CC5DB1F00844DAF /* OtherScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OtherScene.h; sourceTree = "<group>"; };
@@ -464,7 +464,7 @@
 			children = (
 				46880B8419C43A87006E1F66 /* AppDelegate.cpp */,
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
-				1F6A373D1CBDD3C9001617E6 /* BaseLayer.h */,
+				1F6A373D1CBDD3C9001617E6 /* BaseScene.h */,
 				1F6A373E1CBDD3C9001617E6 /* common.h */,
 				1FE04AD61C94682A008401EA /* FanCalculator */,
 				1FE2A3E61CBB30D1008C45C5 /* FanTable */,

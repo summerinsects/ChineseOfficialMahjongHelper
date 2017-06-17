@@ -9,13 +9,6 @@
 
 USING_NS_CC;
 
-Scene *FanTableScene::createScene() {
-    auto scene = Scene::create();
-    auto layer = FanTableScene::create();
-    scene->addChild(layer);
-    return scene;
-}
-
 static const int fanLevel[] = { 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };  // 番种
 static const size_t eachLevelCounts[] = { 13, 10, 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次番种的个数
 static const size_t eachLevelBeginIndex[] = { 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
@@ -25,7 +18,7 @@ static inline size_t computeRowsAlign4(size_t cnt) {
 }
 
 bool FanTableScene::init() {
-    if (UNLIKELY(!BaseLayer::initWithTitle("国标麻将番种表"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle("国标麻将番种表"))) {
         return false;
     }
 
@@ -148,5 +141,5 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
 void FanTableScene::onPointsNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
-    Director::getInstance()->pushScene(FanDefinitionScene::createScene(idx));
+    Director::getInstance()->pushScene(FanDefinitionScene::create(idx));
 }

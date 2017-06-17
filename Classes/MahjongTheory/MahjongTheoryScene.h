@@ -1,17 +1,15 @@
 ﻿#ifndef __MAHJONG_THEORY_SCENE_H__
 #define __MAHJONG_THEORY_SCENE_H__
 
-#include "../BaseLayer.h"
+#include "../BaseScene.h"
 #include "../mahjong-algorithm/shanten.h"
 #include "../widget/CWTableView.h"
 #include <unordered_map>
 
 class HandTilesWidget;
 
-class MahjongTheoryScene : public BaseLayer, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
+class MahjongTheoryScene : public BaseScene, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
 public:
-    static cocos2d::Scene *createScene();
-
     virtual bool init() override;
 
     CREATE_FUNC(MahjongTheoryScene);

@@ -61,20 +61,13 @@ static void writeToJson(const Record &record) {
     }
 }
 
-Scene *ScoreSheetScene::createScene() {
-    auto scene = Scene::create();
-    auto layer = ScoreSheetScene::create();
-    scene->addChild(layer);
-    return scene;
-}
-
 bool ScoreSheetScene::init() {
     readFromJson(g_currentRecord);
     return ScoreSheetScene::initWithRecord(&g_currentRecord);
 }
 
 bool ScoreSheetScene::initWithRecord(Record *record) {
-    if (UNLIKELY(!BaseLayer::initWithTitle("国标麻将记分器"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle("国标麻将记分器"))) {
         return false;
     }
 
@@ -513,7 +506,7 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
 
 void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
     const char *name[] = { _record->name[0], _record->name[1], _record->name[2], _record->name[3] };
-    auto scene = RecordScene::createScene(handIdx, name, modify ? &_record->detail[handIdx] : nullptr,
+    auto scene = RecordScene::create(handIdx, name, modify ? &_record->detail[handIdx] : nullptr,
         [this, handIdx](const Record::Detail &detail) {
         bool isModify = (handIdx != _record->current_index);
 
@@ -705,7 +698,7 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
-    Director::getInstance()->pushScene(HistoryScene::createScene([this](Record *record) {
+    Director::getInstance()->pushScene(HistoryScene::create([this](Record *record) {
         if (UNLIKELY(g_currentRecord.start_time == record->start_time)) {  // 我们认为开始时间相同的为同一个记录
             Director::getInstance()->popScene();
         }

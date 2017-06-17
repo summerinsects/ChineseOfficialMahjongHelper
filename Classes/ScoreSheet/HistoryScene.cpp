@@ -18,11 +18,9 @@ USING_NS_CC;
 static std::vector<Record> g_records;
 static std::mutex g_mutex;
 
-Scene *HistoryScene::createScene(const std::function<void (Record *)> &viewCallback) {
-    auto scene = Scene::create();
-    auto layer = HistoryScene::create();
-    layer->_viewCallback = viewCallback;
-    scene->addChild(layer);
+Scene *HistoryScene::create(const std::function<void (Record *)> &viewCallback) {
+    auto scene = HistoryScene::create();
+    scene->_viewCallback = viewCallback;
     return scene;
 }
 
@@ -125,7 +123,7 @@ void HistoryScene::updateRecordTexts() {
 }
 
 bool HistoryScene::init() {
-    if (UNLIKELY(!BaseLayer::initWithTitle("历史记录"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle("历史记录"))) {
         return false;
     }
 
@@ -174,7 +172,7 @@ bool HistoryScene::init() {
 }
 
 void HistoryScene::onEnter() {
-    Layer::onEnter();
+    Scene::onEnter();
 
     if (LIKELY(!g_records.empty())) {
         updateRecordTexts();

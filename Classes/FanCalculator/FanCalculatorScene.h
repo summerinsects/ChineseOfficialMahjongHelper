@@ -1,15 +1,13 @@
 ﻿#ifndef __FAN_CALCULATOR_SCENE_H__
 #define __FAN_CALCULATOR_SCENE_H__
 
-#include "../BaseLayer.h"
+#include "../BaseScene.h"
 
 class TilePickWidget;
 class ExtraInfoWidget;
 
-class FanCalculatorScene : public BaseLayer {
+class FanCalculatorScene : public BaseScene {
 public:
-    static cocos2d::Scene *createScene();
-
     virtual bool init() override;
 
     CREATE_FUNC(FanCalculatorScene);

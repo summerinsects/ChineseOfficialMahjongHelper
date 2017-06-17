@@ -17,15 +17,8 @@ USING_NS_CC;
 
 static bool checkVersion(const std::vector<char> *buffer, bool manual);
 
-Scene* HelloWorld::createScene() {
-    auto scene = Scene::create();
-    auto layer = HelloWorld::create();
-    scene->addChild(layer);
-    return scene;
-}
-
 bool HelloWorld::init() {
-    if (UNLIKELY(!Layer::init())) {
+    if (UNLIKELY(!Scene::init())) {
         return false;
     }
 
@@ -67,7 +60,7 @@ bool HelloWorld::init() {
     button->setTitleText("算番器");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 100));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(FanCalculatorScene::createScene());
+        Director::getInstance()->pushScene(FanCalculatorScene::create());
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -78,7 +71,7 @@ bool HelloWorld::init() {
     button->setTitleText("计分器");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 60));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(ScoreSheetScene::createScene());
+        Director::getInstance()->pushScene(ScoreSheetScene::create());
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -89,7 +82,7 @@ bool HelloWorld::init() {
     button->setTitleText("番种表");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 20));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(FanTableScene::createScene());
+        Director::getInstance()->pushScene(FanTableScene::create());
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -100,7 +93,7 @@ bool HelloWorld::init() {
     button->setTitleText("牌理");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(MahjongTheoryScene::createScene());
+        Director::getInstance()->pushScene(MahjongTheoryScene::create());
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -111,7 +104,7 @@ bool HelloWorld::init() {
     button->setTitleText("其他");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 60));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(OtherScene::createScene());
+        Director::getInstance()->pushScene(OtherScene::create());
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
