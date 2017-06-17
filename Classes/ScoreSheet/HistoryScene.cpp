@@ -131,8 +131,6 @@ bool HistoryScene::init() {
         return false;
     }
 
-    updateRecordTexts();
-
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -145,7 +143,6 @@ bool HistoryScene::init() {
     _tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
     _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
-    _tableView->reloadData();
     this->addChild(_tableView);
 
     if (UNLIKELY(g_records.empty())) {
@@ -179,7 +176,7 @@ void HistoryScene::onEnter() {
 
     if (LIKELY(!g_records.empty())) {
         updateRecordTexts();
-        _tableView->reloadData();
+        _tableView->reloadDataInplacement();
     }
 }
 
