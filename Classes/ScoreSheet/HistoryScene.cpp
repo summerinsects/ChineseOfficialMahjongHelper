@@ -25,6 +25,8 @@ Scene *HistoryScene::create(const std::function<void (Record *)> &viewCallback) 
 }
 
 static void loadRecords(std::vector<Record> &records) {
+    std::lock_guard<std::mutex> lg(g_mutex);
+
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
     std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
@@ -52,6 +54,8 @@ static void loadRecords(std::vector<Record> &records) {
 }
 
 static void saveRecords(const std::vector<Record> &records) {
+    std::lock_guard<std::mutex> lg(g_mutex);
+
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
     FILE *file = fopen(fileName.c_str(), "wb");
@@ -152,7 +156,6 @@ bool HistoryScene::init() {
         auto thiz = makeRef(this);  // 保证线程回来之前不析构
         std::thread([thiz, loadingView]() {
             std::vector<Record> temp;
-            std::lock_guard<std::mutex> lg(g_mutex);
             loadRecords(temp);
 
             // 切换到cocos线程
@@ -269,7 +272,6 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         auto thiz = makeRef(this);  // 保证线程回来之前不析构
         std::vector<Record> temp = g_records;
         std::thread([thiz, temp, loadingView](){
-            std::lock_guard<std::mutex> lg(g_mutex);
             saveRecords(temp);
 
             // 切换到cocos线程
@@ -305,17 +307,13 @@ static void __modifyRecord(const Record *record) {
     std::sort(g_records.begin(), g_records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
 
     std::vector<Record> temp = g_records;
-    std::thread([temp]() {
-        std::lock_guard<std::mutex> lg(g_mutex);
-        saveRecords(temp);
-    }).detach();
+    std::thread(&saveRecords, temp).detach();
 }
 
 void HistoryScene::modifyRecord(const Record *record) {
     if (UNLIKELY(g_records.empty())) {
         std::thread([record]() {
             std::vector<Record> temp;
-            std::lock_guard<std::mutex> lg(g_mutex);
             loadRecords(temp);
 
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([record, temp]() mutable {
