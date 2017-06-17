@@ -144,7 +144,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float width = visibleSize.width * 0.8f - 10;
 
-    ui::Widget *rootWidget = ui::Widget::create();
+    Node *rootNode = Node::create();
 
     Label *label = Label::createWithSystemFont(
         "1. 本软件开源，高端玩家可下载源代码自行编译。\n"
@@ -153,7 +153,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
         "Arail", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0);
-    rootWidget->addChild(label);
+    rootNode->addChild(label);
 
     // 检测新版本
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -162,14 +162,14 @@ void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
     button->setTitleFontSize(12);
     button->setTitleText("检测新版本");
     button->addClickEventListener([this](Ref *sender) { requestVersion(true); });
-    rootWidget->addChild(button);
+    rootNode->addChild(button);
 
     const Size &labelSize = label->getContentSize();
-    rootWidget->setContentSize(Size(width, labelSize.height + 30));
+    rootNode->setContentSize(Size(width, labelSize.height + 30));
     button->setPosition(Vec2(width * 0.5f, 10));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
 
-    AlertView::showWithNode("关于", rootWidget, nullptr, nullptr);
+    AlertView::showWithNode("关于", rootNode, nullptr, nullptr);
 }
 
 void HelloWorld::requestVersion(bool manual) {

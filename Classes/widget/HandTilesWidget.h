@@ -5,7 +5,7 @@
 #include "ui/CocosGUI.h"
 #include "../mahjong-algorithm/tile.h"
 
-class HandTilesWidget : public cocos2d::ui::Widget {
+class HandTilesWidget : public cocos2d::Node {
 public:
     CREATE_FUNC(HandTilesWidget);
 
@@ -30,7 +30,6 @@ public:
     bool isStandingTilesContainsServingTile() const;
     size_t countServingTileInFixedPacks() const;
 
-CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
 public:
@@ -52,8 +51,8 @@ public:
     bool makeFixedConcealedKongPack();
 
 private:
-    cocos2d::ui::Widget *_fixedContainer = nullptr;
-    cocos2d::ui::Widget *_standingContainer = nullptr;
+    cocos2d::Node *_fixedContainer = nullptr;
+    cocos2d::Node *_standingContainer = nullptr;
     std::vector<cocos2d::ui::Button *> _standingTileButtons;
     cocos2d::DrawNode *_highlightBox = nullptr;
 

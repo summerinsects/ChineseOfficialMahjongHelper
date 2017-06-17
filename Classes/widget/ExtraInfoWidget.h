@@ -5,7 +5,7 @@
 #include "ui/CocosGUI.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 
-class ExtraInfoWidget : public cocos2d::ui::Widget {
+class ExtraInfoWidget : public cocos2d::Node {
 public:
     CREATE_FUNC(ExtraInfoWidget);
 
@@ -30,7 +30,6 @@ public:
     void refreshByKong(bool hasKong);
     void refreshByWinTile(const RefreshByWinTile &rt);
 
-CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
 private:

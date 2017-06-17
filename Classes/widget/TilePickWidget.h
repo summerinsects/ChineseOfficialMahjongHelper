@@ -3,7 +3,7 @@
 
 #include "HandTilesWidget.h"
 
-class TilePickWidget : public cocos2d::ui::Widget {
+class TilePickWidget : public cocos2d::Node {
 public:
     CREATE_FUNC(TilePickWidget);
 
@@ -11,7 +11,6 @@ public:
     void setWinTileChangedCallback(const std::function<void ()> &callback) { _winTileChangedCallback = callback; }
     void setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile);
 
-CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
 
 private:

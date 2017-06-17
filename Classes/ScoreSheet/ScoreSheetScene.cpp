@@ -1136,18 +1136,18 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
 
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     const char (&name)[4][255] = _record->name;
-    ui::Widget *rootWidget = nullptr;
+    Node *rootNode = nullptr;
 
     // 当当前一局比赛未结束时，显示快捷分差按钮
     if (std::none_of(std::begin(name), std::end(name), &isCStringEmpty)
         && _record->current_index < 16) {
-        rootWidget = ui::Widget::create();
+        rootNode = Node::create();
 
         DrawNode *drawNode = createPursuitTable(_record->name, _totalScores);
         const Size &drawNodeSize = drawNode->getContentSize();
 
-        rootWidget->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30));
-        rootWidget->addChild(drawNode);
+        rootNode->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30));
+        rootNode->addChild(drawNode);
         drawNode->setPosition(Vec2(0, 30));
     }
 
@@ -1161,13 +1161,13 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入任意分差");
 
-    if (rootWidget != nullptr) {
-        rootWidget->addChild(editBox);
-        const Size &rootSize = rootWidget->getContentSize();
+    if (rootNode != nullptr) {
+        rootNode->addChild(editBox);
+        const Size &rootSize = rootNode->getContentSize();
         editBox->setPosition(Vec2(rootSize.width * 0.5f, 10.0f));
     }
     else {
-        rootWidget = editBox;
+        rootNode = editBox;
     }
 
     // EditBox的代理
@@ -1182,7 +1182,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     editBox->setDelegate(delegate.get());
 
     // 使这个代理随AlertView一起析构
-    AlertView::showWithNode("追分策略", rootWidget, [editBox, delegate]() {
+    AlertView::showWithNode("追分策略", rootNode, [editBox, delegate]() {
         const char *text = editBox->getText();
         if (!isCStringEmpty(text)) {
             int delta = atoi(text);
@@ -1200,8 +1200,8 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
 
     static const size_t cmpIdx[][3] = { { 1, 2, 3 }, { 0, 2, 3 }, { 0, 1, 3 }, { 0, 1, 2 } };
 
-    ui::Widget *rootWidget = ui::Widget::create();
-    rootWidget->setContentSize(Size(150.0f, 70.0f));
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(150.0f, 70.0f));
 
     for (int i = 0; i < 3; ++i) {
         size_t dst = cmpIdx[idx][i];
@@ -1221,12 +1221,12 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
             button->setTitleText(StringUtils::format("与「%s」平分", name[dst]));
         }
         scaleLabelToFitWidth(button->getTitleLabel(), 148.0f);
-        rootWidget->addChild(button);
+        rootNode->addChild(button);
         button->setPosition(Vec2(75.0f, 60.0f - i * 25.0f));
         button->addClickEventListener([delta](Ref *) {
             showPursuit(delta);
         });
     }
 
-    AlertView::showWithNode(name[idx], rootWidget, nullptr, nullptr);
+    AlertView::showWithNode(name[idx], rootNode, nullptr, nullptr);
 }

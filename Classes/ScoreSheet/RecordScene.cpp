@@ -226,20 +226,22 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->setTouchEnabled(true);
 
     // 上方所有东西
-    ui::Widget *topWidget = ui::Widget::create();
-    topWidget->setContentSize(Size(visibleSize.width, 70));
-    rootLayout->addChild(topWidget);
+    Node *topNode = Node::create();
+    topNode->setContentSize(Size(visibleSize.width, 70));
+    topNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    topNode->setIgnoreAnchorPointForPosition(false);
+    rootLayout->addChild(topNode);
 
     // 说明
     label = Label::createWithSystemFont("标记4番以上番种（未做排斥检测）", "Arial", 12);
     label->setColor(Color3B::BLACK);
-    topWidget->addChild(label);
+    topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 65.0f));
 
     label = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
     label->setColor(Color3B(0x60, 0x60, 0x60));
-    topWidget->addChild(label);
+    topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 40.0f));
 
@@ -250,7 +252,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleFontSize(12);
     button->setTitleText("记录和牌");
     button->addClickEventListener(std::bind(&RecordScene::onTilesButton, this, std::placeholders::_1));
-    topWidget->addChild(button);
+    topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35.0f, 65.0f));
 
     // 展开/收起
@@ -258,7 +260,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    topWidget->addChild(button);
+    topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35.0f, 40.0f));
 
     cw::TableView *tableView = cw::TableView::create();
@@ -272,7 +274,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(tableView);
     _tableView = tableView;
 
-    std::function<void (Ref *)> layoutChildren = [radioNode, rootLayout, topWidget, tableView](Ref *sender) {
+    std::function<void (Ref *)> layoutChildren = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
         ui::Button *button = (ui::Button *)sender;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -292,7 +294,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         }
 
         rootLayout->setContentSize(layoutSize);
-        topWidget->setPosition(Vec2(visibleSize.width * 0.5f, layoutSize.height - 35));
+        topNode->setPosition(Vec2(visibleSize.width * 0.5f, layoutSize.height - 35));
         tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 75));
         tableView->reloadData();
     };
@@ -302,7 +304,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     // 转到
     label = Label::createWithSystemFont("转到", "Arial", 12);
     label->setColor(Color3B::BLACK);
-    topWidget->addChild(label);
+    topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 10.0f));
 
@@ -314,7 +316,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleFontSize(12);
     button->setTitleText("6番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(1); });
-    topWidget->addChild(button);
+    topNode->addChild(button);
     button->setPosition(Vec2(labelPosX + 40.0f * 0.5f, 10.0f));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -323,7 +325,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleFontSize(12);
     button->setTitleText("8番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(2); });
-    topWidget->addChild(button);
+    topNode->addChild(button);
     button->setPosition(Vec2(labelPosX + 40.0f * 1.5f, 10.0f));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -332,7 +334,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleFontSize(12);
     button->setTitleText("12番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(3); });
-    topWidget->addChild(button);
+    topNode->addChild(button);
     button->setPosition(Vec2(labelPosX + 40.0f * 2.5f, 10.0f));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -341,7 +343,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleFontSize(12);
     button->setTitleText("16番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(4); });
-    topWidget->addChild(button);
+    topNode->addChild(button);
     button->setPosition(Vec2(labelPosX + 40.0f * 3.5f, 10.0f));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -350,7 +352,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleFontSize(12);
     button->setTitleText("24番");
     button->addClickEventListener([tableView](Ref *) { tableView->jumpToCell(5); });
-    topWidget->addChild(button);
+    topNode->addChild(button);
     button->setPosition(Vec2(labelPosX + 40.0f * 4.5f, 10.0f));
 
     // 确定按钮
@@ -802,14 +804,14 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
     extraInfo->setScale(extraInfoScale);
     extraInfoSize = Size(maxWidth, extraInfoSize.height * extraInfoScale);
 
-    // 布局在rootWidget上
-    ui::Widget *rootWidget = ui::Widget::create();
-    rootWidget->setContentSize(Size(maxWidth, handTilesSize.height + extraInfoSize.height + 5 + 25));
-    rootWidget->addChild(editBox);
+    // 布局在rootNode上
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(maxWidth, handTilesSize.height + extraInfoSize.height + 5 + 25));
+    rootNode->addChild(editBox);
     editBox->setPosition(Vec2(maxWidth * 0.5f, handTilesSize.height + extraInfoSize.height + 20));
-    rootWidget->addChild(handTiles);
+    rootNode->addChild(handTiles);
     handTiles->setPosition(Vec2(maxWidth * 0.5f, handTilesSize.height * 0.5f + extraInfoSize.height + 5));
-    rootWidget->addChild(extraInfo);
+    rootNode->addChild(extraInfo);
     extraInfo->setPosition(Vec2(maxWidth * 0.5f, extraInfoSize.height * 0.5f));
 
     if (param.hand_tiles.tile_count != 0 && param.win_tile != 0) {
@@ -854,7 +856,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
     editBox->setDelegate(delegate.get());
 
     // 通过AlertView显示出来
-    AlertView::showWithNode("记录和牌", rootWidget, maxWidth, [this, handTiles, extraInfo, param, delegate]() {
+    AlertView::showWithNode("记录和牌", rootNode, maxWidth, [this, handTiles, extraInfo, param, delegate]() {
         calculate(handTiles, extraInfo, param);
     }, nullptr);
 }

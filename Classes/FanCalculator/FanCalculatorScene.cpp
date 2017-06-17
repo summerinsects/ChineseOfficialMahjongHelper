@@ -121,7 +121,7 @@ void FanCalculatorScene::showInputAlert(const char *prevInput) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float width = visibleSize.width * 0.8f - 10;
 
-    ui::Widget *rootWidget = ui::Widget::create();
+    Node *rootNode = Node::create();
 
     Label *label = Label::createWithSystemFont("使用说明：\n"
         "1." INPUT_GUIDE_STRING_1 "\n"
@@ -132,7 +132,7 @@ void FanCalculatorScene::showInputAlert(const char *prevInput) {
         "输入范例3：WWWW 444s 45m678pFF6m\n", "Arial", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0);
-    rootWidget->addChild(label);
+    rootNode->addChild(label);
 
     // 输入手牌
     ui::EditBox *editBox = ui::EditBox::create(Size(width - 10, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
@@ -147,14 +147,14 @@ void FanCalculatorScene::showInputAlert(const char *prevInput) {
         editBox->setText(prevInput);
     }
     TilesKeyboard::hookEditBox(editBox);
-    rootWidget->addChild(editBox);
+    rootNode->addChild(editBox);
 
     const Size &labelSize = label->getContentSize();
-    rootWidget->setContentSize(Size(width, labelSize.height + 30));
+    rootNode->setContentSize(Size(width, labelSize.height + 30));
     editBox->setPosition(Vec2(width * 0.5f, 10));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
 
-    AlertView::showWithNode("直接输入", rootWidget, [this, editBox]() {
+    AlertView::showWithNode("直接输入", rootNode, [this, editBox]() {
         const char *input = editBox->getText();
         const char *errorStr = TilesKeyboard::parseInput(input,
             std::bind(&TilePickWidget::setData, _tilePicker, std::placeholders::_1, std::placeholders::_2));

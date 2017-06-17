@@ -5,9 +5,12 @@
 USING_NS_CC;
 
 bool ExtraInfoWidget::init() {
-    if (UNLIKELY(!ui::Widget::init())) {
+    if (UNLIKELY(!Node::init())) {
         return false;
     }
+
+    this->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    this->setIgnoreAnchorPointForPosition(false);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
 

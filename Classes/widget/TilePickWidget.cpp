@@ -5,9 +5,12 @@
 USING_NS_CC;
 
 bool TilePickWidget::init() {
-    if (UNLIKELY(!ui::Widget::init())) {
+    if (UNLIKELY(!Node::init())) {
         return false;
     }
+
+    this->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    this->setIgnoreAnchorPointForPosition(false);
 
 #define GAP 5
 
@@ -28,7 +31,9 @@ bool TilePickWidget::init() {
 
     // 上方左边的牌面板
     Size tableSize = Size(TILE_WIDTH * 9, TILE_HEIGHT * 4);
-    ui::Widget *tilesContainer = ui::Widget::create();
+    Node *tilesContainer = Node::create();
+    tilesContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    tilesContainer->setIgnoreAnchorPointForPosition(false);
     tilesContainer->setContentSize(tableSize);
     this->addChild(tilesContainer);
 
@@ -39,7 +44,9 @@ bool TilePickWidget::init() {
 
     // 上方右边的按钮
     Size rightSize = Size(BUTTON_WIDHT * 2 + GAP, BUTTON_HEIGHT * 4 + GAP_H * 3);
-    ui::Widget *buttonsContainer = ui::Widget::create();
+    Node *buttonsContainer = Node::create();
+    buttonsContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    buttonsContainer->setIgnoreAnchorPointForPosition(false);
     buttonsContainer->setContentSize(rightSize);
     this->addChild(buttonsContainer);
 

@@ -8,13 +8,18 @@ USING_NS_CC;
 #define GAP 4
 
 bool HandTilesWidget::init() {
-    if (UNLIKELY(!ui::Widget::init())) {
+    if (UNLIKELY(!Node::init())) {
         return false;
     }
 
+    this->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    this->setIgnoreAnchorPointForPosition(false);
+
     // 14张牌宽度：TILE_WIDTH * 14
     Size standingSize = Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT);
-    _standingContainer = ui::Widget::create();
+    _standingContainer = Node::create();
+    _standingContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    _standingContainer->setIgnoreAnchorPointForPosition(false);
     _standingContainer->setContentSize(standingSize);
     this->addChild(_standingContainer);
     _standingContainer->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height * 0.5f));
@@ -27,7 +32,9 @@ bool HandTilesWidget::init() {
     _standingContainer->addChild(_highlightBox, 2);
 
     const float fixedHeight = TILE_HEIGHT;  // NOTE: 如果将来支持加杠，则应为std::max(TILE_HEIGHT, TILE_WIDTH * 2)
-    _fixedContainer = ui::Widget::create();
+    _fixedContainer = Node::create();
+    _fixedContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    _fixedContainer->setIgnoreAnchorPointForPosition(false);
     _fixedContainer->setContentSize(Size(0, fixedHeight));
     this->addChild(_fixedContainer);
     _fixedContainer->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height + fixedHeight * 0.5f + GAP));
