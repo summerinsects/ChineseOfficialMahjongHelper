@@ -59,7 +59,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
         return false;
     }
 
-    if (LIKELY(!g_definitions.empty() && !g_principles.empty())) {
+    if (LIKELY(g_definitions.size() == 82 && g_principles.size() == 5)) {
         createContentView(idx);
         return true;
     }
@@ -84,20 +84,22 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     std::thread([thiz, idx, scale, loadingView]() {
         // 读文件
-        if (g_definitions.empty()) {
-            ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
-            g_definitions.reserve(valueVec.size());
-            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_definitions), [scale](const Value &value) {
+        std::vector<std::string> definitions;
+        ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
+        if (valueVec.size() == 82) {
+            definitions.reserve(82);
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(definitions), [scale](const Value &value) {
                 std::string ret = value.asString();
                 replaceTilesToImage(ret, scale);
                 return std::move(ret);
             });
         }
 
-        if (g_principles.empty()) {
-            ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
-            g_principles.reserve(valueVec.size());
-            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(g_principles), [scale](const Value &value) {
+        std::vector<std::string> principles;
+        valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
+        if (valueVec.size() == 5) {
+            principles.reserve(5);
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(principles), [scale](const Value &value) {
                 std::string ret = value.asString();
                 replaceTilesToImage(ret, scale);
                 return std::move(ret);
@@ -105,7 +107,10 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
         }
 
         // 切换到cocos线程
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView]() {
+        Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView, definitions, principles]() mutable {
+            g_definitions.swap(definitions);
+            g_principles.swap(principles);
+
             if (LIKELY(thiz->isRunning())) {
                 loadingView->removeFromParent();
                 thiz->createContentView(idx);
