@@ -159,7 +159,7 @@ bool HistoryScene::init() {
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
                 g_records.swap(temp);
 
-                if (LIKELY(thiz->getParent() != nullptr)) {
+                if (LIKELY(thiz->isRunning())) {
                     thiz->updateRecordTexts();
                     loadingView->removeFromParent();
                     thiz->_tableView->reloadData();
@@ -274,7 +274,7 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
 
             // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-                if (LIKELY(thiz->getParent() != nullptr)) {
+                if (LIKELY(thiz->isRunning())) {
                     thiz->updateRecordTexts();
                     loadingView->removeFromParent();
                     thiz->_tableView->reloadDataInplacement();

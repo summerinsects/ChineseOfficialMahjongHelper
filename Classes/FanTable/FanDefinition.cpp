@@ -106,7 +106,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
 
         // 切换到cocos线程
         Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView]() {
-            if (LIKELY(thiz->getParent() != nullptr)) {
+            if (LIKELY(thiz->isRunning())) {
                 loadingView->removeFromParent();
                 thiz->createContentView(idx);
             }
