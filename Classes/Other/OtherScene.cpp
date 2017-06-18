@@ -30,7 +30,7 @@ bool OtherScene::init() {
 
             // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-                if (LIKELY(thiz->isRunning())) {
+                if (LIKELY(thiz->getReferenceCount() > 2)) {
                     loadingView->removeFromParent();
                     thiz->createContentView();
                 }

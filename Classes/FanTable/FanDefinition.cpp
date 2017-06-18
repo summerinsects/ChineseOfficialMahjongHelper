@@ -111,7 +111,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
             g_definitions.swap(definitions);
             g_principles.swap(principles);
 
-            if (LIKELY(thiz->isRunning())) {
+            if (LIKELY(thiz->getReferenceCount() > 2)) {
                 loadingView->removeFromParent();
                 thiz->createContentView(idx);
             }

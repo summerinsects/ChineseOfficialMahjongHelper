@@ -434,12 +434,12 @@ void MahjongTheoryScene::calculate() {
             if (result->shanten != std::numeric_limits<int>::max()) {
                 thiz->_allResults.push_back(*result);
             }
-            return (thiz->isRunning());
+            return (thiz->getReferenceCount() > 2);
         });
 
         // 调回cocos线程
         Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-            if (thiz->isRunning()) {
+            if (thiz->getReferenceCount() > 2) {
                 thiz->filterResultsByFlag(thiz->getFilterFlag());
                 thiz->_tableView->reloadData();
                 loadingView->removeFromParent();
