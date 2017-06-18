@@ -159,7 +159,7 @@ bool HistoryScene::init() {
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
                 g_records.swap(temp);
 
-                if (LIKELY(thiz->isRunning())) {
+                if (LIKELY(thiz->getReferenceCount() > 2)) {
                     thiz->updateRecordTexts();
                     loadingView->removeFromParent();
                     thiz->_tableView->reloadData();
