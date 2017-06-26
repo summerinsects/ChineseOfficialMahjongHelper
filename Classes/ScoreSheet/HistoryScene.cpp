@@ -86,6 +86,16 @@ void HistoryScene::updateRecordTexts() {
     _recordTexts.reserve(g_records.size());
 
     std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record) {
+        RecordText rt;
+
+        strftime(rt.startTime, sizeof(rt.startTime), "%Y-%m-%d %H:%M", localtime(&record.start_time));
+        if (record.end_time != 0) {
+            strftime(rt.endTime, sizeof(rt.endTime), "%Y-%m-%d %H:%M", localtime(&record.end_time));
+        }
+        else {
+            rt.endTime[0] = '\0';
+        }
+
         typedef std::pair<int, int> SeatScore;
         SeatScore seatscore[4];
         seatscore[0].first = 0; seatscore[0].second = 0;
@@ -105,16 +115,6 @@ void HistoryScene::updateRecordTexts() {
             [](const SeatScore &left, const SeatScore &right) {
             return left.second > right.second;
         });
-
-        RecordText rt;
-
-        strftime(rt.startTime, sizeof(rt.startTime), "%Y-%m-%d %H:%M", localtime(&record.start_time));
-        if (record.end_time != 0) {
-            strftime(rt.endTime, sizeof(rt.endTime), "%Y-%m-%d %H:%M", localtime(&record.end_time));
-        }
-        else {
-            rt.endTime[0] = '\0';
-        }
 
         static const char *seatText[] = { "东", "南", "西", "北" };
         snprintf(rt.score, sizeof(rt.score), "%s: %s(%+d)\n%s: %s(%+d)\n%s: %s(%+d)\n%s: %s(%+d)",
