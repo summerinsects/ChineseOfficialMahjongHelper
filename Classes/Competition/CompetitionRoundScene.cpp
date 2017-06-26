@@ -1,4 +1,4 @@
-#include "CompetitionRoundScene.h"
+﻿#include "CompetitionRoundScene.h"
 #include "../common.h"
 
 USING_NS_CC;

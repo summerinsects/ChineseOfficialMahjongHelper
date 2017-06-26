@@ -1,4 +1,4 @@
-#ifndef __COMPETITION_H__
+﻿#ifndef __COMPETITION_H__
 #define __COMPETITION_H__
 
 

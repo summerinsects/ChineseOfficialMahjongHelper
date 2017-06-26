@@ -1,4 +1,4 @@
-#ifndef __COMPETITION_ROUND_SCENE__
+﻿#ifndef __COMPETITION_ROUND_SCENE__
 #define __COMPETITION_ROUND_SCENE__
 
 #include "../BaseScene.h"
@@ -9,7 +9,7 @@ public:
     virtual bool init() override;
 
     CREATE_FUNC(CompetitionRoundScene);
-    
+
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
     virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
