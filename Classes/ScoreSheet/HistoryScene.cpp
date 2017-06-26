@@ -88,9 +88,11 @@ void HistoryScene::updateRecordTexts() {
     std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record) {
         RecordText rt;
 
-        strftime(rt.startTime, sizeof(rt.startTime), "%Y-%m-%d %H:%M", localtime(&record.start_time));
+        struct tm ret = *localtime(&record.start_time);
+        snprintf(rt.startTime, sizeof(rt.startTime), "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (record.end_time != 0) {
-            strftime(rt.endTime, sizeof(rt.endTime), "%Y-%m-%d %H:%M", localtime(&record.end_time));
+            ret = *localtime(&record.end_time);
+            snprintf(rt.endTime, sizeof(rt.endTime), "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         }
         else {
             rt.endTime[0] = '\0';
@@ -244,11 +246,11 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
 
     std::string str = rt.startTime;
     if (rt.endTime[0] != '\0') {
-        str.append(" -- ");
+        str.append("——");
         str.append(rt.endTime);
     }
     else {
-        str.append(" (未结束)");
+        str.append("(未结束)");
     }
     str.append("\n");
     str.append(rt.score);
