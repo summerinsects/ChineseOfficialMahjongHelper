@@ -52,13 +52,16 @@ bool HelloWorld::init() {
     }
 #endif
 
+    const float buttonWidth = (visibleSize.width - 16) / 3;
+    const float buttonHeight = buttonWidth * 0.8;
+
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(75.0, 32.0f));
+    button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("算番器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 100));
+    button->setPosition(Vec2(origin.x + buttonWidth * 0.5f + 4, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(FanCalculatorScene::create());
     });
@@ -66,10 +69,10 @@ bool HelloWorld::init() {
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(75.0, 32.0f));
+    button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("计分器");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 60));
+    button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(ScoreSheetScene::create());
     });
@@ -77,10 +80,10 @@ bool HelloWorld::init() {
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(75.0, 32.0f));
+    button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("番种表");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 20));
+    button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(FanTableScene::create());
     });
@@ -88,10 +91,10 @@ bool HelloWorld::init() {
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(75.0, 32.0f));
+    button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("牌理");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 20));
+    button->setPosition(Vec2(origin.x + buttonWidth * 0.5f + 4, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(MahjongTheoryScene::create());
     });
@@ -99,10 +102,10 @@ bool HelloWorld::init() {
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(75.0, 32.0f));
+    button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("其他");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 60));
+    button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(OtherScene::create());
     });
@@ -110,10 +113,10 @@ bool HelloWorld::init() {
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(75.0, 32.0f));
+    button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("关于");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 100));
+    button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8));
     button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
