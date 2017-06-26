@@ -143,7 +143,9 @@ bool MahjongTheoryScene::init() {
     _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    _tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
+    _tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
+    _tableView->setScrollBarWidth(4);
+    _tableView->setScrollBarOpacity(0x99);
     _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 60));
     this->addChild(_tableView);

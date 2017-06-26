@@ -55,7 +55,9 @@ bool FanTableScene::init() {
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
+    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
+    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 70.0f));
     tableView->reloadData();
