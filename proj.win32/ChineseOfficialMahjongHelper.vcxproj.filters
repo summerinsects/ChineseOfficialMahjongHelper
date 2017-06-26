@@ -31,6 +31,9 @@
     <Filter Include="src\MahjongTheory">
       <UniqueIdentifier>{0d3ab171-ddea-44a5-bacd-63f9043728ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Competition">
+      <UniqueIdentifier>{ec2ebec7-c428-4bb6-8308-3e4f802a6fe0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -95,6 +98,18 @@
     </ClCompile>
     <ClCompile Include="..\Classes\ScoreSheet\Record.cpp">
       <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Competition\Competition.cpp">
+      <Filter>src\Competition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Competition\CompetitionFinalScene.cpp">
+      <Filter>src\Competition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Competition\CompetitionRoundScene.cpp">
+      <Filter>src\Competition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Competition\CompetitionTableScene.cpp">
+      <Filter>src\Competition</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +193,18 @@
     </ClInclude>
     <ClInclude Include="..\Classes\widget\TilesKeyboard.h">
       <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Competition\Competition.h">
+      <Filter>src\Competition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Competition\CompetitionFinalScene.h">
+      <Filter>src\Competition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Competition\CompetitionRoundScene.h">
+      <Filter>src\Competition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Competition\CompetitionTableScene.h">
+      <Filter>src\Competition</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

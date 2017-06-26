@@ -144,6 +144,10 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\Classes\Competition\Competition.cpp" />
+    <ClCompile Include="..\Classes\Competition\CompetitionFinalScene.cpp" />
+    <ClCompile Include="..\Classes\Competition\CompetitionRoundScene.cpp" />
+    <ClCompile Include="..\Classes\Competition\CompetitionTableScene.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp" />
@@ -169,6 +173,10 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\BaseScene.h" />
     <ClInclude Include="..\Classes\common.h" />
+    <ClInclude Include="..\Classes\Competition\Competition.h" />
+    <ClInclude Include="..\Classes\Competition\CompetitionFinalScene.h" />
+    <ClInclude Include="..\Classes\Competition\CompetitionRoundScene.h" />
+    <ClInclude Include="..\Classes\Competition\CompetitionTableScene.h" />
     <ClInclude Include="..\Classes\compiler.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h" />
