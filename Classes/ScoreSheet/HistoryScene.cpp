@@ -135,7 +135,7 @@ bool HistoryScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     _tableView = cw::TableView::create();
-    _tableView->setContentSize(Size(visibleSize.width - 10.0f, visibleSize.height - 35));
+    _tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35));
     _tableView->setDelegate(this);
     _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
@@ -196,7 +196,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         cell = CustomCell::create();
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = visibleSize.width - 10.0f;
+        const float width = visibleSize.width - 5.0f;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         LayerColor *(&layerColor)[2] = std::get<0>(ext);

@@ -123,7 +123,7 @@ bool MahjongTheoryScene::init() {
     }
 
     // 预先算好Cell及各label的Size
-    _cellWidth = visibleSize.width - 10;
+    _cellWidth = visibleSize.width - 5;
     Label *tempLabel = Label::createWithSystemFont("打「", "Arial", 12);
     _discardLabelWidth = tempLabel->getContentSize().width;
     tempLabel->setString("」摸「"); 
@@ -138,7 +138,7 @@ bool MahjongTheoryScene::init() {
     _totalLabelWidth = tempLabel->getContentSize().width;
 
     _tableView = cw::TableView::create();
-    _tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 130 - widgetSize.height));
+    _tableView->setContentSize(Size(visibleSize.width - 5, visibleSize.height - 130 - widgetSize.height));
     _tableView->setDelegate(this);
     _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);

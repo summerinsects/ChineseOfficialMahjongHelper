@@ -50,7 +50,7 @@ bool FanTableScene::init() {
     }
 
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 150));
+    tableView->setContentSize(Size(visibleSize.width - 5, visibleSize.height - 150));
     tableView->setDelegate(this);
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
@@ -79,7 +79,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float gap = (visibleSize.width - 10.0f) * 0.25f;
+    const float gap = (visibleSize.width - 5.0f) * 0.25f;
 
     if (cell == nullptr) {
         cell = CustomCell::create();
