@@ -705,11 +705,9 @@ void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
             Director::getInstance()->popScene();
         }
         else {
-            auto scene = Scene::create();
-            auto layer = new (std::nothrow) ScoreSheetScene();
-            layer->initWithRecord(record);
-            layer->autorelease();
-            scene->addChild(layer);
+            auto scene = new (std::nothrow) ScoreSheetScene();
+            scene->initWithRecord(record);
+            scene->autorelease();
             Director::getInstance()->pushScene(scene);
         }
     }));
