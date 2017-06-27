@@ -26,13 +26,19 @@ bool LatestCompetitionScene::init() {
     _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     this->addChild(_tableView);
 
+    requestCompetitions();
+
+    return true;
+}
+
+void LatestCompetitionScene::requestCompetitions() {
     LoadingView *loadingView = LoadingView::create();
     this->addChild(loadingView);
-    loadingView->setPosition(origin);
+    loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
 
     network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
     request->setRequestType(network::HttpRequest::Type::GET);
-    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongHelper/master/proj.android/build-cfg.json");
+    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongLatestCompetition/master/LatestCompetition.json");
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
@@ -41,7 +47,7 @@ bool LatestCompetitionScene::init() {
         }
 
         if (response == nullptr) {
-            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, nullptr, nullptr);
+            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, std::bind(&LatestCompetitionScene::requestCompetitions, thiz.get()), nullptr);
             return;
         }
 
@@ -50,27 +56,71 @@ bool LatestCompetitionScene::init() {
         if (!response->isSucceed()) {
             log("response failed");
             log("error buffer: %s", response->getErrorBuffer());
-            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, nullptr, nullptr);
+            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, std::bind(&LatestCompetitionScene::requestCompetitions, thiz.get()), nullptr);
             return;
         }
 
         std::vector<char> *buffer = response->getResponseData();
-        printf("%.*s", (int)buffer->size(), &buffer->front());
-
-        thiz->_competitions.clear();
-        CompetitionInfo info;
-        info.name = "2017年逍遥宫线下组织广州分会6月联赛";
-        info.startTime = time(nullptr);
-        info.endTime = time(nullptr);
-        info.url = "adsff";
-        for (int i = 0; i < 10; ++i) thiz->_competitions.push_back(info);
-        thiz->_tableView->reloadDataInplacement();
+        thiz->parseResponse(buffer);
     });
 
     network::HttpClient::getInstance()->send(request);
     request->release();
+}
 
-    return true;
+bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
+    if (buffer == nullptr) {
+        return false;
+    }
+
+    try {
+        do {
+            std::string str(buffer->begin(), buffer->end());
+            rapidjson::Document doc;
+            doc.Parse<0>(str.c_str());
+            if (doc.HasParseError() || !doc.IsArray()) {
+                break;
+            }
+
+            _competitions.clear();
+            _competitions.reserve(doc.Size());
+            std::transform(doc.Begin(), doc.End(), std::back_inserter(_competitions), [](const rapidjson::Value &json) {
+                CompetitionInfo info = { 0 };
+
+                rapidjson::Value::ConstMemberIterator it = json.FindMember("name");
+                if (it != json.MemberEnd() && it->value.IsString()) {
+                    strncpy(info.name, it->value.GetString(), 255);
+                }
+
+                it = json.FindMember("start_time");
+                if (it != json.MemberEnd() && it->value.IsInt64()) {
+                    info.startTime = it->value.GetInt64();
+                }
+
+                it = json.FindMember("end_time");
+                if (it != json.MemberEnd() && it->value.IsInt64()) {
+                    info.endTime = it->value.GetInt64();
+                }
+
+                it = json.FindMember("url");
+                if (it != json.MemberEnd() && it->value.IsString()) {
+                    strncpy(info.url, it->value.GetString(), 1023);
+                }
+
+                return info;
+            });
+
+            std::sort(_competitions.begin(), _competitions.end(), [](const CompetitionInfo &r1, const CompetitionInfo &r2) { return r1.startTime > r2.startTime; });
+            _tableView->reloadDataInplacement();
+
+            return true;
+        } while (0);
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+    }
+
+    return false;
 }
 
 ssize_t LatestCompetitionScene::numberOfCellsInTableView(cw::TableView *table) {
@@ -137,20 +187,22 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
     detailBtn->setUserData(reinterpret_cast<void *>(idx));
 
     const CompetitionInfo &info = _competitions[idx];
+    label[0]->setString(info.name);
 
-    char buf[sizeof("年月日") + 8];
-    strftime(buf, sizeof(buf), "%Y年%m月%d日", localtime(&info.startTime));
+    char buf[255];
+    struct tm ret = *localtime(&info.startTime);
+    snprintf(buf, sizeof(buf), "%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
 
     std::string date = buf;
     if (info.endTime != 0) {
-        date.append("-");
-        strftime(buf, sizeof(buf), "%Y年%m月%d日", localtime(&info.endTime));
+        date.append("——");
+        ret = *localtime(&info.endTime);
+        snprintf(buf, sizeof(buf), "%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
         date.append(buf);
     }
-    label[0]->setString(date);
-    label[1]->setString(info.name);
+    label[1]->setString(date);
 
-    detailBtn->setVisible(!info.url.empty());
+    detailBtn->setVisible(info.url[0] != '\0');
 
     return cell;
 }

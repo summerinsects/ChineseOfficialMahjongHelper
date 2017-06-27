@@ -17,13 +17,16 @@ private:
 
     void onDetailButton(cocos2d::Ref *sender);
 
+    void requestCompetitions();
+    bool parseResponse(const std::vector<char> *buffer);
+
     cw::TableView *_tableView = nullptr;
 
     struct CompetitionInfo {
-        std::string name;
+        char name[256];
         time_t startTime;
         time_t endTime;
-        std::string url;
+        char url[1024];
     };
 
     std::vector<CompetitionInfo> _competitions;
