@@ -4,6 +4,7 @@
 #include "FanTable/FanTable.h"
 #include "Other/OtherScene.h"
 #include "MahjongTheory/MahjongTheoryScene.h"
+#include "LatestCompetition/LatestCompetitionScene.h"
 #include "widget/AlertView.h"
 #include "common.h"
 
@@ -104,10 +105,10 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
-    button->setTitleText("其他");
+    button->setTitleText("近期赛事");
     button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(OtherScene::create());
+        Director::getInstance()->pushScene(LatestCompetitionScene::create());
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -115,8 +116,19 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
-    button->setTitleText("关于");
+    button->setTitleText("其他");
     button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8));
+    button->addClickEventListener([](Ref *) {
+        Director::getInstance()->pushScene(OtherScene::create());
+    });
+
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(30.0, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("关于");
+    button->setPosition(Vec2(origin.x + 18, origin.y + 13));
     button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");

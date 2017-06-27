@@ -63,6 +63,8 @@
 		1FE5CFDE1CAE029200A5C38B /* TilePickWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */; };
 		1FE5D0481CAE046300A5C38B /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = 1FE5D0471CAE046300A5C38B /* tiles */; };
 		1FE5D0491CAE046300A5C38B /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = 1FE5D0471CAE046300A5C38B /* tiles */; };
+		1FF6025B1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */; };
+		1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		294D0D641D0D56D500F7F5D4 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 294D0D631D0D56D500F7F5D4 /* CoreText.framework */; };
 		46880B8119C43A67006E1F66 /* xyg.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7A19C43A67006E1F66 /* xyg.png */; };
@@ -204,6 +206,8 @@
 		1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilePickWidget.cpp; sourceTree = "<group>"; };
 		1FE5CFDC1CAE029200A5C38B /* TilePickWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilePickWidget.h; sourceTree = "<group>"; };
 		1FE5D0471CAE046300A5C38B /* tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tiles; sourceTree = "<group>"; };
+		1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LatestCompetitionScene.cpp; sourceTree = "<group>"; };
+		1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LatestCompetitionScene.h; sourceTree = "<group>"; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		294D0D631D0D56D500F7F5D4 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
 		46880B7A19C43A67006E1F66 /* xyg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = xyg.png; sourceTree = "<group>"; };
@@ -435,6 +439,15 @@
 			path = widget;
 			sourceTree = "<group>";
 		};
+		1FF602581F00D792006BF5E3 /* LatestCompetition */ = {
+			isa = PBXGroup;
+			children = (
+				1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */,
+				1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */,
+			);
+			path = LatestCompetition;
+			sourceTree = "<group>";
+		};
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
@@ -502,6 +515,7 @@
 				1FE2A3E61CBB30D1008C45C5 /* FanTable */,
 				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
 				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
+				1FF602581F00D792006BF5E3 /* LatestCompetition */,
 				1FDD943B1C8337140031BC38 /* mahjong-algorithm */,
 				1F154E391E4409420083F8B3 /* MahjongTheory */,
 				1F764BE81CC5DB1F00844DAF /* Other */,
@@ -716,6 +730,7 @@
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				1F4192741E10A10200CDC47D /* CWTableView.cpp in Sources */,
+				1FF6025B1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				1FE17A7B1EE0FF9300B47FE3 /* CompetitionTableScene.cpp in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
@@ -737,6 +752,7 @@
 				1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */,
 				1FE17A7A1EE0FF9300B47FE3 /* CompetitionRoundScene.cpp in Sources */,
 				1FE17A781EE0FF9300B47FE3 /* CompetitionFinalScene.cpp in Sources */,
+				1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
 				1FE2A3EE1CBB30D1008C45C5 /* FanTable.cpp in Sources */,
 				1FE2A3EC1CBB30D1008C45C5 /* FanDefinition.cpp in Sources */,
 				1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,

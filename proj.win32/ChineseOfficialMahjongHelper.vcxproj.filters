@@ -33,6 +33,8 @@
     </Filter>
     <Filter Include="src\Competition">
       <UniqueIdentifier>{ec2ebec7-c428-4bb6-8308-3e4f802a6fe0}</UniqueIdentifier>
+    <Filter Include="src\LatestCompetition">
+      <UniqueIdentifier>{0c098f96-90e5-4fd6-87d0-c74d284ea39a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +112,8 @@
     </ClCompile>
     <ClCompile Include="..\Classes\Competition\CompetitionTableScene.cpp">
       <Filter>src\Competition</Filter>
+    <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
+      <Filter>src\LatestCompetition</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +209,8 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Competition\CompetitionTableScene.h">
       <Filter>src\Competition</Filter>
+    <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h">
+      <Filter>src\LatestCompetition</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
