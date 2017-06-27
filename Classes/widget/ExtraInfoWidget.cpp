@@ -202,7 +202,7 @@ bool ExtraInfoWidget::init() {
     button->addClickEventListener([label](Ref *) {
         int n = atoi(label->getString().c_str());
         if (n > 0) {
-            label->setString(StringUtils::format("%d", n - 1));
+            label->setString(std::to_string(n - 1));
         }
     });
 
@@ -216,7 +216,7 @@ bool ExtraInfoWidget::init() {
     button->addClickEventListener([label](Ref *) {
         int n = atoi(label->getString().c_str());
         if (n < 8) {
-            label->setString(StringUtils::format("%d", n + 1));
+            label->setString(std::to_string(n + 1));
         }
     });
 
@@ -228,7 +228,7 @@ int ExtraInfoWidget::getFlowerCount() const {
 }
 
 void ExtraInfoWidget::setFlowerCount(int cnt) {
-    _flowerLabel->setString(StringUtils::format("%d", cnt));
+    _flowerLabel->setString(std::to_string(cnt));
 }
 
 mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
