@@ -145,7 +145,9 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\Competition\Competition.cpp" />
+    <ClCompile Include="..\Classes\Competition\CompetitionEnterScene.cpp" />
     <ClCompile Include="..\Classes\Competition\CompetitionFinalScene.cpp" />
+    <ClCompile Include="..\Classes\Competition\CompetitionMainScene.cpp" />
     <ClCompile Include="..\Classes\Competition\CompetitionRoundScene.cpp" />
     <ClCompile Include="..\Classes\Competition\CompetitionTableScene.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
@@ -175,7 +177,9 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\BaseScene.h" />
     <ClInclude Include="..\Classes\common.h" />
     <ClInclude Include="..\Classes\Competition\Competition.h" />
+    <ClInclude Include="..\Classes\Competition\CompetitionEnterScene.h" />
     <ClInclude Include="..\Classes\Competition\CompetitionFinalScene.h" />
+    <ClInclude Include="..\Classes\Competition\CompetitionMainScene.h" />
     <ClInclude Include="..\Classes\Competition\CompetitionRoundScene.h" />
     <ClInclude Include="..\Classes\Competition\CompetitionTableScene.h" />
     <ClInclude Include="..\Classes\compiler.h" />

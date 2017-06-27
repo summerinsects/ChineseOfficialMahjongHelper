@@ -117,6 +117,12 @@
     <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
       <Filter>src\LatestCompetition</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Competition\CompetitionMainScene.cpp">
+      <Filter>src\Competition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Competition\CompetitionEnterScene.cpp">
+      <Filter>src\Competition</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -214,6 +220,12 @@
     </ClInclude>
     <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h">
       <Filter>src\LatestCompetition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Competition\CompetitionMainScene.h">
+      <Filter>src\Competition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Competition\CompetitionEnterScene.h">
+      <Filter>src\Competition</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
