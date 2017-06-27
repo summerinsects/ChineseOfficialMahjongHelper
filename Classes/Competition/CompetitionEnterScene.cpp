@@ -156,7 +156,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
 
     size_t idx0 = idx << 1;
     size_t idx1 = idx0 | 1;
-    labels[0]->setString(std::to_string(idx0));
+    labels[0]->setString(std::to_string(idx0 + 1));
     buttons[0]->setUserData(reinterpret_cast<void *>(idx0));
     labels[2]->setString(std::to_string(idx1 + 1));
     buttons[1]->setUserData(reinterpret_cast<void *>(idx1));
