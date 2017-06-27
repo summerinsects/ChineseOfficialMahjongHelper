@@ -15,6 +15,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/FanCalculator/FanCalculatorScene.cpp \
                    ../../Classes/FanTable/FanDefinition.cpp \
                    ../../Classes/FanTable/FanTable.cpp \
+                   ../../Classes/LatestCompetition/LatestCompetitionScene.cpp \
                    ../../Classes/mahjong-algorithm/fan_calculator.cpp \
                    ../../Classes/mahjong-algorithm/stringify.cpp \
                    ../../Classes/mahjong-algorithm/shanten.cpp \

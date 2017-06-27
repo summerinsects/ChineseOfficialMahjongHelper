@@ -31,6 +31,9 @@
     <Filter Include="src\MahjongTheory">
       <UniqueIdentifier>{0d3ab171-ddea-44a5-bacd-63f9043728ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\LatestCompetition">
+      <UniqueIdentifier>{0c098f96-90e5-4fd6-87d0-c74d284ea39a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\ScoreSheet\Record.cpp">
       <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
+      <Filter>src\LatestCompetition</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\widget\TilesKeyboard.h">
       <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h">
+      <Filter>src\LatestCompetition</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
