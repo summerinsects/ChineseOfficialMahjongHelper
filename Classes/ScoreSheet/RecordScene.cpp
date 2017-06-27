@@ -268,7 +268,9 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
+    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
+    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
     tableView->setPosition(Vec2(visibleSize.width * 0.5f, 0));
     rootLayout->addChild(tableView);
@@ -295,7 +297,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
         rootLayout->setContentSize(layoutSize);
         topNode->setPosition(Vec2(visibleSize.width * 0.5f, layoutSize.height - 35));
-        tableView->setContentSize(Size(visibleSize.width - 10, layoutSize.height - 75));
+        tableView->setContentSize(Size(visibleSize.width - 5, layoutSize.height - 75));
         tableView->reloadData();
     };
     layoutChildren(button);
@@ -387,7 +389,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float gap = (visibleSize.width - 10.0f) * 0.25f;
+    const float gap = (visibleSize.width - 5.0f) * 0.25f;
 
     if (cell == nullptr) {
         cell = CustomCell::create();
