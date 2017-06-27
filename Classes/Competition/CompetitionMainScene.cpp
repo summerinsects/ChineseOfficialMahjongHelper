@@ -16,7 +16,7 @@ bool CompetitionMainScene::init() {
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(85.0, 32.0f));
+    button->setContentSize(Size(90.0, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleText("创建比赛");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 30));
@@ -27,7 +27,7 @@ bool CompetitionMainScene::init() {
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(85.0, 32.0f));
+    button->setContentSize(Size(90.0, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleText("历史记录");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 30));
