@@ -9,9 +9,11 @@
 
 USING_NS_CC;
 
-static const int fanLevel[] = { 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };  // 番种
-static const size_t eachLevelCounts[] = { 13, 10, 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次番种的个数
-static const size_t eachLevelBeginIndex[] = { 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
+static const char *principle_title[] = { "不重复", "不拆移", "不得相同", "就高不就低", "套算一次" };
+
+static const int fanLevel[] = { 0, 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };  // 番种
+static const size_t eachLevelCounts[] = { 5, 13, 10, 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次番种的个数
+static const size_t eachLevelBeginIndex[] = { 0, 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 
 static inline size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
@@ -25,39 +27,17 @@ bool FanTableScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Label *label = Label::createWithSystemFont("基本计分原则", "Arial", 12);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    this->addChild(label);
-    label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 40));
-    label->setColor(Color3B::BLACK);
-
-    for (size_t i = 0; i < 5; ++i) {
-        ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        button->setScale9Enabled(true);
-        button->setContentSize(Size(90.0f, 20.0f));
-        button->setTitleColor(Color3B::BLACK);
-        button->setTitleFontSize(12);
-        button->setTitleText(principle_title[i]);
-        button->setUserData(reinterpret_cast<void *>(100 + i));
-        button->addClickEventListener(std::bind(&FanTableScene::onPointsNameButton, this, std::placeholders::_1));
-
-        this->addChild(button);
-
-        size_t col = i & 0x1;
-        size_t row = i >> 1;
-        button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f + col * visibleSize.width * 0.5f,
-            origin.y + visibleSize.height - 65 - row * 30));
-    }
-
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width - 10, visibleSize.height - 150));
+    tableView->setContentSize(Size(visibleSize.width - 5, visibleSize.height - 35));
     tableView->setDelegate(this);
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
+    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
+    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 70.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     tableView->reloadData();
     this->addChild(tableView);
 
@@ -65,7 +45,7 @@ bool FanTableScene::init() {
 }
 
 ssize_t FanTableScene::numberOfCellsInTableView(cw::TableView *table) {
-    return 12;
+    return 13;
 }
 
 cocos2d::Size FanTableScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
@@ -79,7 +59,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float gap = (visibleSize.width - 10.0f) * 0.25f;
+    const float gap = (visibleSize.width - 5.0f) * 0.25f;
 
     if (cell == nullptr) {
         cell = CustomCell::create();
@@ -113,14 +93,24 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     Label *label = std::get<0>(ext);
     ui::Button *const (&buttons)[13] = std::get<1>(ext);
 
-    label->setString(StringUtils::format("%d番", fanLevel[idx]));
+    size_t idx0;
+    const char **titleTexts;
+    if (fanLevel[idx] == 0) {
+        label->setString("基本计分原则");
+        idx0 = 100;
+        titleTexts = &principle_title[0];
+    }
+    else {
+        label->setString(StringUtils::format("%d番", fanLevel[idx]));
+        idx0 = eachLevelBeginIndex[idx];
+        titleTexts = &mahjong::fan_name[idx0];
+    }
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
     for (size_t k = 0; k < currentLevelCount; ++k) {
-        size_t idx0 = eachLevelBeginIndex[idx] + k;
         ui::Button *button = buttons[k];
-        button->setTitleText(mahjong::fan_name[idx0]);
-        button->setUserData(reinterpret_cast<void *>(idx0));
+        button->setTitleText(titleTexts[k]);
+        button->setUserData(reinterpret_cast<void *>(idx0 + k));
         button->setVisible(true);
         button->setEnabled(true);
         size_t col = k & 0x3;

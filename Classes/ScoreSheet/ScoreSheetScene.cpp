@@ -126,7 +126,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     _timeLabel = Label::createWithSystemFont("当前时间", "Arial", 12);
     this->addChild(_timeLabel);
     _timeLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    _timeLabel->setPosition(Vec2(origin.x + 5, origin.y + 10));
+    _timeLabel->setPosition(Vec2(origin.x + 5, origin.y + 12));
     _timeLabel->setColor(Color3B::BLACK);
 
     // 用来绘制表格线的根结点
@@ -329,20 +329,21 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 }
 
 void ScoreSheetScene::refreshStartTime() {
-    char str[255] = "开始时间：";
-    size_t len = strlen(str);
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&_record->start_time));
+    char str[255];
+    struct tm ret = *localtime(&_record->start_time);
+    snprintf(str, sizeof(str), "开始时间：%d年%d月%d日%.2d:%.2d",
+        ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
     _timeLabel->setString(str);
     _timeLabel->setScale(1);
 }
 
 void ScoreSheetScene::refreshEndTime() {
-    char str[255] = "起止时间：";
-    size_t len = strlen(str);
-    len += strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&_record->start_time));
-    strcpy(str + len, " -- ");
-    len += 4;
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&_record->end_time));
+    char str[255];
+    struct tm ret0 = *localtime(&_record->start_time);
+    struct tm ret1 = *localtime(&_record->end_time);
+    snprintf(str, sizeof(str), "起止时间：%d年%d月%d日%.2d:%.2d——%d年%d月%d日%.2d:%.2d",
+        ret0.tm_year + 1900, ret0.tm_mon + 1, ret0.tm_mday, ret0.tm_hour, ret0.tm_min,
+        ret1.tm_year + 1900, ret1.tm_mon + 1, ret1.tm_mday, ret1.tm_hour, ret1.tm_min);
     _timeLabel->setString(str);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -678,10 +679,11 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
 }
 
 void ScoreSheetScene::onTimeScheduler(float dt) {
-    char str[255] = "当前时间：";
-    size_t len = strlen(str);
+    char str[255];
     time_t t = time(nullptr);
-    strftime(str + len, sizeof(str) - len, "%Y-%m-%d %H:%M", localtime(&t));
+    struct tm ret = *localtime(&t);
+    snprintf(str, sizeof(str), "当前时间：%d年%d月%d日%.2d:%.2d",
+        ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
     _timeLabel->setString(str);
     _timeLabel->setScale(1);
 }

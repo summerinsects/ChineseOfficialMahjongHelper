@@ -231,7 +231,9 @@ void FanCalculatorScene::calculate() {
     else {
         ui::ScrollView *scrollView = ui::ScrollView::create();
         scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-        scrollView->setScrollBarPositionFromCorner(Vec2(10, 10));
+        scrollView->setScrollBarPositionFromCorner(Vec2(2, 2));
+        scrollView->setScrollBarWidth(4);
+        scrollView->setScrollBarOpacity(0x99);
         scrollView->setContentSize(fanAreaSize);
         scrollView->setInnerContainerSize(innerNode->getContentSize());
         scrollView->addChild(innerNode);

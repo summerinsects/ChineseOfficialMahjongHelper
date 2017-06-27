@@ -86,6 +86,18 @@ void HistoryScene::updateRecordTexts() {
     _recordTexts.reserve(g_records.size());
 
     std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record) {
+        RecordText rt;
+
+        struct tm ret = *localtime(&record.start_time);
+        snprintf(rt.startTime, sizeof(rt.startTime), "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        if (record.end_time != 0) {
+            ret = *localtime(&record.end_time);
+            snprintf(rt.endTime, sizeof(rt.endTime), "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        }
+        else {
+            rt.endTime[0] = '\0';
+        }
+
         typedef std::pair<int, int> SeatScore;
         SeatScore seatscore[4];
         seatscore[0].first = 0; seatscore[0].second = 0;
@@ -106,16 +118,6 @@ void HistoryScene::updateRecordTexts() {
             return left.second > right.second;
         });
 
-        RecordText rt;
-
-        strftime(rt.startTime, sizeof(rt.startTime), "%Y-%m-%d %H:%M", localtime(&record.start_time));
-        if (record.end_time != 0) {
-            strftime(rt.endTime, sizeof(rt.endTime), "%Y-%m-%d %H:%M", localtime(&record.end_time));
-        }
-        else {
-            rt.endTime[0] = '\0';
-        }
-
         static const char *seatText[] = { "东", "南", "西", "北" };
         snprintf(rt.score, sizeof(rt.score), "%s: %s(%+d)\n%s: %s(%+d)\n%s: %s(%+d)\n%s: %s(%+d)",
             seatText[seatscore[0].first], record.name[seatscore[0].first], seatscore[0].second,
@@ -135,12 +137,14 @@ bool HistoryScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     _tableView = cw::TableView::create();
-    _tableView->setContentSize(Size(visibleSize.width - 10.0f, visibleSize.height - 35));
+    _tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35));
     _tableView->setDelegate(this);
     _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    _tableView->setScrollBarPositionFromCorner(Vec2(5, 5));
+    _tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
+    _tableView->setScrollBarWidth(4);
+    _tableView->setScrollBarOpacity(0x99);
     _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     this->addChild(_tableView);
@@ -196,7 +200,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         cell = CustomCell::create();
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = visibleSize.width - 10.0f;
+        const float width = visibleSize.width - 5.0f;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         LayerColor *(&layerColor)[2] = std::get<0>(ext);
@@ -242,11 +246,11 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
 
     std::string str = rt.startTime;
     if (rt.endTime[0] != '\0') {
-        str.append(" -- ");
+        str.append("——");
         str.append(rt.endTime);
     }
     else {
-        str.append(" (未结束)");
+        str.append("(未结束)");
     }
     str.append("\n");
     str.append(rt.score);
