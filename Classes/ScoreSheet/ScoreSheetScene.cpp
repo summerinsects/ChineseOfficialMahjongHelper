@@ -885,28 +885,28 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     int d4 = (d >> 2) + 1;
 
     // 分差
-    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label = Label::createWithSystemFont(std::to_string(delta), "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 150));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 自摸
-    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : std::to_string(d4), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 3.5f, 150));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 对点
-    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : std::to_string(d2), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 4.5f, 150));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 旁点
-    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : std::to_string(d1), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 5.5f, 150));
     drawNode->addChild(label);
@@ -926,28 +926,28 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     d4 = (d >> 2) + 1;
 
     // 分差
-    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label = Label::createWithSystemFont(std::to_string(delta), "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 130));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 自摸
-    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : std::to_string(d4), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 3.5f, 130));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 对点
-    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : std::to_string(d2), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 4.5f, 130));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 旁点
-    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : std::to_string(d1), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 5.5f, 130));
     drawNode->addChild(label);
@@ -967,28 +967,28 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     d4 = (d >> 2) + 1;
 
     // 分差
-    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label = Label::createWithSystemFont(std::to_string(delta), "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 110));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 自摸
-    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : std::to_string(d4), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 3.5f, 110));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 对点
-    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : std::to_string(d2), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 4.5f, 110));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 旁点
-    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : std::to_string(d1), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 5.5f, 110));
     drawNode->addChild(label);
@@ -1015,28 +1015,28 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     d4 = (d >> 2) + 1;
 
     // 分差
-    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label = Label::createWithSystemFont(std::to_string(delta), "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 70));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 自摸
-    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : std::to_string(d4), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 3.5f, 70));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 对点
-    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : std::to_string(d2), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 4.5f, 70));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 旁点
-    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : std::to_string(d1), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 5.5f, 70));
     drawNode->addChild(label);
@@ -1056,28 +1056,28 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     d4 = (d >> 2) + 1;
 
     // 分差
-    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label = Label::createWithSystemFont(std::to_string(delta), "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 50));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 自摸
-    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : std::to_string(d4), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 3.5f, 50));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 对点
-    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : std::to_string(d2), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 4.5f, 50));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 旁点
-    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : std::to_string(d1), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 5.5f, 50));
     drawNode->addChild(label);
@@ -1104,28 +1104,28 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     d4 = (d >> 2) + 1;
 
     // 分差
-    label = Label::createWithSystemFont(StringUtils::format("%d", delta), "Arail", 12);
+    label = Label::createWithSystemFont(std::to_string(delta), "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(gap * 2.5f, 10));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 自摸
-    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : StringUtils::format("%d", d4), "Arail", 12);
+    label = Label::createWithSystemFont(d4 <= 8 ? std::string("8") : std::to_string(d4), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 3.5f, 10));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 对点
-    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : StringUtils::format("%d", d2), "Arail", 12);
+    label = Label::createWithSystemFont(d2 <= 8 ? std::string("8") : std::to_string(d2), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 4.5f, 10));
     drawNode->addChild(label);
     scaleLabelToFitWidth(label, gap - 4);
 
     // 旁点
-    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : StringUtils::format("%d", d1), "Arail", 12);
+    label = Label::createWithSystemFont(d1 <= 8 ? std::string("8") : std::to_string(d1), "Arail", 12);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     label->setPosition(Vec2(gap * 5.5f, 10));
     drawNode->addChild(label);

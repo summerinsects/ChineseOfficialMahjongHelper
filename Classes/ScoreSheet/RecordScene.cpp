@@ -587,7 +587,9 @@ void RecordScene::onMinusButton(cocos2d::Ref *sender, int delta) {
     int temp = winScore - delta;
     if (temp < 8) temp = 8;
     if (winScore != temp) {
-        _editBox->setText(StringUtils::format("%d", temp).c_str());
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%d", temp);
+        _editBox->setText(buf);
         updateScoreLabel();
     }
 }
@@ -595,7 +597,9 @@ void RecordScene::onMinusButton(cocos2d::Ref *sender, int delta) {
 void RecordScene::onPlusButton(cocos2d::Ref *sender, int delta) {
     int winScore = atoi(_editBox->getText());
     winScore += delta;
-    _editBox->setText(StringUtils::format("%d", winScore).c_str());
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%d", winScore);
+    _editBox->setText(buf);
     updateScoreLabel();
 }
 
