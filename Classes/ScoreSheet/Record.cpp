@@ -9,7 +9,7 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
         rapidjson::Value::ConstArray name = it->value.GetArray();
         if (name.Size() == 4) {
             for (int i = 0; i < 4; ++i) {
-                strncpy(record.name[i], name[i].GetString(), name[i].GetStringLength());
+                strncpy(record.name[i], name[i].GetString(), 255);
             }
         }
     }
