@@ -170,7 +170,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
         labels[1]->setColor(Color3B::BLACK);
         labels[1]->setString(_names[idx0]);
     }
-    scaleLabelToFitWidth(labels[1], visibleSize.width * 0.5f - 50.0f);
+    Common::scaleLabelToFitWidth(labels[1], visibleSize.width * 0.5f - 50.0f);
 
     if (_names[idx1].empty()) {
         labels[3]->setColor(Color3B::GRAY);
@@ -180,7 +180,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
         labels[3]->setColor(Color3B::BLACK);
         labels[3]->setString(_names[idx1]);
     }
-    scaleLabelToFitWidth(labels[3], visibleSize.width * 0.5f - 50.0f);
+    Common::scaleLabelToFitWidth(labels[3], visibleSize.width * 0.5f - 50.0f);
 
     return cell;
 }
