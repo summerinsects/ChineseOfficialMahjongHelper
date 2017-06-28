@@ -325,22 +325,18 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 }
 
 void ScoreSheetScene::refreshStartTime() {
-    char str[255];
     struct tm ret = *localtime(&_record->start_time);
-    snprintf(str, sizeof(str), "开始时间：%d年%d月%d日%.2d:%.2d",
-        ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
-    _timeLabel->setString(str);
+    _timeLabel->setString(Common::format<256>("开始时间：%d年%d月%d日%.2d:%.2d",
+        ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
     _timeLabel->setScale(1);
 }
 
 void ScoreSheetScene::refreshEndTime() {
-    char str[255];
     struct tm ret0 = *localtime(&_record->start_time);
     struct tm ret1 = *localtime(&_record->end_time);
-    snprintf(str, sizeof(str), "起止时间：%d年%d月%d日%.2d:%.2d——%d年%d月%d日%.2d:%.2d",
+    _timeLabel->setString(Common::format<256>("起止时间：%d年%d月%d日%.2d:%.2d——%d年%d月%d日%.2d:%.2d",
         ret0.tm_year + 1900, ret0.tm_mon + 1, ret0.tm_mday, ret0.tm_hour, ret0.tm_min,
-        ret1.tm_year + 1900, ret1.tm_mon + 1, ret1.tm_mday, ret1.tm_hour, ret1.tm_min);
-    _timeLabel->setString(str);
+        ret1.tm_year + 1900, ret1.tm_mon + 1, ret1.tm_mday, ret1.tm_hour, ret1.tm_min));
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Common::scaleLabelToFitWidth(_timeLabel, visibleSize.width - 10);
@@ -445,9 +441,7 @@ void ScoreSheetScene::editName(size_t idx) {
     editBox->setPlaceHolder("输入选手姓名");
 
     const char *wind[] = { "东", "南", "西", "北" };
-    char title[64];
-    snprintf(title, sizeof(title), "开局座位「%s」", wind[idx]);
-    AlertView::showWithNode(title, editBox, [this, editBox, idx]() {
+    AlertView::showWithNode(Common::format<64>("开局座位「%s」", wind[idx]), editBox, [this, editBox, idx]() {
         const char *text = editBox->getText();
         if (!Common::isCStringEmpty(text)) {
             strncpy(_record->name[idx], text, 255);
@@ -675,12 +669,10 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
 }
 
 void ScoreSheetScene::onTimeScheduler(float dt) {
-    char str[255];
     time_t t = time(nullptr);
     struct tm ret = *localtime(&t);
-    snprintf(str, sizeof(str), "当前时间：%d年%d月%d日%.2d:%.2d",
-        ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
-    _timeLabel->setString(str);
+    _timeLabel->setString(Common::format<255>("当前时间：%d年%d月%d日%.2d:%.2d",
+        ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
     _timeLabel->setScale(1);
 }
 
