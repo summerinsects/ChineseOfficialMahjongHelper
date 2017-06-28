@@ -95,8 +95,10 @@
 #ifndef NOTHROW
 #if defined(_MSC_VER)
 #define NOTHROW __declspec(nothrow)
-#else
+#elif defined(__GNUC__)
 #define NOTHROW __attribute__((__nothrow__))
+#else
+#define NOTHROW
 #endif
 #endif
 
@@ -104,8 +106,10 @@
 #ifndef RETURNS_NONULL
 #if defined(_MSC_VER)
 #define RETURNS_NONULL _Ret_notnull_
-#else
+#elif defined(__GNUC__)
 #define RETURNS_NONULL __attribute__((__returns_nonnull__))
+#else
+#define NOTHROW
 #endif
 #endif
 
@@ -150,6 +154,18 @@
 
 #ifndef UNLIKELY
 #define UNLIKELY(expr_) BUILTIN_EXPECT(!!(expr_), 0)
+#endif
+
+#ifndef FORMAT_CHECK_PRINTF
+#if defined(__GNUC__) && (__GNUC__ >= 4)
+#define FORMAT_CHECK_PRINTF(format_pos_, arg_pos_) __attribute__((__format__(printf, format_pos_, arg_pos_)))
+#elif defined(__has_attribute)
+#if __has_attribute(format)
+#define FORMAT_CHECK_PRINTF(format_pos_, arg_pos_) __attribute__((__format__(printf, format_pos_, arg_pos_)))
+#endif  // __has_attribute(format)
+#else
+#define FORMAT_CHECK_PRINTF(format_pos_, arg_pos_)
+#endif
 #endif
 
 #ifdef ANDROID
