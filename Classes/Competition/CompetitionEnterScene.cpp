@@ -185,7 +185,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
 }
 
 void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
-    if (std::any_of(_names.begin(), _names.end(), std::bind(&std::string::empty, std::placeholders::_1))) {
+    if (std::any_of(_names.begin(), _names.end(), [](const std::string &str) { return str.empty(); })) {
         AlertView::showWithMessage("提示", "请录入所有选手姓名", 12, nullptr, nullptr);
         return;
     }
