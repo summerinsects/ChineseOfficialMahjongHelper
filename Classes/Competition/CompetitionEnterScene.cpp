@@ -132,7 +132,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
         ui::Button *button = ui::Button::create();
         button->setScale9Enabled(true);
         button->setPosition(labels[1]->getPosition());
-        button->setContentSize(Size(visibleSize.width * 0.25f - 30.0f, 25.0f));
+        button->setContentSize(Size(visibleSize.width * 0.5f - 50.0f, 25.0f));
         cell->addChild(button);
         button->addClickEventListener(std::bind(&CompetitionEnterScene::onNameButton, this, std::placeholders::_1));
         buttons[0] = button;
@@ -140,7 +140,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
         button = ui::Button::create();
         button->setScale9Enabled(true);
         button->setPosition(labels[3]->getPosition());
-        button->setContentSize(Size(visibleSize.width * 0.25f - 30.0f, 25.0f));
+        button->setContentSize(Size(visibleSize.width * 0.5f - 50.0f, 25.0f));
         cell->addChild(button);
         button->addClickEventListener(std::bind(&CompetitionEnterScene::onNameButton, this, std::placeholders::_1));
         buttons[1] = button;
