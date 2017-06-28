@@ -1,4 +1,5 @@
 ﻿#include "CompetitionEnterScene.h"
+#include "CompetitionRoundScene.h"
 #include "../common.h"
 #include "../widget/AlertView.h"
 
@@ -191,6 +192,7 @@ void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
     }
 
     // TODO:
+    Director::getInstance()->pushScene(CompetitionRoundScene::create());
 }
 
 void CompetitionEnterScene::onNameButton(cocos2d::Ref *sender) {

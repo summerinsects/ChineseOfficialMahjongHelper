@@ -5,6 +5,7 @@
 #include "Other/OtherScene.h"
 #include "MahjongTheory/MahjongTheoryScene.h"
 #include "LatestCompetition/LatestCompetitionScene.h"
+#include "Competition/CompetitionMainScene.h"
 #include "widget/AlertView.h"
 #include "common.h"
 
@@ -119,7 +120,8 @@ bool HelloWorld::init() {
     button->setTitleText("其他");
     button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(OtherScene::create());
+        //Director::getInstance()->pushScene(OtherScene::create());
+        Director::getInstance()->pushScene(CompetitionMainScene::create());
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");

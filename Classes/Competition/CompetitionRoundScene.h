@@ -16,6 +16,7 @@ private:
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
     float _colWidth[8];
+    float _posX[8];
 };
 
 #endif
