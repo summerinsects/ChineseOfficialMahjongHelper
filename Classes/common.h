@@ -7,7 +7,7 @@
 
 namespace Common {
 
-static FORCE_INLINE void scaleLabelToFitWidth(cocos2d::Label *label, float width) {
+static inline void scaleLabelToFitWidth(cocos2d::Label *label, float width) {
     const cocos2d::Size &size = label->getContentSize();
     if (size.width > width) {
         float s = width / size.width;
@@ -18,7 +18,7 @@ static FORCE_INLINE void scaleLabelToFitWidth(cocos2d::Label *label, float width
     }
 }
 
-static FORCE_INLINE bool isCStringEmpty(const char *str) {
+static inline bool isCStringEmpty(const char *str) {
     return *str == '\0';
 }
 
@@ -26,7 +26,7 @@ template <size_t BufferSize>
 static std::string format(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
 
 template <size_t BufferSize>
-FORCE_INLINE std::string format(const char *fmt, ...) {
+inline std::string format(const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
 
