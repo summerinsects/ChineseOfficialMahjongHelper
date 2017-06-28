@@ -209,9 +209,7 @@ void CompetitionEnterScene::onNameButton(cocos2d::Ref *sender) {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
-    char title[64];
-    snprintf(title, sizeof(title), "序号「%lu」", (unsigned long)idx + 1);
-    AlertView::showWithNode(title, editBox, [this, editBox, idx]() {
+    AlertView::showWithNode(Common::format<64>("序号「%lu」", (unsigned long)idx + 1), editBox, [this, editBox, idx]() {
         _names[idx] = editBox->getText();
         _tableView->updateCellAtIndex(idx >> 1);
     }, nullptr);
