@@ -431,7 +431,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         button->setTag(false);
     }
 
-    label->setString(StringUtils::format("%d番", fanLevel[idx]));
+    label->setString(std::to_string(fanLevel[idx]).append("番"));
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
     for (size_t k = 0; k < currentLevelCount; ++k) {
@@ -562,7 +562,7 @@ void RecordScene::updateScoreLabel() {
     TranslateDetailToScoreTable(_detail, scoreTable);
 
     for (int i = 0; i < 4; ++i) {
-        _scoreLabel[i]->setString(StringUtils::format("%+d", scoreTable[i]));
+        _scoreLabel[i]->setString(Common::format<32>("%+d", scoreTable[i]));
     }
     // 使用不同颜色
     _SetScoreLabelColor(_scoreLabel, scoreTable, _detail.win_claim, _detail.false_win);

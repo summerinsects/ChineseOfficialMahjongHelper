@@ -22,6 +22,18 @@ static FORCE_INLINE bool isCStringEmpty(const char *str) {
     return *str == '\0';
 }
 
+template <size_t BufferSize>
+static FORCE_INLINE std::string format(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+
+    char buf[BufferSize];
+    vsnprintf(buf, BufferSize, fmt, ap);
+    va_end(ap);
+
+    return buf;
+}
+
 }
 
 #endif

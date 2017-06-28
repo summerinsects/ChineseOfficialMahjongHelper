@@ -96,8 +96,8 @@ cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SI
         int f = mahjong::fan_value_table[j];
         long n = fan_table[j];
         fan += f * n;
-        std::string str = (n == 1) ? StringUtils::format("%s %d番\n", mahjong::fan_name[j], f)
-            : StringUtils::format("%s %d番x%ld\n", mahjong::fan_name[j], f, fan_table[j]);
+        std::string str = (n == 1) ? Common::format<128>("%s %d番\n", mahjong::fan_name[j], f)
+            : Common::format<128>("%s %d番x%ld\n", mahjong::fan_name[j], f, fan_table[j]);
 
         // 创建label，每行排2个
         Label *fanName = Label::createWithSystemFont(str, "Arial", fontSize);
@@ -108,7 +108,7 @@ cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SI
         fanName->setPosition(Vec2(ret.rem == 0 ? 10.0f : resultAreaWidth * 0.5f, resultAreaHeight - lineHeight * (ret.quot + 1)));
     }
 
-    Label *fanTotal = Label::createWithSystemFont(StringUtils::format("总计：%ld番", fan), "Arial", fontSize);
+    Label *fanTotal = Label::createWithSystemFont(Common::format<64>("总计：%ld番", fan), "Arial", fontSize);
     fanTotal->setColor(Color3B::BLACK);
     node->addChild(fanTotal);
     fanTotal->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);

@@ -143,7 +143,7 @@ bool HelloWorld::init() {
     });
 
     Label *label = Label::createWithSystemFont(
-        StringUtils::format("v%d.%d.%d\n%s", (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, "Built  " __DATE__ "  " __TIME__),
+        Common::format<256>("v%d.%d.%d\n%s", (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, "Built  " __DATE__ "  " __TIME__),
         "Arial", 10);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
@@ -315,7 +315,7 @@ bool checkVersion(const std::vector<char> *buffer, bool manual) {
 
             AlertView::showWithMessage(
                 "检测到新版本",
-                StringUtils::format("%s，大小%.2fM，是否下载？\n%s", tag.c_str(), size / 1048576.0f, body.c_str()), 12, [url]() {
+                Common::format<1024>("%s，大小%.2fM，是否下载？\n%s", tag.c_str(), size / 1048576.0f, body.c_str()), 12, [url]() {
                 Application::getInstance()->openURL(url);
             }, nullptr);
 

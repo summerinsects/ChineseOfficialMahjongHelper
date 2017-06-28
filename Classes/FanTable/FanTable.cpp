@@ -101,7 +101,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         titleTexts = &principle_title[0];
     }
     else {
-        label->setString(StringUtils::format("%d番", fanLevel[idx]));
+        label->setString(std::to_string(fanLevel[idx]).append("番"));
         idx0 = eachLevelBeginIndex[idx];
         titleTexts = &mahjong::fan_name[idx0];
     }

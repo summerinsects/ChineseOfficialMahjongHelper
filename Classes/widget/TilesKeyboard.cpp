@@ -1,5 +1,5 @@
 ﻿#include "TilesKeyboard.h"
-#include "../compiler.h"
+#include "../common.h"
 #include "../TilesImage.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
@@ -372,7 +372,7 @@ void TilesKeyboard::addTiles(const mahjong::tile_t *tiles, size_t count) {
         _tilesContainer->setScale(scale);
     }
 
-    _countLabel->setString(StringUtils::format("当前牌数目：%lu",
+    _countLabel->setString(Common::format<64>("当前牌数目：%lu",
         (unsigned long)std::count_if(_tilesSprite.begin(), _tilesSprite.end(), [](Sprite *s) {
         return s->getTag() != INVALID_TAG;
     })));
@@ -400,7 +400,7 @@ void TilesKeyboard::removeTiles(size_t count) {
         _tilesContainer->setScale(1.0f);
     }
 
-    _countLabel->setString(StringUtils::format("当前牌数目：%lu",
+    _countLabel->setString(Common::format<64>("当前牌数目：%lu",
         (unsigned long)std::count_if(_tilesSprite.begin(), _tilesSprite.end(), [](Sprite *s) {
         return s->getTag() != INVALID_TAG;
     })));
