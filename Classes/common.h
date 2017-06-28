@@ -26,7 +26,7 @@ template <size_t BufferSize>
 static std::string format(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
 
 template <size_t BufferSize>
-static FORCE_INLINE std::string format(const char *fmt, ...) {
+FORCE_INLINE std::string format(const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
 
