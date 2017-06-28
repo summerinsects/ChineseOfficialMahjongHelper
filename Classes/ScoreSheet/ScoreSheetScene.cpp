@@ -671,7 +671,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
 void ScoreSheetScene::onTimeScheduler(float dt) {
     time_t t = time(nullptr);
     struct tm ret = *localtime(&t);
-    _timeLabel->setString(Common::format<255>("当前时间：%d年%d月%d日%.2d:%.2d",
+    _timeLabel->setString(Common::format<256>("当前时间：%d年%d月%d日%.2d:%.2d",
         ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
     _timeLabel->setScale(1);
 }
