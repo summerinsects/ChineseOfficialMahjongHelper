@@ -30,7 +30,7 @@ bool CompetitionRoundScene::init() {
     _posX[7] = _posX[6] + _colWidth[6] * 0.5f + _colWidth[7] * 0.5f;
 
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 150));
+    tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 115.0f));
     tableView->setDelegate(this);
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
@@ -39,19 +39,9 @@ bool CompetitionRoundScene::init() {
     tableView->setScrollBarWidth(4);
     tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 70.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 55.0f));
     tableView->reloadData();
     this->addChild(tableView);
-
-    DrawNode *drawNode = DrawNode::create();
-    tableView->getInnerContainer()->addChild(drawNode);
-
-    float h = tableView->getInnerContainerSize().height;
-    float xPos = 0;
-    for (int i = 0; i < 7; ++i) {
-        xPos += _colWidth[i];
-        drawNode->drawLine(Vec2(xPos, 0), Vec2(xPos, h), Color4F::BLACK);
-    }
 
     return true;
 }

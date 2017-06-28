@@ -30,7 +30,7 @@ bool CompetitionEnterScene::initWithName(const std::string &name, unsigned num) 
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
 
-    // 使用说明按钮
+    // 下一步按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
