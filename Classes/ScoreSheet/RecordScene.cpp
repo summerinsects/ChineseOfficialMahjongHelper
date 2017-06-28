@@ -153,7 +153,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         nameLabel->setColor(Color3B::ORANGE);
         this->addChild(nameLabel);
         nameLabel->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
-        scaleLabelToFitWidth(nameLabel, gap - 4);
+        Common::scaleLabelToFitWidth(nameLabel, gap - 4);
 
         // 得分
         _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);
@@ -451,7 +451,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             button->setTag(true);
         }
 
-        scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
+        Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
     }
 
     return cell;

@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
-#include "compiler.h"
+#include "common.h"
 
 #define COLOR4B_BG          cocos2d::Color4B(245, 245, 245, 255)
 #define COLOR4B_NAVIGATION  cocos2d::Color4B(51, 204, 255, 255)
