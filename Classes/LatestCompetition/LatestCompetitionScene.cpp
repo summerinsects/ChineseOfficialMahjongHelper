@@ -189,16 +189,12 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
     const CompetitionInfo &info = _competitions[idx];
     label[0]->setString(info.name);
 
-    char buf[255];
     struct tm ret = *localtime(&info.startTime);
-    snprintf(buf, sizeof(buf), "%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
-
-    std::string date = buf;
+    std::string date = Common::format<256>("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
     if (info.endTime != 0) {
         date.append("——");
         ret = *localtime(&info.endTime);
-        snprintf(buf, sizeof(buf), "%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
-        date.append(buf);
+        date.append(Common::format<256>("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday));
     }
     label[1]->setString(date);
 

@@ -610,7 +610,7 @@ static std::string getResultTypeString(uint8_t flag, int step) {
     switch (step) {
     case 0: str = "听牌("; break;
     case -1: str = "和了("; break;
-    default: str = StringUtils::format("%d上听(", step); break;
+    default: str = Common::format<64>("%d上听(", step); break;
     }
 
     bool needCaesuraSign = false;
@@ -893,7 +893,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         xPos += TILE_WIDTH_SMALL;
     }
 
-    std::string str = StringUtils::format("」共%d种，%d枚", result->count_in_tiles, result->count_total);
+    std::string str = Common::format<64>("」共%d种，%d枚", result->count_in_tiles, result->count_total);
     if (yPos > 15) {
         spiltStringToLabel(str, _cellWidth - SPACE * 2 - xPos, cntLabel1, cntLabel2);
     }

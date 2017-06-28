@@ -101,7 +101,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         titleTexts = &principle_title[0];
     }
     else {
-        label->setString(StringUtils::format("%d番", fanLevel[idx]));
+        label->setString(std::to_string(fanLevel[idx]).append("番"));
         idx0 = eachLevelBeginIndex[idx];
         titleTexts = &mahjong::fan_name[idx0];
     }
@@ -117,7 +117,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         size_t row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
-        scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
+        Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
     }
 
     for (size_t k = currentLevelCount; k < 13; ++k) {
