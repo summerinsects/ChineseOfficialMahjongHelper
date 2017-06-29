@@ -14,6 +14,7 @@ LOCAL_MODULE_FILENAME := libMyGame
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/Competition/CompetitionEnterScene.cpp \
                    ../../Classes/Competition/CompetitionMainScene.cpp \
+                   ../../Classes/Competition/CompetitionRoundScene.cpp \
                    ../../Classes/FanCalculator/FanCalculatorScene.cpp \
                    ../../Classes/FanTable/FanDefinition.cpp \
                    ../../Classes/FanTable/FanTable.cpp \
