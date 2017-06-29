@@ -1,13 +1,14 @@
 ﻿#include "CompetitionEnterScene.h"
 #include "CompetitionRoundScene.h"
+#include "Competition.h"
 #include "../common.h"
 #include "../widget/AlertView.h"
 
 USING_NS_CC;
 
-CompetitionEnterScene *CompetitionEnterScene::create(const std::string &name, unsigned num) {
+CompetitionEnterScene *CompetitionEnterScene::create(const std::string &name, unsigned num, unsigned round) {
     auto ret = new (std::nothrow) CompetitionEnterScene();
-    if (ret != nullptr && ret->initWithName(name, num)) {
+    if (ret != nullptr && ret->initWithName(name, num, round)) {
         ret->autorelease();
         return ret;
     }
@@ -15,17 +16,25 @@ CompetitionEnterScene *CompetitionEnterScene::create(const std::string &name, un
     return nullptr;
 }
 
-bool CompetitionEnterScene::initWithName(const std::string &name, unsigned num) {
-    if (UNLIKELY(!BaseScene::initWithTitle("报名表"))) {
+bool CompetitionEnterScene::initWithName(const std::string &name, unsigned num, unsigned round) {
+    if (UNLIKELY(!BaseScene::initWithTitle(name))) {
         return false;
     }
 
-    _names.resize(num);
+    _competitionData = std::make_shared<CompetitionData>();
+
+    _competitionData->name = name;
+    _competitionData->round_count = round;
+    _competitionData->current_round = 0;
+    _competitionData->players.resize(num);
+    for (unsigned i = 0; i < num; ++i) {
+        _competitionData->players[i].serial = 1 + i;
+    }
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Label *label = Label::createWithSystemFont(name, "Arail", 12);
+    Label *label = Label::createWithSystemFont("报名表", "Arail", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
@@ -79,7 +88,7 @@ bool CompetitionEnterScene::initWithName(const std::string &name, unsigned num) 
 }
 
 ssize_t CompetitionEnterScene::numberOfCellsInTableView(cw::TableView *table) {
-    return _names.size() >> 1;
+    return _competitionData->players.size() >> 1;
 }
 
 cocos2d::Size CompetitionEnterScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
@@ -162,23 +171,26 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
     labels[2]->setString(std::to_string(idx1 + 1));
     buttons[1]->setUserData(reinterpret_cast<void *>(idx1));
 
-    if (_names[idx0].empty()) {
+    const std::string &name0 = _competitionData->players[idx0].name;
+    const std::string &name1 = _competitionData->players[idx1].name;
+
+    if (name0.empty()) {
         labels[1]->setColor(Color3B::GRAY);
         labels[1]->setString("选手姓名");
     }
     else {
         labels[1]->setColor(Color3B::BLACK);
-        labels[1]->setString(_names[idx0]);
+        labels[1]->setString(name0);
     }
     Common::scaleLabelToFitWidth(labels[1], visibleSize.width * 0.5f - 50.0f);
 
-    if (_names[idx1].empty()) {
+    if (name1.empty()) {
         labels[3]->setColor(Color3B::GRAY);
         labels[3]->setString("选手姓名");
     }
     else {
         labels[3]->setColor(Color3B::BLACK);
-        labels[3]->setString(_names[idx1]);
+        labels[3]->setString(name1);
     }
     Common::scaleLabelToFitWidth(labels[3], visibleSize.width * 0.5f - 50.0f);
 
@@ -186,13 +198,14 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
 }
 
 void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
-    if (std::any_of(_names.begin(), _names.end(), [](const std::string &str) { return str.empty(); })) {
+    if (std::any_of(_competitionData->players.begin(), _competitionData->players.end(),
+        [](const CompetitionPlayer &p) { return p.name.empty(); })) {
         AlertView::showWithMessage("提示", "请录入所有选手姓名", 12, nullptr, nullptr);
         return;
     }
 
     // TODO:
-    Director::getInstance()->pushScene(CompetitionRoundScene::create());
+    Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData));
 }
 
 void CompetitionEnterScene::onNameButton(cocos2d::Ref *sender) {
@@ -205,12 +218,12 @@ void CompetitionEnterScene::onNameButton(cocos2d::Ref *sender) {
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
     editBox->setFontColor(Color3B::BLACK);
     editBox->setFontSize(12);
-    editBox->setText(_names[idx].c_str());
+    editBox->setText(_competitionData->players[idx].name.c_str());
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
     AlertView::showWithNode(Common::format<64>("序号「%lu」", (unsigned long)idx + 1), editBox, [this, editBox, idx]() {
-        _names[idx] = editBox->getText();
+        _competitionData->players[idx].name = editBox->getText();
         _tableView->updateCellAtIndex(idx >> 1);
     }, nullptr);
 

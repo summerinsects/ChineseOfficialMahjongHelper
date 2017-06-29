@@ -1,6 +1,8 @@
 ﻿#ifndef __COMPETITION_H__
 #define __COMPETITION_H__
 
+#include <string>
+#include <vector>
 
 // 4 2 1 0
 // 并列12：(4+2)/2=3
@@ -25,19 +27,36 @@ static const unsigned standard_score_12[] = {
     0
 };
 
-struct CompetitionPlayer {
-    unsigned serial;
-    char name[255];
-    unsigned standard_score_table[10];
-    unsigned competition_scores;
+class CompetitionPlayer {
+public:
+    unsigned serial;  // 编号
+    std::string name;  // 姓名
+    std::vector<RANK_TYPE> ranks;  // 每一轮的名次（用于标准分）
+    std::vector<unsigned> scores;  // 比赛分
+    size_t team_index;  // 队伍索引
 };
 
-struct CompetitionData {
-    char name[128];
-    unsigned round_count;
-    unsigned current_round;
-    size_t player_count;
-    CompetitionPlayer *players;
+class CompetitionTeam {
+public:
+    unsigned serial;  // 编号
+    std::string name;  // 队名
+    std::vector<size_t> player_indices;  // 队员
+    std::vector<unsigned> standard_scores;  // 标准分
+    std::vector<unsigned> scores;  // 比赛分
+};
+
+class CompetitionData {
+public:
+    std::string name;  // 赛事名称
+    unsigned round_count;  // 总轮数
+    unsigned current_round;  // 当前轮数
+    std::vector<CompetitionPlayer> players;  // 参赛选手
+    std::vector<CompetitionTeam> teams;  // 参赛队伍
+};
+
+struct CompetitionTable {
+    unsigned serial;  // 编号
+    size_t player_indices[4];  // 参赛选手
 };
 
 #endif

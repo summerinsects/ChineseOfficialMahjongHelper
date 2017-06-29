@@ -136,8 +136,8 @@ void CompetitionMainScene::showCompetitionCreatingAlert(const std::string &name,
         label->setColor(Color3B::BLACK);
         label->setHorizontalAlignment(TextHAlignment::CENTER);
 
-        AlertView::showWithNode("创建比赛", label, [name, num]() {
-            Director::getInstance()->pushScene(CompetitionEnterScene::create(name, num));
+        AlertView::showWithNode("创建比赛", label, [name, num, round]() {
+            Director::getInstance()->pushScene(CompetitionEnterScene::create(name, num, round));
         }, nullptr);
     }, nullptr);
 }

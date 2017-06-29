@@ -4,10 +4,12 @@
 #include "../BaseScene.h"
 #include "../widget/CWTableView.h"
 
+class CompetitionData;
+
 class CompetitionEnterScene : public BaseScene, cw::TableViewDelegate {
 public:
-    static CompetitionEnterScene *create(const std::string &name, unsigned num);
-    bool initWithName(const std::string &name, unsigned num);
+    static CompetitionEnterScene *create(const std::string &name, unsigned num, unsigned round);
+    bool initWithName(const std::string &name, unsigned num, unsigned round);
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
@@ -17,8 +19,9 @@ private:
     void onOkButton(cocos2d::Ref *sender);
     void onNameButton(cocos2d::Ref *sender);
 
-    std::vector<std::string> _names;
     cw::TableView *_tableView = nullptr;
+
+    std::shared_ptr<CompetitionData> _competitionData;
 };
 
 #endif

@@ -4,11 +4,13 @@
 #include "../BaseScene.h"
 #include "../widget/CWTableView.h"
 
+class CompetitionData;
+
 class CompetitionRoundScene : public BaseScene, cw::TableViewDelegate {
 public:
-    virtual bool init() override;
+    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData);
 
-    CREATE_FUNC(CompetitionRoundScene);
+    static CompetitionRoundScene *create(const std::shared_ptr<CompetitionData> &competitionData);
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
@@ -17,6 +19,8 @@ private:
 
     float _colWidth[8];
     float _posX[8];
+
+    std::shared_ptr<CompetitionData> _competitionData;
 };
 
 #endif

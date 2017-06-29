@@ -1,12 +1,25 @@
 ﻿#include "CompetitionRoundScene.h"
+#include "Competition.h"
 #include "../common.h"
 
 USING_NS_CC;
 
-bool CompetitionRoundScene::init() {
+CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<CompetitionData> &competitionData) {
+    CompetitionRoundScene *ret = new (std::nothrow) CompetitionRoundScene();
+    if (ret != nullptr && ret->initWithData(competitionData)) {
+        ret->autorelease();
+        return ret;
+    }
+    CC_SAFE_DELETE(ret);
+    return nullptr;
+}
+
+bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData) {
     if (UNLIKELY(!BaseScene::initWithTitle("第N轮"))) {
         return false;
     }
+
+    _competitionData = competitionData;
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -47,7 +60,7 @@ bool CompetitionRoundScene::init() {
 }
 
 ssize_t CompetitionRoundScene::numberOfCellsInTableView(cw::TableView *table) {
-    return 48;
+    return _competitionData->players.size();
 }
 
 cocos2d::Size CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
@@ -91,8 +104,9 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     layerColor[0]->setVisible(!(idx & 1));
     layerColor[1]->setVisible(!!(idx & 1));
 
-    labels[0]->setString("序号");
-    labels[1]->setString("选手姓名");
+    const CompetitionPlayer &player = _competitionData->players[idx];
+    labels[0]->setString(std::to_string(player.serial));
+    labels[1]->setString(player.name);
     labels[2]->setString("桌号");
     labels[3]->setString("座位");
     labels[4]->setString("标准分");
