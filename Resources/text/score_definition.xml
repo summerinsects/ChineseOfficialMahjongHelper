@@ -44,8 +44,8 @@
 <string>三色三同顺 Mixed Triple Chow：&lt;br/&gt;和牌中，有三种花色序数相同的三副顺子，计8番。不计喜相逢。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;副露[234m]&lt;br/&gt;立牌[11234p23344s]点和[2s]&lt;br/&gt;计：小于五、三色三同顺、平和、一般高</string>
 <string>三色三节高 Mixed Shifted Pungs：&lt;br/&gt;和牌中，有三种花色序数相连的三副刻子（杠），计8番。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;副露[444s]&lt;br/&gt;立牌[333m55pWWCCC]自摸和[5p]&lt;br/&gt;计：三暗刻、三色三节高、五门齐、碰碰和、箭刻、自摸</string>
 <string>无番和 Chicken Hand：&lt;br/&gt;和牌后，数不出任何其他番种（花牌除外），计8番。&lt;br/&gt;&lt;br/&gt;【牌例】&lt;br/&gt;副露[123m] [345m]&lt;br/&gt;立牌[678p56sWW]点和[7s]</string>
-<string>妙手回春 Last Tile Draw：&lt;br/&gt;抓牌墙上最后一张牌成自摸和，计8番。不计自摸。&lt;br/&gt;&lt;br/&gt;【牌例】略。&lt;br/&gt;&lt;br/&gt;【注】&lt;br/&gt;(1)关于海底牌（即牌墙最后一张牌）的行牌规则：“牌墙最后一张牌摸起后，四家只能选择和牌或不和牌，不能吃、碰、杠、补花”，摸海底牌的那一家如不能“妙手回春”，就必须舍出一张牌，舍出一张后，如其他三家不能“海底捞月”即时荒庄。&lt;br/&gt;(2)摸牌山上倒数第二张牌后开杠，抓来海底牌成自摸和，应计杠上开花+妙手回春。</string>
-<string>海底捞月 Last Tile Claim：&lt;br/&gt;牌墙已摸完，和本局打出的最后一张牌，计8番。&lt;br/&gt;&lt;br/&gt;【牌例】略。&lt;br/&gt;&lt;br/&gt;【说明】海底捞月可以不是从牌墙上所抓的那张。</string>
+<string>妙手回春 Last Tile Draw：&lt;br/&gt;抓牌墙上最后一张牌成自摸和，计8番。不计自摸。&lt;br/&gt;&lt;br/&gt;【牌例】略。&lt;br/&gt;&lt;br/&gt;【注】&lt;br/&gt;(1)关于海底牌（即牌墙最后一张牌）的行牌规则：“牌墙最后一张牌摸起后，摸牌的那一家，如不能“妙手回春”，就必须舍出一张牌，不允许开杠、补花。无论其舍出的牌是否为海底摸上来的那一张，只要点炮，便是“海底捞月”，其他三家如不能“海底捞月”即是荒庄，不允许再吃、碰、杠。&lt;br/&gt;(2)摸牌墙上倒数第二张牌后开杠，抓来海底牌成自摸和，应计杠上开花+妙手回春。</string>
+<string>海底捞月 Last Tile Claim：&lt;br/&gt;牌墙已摸完，和本局打出的最后一张牌，计8番。&lt;br/&gt;&lt;br/&gt;【牌例】略。&lt;br/&gt;&lt;br/&gt;【说明】牌墙最后一张牌摸起后，摸牌的那一家无论其舍出的牌是否为海底摸上来的那一张，只要点炮，便是“海底捞月”。</string>
 <string>杠上开花 Out with Replacement Tile：&lt;br/&gt;开杠抓进的牌成和牌，计8番。不计自摸，杠来花牌再补花成和，不计杠上开花。&lt;br/&gt;&lt;br/&gt;【牌例】略。&lt;br/&gt;&lt;br/&gt;【注】&lt;br/&gt;(1)杠来花牌补花自摸的，不算杠上开花，算自摸。&lt;br/&gt;(2)杠上开花不影响杠类番种计分。</string>
 <string>抢杠和 Robbing The Kong：&lt;br/&gt;和他家明刻加杠的那张牌，计8番。不计和绝张。&lt;br/&gt;&lt;br/&gt;【牌例】略。&lt;br/&gt;&lt;br/&gt;【注】抢杠和只有先碰出明刻再开杠的那张牌才能被抢杠。手中暗刻别人打出第四张开杠的，不能抢杠，此时如果能和则可以报和，但不是抢杠和，因为和牌比杠牌优先。</string>
 <string>碰碰和 All Pungs：&lt;br/&gt;由四副刻子（杠）、将牌组成的和牌。&lt;br/&gt;&lt;br/&gt;【牌例1】&lt;br/&gt;副露[333p] [444s]&lt;br/&gt;立牌[11188mSS]自摸和[8m]&lt;br/&gt;计：碰碰和、双暗刻、幺九刻、自摸&lt;br/&gt;&lt;br/&gt;【注】不计碰碰和的番种列举如下：四杠、大四喜、四暗刻、清幺九、字一色、一色四节高、混幺九、全双刻</string>
