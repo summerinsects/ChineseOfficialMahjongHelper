@@ -15,18 +15,31 @@ bool LatestCompetitionScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    _tableView = cw::TableView::create();
-    _tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
-    _tableView->setScrollBarWidth(4);
-    _tableView->setScrollBarOpacity(0x99);
-    _tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35));
-    _tableView->setDelegate(this);
-    _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
+    Label *label = Label::createWithSystemFont("宣传赛事信息，请联系逍遥宫", "Arial", 12);
+    this->addChild(label);
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
+    label->setColor(Color3B::ORANGE);
 
-    _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
-    this->addChild(_tableView);
+    cw::TableView *tableView = cw::TableView::create();
+    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
+    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarOpacity(0x99);
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 65.0f));
+    tableView->setDelegate(this);
+    tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
+    tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
+
+    tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 30.0f));
+    this->addChild(tableView);
+    _tableView = tableView;
+
+    label = Label::createWithSystemFont("无近期赛事信息", "Arial", 12);
+    this->addChild(label);
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 75.0f));
+    label->setColor(Color3B::BLACK);
+    label->setVisible(false);
+    _emptyLabel = label;
 
     requestCompetitions();
 
@@ -109,11 +122,22 @@ bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
                     strncpy(info.url, it->value.GetString(), 1023);
                 }
 
+                it = json.FindMember("time_accuracy");
+                if (it != json.MemberEnd() && it->value.IsInt()) {
+                    info.timeAccuracy = static_cast<TIME_ACCURACY>(it->value.GetInt());
+                }
                 return info;
             });
 
-            std::sort(_competitions.begin(), _competitions.end(), [](const CompetitionInfo &r1, const CompetitionInfo &r2) { return r1.startTime > r2.startTime; });
+            time_t now = time(nullptr);
+            std::vector<CompetitionInfo>::iterator it = std::remove_if(_competitions.begin(), _competitions.end(),
+                [now](const CompetitionInfo &info) {
+                return (info.timeAccuracy != TIME_ACCURACY::UNDETERMINED && info.startTime < now);
+            });
+            _competitions.erase(it, _competitions.end());
+
             _tableView->reloadDataInplacement();
+            _emptyLabel->setVisible(_competitions.empty());
 
             return true;
         } while (0);
@@ -163,7 +187,7 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         label[0]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
         label[1] = Label::createWithSystemFont("", "Arail", 10);
-        label[1]->setColor(Color3B::BLACK);
+        label[1]->setColor(Color3B(0x60, 0x60, 0x60));
         cell->addChild(label[1]);
         label[1]->setPosition(Vec2(5.0f, 15.0f));
         label[1]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -192,11 +216,44 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
     label[0]->setString(info.name);
 
     struct tm ret = *localtime(&info.startTime);
-    std::string date = Common::format<256>("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
-    if (info.endTime != 0) {
-        date.append("——");
-        ret = *localtime(&info.endTime);
-        date.append(Common::format<256>("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday));
+    std::string date;
+
+    switch (info.timeAccuracy) {
+    default:
+        date = "具体时间待定";
+        break;
+    case TIME_ACCURACY::MONTHS:
+        date = Common::format<256>("%d年%d月", ret.tm_year + 1900, ret.tm_mon + 1);
+        if (info.endTime != 0) {
+            date.append("——");
+            ret = *localtime(&info.endTime);
+            date.append(Common::format<256>("%d年%d月", ret.tm_year + 1900, ret.tm_mon + 1));
+        }
+        break;
+    case TIME_ACCURACY::DAYS:
+        date = Common::format<256>("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
+        if (info.endTime != 0) {
+            date.append("——");
+            ret = *localtime(&info.endTime);
+            date.append(Common::format<256>("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday));
+        }
+        break;
+    case TIME_ACCURACY::HONRS:
+        date = Common::format<256>("%d年%d月%d日%.2d点", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour);
+        if (info.endTime != 0) {
+            date.append("——");
+            ret = *localtime(&info.endTime);
+            date.append(Common::format<256>("%d年%d月%d日%.2d点", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour));
+        }
+        break;
+    case TIME_ACCURACY::MINUTES:
+        date = Common::format<256>("%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        if (info.endTime != 0) {
+            date.append("——");
+            ret = *localtime(&info.endTime);
+            date.append(Common::format<256>("%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
+        }
+        break;
     }
     label[1]->setString(date);
 

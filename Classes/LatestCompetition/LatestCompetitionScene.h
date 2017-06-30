@@ -21,12 +21,18 @@ private:
     bool parseResponse(const std::vector<char> *buffer);
 
     cw::TableView *_tableView = nullptr;
+    cocos2d::Label *_emptyLabel = nullptr;
+
+    enum class TIME_ACCURACY {
+        UNDETERMINED = 0, MONTHS, DAYS, HONRS, MINUTES
+    };
 
     struct CompetitionInfo {
         char name[256];
         time_t startTime;
         time_t endTime;
         char url[1024];
+        TIME_ACCURACY timeAccuracy;
     };
 
     std::vector<CompetitionInfo> _competitions;
