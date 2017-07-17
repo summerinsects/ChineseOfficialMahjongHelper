@@ -150,26 +150,30 @@ bool HistoryScene::init() {
     this->addChild(_tableView);
 
     if (UNLIKELY(g_records.empty())) {
-        LoadingView *loadingView = LoadingView::create();
-        this->addChild(loadingView);
-        loadingView->setPosition(origin);
+        this->scheduleOnce([this](float) {
+            Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-        auto thiz = makeRef(this);  // 保证线程回来之前不析构
-        std::thread([thiz, loadingView]() {
-            std::vector<Record> temp;
-            loadRecords(temp);
+            LoadingView *loadingView = LoadingView::create();
+            this->addChild(loadingView);
+            loadingView->setPosition(origin);
 
-            // 切换到cocos线程
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
-                g_records.swap(temp);
+            auto thiz = makeRef(this);  // 保证线程回来之前不析构
+            std::thread([thiz, loadingView]() {
+                std::vector<Record> temp;
+                loadRecords(temp);
 
-                if (LIKELY(thiz->getReferenceCount() > 2)) {
-                    thiz->updateRecordTexts();
-                    loadingView->removeFromParent();
-                    thiz->_tableView->reloadData();
-                }
-            });
-        }).detach();
+                // 切换到cocos线程
+                Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
+                    g_records.swap(temp);
+
+                    if (LIKELY(thiz->isRunning())) {
+                        thiz->updateRecordTexts();
+                        loadingView->removeFromParent();
+                        thiz->_tableView->reloadData();
+                    }
+                });
+            }).detach();
+        }, 0.0f, "load_records");
     }
 
     return true;
@@ -277,7 +281,7 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
 
             // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-                if (LIKELY(thiz->getReferenceCount() > 2)) {
+                if (LIKELY(thiz->isRunning())) {
                     thiz->updateRecordTexts();
                     loadingView->removeFromParent();
                     thiz->_tableView->reloadDataInplacement();

@@ -12,8 +12,10 @@ bool OtherScene::init() {
 
     if (LIKELY(!g_text.empty())) {
         createContentView();
+        return true;
     }
-    else {
+
+    this->scheduleOnce([this](float) {
         Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
         LoadingView *loadingView = LoadingView::create();
@@ -30,13 +32,13 @@ bool OtherScene::init() {
 
             // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-                if (LIKELY(thiz->getReferenceCount() > 2)) {
+                if (LIKELY(thiz->isRunning())) {
                     loadingView->removeFromParent();
                     thiz->createContentView();
                 }
             });
         }).detach();
-    }
+    }, 0.0f, "load_texts");
 
     return true;
 }
