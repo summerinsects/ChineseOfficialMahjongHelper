@@ -459,9 +459,9 @@ void ScoreSheetScene::editName(size_t idx) {
         }
     }, nullptr);
 
-    Director::getInstance()->getScheduler()->schedule([editBox](float) {
+    editBox->scheduleOnce([editBox](float) {
         editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
-    }, editBox, 0.0f, 0, 0.0f, false, "open_keyboard");
+    }, 0.0f, "open_keyboard");
 }
 
 void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
