@@ -125,19 +125,19 @@ bool HelloWorld::init() {
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(30.0, 20.0f));
-    button->setTitleFontSize(12);
+    button->setContentSize(Size(40.0, 25.0f));
+    button->setTitleFontSize(14);
     button->setTitleText("关于");
-    button->setPosition(Vec2(origin.x + 18, origin.y + 13));
+    button->setPosition(Vec2(origin.x + 23, origin.y + 15));
     button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(30.0, 20.0f));
-    button->setTitleFontSize(12);
+    button->setContentSize(Size(40.0, 25.0f));
+    button->setTitleFontSize(14);
     button->setTitleText("捐赠");
-    button->setPosition(Vec2(origin.x + visibleSize.width - 18, origin.y + 13));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 23, origin.y + 15));
     button->addClickEventListener([](Ref *) {
         Application::getInstance()->openURL("https://git.oschina.net/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
     });
