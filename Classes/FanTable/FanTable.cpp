@@ -9,7 +9,7 @@
 
 USING_NS_CC;
 
-static const char *principle_title[] = { "不重复", "不拆移", "不得相同", "就高不就低", "套算一次" };
+static const char *principle_title[] = { "不重复原则", "不拆移原则", "不得相同原则", "就高不就低", "套算一次原则" };
 
 static const int fanLevel[] = { 0, 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };  // 番种
 static const size_t eachLevelCounts[] = { 5, 13, 10, 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次番种的个数
