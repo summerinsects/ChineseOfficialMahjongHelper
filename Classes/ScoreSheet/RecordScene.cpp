@@ -406,7 +406,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         for (size_t k = 0; k < 9; ++k) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
-            button->setContentSize(Size(gap - 5.0f, 20.0f));
+            button->setContentSize(Size(gap - 4.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
             button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1));
@@ -451,7 +451,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             button->setTag(true);
         }
 
-        Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
+        Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
     }
 
     return cell;
