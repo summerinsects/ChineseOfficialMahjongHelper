@@ -132,10 +132,11 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     const float gap = visibleSize.width / 6;  // 分成6份
     _cellWidth = gap;
 
-    const float cellHeight = std::min<float>((visibleSize.height - 85) / 20, 20);
-    const float tableHeight = cellHeight * 20;
+    const int cellCount = 20;  // 姓名+开局+每圈+累计+16盘=20行
+    const float cellHeight = std::min<float>((visibleSize.height - 85) / cellCount, 20);
+    const float tableHeight = cellHeight * cellCount;
 
-    node->setPosition(Vec2(origin.x, origin.y + (visibleSize.height - 85 - cellHeight * 20) * 0.5f + 25));
+    node->setPosition(Vec2(origin.x, origin.y + (visibleSize.height - 85 - cellHeight * cellCount) * 0.5f + 25));
 
     // 5条竖线
     for (int i = 0; i < 5; ++i) {
@@ -143,8 +144,8 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         node->drawLine(Vec2(x, 0.0f), Vec2(x, tableHeight), Color4F::BLACK);
     }
 
-    // 21条横线
-    for (int i = 0; i < 21; ++i) {
+    // cellCount+1条横线
+    for (int i = 0; i < cellCount + 1; ++i) {
         const float y = cellHeight * i;
         node->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y),
             (i > 0 && i < 16) ? Color4F(0.3f, 0.3f, 0.3f, 1.0f) : Color4F::BLACK);
@@ -235,7 +236,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第5~20栏，东风东~北风北的计分
     for (int k = 0; k < 16; ++k) {
-        const float y = 10 + (15 - k) * cellHeight;
+        const float y = 10 + (cellCount - 5 - k) * cellHeight;
 
         // 东风东~北风北名字
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
