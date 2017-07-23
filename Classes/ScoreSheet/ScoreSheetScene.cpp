@@ -717,17 +717,48 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         return;
     }
 
-    AlertView::showWithMessage("清空表格", "在清空表格之前，请选择「保存当前记录」或「丢弃当前记录」", 12,
-        [this]() {
-        AlertView::showWithMessage("清空表格", "点击「确认」将余下盘数标记为荒庄，并保存到历史记录，\n点击「取消」则直接丢弃当前记录，不保存。", 12,
-            [this]() {
-            _record->current_index = 16;
-            _record->end_time = time(nullptr);
-            HistoryScene::modifyRecord(_record);
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(200.0f, 70.0f));
 
-            reset();
-        }, std::bind(&ScoreSheetScene::reset, this));
-    }, nullptr);
+    Label *label = Label::createWithSystemFont("在清空表格之前，请选择「保存」或「丢弃」", "Arail", 12);
+    rootNode->addChild(label);
+    label->setPosition(Vec2(100.0f, 60.0f));
+    label->setColor(Color3B(0x60, 0x60, 0x60));
+    Common::scaleLabelToFitWidth(label, 200.0f);
+
+    ui::Button *saveButton = ui::Button::create("source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png");
+    saveButton->setScale9Enabled(true);
+    saveButton->setContentSize(Size(180.0f, 20.0f));
+    saveButton->setTitleFontSize(12);
+    saveButton->setTitleText("保存，未打完盘数标记为荒庄");
+    Common::scaleLabelToFitWidth(saveButton->getTitleLabel(), 176.0f);
+    rootNode->addChild(saveButton);
+    saveButton->setPosition(Vec2(100.0f, 60.0f - 1 * 25.0f));
+
+    ui::Button *discardButton = ui::Button::create("source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png");
+    discardButton->setScale9Enabled(true);
+    discardButton->setContentSize(Size(180.0f, 20.0f));
+    discardButton->setTitleFontSize(12);
+    discardButton->setTitleText("丢弃，历史记录中不保存当前记录");
+    Common::scaleLabelToFitWidth(discardButton->getTitleLabel(), 176.0f);
+    rootNode->addChild(discardButton);
+    discardButton->setPosition(Vec2(100.0f, 60.0f - 2 * 25.0f));
+
+    AlertView *alertView = AlertView::showWithNode("清空表格", rootNode, nullptr, nullptr);
+
+    saveButton->addClickEventListener([this, alertView](Ref *) {
+        _record->current_index = 16;
+        _record->end_time = time(nullptr);
+        HistoryScene::modifyRecord(_record);
+
+        reset();
+        alertView->close();
+    });
+
+    discardButton->addClickEventListener([this, alertView](Ref *) {
+        reset();
+        alertView->close();
+    });
 }
 
 static void showPursuit(int delta) {
