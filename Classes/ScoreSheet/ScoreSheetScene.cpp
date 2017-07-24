@@ -119,11 +119,12 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Common::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
 
     // 时间label
-    _timeLabel = Label::createWithSystemFont("当前时间", "Arial", 12);
-    this->addChild(_timeLabel);
-    _timeLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    _timeLabel->setPosition(Vec2(origin.x + 5, origin.y + 12));
-    _timeLabel->setColor(Color3B::BLACK);
+    Label *label = Label::createWithSystemFont("当前时间", "Arial", 12);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 5, origin.y + 12));
+    label->setColor(Color3B::BLACK);
+    _timeLabel = label;
 
     // 用来绘制表格线的根结点
     DrawNode *node = DrawNode::create();
@@ -156,7 +157,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第1栏：选手姓名
     const float line1Y = tableHeight - cellHeight * 0.5f;
-    Label *label = Label::createWithSystemFont("选手姓名", "Arail", 12);
+    label = Label::createWithSystemFont("选手姓名", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line1Y));
     node->addChild(label);
@@ -165,27 +166,29 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     // 4个用于弹出输入框的AlertLayer及同位置的label
     // 这里不直接使用Button内部Label，因为内部Label在点击后会恢复scale
     for (int i = 0; i < 4; ++i) {
-        ui::Button *button = ui::Button::create();
+        button = ui::Button::create();
         button->setScale9Enabled(true);
         button->setPosition(Vec2(colPosX[i + 1], line1Y));
         button->setContentSize(Size(gap, cellHeight));
         node->addChild(button);
         button->addClickEventListener(std::bind(&ScoreSheetScene::onNameButton, this, std::placeholders::_1, i));
 
-        _nameLabel[i] = Label::createWithSystemFont("", "Arail", 12);
-        _nameLabel[i]->setColor(Color3B::ORANGE);
-        _nameLabel[i]->setPosition(Vec2(colPosX[i + 1], line1Y));
-        node->addChild(_nameLabel[i]);
+        label = Label::createWithSystemFont("", "Arail", 12);
+        label->setColor(Color3B::ORANGE);
+        label->setPosition(Vec2(colPosX[i + 1], line1Y));
+        node->addChild(label);
+        _nameLabel[i] = label;
     }
 
-    _lockButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    node->addChild(_lockButton, -1);
-    _lockButton->setScale9Enabled(true);
-    _lockButton->setContentSize(Size(gap, cellHeight));
-    _lockButton->setTitleFontSize(12);
-    _lockButton->setTitleText("锁定");
-    _lockButton->setPosition(Vec2(colPosX[5], line1Y));
-    _lockButton->addClickEventListener(std::bind(&ScoreSheetScene::onLockButton, this, std::placeholders::_1));
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    node->addChild(button, -1);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(gap, cellHeight));
+    button->setTitleFontSize(12);
+    button->setTitleText("锁定");
+    button->setPosition(Vec2(colPosX[5], line1Y));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onLockButton, this, std::placeholders::_1));
+    _lockButton = button;
 
     // 第2、3栏：座位
     const float line2Y = tableHeight - cellHeight * 1.5f;
@@ -208,23 +211,24 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第4栏：累计
     const float line4Y = tableHeight - cellHeight * 3.5f;
-    label = Label::createWithSystemFont("累计", "Arail", 12);
+    label = Label::createWithSystemFont("比赛分", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line4Y));
     node->addChild(label);
     Common::scaleLabelToFitWidth(label, gap - 4);
 
-    label = Label::createWithSystemFont("备注", "Arail", 12);
+    label = Label::createWithSystemFont("番种备注", "Arail", 12);
     label->setColor(Color3B::BLACK);
     label->setPosition(Vec2(colPosX[5], line4Y));
     node->addChild(label);
     Common::scaleLabelToFitWidth(label, gap - 4);
 
     for (int i = 0; i < 4; ++i) {
-        _totalLabel[i] = Label::createWithSystemFont("+0", "Arail", 12);
-        _totalLabel[i]->setColor(Color3B::ORANGE);
-        _totalLabel[i]->setPosition(Vec2(colPosX[i + 1], line4Y));
-        node->addChild(_totalLabel[i]);
+        label = Label::createWithSystemFont("+0", "Arail", 12);
+        label->setColor(Color3B::ORANGE);
+        label->setPosition(Vec2(colPosX[i + 1], line4Y));
+        node->addChild(label);
+        _totalLabel[i] = label;
 
         ui::Button *button = ui::Button::create();
         button->setScale9Enabled(true);
@@ -253,7 +257,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         }
 
         // 计分按钮
-        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         node->addChild(button, -1);
         button->setScale9Enabled(true);
         button->setContentSize(Size(gap, cellHeight));
@@ -266,7 +270,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         _recordButton[k] = button;
 
         // 备注的番种label
-        Label *label = Label::createWithSystemFont("", "Arail", 12);
+        label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(Color3B(0x60, 0x60, 0x60));
         label->setPosition(Vec2(colPosX[5], y));
         node->addChild(label);
