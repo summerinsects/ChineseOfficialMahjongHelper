@@ -133,7 +133,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     const float gap = visibleSize.width / 6;  // 分成6份
     _cellWidth = gap;
 
-    const int cellCount = 20;  // 姓名+开局+每圈+累计+16盘=20行
+    const int cellCount = 21;  // 姓名+开局+每圈+累计+16盘+名次=21行
     const float cellHeight = std::min<float>((visibleSize.height - 85) / cellCount, 20);
     const float tableHeight = cellHeight * cellCount;
 
@@ -288,6 +288,24 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         _detailButton[k] = button;
     }
 
+    // 第21栏：名次
+    const float line21Y = 10 + (cellCount - 21) * cellHeight;
+
+    label = Label::createWithSystemFont("名次", "Arail", 12);
+    label->setColor(Color3B::ORANGE);
+    label->setPosition(Vec2(colPosX[0], line21Y));
+    node->addChild(label);
+    Common::scaleLabelToFitWidth(label, gap - 4);
+
+    for (int i = 0; i < 4; ++i) {
+        label = Label::createWithSystemFont("", "Arail", 12);
+        label->setColor(Color3B::ORANGE);
+        label->setPosition(Vec2(colPosX[i + 1], line21Y));
+        node->addChild(label);
+
+        _rankLabels[i] = label;
+    }
+
     // 恢复界面数据
     _record = record;
     recover();
@@ -327,6 +345,24 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     label->setString(GetFanText(detail));
     label->setVisible(true);
     Common::scaleLabelToFitWidth(label, _cellWidth - 4);
+}
+
+void ScoreSheetScene::refreshRank() {
+    // 计算名次
+    const char *text[] = { "一", "二", "三", "四" };
+    int rank[4] = {0};
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (i == j) continue;
+            if (_totalScores[i] < _totalScores[j]) ++rank[i];
+            if (_totalScores[i] == _totalScores[j] && i > j) ++rank[i];
+        }
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        _rankLabels[i]->setVisible(true);
+        _rankLabels[i]->setString(text[rank[i]]);
+    }
 }
 
 void ScoreSheetScene::refreshStartTime() {
@@ -379,10 +415,13 @@ void ScoreSheetScene::recover() {
         cleanRow(i);
     }
 
-    // 刷新总分label
+    // 刷新总分和名次label
     for (int i = 0; i < 4; ++i) {
         _totalLabel[i]->setString(Common::format<32>("%+d", _totalScores[i]));
+        _rankLabels[i]->setVisible(false);
     }
+
+    refreshRank();
 
     // 如果不是北风北，则显示下一行的计分按钮
     if (_record->current_index < 16) {
@@ -528,6 +567,9 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
         for (int i = 0; i < 4; ++i) {
             _totalLabel[i]->setString(Common::format<32>("%+d", _totalScores[i]));
         }
+
+        // 更新名次
+        refreshRank();
 
         if (isModify) {
             if (_record->end_time != 0) {
@@ -691,7 +733,8 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
         "3. 对于已经记分的，点击「备注」一栏可修改记录。\n"
         "4. 对局未完成时，点击「累计」一栏处，可显示分差并有快捷计算追分选项。\n"
         "5. 「北风北」记分完成后，会自动添加入「历史记录」。\n"
-        "6. 「历史记录」里的内容只要不卸载程序就会一直保存。",
+        "6. 「历史记录」里的内容只要不卸载程序就会一直保存。\n"
+        "7. 「名次」一栏对于小分相同的，名次按开局座位排列。",
         10, nullptr, nullptr);
 }
 
