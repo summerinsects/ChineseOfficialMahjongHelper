@@ -11,10 +11,6 @@ static const char *handNameText[] = {
     "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北"
 };
 
-static const char *packedFanNames[] = {
-    "门断平", "门清平和", "四番风", "门清双暗", "断幺平和", "双同幺九", "双暗暗杠", "番牌暗杠"
-};
-
 #define EMOJI_FLOWER "\xF0\x9F\x8C\xB8"
 
 #define EMOJI_FLOWER_8 EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER

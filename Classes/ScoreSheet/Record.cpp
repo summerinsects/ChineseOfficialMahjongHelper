@@ -1,5 +1,10 @@
 ﻿#include "Record.h"
 #include "../mahjong-algorithm/fan_calculator.h"
+#include "../compiler.h"
+
+static const char *packedFanNames[] = {
+    "门断平", "门清平和", "断幺平和", "圈门合一", "番牌暗杠", "双同幺九", "门清双暗", "双暗暗杠"
+};
 
 void JsonToRecord(const rapidjson::Value &json, Record &record) {
     memset(&record, 0, sizeof(Record));
@@ -31,6 +36,11 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
             it = detail_json.FindMember("false_win");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
                 detail_data.false_win = it->value.GetUint();
+            }
+
+            it = detail_json.FindMember("packed_fan");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                detail_data.packed_fan = it->value.GetUint();
             }
 
             it = detail_json.FindMember("score");
@@ -108,6 +118,7 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
         rapidjson::Value detail_json(rapidjson::Type::kObjectType);
         detail_json.AddMember("win_claim", rapidjson::Value(detail_data.win_claim), alloc);
         detail_json.AddMember("false_win", rapidjson::Value(detail_data.false_win), alloc);
+        detail_json.AddMember("packed_fan", rapidjson::Value(detail_data.packed_fan), alloc);
         detail_json.AddMember("score", rapidjson::Value(detail_data.score), alloc);
         detail_json.AddMember("fan_flag", rapidjson::Value(detail_data.fan_flag), alloc);
 
@@ -899,6 +910,46 @@ const char *GetShortFanText(const Record::Detail &detail) {
         }
     }
 
+    uint8_t packedFan = detail.packed_fan;
+    if (packedFan > 0 && packedFan <= 8) {
+        return packedFanNames[packedFan - 1];
+    }
+
     // 将未标记番种的显示为其他凑番
     return "其他凑番";
+}
+
+const char *GetPackedFanText(uint8_t packedFan) {
+    if (packedFan > 0 && packedFan <= 8) {
+        return packedFanNames[packedFan - 1];
+    }
+    return "";
+}
+
+std::string GetLongFanText(const Record::Detail &detail) {
+    std::string fanText;
+
+    uint8_t packedFan = detail.packed_fan;
+    uint64_t fanFlag = detail.fan_flag;
+    if (fanFlag != 0) {
+        for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
+            if (TEST_FAN(fanFlag, n)) {
+                unsigned idx = n;
+                fanText.append("「");
+                fanText.append(mahjong::fan_name[idx]);
+                fanText.append("」");
+            }
+        }
+
+        if (!fanText.empty()) {
+            fanText.append("等");
+        }
+    }
+    else if (packedFan > 0 && packedFan <= 8) {
+        fanText.append("「");
+        fanText.append(packedFanNames[packedFan - 1]);
+        fanText.append("」");
+    }
+
+    return fanText;
 }

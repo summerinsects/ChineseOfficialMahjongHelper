@@ -233,13 +233,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(topNode);
 
     // 说明
-    label = Label::createWithSystemFont("标记4番以上番种（未做排斥检测）", "Arial", 12);
+    label = Label::createWithSystemFont("标记主番（4番以上，未做排斥检测）", "Arial", 12);
     label->setColor(Color3B::BLACK);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 65.0f));
 
-    label = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
+    label = Label::createWithSystemFont("标记主番可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -738,6 +738,78 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
             _okCallback(_detail);
             Director::getInstance()->popScene();
         }, nullptr);
+        return;
+    }
+
+    if (_detail.fan_flag == 0 && _detail.win_hand.tile_count == 0) {
+        Node *rootNode = Node::create();
+        rootNode->setContentSize(Size(200.0f, 95.0f));
+
+        Label *label = Label::createWithSystemFont("未标记主番，如下常用凑番可标记", "Arail", 12);
+        rootNode->addChild(label);
+        label->setPosition(Vec2(100.0f, 85.0f));
+        label->setColor(Color3B(0x60, 0x60, 0x60));
+        Common::scaleLabelToFitWidth(label, 200.0f);
+
+        const float gap = (200 - 5.0f) / 3.0f;
+        const size_t totalRows = 3;
+
+        static ui::Button *buttons[8];
+        memset(buttons, 0, sizeof(buttons));
+
+        for (size_t i = 0; i < 8; ++i) {
+            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            button->setScale9Enabled(true);
+            button->setContentSize(Size(gap - 4.0f, 20.0f));
+            button->setTitleColor(Color3B::BLACK);
+            button->setTitleFontSize(12);
+            button->setTitleText(GetPackedFanText(i + 1));
+            button->setUserData(reinterpret_cast<void *>(i));
+
+            div_t ret = div(i, 3);
+            size_t col = ret.rem;
+            size_t row = ret.quot;
+            button->setPosition(Vec2(gap * (col + 0.5f) + 2.0f, (totalRows - row - 0.5f) * 25.0f));
+
+            Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
+
+            rootNode->addChild(button);
+            buttons[i] = button;
+
+            button->addClickEventListener([](cocos2d::Ref *sender) {
+                ui::Button *button = (ui::Button *)sender;
+                size_t index = reinterpret_cast<size_t>(button->getUserData());
+
+                // 标记/取消标记
+                bool selected = !!button->getTag();
+                if (selected) {
+                    button->setHighlighted(false);
+                    button->setTag(false);
+                }
+                else {
+                    button->setHighlighted(true);
+                    button->setTag(true);
+
+                    // 清除其他的标记
+                    for (size_t i = 0; i < 8; ++i) {
+                        if (i != index) {
+                            buttons[i]->setHighlighted(false);
+                            buttons[i]->setTag(false);
+                        }
+                    }
+                }
+            });
+        }
+
+        AlertView::showWithNode("记分", rootNode, [this]() {
+            size_t highlight = std::find_if(std::begin(buttons), std::end(buttons), std::bind(&ui::Button::isHighlighted, std::placeholders::_1))
+                - std::begin(buttons);
+            _detail.packed_fan = static_cast<uint8_t>(highlight + 1);
+
+            _okCallback(_detail);
+            Director::getInstance()->popScene();
+        }, nullptr);
+
         return;
     }
 

@@ -599,35 +599,18 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
 static std::string stringifyDetail(const Record *record, size_t handIdx) {
     const Record::Detail &detail = record->detail[handIdx];
 
+    std::string fanText = GetLongFanText(detail);
+
     std::string ret;
 
     int wc = detail.win_claim;
     int winIndex = WIN_INDEX(wc);
     int claimIndex = CLAIM_INDEX(wc);
     if (winIndex == claimIndex) {
-        ret.append(Common::format<128>("「%s」自摸%d番。\n", record->name[winIndex], detail.score));
+        ret.append(Common::format<128>("「%s」自摸%s%d番。\n", record->name[winIndex], fanText.c_str(), detail.score));
     }
     else {
-        ret.append(Common::format<128>("「%s」和%d番，「%s」点炮。\n", record->name[winIndex], detail.score, record->name[claimIndex]));
-    }
-
-    uint64_t fanFlag = detail.fan_flag;
-    if (fanFlag != 0) {
-        std::string fanText;
-        for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-            if (TEST_FAN(fanFlag, n)) {
-                unsigned idx = n;
-                fanText.append("「");
-                fanText.append(mahjong::fan_name[idx]);
-                fanText.append("」");
-            }
-        }
-
-        if (!fanText.empty()) {
-            ret.append("和出番种：");
-            ret.append(fanText);
-            ret.append("等。\n");
-        }
+        ret.append(Common::format<128>("「%s」和%s%d番，「%s」点炮。\n", record->name[winIndex], fanText.c_str(), detail.score, record->name[claimIndex]));
     }
 
     if (detail.false_win != 0) {
