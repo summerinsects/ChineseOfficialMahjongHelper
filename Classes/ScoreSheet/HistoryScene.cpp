@@ -119,7 +119,7 @@ void HistoryScene::updateRecordTexts() {
         });
 
         static const char *seatText[] = { "东", "南", "西", "北" };
-        snprintf(rt.score, sizeof(rt.score), "%s: %s(%+d)\n%s: %s(%+d)\n%s: %s(%+d)\n%s: %s(%+d)",
+        snprintf(rt.score, sizeof(rt.score), "%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)",
             seatText[seatscore[0].first], record.name[seatscore[0].first], seatscore[0].second,
             seatText[seatscore[1].first], record.name[seatscore[1].first], seatscore[1].second,
             seatText[seatscore[2].first], record.name[seatscore[2].first], seatscore[2].second,
