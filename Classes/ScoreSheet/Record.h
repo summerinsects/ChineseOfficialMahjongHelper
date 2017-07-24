@@ -55,6 +55,6 @@ void JsonToRecord(const rapidjson::Value &json, Record &record);
 void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
-const char *GetFanText(const Record::Detail &detail);
+const char *GetShortFanText(const Record::Detail &detail);
 
 #endif

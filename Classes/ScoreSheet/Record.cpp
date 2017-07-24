@@ -871,7 +871,7 @@ static const char *fan_name2[mahjong::LAST_TILE + 1][mahjong::LAST_TILE + 1] = {
     { "和绝张" }  // 和绝张
 };
 
-const char *GetFanText(const Record::Detail &detail) {
+const char *GetShortFanText(const Record::Detail &detail) {
     if (detail.score == 0) {
         return "荒庄";
     }

@@ -342,7 +342,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     _detailButton[handIdx]->setEnabled(true);
 
     Label *label = _fanNameLabel[handIdx];
-    label->setString(GetFanText(detail));
+    label->setString(GetShortFanText(detail));
     label->setVisible(true);
     Common::scaleLabelToFitWidth(label, _cellWidth - 4);
 }
