@@ -52,45 +52,6 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
             if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
                 detail_data.fan_flag = it->value.GetUint64();
             }
-
-            it = detail_json.FindMember("win_hand");
-            if (it != detail_json.MemberEnd() && it->value.IsObject()) {
-                const rapidjson::Value::ConstObject &win_hand_json = it->value.GetObject();
-
-                Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
-                it = win_hand_json.FindMember("fixed_packs");
-                if (it != win_hand_json.MemberEnd() && it->value.IsArray()) {
-                    rapidjson::Value::ConstArray fixed_packs = it->value.GetArray();
-                    win_hand_data.pack_count = fixed_packs.Size();
-                    for (uint8_t i = 0; i < win_hand_data.pack_count; ++i) {
-                        win_hand_data.fixed_packs[i] = fixed_packs[i].GetUint();
-                    }
-                }
-
-                it = win_hand_json.FindMember("standing_tiles");
-                if (it != win_hand_json.MemberEnd() && it->value.IsArray()) {
-                    rapidjson::Value::ConstArray standing_tiles = it->value.GetArray();
-                    win_hand_data.tile_count = standing_tiles.Size();
-                    for (uint8_t i = 0; i < win_hand_data.tile_count; ++i) {
-                        win_hand_data.standing_tiles[i] = standing_tiles[i].GetUint();
-                    }
-                }
-
-                it = win_hand_json.FindMember("win_tile");
-                if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
-                    win_hand_data.win_tile = it->value.GetUint();
-                }
-
-                it = win_hand_json.FindMember("win_flag");
-                if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
-                    win_hand_data.win_flag = it->value.GetUint();
-                }
-
-                it = win_hand_json.FindMember("flower_count");
-                if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
-                    win_hand_data.flower_count = it->value.GetUint();
-                }
-            }
         }
     }
 
@@ -121,28 +82,6 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
         detail_json.AddMember("packed_fan", rapidjson::Value(detail_data.packed_fan), alloc);
         detail_json.AddMember("score", rapidjson::Value(detail_data.score), alloc);
         detail_json.AddMember("fan_flag", rapidjson::Value(detail_data.fan_flag), alloc);
-
-        const Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
-        rapidjson::Value win_hand_json(rapidjson::Type::kObjectType);
-        if (win_hand_data.pack_count > 0) {
-            rapidjson::Value fixed_packs(rapidjson::Type::kArrayType);
-            for (uint8_t i = 0; i < win_hand_data.pack_count; ++i) {
-                fixed_packs.PushBack(rapidjson::Value(win_hand_data.fixed_packs[i]), alloc);
-            }
-            win_hand_json.AddMember("fixed_packs", std::move(fixed_packs), alloc);
-        }
-        if (win_hand_data.tile_count > 0) {
-            rapidjson::Value standing_tiles(rapidjson::Type::kArrayType);
-            for (uint8_t i = 0; i < win_hand_data.tile_count; ++i) {
-                standing_tiles.PushBack(rapidjson::Value(win_hand_data.standing_tiles[i]), alloc);
-            }
-            win_hand_json.AddMember("standing_tiles", std::move(standing_tiles), alloc);
-        }
-        win_hand_json.AddMember("win_tile", rapidjson::Value(win_hand_data.win_tile), alloc);
-        win_hand_json.AddMember("win_flag", rapidjson::Value(win_hand_data.win_flag), alloc);
-        win_hand_json.AddMember("flower_count", rapidjson::Value(win_hand_data.flower_count), alloc);
-
-        detail_json.AddMember("win_hand", std::move(win_hand_json), alloc);
 
         detail.PushBack(std::move(detail_json), alloc);
     }

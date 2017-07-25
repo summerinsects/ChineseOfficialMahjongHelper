@@ -639,65 +639,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     std::string message = stringifyDetail(_record, handIdx);
     message.append("\n是否需要修改这盘的记录？");
 
-    if (detail.win_hand.tile_count == 0 || detail.win_hand.win_tile == 0) {
-        AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"), message, 12,
-            std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
-        return;
-    }
-
-    mahjong::calculate_param_t param;
-    RecordScene::_WinHandToCalculateParam(detail.win_hand, param);
-
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width * 0.8f - 10;
-
-    // 花（使用emoji代码）
-    Label *flowerLabel = nullptr;
-    if (param.flower_count > 0) {
-        flowerLabel = Label::createWithSystemFont(std::string(EMOJI_FLOWER_8, param.flower_count * (sizeof(EMOJI_FLOWER) - 1)), "Arial", 12);
-        flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-        flowerLabel->setColor(Color3B(224, 45, 45));
-#endif
-    }
-
-    // 手牌
-    Node *tilesNode = HandTilesWidget::createStaticNode(param.hand_tiles, param.win_tile);
-    Size tilesNodeSize = tilesNode->getContentSize();
-    if (tilesNodeSize.width > maxWidth) {
-        const float scale = maxWidth / tilesNodeSize.width;
-        tilesNode->setScale(scale);
-        tilesNodeSize.width = maxWidth;
-        tilesNodeSize.height *= scale;
-    }
-
-    // 描述文本
-    Label *label = Label::createWithSystemFont(message, "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
-        label->setDimensions(maxWidth, 0);
-    }
-    const Size &labelSize = label->getContentSize();
-
-    Node *container = Node::create();
-    if (param.flower_count > 0) {
-        const Size &flowerSize = flowerLabel->getContentSize();
-        container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height));
-
-        container->addChild(flowerLabel);
-        flowerLabel->setPosition(Vec2(0, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
-    }
-    else {
-        container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height));
-    }
-
-    container->addChild(tilesNode);
-    tilesNode->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 10 + tilesNodeSize.height * 0.5f));
-
-    container->addChild(label);
-    label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f));
-
-    AlertView::showWithNode(std::string(handNameText[handIdx]).append("详情"), container,
+    AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"), message, 12,
         std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
 }
 
