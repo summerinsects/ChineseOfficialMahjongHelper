@@ -698,39 +698,47 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
     label->setColor(Color3B(0x60, 0x60, 0x60));
     Common::scaleLabelToFitWidth(label, 200.0f);
 
-    ui::Button *saveButton = ui::Button::create("source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png");
-    saveButton->setScale9Enabled(true);
-    saveButton->setContentSize(Size(180.0f, 20.0f));
-    saveButton->setTitleFontSize(12);
-    saveButton->setTitleText("保存，未打完盘数标记为荒庄");
-    Common::scaleLabelToFitWidth(saveButton->getTitleLabel(), 176.0f);
-    rootNode->addChild(saveButton);
-    saveButton->setPosition(Vec2(100.0f, 60.0f - 1 * 25.0f));
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    rootNode->addChild(radioGroup);
 
-    ui::Button *discardButton = ui::Button::create("source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png");
-    discardButton->setScale9Enabled(true);
-    discardButton->setContentSize(Size(180.0f, 20.0f));
-    discardButton->setTitleFontSize(12);
-    discardButton->setTitleText("丢弃，历史记录中不保存当前记录");
-    Common::scaleLabelToFitWidth(discardButton->getTitleLabel(), 176.0f);
-    rootNode->addChild(discardButton);
-    discardButton->setPosition(Vec2(100.0f, 60.0f - 2 * 25.0f));
+    ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    radioButton->setZoomScale(0.0f);
+    radioButton->ignoreContentAdaptWithSize(false);
+    radioButton->setContentSize(Size(20.0f, 20.0f));
+    radioButton->setPosition(Vec2(10.0f, 60.0f - 1 * 25.0f));
+    rootNode->addChild(radioButton);
+    radioGroup->addRadioButton(radioButton);
 
-    AlertView *alertView = AlertView::showWithNode("清空表格", rootNode, nullptr, nullptr);
+    label = Label::createWithSystemFont("保存，将未打完盘数标记为荒庄", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    Common::scaleLabelToFitWidth(label, 175.0f);
+    radioButton->addChild(label);
+    label->setPosition(Vec2(25.0f, 10.0f));
 
-    saveButton->addClickEventListener([this, alertView](Ref *) {
-        _record->current_index = 16;
-        _record->end_time = time(nullptr);
-        HistoryScene::modifyRecord(_record);
+    radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    radioButton->setZoomScale(0.0f);
+    radioButton->ignoreContentAdaptWithSize(false);
+    radioButton->setContentSize(Size(20.0f, 20.0f));
+    radioButton->setPosition(Vec2(10.0f, 60.0f - 2 * 25.0f));
+    rootNode->addChild(radioButton);
+    radioGroup->addRadioButton(radioButton);
 
+    label = Label::createWithSystemFont("丢弃，不保存当前一局记录", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    Common::scaleLabelToFitWidth(label, 175.0f);
+    radioButton->addChild(label);
+    label->setPosition(Vec2(25.0f, 10.0f));
+
+    AlertView::showWithNode("清空表格", rootNode, [this, radioGroup]() {
+        if (radioGroup->getSelectedButtonIndex() == 0) {
+            _record->current_index = 16;
+            _record->end_time = time(nullptr);
+            HistoryScene::modifyRecord(_record);
+        }
         reset();
-        alertView->close();
-    });
-
-    discardButton->addClickEventListener([this, alertView](Ref *) {
-        reset();
-        alertView->close();
-    });
+    }, nullptr);
 }
 
 static void showPursuit(int delta) {
