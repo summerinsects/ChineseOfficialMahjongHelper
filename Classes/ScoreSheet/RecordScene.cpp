@@ -771,25 +771,3 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
     _okCallback(_detail);
     Director::getInstance()->popScene();
 }
-
-static const mahjong::wind_t seatWindTable[16][4] = {
-    { mahjong::wind_t::EAST, mahjong::wind_t::SOUTH, mahjong::wind_t::WEST, mahjong::wind_t::NORTH },
-    { mahjong::wind_t::NORTH, mahjong::wind_t::EAST, mahjong::wind_t::SOUTH, mahjong::wind_t::WEST },
-    { mahjong::wind_t::WEST, mahjong::wind_t::NORTH, mahjong::wind_t::EAST, mahjong::wind_t::SOUTH },
-    { mahjong::wind_t::SOUTH, mahjong::wind_t::WEST, mahjong::wind_t::NORTH, mahjong::wind_t::EAST },
-
-    { mahjong::wind_t::SOUTH, mahjong::wind_t::EAST, mahjong::wind_t::NORTH, mahjong::wind_t::WEST },
-    { mahjong::wind_t::EAST, mahjong::wind_t::NORTH, mahjong::wind_t::WEST, mahjong::wind_t::SOUTH },
-    { mahjong::wind_t::NORTH, mahjong::wind_t::WEST, mahjong::wind_t::SOUTH, mahjong::wind_t::EAST },
-    { mahjong::wind_t::WEST, mahjong::wind_t::SOUTH, mahjong::wind_t::EAST, mahjong::wind_t::NORTH },
-
-    { mahjong::wind_t::NORTH, mahjong::wind_t::WEST, mahjong::wind_t::EAST, mahjong::wind_t::SOUTH },
-    { mahjong::wind_t::WEST, mahjong::wind_t::SOUTH, mahjong::wind_t::NORTH, mahjong::wind_t::EAST },
-    { mahjong::wind_t::SOUTH, mahjong::wind_t::EAST, mahjong::wind_t::WEST, mahjong::wind_t::NORTH },
-    { mahjong::wind_t::EAST, mahjong::wind_t::NORTH, mahjong::wind_t::SOUTH, mahjong::wind_t::WEST },
-
-    { mahjong::wind_t::WEST, mahjong::wind_t::NORTH, mahjong::wind_t::SOUTH, mahjong::wind_t::EAST },
-    { mahjong::wind_t::SOUTH, mahjong::wind_t::WEST, mahjong::wind_t::EAST, mahjong::wind_t::NORTH },
-    { mahjong::wind_t::EAST, mahjong::wind_t::SOUTH, mahjong::wind_t::NORTH, mahjong::wind_t::WEST },
-    { mahjong::wind_t::NORTH, mahjong::wind_t::EAST, mahjong::wind_t::WEST, mahjong::wind_t::SOUTH }
-};
