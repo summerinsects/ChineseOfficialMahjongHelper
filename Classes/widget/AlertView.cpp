@@ -5,18 +5,17 @@
 
 USING_NS_CC;
 
-AlertView *AlertView::showWithNode(const std::string &title, cocos2d::Node *node, float maxWidth, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
+void AlertView::showWithNode(const std::string &title, cocos2d::Node *node, float maxWidth, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
     AlertView *alert = new (std::nothrow) AlertView();
     if (alert != nullptr && alert->initWithTitle(title, node, maxWidth, confirmCallback, cancelCallback)) {
         alert->autorelease();
         Director::getInstance()->getRunningScene()->addChild(alert, 100);
-        return alert;
+        return;
     }
     CC_SAFE_DELETE(alert);
-    return nullptr;
 }
 
-AlertView *AlertView::showWithMessage(const std::string &title, const std::string &message, float fontSize, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
+void AlertView::showWithMessage(const std::string &title, const std::string &message, float fontSize, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float maxWidth = visibleSize.width * 0.8f - 10;
     Label *label = Label::createWithSystemFont(message, "Arail", fontSize);
@@ -24,7 +23,7 @@ AlertView *AlertView::showWithMessage(const std::string &title, const std::strin
     if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
         label->setDimensions(maxWidth, 0);
     }
-    return AlertView::showWithNode(title, label, maxWidth, confirmCallback, cancelCallback);
+    AlertView::showWithNode(title, label, maxWidth, confirmCallback, cancelCallback);
 }
 
 bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, float maxWidth, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
@@ -136,12 +135,12 @@ void AlertView::onCancelButton(cocos2d::Ref *sender) {
     if (_cancelCallback) {
         _cancelCallback();
     }
-    close();
+    this->removeFromParent();
 }
 
 void AlertView::onConfirmButton(cocos2d::Ref *sender) {
     if (_confirmCallback) {
         _confirmCallback();
     }
-    close();
+    this->removeFromParent();
 }
