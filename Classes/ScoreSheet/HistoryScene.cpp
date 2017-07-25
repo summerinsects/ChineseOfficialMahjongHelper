@@ -317,13 +317,14 @@ static void __modifyRecord(const Record *record) {
 
 void HistoryScene::modifyRecord(const Record *record) {
     if (UNLIKELY(g_records.empty())) {
-        std::thread([record]() {
+        Record recordCopy = *record;
+        std::thread([recordCopy]() {
             std::vector<Record> temp;
             loadRecords(temp);
 
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([record, temp]() mutable {
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([recordCopy, temp]() mutable {
                 g_records.swap(temp);
-                __modifyRecord(record);
+                __modifyRecord(&recordCopy);
             });
         }).detach();
     }
