@@ -690,77 +690,56 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
         return;
     }
 
+    // 未标记主番时，标记凑番
     if (_detail.fan_flag == 0) {
         Node *rootNode = Node::create();
-        rootNode->setContentSize(Size(200.0f, 95.0f));
+        rootNode->setContentSize(Size(200.0f, 120.0f));
 
         Label *label = Label::createWithSystemFont("未标记主番，如下常用凑番可标记", "Arail", 12);
         rootNode->addChild(label);
-        label->setPosition(Vec2(100.0f, 85.0f));
+        label->setPosition(Vec2(100.0f, 110.0f));
         label->setColor(Color3B(0x60, 0x60, 0x60));
         Common::scaleLabelToFitWidth(label, 200.0f);
 
-        const float gap = (200 - 5.0f) / 3.0f;
-        const size_t totalRows = 3;
+        ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+        radioGroup->setAllowedNoSelection(true);
+        rootNode->addChild(radioGroup);
 
-        static ui::Button *buttons[8];
-        memset(buttons, 0, sizeof(buttons));
+        const int totalRows = 4;
+        for (int i = 0; i < 8; ++i) {
+            ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            radioButton->setZoomScale(0.0f);
+            radioButton->ignoreContentAdaptWithSize(false);
+            radioButton->setContentSize(Size(20.0f, 20.0f));
+            radioButton->setPosition(Vec2(10.0f + 100.0f * (i & 1), (totalRows - (i >> 1) - 0.5f) * 25.0f));
+            rootNode->addChild(radioButton);
+            radioGroup->addRadioButton(radioButton);
 
-        std::function<void (Ref *)> onPackedFanButton = [](cocos2d::Ref *sender) {
-            ui::Button *button = (ui::Button *)sender;
-            size_t index = reinterpret_cast<size_t>(button->getUserData());
+            label = Label::createWithSystemFont(GetPackedFanText(i + 1), "Arial", 12);
+            label->setColor(Color3B::BLACK);
+            label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+            radioButton->addChild(label);
+            label->setPosition(Vec2(25.0f, 10.0f));
 
-            // 标记/取消标记
-            bool selected = !!button->getTag();
-            if (selected) {
-                button->setHighlighted(false);
-                button->setTag(false);
-            }
-            else {
-                button->setHighlighted(true);
-                button->setTag(true);
-
-                // 清除其他的标记
-                for (size_t i = 0; i < 8; ++i) {
-                    if (i != index) {
-                        buttons[i]->setHighlighted(false);
-                        buttons[i]->setTag(false);
+            // 这一段是实现RadioButton可以取消选中的
+            radioButton->addTouchEventListener([radioGroup](Ref *sender, ui::Widget::TouchEventType event) {
+                ui::RadioButton *radioButton = (ui::RadioButton *)sender;
+                if (event == ui::Widget::TouchEventType::ENDED) {
+                    if (radioButton->isSelected()) {
+                        // 需要在下一帧调用
+                        radioGroup->scheduleOnce([radioGroup](float) { radioGroup->setSelectedButton(nullptr); }, 0.0f, "deselect");
                     }
                 }
-            }
-        };
-
-        for (size_t i = 0; i < 8; ++i) {
-            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-            button->setScale9Enabled(true);
-            button->setContentSize(Size(gap - 4.0f, 20.0f));
-            button->setTitleColor(Color3B::BLACK);
-            button->setTitleFontSize(12);
-            button->setTitleText(GetPackedFanText(i + 1));
-            button->setUserData(reinterpret_cast<void *>(i));
-            button->setHighlighted(false);
-            button->setTag(false);
-
-            div_t ret = div((int)i, 3);
-            size_t col = ret.rem;
-            size_t row = ret.quot;
-            button->setPosition(Vec2(gap * (col + 0.5f) + 2.0f, (totalRows - row - 0.5f) * 25.0f));
-
-            Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
-
-            rootNode->addChild(button);
-            buttons[i] = button;
-
-            button->addClickEventListener(onPackedFanButton);
+            });
         }
 
-        if (_detail.packed_fan > 0 && _detail.packed_fan <= 8) {
-            onPackedFanButton(buttons[_detail.packed_fan - 1]);
+        uint8_t packedFan = _detail.packed_fan;
+        if (packedFan > 0 && packedFan <= 8) {
+            radioGroup->setSelectedButtonWithoutEvent(packedFan - 1);
         }
 
-        AlertView::showWithNode("记分", rootNode, [this]() {
-            size_t highlight = std::find_if(std::begin(buttons), std::end(buttons), std::bind(&ui::Button::isHighlighted, std::placeholders::_1))
-                - std::begin(buttons);
+        AlertView::showWithNode("记分", rootNode, [this, radioGroup]() {
+            int highlight = radioGroup->getSelectedButtonIndex();
             _detail.packed_fan = static_cast<uint8_t>(highlight + 1);
 
             _okCallback(_detail);
