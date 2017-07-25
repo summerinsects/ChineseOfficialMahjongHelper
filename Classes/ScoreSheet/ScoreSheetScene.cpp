@@ -119,11 +119,12 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Common::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
 
     // 时间label
-    _timeLabel = Label::createWithSystemFont("当前时间", "Arial", 12);
-    this->addChild(_timeLabel);
-    _timeLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    _timeLabel->setPosition(Vec2(origin.x + 5, origin.y + 12));
-    _timeLabel->setColor(Color3B::BLACK);
+    Label *label = Label::createWithSystemFont("当前时间", "Arial", 12);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 5, origin.y + 12));
+    label->setColor(Color3B::BLACK);
+    _timeLabel = label;
 
     // 用来绘制表格线的根结点
     DrawNode *node = DrawNode::create();
@@ -132,10 +133,11 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     const float gap = visibleSize.width / 6;  // 分成6份
     _cellWidth = gap;
 
-    const float cellHeight = std::min<float>((visibleSize.height - 85) / 20, 20);
-    const float tableHeight = cellHeight * 20;
+    const int cellCount = 21;  // 姓名+开局+每圈+累计+16盘+名次=21行
+    const float cellHeight = std::min<float>((visibleSize.height - 85) / cellCount, 20);
+    const float tableHeight = cellHeight * cellCount;
 
-    node->setPosition(Vec2(origin.x, origin.y + (visibleSize.height - 85 - cellHeight * 20) * 0.5f + 25));
+    node->setPosition(Vec2(origin.x, origin.y + (visibleSize.height - 85 - cellHeight * cellCount) * 0.5f + 25));
 
     // 5条竖线
     for (int i = 0; i < 5; ++i) {
@@ -143,8 +145,8 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         node->drawLine(Vec2(x, 0.0f), Vec2(x, tableHeight), Color4F::BLACK);
     }
 
-    // 21条横线
-    for (int i = 0; i < 21; ++i) {
+    // cellCount+1条横线
+    for (int i = 0; i < cellCount + 1; ++i) {
         const float y = cellHeight * i;
         node->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y),
             (i > 0 && i < 16) ? Color4F(0.3f, 0.3f, 0.3f, 1.0f) : Color4F::BLACK);
@@ -155,7 +157,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第1栏：选手姓名
     const float line1Y = tableHeight - cellHeight * 0.5f;
-    Label *label = Label::createWithSystemFont("选手姓名", "Arail", 12);
+    label = Label::createWithSystemFont("选手姓名", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line1Y));
     node->addChild(label);
@@ -164,27 +166,29 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     // 4个用于弹出输入框的AlertLayer及同位置的label
     // 这里不直接使用Button内部Label，因为内部Label在点击后会恢复scale
     for (int i = 0; i < 4; ++i) {
-        ui::Button *button = ui::Button::create();
+        button = ui::Button::create();
         button->setScale9Enabled(true);
         button->setPosition(Vec2(colPosX[i + 1], line1Y));
         button->setContentSize(Size(gap, cellHeight));
         node->addChild(button);
         button->addClickEventListener(std::bind(&ScoreSheetScene::onNameButton, this, std::placeholders::_1, i));
 
-        _nameLabel[i] = Label::createWithSystemFont("", "Arail", 12);
-        _nameLabel[i]->setColor(Color3B::ORANGE);
-        _nameLabel[i]->setPosition(Vec2(colPosX[i + 1], line1Y));
-        node->addChild(_nameLabel[i]);
+        label = Label::createWithSystemFont("", "Arail", 12);
+        label->setColor(Color3B::ORANGE);
+        label->setPosition(Vec2(colPosX[i + 1], line1Y));
+        node->addChild(label);
+        _nameLabel[i] = label;
     }
 
-    _lockButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    node->addChild(_lockButton, -1);
-    _lockButton->setScale9Enabled(true);
-    _lockButton->setContentSize(Size(gap, cellHeight));
-    _lockButton->setTitleFontSize(12);
-    _lockButton->setTitleText("锁定");
-    _lockButton->setPosition(Vec2(colPosX[5], line1Y));
-    _lockButton->addClickEventListener(std::bind(&ScoreSheetScene::onLockButton, this, std::placeholders::_1));
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    node->addChild(button, -1);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(gap, cellHeight));
+    button->setTitleFontSize(12);
+    button->setTitleText("锁定");
+    button->setPosition(Vec2(colPosX[5], line1Y));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onLockButton, this, std::placeholders::_1));
+    _lockButton = button;
 
     // 第2、3栏：座位
     const float line2Y = tableHeight - cellHeight * 1.5f;
@@ -207,23 +211,24 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第4栏：累计
     const float line4Y = tableHeight - cellHeight * 3.5f;
-    label = Label::createWithSystemFont("累计", "Arail", 12);
+    label = Label::createWithSystemFont("比赛分", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line4Y));
     node->addChild(label);
     Common::scaleLabelToFitWidth(label, gap - 4);
 
-    label = Label::createWithSystemFont("备注", "Arail", 12);
+    label = Label::createWithSystemFont("番种备注", "Arail", 12);
     label->setColor(Color3B::BLACK);
     label->setPosition(Vec2(colPosX[5], line4Y));
     node->addChild(label);
     Common::scaleLabelToFitWidth(label, gap - 4);
 
     for (int i = 0; i < 4; ++i) {
-        _totalLabel[i] = Label::createWithSystemFont("+0", "Arail", 12);
-        _totalLabel[i]->setColor(Color3B::ORANGE);
-        _totalLabel[i]->setPosition(Vec2(colPosX[i + 1], line4Y));
-        node->addChild(_totalLabel[i]);
+        label = Label::createWithSystemFont("+0", "Arail", 12);
+        label->setColor(Color3B::ORANGE);
+        label->setPosition(Vec2(colPosX[i + 1], line4Y));
+        node->addChild(label);
+        _totalLabel[i] = label;
 
         ui::Button *button = ui::Button::create();
         button->setScale9Enabled(true);
@@ -235,7 +240,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第5~20栏，东风东~北风北的计分
     for (int k = 0; k < 16; ++k) {
-        const float y = 10 + (15 - k) * cellHeight;
+        const float y = 10 + (cellCount - 5 - k) * cellHeight;
 
         // 东风东~北风北名字
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
@@ -252,7 +257,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         }
 
         // 计分按钮
-        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         node->addChild(button, -1);
         button->setScale9Enabled(true);
         button->setContentSize(Size(gap, cellHeight));
@@ -265,7 +270,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         _recordButton[k] = button;
 
         // 备注的番种label
-        Label *label = Label::createWithSystemFont("", "Arail", 12);
+        label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(Color3B(0x60, 0x60, 0x60));
         label->setPosition(Vec2(colPosX[5], y));
         node->addChild(label);
@@ -281,6 +286,24 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         button->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1, k));
         button->setEnabled(false);
         _detailButton[k] = button;
+    }
+
+    // 第21栏：名次
+    const float line21Y = 10 + (cellCount - 21) * cellHeight;
+
+    label = Label::createWithSystemFont("名次", "Arail", 12);
+    label->setColor(Color3B::ORANGE);
+    label->setPosition(Vec2(colPosX[0], line21Y));
+    node->addChild(label);
+    Common::scaleLabelToFitWidth(label, gap - 4);
+
+    for (int i = 0; i < 4; ++i) {
+        label = Label::createWithSystemFont("", "Arail", 12);
+        label->setColor(Color3B::ORANGE);
+        label->setPosition(Vec2(colPosX[i + 1], line21Y));
+        node->addChild(label);
+
+        _rankLabels[i] = label;
     }
 
     // 恢复界面数据
@@ -319,9 +342,27 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     _detailButton[handIdx]->setEnabled(true);
 
     Label *label = _fanNameLabel[handIdx];
-    label->setString(GetFanText(detail));
+    label->setString(GetShortFanText(detail));
     label->setVisible(true);
     Common::scaleLabelToFitWidth(label, _cellWidth - 4);
+}
+
+void ScoreSheetScene::refreshRank() {
+    // 计算名次
+    const char *text[] = { "一", "二", "三", "四" };
+    int rank[4] = {0};
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (i == j) continue;
+            if (_totalScores[i] < _totalScores[j]) ++rank[i];
+            if (_totalScores[i] == _totalScores[j] && i > j) ++rank[i];
+        }
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        _rankLabels[i]->setVisible(true);
+        _rankLabels[i]->setString(text[rank[i]]);
+    }
 }
 
 void ScoreSheetScene::refreshStartTime() {
@@ -374,10 +415,13 @@ void ScoreSheetScene::recover() {
         cleanRow(i);
     }
 
-    // 刷新总分label
+    // 刷新总分和名次label
     for (int i = 0; i < 4; ++i) {
         _totalLabel[i]->setString(Common::format<32>("%+d", _totalScores[i]));
+        _rankLabels[i]->setVisible(false);
     }
+
+    refreshRank();
 
     // 如果不是北风北，则显示下一行的计分按钮
     if (_record->current_index < 16) {
@@ -459,9 +503,9 @@ void ScoreSheetScene::editName(size_t idx) {
         }
     }, nullptr);
 
-    Director::getInstance()->getScheduler()->schedule([editBox](float) {
+    editBox->scheduleOnce([editBox](float) {
         editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
-    }, editBox, 0.0f, 0, 0.0f, false, "open_keyboard");
+    }, 0.0f, "open_keyboard");
 }
 
 void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
@@ -524,6 +568,9 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
             _totalLabel[i]->setString(Common::format<32>("%+d", _totalScores[i]));
         }
 
+        // 更新名次
+        refreshRank();
+
         if (isModify) {
             if (_record->end_time != 0) {
                 HistoryScene::modifyRecord(_record);
@@ -552,35 +599,18 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
 static std::string stringifyDetail(const Record *record, size_t handIdx) {
     const Record::Detail &detail = record->detail[handIdx];
 
+    std::string fanText = GetLongFanText(detail);
+
     std::string ret;
 
     int wc = detail.win_claim;
     int winIndex = WIN_INDEX(wc);
     int claimIndex = CLAIM_INDEX(wc);
     if (winIndex == claimIndex) {
-        ret.append(Common::format<128>("「%s」自摸%d番。\n", record->name[winIndex], detail.score));
+        ret.append(Common::format<128>("「%s」自摸%s%d番。\n", record->name[winIndex], fanText.c_str(), detail.score));
     }
     else {
-        ret.append(Common::format<128>("「%s」和%d番，「%s」点炮。\n", record->name[winIndex], detail.score, record->name[claimIndex]));
-    }
-
-    uint64_t fanFlag = detail.fan_flag;
-    if (fanFlag != 0) {
-        std::string fanText;
-        for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-            if (TEST_FAN(fanFlag, n)) {
-                unsigned idx = n;
-                fanText.append("「");
-                fanText.append(mahjong::fan_name[idx]);
-                fanText.append("」");
-            }
-        }
-
-        if (!fanText.empty()) {
-            ret.append("和出番种：");
-            ret.append(fanText);
-            ret.append("等。\n");
-        }
+        ret.append(Common::format<128>("「%s」和%s%d番，「%s」点炮。\n", record->name[winIndex], fanText.c_str(), detail.score, record->name[claimIndex]));
     }
 
     if (detail.false_win != 0) {
@@ -609,65 +639,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
     std::string message = stringifyDetail(_record, handIdx);
     message.append("\n是否需要修改这盘的记录？");
 
-    if (detail.win_hand.tile_count == 0 || detail.win_hand.win_tile == 0) {
-        AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"), message, 12,
-            std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
-        return;
-    }
-
-    mahjong::calculate_param_t param;
-    RecordScene::_WinHandToCalculateParam(detail.win_hand, param);
-
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width * 0.8f - 10;
-
-    // 花（使用emoji代码）
-    Label *flowerLabel = nullptr;
-    if (param.flower_count > 0) {
-        flowerLabel = Label::createWithSystemFont(std::string(EMOJI_FLOWER_8, param.flower_count * (sizeof(EMOJI_FLOWER) - 1)), "Arial", 12);
-        flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-        flowerLabel->setColor(Color3B(224, 45, 45));
-#endif
-    }
-
-    // 手牌
-    Node *tilesNode = HandTilesWidget::createStaticNode(param.hand_tiles, param.win_tile);
-    Size tilesNodeSize = tilesNode->getContentSize();
-    if (tilesNodeSize.width > maxWidth) {
-        const float scale = maxWidth / tilesNodeSize.width;
-        tilesNode->setScale(scale);
-        tilesNodeSize.width = maxWidth;
-        tilesNodeSize.height *= scale;
-    }
-
-    // 描述文本
-    Label *label = Label::createWithSystemFont(message, "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
-        label->setDimensions(maxWidth, 0);
-    }
-    const Size &labelSize = label->getContentSize();
-
-    Node *container = Node::create();
-    if (param.flower_count > 0) {
-        const Size &flowerSize = flowerLabel->getContentSize();
-        container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height));
-
-        container->addChild(flowerLabel);
-        flowerLabel->setPosition(Vec2(0, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
-    }
-    else {
-        container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height));
-    }
-
-    container->addChild(tilesNode);
-    tilesNode->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 10 + tilesNodeSize.height * 0.5f));
-
-    container->addChild(label);
-    label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f));
-
-    AlertView::showWithNode(std::string(handNameText[handIdx]).append("详情"), container,
+    AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"), message, 12,
         std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
 }
 
@@ -686,7 +658,8 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
         "3. 对于已经记分的，点击「备注」一栏可修改记录。\n"
         "4. 对局未完成时，点击「累计」一栏处，可显示分差并有快捷计算追分选项。\n"
         "5. 「北风北」记分完成后，会自动添加入「历史记录」。\n"
-        "6. 「历史记录」里的内容只要不卸载程序就会一直保存。",
+        "6. 「历史记录」里的内容只要不卸载程序就会一直保存。\n"
+        "7. 「名次」一栏对于小分相同的，简便起见按开局座位排列。",
         10, nullptr, nullptr);
 }
 
@@ -716,16 +689,55 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         return;
     }
 
-    AlertView::showWithMessage("清空表格", "在清空表格之前，请选择「保存当前记录」或「丢弃当前记录」", 12,
-        [this]() {
-        AlertView::showWithMessage("清空表格", "点击「确认」将余下盘数标记为荒庄，并保存到历史记录，\n点击「取消」则直接丢弃当前记录，不保存。", 12,
-            [this]() {
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(200.0f, 70.0f));
+
+    Label *label = Label::createWithSystemFont("在清空表格之前，请选择「保存」或「丢弃」", "Arail", 12);
+    rootNode->addChild(label);
+    label->setPosition(Vec2(100.0f, 60.0f));
+    label->setColor(Color3B(0x60, 0x60, 0x60));
+    Common::scaleLabelToFitWidth(label, 200.0f);
+
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    rootNode->addChild(radioGroup);
+
+    ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    radioButton->setZoomScale(0.0f);
+    radioButton->ignoreContentAdaptWithSize(false);
+    radioButton->setContentSize(Size(20.0f, 20.0f));
+    radioButton->setPosition(Vec2(10.0f, 60.0f - 1 * 25.0f));
+    rootNode->addChild(radioButton);
+    radioGroup->addRadioButton(radioButton);
+
+    label = Label::createWithSystemFont("保存，将未打完盘数标记为荒庄", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    Common::scaleLabelToFitWidth(label, 175.0f);
+    radioButton->addChild(label);
+    label->setPosition(Vec2(25.0f, 10.0f));
+
+    radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    radioButton->setZoomScale(0.0f);
+    radioButton->ignoreContentAdaptWithSize(false);
+    radioButton->setContentSize(Size(20.0f, 20.0f));
+    radioButton->setPosition(Vec2(10.0f, 60.0f - 2 * 25.0f));
+    rootNode->addChild(radioButton);
+    radioGroup->addRadioButton(radioButton);
+
+    label = Label::createWithSystemFont("丢弃，不保存当前一局记录", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    Common::scaleLabelToFitWidth(label, 175.0f);
+    radioButton->addChild(label);
+    label->setPosition(Vec2(25.0f, 10.0f));
+
+    AlertView::showWithNode("清空表格", rootNode, [this, radioGroup]() {
+        if (radioGroup->getSelectedButtonIndex() == 0) {
             _record->current_index = 16;
             _record->end_time = time(nullptr);
             HistoryScene::modifyRecord(_record);
-
-            reset();
-        }, std::bind(&ScoreSheetScene::reset, this));
+        }
+        reset();
     }, nullptr);
 }
 

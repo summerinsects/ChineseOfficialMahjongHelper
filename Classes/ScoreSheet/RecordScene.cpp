@@ -6,11 +6,6 @@
 #include "../common.h"
 #include "../widget/AlertView.h"
 #include "../widget/CWTableView.h"
-#include "../widget/HandTilesWidget.h"
-#include "../widget/ExtraInfoWidget.h"
-#include "../widget/TilesKeyboard.h"
-#include "../widget/CWEditBoxDelegate.h"
-#include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 
 USING_NS_CC;
@@ -233,33 +228,33 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(topNode);
 
     // 说明
-    label = Label::createWithSystemFont("标记4番以上番种（未做排斥检测）", "Arial", 12);
+    label = Label::createWithSystemFont("标记主番（4番以上，未做排斥检测）", "Arial", 12);
     label->setColor(Color3B::BLACK);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 65.0f));
 
-    label = Label::createWithSystemFont("标记番种可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
+    label = Label::createWithSystemFont("标记主番可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 40.0f));
 
-    // 记录和牌
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("记录和牌");
-    button->addClickEventListener(std::bind(&RecordScene::onTilesButton, this, std::placeholders::_1));
-    topNode->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 35.0f, 65.0f));
-
     // 展开/收起
+    ui::Button *layoutButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    layoutButton->setScale9Enabled(true);
+    layoutButton->setContentSize(Size(55.0f, 20.0f));
+    layoutButton->setTitleFontSize(12);
+    topNode->addChild(layoutButton);
+    layoutButton->setPosition(Vec2(visibleSize.width - 35.0f, 65.0f));
+
+    // 常用凑番
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
+    button->setTitleText("常用凑番");
+    button->addClickEventListener(std::bind(&RecordScene::onPackedFanButton, this, std::placeholders::_1));
     topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35.0f, 40.0f));
 
@@ -276,22 +271,22 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(tableView);
     _tableView = tableView;
 
-    std::function<void (Ref *)> layoutChildren = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
-        ui::Button *button = (ui::Button *)sender;
+    std::function<void (Ref *)> onLayoutButton = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
+        ui::Button *layoutButton = (ui::Button *)sender;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Size layoutSize;
         layoutSize.width = visibleSize.width;
-        if (button->getUserData()) {
+        if (layoutButton->getUserData()) {
             layoutSize.height = visibleSize.height - 150;
-            button->setUserData(reinterpret_cast<void *>(false));
-            button->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
+            layoutButton->setUserData(reinterpret_cast<void *>(false));
+            layoutButton->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
             radioNode->setVisible(false);
         }
         else {
             layoutSize.height = visibleSize.height - 240;
-            button->setUserData(reinterpret_cast<void *>(true));
-            button->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E展开");
+            layoutButton->setUserData(reinterpret_cast<void *>(true));
+            layoutButton->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E展开");
             radioNode->setVisible(true);
         }
 
@@ -300,8 +295,8 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         tableView->setContentSize(Size(visibleSize.width - 5, layoutSize.height - 75));
         tableView->reloadData();
     };
-    layoutChildren(button);
-    button->addClickEventListener(layoutChildren);
+    onLayoutButton(layoutButton);
+    layoutButton->addClickEventListener(onLayoutButton);
 
     // 转到
     label = Label::createWithSystemFont("转到", "Arial", 12);
@@ -406,7 +401,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         for (size_t k = 0; k < 9; ++k) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
-            button->setContentSize(Size(gap - 5.0f, 20.0f));
+            button->setContentSize(Size(gap - 4.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
             button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1));
@@ -451,7 +446,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             button->setTag(true);
         }
 
-        Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 10.0f);
+        Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
     }
 
     return cell;
@@ -577,7 +572,7 @@ void RecordScene::updateScoreLabel() {
         }
     }
     else {
-        // 四位选手的总分加起来和不为0说明还没有选择是自摸还是点炮
+        // 四位选手的总分加起来和不为0，则说明还没有选择是自摸还是点炮
         _okButton->setEnabled(false);
     }
 }
@@ -601,43 +596,6 @@ void RecordScene::onPlusButton(cocos2d::Ref *sender, int delta) {
     snprintf(buf, sizeof(buf), "%d", winScore);
     _editBox->setText(buf);
     updateScoreLabel();
-}
-
-void RecordScene::_WinHandToCalculateParam(const Record::Detail::WinHand &winHand, mahjong::calculate_param_t &param) {
-    memset(&param, 0, sizeof(mahjong::calculate_param_t));
-    std::copy(winHand.fixed_packs, winHand.fixed_packs + winHand.pack_count,
-        param.hand_tiles.fixed_packs);
-    param.hand_tiles.pack_count = winHand.pack_count;
-    std::copy(winHand.standing_tiles, winHand.standing_tiles + winHand.tile_count,
-        param.hand_tiles.standing_tiles);
-    param.hand_tiles.tile_count = winHand.tile_count;
-    param.win_tile = winHand.win_tile;
-    param.flower_count = winHand.flower_count;
-    param.ext_cond.win_flag = winHand.win_flag;
-}
-
-void RecordScene::_CalculateParamToWinHand(const mahjong::calculate_param_t &param, Record::Detail::WinHand &winHand) {
-    memset(&winHand, 0, sizeof(Record::Detail::WinHand));
-    std::copy(param.hand_tiles.fixed_packs, param.hand_tiles.fixed_packs + param.hand_tiles.pack_count,
-        winHand.fixed_packs);
-    winHand.pack_count = param.hand_tiles.pack_count;
-    std::copy(param.hand_tiles.standing_tiles, param.hand_tiles.standing_tiles + param.hand_tiles.tile_count,
-        winHand.standing_tiles);
-    winHand.tile_count = param.hand_tiles.tile_count;
-    winHand.win_tile = param.win_tile;
-    winHand.flower_count = param.flower_count;
-    winHand.win_flag = param.ext_cond.win_flag;
-}
-
-void RecordScene::onTilesButton(cocos2d::Ref *sender) {
-    if (_drawBox->isSelected()) {
-        AlertView::showWithMessage("记录和牌", "荒庄时不能记录和牌", 12, nullptr, nullptr);
-        return;
-    }
-
-    mahjong::calculate_param_t param;
-    _WinHandToCalculateParam(_detail.win_hand, param);
-    showCalculator(param);
 }
 
 void RecordScene::onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
@@ -694,6 +652,53 @@ void RecordScene::onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::Eve
     updateScoreLabel();
 }
 
+void RecordScene::onPackedFanButton(cocos2d::Ref *sender) {
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(200.0f, 100.0f));
+
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    radioGroup->setAllowedNoSelection(true);
+    rootNode->addChild(radioGroup);
+
+    const int totalRows = 4;  // 每行2个，共4行
+    for (int i = 0; i < 8; ++i) {
+        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(10.0f + 100.0f * (i & 1), (totalRows - (i >> 1) - 0.5f) * 25.0f));
+        rootNode->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        Label *label = Label::createWithSystemFont(GetPackedFanText(i + 1), "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+
+        // 这一段是实现RadioButton可以取消选中的
+        radioButton->addTouchEventListener([radioGroup](Ref *sender, ui::Widget::TouchEventType event) {
+            ui::RadioButton *radioButton = (ui::RadioButton *)sender;
+            if (event == ui::Widget::TouchEventType::ENDED) {
+                if (radioButton->isSelected()) {
+                    // 需要在下一帧调用
+                    radioGroup->scheduleOnce([radioGroup](float) { radioGroup->setSelectedButton(nullptr); }, 0.0f, "deselect");
+                }
+            }
+        });
+    }
+
+    uint8_t packedFan = _detail.packed_fan;
+    if (packedFan > 0 && packedFan <= 8) {
+        radioGroup->setSelectedButtonWithoutEvent(packedFan - 1);
+    }
+
+    AlertView::showWithNode("常用凑番", rootNode, [this, radioGroup]() {
+        int highlight = radioGroup->getSelectedButtonIndex();
+        _detail.packed_fan = static_cast<uint8_t>(highlight + 1);
+    }, nullptr);
+}
+
 void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t index = reinterpret_cast<size_t>(button->getUserData());
@@ -711,7 +716,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
         SET_FAN(_detail.fan_flag, index);
     }
 
-    // 增加番数
+    // 计算番数
     int prevWinScore = atoi(_editBox->getText());
     int currentWinScore = 0;
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
@@ -721,6 +726,8 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
         }
     }
     currentWinScore = std::max(8, currentWinScore);
+
+    // 增加番数
     if (currentWinScore > prevWinScore) {
         char str[16];
         snprintf(str, sizeof(str), "%d", currentWinScore);
@@ -733,8 +740,8 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
     if (_drawBox->isSelected() && _detail.fan_flag != 0) {
         AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", 12,
             [this]() {
-            memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
             _detail.fan_flag = 0;
+            _detail.packed_fan = 0;
             _okCallback(_detail);
             Director::getInstance()->popScene();
         }, nullptr);
@@ -743,246 +750,4 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
 
     _okCallback(_detail);
     Director::getInstance()->popScene();
-}
-
-static const mahjong::wind_t seatWindTable[16][4] = {
-    { mahjong::wind_t::EAST, mahjong::wind_t::SOUTH, mahjong::wind_t::WEST, mahjong::wind_t::NORTH },
-    { mahjong::wind_t::NORTH, mahjong::wind_t::EAST, mahjong::wind_t::SOUTH, mahjong::wind_t::WEST },
-    { mahjong::wind_t::WEST, mahjong::wind_t::NORTH, mahjong::wind_t::EAST, mahjong::wind_t::SOUTH },
-    { mahjong::wind_t::SOUTH, mahjong::wind_t::WEST, mahjong::wind_t::NORTH, mahjong::wind_t::EAST },
-
-    { mahjong::wind_t::SOUTH, mahjong::wind_t::EAST, mahjong::wind_t::NORTH, mahjong::wind_t::WEST },
-    { mahjong::wind_t::EAST, mahjong::wind_t::NORTH, mahjong::wind_t::WEST, mahjong::wind_t::SOUTH },
-    { mahjong::wind_t::NORTH, mahjong::wind_t::WEST, mahjong::wind_t::SOUTH, mahjong::wind_t::EAST },
-    { mahjong::wind_t::WEST, mahjong::wind_t::SOUTH, mahjong::wind_t::EAST, mahjong::wind_t::NORTH },
-
-    { mahjong::wind_t::NORTH, mahjong::wind_t::WEST, mahjong::wind_t::EAST, mahjong::wind_t::SOUTH },
-    { mahjong::wind_t::WEST, mahjong::wind_t::SOUTH, mahjong::wind_t::NORTH, mahjong::wind_t::EAST },
-    { mahjong::wind_t::SOUTH, mahjong::wind_t::EAST, mahjong::wind_t::WEST, mahjong::wind_t::NORTH },
-    { mahjong::wind_t::EAST, mahjong::wind_t::NORTH, mahjong::wind_t::SOUTH, mahjong::wind_t::WEST },
-
-    { mahjong::wind_t::WEST, mahjong::wind_t::NORTH, mahjong::wind_t::SOUTH, mahjong::wind_t::EAST },
-    { mahjong::wind_t::SOUTH, mahjong::wind_t::WEST, mahjong::wind_t::EAST, mahjong::wind_t::NORTH },
-    { mahjong::wind_t::EAST, mahjong::wind_t::SOUTH, mahjong::wind_t::NORTH, mahjong::wind_t::WEST },
-    { mahjong::wind_t::NORTH, mahjong::wind_t::EAST, mahjong::wind_t::WEST, mahjong::wind_t::SOUTH }
-};
-
-void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width - 20;
-
-    ui::EditBox *editBox = ui::EditBox::create(Size(maxWidth, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setPlaceholderFontColor(Color4B::GRAY);
-    editBox->setPlaceHolder("输入手牌");
-
-    // 选牌面板和其他信息的相关控件
-    HandTilesWidget *handTiles = HandTilesWidget::create();
-    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
-
-    extraInfo->setFlowerCount(param.flower_count);
-    extraInfo->setWinFlag(param.ext_cond.win_flag);
-
-    // 设置圈风
-    extraInfo->setPrevalentWind(static_cast<mahjong::wind_t>(_handIdx / 4));
-
-    int winIndex = _winGroup->getSelectedButtonIndex();
-    int claimIndex = _claimGroup->getSelectedButtonIndex();
-    if (winIndex != -1) {  // 有人和牌
-        // 设置门风
-        extraInfo->setSeatWind(seatWindTable[_handIdx][winIndex]);
-
-        // 自摸
-        extraInfo->setWinFlag(claimIndex != winIndex ? WIN_FLAG_DISCARD : WIN_FLAG_SELF_DRAWN);
-    }
-
-    // 缩放
-    Size handTilesSize = handTiles->getContentSize();
-    const float handTilesScale = maxWidth / handTilesSize.width;
-    handTiles->setScale(handTilesScale);
-    handTilesSize = Size(maxWidth, handTilesSize.height * handTilesScale);
-
-    Size extraInfoSize = extraInfo->getContentSize();
-    const float extraInfoScale = maxWidth / extraInfoSize.width;
-    extraInfo->setScale(extraInfoScale);
-    extraInfoSize = Size(maxWidth, extraInfoSize.height * extraInfoScale);
-
-    // 布局在rootNode上
-    Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(maxWidth, handTilesSize.height + extraInfoSize.height + 5 + 25));
-    rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(maxWidth * 0.5f, handTilesSize.height + extraInfoSize.height + 20));
-    rootNode->addChild(handTiles);
-    handTiles->setPosition(Vec2(maxWidth * 0.5f, handTilesSize.height * 0.5f + extraInfoSize.height + 5));
-    rootNode->addChild(extraInfo);
-    extraInfo->setPosition(Vec2(maxWidth * 0.5f, extraInfoSize.height * 0.5f));
-
-    if (param.hand_tiles.tile_count != 0 && param.win_tile != 0) {
-        handTiles->setData(param.hand_tiles, param.win_tile);
-
-        char str[64];
-        long ret = mahjong::hand_tiles_to_string(&param.hand_tiles, str, sizeof(str));
-        mahjong::tiles_to_string(&param.win_tile, 1, str + ret, sizeof(str) - ret);
-        editBox->setText(str);
-
-        ExtraInfoWidget::RefreshByWinTile rt;
-        rt.getWinTile = [&param]() { return param.win_tile; };
-        rt.isStandingTilesContainsServingTile = std::bind(&HandTilesWidget::isStandingTilesContainsServingTile, handTiles);
-        rt.countServingTileInFixedPacks = std::bind(&HandTilesWidget::countServingTileInFixedPacks, handTiles);
-        rt.isFixedPacksContainsKong = std::bind(&HandTilesWidget::isFixedPacksContainsKong, handTiles);
-        extraInfo->refreshByWinTile(rt);
-    }
-
-    TilesKeyboard::hookEditBox(editBox);
-
-    // EditBox的代理
-    std::shared_ptr<cw::EditBoxDelegate> delegate = std::make_shared<cw::EditBoxDelegate>(
-        [handTiles, extraInfo](ui::EditBox *editBox) {
-        const char *input = editBox->getText();
-        const char *errorStr = TilesKeyboard::parseInput(input,
-            [handTiles, extraInfo](const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t serving_tile) {
-            handTiles->setData(hand_tiles, serving_tile);
-
-            ExtraInfoWidget::RefreshByWinTile rt;
-            rt.getWinTile = std::bind(&HandTilesWidget::getServingTile, handTiles);
-            rt.isStandingTilesContainsServingTile = std::bind(&HandTilesWidget::isStandingTilesContainsServingTile, handTiles);
-            rt.countServingTileInFixedPacks = std::bind(&HandTilesWidget::countServingTileInFixedPacks, handTiles);
-            rt.isFixedPacksContainsKong = std::bind(&HandTilesWidget::isFixedPacksContainsKong, handTiles);
-            extraInfo->refreshByWinTile(rt);
-        });
-
-        if (errorStr != nullptr) {
-            const std::string str = input;
-            AlertView::showWithMessage("直接输入牌", errorStr, 12, nullptr, nullptr);
-        }
-    });
-    editBox->setDelegate(delegate.get());
-
-    // 通过AlertView显示出来
-    AlertView::showWithNode("记录和牌", rootNode, maxWidth, [this, handTiles, extraInfo, param, delegate]() {
-        calculate(handTiles, extraInfo, param);
-    }, nullptr);
-}
-
-// in FanCalculatorScene.cpp
-cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SIZE], int fontSize, float resultAreaWidth);
-
-void RecordScene::calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraInfo, const mahjong::calculate_param_t &param) {
-    mahjong::calculate_param_t temp = { 0 };
-    handTiles->getData(&temp.hand_tiles, &temp.win_tile);
-    if (temp.win_tile == 0 && temp.hand_tiles.tile_count == 0 && temp.hand_tiles.pack_count == 0) {
-        AlertView::showWithMessage("记录和牌", "确定不记录和牌吗？", 12,
-            [this]() {
-                memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
-                _detail.fan_flag = 0;
-                refresh();
-            },
-            std::bind(&RecordScene::showCalculator, this, param));
-        return;
-    }
-
-    temp.flower_count = extraInfo->getFlowerCount();
-    if (temp.flower_count > 8) {
-        AlertView::showWithMessage("记录和牌", "花牌数的范围为0~8", 12, std::bind(&RecordScene::showCalculator, this, param), nullptr);
-        return;
-    }
-
-    if (temp.win_tile == 0) {
-        AlertView::showWithMessage("记录和牌", "牌张数错误", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
-        return;
-    }
-
-    std::sort(temp.hand_tiles.standing_tiles, temp.hand_tiles.standing_tiles + temp.hand_tiles.tile_count);
-
-    long fan_table[mahjong::FAN_TABLE_SIZE] = { 0 };
-
-    // 获取绝张、杠开、抢杠、海底信息
-    temp.ext_cond.win_flag = extraInfo->getWinFlag();
-
-    // 获取圈风门风
-    temp.ext_cond.prevalent_wind = extraInfo->getPrevalentWind();
-    temp.ext_cond.seat_wind = extraInfo->getSeatWind();
-
-    // 算番
-    int fan = calculate_fan(&temp, fan_table);
-
-    if (fan == ERROR_NOT_WIN) {
-        AlertView::showWithMessage("记录和牌", "诈和", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
-        return;
-    }
-    if (fan == ERROR_WRONG_TILES_COUNT) {
-        AlertView::showWithMessage("记录和牌", "牌张数错误", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
-        return;
-    }
-    if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
-        AlertView::showWithMessage("记录和牌", "同一种牌最多只能使用4枚", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
-        return;
-    }
-
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width * 0.8f - 10;
-
-    Node *innerNode = createFanResultNode(fan_table, 12, maxWidth);
-    const Size &fanResultSize = innerNode->getContentSize();
-
-    // 花（使用emoji代码）
-    Label *flowerLabel = nullptr;
-    if (temp.flower_count > 0) {
-        flowerLabel = Label::createWithSystemFont(std::string(EMOJI_FLOWER_8, temp.flower_count * (sizeof(EMOJI_FLOWER) - 1)), "Arial", 12);
-        flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-        flowerLabel->setColor(Color3B(224, 45, 45));
-#endif
-    }
-
-    // 手牌
-    Node *tilesNode = HandTilesWidget::createStaticNode(temp.hand_tiles, temp.win_tile);
-    Size tilesNodeSize = tilesNode->getContentSize();
-    if (tilesNodeSize.width > maxWidth) {
-        const float scale = maxWidth / tilesNodeSize.width;
-        tilesNode->setScale(scale);
-        tilesNodeSize.width = maxWidth;
-        tilesNodeSize.height *= scale;
-    }
-    innerNode->addChild(tilesNode);
-    tilesNode->setPosition(Vec2(maxWidth * 0.5f, fanResultSize.height + 5 + tilesNodeSize.height * 0.5f));
-
-    if (temp.flower_count > 0) {
-        innerNode->addChild(flowerLabel);
-        const Size &flowerSize = flowerLabel->getContentSize();
-        flowerLabel->setPosition(Vec2(0, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
-
-        innerNode->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height));
-    }
-    else {
-        innerNode->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height));
-    }
-
-    uint64_t fanFlag = 0;
-    for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-        if (fan_table[n]) {
-            SET_FAN(fanFlag, n);
-        }
-    }
-
-    AlertView::showWithNode("记录和牌", innerNode, [this, temp, fan, fanFlag]() {
-        _detail.score = std::max(fan, 8);
-        _detail.fan_flag = fanFlag;
-
-        int winIndex = _winGroup->getSelectedButtonIndex();
-        int claimIndex = _claimGroup->getSelectedButtonIndex();
-        if (winIndex != -1) {  // 有人和牌
-            if (claimIndex != winIndex) {
-                if (temp.ext_cond.win_flag & WIN_FLAG_SELF_DRAWN) {  // 自摸
-                    _claimGroup->setSelectedButton(winIndex);
-                }
-            }
-        }
-
-        _CalculateParamToWinHand(temp, _detail.win_hand);
-        refresh();
-    }, std::bind(&RecordScene::showCalculator, this, temp));
 }

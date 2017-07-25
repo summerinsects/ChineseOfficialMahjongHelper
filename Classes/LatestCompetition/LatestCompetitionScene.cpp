@@ -41,7 +41,7 @@ bool LatestCompetitionScene::init() {
     label->setVisible(false);
     _emptyLabel = label;
 
-    requestCompetitions();
+    this->scheduleOnce([this](float) { requestCompetitions(); }, 0.0f, "request_competitions");
 
     return true;
 }
@@ -57,9 +57,11 @@ void LatestCompetitionScene::requestCompetitions() {
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
-        if (LIKELY(thiz->getReferenceCount() > 2)) {
-            loadingView->removeFromParent();
+        if (UNLIKELY(!thiz->isRunning())) {
+            return;
         }
+
+        loadingView->removeFromParent();
 
         if (response == nullptr) {
             AlertView::showWithMessage("提示", "获取近期赛事失败", 12, std::bind(&LatestCompetitionScene::requestCompetitions, thiz.get()), nullptr);

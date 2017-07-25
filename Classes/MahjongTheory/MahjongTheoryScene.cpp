@@ -151,7 +151,8 @@ bool MahjongTheoryScene::init() {
     this->addChild(_tableView);
 
     srand((unsigned)time(nullptr));
-    setRandomInput();
+
+    this->scheduleOnce([this](float) { setRandomInput(); }, 0.0f, "set_random_input");
 
     return true;
 }
@@ -436,12 +437,12 @@ void MahjongTheoryScene::calculate() {
             if (result->shanten != std::numeric_limits<int>::max()) {
                 thiz->_allResults.push_back(*result);
             }
-            return (thiz->getReferenceCount() > 2);
+            return (thiz->isRunning());
         });
 
         // 调回cocos线程
         Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-            if (thiz->getReferenceCount() > 2) {
+            if (thiz->isRunning()) {
                 thiz->filterResultsByFlag(thiz->getFilterFlag());
                 thiz->_tableView->reloadData();
                 loadingView->removeFromParent();

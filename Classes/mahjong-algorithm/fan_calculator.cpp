@@ -457,18 +457,16 @@ static fan_t get_1_chow_extra(tile_t tile0, tile_t tile1, tile_t tile2, tile_t t
     fan_t fan0 = get_2_chows_fan(tile0, tile_extra);
     fan_t fan1 = get_2_chows_fan(tile1, tile_extra);
     fan_t fan2 = get_2_chows_fan(tile2, tile_extra);
-    if (fan0 == PURE_DOUBLE_CHOW || fan1 == PURE_DOUBLE_CHOW || fan2 == PURE_DOUBLE_CHOW) {
-        return PURE_DOUBLE_CHOW;
-    }
-    if (fan0 == MIXED_DOUBLE_CHOW || fan1 == MIXED_DOUBLE_CHOW || fan2 == MIXED_DOUBLE_CHOW) {
-        return MIXED_DOUBLE_CHOW;
-    }
-    if (fan0 == SHORT_STRAIGHT || fan1 == SHORT_STRAIGHT || fan2 == SHORT_STRAIGHT) {
-        return SHORT_STRAIGHT;
-    }
-    if (fan0 == TWO_TERMINAL_CHOWS || fan1 == TWO_TERMINAL_CHOWS || fan2 == TWO_TERMINAL_CHOWS) {
-        return TWO_TERMINAL_CHOWS;
-    }
+
+#define TEST_RETURN_FAN(fan_) \
+    if (fan0 == fan_ || fan1 == fan_ || fan2 == fan_) return fan_
+
+    TEST_RETURN_FAN(PURE_DOUBLE_CHOW);  // 一般高
+    TEST_RETURN_FAN(MIXED_DOUBLE_CHOW);  // 喜相逢
+    TEST_RETURN_FAN(SHORT_STRAIGHT);  // 连六
+    TEST_RETURN_FAN(TWO_TERMINAL_CHOWS);  // 老少副
+
+#undef TEST_RETURN_FAN
     return FAN_NONE;
 }
 

@@ -66,59 +66,61 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
         return true;
     }
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    this->scheduleOnce([this, idx](float) {
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    LoadingView *loadingView = LoadingView::create();
-    this->addChild(loadingView);
-    loadingView->setPosition(origin);
+        LoadingView *loadingView = LoadingView::create();
+        this->addChild(loadingView);
+        loadingView->setPosition(origin);
 
 #if HAS_WEBVIEW
-    float scale = 1.0f;
-    float maxWidth = (visibleSize.width - 10) / 18;
-    if (maxWidth < 25) {
-        scale = maxWidth / TILE_WIDTH;
-    }
+        float scale = 1.0f;
+        float maxWidth = (visibleSize.width - 10) / 18;
+        if (maxWidth < 25) {
+            scale = maxWidth / TILE_WIDTH;
+        }
 #else
-    float scale = 1.0f / Director::getInstance()->getContentScaleFactor();
+        float scale = 1.0f / Director::getInstance()->getContentScaleFactor();
 #endif
 
-    auto thiz = makeRef(this);  // 保证线程回来之前不析构
-    std::thread([thiz, idx, scale, loadingView]() {
-        // 读文件
-        std::vector<std::string> definitions;
-        ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
-        if (valueVec.size() == 82) {
-            definitions.reserve(82);
-            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(definitions), [scale](const Value &value) {
-                std::string ret = value.asString();
-                replaceTilesToImage(ret, scale);
-                return std::move(ret);
-            });
-        }
-
-        std::vector<std::string> principles;
-        valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
-        if (valueVec.size() == 5) {
-            principles.reserve(5);
-            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(principles), [scale](const Value &value) {
-                std::string ret = value.asString();
-                replaceTilesToImage(ret, scale);
-                return std::move(ret);
-            });
-        }
-
-        // 切换到cocos线程
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView, definitions, principles]() mutable {
-            g_definitions.swap(definitions);
-            g_principles.swap(principles);
-
-            if (LIKELY(thiz->getReferenceCount() > 2)) {
-                loadingView->removeFromParent();
-                thiz->createContentView(idx);
+        auto thiz = makeRef(this);  // 保证线程回来之前不析构
+        std::thread([thiz, idx, scale, loadingView]() {
+            // 读文件
+            std::vector<std::string> definitions;
+            ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
+            if (valueVec.size() == 82) {
+                definitions.reserve(82);
+                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(definitions), [scale](const Value &value) {
+                    std::string ret = value.asString();
+                    replaceTilesToImage(ret, scale);
+                    return std::move(ret);
+                });
             }
-        });
-    }).detach();
+
+            std::vector<std::string> principles;
+            valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
+            if (valueVec.size() == 5) {
+                principles.reserve(5);
+                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(principles), [scale](const Value &value) {
+                    std::string ret = value.asString();
+                    replaceTilesToImage(ret, scale);
+                    return std::move(ret);
+                });
+            }
+
+            // 切换到cocos线程
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView, definitions, principles]() mutable {
+                g_definitions.swap(definitions);
+                g_principles.swap(principles);
+
+                if (LIKELY(thiz->isRunning())) {
+                    loadingView->removeFromParent();
+                    thiz->createContentView(idx);
+                }
+            });
+        }).detach();
+    }, 0.0f, "load_texts");
 
     return true;
 }

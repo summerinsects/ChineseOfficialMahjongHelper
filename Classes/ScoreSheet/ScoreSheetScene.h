@@ -21,6 +21,7 @@ private:
     cocos2d::ui::Button *_recordButton[16];
     cocos2d::ui::Button *_detailButton[16];
     cocos2d::Label *_fanNameLabel[16];
+    cocos2d::Label *_rankLabels[4];
     cocos2d::Label *_timeLabel = nullptr;
 
     Record *_record;
@@ -28,6 +29,7 @@ private:
 
     void fillRow(size_t handIdx);
     void cleanRow(size_t handIdx);
+    void refreshRank();
     void refreshStartTime();
     void refreshEndTime();
     void recover();
