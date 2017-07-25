@@ -757,6 +757,30 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
         static ui::Button *buttons[8];
         memset(buttons, 0, sizeof(buttons));
 
+        std::function<void (Ref *)> onPackedFanButton = [](cocos2d::Ref *sender) {
+            ui::Button *button = (ui::Button *)sender;
+            size_t index = reinterpret_cast<size_t>(button->getUserData());
+
+            // 标记/取消标记
+            bool selected = !!button->getTag();
+            if (selected) {
+                button->setHighlighted(false);
+                button->setTag(false);
+            }
+            else {
+                button->setHighlighted(true);
+                button->setTag(true);
+
+                // 清除其他的标记
+                for (size_t i = 0; i < 8; ++i) {
+                    if (i != index) {
+                        buttons[i]->setHighlighted(false);
+                        buttons[i]->setTag(false);
+                    }
+                }
+            }
+        };
+
         for (size_t i = 0; i < 8; ++i) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
@@ -765,6 +789,8 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
             button->setTitleFontSize(12);
             button->setTitleText(GetPackedFanText(i + 1));
             button->setUserData(reinterpret_cast<void *>(i));
+            button->setHighlighted(false);
+            button->setTag(false);
 
             div_t ret = div((int)i, 3);
             size_t col = ret.rem;
@@ -776,29 +802,11 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
             rootNode->addChild(button);
             buttons[i] = button;
 
-            button->addClickEventListener([](cocos2d::Ref *sender) {
-                ui::Button *button = (ui::Button *)sender;
-                size_t index = reinterpret_cast<size_t>(button->getUserData());
+            button->addClickEventListener(onPackedFanButton);
+        }
 
-                // 标记/取消标记
-                bool selected = !!button->getTag();
-                if (selected) {
-                    button->setHighlighted(false);
-                    button->setTag(false);
-                }
-                else {
-                    button->setHighlighted(true);
-                    button->setTag(true);
-
-                    // 清除其他的标记
-                    for (size_t i = 0; i < 8; ++i) {
-                        if (i != index) {
-                            buttons[i]->setHighlighted(false);
-                            buttons[i]->setTag(false);
-                        }
-                    }
-                }
-            });
+        if (_detail.packed_fan > 0 && _detail.packed_fan <= 8) {
+            onPackedFanButton(buttons[_detail.packed_fan - 1]);
         }
 
         AlertView::showWithNode("记分", rootNode, [this]() {
@@ -1037,6 +1045,41 @@ void RecordScene::calculate(HandTilesWidget *handTiles, ExtraInfoWidget *extraIn
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
         if (fan_table[n]) {
             SET_FAN(fanFlag, n);
+        }
+    }
+
+    /*
+    static const char *packedFanNames[] = {
+    "门断平", "门清平和", "断幺平和", "连风刻", "番牌暗杠", "双同幺九", "门清双暗", "双暗暗杠"
+    };
+    */
+    uint8_t packedFan = 0;
+    if (fanFlag == 0) {
+        if (fan_table[mahjong::ALL_CHOWS]) {
+            if (fan_table[mahjong::CONCEALED_HAND]) {
+                packedFan = fan_table[mahjong::ALL_SIMPLES] ? 1 : 2;
+            }
+            if (fan_table[mahjong::ALL_SIMPLES]) {
+                packedFan = 3;
+            }
+        }
+        else if (fan_table[mahjong::PREVALENT_WIND] && fan_table[mahjong::SEAT_WIND]) {
+            packedFan = 4;
+        }
+        else if ((fan_table[mahjong::PREVALENT_WIND] || fan_table[mahjong::SEAT_WIND] || fan_table[mahjong::DRAGON_PUNG])
+            && fan_table[mahjong::CONCEALED_KONG]) {
+            packedFan = 5;
+        }
+        else if (fan_table[mahjong::DOUBLE_PUNG] && fan_table[mahjong::PUNG_OF_TERMINALS_OR_HONORS] >= 2) {
+            packedFan = 6;
+        }
+        else if (fan_table[mahjong::TWO_CONCEALED_PUNGS]) {
+            if (fan_table[mahjong::CONCEALED_HAND]) {
+                packedFan = 7;
+            }
+            else if (fan_table[mahjong::CONCEALED_KONG]) {
+                packedFan = 8;
+            }
         }
     }
 
