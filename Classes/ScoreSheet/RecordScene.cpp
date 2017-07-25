@@ -241,12 +241,22 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setPosition(Vec2(5.0f, 40.0f));
 
     // 展开/收起
+    ui::Button *layoutButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    layoutButton->setScale9Enabled(true);
+    layoutButton->setContentSize(Size(55.0f, 20.0f));
+    layoutButton->setTitleFontSize(12);
+    topNode->addChild(layoutButton);
+    layoutButton->setPosition(Vec2(visibleSize.width - 35.0f, 65.0f));
+
+    // 常用凑番
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
+    button->setTitleText("常用凑番");
+    button->addClickEventListener(std::bind(&RecordScene::onPackedFanButton, this, std::placeholders::_1));
     topNode->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 35.0f, 65.0f));
+    button->setPosition(Vec2(visibleSize.width - 35.0f, 40.0f));
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
@@ -262,21 +272,21 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     _tableView = tableView;
 
     std::function<void (Ref *)> onLayoutButton = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
-        ui::Button *button = (ui::Button *)sender;
+        ui::Button *layoutButton = (ui::Button *)sender;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Size layoutSize;
         layoutSize.width = visibleSize.width;
-        if (button->getUserData()) {
+        if (layoutButton->getUserData()) {
             layoutSize.height = visibleSize.height - 150;
-            button->setUserData(reinterpret_cast<void *>(false));
-            button->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
+            layoutButton->setUserData(reinterpret_cast<void *>(false));
+            layoutButton->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
             radioNode->setVisible(false);
         }
         else {
             layoutSize.height = visibleSize.height - 240;
-            button->setUserData(reinterpret_cast<void *>(true));
-            button->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E展开");
+            layoutButton->setUserData(reinterpret_cast<void *>(true));
+            layoutButton->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E展开");
             radioNode->setVisible(true);
         }
 
@@ -285,8 +295,8 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         tableView->setContentSize(Size(visibleSize.width - 5, layoutSize.height - 75));
         tableView->reloadData();
     };
-    onLayoutButton(button);
-    button->addClickEventListener(onLayoutButton);
+    onLayoutButton(layoutButton);
+    layoutButton->addClickEventListener(onLayoutButton);
 
     // 转到
     label = Label::createWithSystemFont("转到", "Arial", 12);
@@ -642,6 +652,53 @@ void RecordScene::onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::Eve
     updateScoreLabel();
 }
 
+void RecordScene::onPackedFanButton(cocos2d::Ref *sender) {
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(200.0f, 100.0f));
+
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    radioGroup->setAllowedNoSelection(true);
+    rootNode->addChild(radioGroup);
+
+    const int totalRows = 4;  // 每行2个，共4行
+    for (int i = 0; i < 8; ++i) {
+        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(10.0f + 100.0f * (i & 1), (totalRows - (i >> 1) - 0.5f) * 25.0f));
+        rootNode->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        Label *label = Label::createWithSystemFont(GetPackedFanText(i + 1), "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+
+        // 这一段是实现RadioButton可以取消选中的
+        radioButton->addTouchEventListener([radioGroup](Ref *sender, ui::Widget::TouchEventType event) {
+            ui::RadioButton *radioButton = (ui::RadioButton *)sender;
+            if (event == ui::Widget::TouchEventType::ENDED) {
+                if (radioButton->isSelected()) {
+                    // 需要在下一帧调用
+                    radioGroup->scheduleOnce([radioGroup](float) { radioGroup->setSelectedButton(nullptr); }, 0.0f, "deselect");
+                }
+            }
+        });
+    }
+
+    uint8_t packedFan = _detail.packed_fan;
+    if (packedFan > 0 && packedFan <= 8) {
+        radioGroup->setSelectedButtonWithoutEvent(packedFan - 1);
+    }
+
+    AlertView::showWithNode("常用凑番", rootNode, [this, radioGroup]() {
+        int highlight = radioGroup->getSelectedButtonIndex();
+        _detail.packed_fan = static_cast<uint8_t>(highlight + 1);
+    }, nullptr);
+}
+
 void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t index = reinterpret_cast<size_t>(button->getUserData());
@@ -684,68 +741,10 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
         AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", 12,
             [this]() {
             _detail.fan_flag = 0;
+            _detail.packed_fan = 0;
             _okCallback(_detail);
             Director::getInstance()->popScene();
         }, nullptr);
-        return;
-    }
-
-    // 未标记主番时，标记凑番
-    if (_detail.fan_flag == 0) {
-        Node *rootNode = Node::create();
-        rootNode->setContentSize(Size(200.0f, 120.0f));
-
-        Label *label = Label::createWithSystemFont("未标记主番，如下常用凑番可标记", "Arail", 12);
-        rootNode->addChild(label);
-        label->setPosition(Vec2(100.0f, 110.0f));
-        label->setColor(Color3B(0x60, 0x60, 0x60));
-        Common::scaleLabelToFitWidth(label, 200.0f);
-
-        ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
-        radioGroup->setAllowedNoSelection(true);
-        rootNode->addChild(radioGroup);
-
-        const int totalRows = 4;
-        for (int i = 0; i < 8; ++i) {
-            ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-            radioButton->setZoomScale(0.0f);
-            radioButton->ignoreContentAdaptWithSize(false);
-            radioButton->setContentSize(Size(20.0f, 20.0f));
-            radioButton->setPosition(Vec2(10.0f + 100.0f * (i & 1), (totalRows - (i >> 1) - 0.5f) * 25.0f));
-            rootNode->addChild(radioButton);
-            radioGroup->addRadioButton(radioButton);
-
-            label = Label::createWithSystemFont(GetPackedFanText(i + 1), "Arial", 12);
-            label->setColor(Color3B::BLACK);
-            label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-            radioButton->addChild(label);
-            label->setPosition(Vec2(25.0f, 10.0f));
-
-            // 这一段是实现RadioButton可以取消选中的
-            radioButton->addTouchEventListener([radioGroup](Ref *sender, ui::Widget::TouchEventType event) {
-                ui::RadioButton *radioButton = (ui::RadioButton *)sender;
-                if (event == ui::Widget::TouchEventType::ENDED) {
-                    if (radioButton->isSelected()) {
-                        // 需要在下一帧调用
-                        radioGroup->scheduleOnce([radioGroup](float) { radioGroup->setSelectedButton(nullptr); }, 0.0f, "deselect");
-                    }
-                }
-            });
-        }
-
-        uint8_t packedFan = _detail.packed_fan;
-        if (packedFan > 0 && packedFan <= 8) {
-            radioGroup->setSelectedButtonWithoutEvent(packedFan - 1);
-        }
-
-        AlertView::showWithNode("记分", rootNode, [this, radioGroup]() {
-            int highlight = radioGroup->getSelectedButtonIndex();
-            _detail.packed_fan = static_cast<uint8_t>(highlight + 1);
-
-            _okCallback(_detail);
-            Director::getInstance()->popScene();
-        }, nullptr);
-
         return;
     }
 
