@@ -562,7 +562,7 @@ void RecordScene::updateScoreLabel() {
         }
     }
     else {
-        // 四位选手的总分加起来和不为0说明还没有选择是自摸还是点炮
+        // 四位选手的总分加起来和不为0，则说明还没有选择是自摸还是点炮
         _okButton->setEnabled(false);
     }
 }
@@ -659,7 +659,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
         SET_FAN(_detail.fan_flag, index);
     }
 
-    // 增加番数
+    // 计算番数
     int prevWinScore = atoi(_editBox->getText());
     int currentWinScore = 0;
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
@@ -669,6 +669,8 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
         }
     }
     currentWinScore = std::max(8, currentWinScore);
+
+    // 增加番数
     if (currentWinScore > prevWinScore) {
         char str[16];
         snprintf(str, sizeof(str), "%d", currentWinScore);
