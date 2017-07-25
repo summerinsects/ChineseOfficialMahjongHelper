@@ -276,7 +276,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(tableView);
     _tableView = tableView;
 
-    std::function<void (Ref *)> layoutChildren = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
+    std::function<void (Ref *)> onLayoutButton = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
         ui::Button *button = (ui::Button *)sender;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -300,8 +300,8 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         tableView->setContentSize(Size(visibleSize.width - 5, layoutSize.height - 75));
         tableView->reloadData();
     };
-    layoutChildren(button);
-    button->addClickEventListener(layoutChildren);
+    onLayoutButton(button);
+    button->addClickEventListener(onLayoutButton);
 
     // 转到
     label = Label::createWithSystemFont("转到", "Arial", 12);
@@ -766,7 +766,7 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
             button->setTitleText(GetPackedFanText(i + 1));
             button->setUserData(reinterpret_cast<void *>(i));
 
-            div_t ret = div(i, 3);
+            div_t ret = div((int)i, 3);
             size_t col = ret.rem;
             size_t row = ret.quot;
             button->setPosition(Vec2(gap * (col + 0.5f) + 2.0f, (totalRows - row - 0.5f) * 25.0f));
