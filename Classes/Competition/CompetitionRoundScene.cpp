@@ -25,13 +25,12 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     _colWidth[0] = visibleSize.width * 0.1f;
-    _colWidth[1] = visibleSize.width * 0.2f;
-    _colWidth[2] = visibleSize.width * 0.1f;
+    _colWidth[1] = visibleSize.width * 0.1f;
+    _colWidth[2] = visibleSize.width * 0.25f;
     _colWidth[3] = visibleSize.width * 0.1f;
-    _colWidth[4] = visibleSize.width * 0.125f;
-    _colWidth[5] = visibleSize.width * 0.125f;
-    _colWidth[6] = visibleSize.width * 0.125f;
-    _colWidth[7] = visibleSize.width * 0.125f;
+    _colWidth[4] = visibleSize.width * 0.1f;
+    _colWidth[5] = visibleSize.width * 0.15f;
+    _colWidth[6] = visibleSize.width * 0.2f;
 
     _posX[0] = _colWidth[0] * 0.5f;
     _posX[1] = _posX[0] + _colWidth[0] * 0.5f + _colWidth[1] * 0.5f;
@@ -40,7 +39,14 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     _posX[4] = _posX[3] + _colWidth[3] * 0.5f + _colWidth[4] * 0.5f;
     _posX[5] = _posX[4] + _colWidth[4] * 0.5f + _colWidth[5] * 0.5f;
     _posX[6] = _posX[5] + _colWidth[5] * 0.5f + _colWidth[6] * 0.5f;
-    _posX[7] = _posX[6] + _colWidth[6] * 0.5f + _colWidth[7] * 0.5f;
+
+    const char *titleTexts[] = { "名次", "编号", "选手姓名", "桌号", "座次", "标准分", "比赛分" };
+    for (int i = 0; i < 7; ++i) {
+        Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
+        label->setColor(Color3B::BLACK);
+        this->addChild(label);
+        label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 100.0f));
+    }
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 115.0f));
@@ -68,14 +74,14 @@ cocos2d::Size CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table,
 }
 
 cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *[8], ui::EditBox *, LayerColor *[2]> CustomCell;
+    typedef cw::TableViewCellEx<Label *[7], ui::EditBox *, LayerColor *[2]> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        Label *(&labels)[8] = std::get<0>(ext);
+        Label *(&labels)[7] = std::get<0>(ext);
         ui::EditBox *&editBox = std::get<1>(ext);
         LayerColor *(&layerColor)[2] = std::get<2>(ext);
 
@@ -87,7 +93,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
         layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 29);
         cell->addChild(layerColor[1]);
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < 7; ++i) {
             Label *label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
@@ -97,22 +103,22 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     }
 
     const CustomCell::ExtDataType ext = cell->getExtData();
-    Label *const (&labels)[8] = std::get<0>(ext);
+    Label *const (&labels)[7] = std::get<0>(ext);
     ui::EditBox *editBox = std::get<1>(ext);
     LayerColor *const (&layerColor)[2] = std::get<2>(ext);
 
     layerColor[0]->setVisible(!(idx & 1));
     layerColor[1]->setVisible(!!(idx & 1));
 
+    static const char *seatText[] = { "东", "南", "西", "北" };
     const CompetitionPlayer &player = _competitionData->players[idx];
-    labels[0]->setString(std::to_string(player.serial));
-    labels[1]->setString(player.name);
-    labels[2]->setString("桌号");
-    labels[3]->setString("座位");
-    labels[4]->setString("标准分");
-    labels[5]->setString("比赛分");
-    labels[6]->setString("标准分");
-    labels[7]->setString("比赛分");
+    labels[0]->setString(std::to_string(idx + 1));
+    labels[1]->setString(std::to_string(player.serial));
+    labels[2]->setString(player.name);
+    labels[3]->setString(std::to_string((idx >> 2) + 1));
+    labels[4]->setString(seatText[idx & 3]);
+    labels[5]->setString("0");
+    labels[6]->setString("0");
 
     return cell;
 }

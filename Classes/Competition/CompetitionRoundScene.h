@@ -17,8 +17,8 @@ private:
     virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
-    float _colWidth[8];
-    float _posX[8];
+    float _colWidth[7];
+    float _posX[7];
 
     std::shared_ptr<CompetitionData> _competitionData;
 };
