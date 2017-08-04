@@ -12,7 +12,7 @@
 #include "json/document.h"
 #include "json/stringbuffer.h"
 
-#define VERSION 0x010104
+#define VERSION 0x010105
 
 USING_NS_CC;
 
