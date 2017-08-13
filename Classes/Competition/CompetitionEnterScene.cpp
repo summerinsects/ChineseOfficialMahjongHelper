@@ -227,7 +227,8 @@ void CompetitionEnterScene::onNameButton(cocos2d::Ref *sender) {
         _tableView->updateCellAtIndex(idx >> 1);
     }, nullptr);
 
-    Director::getInstance()->getScheduler()->schedule([editBox](float) {
-        editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
+    auto editBoxStrong = makeRef(editBox);
+    Director::getInstance()->getScheduler()->schedule([editBoxStrong](float) {
+        editBoxStrong->touchDownAction(editBoxStrong.get(), ui::Widget::TouchEventType::ENDED);
     }, this, 0.0f, 0, 0.0f, false, "open_keyboard");
 }
