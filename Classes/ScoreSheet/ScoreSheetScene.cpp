@@ -445,6 +445,7 @@ void ScoreSheetScene::reset() {
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setVisible(false);
         _totalLabel[i]->setString("+0");
+        _rankLabels[i]->setVisible(false);
     }
 
     _lockButton->setEnabled(true);
