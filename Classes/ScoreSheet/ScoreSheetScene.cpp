@@ -217,12 +217,6 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     node->addChild(label);
     Common::scaleLabelToFitWidth(label, gap - 4);
 
-    label = Label::createWithSystemFont("番种备注", "Arail", 12);
-    label->setColor(Color3B::BLACK);
-    label->setPosition(Vec2(colPosX[5], line4Y));
-    node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
-
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("+0", "Arail", 12);
         label->setColor(Color3B::ORANGE);
@@ -238,9 +232,33 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         button->addClickEventListener(std::bind(&ScoreSheetScene::onScoreButton, this, std::placeholders::_1, i));
     }
 
-    // 第5~20栏，东风东~北风北的计分
+    // 第5栏：名次
+    const float line5Y = tableHeight - cellHeight * 4.5f;
+
+    label = Label::createWithSystemFont("名次", "Arail", 12);
+    label->setColor(Color3B::ORANGE);
+    label->setPosition(Vec2(colPosX[0], line5Y));
+    node->addChild(label);
+    Common::scaleLabelToFitWidth(label, gap - 4);
+
+    for (int i = 0; i < 4; ++i) {
+        label = Label::createWithSystemFont("", "Arail", 12);
+        label->setColor(Color3B::ORANGE);
+        label->setPosition(Vec2(colPosX[i + 1], line5Y));
+        node->addChild(label);
+
+        _rankLabels[i] = label;
+    }
+
+    label = Label::createWithSystemFont("番种备注", "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    label->setPosition(Vec2(colPosX[5], line5Y));
+    node->addChild(label);
+    Common::scaleLabelToFitWidth(label, gap - 4);
+
+    // 第6~21栏，东风东~北风北的计分
     for (int k = 0; k < 16; ++k) {
-        const float y = 10 + (cellCount - 5 - k) * cellHeight;
+        const float y = 10 + (cellCount - 6 - k) * cellHeight;
 
         // 东风东~北风北名字
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
@@ -286,24 +304,6 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         button->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1, k));
         button->setEnabled(false);
         _detailButton[k] = button;
-    }
-
-    // 第21栏：名次
-    const float line21Y = 10 + (cellCount - 21) * cellHeight;
-
-    label = Label::createWithSystemFont("名次", "Arail", 12);
-    label->setColor(Color3B::ORANGE);
-    label->setPosition(Vec2(colPosX[0], line21Y));
-    node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
-
-    for (int i = 0; i < 4; ++i) {
-        label = Label::createWithSystemFont("", "Arail", 12);
-        label->setColor(Color3B::ORANGE);
-        label->setPosition(Vec2(colPosX[i + 1], line21Y));
-        node->addChild(label);
-
-        _rankLabels[i] = label;
     }
 
     // 恢复界面数据
