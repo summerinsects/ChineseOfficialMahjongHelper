@@ -21,7 +21,7 @@ public:
 
     const Record::Detail &getDetail() const { return _detail; }
 
-    static void _SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, uint8_t false_win);
+    static void _SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t seatFlag, uint8_t win_claim, uint8_t false_win);
 
 private:
     cocos2d::ui::EditBox *_editBox = nullptr;
@@ -38,6 +38,8 @@ private:
     int _winIndex = -1;
     Record::Detail _detail;
     std::function<void (const Record::Detail &)> _okCallback;
+    uint8_t _seatFlag;
+    uint8_t _playerFlag;
 
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
     virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;

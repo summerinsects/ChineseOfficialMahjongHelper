@@ -334,7 +334,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     }
 
     // 使用不同颜色
-    RecordScene::_SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_claim, detail.false_win);
+    RecordScene::_SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, 0xE4, detail.win_claim, detail.false_win);
 
     // 禁用并隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
