@@ -420,8 +420,9 @@ void ScoreSheetScene::recover() {
         _totalLabel[i]->setString(Common::format<32>("%+d", _totalScores[i]));
         _rankLabels[i]->setVisible(false);
     }
-
-    refreshRank();
+    if (_record->current_index > 0) {
+        refreshRank();
+    }
 
     // 如果不是北风北，则显示下一行的计分按钮
     if (_record->current_index < 16) {
