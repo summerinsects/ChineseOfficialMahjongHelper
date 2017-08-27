@@ -475,19 +475,19 @@ void RecordScene::refresh() {
         _editBox->setText(str);
     }
 
+    // 错和
+    if (_detail.false_win != 0) {
+        for (int i = 0; i < 4; ++i) {
+            _falseWinBox[i]->setSelected(TEST_FALSE_WIN(_detail.false_win, i));
+        }
+    }
+
     _winIndex = WIN_INDEX(wc);
     if (_winIndex != -1) {  // 有人和牌
         int claimIndex = CLAIM_INDEX(wc);  // 点炮者
         _winGroup->setSelectedButton(_winIndex);
         if (claimIndex != -1) {
             _claimGroup->setSelectedButton(claimIndex);
-        }
-    }
-
-    // 错和
-    if (_detail.false_win != 0) {
-        for (int i = 0; i < 4; ++i) {
-            _falseWinBox[i]->setSelected(TEST_FALSE_WIN(_detail.false_win, i));
         }
     }
 
