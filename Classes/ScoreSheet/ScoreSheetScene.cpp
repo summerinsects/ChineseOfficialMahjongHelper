@@ -211,7 +211,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第4栏：累计
     const float line4Y = tableHeight - cellHeight * 3.5f;
-    label = Label::createWithSystemFont("比赛分", "Arail", 12);
+    label = Label::createWithSystemFont("累计", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line4Y));
     node->addChild(label);
@@ -656,8 +656,8 @@ void ScoreSheetScene::onTimeScheduler(float dt) {
 void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
     AlertView::showWithMessage("使用说明",
         "1. 使用步骤：点击「选手姓名」一栏，输入四名选手姓名，点击「锁定」，开始「记分」。\n"
-        "2. 计分时如果有标记番种，则「备注」一栏会选取一个最大的番种名予以显示。\n"
-        "3. 对于已经记分的，点击「备注」一栏可修改记录。\n"
+        "2. 计分时如果有标记番种，则「番种备注」一栏会选取一个最大的番种名予以显示。\n"
+        "3. 对于已经记分的，点击「番种备注」一栏可修改记录。\n"
         "4. 对局未完成时，点击「累计」一栏处，可显示分差并有快捷计算追分选项。\n"
         "5. 「北风北」记分完成后，会自动添加入「历史记录」。\n"
         "6. 「历史记录」里的内容只要不卸载程序就会一直保存。\n"
