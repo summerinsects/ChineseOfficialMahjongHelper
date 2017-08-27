@@ -35,7 +35,6 @@ private:
     cw::TableView *_tableView = nullptr;
     cocos2d::ui::Button *_okButton = nullptr;
 
-    size_t _handIdx = 0;
     int _winIndex = -1;
     Record::Detail _detail;
     std::function<void (const Record::Detail &)> _okCallback;

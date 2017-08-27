@@ -31,7 +31,6 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         return false;
     }
 
-    _handIdx = handIdx;
     _winIndex = -1;
     if (detail != nullptr) {
         memcpy(&_detail, detail, sizeof(_detail));
