@@ -318,8 +318,8 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     onLayoutButton(layoutButton);
     layoutButton->addClickEventListener(onLayoutButton);
 
-    // 转到
-    label = Label::createWithSystemFont("转到", "Arial", 12);
+    // 跳到
+    label = Label::createWithSystemFont("跳到", "Arial", 12);
     label->setColor(Color3B::BLACK);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
