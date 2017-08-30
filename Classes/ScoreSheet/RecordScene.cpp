@@ -255,7 +255,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setPosition(Vec2(5.0f, 65.0f));
 
     label = Label::createWithSystemFont("标记主番可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
-    label->setColor(Color3B(0x60, 0x60, 0x60));
+    label->setColor(Color3B::ORANGE);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 40.0f));
