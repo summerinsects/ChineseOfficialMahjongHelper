@@ -397,17 +397,47 @@ void ExtraInfoWidget::refreshByWinTile(const RefreshByWinTile &rt) {
 }
 
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
-    AlertView::showWithMessage("使用说明",
-        "1. 本算番器遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式，请以您所参加的比赛细则中之规定为准。\n"
-        "2. 边张、嵌张、单钓将必须在严格独听时才计；对于可解释为组合龙龙身部分的牌，一律不计边张、嵌张、单钓将。\n"
-        "3. 必然门前清的番种自摸和牌时只计自摸，不计不求人。如七对、全不靠、七星不靠、十三幺、四暗刻、连七对、九莲宝灯等。\n"
-        "4. 绿一色、字一色、清幺九、混幺九、全大、全中、全小、大于五、小于五均可复合七对。\n"
-        "5. 全双刻不可复合七对，对于由仅偶数牌组成的七对，只计七对+断幺。\n"
-        "6. 大三元、小三元、三风刻、一色四同顺、一色四节高、一色四步高等至少缺少一门花色序数牌的番种，可计缺一门。\n"
-        "7. 有发的绿一色不计混一色。\n"
-        "8. 大四喜、小四喜可计混一色。\n"
-        "9. 清幺九不计双同刻，可计三同刻。\n"
-        "10. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n"
-        "11. 1明杠1暗杠计5番。暗杠的加计遵循国际麻将联盟（MIL）的规则，杠系列和暗刻系列最多各取一个番种计分。",
-        10, nullptr, nullptr);
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float maxWidth = visibleSize.width * 0.8f - 10;
+    Label *label = Label::createWithSystemFont(
+        "1. 本程序不对和牌张位置的牌进行吃、碰、杠检测，如果要对某张牌进行吃、碰、杠操作，请将这张牌放在手牌范围内。点击算番结果处的番种名，可跳转到相应番种的定义。\n"
+        "2. 本程序遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式，请以您所参加的比赛细则中之规定为准。\n"
+        "3. 手牌在形式上听多种牌（包括听第5张不存在的牌）时，不计边张、嵌张、单钓将。边张、嵌张、单钓将最多计其中一个。\n"
+        "4. 组合龙普通型和牌中，可加计平和。对于可解释为组合龙龙身部分的听牌，一律不计边张、嵌张、单钓将。\n"
+        "5. 必然门前清的番种（七对、全不靠、七星不靠、十三幺、四暗刻、连七对、九莲宝灯）自摸和牌时只计自摸，不计不求人。\n"
+        "6. 绿一色、字一色、清幺九、混幺九、全大、全中、全小、大于五、小于五均可复合七对。全双刻不可复合七对，对于由仅偶数牌组成的七对，只计七对+断幺。\n"
+        "7. 字一色、混幺九、清幺九不计碰碰和。\n"
+        "8. 至少缺一门花色的番种（包括大三元、小三元、三风刻、一色四同顺、一色四节高、一色四步高、推不倒），除推不倒不计缺一门以外，其他番种均可加计缺一门。\n"
+        "9. 有发的绿一色不计混一色。大四喜、小四喜可计混一色。\n"
+        "10. 清幺九不计双同刻，可计三同刻。\n"
+        "11. 九莲宝灯和258时计1个幺九刻，和其他牌不计幺九刻。\n"
+        "12. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n"
+        "13. 双暗杠6番，一明杠一暗杠5番，双明杠4番。暗杠的加计遵循国际麻将联盟（MIL）的规则，即杠系列和暗刻系列最多各计一个。",
+        "Arail", 10);
+    label->setColor(Color3B::BLACK);
+    label->setDimensions(maxWidth, 0);
+
+    Node *node = nullptr;
+
+    // 超出高度就使用ScrollView
+    const Size &labelSize = label->getContentSize();
+    const float maxHeight = visibleSize.height - 120;
+    if (labelSize.height <= maxHeight) {
+        node = label;
+    }
+    else {
+        ui::ScrollView *scrollView = ui::ScrollView::create();
+        scrollView->setScrollBarPositionFromCorner(Vec2(2, 2));
+        scrollView->setScrollBarWidth(4);
+        scrollView->setScrollBarOpacity(0x99);
+        scrollView->setContentSize(Size(maxWidth, maxHeight));
+        scrollView->setInnerContainerSize(labelSize);
+        scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
+        scrollView->addChild(label);
+        label->setPosition(Vec2(labelSize.width * 0.5f, labelSize.height * 0.5f));
+
+        node = scrollView;
+    }
+
+    AlertView::showWithNode("使用说明", node, nullptr, nullptr);
 }
