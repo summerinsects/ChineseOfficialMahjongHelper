@@ -138,12 +138,12 @@ bool MahjongTheoryScene::init() {
     _totalLabelWidth = tempLabel->getContentSize().width;
 
     _tableView = cw::TableView::create();
+    _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
     _tableView->setScrollBarWidth(4);
     _tableView->setScrollBarOpacity(0x99);
     _tableView->setContentSize(Size(visibleSize.width - 5, visibleSize.height - 130 - widgetSize.height));
     _tableView->setDelegate(this);
-    _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);

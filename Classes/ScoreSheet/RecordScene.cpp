@@ -279,11 +279,11 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setPosition(Vec2(visibleSize.width - 35.0f, 40.0f));
 
     cw::TableView *tableView = cw::TableView::create();
+    tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
     tableView->setScrollBarWidth(4);
     tableView->setScrollBarOpacity(0x99);
     tableView->setDelegate(this);
-    tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);

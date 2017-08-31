@@ -66,7 +66,7 @@ namespace cw {
         case Direction::NONE:
         case Direction::HORIZONTAL:
         case Direction::VERTICAL:
-            _direction = dir;
+            ui::ScrollView::setDirection(dir);
             break;
         case Direction::BOTH:
             CCAssert(0, "TableView doesn't support both diretion!");
