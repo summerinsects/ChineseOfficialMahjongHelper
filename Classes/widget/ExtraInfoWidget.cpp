@@ -175,21 +175,17 @@ bool ExtraInfoWidget::init() {
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
-    label = Label::createWithSystemFont("花", "Arial", 12);
+    label = Label::createWithSystemFont("花x", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(visibleSize.width - 90, 40.0f));
-
-    Sprite *sprite = Sprite::create("source_material/btn_square_normal.png");
-    sprite->setScale(20 / sprite->getContentSize().width);
-    this->addChild(sprite);
-    sprite->setPosition(Vec2(visibleSize.width - 50, 40.0f));
+    label->setPosition(Vec2(visibleSize.width - 80, 40.0f));
 
     label = Label::createWithSystemFont("0", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(visibleSize.width - 50, 40.0f));
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(visibleSize.width - 80, 40.0f));
     _flowerLabel = label;
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -198,7 +194,7 @@ bool ExtraInfoWidget::init() {
     button->setTitleFontSize(12);
     button->setTitleText("-1");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 75, 40.0f));
+    button->setPosition(Vec2(visibleSize.width - 55, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = atoi(label->getString().c_str());
         if (n > 0) {
