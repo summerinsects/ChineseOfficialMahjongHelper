@@ -87,7 +87,7 @@ static cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_T
     Node *node = Node::create();
     const int lineHeight = fontSize + 2;
     long resultAreaHeight = lineHeight * rows;  // 每行间隔2像素
-    resultAreaHeight += (5 + lineHeight);  // 总计
+    resultAreaHeight += (5 + lineHeight) + 20;  // 总计+提示
     node->setContentSize(Size(resultAreaWidth, resultAreaHeight));
 
     long fan = 0;
@@ -124,7 +124,13 @@ static cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_T
     label->setColor(Color3B::BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(0.0f, lineHeight * 0.5f));
+    label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20));
+
+    label = Label::createWithSystemFont("点击番种名可查看番种介绍。", "Arial", 10);
+    label->setColor(Color3B::ORANGE);
+    node->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(0.0f, 5));
 
     return node;
 }
