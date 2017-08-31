@@ -421,7 +421,7 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
 
     // 超出高度就使用ScrollView
     const Size &labelSize = label->getContentSize();
-    const float maxHeight = visibleSize.height - 120;
+    const float maxHeight = visibleSize.height * 0.8f - 80;
     if (labelSize.height <= maxHeight) {
         node = label;
     }
