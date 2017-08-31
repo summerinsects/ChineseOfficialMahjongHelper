@@ -106,7 +106,7 @@ static cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_T
         node->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         div_t ret = div(i, 2);
-        label->setPosition(Vec2(ret.rem == 0 ? 10.0f : resultAreaWidth * 0.5f, resultAreaHeight - lineHeight * (ret.quot + 1)));
+        label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, resultAreaHeight - lineHeight * (ret.quot + 1)));
 
         // 创建与label同位置的button
         ui::Button *button = ui::Button::create();
@@ -123,7 +123,7 @@ static cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_T
     label->setColor(Color3B::BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(10.0f, lineHeight * 0.5f));
+    label->setPosition(Vec2(0.0f, lineHeight * 0.5f));
 
     return node;
 }
@@ -231,7 +231,7 @@ void FanCalculatorScene::calculate() {
         return;
     }
 
-    Node *innerNode = createFanResultNode(fan_table, 14, fanAreaSize.width);
+    Node *innerNode = createFanResultNode(fan_table, 14, fanAreaSize.width - 10);
 
     // 超出高度就使用ScrollView
     if (innerNode->getContentSize().height <= fanAreaSize.height) {
@@ -245,7 +245,7 @@ void FanCalculatorScene::calculate() {
         scrollView->setScrollBarPositionFromCorner(Vec2(2, 2));
         scrollView->setScrollBarWidth(4);
         scrollView->setScrollBarOpacity(0x99);
-        scrollView->setContentSize(fanAreaSize);
+        scrollView->setContentSize(Size(fanAreaSize.width - 10, fanAreaSize.height));
         scrollView->setInnerContainerSize(innerNode->getContentSize());
         scrollView->addChild(innerNode);
 
