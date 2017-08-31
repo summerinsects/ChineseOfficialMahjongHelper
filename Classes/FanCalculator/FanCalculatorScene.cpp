@@ -111,6 +111,7 @@ static cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_T
         // 创建与label同位置的button
         ui::Button *button = ui::Button::create();
         button->setScale9Enabled(true);
+        button->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         button->setPosition(label->getPosition());
         button->setContentSize(label->getContentSize());
         node->addChild(button);
