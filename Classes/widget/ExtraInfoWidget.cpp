@@ -126,18 +126,19 @@ bool ExtraInfoWidget::init() {
     this->addChild(_prevalentWindGroup);
 
     for (int i = 0; i < 4; ++i) {
-        ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        button->setZoomScale(0.0f);
-        button->ignoreContentAdaptWithSize(false);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(50.0f + i * 30, 40.0f));
-        this->addChild(button);
-        _prevalentWindGroup->addRadioButton(button);
+        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(50.0f + i * 30, 40.0f));
+        this->addChild(radioButton);
 
         label = Label::createWithSystemFont(windName[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
-        button->addChild(label);
+        radioButton->addChild(label);
         label->setPosition(Vec2(10.0f, 10.0f));
+
+        _prevalentWindGroup->addRadioButton(radioButton);
     }
 
     // 门风
@@ -150,18 +151,19 @@ bool ExtraInfoWidget::init() {
     this->addChild(_seatWindGroup);
 
     for (int i = 0; i < 4; ++i) {
-        ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        button->setZoomScale(0.0f);
-        button->ignoreContentAdaptWithSize(false);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(50.0f + i * 30, 10.0f));
-        this->addChild(button);
-        _seatWindGroup->addRadioButton(button);
+        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(50.0f + i * 30, 10.0f));
+        this->addChild(radioButton);
 
         label = Label::createWithSystemFont(windName[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
-        button->addChild(label);
+        radioButton->addChild(label);
         label->setPosition(Vec2(10.0f, 10.0f));
+
+        _seatWindGroup->addRadioButton(radioButton);
     }
 
     // 使用说明
