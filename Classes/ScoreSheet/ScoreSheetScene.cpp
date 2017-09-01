@@ -258,7 +258,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第6~21栏，东风东~北风北的计分
     for (int k = 0; k < 16; ++k) {
-        const float y = 10 + (cellCount - 6 - k) * cellHeight;
+        const float y = tableHeight - cellHeight * (5.5f + k);
 
         // 东风东~北风北名字
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
