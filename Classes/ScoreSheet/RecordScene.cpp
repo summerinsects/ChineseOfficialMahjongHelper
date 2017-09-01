@@ -72,7 +72,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText("8");
-    editBox->setPosition(Vec2(origin.x + 95.0f, origin.y + visibleSize.height - 50));
+    editBox->setPosition(Vec2(origin.x + 86.0f, origin.y + visibleSize.height - 50));
     editBox->setDelegate(this);
     _editBox = editBox;
 
@@ -92,7 +92,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(30.0f, 20.0f));
+    button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("-5");
     button->setPosition(Vec2(origin.x + 20.0f, origin.y + visibleSize.height - 50));
@@ -101,35 +101,35 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(30.0f, 20.0f));
+    button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("-1");
-    button->setPosition(Vec2(origin.x + 55.0f, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + 50.0f, origin.y + visibleSize.height - 50));
     button->addClickEventListener(std::bind(&RecordScene::onMinusButton, this, std::placeholders::_1, 1));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(30.0f, 20.0f));
+    button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("+1");
-    button->setPosition(Vec2(origin.x + 145.0f, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + 135.0f, origin.y + visibleSize.height - 50));
     button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1, 1));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(30.0f, 20.0f));
+    button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("+5");
-    button->setPosition(Vec2(origin.x + 180.0f, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + 165.0f, origin.y + visibleSize.height - 50));
     button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1, 5));
 
     Label *label = Label::createWithSystemFont("番", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 115.0f, origin.y + visibleSize.height - 50));
+    label->setPosition(Vec2(origin.x + 106.0f, origin.y + visibleSize.height - 50));
 
     // 荒庄
     _drawBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -331,12 +331,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     for (size_t i = 0; i < 5; ++i) {
         button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         button->setScale9Enabled(true);
-        button->setContentSize(Size(35.0f, 20.0f));
+        button->setContentSize(Size(30.0f, 20.0f));
         button->setTitleFontSize(12);
         button->setTitleText(text[i]);
         button->addClickEventListener([tableView, i](Ref *) { tableView->jumpToCell(i + 1); });
         topNode->addChild(button);
-        button->setPosition(Vec2(labelPosX + 40.0f * (0.5f + i), 10.0f));
+        button->setPosition(Vec2(labelPosX + 35.0f * (0.5f + i), 10.0f));
     }
 
     // 确定按钮
