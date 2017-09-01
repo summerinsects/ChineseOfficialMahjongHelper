@@ -325,10 +325,10 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 10.0f));
 
-    // 6 8 12 16 24
+    // 6 8 12 16 24 32
     const float labelPosX = label->getContentSize().width + 5 + 2;
-    const char *text[] = { "6番", "8番", "12番", "16番", "24番" };
-    for (size_t i = 0; i < 5; ++i) {
+    const char *text[] = { "6番", "8番", "12番", "16番", "24番", "32番" };
+    for (size_t i = 0; i < 6; ++i) {
         button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         button->setScale9Enabled(true);
         button->setContentSize(Size(30.0f, 20.0f));
