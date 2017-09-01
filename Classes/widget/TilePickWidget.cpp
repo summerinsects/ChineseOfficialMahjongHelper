@@ -110,9 +110,9 @@ bool TilePickWidget::init() {
     }
 
     // 排列按钮
-    const char *normalImage = "source_material/btn_square_highlighted.png";
-    const char *selectedImage = "source_material/btn_square_selected.png";
-    const char *disableImage = "source_material/btn_square_disabled.png";
+#define normalImage "source_material/btn_square_highlighted.png"
+#define selectedImage "source_material/btn_square_selected.png"
+#define disableImage "source_material/btn_square_disabled.png"
 
     // 吃(_XX) 为23吃1这种类型
     ui::Button *button = ui::Button::create(normalImage, selectedImage, disableImage);
@@ -207,6 +207,10 @@ bool TilePickWidget::init() {
     buttonsContainer->addChild(button);
     button->setPosition(Vec2(BUTTON_WIDHT + GAP + BUTTON_WIDHT / 2, BUTTON_HEIGHT / 2));
     button->addClickEventListener([this](Ref *) { reset(); });
+
+#undef normalImage
+#undef selectedImage
+#undef disableImage
 
     reset();
 
