@@ -47,6 +47,7 @@ private:
 
     void refresh();
     void updateScoreLabel();
+    void showPackedFanAlert(const std::function<void ()> &callback);
 
     void onMinusButton(cocos2d::Ref *sender, int delta);
     void onPlusButton(cocos2d::Ref *sender, int delta);
@@ -55,7 +56,6 @@ private:
     void onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
     void onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
-    void onPackedFanButton(cocos2d::Ref *sender);
     void onPointsNameButton(cocos2d::Ref *sender);
     void onOkButton(cocos2d::Ref *sender);
 };

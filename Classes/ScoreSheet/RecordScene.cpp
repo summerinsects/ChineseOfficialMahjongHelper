@@ -274,7 +274,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("常用凑番");
-    button->addClickEventListener(std::bind(&RecordScene::onPackedFanButton, this, std::placeholders::_1));
+    button->addClickEventListener([this](Ref *) { showPackedFanAlert(nullptr); });
     topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35.0f, 40.0f));
 
@@ -639,7 +639,7 @@ void RecordScene::onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::Eve
     updateScoreLabel();
 }
 
-void RecordScene::onPackedFanButton(cocos2d::Ref *sender) {
+void RecordScene::showPackedFanAlert(const std::function<void ()> &callback) {
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(200.0f, 100.0f));
 
@@ -680,9 +680,12 @@ void RecordScene::onPackedFanButton(cocos2d::Ref *sender) {
         radioGroup->setSelectedButtonWithoutEvent(packedFan - 1);
     }
 
-    AlertView::showWithNode("常用凑番", rootNode, [this, radioGroup]() {
+    AlertView::showWithNode("选择常用凑番", rootNode, [this, radioGroup, callback]() {
         int highlight = radioGroup->getSelectedButtonIndex();
         _detail.packed_fan = static_cast<uint8_t>(highlight + 1);
+        if (callback) {
+            callback();
+        }
     }, nullptr);
 }
 
@@ -732,6 +735,14 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
             _okCallback(_detail);
             Director::getInstance()->popScene();
         }, nullptr);
+        return;
+    }
+
+    if (_detail.fan_flag == 0 && _detail.win_claim != 0) {
+        showPackedFanAlert([this]() {
+            _okCallback(_detail);
+            Director::getInstance()->popScene();
+        });
         return;
     }
 
