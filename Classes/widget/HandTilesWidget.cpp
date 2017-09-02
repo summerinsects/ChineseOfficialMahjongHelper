@@ -334,8 +334,10 @@ void HandTilesWidget::sortStandingTiles() {
         return;
     }
 
-    std::sort(_standingTiles.begin(), _standingTiles.end() - 1);
-    std::sort(_standingTileButtons.begin(), _standingTileButtons.end() - 1, [](ui::Button *btn1, ui::Button *btn2) {
+    const size_t offset = getServingTile() == 0 ? 0 : 1;
+
+    std::sort(_standingTiles.begin(), _standingTiles.end() - offset);
+    std::sort(_standingTileButtons.begin(), _standingTileButtons.end() - offset, [](ui::Button *btn1, ui::Button *btn2) {
         return btn1->getTag() < btn2->getTag();
     });
 
