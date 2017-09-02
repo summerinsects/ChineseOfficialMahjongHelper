@@ -738,7 +738,7 @@ void RecordScene::onOkButton(cocos2d::Ref *sender) {
         return;
     }
 
-    if (_detail.fan_flag == 0 && _detail.win_claim != 0) {
+    if (_detail.fan_flag == 0 && _winIndex != -1) {
         showPackedFanAlert([this]() {
             _okCallback(_detail);
             Director::getInstance()->popScene();
