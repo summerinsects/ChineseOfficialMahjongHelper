@@ -48,7 +48,7 @@ bool FanCalculatorScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("算 番");
+    button->setTitleText("算  番");
     extraInfo->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 40, 10.0f));
     button->addClickEventListener([this](Ref *) { calculate(); });
@@ -127,7 +127,7 @@ static cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_T
     label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20));
 
     label = Label::createWithSystemFont("点击番种名可查看番种介绍。", "Arial", 10);
-    label->setColor(Color3B::ORANGE);
+    label->setColor(Color3B(51, 204, 255));
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(0.0f, 5));
