@@ -51,3 +51,9 @@ Chinese Official Mahjong Helper 国标小助手
 ```
     this.setBackgroundColor(Color.TRANSPARENT);
 ```
+
+#### iOS的WebView如何禁止数字链接
+- 接着上面修改使WebView透明，在后面添加代码
+```
+    self.uiWebView.dataDetectorTypes = UIDataDetectorTypeNone;
+```

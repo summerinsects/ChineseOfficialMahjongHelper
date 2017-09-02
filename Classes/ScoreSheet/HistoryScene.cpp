@@ -137,12 +137,12 @@ bool HistoryScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     _tableView = cw::TableView::create();
+    _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
     _tableView->setScrollBarWidth(4);
     _tableView->setScrollBarOpacity(0x99);
     _tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35));
     _tableView->setDelegate(this);
-    _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);

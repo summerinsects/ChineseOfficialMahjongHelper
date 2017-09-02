@@ -126,18 +126,19 @@ bool ExtraInfoWidget::init() {
     this->addChild(_prevalentWindGroup);
 
     for (int i = 0; i < 4; ++i) {
-        ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        button->setZoomScale(0.0f);
-        button->ignoreContentAdaptWithSize(false);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(50.0f + i * 30, 40.0f));
-        this->addChild(button);
-        _prevalentWindGroup->addRadioButton(button);
+        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(50.0f + i * 30, 40.0f));
+        this->addChild(radioButton);
 
         label = Label::createWithSystemFont(windName[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
-        button->addChild(label);
+        radioButton->addChild(label);
         label->setPosition(Vec2(10.0f, 10.0f));
+
+        _prevalentWindGroup->addRadioButton(radioButton);
     }
 
     // 门风
@@ -150,18 +151,19 @@ bool ExtraInfoWidget::init() {
     this->addChild(_seatWindGroup);
 
     for (int i = 0; i < 4; ++i) {
-        ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        button->setZoomScale(0.0f);
-        button->ignoreContentAdaptWithSize(false);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(50.0f + i * 30, 10.0f));
-        this->addChild(button);
-        _seatWindGroup->addRadioButton(button);
+        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(50.0f + i * 30, 10.0f));
+        this->addChild(radioButton);
 
         label = Label::createWithSystemFont(windName[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
-        button->addChild(label);
+        radioButton->addChild(label);
         label->setPosition(Vec2(10.0f, 10.0f));
+
+        _seatWindGroup->addRadioButton(radioButton);
     }
 
     // 使用说明
@@ -175,30 +177,26 @@ bool ExtraInfoWidget::init() {
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
-    label = Label::createWithSystemFont("花", "Arial", 12);
+    label = Label::createWithSystemFont("花x", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(visibleSize.width - 90, 40.0f));
-
-    Sprite *sprite = Sprite::create("source_material/btn_square_normal.png");
-    sprite->setScale(20 / sprite->getContentSize().width);
-    this->addChild(sprite);
-    sprite->setPosition(Vec2(visibleSize.width - 50, 40.0f));
+    label->setPosition(Vec2(visibleSize.width - 80, 40.0f));
 
     label = Label::createWithSystemFont("0", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(visibleSize.width - 50, 40.0f));
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(visibleSize.width - 80, 40.0f));
     _flowerLabel = label;
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("\xE2\x97\x80\xEF\xB8\x8E");
+    button->setTitleText("-1");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 75, 40.0f));
+    button->setPosition(Vec2(visibleSize.width - 55, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = atoi(label->getString().c_str());
         if (n > 0) {
@@ -210,7 +208,7 @@ bool ExtraInfoWidget::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("\xE2\x96\xB6\xEF\xB8\x8E");
+    button->setTitleText("+1");
     this->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 25, 40.0f));
     button->addClickEventListener([label](Ref *) {
@@ -397,17 +395,47 @@ void ExtraInfoWidget::refreshByWinTile(const RefreshByWinTile &rt) {
 }
 
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
-    AlertView::showWithMessage("使用说明",
-        "1. 本算番器遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式，请以您所参加的比赛细则中之规定为准。\n"
-        "2. 边张、嵌张、单钓将必须在严格独听时才计；对于可解释为组合龙龙身部分的牌，一律不计边张、嵌张、单钓将。\n"
-        "3. 必然门前清的番种自摸和牌时只计自摸，不计不求人。如七对、全不靠、七星不靠、十三幺、四暗刻、连七对、九莲宝灯等。\n"
-        "4. 绿一色、字一色、清幺九、混幺九、全大、全中、全小、大于五、小于五均可复合七对。\n"
-        "5. 全双刻不可复合七对，对于由仅偶数牌组成的七对，只计七对+断幺。\n"
-        "6. 大三元、小三元、三风刻、一色四同顺、一色四节高、一色四步高等至少缺少一门花色序数牌的番种，可计缺一门。\n"
-        "7. 有发的绿一色不计混一色。\n"
-        "8. 大四喜、小四喜可计混一色。\n"
-        "9. 清幺九不计双同刻，可计三同刻。\n"
-        "10. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n"
-        "11. 1明杠1暗杠计5番。暗杠的加计遵循国际麻将联盟（MIL）的规则，杠系列和暗刻系列最多各取一个番种计分。",
-        10, nullptr, nullptr);
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float maxWidth = visibleSize.width * 0.8f - 10;
+    Label *label = Label::createWithSystemFont(
+        "1. 本程序不对和牌张位置的牌进行吃、碰、杠检测，如果要对某张牌进行吃、碰、杠操作，请将这张牌放在手牌范围内。点击算番结果处的番种名，可跳转到相应番种的定义。\n"
+        "2. 本程序遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式，请以您所参加的比赛细则中之规定为准。\n"
+        "3. 手牌在形式上听多种牌（包括听第5张不存在的牌）时，不计边张、嵌张、单钓将。边张、嵌张、单钓将最多计其中一个。\n"
+        "4. 组合龙普通型和牌中，可加计平和。对于可解释为组合龙龙身部分的听牌，一律不计边张、嵌张、单钓将。\n"
+        "5. 必然门前清的番种（七对、全不靠、七星不靠、十三幺、四暗刻、连七对、九莲宝灯）自摸和牌时只计自摸，不计不求人。\n"
+        "6. 绿一色、字一色、清幺九、混幺九、全大、全中、全小、大于五、小于五均可复合七对。全双刻不可复合七对，对于由仅偶数牌组成的七对，只计七对+断幺。\n"
+        "7. 字一色、混幺九、清幺九不计碰碰和。\n"
+        "8. 至少缺一门花色的番种（包括大三元、小三元、三风刻、一色四同顺、一色四节高、一色四步高、推不倒），除推不倒不计缺一门以外，其他番种均可加计缺一门。\n"
+        "9. 有发的绿一色不计混一色。大四喜、小四喜可计混一色。\n"
+        "10. 清幺九不计双同刻，可计三同刻。\n"
+        "11. 九莲宝灯和258时计1个幺九刻，和其他牌不计幺九刻。\n"
+        "12. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n"
+        "13. 双暗杠6番，一明杠一暗杠5番，双明杠4番。暗杠的加计遵循国际麻将联盟（MIL）的规则，即杠系列和暗刻系列最多各计一个。",
+        "Arail", 10);
+    label->setColor(Color3B::BLACK);
+    label->setDimensions(maxWidth, 0);
+
+    Node *node = nullptr;
+
+    // 超出高度就使用ScrollView
+    const Size &labelSize = label->getContentSize();
+    const float maxHeight = visibleSize.height * 0.8f - 80;
+    if (labelSize.height <= maxHeight) {
+        node = label;
+    }
+    else {
+        ui::ScrollView *scrollView = ui::ScrollView::create();
+        scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
+        scrollView->setScrollBarPositionFromCorner(Vec2(2, 2));
+        scrollView->setScrollBarWidth(4);
+        scrollView->setScrollBarOpacity(0x99);
+        scrollView->setContentSize(Size(maxWidth, maxHeight));
+        scrollView->setInnerContainerSize(labelSize);
+        scrollView->addChild(label);
+        label->setPosition(Vec2(labelSize.width * 0.5f, labelSize.height * 0.5f));
+
+        node = scrollView;
+    }
+
+    AlertView::showWithNode("使用说明", node, nullptr, nullptr);
 }

@@ -5,6 +5,7 @@
 #include "../widget/ExtraInfoWidget.h"
 #include "../widget/AlertView.h"
 #include "../widget/TilesKeyboard.h"
+#include "../FanTable/FanDefinition.h"
 
 USING_NS_CC;
 
@@ -45,11 +46,11 @@ bool FanCalculatorScene::init() {
     // 番算按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
-    button->setContentSize(Size(45.0f, 20.0f));
+    button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("算番");
+    button->setTitleText("算  番");
     extraInfo->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 35, 10.0f));
+    button->setPosition(Vec2(visibleSize.width - 40, 10.0f));
     button->addClickEventListener([this](Ref *) { calculate(); });
 
     // 番种显示的Node
@@ -86,7 +87,7 @@ static cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_T
     Node *node = Node::create();
     const int lineHeight = fontSize + 2;
     long resultAreaHeight = lineHeight * rows;  // 每行间隔2像素
-    resultAreaHeight += (5 + lineHeight);  // 总计
+    resultAreaHeight += (5 + lineHeight) + 20;  // 总计+提示
     node->setContentSize(Size(resultAreaWidth, resultAreaHeight));
 
     long fan = 0;
@@ -100,19 +101,36 @@ static cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_T
             : Common::format<128>("%s %d番x%ld\n", mahjong::fan_name[j], f, fan_table[j]);
 
         // 创建label，每行排2个
-        Label *fanName = Label::createWithSystemFont(str, "Arial", fontSize);
-        fanName->setColor(Color3B(0x60, 0x60, 0x60));
-        node->addChild(fanName);
-        fanName->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        Label *label = Label::createWithSystemFont(str, "Arial", fontSize);
+        label->setColor(Color3B(0x60, 0x60, 0x60));
+        node->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         div_t ret = div(i, 2);
-        fanName->setPosition(Vec2(ret.rem == 0 ? 10.0f : resultAreaWidth * 0.5f, resultAreaHeight - lineHeight * (ret.quot + 1)));
+        label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, resultAreaHeight - lineHeight * (ret.quot + 1)));
+
+        // 创建与label同位置的button
+        ui::Button *button = ui::Button::create();
+        button->setScale9Enabled(true);
+        button->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        button->setPosition(label->getPosition());
+        button->setContentSize(label->getContentSize());
+        node->addChild(button);
+        button->addClickEventListener([j](Ref *) {
+            Director::getInstance()->pushScene(FanDefinitionScene::create(j));
+        });
     }
 
-    Label *fanTotal = Label::createWithSystemFont(Common::format<64>("总计：%ld番", fan), "Arial", fontSize);
-    fanTotal->setColor(Color3B::BLACK);
-    node->addChild(fanTotal);
-    fanTotal->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    fanTotal->setPosition(Vec2(10.0f, lineHeight * 0.5f));
+    Label *label = Label::createWithSystemFont(Common::format<64>("总计：%ld番", fan), "Arial", fontSize);
+    label->setColor(Color3B::BLACK);
+    node->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20));
+
+    label = Label::createWithSystemFont("点击番种名可查看番种介绍。", "Arial", 10);
+    label->setColor(Color3B(51, 204, 255));
+    node->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(0.0f, 5));
 
     return node;
 }
@@ -220,7 +238,7 @@ void FanCalculatorScene::calculate() {
         return;
     }
 
-    Node *innerNode = createFanResultNode(fan_table, 14, fanAreaSize.width);
+    Node *innerNode = createFanResultNode(fan_table, 14, fanAreaSize.width - 10);
 
     // 超出高度就使用ScrollView
     if (innerNode->getContentSize().height <= fanAreaSize.height) {
@@ -230,12 +248,12 @@ void FanCalculatorScene::calculate() {
     }
     else {
         ui::ScrollView *scrollView = ui::ScrollView::create();
+        scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
         scrollView->setScrollBarPositionFromCorner(Vec2(2, 2));
         scrollView->setScrollBarWidth(4);
         scrollView->setScrollBarOpacity(0x99);
-        scrollView->setContentSize(fanAreaSize);
+        scrollView->setContentSize(Size(fanAreaSize.width - 10, fanAreaSize.height));
         scrollView->setInnerContainerSize(innerNode->getContentSize());
-        scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
         scrollView->addChild(innerNode);
 
         _fanAreaNode->addChild(scrollView);

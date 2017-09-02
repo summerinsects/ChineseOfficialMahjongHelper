@@ -21,7 +21,7 @@ public:
 
     const Record::Detail &getDetail() const { return _detail; }
 
-    static void _SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, uint8_t false_win);
+    static void _SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t seatFlag, uint8_t win_claim, uint8_t false_win);
 
 private:
     cocos2d::ui::EditBox *_editBox = nullptr;
@@ -35,10 +35,11 @@ private:
     cw::TableView *_tableView = nullptr;
     cocos2d::ui::Button *_okButton = nullptr;
 
-    size_t _handIdx = 0;
     int _winIndex = -1;
     Record::Detail _detail;
     std::function<void (const Record::Detail &)> _okCallback;
+    uint8_t _seatFlag;
+    uint8_t _playerFlag;
 
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
     virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
@@ -46,6 +47,7 @@ private:
 
     void refresh();
     void updateScoreLabel();
+    void showPackedFanAlert(const std::function<void ()> &callback);
 
     void onMinusButton(cocos2d::Ref *sender, int delta);
     void onPlusButton(cocos2d::Ref *sender, int delta);
@@ -54,7 +56,6 @@ private:
     void onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
     void onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
-    void onPackedFanButton(cocos2d::Ref *sender);
     void onPointsNameButton(cocos2d::Ref *sender);
     void onOkButton(cocos2d::Ref *sender);
 };
