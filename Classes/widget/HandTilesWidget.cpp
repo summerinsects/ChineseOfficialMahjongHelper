@@ -515,7 +515,7 @@ void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
     }
 }
 
-bool HandTilesWidget::canChow_XX() {
+bool HandTilesWidget::canChow_XX() const {
     if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
         return false;
     }
@@ -533,7 +533,7 @@ bool HandTilesWidget::canChow_XX() {
         && _standingTilesTable[tile + 2] > 0);
 }
 
-bool HandTilesWidget::canChowX_X() {
+bool HandTilesWidget::canChowX_X() const {
     if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
         return false;
     }
@@ -551,7 +551,7 @@ bool HandTilesWidget::canChowX_X() {
         && _standingTilesTable[tile + 1] > 0);
 }
 
-bool HandTilesWidget::canChowXX_() {
+bool HandTilesWidget::canChowXX_() const {
     if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
         return false;
     }
@@ -569,7 +569,7 @@ bool HandTilesWidget::canChowXX_() {
         && _standingTilesTable[tile] > 0);
 }
 
-bool HandTilesWidget::canPung() {
+bool HandTilesWidget::canPung() const {
     if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
         return false;
     }
@@ -583,7 +583,7 @@ bool HandTilesWidget::canPung() {
     return (_standingTilesTable[tile] >= 3);
 }
 
-bool HandTilesWidget::canKong() {
+bool HandTilesWidget::canKong() const {
     if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
         return false;
     }
