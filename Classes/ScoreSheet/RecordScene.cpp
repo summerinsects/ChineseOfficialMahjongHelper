@@ -146,6 +146,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 50));
 
+    // 说明文本
+    label = Label::createWithSystemFont("番数支持直接输入。标记主番可快速增加番数，取消标记不减少。", "Arial", 10);
+    label->setColor(Color3B(0x60, 0x60, 0x60));
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 5, origin.y + visibleSize.height - 70));
+    Common::scaleLabelToFitWidth(label, visibleSize.width - 10);
+
     _winGroup = ui::RadioButtonGroup::create();
     _winGroup->setAllowedNoSelection(true);
     this->addChild(_winGroup);
@@ -167,14 +175,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         Label *nameLabel = Label::createWithSystemFont(playerNames[ORDER(_seatFlag, i)], "Arial", 12);
         nameLabel->setColor(Color3B::ORANGE);
         this->addChild(nameLabel);
-        nameLabel->setPosition(Vec2(x, origin.y + visibleSize.height - 80));
+        nameLabel->setPosition(Vec2(x, origin.y + visibleSize.height - 90));
         Common::scaleLabelToFitWidth(nameLabel, gap - 4);
 
         // 得分
         _scoreLabel[i] = Label::createWithSystemFont("+0", "Arial", 12);
         _scoreLabel[i]->setColor(Color3B(0x60, 0x60, 0x60));
         this->addChild(_scoreLabel[i]);
-        _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 100));
+        _scoreLabel[i]->setPosition(Vec2(x, origin.y + visibleSize.height - 110));
 
         // 和
         ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
@@ -183,14 +191,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 125));
+        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 135));
         _winGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("和", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 125));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 135));
 
         // 点炮或自摸
         button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
@@ -199,21 +207,21 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 155));
+        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 165));
         _claimGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 155));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 165));
         _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 155));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 165));
         _selfDrawnLabel[i] = label;
         label->setVisible(false);
 
@@ -224,25 +232,25 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         _falseWinBox[i]->setZoomScale(0.0f);
         _falseWinBox[i]->ignoreContentAdaptWithSize(false);
         _falseWinBox[i]->setContentSize(Size(20.0f, 20.0f));
-        _falseWinBox[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 185));
+        _falseWinBox[i]->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 195));
         _falseWinBox[i]->addEventListener(std::bind(&RecordScene::onFalseWinBox, this, std::placeholders::_1, std::placeholders::_2));
 
         label = Label::createWithSystemFont("错和", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 185));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 195));
     }
 
     // 根结点
     ui::Layout *rootLayout = ui::Layout::create();
     this->addChild(rootLayout);
-    rootLayout->setPosition(Vec2(origin.x, origin.y + 35));
+    rootLayout->setPosition(Vec2(origin.x, origin.y + 30));
     rootLayout->setTouchEnabled(true);
 
     // 上方所有东西
     Node *topNode = Node::create();
-    topNode->setContentSize(Size(visibleSize.width, 70));
+    topNode->setContentSize(Size(visibleSize.width, 45));
     topNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     topNode->setIgnoreAnchorPointForPosition(false);
     rootLayout->addChild(topNode);
@@ -252,13 +260,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setColor(Color3B::BLACK);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 65.0f));
-
-    label = Label::createWithSystemFont("标记主番可快速增加番数，取消标记不减少。\n微调番数可按两侧的+/-，亦可直接输入", "Arial", 10);
-    label->setColor(Color3B::ORANGE);
-    topNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 40.0f));
+    label->setPosition(Vec2(5.0f, 35.0f));
 
     // 展开/收起
     ui::Button *layoutButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -266,7 +268,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     layoutButton->setContentSize(Size(55.0f, 20.0f));
     layoutButton->setTitleFontSize(12);
     topNode->addChild(layoutButton);
-    layoutButton->setPosition(Vec2(visibleSize.width - 35.0f, 65.0f));
+    layoutButton->setPosition(Vec2(visibleSize.width - 35.0f, 35.0f));
 
     // 常用凑番
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -276,7 +278,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setTitleText("常用凑番");
     button->addClickEventListener([this](Ref *) { showPackedFanAlert(nullptr); });
     topNode->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 35.0f, 40.0f));
+    button->setPosition(Vec2(visibleSize.width - 35.0f, 10.0f));
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
@@ -298,13 +300,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         Size layoutSize;
         layoutSize.width = visibleSize.width;
         if (layoutButton->getUserData()) {
-            layoutSize.height = visibleSize.height - 150;
+            layoutSize.height = visibleSize.height - 140;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
             layoutButton->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
             radioNode->setVisible(false);
         }
         else {
-            layoutSize.height = visibleSize.height - 240;
+            layoutSize.height = visibleSize.height - 230;
             layoutButton->setUserData(reinterpret_cast<void *>(true));
             layoutButton->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E展开");
             radioNode->setVisible(true);
@@ -312,7 +314,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
         rootLayout->setContentSize(layoutSize);
         topNode->setPosition(Vec2(visibleSize.width * 0.5f, layoutSize.height - 35));
-        tableView->setContentSize(Size(visibleSize.width - 5, layoutSize.height - 75));
+        tableView->setContentSize(Size(visibleSize.width - 5, layoutSize.height - 65));
         tableView->reloadData();
     };
     onLayoutButton(layoutButton);
@@ -325,10 +327,10 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 10.0f));
 
-    // 6 8 12 16 24 32
+    // 6 8 12 16 24
     const float labelPosX = label->getContentSize().width + 5 + 2;
-    const char *text[] = { "6番", "8番", "12番", "16番", "24番", "32番" };
-    for (size_t i = 0; i < 6; ++i) {
+    const char *text[] = { "6番", "8番", "12番", "16番", "24番" };
+    for (size_t i = 0; i < 5; ++i) {
         button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         button->setScale9Enabled(true);
         button->setContentSize(Size(30.0f, 20.0f));
