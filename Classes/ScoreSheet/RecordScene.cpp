@@ -727,25 +727,31 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
 }
 
 void RecordScene::onOkButton(cocos2d::Ref *sender) {
-    if (_drawBox->isSelected() && _detail.fan_flag != 0) {
-        AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", 12,
-            [this]() {
-            _detail.fan_flag = 0;
-            _detail.packed_fan = 0;
+    if (_detail.fan_flag != 0) {  // 标记了番种
+        if (_drawBox->isSelected()) {  // 荒庄
+            AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", 12,
+                [this]() {
+                _detail.fan_flag = 0;
+                _detail.packed_fan = 0;
+                _okCallback(_detail);
+                Director::getInstance()->popScene();
+            }, nullptr);
+        }
+        else {
             _okCallback(_detail);
             Director::getInstance()->popScene();
-        }, nullptr);
-        return;
+        }
     }
-
-    if (_detail.fan_flag == 0 && _winIndex != -1) {
-        showPackedFanAlert([this]() {
+    else {  // 未标记番种
+        if (_winIndex != -1) {  // 有人和牌
+            showPackedFanAlert([this]() {
+                _okCallback(_detail);
+                Director::getInstance()->popScene();
+            });
+        }
+        else {
             _okCallback(_detail);
             Director::getInstance()->popScene();
-        });
-        return;
+        }
     }
-
-    _okCallback(_detail);
-    Director::getInstance()->popScene();
 }
