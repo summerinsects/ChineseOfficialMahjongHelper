@@ -66,45 +66,49 @@ bool TilePickWidget::init() {
     const float contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
 
     // 万
+    const float charactersY = TILE_HEIGHT * 3.5f;
     for (int i = 0; i < 9; ++i) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, i + 1);
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tilesContainer->addChild(button);
-        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), TILE_HEIGHT * 3.5f));
+        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), charactersY));
         button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
         _characterButtons[i] = button;
     }
 
     // 条
+    const float bambooY = TILE_HEIGHT * 2.5f;
     for (int i = 0; i < 9; ++i) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_BAMBOO, i + 1);
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tilesContainer->addChild(button);
-        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), TILE_HEIGHT * 2.5f));
+        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), bambooY));
         button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
         _bambooButtons[i] = button;
     }
 
     // 饼
+    const float dotsY = TILE_HEIGHT * 1.5f;
     for (int i = 0; i < 9; ++i) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DOTS, i + 1);
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tilesContainer->addChild(button);
-        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), TILE_HEIGHT * 1.5f));
+        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), dotsY));
         button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
         _dotsButtons[i] = button;
     }
 
     // 字牌
+    const float honorsY = TILE_HEIGHT * 0.5f;
     for (int i = 0; i < 7; ++i) {
         mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_HONORS, i + 1);
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tilesContainer->addChild(button);
-        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), TILE_HEIGHT * 0.5f));
+        button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), honorsY));
         button->addClickEventListener(std::bind(&TilePickWidget::onTileTableButton, this, std::placeholders::_1, tile));
         _honorButtons[i] = button;
     }
