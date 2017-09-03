@@ -133,16 +133,16 @@ bool TilePickWidget::init() {
     }
 
     // 吃(_XX) 为23吃1这种类型
-    buttons[0]->addClickEventListener(std::bind(&TilePickWidget::onChow_XXButton, this, std::placeholders::_1));
-    _chow_XXButton = buttons[0];
+    buttons[0]->addClickEventListener(std::bind(&TilePickWidget::onChow1Button, this, std::placeholders::_1));
+    _chow1Button = buttons[0];
 
     // 吃(X_X) 为13吃2这种类型
-    buttons[1]->addClickEventListener(std::bind(&TilePickWidget::onChowX_XButton, this, std::placeholders::_1));
-    _chowX_XButton = buttons[1];
+    buttons[1]->addClickEventListener(std::bind(&TilePickWidget::onChow2Button, this, std::placeholders::_1));
+    _chow2Button = buttons[1];
 
     // 吃(XX_) 为12吃3这种类型
-    buttons[2]->addClickEventListener(std::bind(&TilePickWidget::onChowXX_Button, this, std::placeholders::_1));
-    _chowXX_Button = buttons[2];
+    buttons[2]->addClickEventListener(std::bind(&TilePickWidget::onChow3Button, this, std::placeholders::_1));
+    _chow3Button = buttons[2];
 
     // 排序
     buttons[3]->addClickEventListener([this](Ref *) {  sort(); });
@@ -183,9 +183,9 @@ void TilePickWidget::reset() {
     }
 
     // 禁用吃碰杠按钮
-    _chow_XXButton->setEnabled(false);
-    _chowX_XButton->setEnabled(false);
-    _chowXX_Button->setEnabled(false);
+    _chow1Button->setEnabled(false);
+    _chow2Button->setEnabled(false);
+    _chow3Button->setEnabled(false);
     _pungButton->setEnabled(false);
     _meldedKongButton->setEnabled(false);
     _concealedKongButton->setEnabled(false);
@@ -263,9 +263,9 @@ void TilePickWidget::refreshAllTilesTableButton() {
 }
 
 void TilePickWidget::refreshActionButtons() {
-    _chow_XXButton->setEnabled(_handTilesWidget->canChow_XX());
-    _chowX_XButton->setEnabled(_handTilesWidget->canChowX_X());
-    _chowXX_Button->setEnabled(_handTilesWidget->canChowXX_());
+    _chow1Button->setEnabled(_handTilesWidget->canChow1());
+    _chow2Button->setEnabled(_handTilesWidget->canChow2());
+    _chow3Button->setEnabled(_handTilesWidget->canChow3());
     _pungButton->setEnabled(_handTilesWidget->canPung());
     _meldedKongButton->setEnabled(_handTilesWidget->canKong());
     _concealedKongButton->setEnabled(_meldedKongButton->isEnabled());
@@ -282,24 +282,24 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t til
     }
 }
 
-void TilePickWidget::onChow_XXButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedChow_XXPack())) {
+void TilePickWidget::onChow1Button(cocos2d::Ref *sender) {
+    if (LIKELY(_handTilesWidget->makeFixedChow1Pack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }
     }
 }
 
-void TilePickWidget::onChowX_XButton(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedChowX_XPack())) {
+void TilePickWidget::onChow2Button(cocos2d::Ref *sender) {
+    if (LIKELY(_handTilesWidget->makeFixedChow2Pack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }
     }
 }
 
-void TilePickWidget::onChowXX_Button(cocos2d::Ref *sender) {
-    if (LIKELY(_handTilesWidget->makeFixedChowXX_Pack())) {
+void TilePickWidget::onChow3Button(cocos2d::Ref *sender) {
+    if (LIKELY(_handTilesWidget->makeFixedChow3Pack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }
