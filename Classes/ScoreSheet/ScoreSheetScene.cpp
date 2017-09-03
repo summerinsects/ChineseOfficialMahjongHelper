@@ -837,95 +837,42 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
         Common::scaleLabelToFitWidth(label, gap - 4);
     }
 
-    // 2位
-    Label *label = Label::createWithSystemFont(name[indices[1]], "Arail", 12);
-    label->setColor(titleColor[0]);
-    label->setPosition(Vec2(gap * 0.5f, 150));
-    drawNode->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
+    const int nameY[3] = { 150, 100, 30 };
+    const int numbersStartY[3] = { 150, 110, 50 };
 
-    // 追1位
-    label = Label::createWithSystemFont(name[indices[0]], "Arail", 12);
-    label->setColor(titleColor[1]);
-    label->setPosition(Vec2(gap * 1.5f, 150));
-    drawNode->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
-
-    int delta = totalScores[indices[0]] - totalScores[indices[1]];
-    int d = delta - 32;
-    int numbers[4];
-    numbers[0] = delta;  // 分差
-    numbers[1] = std::max((d >> 2) + 1, 8);  // 自摸
-    numbers[2] = std::max((d >> 1) + 1, 8);  // 对点
-    numbers[3] = std::max(d + 1, 8);  // 旁点
-
-    for (int i = 0; i < 4; ++i) {
-        label = Label::createWithSystemFont(std::to_string(numbers[i]), "Arail", 12);
-        label->setColor(titleColor[i + 2]);
-        label->setPosition(Vec2(gap * (2.5f + i), 150));
-        drawNode->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4);
-    }
-
-    // 3位
-    label = Label::createWithSystemFont(name[indices[2]], "Arail", 12);
-    label->setColor(titleColor[0]);
-    label->setPosition(Vec2(gap * 0.5f, 100));
-    drawNode->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
-
-    for (int k = 0; k < 2; ++k) {
-        // 追k位
-        label = Label::createWithSystemFont(name[indices[k]], "Arail", 12);
-        label->setColor(titleColor[1]);
-        label->setPosition(Vec2(gap * 1.5f, 110 - k * 20));
+    // n位。n=1表示二位，以此类推
+    for (int n = 1; n < 4; ++n) {
+        Label *label = Label::createWithSystemFont(name[indices[n]], "Arail", 12);
+        label->setColor(titleColor[0]);
+        label->setPosition(Vec2(gap * 0.5f, nameY[n - 1]));
         drawNode->addChild(label);
         Common::scaleLabelToFitWidth(label, gap - 4);
 
-        delta = totalScores[indices[k]] - totalScores[indices[2]];
-        d = delta - 32;
-        numbers[0] = delta;  // 分差
-        numbers[1] = std::max((d >> 2) + 1, 8);  // 自摸
-        numbers[2] = std::max((d >> 1) + 1, 8);  // 对点
-        numbers[3] = std::max(d + 1, 8);  // 旁点
+        // 追k位。k=0表示1位，以此类推
+        for (int k = 0; k < n; ++k) {
+            const int posY = numbersStartY[n - 1] - k * 20;
 
-        for (int i = 0; i < 4; ++i) {
-            label = Label::createWithSystemFont(std::to_string(numbers[i]), "Arail", 12);
-            label->setColor(titleColor[i + 2]);
-            label->setPosition(Vec2(gap * (2.5f + i), 110 - k * 20));
+            label = Label::createWithSystemFont(name[indices[k]], "Arail", 12);
+            label->setColor(titleColor[1]);
+            label->setPosition(Vec2(gap * 1.5f, posY));
             drawNode->addChild(label);
             Common::scaleLabelToFitWidth(label, gap - 4);
-        }
-    }
 
-    // 4位
-    label = Label::createWithSystemFont(name[indices[3]], "Arail", 12);
-    label->setColor(titleColor[0]);
-    label->setPosition(Vec2(gap * 0.5f, 30));
-    drawNode->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
+            int delta = totalScores[indices[k]] - totalScores[indices[n]];
+            int d = delta - 32;
+            int numbers[4];
+            numbers[0] = delta;  // 分差
+            numbers[1] = std::max((d >> 2) + 1, 8);  // 自摸
+            numbers[2] = std::max((d >> 1) + 1, 8);  // 对点
+            numbers[3] = std::max(d + 1, 8);  // 旁点
 
-    for (int k = 0; k < 3; ++k) {
-        // 追k位
-        label = Label::createWithSystemFont(name[indices[k]], "Arail", 12);
-        label->setColor(titleColor[1]);
-        label->setPosition(Vec2(gap * 1.5f, 50 - k * 20));
-        drawNode->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4);
-
-        delta = totalScores[indices[k]] - totalScores[indices[2]];
-        d = delta - 32;
-        numbers[0] = delta;  // 分差
-        numbers[1] = std::max((d >> 2) + 1, 8);  // 自摸
-        numbers[2] = std::max((d >> 1) + 1, 8);  // 对点
-        numbers[3] = std::max(d + 1, 8);  // 旁点
-
-        for (int i = 0; i < 4; ++i) {
-            label = Label::createWithSystemFont(std::to_string(numbers[i]), "Arail", 12);
-            label->setColor(titleColor[i + 2]);
-            label->setPosition(Vec2(gap * (2.5f + i), 50 - k * 20));
-            drawNode->addChild(label);
-            Common::scaleLabelToFitWidth(label, gap - 4);
+            for (int i = 0; i < 4; ++i) {
+                label = Label::createWithSystemFont(std::to_string(numbers[i]), "Arail", 12);
+                label->setColor(titleColor[i + 2]);
+                label->setPosition(Vec2(gap * (2.5f + i), posY));
+                drawNode->addChild(label);
+                Common::scaleLabelToFitWidth(label, gap - 4);
+            }
         }
     }
 

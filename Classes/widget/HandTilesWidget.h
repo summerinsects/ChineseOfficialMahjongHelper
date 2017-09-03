@@ -37,15 +37,15 @@ public:
     void sortStandingTiles();
     mahjong::tile_t putTile(mahjong::tile_t tile);
 
-    bool canChow_XX() const;
-    bool canChowX_X() const;
-    bool canChowXX_() const;
+    bool canChow1() const;
+    bool canChow2() const;
+    bool canChow3() const;
     bool canPung() const;
     bool canKong() const;
 
-    bool makeFixedChow_XXPack();
-    bool makeFixedChowX_XPack();
-    bool makeFixedChowXX_Pack();
+    bool makeFixedChow1Pack();
+    bool makeFixedChow2Pack();
+    bool makeFixedChow3Pack();
     bool makeFixedPungPack();
     bool makeFixedMeldedKongPack();
     bool makeFixedConcealedKongPack();

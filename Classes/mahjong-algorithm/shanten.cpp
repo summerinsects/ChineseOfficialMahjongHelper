@@ -586,7 +586,7 @@ static bool is_basic_type_win_recursively(int (&cnt_table)[TILE_TABLE_SIZE], lon
         if (cnt_table[t] > 2) {
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
-            bool ret = is_basic_type_win_recursively(cnt_table, left_cnt - 3);            
+            bool ret = is_basic_type_win_recursively(cnt_table, left_cnt - 3);
             cnt_table[t] += 3;
             if (ret) {
                 return true;
