@@ -71,7 +71,7 @@ typedef uint8_t rank_t;
 #define TILE_SUIT_HONORS        4  ///< 字牌（HONORS）
 
 /**
- * @brief 牌
+ * @brief 牌\n
  * 内存结构：
  * - 0-3 4bit 牌的点数
  * - 4-7 4bit 牌的花色
@@ -262,7 +262,7 @@ static forceinline bool is_terminal(tile_t tile) {
     // 最基本的逐个判断
     //return (tile == 0x11 || tile == 0x19 || tile == 0x21 || tile == 0x29 || tile == 0x31 || tile == 0x39);
 
-    // 高级算法：观察数牌幺九的二进制位：
+    // 算法原理：观察数牌幺九的二进制位：
     // 0x11：0001 0001
     // 0x19：0001 1001
     // 0x21：0010 0001
