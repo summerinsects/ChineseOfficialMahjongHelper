@@ -180,7 +180,7 @@ typedef uint8_t win_flag_t;
  * @brief 检查算番的输入是否合法
  *
  *
- * @param [in] hand_tiles 手牌信息
+ * @param [in] hand_tiles 手牌
  * @param [in] win_tile 和牌张
  * @retval 0 成功
  * @retval ERROR_WRONG_TILES_COUNT 错误的张数
@@ -201,7 +201,7 @@ struct extra_condition_t {
  * @brief 算番参数
  */
 struct calculate_param_t {
-    hand_tiles_t hand_tiles;    ///< 手牌信息
+    hand_tiles_t hand_tiles;    ///< 手牌
     tile_t win_tile;            ///< 和牌张
     int flower_count;           ///< 花牌数
     extra_condition_t ext_cond; ///< 附加信息
