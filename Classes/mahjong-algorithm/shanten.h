@@ -247,7 +247,7 @@ int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing
  * @param [out] waiting_table 听牌标记表（可为null)
  * @return bool 是否听牌
  */
-bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t waiting_table);
+bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table);
 
 /**
  * @brief 全不靠是否和牌
