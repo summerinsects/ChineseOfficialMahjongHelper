@@ -208,6 +208,11 @@ struct calculate_param_t {
 };
 
 /**
+ * @brief 番表
+ */
+typedef long fan_table_t[FAN_TABLE_SIZE];
+
+/**
  * @brief 算番
  *
  * @param [in] calculate_param 算番参数
@@ -217,7 +222,7 @@ struct calculate_param_t {
  * @retval ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
  * @retval ERROR_NOT_WIN 没和牌
  */
-int calculate_fan(const calculate_param_t *calculate_param, long (&fan_table)[FAN_TABLE_SIZE]);
+int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_table);
 
 #if 0
 

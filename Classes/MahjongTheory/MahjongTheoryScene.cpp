@@ -15,7 +15,7 @@
 
 USING_NS_CC;
 
-static mahjong::tile_t serveRandomTile(const int (&usedTable)[mahjong::TILE_TABLE_SIZE], mahjong::tile_t discardTile);
+static mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile);
 
 bool MahjongTheoryScene::init() {
     if (UNLIKELY(!BaseScene::initWithTitle("牌理"))) {
@@ -451,7 +451,7 @@ void MahjongTheoryScene::calculate() {
     }).detach();
 }
 
-mahjong::tile_t serveRandomTile(const int (&usedTable)[mahjong::TILE_TABLE_SIZE], mahjong::tile_t discardTile) {
+mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile) {
     // 没用到的牌表
     int remainTable[mahjong::TILE_TABLE_SIZE];
     std::transform(std::begin(usedTable), std::end(usedTable), std::begin(remainTable),
