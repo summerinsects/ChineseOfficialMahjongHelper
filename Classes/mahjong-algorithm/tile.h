@@ -20,8 +20,8 @@
  SOFTWARE.
  ****************************************************************************/
 
-#ifndef _TILE_H_
-#define _TILE_H_
+#ifndef __MAHJONG_ALGORITHM__TILE_H__
+#define __MAHJONG_ALGORITHM__TILE_H__
 
 #include <stdint.h>
 

@@ -20,8 +20,8 @@
  SOFTWARE.
  ****************************************************************************/
 
-#ifndef __STRINGIFY_H__
-#define __STRINGIFY_H__
+#ifndef __MAHJONG_ALGORITHM__STRINGIFY_H__
+#define __MAHJONG_ALGORITHM__STRINGIFY_H__
 
 #include "tile.h"
 

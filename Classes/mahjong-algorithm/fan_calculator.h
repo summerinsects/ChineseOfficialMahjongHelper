@@ -20,8 +20,8 @@
  SOFTWARE.
 ****************************************************************************/
 
-#ifndef __FAN_CALCULATOR_H__
-#define __FAN_CALCULATOR_H__
+#ifndef __MAHJONG_ALGORITHM__FAN_CALCULATOR_H__
+#define __MAHJONG_ALGORITHM__FAN_CALCULATOR_H__
 
 #include "tile.h"
 

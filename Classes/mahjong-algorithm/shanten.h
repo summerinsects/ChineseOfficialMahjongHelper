@@ -20,8 +20,8 @@
  SOFTWARE.
  ****************************************************************************/
 
-#ifndef __SHANTEN_H__
-#define __SHANTEN_H__
+#ifndef __MAHJONG_ALGORITHM__SHANTEN_H__
+#define __MAHJONG_ALGORITHM__SHANTEN_H__
 
 #include "tile.h"
 
