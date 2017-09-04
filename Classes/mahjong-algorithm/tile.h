@@ -83,7 +83,7 @@ typedef uint8_t tile_t;
 
 /**
  * @brief 生成一张牌
- *  函数不检查输入的合法性，不保证返回值的合法性
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] suit 花色
  * @param [in] rank 点数
  * @return tile_t 牌
@@ -94,7 +94,7 @@ static forceinline tile_t make_tile(suit_t suit, rank_t rank) {
 
 /**
  * @brief 获取牌的花色
- *  函数不检查输入的合法性，不保证返回值的合法性
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return suit_t 花色
  */
@@ -104,7 +104,7 @@ static forceinline suit_t tile_suit(tile_t tile) {
 
 /**
  * @brief 获取牌的点数
- *  函数不检查输入的合法性，不保证返回值的合法性
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return rank_t 点数
  */
@@ -141,12 +141,12 @@ static const tile_t all_tiles[] = {
 
 /**
  * @brief 牌组
- * 用于表示一组面子或者雀头
+ *  用于表示一组面子或者雀头
  *
  * 内存结构：
- * - 0-7 8bit tile 牌（对于顺子，为中间那张牌）
- * - 8-11 4bit type 牌组类型
- * - 12-15 4bit offer 供牌信息\n
+ * - 0-7 8bit tile 牌（对于顺子，则表示中间那张牌，比如234p，那么牌为3p）
+ * - 8-11 4bit type 牌组类型，使用PACK_TYPE_xxx宏
+ * - 12-15 4bit offer 供牌信息，取值范围为0123\n
  *       0表示暗手（暗顺、暗刻、暗杠），非0表示明手（明顺、明刻、明杠）
  *
  *       对于牌组是刻子和杠时，123分别来表示是上家/对家/下家供的\n
@@ -218,6 +218,7 @@ struct hand_tiles_t {
 
 /**
  * @brief 判断是否为绿一色构成牌
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return bool
  */
@@ -232,6 +233,7 @@ static bool forceinline is_green(tile_t tile) {
 
 /**
  * @brief 判断是否为推不倒构成牌
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return bool
  */
@@ -248,6 +250,7 @@ static bool forceinline is_reversible(tile_t tile) {
 
 /**
  * @brief 判断是否为数牌幺九（老头牌）
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return bool
  */
@@ -297,7 +300,8 @@ static forceinline bool is_numbered_suit(tile_t tile) {
 }
 
 /**
- * @brief 判断是否为数牌（更快，对于非法牌可能产生误判）
+ * @brief 判断是否为数牌（更快）
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @see is_numbered_suit
  * @param [in] tile 牌
  * @return bool
@@ -316,7 +320,8 @@ static forceinline bool is_terminal_or_honor(tile_t tile) {
 }
 
 /**
- * @brief 判断两张牌花色是否相同（更快，对于非法牌可能产生误判）
+ * @brief 判断两张牌花色是否相同（更快）
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile0 牌0
  * @param [in] tile1 牌1
  * @return bool
@@ -326,7 +331,8 @@ static forceinline bool is_suit_equal_quick(tile_t tile0, tile_t tile1) {
 }
 
 /**
- * @brief 判断两张牌点数是否相同（更快，对于非法牌可能产生误判）
+ * @brief 判断两张牌点数是否相同（更快）
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile0 牌0
  * @param [in] tile1 牌1
  * @return bool
