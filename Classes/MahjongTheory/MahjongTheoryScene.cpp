@@ -15,7 +15,7 @@
 
 USING_NS_CC;
 
-static mahjong::tile_t serveRandomTile(const int (&usedTable)[mahjong::TILE_TABLE_SIZE], mahjong::tile_t discardTile);
+static mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile);
 
 bool MahjongTheoryScene::init() {
     if (UNLIKELY(!BaseScene::initWithTitle("牌理"))) {
@@ -283,7 +283,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
 
         // 随机上牌
         if (serving_tile == 0) {
-            int cnt_table[mahjong::TILE_TABLE_SIZE];
+            mahjong::tile_table_t cnt_table;
             mahjong::map_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count, cnt_table);
             serving_tile = serveRandomTile(cnt_table, 0);
 
@@ -451,9 +451,9 @@ void MahjongTheoryScene::calculate() {
     }).detach();
 }
 
-mahjong::tile_t serveRandomTile(const int (&usedTable)[mahjong::TILE_TABLE_SIZE], mahjong::tile_t discardTile) {
+mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile) {
     // 没用到的牌表
-    int remainTable[mahjong::TILE_TABLE_SIZE];
+    mahjong::tile_table_t remainTable;
     std::transform(std::begin(usedTable), std::end(usedTable), std::begin(remainTable),
         [](int n) { return 4 - n; });
     //--remainTable[discardTile];  // 有必要吗？
@@ -578,7 +578,7 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t ser
     _handTilesWidget->getData(&handTiles, &st);
 
     // 对立牌打表
-    int cntTable[mahjong::TILE_TABLE_SIZE];
+    mahjong::tile_table_t cntTable;
     mahjong::map_tiles(handTiles.standing_tiles, handTiles.tile_count, cntTable);
     ++cntTable[st];  // 当前上牌
 

@@ -1,5 +1,27 @@
-﻿#ifndef __FAN_CALCULATOR_H__
-#define __FAN_CALCULATOR_H__
+﻿/****************************************************************************
+ Copyright (c) 2016-2017 Jeff Wang <summer_insects@163.com>
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+****************************************************************************/
+
+#ifndef __MAHJONG_ALGORITHM__FAN_CALCULATOR_H__
+#define __MAHJONG_ALGORITHM__FAN_CALCULATOR_H__
 
 #include "tile.h"
 
@@ -158,7 +180,7 @@ typedef uint8_t win_flag_t;
  * @brief 检查算番的输入是否合法
  *
  *
- * @param [in] hand_tiles 手牌信息
+ * @param [in] hand_tiles 手牌
  * @param [in] win_tile 和牌张
  * @retval 0 成功
  * @retval ERROR_WRONG_TILES_COUNT 错误的张数
@@ -179,11 +201,16 @@ struct extra_condition_t {
  * @brief 算番参数
  */
 struct calculate_param_t {
-    hand_tiles_t hand_tiles;    ///< 手牌信息
+    hand_tiles_t hand_tiles;    ///< 手牌
     tile_t win_tile;            ///< 和牌张
     int flower_count;           ///< 花牌数
     extra_condition_t ext_cond; ///< 附加信息
 };
+
+/**
+ * @brief 番表
+ */
+typedef long fan_table_t[FAN_TABLE_SIZE];
 
 /**
  * @brief 算番
@@ -195,7 +222,7 @@ struct calculate_param_t {
  * @retval ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
  * @retval ERROR_NOT_WIN 没和牌
  */
-int calculate_fan(const calculate_param_t *calculate_param, long (&fan_table)[FAN_TABLE_SIZE]);
+int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_table);
 
 #if 0
 

@@ -1,4 +1,26 @@
-﻿#include "shanten.h"
+﻿/****************************************************************************
+ Copyright (c) 2016-2017 Jeff Wang <summer_insects@163.com>
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ****************************************************************************/
+
+#include "shanten.h"
 
 #include <assert.h>
 #include <string.h>
@@ -45,7 +67,7 @@ long packs_to_tiles(const pack_t *packs, long pack_cnt, tile_t *tiles, long tile
 }
 
 // 将牌打表
-void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[TILE_TABLE_SIZE]) {
+void map_tiles(const tile_t *tiles, long cnt, tile_table_t &cnt_table) {
     memset(cnt_table, 0, sizeof(cnt_table));
     for (long i = 0; i < cnt; ++i) {
         ++cnt_table[tiles[i]];
@@ -53,7 +75,7 @@ void map_tiles(const tile_t *tiles, long cnt, int (&cnt_table)[TILE_TABLE_SIZE])
 }
 
 // 将手牌打表
-bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[TILE_TABLE_SIZE]) {
+bool map_hand_tiles(const hand_tiles_t *hand_tiles, tile_table_t &cnt_table) {
     // 将每一组副露当作3张牌来算，那么总张数=13
     if (hand_tiles->tile_count <= 0 || hand_tiles->pack_count < 0 || hand_tiles->pack_count > 4
         || hand_tiles->pack_count * 3 + hand_tiles->tile_count != 13) {
@@ -79,7 +101,7 @@ bool map_hand_tiles(const hand_tiles_t *hand_tiles, int (&cnt_table)[TILE_TABLE_
 }
 
 // 将表转换成牌
-long table_to_tiles(const int (&cnt_table)[TILE_TABLE_SIZE], tile_t *tiles, long max_cnt) {
+long table_to_tiles(const tile_table_t &cnt_table, tile_t *tiles, long max_cnt) {
     long cnt = 0;
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
@@ -95,7 +117,7 @@ long table_to_tiles(const int (&cnt_table)[TILE_TABLE_SIZE], tile_t *tiles, long
 }
 
 // 计数有效牌枚数
-int count_useful_tile(const int (&used_table)[TILE_TABLE_SIZE], const bool (&useful_table)[TILE_TABLE_SIZE]) {
+int count_useful_tile(const tile_table_t &used_table, const useful_table_t &useful_table) {
     int cnt = 0;
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
@@ -181,7 +203,7 @@ static void save_work_path(const long fixed_cnt, const work_path_t *work_path, w
 // work_path保存当前正在计算的路径，
 // work_state保存了所有已经计算过的路径，
 // 从0到fixed_cnt的数据是不使用的，这些保留给了副露的面子
-static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], const bool has_pair, const uint16_t pack_cnt, const uint16_t incomplete_cnt,
+static int basic_type_shanten_recursively(tile_table_t &cnt_table, const bool has_pair, const uint16_t pack_cnt, const uint16_t incomplete_cnt,
     const long fixed_cnt, work_path_t *work_path, work_state_t *work_state) {
     if (pack_cnt == 4) {  // 已经有4组面子
         return has_pair ? -1 : 0;  // 有雀头：和了；无雀头：听牌
@@ -324,7 +346,7 @@ static int basic_type_shanten_recursively(int (&cnt_table)[TILE_TABLE_SIZE], con
 }
 
 // 数牌是否有搭子
-static bool numbered_tile_has_neighbor(const int (&cnt_table)[TILE_TABLE_SIZE], tile_t t) {
+static bool numbered_tile_has_neighbor(const tile_table_t &cnt_table, tile_t t) {
     rank_t r = tile_rank(t);
     if (r < 9) { if (cnt_table[t + 1]) return true; }
     if (r < 8) { if (cnt_table[t + 2]) return true; }
@@ -334,7 +356,7 @@ static bool numbered_tile_has_neighbor(const int (&cnt_table)[TILE_TABLE_SIZE], 
 }
 
 // 以表格为参数计算基本和型上听数
-static int basic_type_shanten_from_table(int (&cnt_table)[TILE_TABLE_SIZE], long fixed_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+static int basic_type_shanten_from_table(tile_table_t &cnt_table, long fixed_cnt, useful_table_t *useful_table) {
     // 计算上听数
     work_path_t work_path;
     work_state_t work_state;
@@ -374,14 +396,14 @@ static int basic_type_shanten_from_table(int (&cnt_table)[TILE_TABLE_SIZE], long
 }
 
 // 基本和型上听数
-int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table) {
     if (standing_tiles == nullptr || (standing_cnt != 13
         && standing_cnt != 10 && standing_cnt != 7 && standing_cnt != 4 && standing_cnt != 1)) {
         return std::numeric_limits<int>::max();
     }
 
     // 对立牌的种类进行打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     if (useful_table != nullptr) {
@@ -391,7 +413,7 @@ int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*u
 }
 
 // 基本和型判断1张是否听牌
-static bool is_basic_type_wait_1(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiting_table)[TILE_TABLE_SIZE]) {
+static bool is_basic_type_wait_1(tile_table_t &cnt_table, useful_table_t *waiting_table) {
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] != 1) {
@@ -414,7 +436,7 @@ static bool is_basic_type_wait_1(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiti
 }
 
 // 基本和型判断2张是否听牌
-static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiting_table)[TILE_TABLE_SIZE]) {
+static bool is_basic_type_wait_2(const tile_table_t &cnt_table, useful_table_t *waiting_table) {
     bool ret = false;
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
@@ -460,7 +482,7 @@ static bool is_basic_type_wait_2(const int (&cnt_table)[TILE_TABLE_SIZE], bool (
 }
 
 // 基本和型判断4张是否听牌
-static bool is_basic_type_wait_4(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiting_table)[TILE_TABLE_SIZE]) {
+static bool is_basic_type_wait_4(tile_table_t &cnt_table, useful_table_t *waiting_table) {
     bool ret = false;
     // 削减雀头
     for (int i = 0; i < 34; ++i) {
@@ -483,7 +505,7 @@ static bool is_basic_type_wait_4(int (&cnt_table)[TILE_TABLE_SIZE], bool (*waiti
 }
 
 // 递归计算基本和型是否听牌
-static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long left_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+static bool is_basic_type_wait_recursively(tile_table_t &cnt_table, long left_cnt, useful_table_t *waiting_table) {
     if (left_cnt == 1) {
         return is_basic_type_wait_1(cnt_table, waiting_table);
     }
@@ -542,9 +564,9 @@ static bool is_basic_type_wait_recursively(int (&cnt_table)[TILE_TABLE_SIZE], lo
 // 基本和型是否听牌
 // 这里之所以不用直接调用上听数计算函数，判断其返回值为0的方式
 // 是因为前者会削减搭子，这个在听牌判断中是没必要的，所以单独写一套逻辑
-bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table) {
     // 对立牌的种类进行打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     if (waiting_table != nullptr) {
@@ -554,9 +576,10 @@ bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, bool (*
 }
 
 // 基本和型2张能否和牌
-static bool is_basic_type_win_2(const int (&cnt_table)[TILE_TABLE_SIZE]) {
+static bool is_basic_type_win_2(const tile_table_t &cnt_table) {
     // 找到未使用的牌
-    const int *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n > 0; });
+    typedef std::remove_all_extents<tile_table_t>::type table_elem_t;
+    const table_elem_t *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](table_elem_t n) { return n > 0; });
     // 存在且张数等于2
     if (it == std::end(cnt_table) || *it != 2) {
         return false;
@@ -571,7 +594,7 @@ static bool is_basic_type_win_2(const int (&cnt_table)[TILE_TABLE_SIZE]) {
 // 递归计算基本和型是否和牌
 // 这里之所以不用直接调用上听数计算函数，判断其返回值为-1的方式，
 // 是因为前者会削减搭子，这个在和牌判断中是没必要的，所以单独写一套逻辑
-static bool is_basic_type_win_recursively(int (&cnt_table)[TILE_TABLE_SIZE], long left_cnt) {
+static bool is_basic_type_win_recursively(tile_table_t &cnt_table, long left_cnt) {
     if (left_cnt == 2) {
         return is_basic_type_win_2(cnt_table);
     }
@@ -618,7 +641,7 @@ static bool is_basic_type_win_recursively(int (&cnt_table)[TILE_TABLE_SIZE], lon
 // 基本和型是否和牌
 bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
     // 对立牌的种类进行打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, cnt_table);
     ++cnt_table[test_tile];  // 添加测试的牌
     return is_basic_type_win_recursively(cnt_table, standing_cnt + 1);
@@ -627,7 +650,7 @@ bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t t
 // 七对
 
 // 七对上听数
-int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -652,9 +675,9 @@ int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*
 }
 
 // 七对是否听牌
-bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table) {
     // 直接计算其上听数，上听数为0即为听牌
-    bool useful_table[TILE_TABLE_SIZE];
+    useful_table_t useful_table;
     if (0 == seven_pairs_shanten(standing_tiles, standing_cnt,
         waiting_table != nullptr ? &useful_table : nullptr)) {
         if (waiting_table != nullptr) {
@@ -667,7 +690,7 @@ bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, bool (
 
 // 七对是否和牌
 bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
-    bool useful_table[TILE_TABLE_SIZE];
+    useful_table_t useful_table;
     return (0 == seven_pairs_shanten(standing_tiles, standing_cnt, &useful_table)
         && useful_table[test_tile]);
 }
@@ -675,13 +698,13 @@ bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t 
 // 十三幺
 
 // 十三幺上听数
-int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
 
     // 对牌的种类进行打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     bool has_pair = false;
@@ -724,9 +747,9 @@ int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, bo
 }
 
 // 十三幺是否听牌
-bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table) {
     // 直接计算其上听数，上听数为0即为听牌
-    bool useful_table[TILE_TABLE_SIZE];
+    useful_table_t useful_table;
     if (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt,
         waiting_table != nullptr ? &useful_table : nullptr)) {
         if (waiting_table != nullptr) {
@@ -739,7 +762,7 @@ bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, b
 
 // 十三幺是否和牌
 bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
-    bool useful_table[TILE_TABLE_SIZE];
+    useful_table_t useful_table;
     return (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt, &useful_table)
         && useful_table[test_tile]);
 }
@@ -747,7 +770,7 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, ti
 // “组合龙+面子+雀头”和型
 
 // 以表格为参数计算组合龙是否听牌
-static bool is_knitted_straight_wait_from_table(const int(&cnt_table)[TILE_TABLE_SIZE], long left_cnt, bool(*waiting_table)[TILE_TABLE_SIZE]) {
+static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, long left_cnt, useful_table_t *waiting_table) {
     // 匹配组合龙
     const tile_t (*matched_seq)[9] = nullptr;
     tile_t missing_tiles[9];
@@ -771,7 +794,7 @@ static bool is_knitted_straight_wait_from_table(const int(&cnt_table)[TILE_TABLE
     }
 
     // 剔除组合龙
-    int temp_table[TILE_TABLE_SIZE];
+    tile_table_t temp_table;
     memcpy(temp_table, cnt_table, sizeof(temp_table));
     for (int i = 0; i < 9; ++i) {
         tile_t t = (*matched_seq)[i];
@@ -798,7 +821,7 @@ static bool is_knitted_straight_wait_from_table(const int(&cnt_table)[TILE_TABLE
             }
         }
     }
-    else {  // 如果组合龙齐了，那么除去组合龙之后的牌要能听，整手牌才能听
+    else if (missing_cnt == 0) {  // 如果组合龙齐了，那么除去组合龙之后的牌要能听，整手牌才能听
         if (left_cnt == 10) {
             return is_basic_type_wait_1(temp_table, waiting_table);
         }
@@ -811,13 +834,13 @@ static bool is_knitted_straight_wait_from_table(const int(&cnt_table)[TILE_TABLE
 }
 
 // 基本和型包含主番的上听数，可用于计算三步高 三同顺 龙等三组面子的番种整个立牌的上听数
-static int basic_type_shanten_specified(const int (&cnt_table)[TILE_TABLE_SIZE], const tile_t *main_tiles, int main_cnt,
-    long fixed_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+static int basic_type_shanten_specified(const tile_table_t &cnt_table, const tile_t *main_tiles, int main_cnt,
+    long fixed_cnt, useful_table_t *useful_table) {
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
     }
 
-    int temp_table[TILE_TABLE_SIZE];
+    tile_table_t temp_table;
     memcpy(temp_table, cnt_table, sizeof(temp_table));
     int exsit_cnt = 0;
 
@@ -842,17 +865,17 @@ static int basic_type_shanten_specified(const int (&cnt_table)[TILE_TABLE_SIZE],
 }
 
 // 组合龙上听数
-int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table) {
     if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return std::numeric_limits<int>::max();
     }
 
     // 打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     int ret = std::numeric_limits<int>::max();
-    bool temp_table[TILE_TABLE_SIZE];
+    useful_table_t temp_table;
 
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
@@ -879,13 +902,13 @@ int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, bo
 }
 
 // 组合龙是否听牌
-bool is_knitted_straight_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+bool is_knitted_straight_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table) {
     if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
         return false;
     }
 
     // 对立牌的种类进行打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     return is_knitted_straight_wait_from_table(cnt_table, standing_cnt, waiting_table);
@@ -893,7 +916,7 @@ bool is_knitted_straight_wait(const tile_t *standing_tiles, long standing_cnt, b
 
 // 组合龙是否和牌
 bool is_knitted_straight_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
-    bool waiting_table[TILE_TABLE_SIZE];
+    useful_table_t waiting_table;
     return (is_knitted_straight_wait(standing_tiles, standing_cnt, &waiting_table)
         && waiting_table[test_tile]);
 }
@@ -901,7 +924,7 @@ bool is_knitted_straight_win(const tile_t *standing_tiles, long standing_cnt, ti
 // 全不靠/七星不靠
 
 // 1种组合龙的全不靠上听数
-static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, bool (*useful_table)[TILE_TABLE_SIZE]) {
+static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, long standing_cnt, int which_seq, useful_table_t *useful_table) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -911,7 +934,7 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, long
     }
 
     // 对牌的种类进行打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     int cnt = 0;
@@ -945,9 +968,9 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, long
 }
 
 // 全不靠上听数
-int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing_cnt, bool (*useful_table)[TILE_TABLE_SIZE]) {
+int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table) {
     int ret = std::numeric_limits<int>::max();
-    bool temp_table[TILE_TABLE_SIZE];
+    useful_table_t temp_table;
 
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
@@ -971,9 +994,9 @@ int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing
 }
 
 // 全不靠是否听牌
-bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, bool (*waiting_table)[TILE_TABLE_SIZE]) {
+bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table) {
     // 直接计算其上听数，上听数为0即为听牌
-    bool useful_table[TILE_TABLE_SIZE];
+    useful_table_t useful_table;
     if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt,
         waiting_table != nullptr ? &useful_table : nullptr)) {
         if (waiting_table != nullptr) {
@@ -986,7 +1009,7 @@ bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standin
 
 // 全不靠是否和牌
 bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile) {
-    bool useful_table[TILE_TABLE_SIZE];
+    useful_table_t useful_table;
     if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt, &useful_table)) {
         return useful_table[test_tile];
     }
@@ -1073,7 +1096,7 @@ void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint
     }
 
     // 将立牌打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(hand_tiles->standing_tiles, hand_tiles->tile_count, cnt_table);
 
     // 复制一份手牌

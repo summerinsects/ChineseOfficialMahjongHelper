@@ -78,7 +78,7 @@ bool FanCalculatorScene::init() {
     return true;
 }
 
-static cocos2d::Node *createFanResultNode(const long (&fan_table)[mahjong::FAN_TABLE_SIZE], int fontSize, float resultAreaWidth) {
+static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth) {
     // 有n个番种，每行排2个
     long n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
     long rows = (n >> 1) + (n & 1);  // 需要这么多行
@@ -207,7 +207,7 @@ void FanCalculatorScene::calculate() {
     std::sort(param.hand_tiles.standing_tiles, param.hand_tiles.standing_tiles + param.hand_tiles.tile_count);
 
     param.flower_count = flowerCnt;
-    long fan_table[mahjong::FAN_TABLE_SIZE] = { 0 };
+    mahjong::fan_table_t fan_table = { 0 };
 
     // 获取绝张、杠开、抢杠、海底信息
     mahjong::win_flag_t win_flag = _extraInfo->getWinFlag();

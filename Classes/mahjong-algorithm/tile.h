@@ -1,5 +1,27 @@
-﻿#ifndef _TILE_H_
-#define _TILE_H_
+﻿/****************************************************************************
+ Copyright (c) 2016-2017 Jeff Wang <summer_insects@163.com>
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ****************************************************************************/
+
+#ifndef __MAHJONG_ALGORITHM__TILE_H__
+#define __MAHJONG_ALGORITHM__TILE_H__
 
 #include <stdint.h>
 
@@ -14,15 +36,15 @@
 namespace mahjong {
 
 /**
- * @brief 术语
+ * @brief 代码注释中用到的术语简介
  * - 顺子：数牌中，花色相同序数相连的3张牌
- * - 刻子：三张相同的牌。碰出的为明刻，未碰出的为暗刻
+ * - 刻子：三张相同的牌。杠也算刻子。碰出的为明刻，未碰出的为暗刻
  * - 面子：顺子和刻子的统称
  * - 雀头：基本和牌形式中，单独组合的对子，也叫将、眼
  * - 基本和型：4面子+1雀头的和牌形式
  * - 特殊和型：非4面子+1雀头的和牌形式，在国标规则中，有七对、十三幺、全不靠等特殊和型
- * - 副露：利用其他选手打出的牌完成自己手牌的面子的行为，一般不包括暗杠，也叫鸣牌、动牌。
- *     有时也包括暗杠，称为暗副露，而吃、碰、明杠称为明副露
+ * - 副露：吃牌、碰牌、杠牌的统称，即利用其他选手打出的牌完成自己手牌的面子的行为，一般不包括暗杠，也叫鸣牌、动牌。
+ *     副露有时候也包括暗杠，此时将暗杠称为之暗副露，而吃、碰、明杠称为明副露
  * - 立牌：即手牌除了副露（包括暗杠）之后的牌
  * - 手牌：副露和立牌的统称，有时仅指立牌
  */
@@ -61,7 +83,7 @@ typedef uint8_t tile_t;
 
 /**
  * @brief 生成一张牌
- *  函数不检查输入的合法性，不保证返回值的合法性
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] suit 花色
  * @param [in] rank 点数
  * @return tile_t 牌
@@ -72,7 +94,7 @@ static forceinline tile_t make_tile(suit_t suit, rank_t rank) {
 
 /**
  * @brief 获取牌的花色
- *  函数不检查输入的合法性，不保证返回值的合法性
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return suit_t 花色
  */
@@ -82,7 +104,7 @@ static forceinline suit_t tile_suit(tile_t tile) {
 
 /**
  * @brief 获取牌的点数
- *  函数不检查输入的合法性，不保证返回值的合法性
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return rank_t 点数
  */
@@ -119,12 +141,12 @@ static const tile_t all_tiles[] = {
 
 /**
  * @brief 牌组
- * 用于表示一组面子或者雀头
+ *  用于表示一组面子或者雀头
  *
  * 内存结构：
- * - 0-7 8bit tile 牌（对于顺子，为中间那张牌）
- * - 8-11 4bit type 牌组类型
- * - 12-15 4bit offer 供牌信息\n
+ * - 0-7 8bit tile 牌（对于顺子，则表示中间那张牌，比如234p，那么牌为3p）
+ * - 8-11 4bit type 牌组类型，使用PACK_TYPE_xxx宏
+ * - 12-15 4bit offer 供牌信息，取值范围为0123\n
  *       0表示暗手（暗顺、暗刻、暗杠），非0表示明手（明顺、明刻、明杠）
  *
  *       对于牌组是刻子和杠时，123分别来表示是上家/对家/下家供的\n
@@ -193,40 +215,42 @@ struct hand_tiles_t {
     long tile_count;            ///< 立牌数
 };
 
-// 推不倒和绿一色属性
-static const uint32_t traits_mask_table[256] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x03, 0x02, 0x03, 0x01, 0x03, 0x00, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
 
 /**
  * @brief 判断是否为绿一色构成牌
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return bool
  */
 static bool forceinline is_green(tile_t tile) {
-    //return (tile == 0x22 || tile == 0x23 || tile == 0x24 || tile == 0x26 || tile == 0x28 || tile == 0x52);
-    return (traits_mask_table[tile] & 0x02) != 0;
+    //return (tile == 0x22 || tile == 0x23 || tile == 0x24 || tile == 0x26 || tile == 0x28 || tile == 0x46);
+
+    // 算法：
+    // 0x48-0x11=0x37=55刚好在一个64位整型的范围内
+    // uint64_t的每一位表示一张牌的标记
+    return !!(0x0020000000AE0000ULL & (1ULL << (tile - 0x11)));
 }
 
 /**
  * @brief 判断是否为推不倒构成牌
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return bool
  */
 static bool forceinline is_reversible(tile_t tile) {
     //return (tile == 0x22 || tile == 0x24 || tile == 0x25 || tile == 0x26 || tile == 0x28 || tile == 0x29 ||
     //    tile == 0x31 || tile == 0x32 || tile == 0x33 || tile == 0x34 || tile == 0x35 || tile == 0x38 || tile == 0x39 ||
-    //    tile == 0x53);
-    return (traits_mask_table[tile] & 0x01);
+    //    tile == 0x47);
+
+    // 算法：
+    // 0x48-0x11=0x37=55刚好在一个64位整型的范围内
+    // uint64_t的每一位表示一张牌的标记
+    return !!(0x0040019F01BA0000ULL & (1ULL << (tile - 0x11)));
 }
 
 /**
  * @brief 判断是否为数牌幺九（老头牌）
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
  * @return bool
  */
@@ -276,7 +300,8 @@ static forceinline bool is_numbered_suit(tile_t tile) {
 }
 
 /**
- * @brief 判断是否为数牌（更快，对于非法牌可能产生误判）
+ * @brief 判断是否为数牌（更快）
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @see is_numbered_suit
  * @param [in] tile 牌
  * @return bool
@@ -295,7 +320,8 @@ static forceinline bool is_terminal_or_honor(tile_t tile) {
 }
 
 /**
- * @brief 判断两张牌花色是否相同（更快，对于非法牌可能产生误判）
+ * @brief 判断两张牌花色是否相同（更快）
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile0 牌0
  * @param [in] tile1 牌1
  * @return bool
@@ -305,7 +331,8 @@ static forceinline bool is_suit_equal_quick(tile_t tile0, tile_t tile1) {
 }
 
 /**
- * @brief 判断两张牌点数是否相同（更快，对于非法牌可能产生误判）
+ * @brief 判断两张牌点数是否相同（更快）
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile0 牌0
  * @param [in] tile1 牌1
  * @return bool

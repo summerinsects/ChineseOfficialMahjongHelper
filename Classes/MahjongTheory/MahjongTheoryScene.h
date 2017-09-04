@@ -22,7 +22,7 @@ private:
     cocos2d::ui::CheckBox *_checkBoxes[4];
     cw::TableView *_tableView = nullptr;
 
-    int _handTilesTable[mahjong::TILE_TABLE_SIZE];
+    mahjong::tile_table_t _handTilesTable;
 
     struct ResultEx : mahjong::enum_result_t {
         int count_in_tiles;
