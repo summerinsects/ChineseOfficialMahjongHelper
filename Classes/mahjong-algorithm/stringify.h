@@ -28,6 +28,19 @@
 namespace mahjong {
 
 /**
+ * @brief 字符串格式：
+ * - 数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。
+ * - 字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。
+ * - 每组吃、碰、明杠之间用英文空格分隔，每一组暗杠前后用英文[]。副露与立牌之间也用英文空格分隔。\n
+ *     范例1：[EEEE][CCCC][FFFF][PPPP]NN \n
+ *     范例2：1112345678999s9s \n
+ *     范例3：WWWW 444s 45m678pFF6m \n
+ *     范例4：[EEEE]288s349pSCFF2p \n
+ *     范例5：123p 345s 999s 6m6pEW1m \n
+ *     范例6：356m18s1579pWNFF9p \n
+ */
+
+/**
  * @addtogroup stringify
  * @{
  */
@@ -104,10 +117,6 @@ long hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, long max_si
  * end group
  * @}
  */
-
-#define INPUT_GUIDE_STRING_1 "数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。"
-#define INPUT_GUIDE_STRING_2 "字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。"
-#define INPUT_GUIDE_STRING_3 "每组吃、碰、明杠之间用英文空格分隔，每一组暗杠前后用英文[]。副露与立牌之间也用英文空格分隔。"
 
 }
 
