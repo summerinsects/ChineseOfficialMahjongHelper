@@ -207,7 +207,7 @@ void FanCalculatorScene::calculate() {
     std::sort(param.hand_tiles.standing_tiles, param.hand_tiles.standing_tiles + param.hand_tiles.tile_count);
 
     param.flower_count = flowerCnt;
-    long fan_table[mahjong::FAN_TABLE_SIZE] = { 0 };
+    mahjong::fan_table_t fan_table = { 0 };
 
     // 获取绝张、杠开、抢杠、海底信息
     mahjong::win_flag_t win_flag = _extraInfo->getWinFlag();

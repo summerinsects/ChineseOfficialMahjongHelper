@@ -307,7 +307,7 @@ struct enum_result_t {
     tile_t discard_tile;                    ///< 打这张牌
     uint8_t form_flag;                      ///< 和牌形式
     int shanten;                            ///< 上听数
-    bool useful_table[TILE_TABLE_SIZE];     ///< 有效牌标记表
+    useful_table_t useful_table;            ///< 有效牌标记表
 };
 
 /**

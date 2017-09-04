@@ -174,7 +174,7 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
     long standing_cnt = 14 - fixed_cnt * 3;
 
     // 对立牌的种类进行打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, cnt_table);
 
     result->count = 0;
@@ -938,7 +938,7 @@ static void calculate_1_pung(pack_t pung_pack, fan_table_t &fan_table) {
 // 九莲宝灯
 static bool is_nine_gates(const tile_t (&tiles)[14], tile_t win_tile) {
     // 对立牌的种类进行打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(tiles, 14, cnt_table);
     // 去除和牌张
     --cnt_table[win_tile];
@@ -1250,7 +1250,7 @@ static void check_tiles_traits(const tile_t *tiles, long tile_cnt, fan_table_t &
 // 检测四归一
 static void check_tiles_hog(const tile_t *tiles, long tile_cnt, fan_table_t &fan_table) {
     long kong_cnt = tile_cnt - 14;  // 标准和牌14张，多出几张就说明有几个杠
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(tiles, tile_cnt, cnt_table);
     // 有多少种已经用去4张的牌减去杠的数量，即为四归一的数量
     long _4_cnt = std::count(std::begin(cnt_table), std::end(cnt_table), 4);
@@ -1280,12 +1280,12 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     remove_win_tile(standing_tiles, tile_cnt, win_tile);
     --tile_cnt;
 
-    bool waiting_table[TILE_TABLE_SIZE];  // 听牌标记表
+    useful_table_t waiting_table;  // 听牌标记表
     is_basic_type_wait(standing_tiles, tile_cnt, &waiting_table);
 
     if (pack_cnt == 5) {
         // 判断是否为七对听牌
-        bool temp_table[TILE_TABLE_SIZE];
+        useful_table_t temp_table;
         if (is_seven_pairs_wait(standing_tiles, tile_cnt, &temp_table)) {
             // 合并听牌标记表
             std::transform(std::begin(temp_table), std::end(temp_table), std::begin(waiting_table),
@@ -1804,7 +1804,7 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
     long standing_cnt = hand_tiles->tile_count;
 
     // 对立牌和和牌的种类进行打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     map_tiles(hand_tiles->standing_tiles, standing_cnt, cnt_table);
     ++cnt_table[win_tile];
 
@@ -2038,7 +2038,7 @@ size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, t
 
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     // 打表
-    int cnt_table[TILE_TABLE_SIZE];
+    tile_table_t cnt_table;
     if (!map_hand_tiles(hand_tiles, cnt_table)) {
         return ERROR_WRONG_TILES_COUNT;
     }
@@ -2080,7 +2080,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
         std::sort(&result.divisions[i].packs[fixed_cnt], &result.divisions[i].packs[4]);
     }
 
-    long fan_tables[MAX_DIVISION_CNT][FAN_TABLE_SIZE] = { { 0 } };
+    fan_table_t fan_tables[MAX_DIVISION_CNT] = { { 0 } };
     int max_fan = 0;
     long max_idx = -1;
 
