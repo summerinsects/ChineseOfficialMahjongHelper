@@ -3,9 +3,10 @@
 #include "stringify.h"
 #include "fan_calculator.h"
 
+#include <stdio.h>
 #include <iostream>
+#include <limits>
 #include <assert.h>
-
 #include <time.h>
 
 using namespace mahjong;
@@ -17,7 +18,7 @@ void test_wait(const char *str) {
     std::cout << "----------------" << std::endl;
     puts(str);
     bool is_wait = false;
-    bool table[TILE_TABLE_SIZE] = { false };
+    useful_table_t table/* = { false }*/;
 
     if (hand_tiles.tile_count == 13) {
         if (is_thirteen_orphans_wait(hand_tiles.standing_tiles, 13, &table)) {
@@ -66,22 +67,24 @@ void test_wait(const char *str) {
 }
 
 void test_points(const char *str, win_flag_t win_flag, wind_t prevalent_wind, wind_t seat_wind) {
-    hand_tiles_t hand_tiles;
-    tile_t win_tile = 0;
-    long ret = string_to_tiles(str, &hand_tiles, &win_tile);
+    calculate_param_t param;
+
+    long ret = string_to_tiles(str, &param.hand_tiles, &param.win_tile);
     if (ret != PARSE_NO_ERROR) {
         printf("error at line %d error = %ld\n", __LINE__, ret);
         return;
     }
 
-    long fan_table[FAN_TABLE_SIZE] = { 0 };
+    fan_table_t fan_table/* = { 0 }*/;
     puts("----------------");
     puts(str);
-    mahjong::extra_condition_t ext_cond;
-    ext_cond.win_flag = win_flag;
-    ext_cond.prevalent_wind = prevalent_wind;
-    ext_cond.seat_wind = seat_wind;
-    int points = calculate_fan(&hand_tiles, win_tile, &ext_cond, fan_table);
+
+    param.flower_count = 0;
+
+    param.ext_cond.win_flag = win_flag;
+    param.ext_cond.prevalent_wind = prevalent_wind;
+    param.ext_cond.seat_wind = seat_wind;
+    int points = calculate_fan(&param, fan_table);
 
     printf("max points = %d\n\n", points);
     for (int i = 1; i < FLOWER_TILES; ++i) {
@@ -109,7 +112,7 @@ void test_shanten(const char *str) {
     ret = hand_tiles_to_string(&hand_tiles, buf, sizeof(buf));
     puts(buf);
 
-    auto display = [](const hand_tiles_t *hand_tiles, bool (&useful_table)[TILE_TABLE_SIZE]) {
+    auto display = [](const hand_tiles_t *hand_tiles, useful_table_t &useful_table) {
         char buf[64];
         for (tile_t t = TILE_1m; t < TILE_TABLE_SIZE; ++t) {
             if (useful_table[t]) {
@@ -118,36 +121,36 @@ void test_shanten(const char *str) {
             }
         }
 
-        int cnt_table[TILE_TABLE_SIZE];
+        tile_table_t cnt_table;
         map_hand_tiles(hand_tiles, cnt_table);
 
         printf("%d枚", count_useful_tile(cnt_table, useful_table));
     };
 
     puts(str);
-    bool useful_table[TILE_TABLE_SIZE] = {false};
+    useful_table_t useful_table/* = {false}*/;
     int ret0;
-    ret0 = thirteen_orphans_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = thirteen_orphans_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
     printf("131=== %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = seven_pairs_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = seven_pairs_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
     printf("7d=== %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = honors_and_knitted_tiles_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = honors_and_knitted_tiles_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
     printf("honors and knitted tiles  %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = knitted_straight_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = knitted_straight_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
     printf("knitted straight in basic type %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = basic_type_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, nullptr);
+    ret0 = basic_type_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
     printf("basic type %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
