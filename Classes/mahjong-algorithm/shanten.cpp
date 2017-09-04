@@ -820,7 +820,7 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, l
             }
         }
     }
-    else {  // 如果组合龙齐了，那么除去组合龙之后的牌要能听，整手牌才能听
+    else if (missing_cnt == 0) {  // 如果组合龙齐了，那么除去组合龙之后的牌要能听，整手牌才能听
         if (left_cnt == 10) {
             return is_basic_type_wait_1(temp_table, waiting_table);
         }
