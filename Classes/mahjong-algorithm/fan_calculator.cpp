@@ -539,10 +539,11 @@ static fan_t *pairwise_test_chows(const tile_t (&chows_mid_tile)[_Size], fan_t *
             fan_t pt = all_fan[i][j];
             if (pt != FAN_NONE) {
                 int idx = pt - PURE_DOUBLE_CHOW;  // bit分配：0一般高 1喜相逢 2连六 3老少副
+                unsigned flag = 1U << idx;
                 // 不得相同原则，如果i和j都没算过某一种番，则算这种番
-                if ((used_flag[i] & (1 << idx)) == 0 && (used_flag[j] & (1 << idx)) == 0) {
-                    used_flag[i] |= (1 << (pt - PURE_DOUBLE_CHOW));
-                    used_flag[j] |= (1 << (pt - PURE_DOUBLE_CHOW));
+                if ((used_flag[i] & flag) == 0 && (used_flag[j] & flag) == 0) {
+                    used_flag[i] |= flag;
+                    used_flag[j] |= flag;
                     *selected_fan = pt;  // 写入这个番
                     ++selected_fan;
                 }
