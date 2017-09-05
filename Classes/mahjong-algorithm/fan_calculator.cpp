@@ -53,30 +53,30 @@ extern long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long 
 #endif
 
 /** @brief 每一种划分类型 */
-struct one_division_t {
+struct division_t {
     pack_t packs[5];  ///< 牌组。4面子1雀头，共5组
 };
 
 /** @brief 所有的划分类型 */
-struct divisions_t {
-    one_division_t divisions[MAX_DIVISION_CNT];  ///< 每一种划分
+struct division_result_t {
+    division_t divisions[MAX_DIVISION_CNT];  ///< 每一种划分
     long count;  ///< 划分方式总数
 };
 
 // 递归划分算法的最后一步，添加划分
-static void divide_tail_add_division(tile_t tile, long fixed_cnt, one_division_t *work_division, divisions_t *result) {
+static void divide_tail_add_division(tile_t tile, long fixed_cnt, division_t *work_division, division_result_t *result) {
     // 这2张作为雀头
     work_division->packs[4] = make_pack(0, PACK_TYPE_PAIR, tile);
 
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
     // 这里不能直接在work_division.packs上排序，否则会破坏递归外层的数据
-    one_division_t temp;
+    division_t temp;
     memcpy(&temp, work_division, sizeof(temp));
     std::sort(temp.packs + fixed_cnt, temp.packs + 4);
 
     // 如果这种划分是否已经存在了
     if (std::none_of(&result->divisions[0], &result->divisions[result->count],
-        [&temp, fixed_cnt](const one_division_t &od) {
+        [&temp, fixed_cnt](const division_t &od) {
         return std::equal(&od.packs[fixed_cnt], &od.packs[4], &temp.packs[fixed_cnt]);
     })) {
         // 写入划分结果里
@@ -89,7 +89,7 @@ static void divide_tail_add_division(tile_t tile, long fixed_cnt, one_division_t
 }
 
 // 递归划分的最后一步
-static bool divide_tail(tile_table_t &cnt_table, long fixed_cnt, one_division_t *work_division, divisions_t *result) {
+static bool divide_tail(tile_table_t &cnt_table, long fixed_cnt, division_t *work_division, division_result_t *result) {
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] < 2) {
@@ -110,26 +110,26 @@ static bool divide_tail(tile_table_t &cnt_table, long fixed_cnt, one_division_t 
 }
 
 // 判断一条划分分支是否来过
-static bool is_division_branch_exist(long fixed_cnt, long step, const one_division_t *work_division, const divisions_t *result) {
+static bool is_division_branch_exist(long fixed_cnt, long step, const division_t *work_division, const division_result_t *result) {
     // 没有划分时，以及划分步骤小于2时，不检测，因为至少要有3步递归才会产生不同划分
     if (result->count <= 0 || step < 2) {
         return false;
     }
 
     // std::includes要求有序
-    one_division_t temp;
+    division_t temp;
     memcpy(&temp.packs[fixed_cnt], &work_division->packs[fixed_cnt], step * sizeof(pack_t));
     std::sort(&temp.packs[fixed_cnt], &temp.packs[fixed_cnt + step]);
 
     // 只需要比较面子是否重复分支，雀头不参与比较，所以下标是4
     return std::any_of(&result->divisions[0], &result->divisions[result->count],
-        [&temp, fixed_cnt, step](const one_division_t &od) {
+        [&temp, fixed_cnt, step](const division_t &od) {
         return std::includes(&od.packs[fixed_cnt], &od.packs[4], &temp.packs[fixed_cnt], &temp.packs[fixed_cnt + step]);
     });
 }
 
 // 递归划分
-static bool divide_recursively(tile_table_t &cnt_table, long fixed_cnt, long step, one_division_t *work_division, divisions_t *result) {
+static bool divide_recursively(tile_table_t &cnt_table, long fixed_cnt, long step, division_t *work_division, division_result_t *result) {
     const long idx = step + fixed_cnt;
     if (idx == 4) {  // 4组面子都有了
         return divide_tail(cnt_table, fixed_cnt, work_division, result);
@@ -180,7 +180,7 @@ static bool divide_recursively(tile_table_t &cnt_table, long fixed_cnt, long ste
 }
 
 // 划分一手牌
-static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_packs, long fixed_cnt, divisions_t *result) {
+static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_packs, long fixed_cnt, division_result_t *result) {
     long standing_cnt = 14 - fixed_cnt * 3;
 
     // 对立牌的种类进行打表
@@ -190,7 +190,7 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
     result->count = 0;
 
     // 复制副露的面子
-    one_division_t work_division;
+    division_t work_division;
     memcpy(work_division.packs, fixed_packs, fixed_cnt * sizeof(pack_t));
     return divide_recursively(cnt_table, fixed_cnt, 0, &work_division, result);
 }
@@ -1859,9 +1859,9 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
     std::for_each(std::begin(*matched_seq), std::end(*matched_seq), [&cnt_table](tile_t t) { --cnt_table[t]; });
 
     // 按基本和型划分
-    divisions_t result;
+    division_result_t result;
     result.count = 0;
-    one_division_t work_division;
+    division_t work_division;
     memset(&work_division, 0, sizeof(work_division));
 
     // 此处逻辑为：将组合龙9张牌当作是已经完成的3组面子，占据了0 1 2下标处的3组
@@ -2151,7 +2151,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
     }
 
     tile_t standing_tiles[14];
-    divisions_t result;
+    division_result_t result;
 
     // 合并得到14张牌
     memcpy(standing_tiles, hand_tiles->standing_tiles, standing_cnt * sizeof(tile_t));
