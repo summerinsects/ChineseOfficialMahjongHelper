@@ -560,6 +560,8 @@ static void calculate_4_chows(const pack_t chow_packs[4], fan_table_t &fan_table
     tiles[1] = pack_tile(chow_packs[1]);
     tiles[2] = pack_tile(chow_packs[2]);
     tiles[3] = pack_tile(chow_packs[3]);
+
+    // 由于pack还有更多数据，其顺序不代表tile顺序，这里要排序
     std::sort(std::begin(tiles), std::end(tiles));
 
     fan_t fan;
@@ -619,6 +621,8 @@ static void calculate_3_chows(const pack_t chow_packs[3], fan_table_t &fan_table
     tiles[0] = pack_tile(chow_packs[0]);
     tiles[1] = pack_tile(chow_packs[1]);
     tiles[2] = pack_tile(chow_packs[2]);
+
+    // 由于pack还有更多数据，其顺序不代表tile顺序，这里要排序
     std::sort(std::begin(tiles), std::end(tiles));
 
     fan_t fan;
@@ -829,6 +833,8 @@ static void calculate_4_pungs(const pack_t pung_packs[4], fan_table_t &fan_table
     tiles[1] = pack_tile(pung_packs[1]);
     tiles[2] = pack_tile(pung_packs[2]);
     tiles[3] = pack_tile(pung_packs[3]);
+
+    // 由于pack还有更多数据，其顺序不代表tile顺序，这里要排序
     std::sort(std::begin(tiles), std::end(tiles));
 
     calculate_kongs(pung_packs, 4, fan_table);
@@ -911,6 +917,7 @@ static void calculate_3_pungs(const pack_t pung_packs[3], fan_table_t &fan_table
     tiles[1] = pack_tile(pung_packs[1]);
     tiles[2] = pack_tile(pung_packs[2]);
 
+    // 由于pack还有更多数据，其顺序不代表tile顺序，这里要排序
     std::sort(std::begin(tiles), std::end(tiles));
 
     calculate_kongs(pung_packs, 3, fan_table);
