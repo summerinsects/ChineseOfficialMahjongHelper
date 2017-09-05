@@ -217,9 +217,9 @@ void FanCalculatorScene::calculate() {
     mahjong::wind_t seat_wind = _extraInfo->getSeatWind();
 
     // 算番
-    param.ext_cond.win_flag = win_flag;
-    param.ext_cond.prevalent_wind = prevalent_wind;
-    param.ext_cond.seat_wind = seat_wind;
+    param.win_flag = win_flag;
+    param.prevalent_wind = prevalent_wind;
+    param.seat_wind = seat_wind;
     int fan = calculate_fan(&param, fan_table);
 
     if (fan == ERROR_NOT_WIN) {

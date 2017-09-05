@@ -1686,7 +1686,7 @@ static bool is_win_tile_in_concealed_chow_packs(const pack_t *chow_packs, long c
 
 // 基本和型算番
 static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, tile_t win_tile,
-    const extra_condition_t *ext_cond, fan_table_t &fan_table) {
+    win_flag_t win_flag, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
     pack_t pair_pack = 0;
     pack_t chow_packs[4];
     pack_t pung_packs[4];
@@ -1716,10 +1716,10 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
         }
     }
 
-    check_win_flag(ext_cond->win_flag, fan_table);
+    check_win_flag(win_flag, fan_table);
 
     // 点和的牌张，如果不能解释为暗顺中的一张，那么将其解释为刻子，并标记这个刻子为明刻
-    if ((ext_cond->win_flag & WIN_FLAG_SELF_DRAWN) == 0) {
+    if ((win_flag & WIN_FLAG_SELF_DRAWN) == 0) {
         if (!is_win_tile_in_concealed_chow_packs(chow_packs, chow_cnt, win_tile)) {
             for (long i = 0; i < pung_cnt; ++i) {
                 if (pack_tile(pung_packs[i]) == win_tile && !is_pack_melded(pung_packs[i])) {
@@ -1761,7 +1761,7 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
     }
 
     // 检测不求人、全求人
-    check_melded_or_concealed_hand(packs, fixed_cnt, ext_cond->win_flag & WIN_FLAG_SELF_DRAWN, fan_table);
+    check_melded_or_concealed_hand(packs, fixed_cnt, win_flag & WIN_FLAG_SELF_DRAWN, fan_table);
     // 检测雀头，确定平和、小三元、小四喜
     check_pair_tile(pack_tile(pair_pack), chow_cnt, fan_table);
     // 检测全带幺、全带五、全双刻
@@ -1780,11 +1780,11 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
 
     // 检测圈风刻、门风刻
     for (int i = 0; i < 5; ++i) {
-        check_wind_pungs(packs[i], ext_cond->prevalent_wind, ext_cond->seat_wind, fan_table);
+        check_wind_pungs(packs[i], prevalent_wind, seat_wind, fan_table);
     }
 
     // 统一校正一些不计的
-    correction_fan_table(fan_table, ext_cond->prevalent_wind == ext_cond->seat_wind);
+    correction_fan_table(fan_table, prevalent_wind == seat_wind);
 
     // 如果什么番都没有，则计为无番和
     if (std::all_of(std::begin(fan_table), std::end(fan_table), [](long p) { return p == 0; })) {
@@ -1793,8 +1793,8 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
 }
 
 // “组合龙+面子+雀头”和型算番
-static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *hand_tiles,
-    tile_t win_tile, const extra_condition_t *ext_cond, fan_table_t &fan_table) {
+static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *hand_tiles, tile_t win_tile,
+    win_flag_t win_flag, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
     long fixed_cnt = hand_tiles->pack_count;
     if (fixed_cnt > 1) {
         return false;
@@ -1850,10 +1850,10 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
         calculate_1_pung(temp_pack[3], fan_table);
     }
 
-    check_win_flag(ext_cond->win_flag, fan_table);
+    check_win_flag(win_flag, fan_table);
     // 门前清（暗杠不影响）
     if (fixed_cnt == 0 || (pack_type(temp_pack[3]) == PACK_TYPE_KONG && !is_pack_melded(temp_pack[3]))) {
-        if (ext_cond->win_flag & WIN_FLAG_SELF_DRAWN) {
+        if (win_flag & WIN_FLAG_SELF_DRAWN) {
             fan_table[FULLY_CONCEALED_HAND] = 1;
         }
         else {
@@ -1884,9 +1884,9 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
     }
 
     // 检测圈风刻、门风刻
-    check_wind_pungs(temp_pack[3], ext_cond->prevalent_wind, ext_cond->seat_wind, fan_table);
+    check_wind_pungs(temp_pack[3], prevalent_wind, seat_wind, fan_table);
     // 统一校正一些不计的
-    correction_fan_table(fan_table, ext_cond->prevalent_wind == ext_cond->seat_wind);
+    correction_fan_table(fan_table, prevalent_wind == seat_wind);
     return true;
 }
 
@@ -2057,7 +2057,9 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
 int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_table) {
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
     tile_t win_tile = calculate_param->win_tile;
-    const extra_condition_t *ext_cond = &calculate_param->ext_cond;
+    win_flag_t win_flag = calculate_param->win_flag;
+    wind_t prevalent_wind = calculate_param->prevalent_wind;
+    wind_t seat_wind = calculate_param->seat_wind;
 
     if (int ret = check_calculator_input(hand_tiles, win_tile)) {
         return ret;
@@ -2086,7 +2088,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
 
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
         if (calculate_knitted_straight_in_basic_type_fan(hand_tiles,
-            win_tile, ext_cond, fan_tables[result.count])) {
+            win_tile, win_flag, prevalent_wind, seat_wind, fan_tables[result.count])) {
             int current_fan = get_fan_by_table(fan_tables[result.count]);
             if (current_fan > max_fan) {
                 max_fan = current_fan;
@@ -2094,7 +2096,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
             }
             LOG("fan = %d\n\n", current_fan);
         }
-        else if (calculate_special_type_fan(standing_tiles, ext_cond->win_flag, fan_tables[result.count])) {
+        else if (calculate_special_type_fan(standing_tiles, win_flag, fan_tables[result.count])) {
             int current_fan = get_fan_by_table(fan_tables[result.count]);
             if (current_fan > max_fan) {
                 max_fan = current_fan;
@@ -2108,8 +2110,8 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
     }
     else if (fixed_cnt == 1 && result.count == 0) {
         // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_fan(hand_tiles,
-            win_tile, ext_cond, fan_tables[0])) {
+        if (calculate_knitted_straight_in_basic_type_fan(hand_tiles, win_tile,
+            win_flag, prevalent_wind, seat_wind, fan_tables[0])) {
             int current_fan = get_fan_by_table(fan_tables[0]);
             if (current_fan > max_fan) {
                 max_fan = current_fan;
@@ -2126,7 +2128,8 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
         packs_to_string(result.divisions[i].packs, 5, str, sizeof(str));
         puts(str);
 #endif
-        calculate_basic_type_fan(result.divisions[i].packs, fixed_cnt, win_tile, ext_cond, fan_tables[i]);
+        calculate_basic_type_fan(result.divisions[i].packs, fixed_cnt, win_tile,
+            win_flag, prevalent_wind, seat_wind, fan_tables[i]);
         int current_fan = get_fan_by_table(fan_tables[i]);
         if (current_fan > max_fan) {
             max_fan = current_fan;

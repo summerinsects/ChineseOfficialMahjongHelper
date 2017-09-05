@@ -81,9 +81,9 @@ void test_points(const char *str, win_flag_t win_flag, wind_t prevalent_wind, wi
 
     param.flower_count = 0;
 
-    param.ext_cond.win_flag = win_flag;
-    param.ext_cond.prevalent_wind = prevalent_wind;
-    param.ext_cond.seat_wind = seat_wind;
+    param.win_flag = win_flag;
+    param.prevalent_wind = prevalent_wind;
+    param.seat_wind = seat_wind;
     int points = calculate_fan(&param, fan_table);
 
     printf("max points = %d\n\n", points);

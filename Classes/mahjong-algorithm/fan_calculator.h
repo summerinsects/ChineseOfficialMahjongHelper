@@ -190,22 +190,15 @@ typedef uint8_t win_flag_t;
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile);
 
 /**
- * @brief 附加信息
- */
-struct extra_condition_t {
-    win_flag_t win_flag;    ///< 和牌标记
-    wind_t prevalent_wind;  ///< 圈风
-    wind_t seat_wind;       ///< 门风
-};
-
-/**
  * @brief 算番参数
  */
 struct calculate_param_t {
     hand_tiles_t hand_tiles;    ///< 手牌
     tile_t win_tile;            ///< 和牌张
     int flower_count;           ///< 花牌数
-    extra_condition_t ext_cond; ///< 附加信息
+    win_flag_t win_flag;        ///< 和牌标记
+    wind_t prevalent_wind;      ///< 圈风
+    wind_t seat_wind;           ///< 门风
 };
 
 /**
