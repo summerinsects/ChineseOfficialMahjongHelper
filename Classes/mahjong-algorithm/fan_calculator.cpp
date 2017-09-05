@@ -911,6 +911,8 @@ static void calculate_3_pungs(const pack_t pung_packs[3], fan_table_t &fan_table
     tiles[1] = pack_tile(pung_packs[1]);
     tiles[2] = pack_tile(pung_packs[2]);
 
+    std::sort(std::begin(tiles), std::end(tiles));
+
     calculate_kongs(pung_packs, 3, fan_table);
 
     fan_t fan;
