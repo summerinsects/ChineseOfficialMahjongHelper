@@ -50,14 +50,15 @@ namespace mahjong {
 
 extern long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size);
 
-struct one_division_t {  // 每一种划分
-    pack_t packs[5];
+/** @brief 每一种划分类型 */
+struct one_division_t {
+    pack_t packs[5];  ///< 牌组。4面子1雀头，共5组
 };
 
-// 所有的划分
+/** @brief 所有的划分类型 */
 struct divisions_t {
-    one_division_t divisions[MAX_DIVISION_CNT];
-    long count;  // 划分方式总数
+    one_division_t divisions[MAX_DIVISION_CNT];  ///< 每一种划分
+    long count;  ///< 划分方式总数
 };
 
 static void divide_tail_add_division(tile_t tile, long fixed_cnt, one_division_t *work_division, divisions_t *result) {
@@ -1717,7 +1718,7 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
 
     check_win_flag(win_flag, fan_table);
 
-    // 点和的牌张，如果不能解释为暗顺中的一张，那么将其解释为刻子，并标记这个刻子为明刻
+    // 点和的牌张，如果不能解释为顺子中的一张，那么将其解释为刻子，并标记这个刻子为明刻
     if ((win_flag & WIN_FLAG_SELF_DRAWN) == 0) {
         if (!is_chow_packs_contains_win_tile(chow_packs, chow_cnt, win_tile)) {
             for (long i = 0; i < pung_cnt; ++i) {

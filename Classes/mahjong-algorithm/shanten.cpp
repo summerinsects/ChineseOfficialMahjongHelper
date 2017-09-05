@@ -147,15 +147,16 @@ typedef uint16_t path_unit_t;
 #define MAX_STATE 512
 #define UNIT_SIZE 7
 
-// 一条路径
+/** @brief 一条路径 */
 struct work_path_t {
-    path_unit_t units[UNIT_SIZE];  // 14/2=7最多7个搭子
-    uint16_t depth;  // 当前路径深度
+    path_unit_t units[UNIT_SIZE];  ///< 14/2=7最多7个搭子
+    uint16_t depth;  ///< 当前路径深度
 };
 
+/** @brief 当前工作状态 */
 struct work_state_t {
-    work_path_t paths[MAX_STATE];  // 所有路径
-    long count;  // 路径数量
+    work_path_t paths[MAX_STATE];  ///< 所有路径
+    long count;  ///< 路径数量
 };
 
 // 路径是否来过了
