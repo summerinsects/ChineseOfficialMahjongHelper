@@ -153,6 +153,9 @@ mahjong::tile_t HandTilesWidget::getServingTile() const {
 }
 
 bool HandTilesWidget::isFixedPacksContainsKong() const {
+    if (_fixedPacks.empty()) {
+        return false;
+    }
     return mahjong::is_fixed_packs_contains_kong(&_fixedPacks.front(), _fixedPacks.size());
 }
 
