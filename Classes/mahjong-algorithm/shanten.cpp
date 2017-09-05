@@ -564,7 +564,7 @@ static bool is_basic_type_wait_recursively(tile_table_t &cnt_table, long left_cn
 
 // 基本和型是否听牌
 // 这里之所以不用直接调用上听数计算函数，判断其返回值为0的方式
-// 是因为前者会削减搭子，这个在听牌判断中是没必要的，所以单独写一套逻辑
+// 是因为前者会削减搭子，这个操作在和牌判断中是没必要的，所以单独写一套更快逻辑
 bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table) {
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
@@ -594,7 +594,7 @@ static bool is_basic_type_win_2(const tile_table_t &cnt_table) {
 
 // 递归计算基本和型是否和牌
 // 这里之所以不用直接调用上听数计算函数，判断其返回值为-1的方式，
-// 是因为前者会削减搭子，这个在和牌判断中是没必要的，所以单独写一套逻辑
+// 是因为前者会削减搭子，这个操作在和牌判断中是没必要的，所以单独写一套更快逻辑
 static bool is_basic_type_win_recursively(tile_table_t &cnt_table, long left_cnt) {
     if (left_cnt == 2) {
         return is_basic_type_win_2(cnt_table);

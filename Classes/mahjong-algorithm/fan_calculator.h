@@ -180,7 +180,6 @@ typedef uint8_t win_flag_t;
 /**
  * @brief 检查算番的输入是否合法
  *
- *
  * @param [in] hand_tiles 手牌
  * @param [in] win_tile 和牌张
  * @retval 0 成功
@@ -310,7 +309,7 @@ static const int fan_value_table[FAN_TABLE_SIZE] = {
 bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long standing_cnt, tile_t win_tile);
 
 /**
- * @brief 统计和牌在副露中出现的张数
+ * @brief 统计和牌在副露牌组中出现的张数
  * 如果出现3张，则必然和绝张
  *
  * @param [in] fixed_packs 副露牌组
