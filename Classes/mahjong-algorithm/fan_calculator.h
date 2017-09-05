@@ -321,6 +321,15 @@ bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long stan
 size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, long fixed_cnt, tile_t win_tile);
 
 /**
+ * @brief 判断副露牌组是否包含杠
+ *
+ * @param [in] fixed_packs 副露牌组
+ * @param [in] standing_cnt 副露牌组数
+ * @return bool
+ */
+bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, long fixed_cnt);
+
+/**
  * end group
  * @}
  */

@@ -153,8 +153,7 @@ mahjong::tile_t HandTilesWidget::getServingTile() const {
 }
 
 bool HandTilesWidget::isFixedPacksContainsKong() const {
-    return std::any_of(_fixedPacks.begin(), _fixedPacks.end(),
-        [](mahjong::pack_t pack) { return mahjong::pack_type(pack) == PACK_TYPE_KONG; });
+    return mahjong::is_fixed_packs_contains_kong(&_fixedPacks.front(), _fixedPacks.size());
 }
 
 bool HandTilesWidget::isStandingTilesContainsServingTile() const {

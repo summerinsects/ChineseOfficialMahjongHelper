@@ -2036,6 +2036,11 @@ size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, long fixed_cnt, 
     return cnt;
 }
 
+bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, long fixed_cnt) {
+    return std::any_of(fixed_packs, fixed_packs + fixed_cnt,
+        [](pack_t pack) { return pack_type(pack) == PACK_TYPE_KONG; });
+}
+
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     // 打表
     tile_table_t cnt_table;
