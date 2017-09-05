@@ -1281,7 +1281,9 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     --tile_cnt;
 
     useful_table_t waiting_table;  // 听牌标记表
-    is_basic_type_wait(standing_tiles, tile_cnt, &waiting_table);
+    if (!is_basic_type_wait(standing_tiles, tile_cnt, &waiting_table)) {
+        return;
+    }
 
     if (pack_cnt == 5) {
         // 判断是否为七对听牌
@@ -1302,24 +1304,23 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     }
 
     // 听1张的情况，看和牌张处于什么位置
-    bool maybe_edge = false;
-    bool maybe_closed = false;
-    bool maybe_single = false;
+    // 边张0x01 嵌张0x02 单钓将0x04
+    uint8_t pos_flag = 0;
 
     for (long i = 0; i < pack_cnt; ++i) {
         switch (pack_type(concealed_packs[i])) {
         case PACK_TYPE_CHOW:
             if (pack_tile(concealed_packs[i]) == win_tile) {
-                maybe_closed = true;  // 嵌张
+                pos_flag |= 0x02;  // 嵌张
             }
             else if (pack_tile(concealed_packs[i]) + 1 == win_tile
                 || pack_tile(concealed_packs[i]) - 1 == win_tile) {
-                maybe_edge = true;  // 边张
+                pos_flag |= 0x01;  // 边张
             }
             break;
         case PACK_TYPE_PAIR:
             if (pack_tile(concealed_packs[i]) == win_tile) {
-                maybe_single = true;  // 单钓
+                pos_flag |= 0x04;  // 单钓将
             }
             break;
         default:
@@ -1328,17 +1329,14 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     }
 
     // 当多种可能存在时，只能计其中一种
-    if (maybe_edge) {
+    if (pos_flag & 0x01) {
         fan_table[EDGE_WAIT] = 1;
-        return;
     }
-    if (maybe_closed) {
+    else if (pos_flag & 0x02) {
         fan_table[CLOSED_WAIT] = 1;
-        return;
     }
-    if (maybe_single) {
+    else if (pos_flag & 0x04) {
         fan_table[SINGLE_WAIT] = 1;
-        return;
     }
 }
 
