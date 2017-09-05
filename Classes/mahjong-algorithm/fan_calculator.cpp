@@ -2153,10 +2153,6 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
     // 划分
     divide_win_hand(standing_tiles, hand_tiles->fixed_packs, fixed_cnt, &result);
 
-    for (long i = 0; i < result.count; ++i) {
-        std::sort(&result.divisions[i].packs[fixed_cnt], &result.divisions[i].packs[4]);
-    }
-
     fan_table_t fan_tables[MAX_DIVISION_CNT] = { { 0 } };
     int max_fan = 0;
     long max_idx = -1;
