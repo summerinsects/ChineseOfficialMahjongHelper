@@ -64,10 +64,7 @@ struct division_result_t {
 };
 
 // 递归划分算法的最后一步，添加划分
-static void divide_tail_add_division(tile_t tile, long fixed_cnt, division_t *work_division, division_result_t *result) {
-    // 这2张作为雀头
-    work_division->packs[4] = make_pack(0, PACK_TYPE_PAIR, tile);
-
+static void divide_tail_add_division(tile_t tile, long fixed_cnt, const division_t *work_division, division_result_t *result) {
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
     // 这里不能直接在work_division.packs上排序，否则会破坏递归外层的数据
     division_t temp;
@@ -100,6 +97,9 @@ static bool divide_tail(tile_table_t &cnt_table, long fixed_cnt, division_t *wor
         // 全部使用完毕
         if (std::all_of(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n == 0; })) {
             cnt_table[t] += 2;  // 还原
+
+            // 这2张作为雀头
+            work_division->packs[4] = make_pack(0, PACK_TYPE_PAIR, t);
             divide_tail_add_division(t, fixed_cnt, work_division, result);  // 记录
             return true;
         }
