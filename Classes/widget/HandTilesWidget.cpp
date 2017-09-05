@@ -78,10 +78,10 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
     for (long i = 0; i < handTiles.pack_count; ++i) {
         mahjong::pack_t pack = handTiles.fixed_packs[i];
         _fixedPacks.push_back(pack);
-        mahjong::tile_t tile = mahjong::pack_tile(pack);
-        switch (mahjong::pack_type(pack)) {
+        mahjong::tile_t tile = mahjong::pack_get_tile(pack);
+        switch (mahjong::pack_get_type(pack)) {
         case PACK_TYPE_CHOW:
-            switch (mahjong::pack_offer(pack)) {
+            switch (mahjong::pack_get_offer(pack)) {
             default: addFixedChowPack(tile - 1, 0); break;
             case 2: addFixedChowPack(tile, 1); break;
             case 3: addFixedChowPack(tile + 1, 2); break;
@@ -91,7 +91,7 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
             ++_usedTilesTable[tile + 1];
             break;
         case PACK_TYPE_PUNG:
-            switch (mahjong::pack_offer(pack)) {
+            switch (mahjong::pack_get_offer(pack)) {
             default: addFixedPungPack(tile, 0); break;
             case 2: addFixedPungPack(tile, 1); break;
             case 3: addFixedPungPack(tile, 2); break;
@@ -99,7 +99,7 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
             _usedTilesTable[tile] += 3;
             break;
         case PACK_TYPE_KONG:
-            switch (mahjong::pack_offer(pack)) {
+            switch (mahjong::pack_get_offer(pack)) {
             case 0: addFixedConcealedKongPack(tile); break;
             default: addFixedMeldedKongPack(tile, 0); break;
             case 2: addFixedMeldedKongPack(tile, 1); break;
@@ -837,8 +837,8 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
     // 副露
     for (long i = 0; i < handTiles.pack_count; ++i) {
         mahjong::pack_t pack = handTiles.fixed_packs[i];
-        mahjong::tile_t tile = mahjong::pack_tile(pack);
-        switch (mahjong::pack_type(pack)) {
+        mahjong::tile_t tile = mahjong::pack_get_tile(pack);
+        switch (mahjong::pack_get_type(pack)) {
         case PACK_TYPE_CHOW:
             rotated[tile_cnt + 0] = true;
 
@@ -846,7 +846,7 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
             pos[tile_cnt + 1] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
             pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
 
-            switch (mahjong::pack_offer(pack)) {
+            switch (mahjong::pack_get_offer(pack)) {
             default:
                 image[tile_cnt + 0] = tilesImageName[tile - 1];
                 image[tile_cnt + 1] = tilesImageName[tile];
@@ -872,7 +872,7 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
             image[tile_cnt + 1] = tilesImageName[tile];
             image[tile_cnt + 2] = tilesImageName[tile];
 
-            switch (mahjong::pack_offer(pack)) {
+            switch (mahjong::pack_get_offer(pack)) {
             default:
                 rotated[tile_cnt + 0] = true;
 
@@ -905,7 +905,7 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
             image[tile_cnt + 2] = tilesImageName[tile];
             image[tile_cnt + 3] = tilesImageName[tile];
 
-            switch (mahjong::pack_offer(pack)) {
+            switch (mahjong::pack_get_offer(pack)) {
             case 0:
                 image[tile_cnt + 0] = "tiles/bg.png";
                 image[tile_cnt + 3] = "tiles/bg.png";

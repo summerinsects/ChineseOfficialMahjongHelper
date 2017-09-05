@@ -100,7 +100,7 @@ static forceinline tile_t make_tile(suit_t suit, rank_t rank) {
  * @param [in] tile 牌
  * @return suit_t 花色
  */
-static forceinline suit_t tile_suit(tile_t tile) {
+static forceinline suit_t tile_get_suit(tile_t tile) {
     return ((tile >> 4) & 0xF);
 }
 
@@ -110,7 +110,7 @@ static forceinline suit_t tile_suit(tile_t tile) {
  * @param [in] tile 牌
  * @return rank_t 点数
  */
-static forceinline rank_t tile_rank(tile_t tile) {
+static forceinline rank_t tile_get_rank(tile_t tile) {
     return (tile & 0xF);
 }
 
@@ -183,7 +183,7 @@ static forceinline bool is_pack_melded(pack_t pack) {
  * @param [in] pack 牌组
  * @return uint8_t
  */
-static forceinline uint8_t pack_offer(pack_t pack) {
+static forceinline uint8_t pack_get_offer(pack_t pack) {
     return ((pack >> 12) & 0xF);
 }
 
@@ -193,7 +193,7 @@ static forceinline uint8_t pack_offer(pack_t pack) {
  * @param [in] pack 牌组
  * @return uint8_t 牌组类型
  */
-static forceinline uint8_t pack_type(pack_t pack) {
+static forceinline uint8_t pack_get_type(pack_t pack) {
     return ((pack >> 8) & 0xF);
 }
 
@@ -203,7 +203,7 @@ static forceinline uint8_t pack_type(pack_t pack) {
  * @param [in] pack 牌组
  * @return tile_t 牌（对于顺子，为中间那张牌）
  */
-static forceinline tile_t pack_tile(pack_t pack) {
+static forceinline tile_t pack_get_tile(pack_t pack) {
     return (pack & 0xFF);
 }
 

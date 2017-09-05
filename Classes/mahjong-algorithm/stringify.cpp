@@ -263,8 +263,8 @@ long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_siz
     suit_t last_suit = 0;
     for (long i = 0; i < tile_cnt && p < end; ++i) {
         tile_t t = tiles[i];
-        suit_t s = tile_suit(t);
-        rank_t r = tile_rank(t);
+        suit_t s = tile_get_suit(t);
+        rank_t r = tile_get_rank(t);
         if (s == 1 || s == 2 || s == 3) {  // 数牌
             if (r >= 1 && r <= 9) {  // 有效范围1-9
                 if (last_suit != s && last_suit != 0) {  // 花色变了，加后缀
@@ -315,8 +315,8 @@ long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_siz
     tile_t temp[4];
     for (long i = 0; i < pack_cnt && p < end; ++i) {
         pack_t pack = packs[i];
-        tile_t t = pack_tile(pack);
-        uint8_t pt = pack_type(pack);
+        tile_t t = pack_get_tile(pack);
+        uint8_t pt = pack_get_type(pack);
         switch (pt) {
         case PACK_TYPE_CHOW:
             temp[0] = t - 1; temp[1] = t; temp[2] = t + 1;

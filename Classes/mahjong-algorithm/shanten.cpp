@@ -37,8 +37,8 @@ long packs_to_tiles(const pack_t *packs, long pack_cnt, tile_t *tiles, long tile
 
     long cnt = 0;
     for (int i = 0; i < pack_cnt && cnt < tile_cnt; ++i) {
-        tile_t tile = pack_tile(packs[i]);
-        switch (pack_type(packs[i])) {
+        tile_t tile = pack_get_tile(packs[i]);
+        switch (pack_get_type(packs[i])) {
         case PACK_TYPE_CHOW:
             if (cnt < tile_cnt) tiles[cnt++] = tile - 1;
             if (cnt < tile_cnt) tiles[cnt++] = tile;
@@ -273,7 +273,7 @@ static int basic_type_shanten_recursively(tile_table_t &cnt_table, const bool ha
         // 顺子（只能是数牌）
         bool is_numbered = is_numbered_suit(t);
         // 顺子t t+1 t+2，显然t不能是8点以上的数牌
-        if (is_numbered && tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
+        if (is_numbered && tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW, t);
             if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                 // 削减这组顺子，递归
@@ -311,7 +311,7 @@ static int basic_type_shanten_recursively(tile_table_t &cnt_table, const bool ha
         if (is_numbered) {
             // 削减搭子，递归
             // 两面或者边张搭子t t+1，显然t不能是9点以上的数牌
-            if (tile_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
+            if (tile_get_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
                 work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_OPEN_END, t);
                 if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                     --cnt_table[t];
@@ -324,7 +324,7 @@ static int basic_type_shanten_recursively(tile_table_t &cnt_table, const bool ha
                 }
             }
             // 嵌张搭子t t+2，显然t不能是8点以上的数牌
-            if (tile_rank(t) < 8 && cnt_table[t + 2]) {  // 嵌张
+            if (tile_get_rank(t) < 8 && cnt_table[t + 2]) {  // 嵌张
                 work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_CLOSED, t);
                 if (!is_basic_type_branch_exist(fixed_cnt, work_path, work_state)) {
                     --cnt_table[t];
@@ -348,7 +348,7 @@ static int basic_type_shanten_recursively(tile_table_t &cnt_table, const bool ha
 
 // 数牌是否有搭子
 static bool numbered_tile_has_neighbor(const tile_table_t &cnt_table, tile_t t) {
-    rank_t r = tile_rank(t);
+    rank_t r = tile_get_rank(t);
     if (r < 9) { if (cnt_table[t + 1]) return true; }
     if (r < 8) { if (cnt_table[t + 2]) return true; }
     if (r > 1) { if (cnt_table[t - 1]) return true; }
@@ -455,7 +455,7 @@ static bool is_basic_type_wait_2(const tile_table_t &cnt_table, useful_table_t *
             }
         }
         if (is_numbered_suit_quick(t)) {  // 数牌搭子
-            rank_t r = tile_rank(t);
+            rank_t r = tile_get_rank(t);
             if (r > 1 && cnt_table[t - 1]) {  // 两面或者边张
                 if (waiting_table != nullptr) {  // 获取听牌张
                     if (r < 9) (*waiting_table)[t + 1] = true;
@@ -541,7 +541,7 @@ static bool is_basic_type_wait_recursively(tile_table_t &cnt_table, long left_cn
         // 顺子（只能是数牌）
         if (is_numbered_suit(t)) {
             // 顺子t t+1 t+2，显然t不能是8点以上的数牌
-            if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
+            if (tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
                 // 削减这组顺子，递归
                 --cnt_table[t];
                 --cnt_table[t + 1];
@@ -620,7 +620,7 @@ static bool is_basic_type_win_recursively(tile_table_t &cnt_table, long left_cnt
         // 顺子（只能是数牌）
         if (is_numbered_suit(t)) {
             // 顺子t t+1 t+2，显然t不能是8点以上的数牌
-            if (tile_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
+            if (tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
                 // 削减这组顺子，递归
                 --cnt_table[t];
                 --cnt_table[t + 1];
