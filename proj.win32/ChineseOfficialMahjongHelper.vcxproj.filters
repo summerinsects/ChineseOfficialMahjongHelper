@@ -188,6 +188,9 @@
     <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h">
       <Filter>src\LatestCompetition</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\standard_tiles.h">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">
