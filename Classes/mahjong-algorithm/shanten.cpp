@@ -698,10 +698,15 @@ bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t 
 
 // 十三幺
 
+#ifndef STANDARD_THIRTEEN_ORPHANS_DEFINED
+#define STANDARD_THIRTEEN_ORPHANS_DEFINED
+
 // 十三幺13面听
 static const tile_t standard_thirteen_orphans[13] = {
     TILE_1m, TILE_9m, TILE_1s, TILE_9s, TILE_1p, TILE_9p, TILE_E, TILE_S, TILE_W, TILE_N, TILE_C, TILE_F, TILE_P
 };
+
+#endif
 
 // 十三幺上听数
 int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table) {
@@ -775,6 +780,9 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, ti
 
 // “组合龙+面子+雀头”和型
 
+#ifndef STANDARD_KNITTED_STRAIGHT_DEFINED
+#define STANDARD_KNITTED_STRAIGHT_DEFINED
+
 // 组合龙只有如下6种
 // 147m 258s 369p
 // 147m 369s 258p
@@ -790,6 +798,8 @@ static const tile_t standard_knitted_straight[6][9] = {
     { TILE_3m, TILE_6m, TILE_9m, TILE_1s, TILE_4s, TILE_7s, TILE_2p, TILE_5p, TILE_8p },
     { TILE_3m, TILE_6m, TILE_9m, TILE_2s, TILE_5s, TILE_8s, TILE_1p, TILE_4p, TILE_7p },
 };
+
+#endif
 
 // 以表格为参数计算组合龙是否听牌
 static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, long left_cnt, useful_table_t *waiting_table) {
