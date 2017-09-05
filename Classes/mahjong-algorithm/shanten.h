@@ -49,8 +49,9 @@ long packs_to_tiles(const pack_t *packs, long pack_cnt, tile_t *tiles, long tile
  * @brief 牌表类型
  *
  * 说明：在判断听牌、计算上听数等算法中，主流的对于牌有两种存储方式：
- * - 一种是用牌表，各索引表示各种牌拥有的枚数，这种存储方式的缺点是一手牌的总数不方便确定
- * - 另一种是直接用牌的数组，这种存储方式的缺点是递归计算是，削减面子不方便
+ * 说明：在判断听牌、计算上听数等算法中，主流的对于牌有两种存储方式：
+ * - 一种是用牌表，各索引表示各种牌拥有的枚数，这种存储方式的优点是在递归计算时削减面子只需要修改表中相应下标的值，缺点是一手牌的总数不方便确定
+ * - 另一种是直接用牌的数组，这种存储方式的优点是很容易确定一手牌的总数，缺点是在递归计算时削减面子不方便，需要进行数组删除元素操作
  */
 typedef int tile_table_t[TILE_TABLE_SIZE];
 
@@ -102,11 +103,16 @@ int count_useful_tile(const tile_table_t &used_table, const useful_table_t &usef
  */
 
 /**
+ * @addtogroup basic_type
+ * @{
+ */
+
+/**
  * @brief 基本和型上听数
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 有效牌标记表（可为null)
+ * @param [out] useful_table 有效牌标记表（可为null）
  * @return int 上听数
  */
 int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table);
@@ -116,7 +122,7 @@ int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, useful_t
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] waiting_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null）
  * @return bool 是否听牌
  */
 bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table);
@@ -131,14 +137,22 @@ bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, useful_
  */
 bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
+/**
+ * end group
+ * @}
+ */
 
+/**
+ * @addtogroup seven_pairs
+ * @{
+ */
 
 /**
  * @brief 七对上听数
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 有效牌标记表（可为null)
+ * @param [out] useful_table 有效牌标记表（可为null）
  * @return int 上听数
  */
 int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table);
@@ -148,7 +162,7 @@ int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, useful_
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] waiting_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null）
  * @return bool 是否听牌
  */
 bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table);
@@ -163,14 +177,22 @@ bool is_seven_pairs_wait(const tile_t *standing_tiles, long standing_cnt, useful
  */
 bool is_seven_pairs_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
+/**
+ * end group
+ * @}
+ */
 
+/**
+ * @addtogroup thirteen_orphans
+ * @{
+ */
 
 /**
  * @brief 十三幺上听数
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 有效牌标记表（可为null)
+ * @param [out] useful_table 有效牌标记表（可为null）
  * @return int 上听数
  */
 int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table);
@@ -180,7 +202,7 @@ int thirteen_orphans_shanten(const tile_t *standing_tiles, long standing_cnt, us
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] waiting_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null）
  * @return bool 是否听牌
  */
 bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table);
@@ -195,14 +217,22 @@ bool is_thirteen_orphans_wait(const tile_t *standing_tiles, long standing_cnt, u
  */
 bool is_thirteen_orphans_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
+/**
+ * end group
+ * @}
+ */
 
+/**
+ * @addtogroup knitted_straight
+ * @{
+ */
 
 /**
  * @brief 组合龙上听数
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 有效牌标记表（可为null)
+ * @param [out] useful_table 有效牌标记表（可为null）
  * @return int 上听数
  */
 int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table);
@@ -212,7 +242,7 @@ int knitted_straight_shanten(const tile_t *standing_tiles, long standing_cnt, us
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] waiting_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null）
  * @return bool 是否听牌
  */
 bool is_knitted_straight_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table);
@@ -227,14 +257,22 @@ bool is_knitted_straight_wait(const tile_t *standing_tiles, long standing_cnt, u
  */
 bool is_knitted_straight_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
+/**
+ * end group
+ * @}
+ */
 
+/**
+ * @addtogroup honors_and_knitted_tiles
+ * @{
+ */
 
 /**
  * @brief 全不靠上听数
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] useful_table 有效牌标记表（可为null)
+ * @param [out] useful_table 有效牌标记表（可为null）
  * @return int 上听数
  */
 int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table);
@@ -244,7 +282,7 @@ int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, long standing
  *
  * @param [in] standing_tiles 立牌
  * @param [in] standing_cnt 立牌数
- * @param [out] waiting_table 听牌标记表（可为null)
+ * @param [out] waiting_table 听牌标记表（可为null）
  * @return bool 是否听牌
  */
 bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table);
@@ -258,6 +296,16 @@ bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, long standin
  * @return bool 是否和牌
  */
 bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
+
+/**
+ * end group
+ * @}
+ */
+
+/**
+ * end group
+ * @}
+ */
 
 /**
  * @brief 组合龙

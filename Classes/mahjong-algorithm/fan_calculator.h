@@ -313,7 +313,7 @@ bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long stan
  * @brief 统计和牌在副露中出现的张数
  * 如果出现3张，则必然和绝张
  *
- * @param [in] fixed_pack 副露牌组
+ * @param [in] fixed_packs 副露牌组
  * @param [in] fixed_cnt 副露牌组数
  * @param [in] win_tile 和牌张
  * @return size_t
@@ -324,7 +324,7 @@ size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, long fixed_cnt, 
  * @brief 判断副露牌组是否包含杠
  *
  * @param [in] fixed_packs 副露牌组
- * @param [in] standing_cnt 副露牌组数
+ * @param [in] fixed_cnt 副露牌组数
  * @return bool
  */
 bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, long fixed_cnt);
