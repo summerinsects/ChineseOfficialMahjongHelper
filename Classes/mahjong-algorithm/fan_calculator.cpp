@@ -1696,15 +1696,6 @@ static void check_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
     }
 }
 
-// 和牌是否为解释为明顺
-static bool is_chow_packs_contains_win_tile(const pack_t *chow_packs, long chow_cnt, tile_t win_tile) {
-    return std::any_of(chow_packs, chow_packs + chow_cnt, [win_tile](pack_t chow_pack) {
-        tile_t tile = pack_tile(chow_pack);
-        return !is_pack_melded(chow_pack)
-            && (tile - 1 == win_tile || tile == win_tile || tile + 1 == win_tile);
-    });
-}
-
 // 基本和型算番
 static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, tile_t win_tile,
     win_flag_t win_flag, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
@@ -1741,7 +1732,12 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
 
     // 点和的牌张，如果不能解释为顺子中的一张，那么将其解释为刻子，并标记这个刻子为明刻
     if ((win_flag & WIN_FLAG_SELF_DRAWN) == 0) {
-        if (!is_chow_packs_contains_win_tile(chow_packs, chow_cnt, win_tile)) {
+        // 和牌不能解释为顺子中的一张
+        if (std::none_of(chow_packs, chow_packs + chow_cnt, [win_tile](pack_t chow_pack) {
+            tile_t tile = pack_tile(chow_pack);
+            return !is_pack_melded(chow_pack)
+                && (tile - 1 == win_tile || tile == win_tile || tile + 1 == win_tile);
+        })) {
             for (long i = 0; i < pung_cnt; ++i) {
                 if (pack_tile(pung_packs[i]) == win_tile && !is_pack_melded(pung_packs[i])) {
                     pung_packs[i] |= (1 << 12);  // 标记为明副露
