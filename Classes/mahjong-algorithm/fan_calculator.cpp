@@ -1676,6 +1676,7 @@ static void check_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
     }
 }
 
+// 和牌是否为解释为明顺
 static bool is_win_tile_in_concealed_chow_packs(const pack_t *chow_packs, long chow_cnt, tile_t win_tile) {
     return std::any_of(chow_packs, chow_packs + chow_cnt, [win_tile](pack_t chow_pack) {
         tile_t tile = pack_tile(chow_pack);
@@ -2072,6 +2073,35 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
 
     long fixed_cnt = hand_tiles->pack_count;
     long standing_cnt = hand_tiles->tile_count;
+
+    // 校正和牌标记
+    // 如果立牌包含和牌，则必然不是和绝张
+    const bool standing_tiles_contains_win_tile = is_standing_tiles_contains_win_tile(hand_tiles->standing_tiles, standing_cnt, win_tile);
+    if (standing_tiles_contains_win_tile) {
+        win_flag &= ~WIN_FLAG_4TH_TILE;
+    }
+
+    // 如果和牌在副露中出现3张，则必然为和绝张
+    const size_t win_tile_in_fixed_packs = count_win_tile_in_fixed_packs(hand_tiles->fixed_packs, fixed_cnt, win_tile);
+    if (3 == win_tile_in_fixed_packs) {
+        win_flag |= WIN_FLAG_4TH_TILE;
+    }
+
+    // 附加杠标记
+    if (win_flag & WIN_FLAG_ABOUT_KONG) {
+        if (win_flag & WIN_FLAG_SELF_DRAWN) {  // 自摸
+            // 如果手牌没有杠，则必然不是杠上开花
+            if (!is_fixed_packs_contains_kong(hand_tiles->fixed_packs, fixed_cnt)) {
+                win_flag &= ~WIN_FLAG_ABOUT_KONG;
+            }
+        }
+        else {  // 点和
+            // 如果和牌在手牌范围内出现过，则必然不是抢杠和
+            if (win_tile_in_fixed_packs > 0 || standing_tiles_contains_win_tile) {
+                win_flag &= ~WIN_FLAG_ABOUT_KONG;
+            }
+        }
+    }
 
     tile_t standing_tiles[14];
     divisions_t result;
