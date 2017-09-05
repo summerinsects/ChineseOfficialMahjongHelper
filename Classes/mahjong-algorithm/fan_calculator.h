@@ -318,7 +318,7 @@ bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long stan
  * @param [in] win_tile 和牌张
  * @return size_t
  */
-size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, tile_t win_tile);
+size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, long fixed_cnt, tile_t win_tile);
 
 /**
  * end group

@@ -2008,10 +2008,10 @@ bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long stan
         [win_tile](tile_t tile) { return tile == win_tile; });
 }
 
-size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, tile_t win_tile) {
+size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, long fixed_cnt, tile_t win_tile) {
     size_t cnt = 0;
     for (long i = 0; i < fixed_cnt; ++i) {
-        pack_t pack = fixed_pack[i];
+        pack_t pack = fixed_packs[i];
         tile_t tile = pack_tile(pack);
         switch (pack_type(pack)) {
         case PACK_TYPE_CHOW:
