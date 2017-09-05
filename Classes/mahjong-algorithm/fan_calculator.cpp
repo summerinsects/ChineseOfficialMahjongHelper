@@ -60,7 +60,7 @@ struct divisions_t {
     long count;  // 划分方式总数
 };
 
-static void divide_tail_add_pair(tile_t tile, long fixed_cnt, one_division_t *work_division, divisions_t *result) {
+static void divide_tail_add_division(tile_t tile, long fixed_cnt, one_division_t *work_division, divisions_t *result) {
     // 这2张作为雀头
     work_division->packs[4] = make_pack(0, PACK_TYPE_PAIR, tile);
 
@@ -94,7 +94,7 @@ static bool divide_tail(tile_table_t &cnt_table, long fixed_cnt, one_division_t 
         // 全部使用完毕
         if (std::all_of(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n == 0; })) {
             cnt_table[t] += 2;
-            divide_tail_add_pair(t, fixed_cnt, work_division, result);
+            divide_tail_add_division(t, fixed_cnt, work_division, result);
             return true;
         }
         cnt_table[t] += 2;
@@ -1677,7 +1677,7 @@ static void check_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
 }
 
 // 和牌是否为解释为明顺
-static bool is_win_tile_in_concealed_chow_packs(const pack_t *chow_packs, long chow_cnt, tile_t win_tile) {
+static bool is_chow_packs_contains_win_tile(const pack_t *chow_packs, long chow_cnt, tile_t win_tile) {
     return std::any_of(chow_packs, chow_packs + chow_cnt, [win_tile](pack_t chow_pack) {
         tile_t tile = pack_tile(chow_pack);
         return !is_pack_melded(chow_pack)
@@ -1721,7 +1721,7 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
 
     // 点和的牌张，如果不能解释为暗顺中的一张，那么将其解释为刻子，并标记这个刻子为明刻
     if ((win_flag & WIN_FLAG_SELF_DRAWN) == 0) {
-        if (!is_win_tile_in_concealed_chow_packs(chow_packs, chow_cnt, win_tile)) {
+        if (!is_chow_packs_contains_win_tile(chow_packs, chow_cnt, win_tile)) {
             for (long i = 0; i < pung_cnt; ++i) {
                 if (pack_tile(pung_packs[i]) == win_tile && !is_pack_melded(pung_packs[i])) {
                     pung_packs[i] |= (1 << 12);  // 标记为明副露
