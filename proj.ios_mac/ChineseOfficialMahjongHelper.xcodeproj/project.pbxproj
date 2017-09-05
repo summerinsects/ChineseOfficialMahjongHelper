@@ -192,6 +192,8 @@
 		1FE5D0471CAE046300A5C38B /* tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tiles; sourceTree = "<group>"; };
 		1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LatestCompetitionScene.cpp; sourceTree = "<group>"; };
 		1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LatestCompetitionScene.h; sourceTree = "<group>"; };
+		1FF8820A1F5E60BE009C3449 /* compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compiler.h; sourceTree = "<group>"; };
+		1FF8820B1F5E60BE009C3449 /* TilesImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilesImage.h; sourceTree = "<group>"; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		294D0D631D0D56D500F7F5D4 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
 		46880B7A19C43A67006E1F66 /* xyg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = xyg.png; sourceTree = "<group>"; };
@@ -479,6 +481,7 @@
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
 				1F6A373D1CBDD3C9001617E6 /* BaseScene.h */,
 				1F6A373E1CBDD3C9001617E6 /* common.h */,
+				1FF8820A1F5E60BE009C3449 /* compiler.h */,
 				1FE04AD61C94682A008401EA /* FanCalculator */,
 				1FE2A3E61CBB30D1008C45C5 /* FanTable */,
 				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
@@ -488,6 +491,7 @@
 				1F154E391E4409420083F8B3 /* MahjongTheory */,
 				1F764BE81CC5DB1F00844DAF /* Other */,
 				1FE04AD91C94682A008401EA /* ScoreSheet */,
+				1FF8820B1F5E60BE009C3449 /* TilesImage.h */,
 				1FE5CFDA1CAE029200A5C38B /* widget */,
 			);
 			name = Classes;
