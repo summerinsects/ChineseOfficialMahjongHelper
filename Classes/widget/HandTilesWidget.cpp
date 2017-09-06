@@ -123,6 +123,7 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
 
     if (servingTile != 0) {
         addTile(servingTile);
+        ++_usedTilesTable[servingTile];
     }
 
     refreshHighlightPos();
