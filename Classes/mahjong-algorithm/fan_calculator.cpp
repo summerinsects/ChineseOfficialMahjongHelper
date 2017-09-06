@@ -486,7 +486,7 @@ static fan_t get_1_pung_fan(tile_t mid_tile) {
 }
 
 // 存在3组顺子的番种时，余下的第4组顺子最多算1番
-static fan_t get_1_chow_extra(tile_t tile0, tile_t tile1, tile_t tile2, tile_t tile_extra) {
+static fan_t get_1_chow_extra_fan(tile_t tile0, tile_t tile1, tile_t tile2, tile_t tile_extra) {
     fan_t fan0 = get_2_chows_fan(tile0, tile_extra);
     fan_t fan1 = get_2_chows_fan(tile1, tile_extra);
     fan_t fan2 = get_2_chows_fan(tile2, tile_extra);
@@ -577,7 +577,7 @@ static void calculate_4_chows(const pack_t chow_packs[4], fan_table_t &fan_table
     // 012构成3组顺子的番种
     if ((fan = get_3_chows_fan(tiles[0], tiles[1], tiles[2])) != FAN_NONE) {
         fan_table[fan] = 1;
-        if ((fan = get_1_chow_extra(tiles[0], tiles[1], tiles[2], tiles[3])) != FAN_NONE) {
+        if ((fan = get_1_chow_extra_fan(tiles[0], tiles[1], tiles[2], tiles[3])) != FAN_NONE) {
             fan_table[fan] = 1;
         }
         return;
@@ -585,7 +585,7 @@ static void calculate_4_chows(const pack_t chow_packs[4], fan_table_t &fan_table
     // 013构成3组顺子的番种
     else if ((fan = get_3_chows_fan(tiles[0], tiles[1], tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
-        if ((fan = get_1_chow_extra(tiles[0], tiles[1], tiles[3], tiles[2])) != FAN_NONE) {
+        if ((fan = get_1_chow_extra_fan(tiles[0], tiles[1], tiles[3], tiles[2])) != FAN_NONE) {
             fan_table[fan] = 1;
         }
         return;
@@ -593,7 +593,7 @@ static void calculate_4_chows(const pack_t chow_packs[4], fan_table_t &fan_table
     // 023构成3组顺子的番种
     else if ((fan = get_3_chows_fan(tiles[0], tiles[2], tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
-        if ((fan = get_1_chow_extra(tiles[0], tiles[2], tiles[3], tiles[1])) != FAN_NONE) {
+        if ((fan = get_1_chow_extra_fan(tiles[0], tiles[2], tiles[3], tiles[1])) != FAN_NONE) {
             fan_table[fan] = 1;
         }
         return;
@@ -601,7 +601,7 @@ static void calculate_4_chows(const pack_t chow_packs[4], fan_table_t &fan_table
     // 123构成3组顺子的番种
     else if ((fan = get_3_chows_fan(tiles[1], tiles[2], tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
-        if ((fan = get_1_chow_extra(tiles[1], tiles[2], tiles[3], tiles[0])) != FAN_NONE) {
+        if ((fan = get_1_chow_extra_fan(tiles[1], tiles[2], tiles[3], tiles[0])) != FAN_NONE) {
             fan_table[fan] = 1;
         }
         return;
