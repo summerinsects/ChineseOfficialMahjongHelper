@@ -954,7 +954,7 @@ static void calculate_2_pungs(const pack_t pung_packs[2], fan_table_t &fan_table
 }
 
 // 1组刻子算番
-static void calculate_1_pung(pack_t pung_pack, fan_table_t &fan_table) {
+static forceinline void calculate_1_pung(pack_t pung_pack, fan_table_t &fan_table) {
     calculate_kongs(&pung_pack, 1, fan_table);
 }
 
@@ -1909,7 +1909,7 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
 }
 
 // 十三幺
-static bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
+static forceinline bool is_thirteen_orphans(const tile_t(&tiles)[14]) {
     return std::all_of(std::begin(tiles), std::end(tiles), &is_terminal_or_honor)
         && std::includes(std::begin(tiles), std::end(tiles),
         std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans));
