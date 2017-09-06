@@ -659,7 +659,7 @@ int seven_pairs_shanten(const tile_t *standing_tiles, long standing_cnt, useful_
 
     // 对牌的种类进行打表，并统计对子数
     int pair_cnt = 0;
-    int cnt_table[TILE_TABLE_SIZE] = { 0 };
+    tile_table_t cnt_table = { 0 };
     for (long i = 0; i < standing_cnt; ++i) {
         tile_t tile = standing_tiles[i];
         ++cnt_table[tile];
