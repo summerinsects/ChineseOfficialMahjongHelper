@@ -203,10 +203,7 @@ static forceinline bool is_quadruple_chow(tile_t t0, tile_t t1, tile_t t2, tile_
 
 // 一色四节高
 static forceinline bool is_four_pure_shifted_pungs(tile_t t0, tile_t t1, tile_t t2, tile_t t3) {
-    if (is_numbered_suit_quick(t0)) {
-        return (t0 + 1 == t1 && t1 + 1 == t2 && t2 + 1 == t3);
-    }
-    return false;
+    return (is_numbered_suit_quick(t0) && t0 + 1 == t1 && t1 + 1 == t2 && t2 + 1 == t3);
 }
 
 // 一色四步高
