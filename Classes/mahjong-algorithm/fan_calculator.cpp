@@ -1367,7 +1367,7 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
 static void check_wind_pungs(pack_t packs, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
     uint8_t type = pack_get_type(packs);
     if (type == PACK_TYPE_PUNG || type == PACK_TYPE_KONG) {
-        rank_t delta = pack_get_tile(packs) - 0x41;
+        rank_t delta = pack_get_tile(packs) - TILE_E;
         if (delta == (int)prevalent_wind - (int)wind_t::EAST) {
             fan_table[PREVALENT_WIND] = 1;
         }
