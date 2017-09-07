@@ -204,11 +204,11 @@ void HandTilesWidget::addTile(mahjong::tile_t tile) {
     if (LIKELY(tilesCnt < maxCnt)) {
         button->setPosition(pos);
         _currentIdx = tilesCnt + 1;
-        ++_standingTilesTable[tile];
     }
     else {
         button->setPosition(Vec2(pos.x + GAP, pos.y));  // 和牌张与立牌间隔4像素
     }
+    ++_standingTilesTable[tile];
 
     _standingTileButtons.push_back(button);
     _standingTiles.push_back(tile);
@@ -221,18 +221,15 @@ void HandTilesWidget::replaceTile(mahjong::tile_t tile) {
     button->loadTextureNormal(tilesImageName[tile]);
     button->setTag(tile);
 
+    mahjong::tile_t prevTile = _standingTiles[_currentIdx];
+    --_standingTilesTable[prevTile];
+
+    _standingTiles[_currentIdx] = tile;
+    ++_standingTilesTable[tile];
+
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
     if (_currentIdx < maxCnt) {
-        mahjong::tile_t prevTile = _standingTiles[_currentIdx];
-        --_standingTilesTable[prevTile];
-
-        _standingTiles[_currentIdx] = tile;
-        ++_standingTilesTable[tile];
-
         ++_currentIdx;
-    }
-    else {
-        _standingTiles[_currentIdx] = tile;
     }
 }
 
