@@ -137,11 +137,11 @@
     <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h">
       <Filter>src\LatestCompetition</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h">
-      <Filter>src\mahjong-algorithm</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h">
       <Filter>src\MahjongTheory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h">
+      <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\mahjong-algorithm\shanten.h">
       <Filter>src\mahjong-algorithm</Filter>
