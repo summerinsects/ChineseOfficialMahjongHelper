@@ -1028,8 +1028,8 @@ static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t
     }
 }
 
-// 检测不求人、全求人
-static void check_melded_or_concealed_hand(const pack_t (&packs)[5], long fixed_cnt, bool self_drawn, fan_table_t &fan_table) {
+// 和牌方式校正，确定不求人、全求人
+static void adjust_by_self_drawn(const pack_t (&packs)[5], long fixed_cnt, bool self_drawn, fan_table_t &fan_table) {
     long melded_cnt = std::count_if(&packs[0], &packs[fixed_cnt], &is_pack_melded);  // 明副露的组数
 
     switch (melded_cnt) {
@@ -1048,8 +1048,8 @@ static void check_melded_or_concealed_hand(const pack_t (&packs)[5], long fixed_
     }
 }
 
-// 检测雀头，确定平和、小三元、小四喜
-static void check_pair_tile(tile_t pair_tile, long chow_cnt, fan_table_t &fan_table) {
+// 雀头校正，确定平和、小三元、小四喜
+static void adjust_by_pair_tile(tile_t pair_tile, long chow_cnt, fan_table_t &fan_table) {
     if (chow_cnt == 4) {  // 4组都是顺子
         if (is_numbered_suit_quick(pair_tile)) {  // 数牌雀头
             fan_table[ALL_CHOWS] = 1;  // 平和
@@ -1075,8 +1075,8 @@ static void check_pair_tile(tile_t pair_tile, long chow_cnt, fan_table_t &fan_ta
     }
 }
 
-// 检测门（五门齐的门）
-static void check_tiles_suits(const tile_t *tiles, long tile_cnt, fan_table_t &fan_table) {
+// 花色校正，相关番种：无字、缺一门、混一色、清一色、五门齐
+static void adjust_by_suits(const tile_t *tiles, long tile_cnt, fan_table_t &fan_table) {
     // 打表标记有哪些花色，用bit操作
     uint8_t suit_flag = 0;
     for (long i = 0; i < tile_cnt; ++i) {
@@ -1116,8 +1116,8 @@ static void check_tiles_suits(const tile_t *tiles, long tile_cnt, fan_table_t &f
     }
 }
 
-// 检测数牌的范围（大于五、小于五、全大、全中、全小）
-static void check_tiles_rank_range(const tile_t *tiles, long tile_cnt, fan_table_t &fan_table) {
+// 数牌的范围校正，相关番种：大于五、小于五、全大、全中、全小
+static void adjust_by_rank_range(const tile_t *tiles, long tile_cnt, fan_table_t &fan_table) {
 #ifdef STRICT_98_RULE
     if (fan_table[SEVEN_PAIRS]) {
         return;  // 严格98规则的七对不支持叠加这些
@@ -1185,8 +1185,8 @@ static bool is_pack_contains_5(pack_t pack) {
     }
 }
 
-// 检测全带幺、全带五、全双刻
-static void check_tiles_rank_by_pack(const pack_t (&packs)[5], fan_table_t &fan_table) {
+// 牌组特征校正，相关番种：全带幺、全带五、全双刻
+static void adjust_by_packs_traits(const pack_t (&packs)[5], fan_table_t &fan_table) {
     // 统计包含数牌19、字牌、5、双数牌的组数
     int terminal_cnt = 0;
     int honor_cnt = 0;
@@ -1226,8 +1226,8 @@ static void check_tiles_rank_by_pack(const pack_t (&packs)[5], fan_table_t &fan_
     }
 }
 
-// 检测特性（断幺、推不倒、绿一色、字一色、清幺九、混幺九）
-static void check_tiles_traits(const tile_t *tiles, long tile_cnt, fan_table_t &fan_table) {
+// 牌特性校正，相关番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
+static void adjust_by_tiles_traits(const tile_t *tiles, long tile_cnt, fan_table_t &fan_table) {
     // 断幺
     if (!std::any_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
         fan_table[ALL_SIMPLES] = 1;
@@ -1270,8 +1270,8 @@ static void check_tiles_traits(const tile_t *tiles, long tile_cnt, fan_table_t &
     }
 }
 
-// 检测四归一
-static void check_tiles_hog(const tile_t *tiles, long tile_cnt, fan_table_t &fan_table) {
+// 四归一校正
+static void adjust_by_tiles_hog(const tile_t *tiles, long tile_cnt, fan_table_t &fan_table) {
     long kong_cnt = tile_cnt - 14;  // 标准和牌14张，多出几张就说明有几个杠
     tile_table_t cnt_table;
     map_tiles(tiles, tile_cnt, cnt_table);
@@ -1289,8 +1289,8 @@ static void remove_win_tile(tile_t *standing_tiles, long tile_cnt, tile_t win_ti
     }
 }
 
-// 检测边嵌钓
-static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pack_cnt, tile_t win_tile, fan_table_t &fan_table) {
+// 听牌方式校正，确定边张、嵌张、单钓将
+static void adjust_by_waiting_form(const pack_t *concealed_packs, long pack_cnt, tile_t win_tile, fan_table_t &fan_table) {
     // 全求人和四杠不计单钓将，也不可能有边张、嵌张
     if (fan_table[MELDED_HAND] || fan_table[FOUR_KONGS]) {
         return;
@@ -1363,8 +1363,8 @@ static void check_edge_closed_single_wait(const pack_t *concealed_packs, long pa
     }
 }
 
-// 检测圈风刻、门风刻
-static void check_wind_pungs(pack_t packs, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
+// 单个牌组用风校正，确定圈风刻、门风刻
+static void adjust_by_winds(pack_t packs, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
     uint8_t type = pack_get_type(packs);
     if (type == PACK_TYPE_PUNG || type == PACK_TYPE_KONG) {
         rank_t delta = pack_get_tile(packs) - TILE_E;
@@ -1378,7 +1378,7 @@ static void check_wind_pungs(pack_t packs, wind_t prevalent_wind, wind_t seat_wi
 }
 
 // 统一校正一些不计的
-static void correction_fan_table(fan_table_t &fan_table, bool prevalent_eq_seat) {
+static void adjust_fan_table(fan_table_t &fan_table, bool prevalent_eq_seat) {
     // 大四喜不计三风刻、碰碰和、圈风刻、门风刻、幺九刻
     if (fan_table[BIG_FOUR_WINDS]) {
         fan_table[BIG_THREE_WINDS] = 0;
@@ -1681,8 +1681,8 @@ static void correction_fan_table(fan_table_t &fan_table, bool prevalent_eq_seat)
     }
 }
 
-// 检测和绝张、妙手回春、海底捞月、自摸
-static void check_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
+// 和牌标记校正，确定和绝张、妙手回春、海底捞月、自摸
+static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
     if (win_flag & WIN_FLAG_4TH_TILE) {
         fan_table[LAST_TILE] = 1;
     }
@@ -1729,7 +1729,8 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
         }
     }
 
-    check_win_flag(win_flag, fan_table);
+    // 和牌标记校正，确定和绝张、妙手回春、海底捞月、自摸
+    adjust_by_win_flag(win_flag, fan_table);
 
     // 点和的牌张，如果不能解释为顺子中的一张，那么将其解释为刻子，并标记这个刻子为明刻
     if ((win_flag & WIN_FLAG_SELF_DRAWN) == 0) {
@@ -1778,31 +1779,31 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
         break;
     }
 
-    // 检测不求人、全求人
-    check_melded_or_concealed_hand(packs, fixed_cnt, win_flag & WIN_FLAG_SELF_DRAWN, fan_table);
-    // 检测雀头，确定平和、小三元、小四喜
-    check_pair_tile(pack_get_tile(pair_pack), chow_cnt, fan_table);
-    // 检测全带幺、全带五、全双刻
-    check_tiles_rank_by_pack(packs, fan_table);
+    // 和牌方式校正，确定不求人、全求人
+    adjust_by_self_drawn(packs, fixed_cnt, win_flag & WIN_FLAG_SELF_DRAWN, fan_table);
+    // 雀头校正，确定平和、小三元、小四喜
+    adjust_by_pair_tile(pack_get_tile(pair_pack), chow_cnt, fan_table);
+    // 牌组特征校正，相关番种：全带幺、全带五、全双刻
+    adjust_by_packs_traits(packs, fan_table);
 
-    // 检测门（五门齐的门）
-    check_tiles_suits(tiles, tile_cnt, fan_table);
-    // 检测特性（断幺、推不倒、绿一色、字一色、清幺九、混幺九）
-    check_tiles_traits(tiles, tile_cnt, fan_table);
-    // 检测数牌的范围（大于五、小于五、全大、全中、全小）
-    check_tiles_rank_range(tiles, tile_cnt, fan_table);
-    // 检测四归一
-    check_tiles_hog(tiles, tile_cnt, fan_table);
-    // 检测边嵌钓
-    check_edge_closed_single_wait(packs + fixed_cnt, 5 - fixed_cnt, win_tile, fan_table);
+    // 花色校正，相关番种：无字、缺一门、混一色、清一色、五门齐
+    adjust_by_suits(tiles, tile_cnt, fan_table);
+    // 牌特性校正，相关番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
+    adjust_by_tiles_traits(tiles, tile_cnt, fan_table);
+    // 数牌的范围校正，相关番种：大于五、小于五、全大、全中、全小
+    adjust_by_rank_range(tiles, tile_cnt, fan_table);
+    // 四归一校正
+    adjust_by_tiles_hog(tiles, tile_cnt, fan_table);
+    // 听牌方式校正，确定边张、嵌张、单钓将
+    adjust_by_waiting_form(packs + fixed_cnt, 5 - fixed_cnt, win_tile, fan_table);
 
-    // 检测圈风刻、门风刻
+    // 用风校正，确定圈风刻、门风刻
     for (int i = 0; i < 5; ++i) {
-        check_wind_pungs(packs[i], prevalent_wind, seat_wind, fan_table);
+        adjust_by_winds(packs[i], prevalent_wind, seat_wind, fan_table);
     }
 
     // 统一校正一些不计的
-    correction_fan_table(fan_table, prevalent_wind == seat_wind);
+    adjust_fan_table(fan_table, prevalent_wind == seat_wind);
 
     // 如果什么番都没有，则计为无番和
     if (std::all_of(std::begin(fan_table), std::end(fan_table), [](long p) { return p == 0; })) {
@@ -1811,7 +1812,7 @@ static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, t
 }
 
 // “组合龙+面子+雀头”和型算番
-static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *hand_tiles, tile_t win_tile,
+static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_t win_tile,
     win_flag_t win_flag, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
     long fixed_cnt = hand_tiles->pack_count;
     if (fixed_cnt > 1) {
@@ -1868,7 +1869,7 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
         calculate_1_pung(temp_pack[3], fan_table);
     }
 
-    check_win_flag(win_flag, fan_table);
+    adjust_by_win_flag(win_flag, fan_table);
     // 门前清（暗杠不影响）
     if (fixed_cnt == 0 || (pack_get_type(temp_pack[3]) == PACK_TYPE_KONG && !is_pack_melded(temp_pack[3]))) {
         if (win_flag & WIN_FLAG_SELF_DRAWN) {
@@ -1885,26 +1886,26 @@ static bool calculate_knitted_straight_in_basic_type_fan(const hand_tiles_t *han
     long tile_cnt = packs_to_tiles(&temp_pack[3], 2, tiles + 9, 6);  // 一组面子+一对雀头 最多6张牌
     tile_cnt += 9;
 
-    // 检测门（五门齐的门）
-    check_tiles_suits(tiles, tile_cnt, fan_table);
-    // 特性和数牌的范围不用检测了，绝对不可能是有断幺、推不倒、绿一色、字一色、清幺九、混幺九
-    // 检测四归一
-    check_tiles_hog(tiles, tile_cnt, fan_table);
+    // 花色校正，相关番种：无字、缺一门、混一色、清一色、五门齐
+    adjust_by_suits(tiles, tile_cnt, fan_table);
+    // 牌组以及牌特征就不需要校正了，有组合龙的存在绝对不可能存在全带幺、全带五、全双刻，断幺、推不倒、绿一色、字一色、清幺九、混幺九
+    // 四归一校正
+    adjust_by_tiles_hog(tiles, tile_cnt, fan_table);
 
     // 和牌张是组合龙范围的牌，不计边嵌钓
     if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; })) {
         if (fixed_cnt == 0) {
-            check_edge_closed_single_wait(temp_pack + 3, 2, win_tile, fan_table);
+            adjust_by_waiting_form(temp_pack + 3, 2, win_tile, fan_table);
         }
         else {
             fan_table[SINGLE_WAIT] = 1;
         }
     }
 
-    // 检测圈风刻、门风刻
-    check_wind_pungs(temp_pack[3], prevalent_wind, seat_wind, fan_table);
+    // 用风校正，确定圈风刻、门风刻
+    adjust_by_winds(temp_pack[3], prevalent_wind, seat_wind, fan_table);
     // 统一校正一些不计的
-    correction_fan_table(fan_table, prevalent_wind == seat_wind);
+    adjust_fan_table(fan_table, prevalent_wind == seat_wind);
     return true;
 }
 
@@ -1970,20 +1971,20 @@ static bool calculate_special_type_fan(const tile_t (&standing_tiles)[14], win_f
             && standing_tiles[10] + 1 == standing_tiles[12]) {
             // 连七对
             fan_table[SEVEN_SHIFTED_PAIRS] = 1;
-            check_tiles_traits(standing_tiles, 14, fan_table);
+            adjust_by_tiles_traits(standing_tiles, 14, fan_table);
         }
         else {
             // 普通七对
             fan_table[SEVEN_PAIRS] = 1;
 
-            // 检测门（五门齐的门）
-            check_tiles_suits(standing_tiles, 14, fan_table);
-            // 检测特性（断幺、推不倒、绿一色、字一色、清幺九、混幺九）
-            check_tiles_traits(standing_tiles, 14, fan_table);
-            // 检测数牌的范围（大于五、小于五、全大、全中、全小）
-            check_tiles_rank_range(standing_tiles, 14, fan_table);
-            // 检测四归一
-            check_tiles_hog(standing_tiles, 14, fan_table);
+            // 花色校正，相关番种：无字、缺一门、混一色、清一色、五门齐
+            adjust_by_suits(standing_tiles, 14, fan_table);
+            // 牌特性校正，相关番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
+            adjust_by_tiles_traits(standing_tiles, 14, fan_table);
+            // 数牌的范围校正，相关番种：大于五、小于五、全大、全中、全小
+            adjust_by_rank_range(standing_tiles, 14, fan_table);
+            // 四归一校正
+            adjust_by_tiles_hog(standing_tiles, 14, fan_table);
         }
     }
     // 十三幺
@@ -1997,10 +1998,10 @@ static bool calculate_special_type_fan(const tile_t (&standing_tiles)[14], win_f
         return false;
     }
 
-    check_win_flag(win_flag, fan_table);
-    // 圈风刻、门风刻没必要检测了，这些特殊和型都没有面子
+    adjust_by_win_flag(win_flag, fan_table);
+    // 风校正就没必要了，这些特殊和型都没有面子，不存在圈风刻、门风刻
     // 统一校正一些不计的
-    correction_fan_table(fan_table, false);
+    adjust_fan_table(fan_table, false);
     return true;
 }
 
@@ -2143,7 +2144,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
 
     // 先判断各种特殊和型，并将结果放在result.count处
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_fan(hand_tiles,
+        if (calculate_knitted_straight_fan(hand_tiles,
             win_tile, win_flag, prevalent_wind, seat_wind, fan_tables[result.count])) {
             int current_fan = get_fan_by_table(fan_tables[result.count]);
             if (current_fan > max_fan) {
@@ -2166,7 +2167,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
     }
     else if (fixed_cnt == 1 && result.count == 0) {
         // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_in_basic_type_fan(hand_tiles, win_tile,
+        if (calculate_knitted_straight_fan(hand_tiles, win_tile,
             win_flag, prevalent_wind, seat_wind, fan_tables[0])) {
             int current_fan = get_fan_by_table(fan_tables[0]);
             if (current_fan > max_fan) {
