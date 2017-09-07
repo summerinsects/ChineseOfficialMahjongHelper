@@ -75,13 +75,13 @@
     <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp">
       <Filter>src\ScoreSheet</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\ScoreSheet\ScoreSheetScene.cpp">
+      <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\ScoreSheet\Record.cpp">
       <Filter>src\ScoreSheet</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp">
-      <Filter>src\ScoreSheet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\ScoreSheet\ScoreSheetScene.cpp">
       <Filter>src\ScoreSheet</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\widget\AlertView.cpp">
