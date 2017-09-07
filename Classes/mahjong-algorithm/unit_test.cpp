@@ -35,19 +35,19 @@ void test_wait(const char *str) {
         }
         else if (is_knitted_straight_wait(hand_tiles.standing_tiles, 13, &table)) {
             is_wait = true;
-            printf("knitted straight in basic type");
+            printf("knitted straight in basic form");
         }
     }
     else if (hand_tiles.tile_count == 10) {
         if (is_knitted_straight_wait(hand_tiles.standing_tiles, 10, &table)) {
             is_wait = true;
-            printf("knitted straight in basic type");
+            printf("knitted straight in basic form");
         }
     }
 
-    if (!is_wait && is_basic_type_wait(hand_tiles.standing_tiles, hand_tiles.tile_count, &table)) {
+    if (!is_wait && is_basic_form_wait(hand_tiles.standing_tiles, hand_tiles.tile_count, &table)) {
         is_wait = true;
-        printf("basic type");
+        printf("basic form");
     }
 
     if (is_wait) {
@@ -146,12 +146,12 @@ void test_shanten(const char *str) {
     puts("\n");
 
     ret0 = knitted_straight_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
-    printf("knitted straight in basic type %d shanten\n", ret0);
+    printf("knitted straight in basic form %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = basic_type_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
-    printf("basic type %d shanten\n", ret0);
+    ret0 = basic_form_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
+    printf("basic form %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 }
