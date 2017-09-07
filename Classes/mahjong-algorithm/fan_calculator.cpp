@@ -231,7 +231,7 @@ static forceinline bool is_pure_straight(tile_t t0, tile_t t1, tile_t t2) {
 
 // 一色三步高
 static forceinline bool is_pure_shifted_chows(tile_t t0, tile_t t1, tile_t t2) {
-    return ((t0 + 2 == t1 && t1 + 2 == t2) || (t0 + 1 == t1 && t1 + 1 == t2));
+    return (t0 + 2 == t1 && t1 + 2 == t2);
 }
 
 // 花龙
@@ -388,17 +388,20 @@ static fan_t get_2_chows_fan(tile_t t0, tile_t t1) {
 
 // 大四喜
 static forceinline bool is_big_four_winds(tile_t t0, tile_t t1, tile_t t2, tile_t t3) {
-    return (is_winds(t0) && is_winds(t1) && is_winds(t2) && is_winds(t3));
+    return (t0 == TILE_E && t1 == TILE_S && t2 == TILE_W && t3 == TILE_N);
 }
 
 // 大三元
 static forceinline bool is_big_three_dragons(tile_t t0, tile_t t1, tile_t t2) {
-    return (is_dragons(t0) && is_dragons(t1) && is_dragons(t2));
+    return (t0 == TILE_C && t1 == TILE_F && t2 == TILE_P);
 }
 
 // 三风刻
 static forceinline bool is_big_three_winds(tile_t t0, tile_t t1, tile_t t2) {
-    return (is_winds(t0) && is_winds(t1) && is_winds(t2));
+    return ((t0 == TILE_E && t1 == TILE_S && t2 == TILE_W)
+        || (t0 == TILE_E && t1 == TILE_S && t2 == TILE_N)
+        || (t0 == TILE_E && t1 == TILE_W && t2 == TILE_N)
+        || (t0 == TILE_S && t1 == TILE_W && t2 == TILE_N));
 }
 
 // 双箭刻
