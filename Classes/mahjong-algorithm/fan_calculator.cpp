@@ -1304,7 +1304,7 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, long pack_cnt,
     --tile_cnt;
 
     useful_table_t waiting_table;  // 听牌标记表
-    if (!is_basic_type_wait(standing_tiles, tile_cnt, &waiting_table)) {
+    if (!is_basic_form_wait(standing_tiles, tile_cnt, &waiting_table)) {
         return;
     }
 
@@ -1698,7 +1698,7 @@ static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
 }
 
 // 基本和型算番
-static void calculate_basic_type_fan(const pack_t (&packs)[5], long fixed_cnt, tile_t win_tile,
+static void calculate_basic_form_fan(const pack_t (&packs)[5], long fixed_cnt, tile_t win_tile,
     win_flag_t win_flag, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
     pack_t pair_pack = 0;
     pack_t chow_packs[4];
@@ -2185,7 +2185,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
         packs_to_string(result.divisions[i].packs, 5, str, sizeof(str));
         puts(str);
 #endif
-        calculate_basic_type_fan(result.divisions[i].packs, fixed_cnt, win_tile,
+        calculate_basic_form_fan(result.divisions[i].packs, fixed_cnt, win_tile,
             win_flag, prevalent_wind, seat_wind, fan_tables[i]);
         int current_fan = get_fan_by_table(fan_tables[i]);
         if (current_fan > max_fan) {

@@ -93,7 +93,7 @@ int count_useful_tile(const tile_table_t &used_table, const useful_table_t &usef
  */
 
 /**
- * @addtogroup basic_type
+ * @addtogroup basic_form
  * @{
  */
 
@@ -105,7 +105,7 @@ int count_useful_tile(const tile_table_t &used_table, const useful_table_t &usef
  * @param [out] useful_table 有效牌标记表（可为null）
  * @return int 上听数
  */
-int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table);
+int basic_form_shanten(const tile_t *standing_tiles, long standing_cnt, useful_table_t *useful_table);
 
 /**
  * @brief 基本和型是否听牌
@@ -115,7 +115,7 @@ int basic_type_shanten(const tile_t *standing_tiles, long standing_cnt, useful_t
  * @param [out] waiting_table 听牌标记表（可为null）
  * @return bool 是否听牌
  */
-bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table);
+bool is_basic_form_wait(const tile_t *standing_tiles, long standing_cnt, useful_table_t *waiting_table);
 
 /**
  * @brief 基本和型是否和牌
@@ -125,7 +125,7 @@ bool is_basic_type_wait(const tile_t *standing_tiles, long standing_cnt, useful_
  * @param [in] test_tile 测试的牌
  * @return bool 是否和牌
  */
-bool is_basic_type_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
+bool is_basic_form_win(const tile_t *standing_tiles, long standing_cnt, tile_t test_tile);
 
 /**
  * end group
@@ -302,7 +302,7 @@ bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, long standing
  * @{
  *  和型
  */
-#define FORM_FLAG_BASIC_TYPE                0x01  ///< 基本和型
+#define FORM_FLAG_BASIC_FORM                0x01  ///< 基本和型
 #define FORM_FLAG_SEVEN_PAIRS               0x02  ///< 七对
 #define FORM_FLAG_THIRTEEN_ORPHANS          0x04  ///< 十三幺
 #define FORM_FLAG_HONORS_AND_KNITTED_TILES  0x08  ///< 全不靠
