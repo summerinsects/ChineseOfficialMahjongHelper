@@ -25,6 +25,7 @@
 
 namespace mahjong {
 
+// 解析牌实现函数
 static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long *out_tile_cnt) {
     //if (strspn(str, "123456789mpsESWNCFP") != strlen(str)) {
     //    return PARSE_ERROR_ILLEGAL_CHARACTER;
@@ -106,6 +107,7 @@ parse_finish:
     return (p - str);
 }
 
+// 解析牌
 long parse_tiles(const char *str, tile_t *tiles, long max_cnt) {
     long tile_cnt;
     if (parse_tiles_impl(str, tiles, max_cnt, &tile_cnt) > 0) {
@@ -114,6 +116,7 @@ long parse_tiles(const char *str, tile_t *tiles, long max_cnt) {
     return 0;
 }
 
+// 生成副露
 static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
     if (tile_cnt > 0) {
         if (tile_cnt != 3 && tile_cnt != 4) {
@@ -158,6 +161,7 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
     return 0;
 }
 
+// 字符串转换为手牌结构和上牌
 long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile) {
     size_t len = strlen(str);
     if (strspn(str, "0123456789mpszESWNCFP []") != len) {
@@ -249,6 +253,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
     return PARSE_NO_ERROR;
 }
 
+// 牌转换为字符串
 long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_size) {
     bool tenhon = false;
     char *p = str, *end = str + max_size;
@@ -258,8 +263,8 @@ long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_siz
     suit_t last_suit = 0;
     for (long i = 0; i < tile_cnt && p < end; ++i) {
         tile_t t = tiles[i];
-        suit_t s = tile_suit(t);
-        rank_t r = tile_rank(t);
+        suit_t s = tile_get_suit(t);
+        rank_t r = tile_get_rank(t);
         if (s == 1 || s == 2 || s == 3) {  // 数牌
             if (r >= 1 && r <= 9) {  // 有效范围1-9
                 if (last_suit != s && last_suit != 0) {  // 花色变了，加后缀
@@ -304,13 +309,14 @@ long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_siz
     return p - str;
 }
 
+// 牌组转换为字符串
 long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size) {
     char *p = str, *end = str + max_size;
     tile_t temp[4];
     for (long i = 0; i < pack_cnt && p < end; ++i) {
         pack_t pack = packs[i];
-        tile_t t = pack_tile(pack);
-        uint8_t pt = pack_type(pack);
+        tile_t t = pack_get_tile(pack);
+        uint8_t pt = pack_get_type(pack);
         switch (pt) {
         case PACK_TYPE_CHOW:
             temp[0] = t - 1; temp[1] = t; temp[2] = t + 1;
@@ -344,6 +350,7 @@ long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_siz
     return p - str;
 }
 
+// 手牌结构转换为字符串
 long hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, long max_size) {
     char *p = str, *end = str + max_size;
     p += packs_to_string(hand_tiles->fixed_packs, hand_tiles->pack_count, str, max_size);

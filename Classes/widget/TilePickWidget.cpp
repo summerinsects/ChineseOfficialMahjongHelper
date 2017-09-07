@@ -226,8 +226,8 @@ void TilePickWidget::setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::t
 void TilePickWidget::refreshTilesTableButton(mahjong::tile_t tile) {
     // 如果某张牌已经使用了4张，就禁用相应按钮
     int n = _handTilesWidget->getUsedTileCount(tile);
-    mahjong::suit_t suit = mahjong::tile_suit(tile);
-    mahjong::rank_t rank = mahjong::tile_rank(tile);
+    mahjong::suit_t suit = mahjong::tile_get_suit(tile);
+    mahjong::rank_t rank = mahjong::tile_get_rank(tile);
     switch (suit) {
     case TILE_SUIT_CHARACTERS: _characterButtons[rank - 1]->setEnabled(n < 4); break;
     case TILE_SUIT_BAMBOO: _bambooButtons[rank - 1]->setEnabled(n < 4); break;

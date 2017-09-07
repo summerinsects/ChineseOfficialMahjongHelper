@@ -56,8 +56,8 @@ private:
     std::vector<cocos2d::ui::Button *> _standingTileButtons;
     cocos2d::DrawNode *_highlightBox = nullptr;
 
-    int _usedTilesTable[mahjong::TILE_TABLE_SIZE];
-    int _standingTilesTable[mahjong::TILE_TABLE_SIZE];
+    mahjong::tile_table_t _usedTilesTable;
+    mahjong::tile_table_t _standingTilesTable;
     std::vector<mahjong::tile_t> _standingTiles;
     std::vector<mahjong::pack_t> _fixedPacks;
     size_t _currentIdx = 0;

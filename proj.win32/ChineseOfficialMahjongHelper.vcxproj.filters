@@ -48,64 +48,16 @@
     <ClCompile Include="..\Classes\HelloWorldScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp">
-      <Filter>src\mahjong-algorithm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp">
-      <Filter>src\mahjong-algorithm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp">
-      <Filter>src\FanCalculator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\ScoreSheet\ScoreSheetScene.cpp">
-      <Filter>src\ScoreSheet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp">
-      <Filter>src\ScoreSheet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\widget\TilePickWidget.cpp">
-      <Filter>src\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\FanTable\FanTable.cpp">
-      <Filter>src\FanTable</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\FanTable\FanDefinition.cpp">
-      <Filter>src\FanTable</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp">
-      <Filter>src\ScoreSheet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Other\OtherScene.cpp">
-      <Filter>src\Other</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\widget\AlertView.cpp">
-      <Filter>src\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\widget\CWTableView.cpp">
-      <Filter>src\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp">
-      <Filter>src\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp">
-      <Filter>src\MahjongTheory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp">
-      <Filter>src\mahjong-algorithm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp">
-      <Filter>src\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\widget\TilesKeyboard.cpp">
-      <Filter>src\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\ScoreSheet\Record.cpp">
-      <Filter>src\ScoreSheet</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Competition\Competition.cpp">
       <Filter>src\Competition</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Competition\CompetitionEnterScene.cpp">
+      <Filter>src\Competition</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\Competition\CompetitionFinalScene.cpp">
+      <Filter>src\Competition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Competition\CompetitionMainScene.cpp">
       <Filter>src\Competition</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Competition\CompetitionRoundScene.cpp">
@@ -114,14 +66,62 @@
     <ClCompile Include="..\Classes\Competition\CompetitionTableScene.cpp">
       <Filter>src\Competition</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp">
+      <Filter>src\FanCalculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\FanTable\FanDefinition.cpp">
+      <Filter>src\FanTable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\FanTable\FanTable.cpp">
+      <Filter>src\FanTable</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
       <Filter>src\LatestCompetition</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\CompetitionMainScene.cpp">
-      <Filter>src\Competition</Filter>
+    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp">
+      <Filter>src\MahjongTheory</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\CompetitionEnterScene.cpp">
-      <Filter>src\Competition</Filter>
+    <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Other\OtherScene.cpp">
+      <Filter>src\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp">
+      <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ScoreSheet\ScoreSheetScene.cpp">
+      <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ScoreSheet\Record.cpp">
+      <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp">
+      <Filter>src\ScoreSheet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\widget\AlertView.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\widget\CWTableView.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\widget\TilesKeyboard.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\widget\TilePickWidget.cpp">
+      <Filter>src\widget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,85 +131,31 @@
     <ClInclude Include="..\Classes\AppDelegate.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\HelloWorldScene.h">
+    <ClInclude Include="..\Classes\BaseScene.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\mahjong-algorithm\tile.h">
-      <Filter>src\mahjong-algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h">
-      <Filter>src\mahjong-algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\mahjong-algorithm\shanten.h">
-      <Filter>src\mahjong-algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h">
-      <Filter>src\FanCalculator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\ScoreSheet\ScoreSheetScene.h">
-      <Filter>src\ScoreSheet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\ScoreSheet\RecordScene.h">
-      <Filter>src\ScoreSheet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\widget\TilePickWidget.h">
-      <Filter>src\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\FanTable\FanTable.h">
-      <Filter>src\FanTable</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\FanTable\FanDefinition.h">
-      <Filter>src\FanTable</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\common.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\BaseScene.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\ScoreSheet\HistoryScene.h">
-      <Filter>src\ScoreSheet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\ScoreSheet\Record.h">
-      <Filter>src\ScoreSheet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Other\OtherScene.h">
-      <Filter>src\Other</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\widget\AlertView.h">
-      <Filter>src\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\widget\CWTableView.h">
-      <Filter>src\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\widget\HandTilesWidget.h">
-      <Filter>src\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h">
-      <Filter>src\MahjongTheory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\mahjong-algorithm\stringify.h">
-      <Filter>src\mahjong-algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\widget\LoadingView.h">
-      <Filter>src\widget</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\compiler.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h">
-      <Filter>src\widget</Filter>
+    <ClInclude Include="..\Classes\HelloWorldScene.h">
+      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\TilesImage.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\widget\TilesKeyboard.h">
-      <Filter>src\widget</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\Competition\Competition.h">
       <Filter>src\Competition</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\Competition\CompetitionEnterScene.h">
+      <Filter>src\Competition</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\Competition\CompetitionFinalScene.h">
+      <Filter>src\Competition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Competition\CompetitionMainScene.h">
       <Filter>src\Competition</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Competition\CompetitionRoundScene.h">
@@ -218,14 +164,71 @@
     <ClInclude Include="..\Classes\Competition\CompetitionTableScene.h">
       <Filter>src\Competition</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\FanTable\FanDefinition.h">
+      <Filter>src\FanTable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\FanTable\FanTable.h">
+      <Filter>src\FanTable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h">
+      <Filter>src\FanCalculator</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h">
       <Filter>src\LatestCompetition</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\CompetitionMainScene.h">
-      <Filter>src\Competition</Filter>
+    <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h">
+      <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\CompetitionEnterScene.h">
-      <Filter>src\Competition</Filter>
+    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h">
+      <Filter>src\MahjongTheory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\shanten.h">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\standard_tiles.h">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\stringify.h">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mahjong-algorithm\tile.h">
+      <Filter>src\mahjong-algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Other\OtherScene.h">
+      <Filter>src\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScoreSheet\HistoryScene.h">
+      <Filter>src\ScoreSheet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScoreSheet\ScoreSheetScene.h">
+      <Filter>src\ScoreSheet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScoreSheet\Record.h">
+      <Filter>src\ScoreSheet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScoreSheet\RecordScene.h">
+      <Filter>src\ScoreSheet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\AlertView.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\CWTableView.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\HandTilesWidget.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\LoadingView.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\TilePickWidget.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\TilesKeyboard.h">
+      <Filter>src\widget</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

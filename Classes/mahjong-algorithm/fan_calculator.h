@@ -23,6 +23,7 @@
 #ifndef __MAHJONG_ALGORITHM__FAN_CALCULATOR_H__
 #define __MAHJONG_ALGORITHM__FAN_CALCULATOR_H__
 
+#include <stddef.h>
 #include "tile.h"
 
 #define SUPPORT_CONCEALED_KONG_AND_MELDED_KONG 1  // 支持明暗杠
@@ -179,7 +180,6 @@ typedef uint8_t win_flag_t;
 /**
  * @brief 检查算番的输入是否合法
  *
- *
  * @param [in] hand_tiles 手牌
  * @param [in] win_tile 和牌张
  * @retval 0 成功
@@ -189,22 +189,15 @@ typedef uint8_t win_flag_t;
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile);
 
 /**
- * @brief 附加信息
- */
-struct extra_condition_t {
-    win_flag_t win_flag;    ///< 和牌标记
-    wind_t prevalent_wind;  ///< 圈风
-    wind_t seat_wind;       ///< 门风
-};
-
-/**
  * @brief 算番参数
  */
 struct calculate_param_t {
     hand_tiles_t hand_tiles;    ///< 手牌
     tile_t win_tile;            ///< 和牌张
     int flower_count;           ///< 花牌数
-    extra_condition_t ext_cond; ///< 附加信息
+    win_flag_t win_flag;        ///< 和牌标记
+    wind_t prevalent_wind;      ///< 圈风
+    wind_t seat_wind;           ///< 门风
 };
 
 /**
@@ -316,15 +309,24 @@ static const int fan_value_table[FAN_TABLE_SIZE] = {
 bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long standing_cnt, tile_t win_tile);
 
 /**
- * @brief 统计和牌在副露中出现的张数
+ * @brief 统计和牌在副露牌组中出现的张数
  * 如果出现3张，则必然和绝张
  *
- * @param [in] fixed_pack 副露牌组
+ * @param [in] fixed_packs 副露牌组
  * @param [in] fixed_cnt 副露牌组数
  * @param [in] win_tile 和牌张
  * @return size_t
  */
-size_t count_win_tile_in_fixed_packs(const pack_t *fixed_pack, long fixed_cnt, tile_t win_tile);
+size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, long fixed_cnt, tile_t win_tile);
+
+/**
+ * @brief 判断副露牌组是否包含杠
+ *
+ * @param [in] fixed_packs 副露牌组
+ * @param [in] fixed_cnt 副露牌组数
+ * @return bool
+ */
+bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, long fixed_cnt);
 
 /**
  * end group

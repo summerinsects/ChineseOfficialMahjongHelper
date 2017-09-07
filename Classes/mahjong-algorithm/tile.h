@@ -71,8 +71,10 @@ typedef uint8_t rank_t;
 #define TILE_SUIT_HONORS        4  ///< 字牌（HONORS）
 
 /**
- * @brief 牌
- *
+ * @brief 牌\n
+ * 内存结构：
+ * - 0-3 4bit 牌的点数
+ * - 4-7 4bit 牌的花色
  * 合法的牌为：
  * - 0x11 - 0x19 万子（CHARACTERS）
  * - 0x21 - 0x29 条子（BAMBOO）
@@ -98,7 +100,7 @@ static forceinline tile_t make_tile(suit_t suit, rank_t rank) {
  * @param [in] tile 牌
  * @return suit_t 花色
  */
-static forceinline suit_t tile_suit(tile_t tile) {
+static forceinline suit_t tile_get_suit(tile_t tile) {
     return ((tile >> 4) & 0xF);
 }
 
@@ -108,7 +110,7 @@ static forceinline suit_t tile_suit(tile_t tile) {
  * @param [in] tile 牌
  * @return rank_t 点数
  */
-static forceinline rank_t tile_rank(tile_t tile) {
+static forceinline rank_t tile_get_rank(tile_t tile) {
     return (tile & 0xF);
 }
 
@@ -132,6 +134,15 @@ static const tile_t all_tiles[] = {
     TILE_1p, TILE_2p, TILE_3p, TILE_4p, TILE_5p, TILE_6p, TILE_7p, TILE_8p, TILE_9p,
     TILE_E , TILE_S , TILE_W , TILE_N , TILE_C , TILE_F , TILE_P
 };
+
+/**
+ * @brief 牌表类型
+ *
+ * 说明：在判断听牌、计算上听数等算法中，主流的对于牌有两种存储方式：
+ * - 一种是用牌表，各索引表示各种牌拥有的枚数，这种存储方式的优点是在递归计算时削减面子只需要修改表中相应下标的值，缺点是一手牌的总数不方便确定
+ * - 另一种是直接用牌的数组，这种存储方式的优点是很容易确定一手牌的总数，缺点是在递归计算时削减面子不方便，需要进行数组删除元素操作
+ */
+typedef int tile_table_t[TILE_TABLE_SIZE];
 
 #define PACK_TYPE_NONE 0  ///< 无效
 #define PACK_TYPE_CHOW 1  ///< 顺子
@@ -181,7 +192,7 @@ static forceinline bool is_pack_melded(pack_t pack) {
  * @param [in] pack 牌组
  * @return uint8_t
  */
-static forceinline uint8_t pack_offer(pack_t pack) {
+static forceinline uint8_t pack_get_offer(pack_t pack) {
     return ((pack >> 12) & 0xF);
 }
 
@@ -191,7 +202,7 @@ static forceinline uint8_t pack_offer(pack_t pack) {
  * @param [in] pack 牌组
  * @return uint8_t 牌组类型
  */
-static forceinline uint8_t pack_type(pack_t pack) {
+static forceinline uint8_t pack_get_type(pack_t pack) {
     return ((pack >> 8) & 0xF);
 }
 
@@ -201,16 +212,17 @@ static forceinline uint8_t pack_type(pack_t pack) {
  * @param [in] pack 牌组
  * @return tile_t 牌（对于顺子，为中间那张牌）
  */
-static forceinline tile_t pack_tile(pack_t pack) {
+static forceinline tile_t pack_get_tile(pack_t pack) {
     return (pack & 0xFF);
 }
 
 /**
  * @brief 手牌结构
+ *  手牌结构一定满足等式：3*副露的牌组数+立牌数=13
  */
 struct hand_tiles_t {
-    pack_t fixed_packs[5];      ///< 副露的面子（包括暗杠）
-    long pack_count;            ///< 副露的面子（包括暗杠）数
+    pack_t fixed_packs[5];      ///< 副露的牌组（面子），包括暗杠
+    long pack_count;            ///< 副露的牌组（面子）数，包括暗杠
     tile_t standing_tiles[13];  ///< 立牌
     long tile_count;            ///< 立牌数
 };
@@ -223,12 +235,14 @@ struct hand_tiles_t {
  * @return bool
  */
 static bool forceinline is_green(tile_t tile) {
-    //return (tile == 0x22 || tile == 0x23 || tile == 0x24 || tile == 0x26 || tile == 0x28 || tile == 0x46);
+    // 最基本的逐个判断，23468s及发财为绿一色构成牌
+    //return (tile == TILE_2s || tile == TILE_3s || tile == TILE_4s || tile == TILE_6s || tile == TILE_8s || tile == TILE_F);
 
-    // 算法：
-    // 0x48-0x11=0x37=55刚好在一个64位整型的范围内
-    // uint64_t的每一位表示一张牌的标记
-    return !!(0x0020000000AE0000ULL & (1ULL << (tile - 0x11)));
+    // 算法原理：
+    // 0x48-0x11=0x37=55刚好在一个64位整型的范围内，
+    // 用uint64_t的每一位表示一张牌的标记，事先得到一个魔数，
+    // 然后每次测试相应位即可
+    return !!(0x0020000000AE0000ULL & (1ULL << (tile - TILE_1m)));
 }
 
 /**
@@ -238,14 +252,13 @@ static bool forceinline is_green(tile_t tile) {
  * @return bool
  */
 static bool forceinline is_reversible(tile_t tile) {
-    //return (tile == 0x22 || tile == 0x24 || tile == 0x25 || tile == 0x26 || tile == 0x28 || tile == 0x29 ||
-    //    tile == 0x31 || tile == 0x32 || tile == 0x33 || tile == 0x34 || tile == 0x35 || tile == 0x38 || tile == 0x39 ||
-    //    tile == 0x47);
+    // 最基本的逐个判断：245689s、1234589p及白板为推不倒构成牌
+    //return (tile == TILE_2s || tile == TILE_4s || tile == TILE_5s || tile == TILE_6s || tile == TILE_8s || tile == TILE_9s ||
+    //    tile == TILE_1p || tile == TILE_2p || tile == TILE_3p || tile == TILE_4p || tile == TILE_5p || tile == TILE_8p || tile == TILE_9p ||
+    //    tile == TILE_P);
 
-    // 算法：
-    // 0x48-0x11=0x37=55刚好在一个64位整型的范围内
-    // uint64_t的每一位表示一张牌的标记
-    return !!(0x0040019F01BA0000ULL & (1ULL << (tile - 0x11)));
+    // 算法原理同绿一色构成牌判断函数
+    return !!(0x0040019F01BA0000ULL & (1ULL << (tile - TILE_1m)));
 }
 
 /**
@@ -255,9 +268,21 @@ static bool forceinline is_reversible(tile_t tile) {
  * @return bool
  */
 static forceinline bool is_terminal(tile_t tile) {
-    //return (tile == 0x11 || tile == 0x19 || tile == 0x21 || tile == 0x29 || tile == 0x31 || tile == 0x39);
-    // 0xC7 : 1100 0111
-    return ((tile & 0xC7) == 1 && (tile >> 4));
+    // 最基本的逐个判断
+    //return (tile == TILE_1m || tile == TILE_9m || tile == TILE_1s || tile == TILE_9s || tile == TILE_1p || tile == TILE_9p);
+
+    // 算法原理：观察数牌幺九的二进制位：
+    // 0x11：0001 0001
+    // 0x19：0001 1001
+    // 0x21：0010 0001
+    // 0x29：0010 1001
+    // 0x31：0011 0001
+    // 0x39：0011 1001
+    // 所有牌的低4bit只会出现在0001到1001之间，跟0111位与，只有0001和1001的结果为1
+    // 所有数牌的高4bit只会出现在0001到0011之间，跟1100位与，必然为0
+    // 于是构造魔数0xC7（1100 0111）跟牌位与，结果为1的，就为数牌幺九
+    // 缺陷：低4bit的操作会对0xB、0xD、0xF产生误判，高4bit的操作会对0x01和0x09产生误判
+    return ((tile & 0xC7) == 1);
 }
 
 /**
@@ -307,6 +332,7 @@ static forceinline bool is_numbered_suit(tile_t tile) {
  * @return bool
  */
 static forceinline bool is_numbered_suit_quick(tile_t tile) {
+    // 算法原理：数牌为0x11-0x19，0x21-0x29，0x31-0x39，跟0xC0位与，结果为0
     return !(tile & 0xC0);
 }
 
@@ -327,6 +353,7 @@ static forceinline bool is_terminal_or_honor(tile_t tile) {
  * @return bool
  */
 static forceinline bool is_suit_equal_quick(tile_t tile0, tile_t tile1) {
+    // 算法原理：高4bit表示花色
     return ((tile0 & 0xF0) == (tile1 & 0xF0));
 }
 
@@ -338,6 +365,7 @@ static forceinline bool is_suit_equal_quick(tile_t tile0, tile_t tile1) {
  * @return bool
  */
 static forceinline bool is_rank_equal_quick(tile_t tile0, tile_t tile1) {
+    // 算法原理：低4bit表示花色。高4bit设置为C是为了过滤掉字牌
     return ((tile0 & 0xCF) == (tile1 & 0xCF));
 }
 
