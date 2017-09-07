@@ -556,7 +556,7 @@ static fan_t *pairwise_test_chows(const tile_t (&chows_mid_tile)[_Size], fan_t *
 }
 
 // 4组顺子算番
-static void calculate_4_chows(const pack_t chow_packs[4], fan_table_t &fan_table) {
+static void calculate_4_chows(const pack_t (&chow_packs)[4], fan_table_t &fan_table) {
     tile_t tiles[4];
     tiles[0] = pack_get_tile(chow_packs[0]);
     tiles[1] = pack_get_tile(chow_packs[1]);
@@ -618,7 +618,7 @@ static void calculate_4_chows(const pack_t chow_packs[4], fan_table_t &fan_table
 }
 
 // 3组顺子算番
-static void calculate_3_chows(const pack_t chow_packs[3], fan_table_t &fan_table) {
+static void calculate_3_chows(const pack_t (&chow_packs)[3], fan_table_t &fan_table) {
     tile_t tiles[3];
     tiles[0] = pack_get_tile(chow_packs[0]);
     tiles[1] = pack_get_tile(chow_packs[1]);
@@ -646,7 +646,7 @@ static void calculate_3_chows(const pack_t chow_packs[3], fan_table_t &fan_table
 }
 
 // 2组顺子算番
-static void calculate_2_chows(const pack_t chow_packs[2], fan_table_t &fan_table) {
+static void calculate_2_chows(const pack_t (&chow_packs)[2], fan_table_t &fan_table) {
     tile_t tiles[2];
     tiles[0] = pack_get_tile(chow_packs[0]);
     tiles[1] = pack_get_tile(chow_packs[1]);
@@ -913,7 +913,7 @@ static void calculate_4_pungs(const pack_t pung_packs[4], fan_table_t &fan_table
 }
 
 // 3组刻子算番
-static void calculate_3_pungs(const pack_t pung_packs[3], fan_table_t &fan_table) {
+static void calculate_3_pungs(const pack_t (&pung_packs)[3], fan_table_t &fan_table) {
     tile_t tiles[3];
     tiles[0] = pack_get_tile(pung_packs[0]);
     tiles[1] = pack_get_tile(pung_packs[1]);
@@ -945,7 +945,7 @@ static void calculate_3_pungs(const pack_t pung_packs[3], fan_table_t &fan_table
 }
 
 // 2组刻子算番
-static void calculate_2_pungs(const pack_t pung_packs[2], fan_table_t &fan_table) {
+static void calculate_2_pungs(const pack_t (&pung_packs)[2], fan_table_t &fan_table) {
     calculate_kongs(pung_packs, 2, fan_table);
     fan_t fan = get_2_pungs_fan(pack_get_tile(pung_packs[0]), pack_get_tile(pung_packs[1]));
     if (fan != FAN_NONE) {
@@ -1762,15 +1762,15 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], long fixed_cnt, t
         calculate_4_chows(chow_packs, fan_table);
         break;
     case 3:  // 3组顺子+1组刻子
-        calculate_3_chows(chow_packs, fan_table);
+        calculate_3_chows((const pack_t (&)[3])chow_packs, fan_table);
         calculate_1_pung(pung_packs[0], fan_table);
         break;
     case 2:  // 2组顺子+2组刻子
-        calculate_2_chows(chow_packs, fan_table);
-        calculate_2_pungs(pung_packs, fan_table);
+        calculate_2_chows((const pack_t (&)[2])chow_packs, fan_table);
+        calculate_2_pungs((const pack_t (&)[2])pung_packs, fan_table);
         break;
     case 1:  // 1组顺子+3组刻子
-        calculate_3_pungs(pung_packs, fan_table);
+        calculate_3_pungs((const pack_t (&)[3])pung_packs, fan_table);
         break;
     case 0:  // 4组刻子
         calculate_4_pungs(pung_packs, fan_table);
