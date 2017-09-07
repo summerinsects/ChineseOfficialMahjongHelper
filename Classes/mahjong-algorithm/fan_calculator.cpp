@@ -503,9 +503,9 @@ static fan_t get_1_chow_extra_fan(tile_t tile0, tile_t tile1, tile_t tile2, tile
     return FAN_NONE;
 }
 
-// 两两测试顺子
+// 若干顺子两两算番
 template <long _Size>
-static fan_t *pairwise_test_chows(const tile_t (&chows_mid_tile)[_Size], fan_t *selected_fan) {
+static long calculate_chows_pairwise(const tile_t (&chows_mid_tile)[_Size], fan_t (&selected_fan)[_Size - 1]) {
     fan_t all_fan[_Size][_Size] = { { FAN_NONE } };
 
     // 初始化矩阵
@@ -527,6 +527,7 @@ static fan_t *pairwise_test_chows(const tile_t (&chows_mid_tile)[_Size], fan_t *
     // 根据套算一次原则，234567s234567p，只能计为“喜相逢*2 连六*1”或者“喜相逢*1 连六*2”，而不是“喜相逢*2 连六*2”
     // 根据以上两点，234s223344567p，只能计为：“喜相逢、一般高、连六”，而不是“喜相逢*2、连六”
 
+    long cnt = 0;
     unsigned used_flag[_Size] = { 0 };  // 标记每一组顺子被用过什么番
     for (int i = 0; i < _Size; ++i) {
         for (int j = 0; j < _Size; ++j) {
@@ -546,13 +547,13 @@ static fan_t *pairwise_test_chows(const tile_t (&chows_mid_tile)[_Size], fan_t *
                 if ((used_flag[i] & flag) == 0 && (used_flag[j] & flag) == 0) {
                     used_flag[i] |= flag;
                     used_flag[j] |= flag;
-                    *selected_fan = pt;  // 写入这个番
-                    ++selected_fan;
+                    selected_fan[cnt++] = pt;  // 写入这个番
                 }
             }
         }
     }
-    return selected_fan;
+
+    return cnt;
 }
 
 // 4组顺子算番
@@ -608,12 +609,10 @@ static void calculate_4_chows(const pack_t (&chow_packs)[4], fan_table_t &fan_ta
     }
 
     // 不存在3组顺子的番种时，4组顺子最多3番
-    fan_t selected_fan[3] = { FAN_NONE };
-    pairwise_test_chows(tiles, selected_fan);
-    for (long i = 0; i < 3; ++i) {
-        if (selected_fan[i] != FAN_NONE) {
-            ++fan_table[selected_fan[i]];
-        }
+    fan_t selected_fan[3];
+    long cnt = calculate_chows_pairwise(tiles, selected_fan);
+    for (long i = 0; i < cnt; ++i) {
+        ++fan_table[selected_fan[i]];
     }
 }
 
@@ -636,12 +635,10 @@ static void calculate_3_chows(const pack_t (&chow_packs)[3], fan_table_t &fan_ta
     }
 
     // 不存在上述番种时，3组顺子最多2番
-    fan_t selected_fan[2] = { FAN_NONE };
-    pairwise_test_chows(tiles, selected_fan);
-    for (long i = 0; i < 2; ++i) {
-        if (selected_fan[i] != FAN_NONE) {
-            ++fan_table[selected_fan[i]];
-        }
+    fan_t selected_fan[2];
+    long cnt = calculate_chows_pairwise(tiles, selected_fan);
+    for (long i = 0; i < cnt; ++i) {
+        ++fan_table[selected_fan[i]];
     }
 }
 
