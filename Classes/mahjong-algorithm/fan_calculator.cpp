@@ -943,8 +943,13 @@ static void calculate_3_pungs(const pack_t (&pung_packs)[3], fan_table_t &fan_ta
 
 // 2组刻子算番
 static void calculate_2_pungs(const pack_t (&pung_packs)[2], fan_table_t &fan_table) {
+    tile_t tiles[2];
+    tiles[0] = pack_get_tile(pung_packs[0]);
+    tiles[1] = pack_get_tile(pung_packs[1]);
+
     calculate_kongs(pung_packs, 2, fan_table);
-    fan_t fan = get_2_pungs_fan(pack_get_tile(pung_packs[0]), pack_get_tile(pung_packs[1]));
+
+    fan_t fan = get_2_pungs_fan(tiles[0], tiles[1]);
     if (fan != FAN_NONE) {
         ++fan_table[fan];
     }
