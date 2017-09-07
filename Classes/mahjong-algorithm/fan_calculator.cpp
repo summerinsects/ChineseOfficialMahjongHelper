@@ -1918,8 +1918,8 @@ static forceinline bool is_thirteen_orphans(const tile_t(&tiles)[14]) {
 
 // 全不靠/七星不靠算番
 bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], fan_table_t &fan_table) {
-    const tile_t *it = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
-    long numbered_cnt = it - standing_tiles;
+    const tile_t *honor_begin = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
+    long numbered_cnt = honor_begin - standing_tiles;
     // 数牌张数大于9或者小于7必然不可能是全不靠
     if (numbered_cnt > 9 || numbered_cnt < 7) {
         return false;
@@ -1927,19 +1927,18 @@ bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], fan_t
 
     // 匹配组合龙
     if (std::none_of(&standard_knitted_straight[0], &standard_knitted_straight[6],
-        [&standing_tiles, it](const tile_t (&seq)[9]) {
-        return std::includes(std::begin(seq), std::end(seq), std::begin(standing_tiles), it);
+        [&standing_tiles, honor_begin](const tile_t (&seq)[9]) {
+        return std::includes(std::begin(seq), std::end(seq), std::begin(standing_tiles), honor_begin);
     })) {
         return false;
     }
 
-    static const tile_t seven_honors[] = { TILE_E, TILE_S, TILE_W, TILE_N, TILE_C, TILE_F, TILE_P };
-    if (numbered_cnt == 7 && std::equal(std::begin(seven_honors), std::end(seven_honors), standing_tiles + 7)) {
+    if (numbered_cnt == 7 && std::equal(std::begin(standard_thirteen_orphans) + 6, std::end(standard_thirteen_orphans), standing_tiles + 7)) {
         // 七种字牌齐，为七星不靠
         fan_table[GREATER_HONORS_AND_KNITTED_TILES] = 1;
         return true;
     }
-    else if (std::includes(std::begin(seven_honors), std::end(seven_honors), it, std::end(standing_tiles))) {
+    else if (std::includes(std::begin(standard_thirteen_orphans) + 6, std::end(standard_thirteen_orphans), honor_begin, std::end(standing_tiles))) {
         // 全不靠
         fan_table[LESSER_HONORS_AND_KNITTED_TILES] = 1;
         if (numbered_cnt == 9) {  // 有9张数牌，为带组合龙的全不靠
