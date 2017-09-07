@@ -236,13 +236,13 @@ struct hand_tiles_t {
  */
 static bool forceinline is_green(tile_t tile) {
     // 最基本的逐个判断，23468s及发财为绿一色构成牌
-    //return (tile == 0x22 || tile == 0x23 || tile == 0x24 || tile == 0x26 || tile == 0x28 || tile == 0x46);
+    //return (tile == TILE_2s || tile == TILE_3s || tile == TILE_4s || tile == TILE_6s || tile == TILE_8s || tile == TILE_F);
 
     // 算法原理：
     // 0x48-0x11=0x37=55刚好在一个64位整型的范围内，
     // 用uint64_t的每一位表示一张牌的标记，事先得到一个魔数，
     // 然后每次测试相应位即可
-    return !!(0x0020000000AE0000ULL & (1ULL << (tile - 0x11)));
+    return !!(0x0020000000AE0000ULL & (1ULL << (tile - TILE_1m)));
 }
 
 /**
@@ -253,12 +253,12 @@ static bool forceinline is_green(tile_t tile) {
  */
 static bool forceinline is_reversible(tile_t tile) {
     // 最基本的逐个判断：245689s、1234589p及白板为推不倒构成牌
-    //return (tile == 0x22 || tile == 0x24 || tile == 0x25 || tile == 0x26 || tile == 0x28 || tile == 0x29 ||
-    //    tile == 0x31 || tile == 0x32 || tile == 0x33 || tile == 0x34 || tile == 0x35 || tile == 0x38 || tile == 0x39 ||
-    //    tile == 0x47);
+    //return (tile == TILE_2s || tile == TILE_4s || tile == TILE_5s || tile == TILE_6s || tile == TILE_8s || tile == TILE_9s ||
+    //    tile == TILE_1p || tile == TILE_2p || tile == TILE_3p || tile == TILE_4p || tile == TILE_5p || tile == TILE_8p || tile == TILE_9p ||
+    //    tile == TILE_P);
 
     // 算法原理同绿一色构成牌判断函数
-    return !!(0x0040019F01BA0000ULL & (1ULL << (tile - 0x11)));
+    return !!(0x0040019F01BA0000ULL & (1ULL << (tile - TILE_1m)));
 }
 
 /**
@@ -269,7 +269,7 @@ static bool forceinline is_reversible(tile_t tile) {
  */
 static forceinline bool is_terminal(tile_t tile) {
     // 最基本的逐个判断
-    //return (tile == 0x11 || tile == 0x19 || tile == 0x21 || tile == 0x29 || tile == 0x31 || tile == 0x39);
+    //return (tile == TILE_1m || tile == TILE_9m || tile == TILE_1s || tile == TILE_9s || tile == TILE_1p || tile == TILE_9p);
 
     // 算法原理：观察数牌幺九的二进制位：
     // 0x11：0001 0001
