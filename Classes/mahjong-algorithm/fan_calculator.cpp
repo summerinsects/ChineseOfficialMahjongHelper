@@ -505,7 +505,7 @@ static fan_t get_1_chow_extra_fan(tile_t tile0, tile_t tile1, tile_t tile2, tile
 
 // 若干顺子两两算番
 template <long _Size>
-static long calculate_chows_pairwise(const tile_t (&chows_mid_tile)[_Size], fan_t (&selected_fan)[_Size - 1]) {
+static long calculate_chows_pairwise(const tile_t (&mid_tiles)[_Size], fan_t (&selected_fan)[_Size - 1]) {
     fan_t all_fan[_Size][_Size] = { { FAN_NONE } };
 
     // 初始化矩阵
@@ -514,7 +514,7 @@ static long calculate_chows_pairwise(const tile_t (&chows_mid_tile)[_Size], fan_
             all_fan[i][j] = all_fan[j][i];
         }
         for (int j = i + 1; j < _Size; ++j) {  // 获取所有两两组合的番种
-            all_fan[i][j] = get_2_chows_fan(chows_mid_tile[i], chows_mid_tile[j]);
+            all_fan[i][j] = get_2_chows_fan(mid_tiles[i], mid_tiles[j]);
         }
     }
 
