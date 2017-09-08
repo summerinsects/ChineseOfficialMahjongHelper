@@ -2132,20 +2132,14 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
         if (calculate_knitted_straight_fan(hand_tiles,
             win_tile, win_flag, prevalent_wind, seat_wind, fan_tables[result.count])) {
-            int current_fan = get_fan_by_table(fan_tables[result.count]);
-            if (current_fan > max_fan) {
-                max_fan = current_fan;
-                max_idx = result.count;
-            }
-            LOG("fan = %d\n\n", current_fan);
+            max_fan = get_fan_by_table(fan_tables[result.count]);
+            max_idx = result.count;
+            LOG("fan = %d\n\n", max_fan);
         }
         else if (calculate_special_form_fan(standing_tiles, win_flag, fan_tables[result.count])) {
-            int current_fan = get_fan_by_table(fan_tables[result.count]);
-            if (current_fan > max_fan) {
-                max_fan = current_fan;
-                max_idx = result.count;
-            }
-            LOG("fan = %d\n\n", current_fan);
+            max_fan = get_fan_by_table(fan_tables[result.count]);
+            max_idx = result.count;
+            LOG("fan = %d\n\n", max_fan);
             if (fan_tables[result.count][SEVEN_SHIFTED_PAIRS]) {
                 result.count = 0;
             }
@@ -2155,12 +2149,9 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
         // 1副露状态，有可能是基本和型组合龙
         if (calculate_knitted_straight_fan(hand_tiles, win_tile,
             win_flag, prevalent_wind, seat_wind, fan_tables[0])) {
-            int current_fan = get_fan_by_table(fan_tables[0]);
-            if (current_fan > max_fan) {
-                max_fan = current_fan;
-                max_idx = result.count;
-            }
-            LOG("fan = %d\n\n", current_fan);
+            max_fan = get_fan_by_table(fan_tables[0]);
+            max_idx = result.count;
+            LOG("fan = %d\n\n", max_fan);
         }
     }
 
