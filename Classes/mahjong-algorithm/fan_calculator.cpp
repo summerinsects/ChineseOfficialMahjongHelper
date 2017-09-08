@@ -909,7 +909,7 @@ static void calculate_2_pungs(const tile_t (&mid_tiles)[2], fan_table_t &fan_tab
 }
 
 // 九莲宝灯
-static bool is_nine_gates(const tile_t (&tiles)[13], tile_t win_tile) {
+static bool is_nine_gates(const tile_t *tiles, tile_t win_tile) {
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
     map_tiles(tiles, 13, cnt_table);
@@ -1747,7 +1747,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], long fixed_cnt, c
 
     // 九莲宝灯
     if (standing_cnt == 13) {
-        if (is_nine_gates((const tile_t (&)[13])standing_tiles, win_tile)) {
+        if (is_nine_gates(standing_tiles, win_tile)) {
             fan_table[NINE_GATES] = 1;
         }
     }
