@@ -87,6 +87,10 @@ void test_points(const char *str, win_flag_t win_flag, wind_t prevalent_wind, wi
     int points = calculate_fan(&param, fan_table);
 
     printf("max points = %d\n\n", points);
+    if (points < 0) {
+        return;
+    }
+
     for (int i = 1; i < FLOWER_TILES; ++i) {
         if (fan_table[i] == 0) {
             continue;
@@ -246,7 +250,6 @@ int main(int argc, const char *argv[]) {
     test_points("2222s 5555m 7777p EEEE CC", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("1111m 2222s 3333p 1111s 4m4m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("7777p NNNN CCCC 3333p 5p5p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
-    test_points("CCCC NNNN CCCC NNNN EE", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
 
     puts("==== test seven shifted pairs ====");
     test_points("1122334455667m7m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
