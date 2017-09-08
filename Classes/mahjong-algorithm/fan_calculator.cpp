@@ -1938,7 +1938,7 @@ bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], fan_t
 }
 
 // 特殊和型算番
-static bool calculate_special_type_fan(const tile_t (&standing_tiles)[14], win_flag_t win_flag, fan_table_t &fan_table) {
+static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_flag_t win_flag, fan_table_t &fan_table) {
     // 七对
     if (standing_tiles[0] == standing_tiles[1]
         && standing_tiles[2] == standing_tiles[3]
@@ -2139,7 +2139,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
             }
             LOG("fan = %d\n\n", current_fan);
         }
-        else if (calculate_special_type_fan(standing_tiles, win_flag, fan_tables[result.count])) {
+        else if (calculate_special_form_fan(standing_tiles, win_flag, fan_tables[result.count])) {
             int current_fan = get_fan_by_table(fan_tables[result.count]);
             if (current_fan > max_fan) {
                 max_fan = current_fan;
