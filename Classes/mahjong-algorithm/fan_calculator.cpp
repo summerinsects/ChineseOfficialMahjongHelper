@@ -2114,68 +2114,71 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
     }
 
     tile_t standing_tiles[14];
-    division_result_t result;
-
     // 合并得到14张牌
     memcpy(standing_tiles, hand_tiles->standing_tiles, standing_cnt * sizeof(tile_t));
     standing_tiles[standing_cnt] = win_tile;
     std::sort(standing_tiles, standing_tiles + standing_cnt + 1);
 
-    // 划分
-    divide_win_hand(standing_tiles, hand_tiles->fixed_packs, fixed_cnt, &result);
-
-    fan_table_t fan_tables[MAX_DIVISION_CNT] = { { 0 } };
     int max_fan = 0;
-    long max_idx = -1;
+    const fan_table_t *selected_fan_table = nullptr;
 
-    // 先判断各种特殊和型，并将结果放在result.count处
+    fan_table_t special_fan_table = { 0 };
+
+    // 先判断各种特殊和型
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(hand_tiles,
-            win_tile, win_flag, prevalent_wind, seat_wind, fan_tables[result.count])) {
-            max_fan = get_fan_by_table(fan_tables[result.count]);
-            max_idx = result.count;
+        if (calculate_knitted_straight_fan(hand_tiles, win_tile,
+            win_flag, prevalent_wind, seat_wind, special_fan_table)) {
+            max_fan = get_fan_by_table(special_fan_table);
+            selected_fan_table = &special_fan_table;
             LOG("fan = %d\n\n", max_fan);
         }
-        else if (calculate_special_form_fan(standing_tiles, win_flag, fan_tables[result.count])) {
-            max_fan = get_fan_by_table(fan_tables[result.count]);
-            max_idx = result.count;
+        else if (calculate_special_form_fan(standing_tiles, win_flag, special_fan_table)) {
+            max_fan = get_fan_by_table(special_fan_table);
+            selected_fan_table = &special_fan_table;
             LOG("fan = %d\n\n", max_fan);
-            if (fan_tables[result.count][SEVEN_SHIFTED_PAIRS]) {
-                result.count = 0;
+        }
+    }
+    else if (fixed_cnt == 1) {  // 1副露状态，有可能是基本和型组合龙
+        if (calculate_knitted_straight_fan(hand_tiles, win_tile,
+            win_flag, prevalent_wind, seat_wind, special_fan_table)) {
+            max_fan = get_fan_by_table(special_fan_table);
+            selected_fan_table = &special_fan_table;
+            LOG("fan = %d\n\n", max_fan);
+        }
+    }
+
+    // 无法构成特殊和型或者为七对
+    // 七对也要按基本和型划分，因为极端情况下，基本和型的番会超过七对的番
+    if (selected_fan_table == nullptr || special_fan_table[SEVEN_PAIRS] == 1) {
+        // 划分
+        division_result_t result;
+        if (divide_win_hand(standing_tiles, hand_tiles->fixed_packs, fixed_cnt, &result)) {
+            fan_table_t fan_tables[MAX_DIVISION_CNT] = { { 0 } };
+
+            // 遍历各种划分方式，分别算番，找出最大的番的划分方式
+            for (long i = 0; i < result.count; ++i) {
+#if 0  // Debug
+                char str[64];
+                packs_to_string(result.divisions[i].packs, 5, str, sizeof(str));
+                puts(str);
+#endif
+                calculate_basic_form_fan(result.divisions[i].packs, fixed_cnt, hand_tiles->standing_tiles, standing_cnt,
+                    win_tile, win_flag, prevalent_wind, seat_wind, fan_tables[i]);
+                int current_fan = get_fan_by_table(fan_tables[i]);
+                if (current_fan > max_fan) {
+                    max_fan = current_fan;
+                    selected_fan_table = &fan_tables[i];
+                }
+                LOG("fan = %d\n\n", current_fan);
             }
         }
     }
-    else if (fixed_cnt == 1 && result.count == 0) {
-        // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(hand_tiles, win_tile,
-            win_flag, prevalent_wind, seat_wind, fan_tables[0])) {
-            max_fan = get_fan_by_table(fan_tables[0]);
-            max_idx = result.count;
-            LOG("fan = %d\n\n", max_fan);
-        }
-    }
 
-    // 遍历各种划分方式，分别算番，找出最大的番的划分方式
-    for (long i = 0; i < result.count; ++i) {
-#if 0  // Debug
-        char str[64];
-        packs_to_string(result.divisions[i].packs, 5, str, sizeof(str));
-        puts(str);
-#endif
-        calculate_basic_form_fan(result.divisions[i].packs, fixed_cnt, hand_tiles->standing_tiles, standing_cnt,
-            win_tile, win_flag, prevalent_wind, seat_wind, fan_tables[i]);
-        int current_fan = get_fan_by_table(fan_tables[i]);
-        if (current_fan > max_fan) {
-            max_fan = current_fan;
-            max_idx = i;
-        }
-        LOG("fan = %d\n\n", current_fan);
-    }
-    if (max_idx == -1) {
+    if (selected_fan_table == nullptr) {
         return ERROR_NOT_WIN;
     }
 
-    memcpy(fan_table, fan_tables[max_idx], sizeof(fan_table));
+    memcpy(fan_table, *selected_fan_table, sizeof(fan_table));
 
     // 加花牌
     max_fan += calculate_param->flower_count;
