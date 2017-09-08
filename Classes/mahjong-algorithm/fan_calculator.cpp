@@ -1855,9 +1855,9 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
 
     // 标记番
     fan_table[KNITTED_STRAIGHT] = 1;  // 组合龙
-    if (pack_get_type(packs[3]) == PACK_TYPE_CHOW) {
+    if (pack_get_type(packs[3]) == PACK_TYPE_CHOW) {  // 第4组是顺子
         if (is_numbered_suit_quick(pack_get_tile(packs[4]))) {
-            fan_table[ALL_CHOWS] = 1;  // 第4组是顺子，雀头是数牌时，为平和
+            fan_table[ALL_CHOWS] = 1;  // 雀头是数牌时，为平和
         }
     }
     else {
