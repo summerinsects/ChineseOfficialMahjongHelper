@@ -307,7 +307,7 @@ int main(int argc, const char *argv[]) {
     puts("==== test all even pungs ====");
     test_points("222m 444s 666p 4488p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_points("222m 222s 222p 44m44s4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("666m 666s 666s 88m22s8m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("666m 666s 666p 88m22s8m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test full flush ====");
     test_points("111m 2223334449m9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
