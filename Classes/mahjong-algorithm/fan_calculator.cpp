@@ -1839,9 +1839,10 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
     division_t work_division;
     memset(&work_division, 0, sizeof(work_division));
 
-    // 此处逻辑为：将组合龙9张牌当作是已经完成的3组面子，占据了0 1 2下标处的3组
+    // 此处逻辑为：将组合龙9张牌当作是已经完成的3组面子，空出0 1 2下标处的3组
     // 如果第4组是副露的，将其放在下标3处
     // 然后按基本和型从从fixed_cnt + 3开始递归
+    // 划分后的结果，下标3处为第四组面子，下标4处为雀头
     if (fixed_cnt == 1) {
         work_division.packs[3] = fixed_packs[0];
     }
@@ -1852,6 +1853,7 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
 
     pack_t *temp_pack = result.divisions[0].packs;
 
+    // 标记番
     fan_table[KNITTED_STRAIGHT] = 1;  // 组合龙
     if (pack_get_type(temp_pack[3]) == PACK_TYPE_CHOW) {
         if (is_numbered_suit_quick(pack_get_tile(temp_pack[4]))) {
