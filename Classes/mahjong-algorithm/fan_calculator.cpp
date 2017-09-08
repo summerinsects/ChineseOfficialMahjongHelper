@@ -1851,22 +1851,22 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
         return false;
     }
 
-    pack_t *temp_pack = result.divisions[0].packs;
+    const pack_t *packs = result.divisions[0].packs;  // packs的0 1 2下标都是没用的
 
     // 标记番
     fan_table[KNITTED_STRAIGHT] = 1;  // 组合龙
-    if (pack_get_type(temp_pack[3]) == PACK_TYPE_CHOW) {
-        if (is_numbered_suit_quick(pack_get_tile(temp_pack[4]))) {
+    if (pack_get_type(packs[3]) == PACK_TYPE_CHOW) {
+        if (is_numbered_suit_quick(pack_get_tile(packs[4]))) {
             fan_table[ALL_CHOWS] = 1;  // 第4组是顺子，雀头是数牌时，为平和
         }
     }
     else {
-        calculate_kongs(&temp_pack[3], 1, fan_table);
+        calculate_kongs(&packs[3], 1, fan_table);
     }
 
     adjust_by_win_flag(win_flag, fan_table);
     // 门前清（暗杠不影响）
-    if (fixed_cnt == 0 || (pack_get_type(temp_pack[3]) == PACK_TYPE_KONG && !is_pack_melded(temp_pack[3]))) {
+    if (fixed_cnt == 0 || (pack_get_type(packs[3]) == PACK_TYPE_KONG && !is_pack_melded(packs[3]))) {
         if (win_flag & WIN_FLAG_SELF_DRAWN) {
             fan_table[FULLY_CONCEALED_HAND] = 1;
         }
@@ -1878,7 +1878,7 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
     // 还原牌
     tile_t tiles[15];  // 第四组可能为杠，所以最多为15张
     memcpy(tiles, matched_seq, sizeof(*matched_seq));  // 组合龙的部分
-    long tile_cnt = packs_to_tiles(&temp_pack[3], 2, tiles + 9, 6);  // 一组面子+一对雀头 最多6张牌
+    long tile_cnt = packs_to_tiles(&packs[3], 2, tiles + 9, 6);  // 一组面子+一对雀头 最多6张牌
     tile_cnt += 9;
 
     // 花色校正，相关番种：无字、缺一门、混一色、清一色、五门齐
@@ -1890,7 +1890,7 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
     // 和牌张是组合龙范围的牌，不计边嵌钓
     if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; })) {
         if (fixed_cnt == 0) {
-            adjust_by_waiting_form(temp_pack + 3, 2, win_tile, fan_table);
+            adjust_by_waiting_form(packs + 3, 2, win_tile, fan_table);
         }
         else {
             fan_table[SINGLE_WAIT] = 1;
@@ -1898,7 +1898,7 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
     }
 
     // 用风校正，确定圈风刻、门风刻
-    adjust_by_winds(temp_pack[3], prevalent_wind, seat_wind, fan_table);
+    adjust_by_winds(packs[3], prevalent_wind, seat_wind, fan_table);
     // 统一校正一些不计的
     adjust_fan_table(fan_table, prevalent_wind == seat_wind);
     return true;
