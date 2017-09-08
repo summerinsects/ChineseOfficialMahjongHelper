@@ -1903,7 +1903,7 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
 }
 
 // 十三幺
-static forceinline bool is_thirteen_orphans(const tile_t(&tiles)[14]) {
+static forceinline bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
     return std::all_of(std::begin(tiles), std::end(tiles), &is_terminal_or_honor)
         && std::includes(std::begin(tiles), std::end(tiles),
         std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans));
