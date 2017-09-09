@@ -1225,16 +1225,13 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, long pack_cnt,
 }
 
 // 单个牌组用风校正，确定圈风刻、门风刻
-static void adjust_by_winds(pack_t packs, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
-    uint8_t type = pack_get_type(packs);
-    if (type == PACK_TYPE_PUNG || type == PACK_TYPE_KONG) {
-        rank_t delta = pack_get_tile(packs) - TILE_E;
-        if (delta == (int)prevalent_wind - (int)wind_t::EAST) {
-            fan_table[PREVALENT_WIND] = 1;
-        }
-        if (delta == (int)seat_wind - (int)wind_t::EAST) {
-            fan_table[SEAT_WIND] = 1;
-        }
+static void adjust_by_winds(tile_t tile, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
+    rank_t delta = tile - TILE_E;
+    if (delta == (int)prevalent_wind - (int)wind_t::EAST) {
+        fan_table[PREVALENT_WIND] = 1;
+    }
+    if (delta == (int)seat_wind - (int)wind_t::EAST) {
+        fan_table[SEAT_WIND] = 1;
     }
 }
 
@@ -1705,8 +1702,8 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], long fixed_cnt, c
     adjust_by_waiting_form(packs + fixed_cnt, 5 - fixed_cnt, standing_tiles, standing_cnt, win_tile, fan_table);
 
     // 用风校正，确定圈风刻、门风刻
-    for (int i = 0; i < 5; ++i) {
-        adjust_by_winds(packs[i], prevalent_wind, seat_wind, fan_table);
+    for (long i = 0; i < pung_cnt; ++i) {
+        adjust_by_winds(pack_get_tile(pung_packs[i]), prevalent_wind, seat_wind, fan_table);
     }
 
     // 统一校正一些不计的
@@ -1776,6 +1773,9 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
     }
     else {
         calculate_kongs(&packs[3], 1, fan_table);
+
+        // 用风校正，确定圈风刻、门风刻
+        adjust_by_winds(pack_get_tile(packs[3]), prevalent_wind, seat_wind, fan_table);
     }
 
     adjust_by_win_flag(win_flag, fan_table);
@@ -1817,8 +1817,6 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
         }
     }
 
-    // 用风校正，确定圈风刻、门风刻
-    adjust_by_winds(packs[3], prevalent_wind, seat_wind, fan_table);
     // 统一校正一些不计的
     adjust_fan_table(fan_table, prevalent_wind == seat_wind);
     return true;
