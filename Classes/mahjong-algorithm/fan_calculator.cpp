@@ -1906,31 +1906,18 @@ bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long stan
 
 // 统计和牌在副露牌组中出现的张数
 size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, long fixed_cnt, tile_t win_tile) {
-    size_t cnt = 0;
+    tile_table_t cnt_table = { 0 };
     for (long i = 0; i < fixed_cnt; ++i) {
         pack_t pack = fixed_packs[i];
         tile_t tile = pack_get_tile(pack);
         switch (pack_get_type(pack)) {
-        case PACK_TYPE_CHOW:
-            if (win_tile == tile - 1 || win_tile == tile || win_tile == tile + 1) {
-                ++cnt;
-            }
-            break;
-        case PACK_TYPE_PUNG:
-            if (win_tile == tile) {
-                cnt += 3;
-            }
-            break;
-        case PACK_TYPE_KONG:
-            if (win_tile == tile) {
-                cnt += 4;
-            }
-            break;
-        default:
-            break;
+        case PACK_TYPE_CHOW: ++cnt_table[tile - 1]; ++cnt_table[tile]; ++cnt_table[tile + 1]; break;
+        case PACK_TYPE_PUNG: cnt_table[tile] += 3; break;
+        case PACK_TYPE_KONG: cnt_table[tile] += 4; break;
+        default: break;
         }
     }
-    return cnt;
+    return cnt_table[win_tile];
 }
 
 // 判断副露牌组是否包含杠
