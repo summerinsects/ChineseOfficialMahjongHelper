@@ -321,7 +321,7 @@ static fan_t get_4_pungs_fan(tile_t t0, tile_t t1, tile_t t2, tile_t t3) {
 static fan_t get_3_pungs_fan(tile_t t0, tile_t t1, tile_t t2) {
     // 按出现频率顺序
 
-    if (is_numbered_suit_quick(t0) && is_numbered_suit_quick(t1) && is_numbered_suit_quick(t2)) {  // 序数牌
+    if (is_numbered_suit_quick(t0) && is_numbered_suit_quick(t1) && is_numbered_suit_quick(t2)) {  // 数牌
         suit_t s0 = tile_get_suit(t0);
         suit_t s1 = tile_get_suit(t1);
         suit_t s2 = tile_get_suit(t2);
@@ -380,7 +380,7 @@ static fan_t get_3_pungs_fan(tile_t t0, tile_t t1, tile_t t2) {
 // 2组刻子的番
 static fan_t get_2_pungs_fan(tile_t t0, tile_t t1) {
     // 按出现频率顺序
-    if (is_numbered_suit_quick(t0) && is_numbered_suit_quick(t1)) {  // 序数牌
+    if (is_numbered_suit_quick(t0) && is_numbered_suit_quick(t1)) {  // 数牌
         // 双同刻
         if (is_rank_equal_quick(t0, t1)) {
             return DOUBLE_PUNG;
