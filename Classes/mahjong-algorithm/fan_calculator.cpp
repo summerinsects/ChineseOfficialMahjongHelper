@@ -1188,7 +1188,7 @@ static void adjust_by_tiles_traits(const tile_t *tiles, long tile_cnt, fan_table
 
 #ifdef STRICT_98_RULE
     if (fan_table[SEVEN_PAIRS]) {
-        return;  // 严格98规则的七对不支持绿一色、清幺九、混幺九
+        return;  // 严格98规则的七对不支持绿一色、字一色、清幺九、混幺九
     }
 #endif
 
