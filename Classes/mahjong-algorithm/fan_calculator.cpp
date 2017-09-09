@@ -1015,73 +1015,50 @@ static void adjust_by_rank_range(const tile_t *tiles, long tile_cnt, fan_table_t
     }
 }
 
-// 判断一组牌是否包含数牌19
-static bool is_pack_contains_terminal_tile(pack_t pack) {
-    tile_t tile = pack_get_tile(pack);
-    if (!is_numbered_suit_quick(tile)) {
-        return false;
-    }
-    rank_t rank = tile_get_rank(tile);
-    if (pack_get_type(pack) == PACK_TYPE_CHOW) {
-        return (rank == 2 || rank == 8);
-    }
-    else {
-        return (rank == 1 || rank == 9);
-    }
-}
-
-// 判断一组牌是否包含数牌5
-static bool is_pack_contains_5(pack_t pack) {
-    tile_t tile = pack_get_tile(pack);
-    if (!is_numbered_suit_quick(tile)) {
-        return false;
-    }
-    rank_t rank = tile_get_rank(tile);
-    if (pack_get_type(pack) == PACK_TYPE_CHOW) {
-        return (rank >= 4 && rank <= 6);
-    }
-    else {
-        return rank == 5;
-    }
-}
-
 // 牌组特征校正，相关番种：全带幺、全带五、全双刻
 static void adjust_by_packs_traits(const pack_t (&packs)[5], fan_table_t &fan_table) {
     // 统计包含数牌19、字牌、5、双数牌的组数
-    int terminal_cnt = 0;
-    int honor_cnt = 0;
-    int _5_cnt = 0;
-    int even_pung_cnt = 0;
+    int terminal_pack = 0;
+    int honor_pack = 0;
+    int _5_pack = 0;
+    int even_pack = 0;
     for (long i = 0; i < 5; ++i) {
         tile_t tile = pack_get_tile(packs[i]);
-        if (is_pack_contains_terminal_tile(packs[i])) {
-            ++terminal_cnt;  // 数牌19
+        if (is_numbered_suit_quick(tile)) {  // 数牌
+            rank_t rank = tile_get_rank(tile);
+            if (pack_get_type(packs[i]) == PACK_TYPE_CHOW) {  // 顺子
+                switch (rank) {
+                case 2: case 8: ++terminal_pack; break;  // 数牌19
+                case 4: case 5: case 6: ++_5_pack; break;  // 带五
+                default: break;
+                }
+            }
+            else {  // 刻子或雀头
+                switch (rank) {
+                case 1: case 9: ++terminal_pack; break;  // 数牌19
+                case 5: ++_5_pack; break;  // 带五
+                case 2: case 4: case 6: case 8: ++even_pack; break;  // 双刻
+                default: break;
+                }
+            }
         }
-        else if (pack_get_type(packs[i]) != PACK_TYPE_CHOW
-            && is_honor(tile)) {
-            ++honor_cnt;  // 字牌
-        }
-        else if (is_pack_contains_5(packs[i])) {
-            ++_5_cnt;  // 5
-        }
-        else if (pack_get_type(packs[i]) != PACK_TYPE_CHOW
-            && is_numbered_suit_quick(tile) && (tile & 1) == 0) {
-            ++even_pung_cnt;  // 双数牌刻子
+        else {
+            ++honor_pack;  // 字牌
         }
     }
 
     // 5组牌都包含数牌19和字牌，先暂时计为全带幺
-    if (terminal_cnt + honor_cnt == 5) {
+    if (terminal_pack + honor_pack == 5) {
         fan_table[OUTSIDE_HAND] = 1;
         return;
     }
     // 全带五
-    if (_5_cnt == 5) {
+    if (_5_pack == 5) {
         fan_table[ALL_FIVE] = 1;
         return;
     }
     // 全双刻
-    if (even_pung_cnt == 5) {
+    if (even_pack == 5) {
         fan_table[ALL_EVEN_PUNGS] = 1;
     }
 }
