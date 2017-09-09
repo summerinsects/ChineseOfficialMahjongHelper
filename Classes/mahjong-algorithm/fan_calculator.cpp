@@ -599,33 +599,28 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, fan_table_t
     switch (kong_cnt) {
     case 0:  // 0个杠
         switch (concealed_pung_cnt) {  // 暗刻的个数
-        case 0: break;
-        case 1: break;
         case 2: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
         case 3: fan_table[THREE_CONCEALED_PUNGS] = 1; break;
         case 4: fan_table[FOUR_CONCEALED_PUNGS] = 1; break;
-        default: assert(0); break;
+        default: break;
         }
         break;
     case 1:  // 1个杠
         if (melded_kong_cnt == 1) {  // 明杠
             fan_table[MELDED_KONG] = 1;
             switch (concealed_pung_cnt) {  // 暗刻的个数
-            case 0: break;
-            case 1: break;
             case 2: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
             case 3: fan_table[THREE_CONCEALED_PUNGS] = 1; break;
-            default: assert(0); break;
+            default: break;
             }
         }
         else {  // 暗杠
             fan_table[CONCEALED_KONG] = 1;
             switch (concealed_pung_cnt) {  // 暗刻的个数
-            case 0: break;
             case 1: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
             case 2: fan_table[THREE_CONCEALED_PUNGS] = 1; break;
             case 3: fan_table[FOUR_CONCEALED_PUNGS] = 1; break;
-            default: assert(0); break;
+            default: break;
             }
         }
         break;
@@ -634,10 +629,8 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, fan_table_t
         case 0:  // 双明杠
             fan_table[TWO_MELDED_KONGS] = 1;
             switch (concealed_pung_cnt) {  // 暗刻的个数
-            case 0: break;
-            case 1: break;
             case 2: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
-            default: assert(0); break;
+            default: break;
             }
             break;
         case 1:  // 明暗杠
@@ -648,36 +641,34 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, fan_table_t
             fan_table[CONCEALED_KONG] = 1;
 #endif
             switch (concealed_pung_cnt) {  // 暗刻的个数
-            case 0: break;
             case 1: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
             case 2: fan_table[THREE_CONCEALED_PUNGS] = 1; break;
-            default: assert(0); break;
+            default: break;
             }
             break;
         case 2:  // 双暗杠
             fan_table[TWO_CONCEALED_KONGS] = 1;
             switch (concealed_pung_cnt) {  // 暗刻的个数
-            case 0: break;
             case 1: fan_table[THREE_CONCEALED_PUNGS] = 1; break;
             case 2: fan_table[FOUR_CONCEALED_PUNGS] = 1; break;
-            default: assert(0); break;
+            default: break;
             }
             break;
         default:
-            assert(0);
             break;
         }
         break;
     case 3:  // 3个杠
         fan_table[THREE_KONGS] = 1;
         switch (concealed_kong_cnt) {  // 暗刻的个数
-        case 0: break;
-        case 1:
+        case 0:  // 3明杠
+            break;
+        case 1:  // 1暗杠2明杠
             if (concealed_pung_cnt > 0) {
                 fan_table[TWO_CONCEALED_PUNGS] = 1;
             }
             break;
-        case 2:
+        case 2:  // 2暗杠1明杠
             if (concealed_pung_cnt == 0) {
                 fan_table[TWO_CONCEALED_PUNGS] = 1;
             }
@@ -685,7 +676,7 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, fan_table_t
                 fan_table[THREE_CONCEALED_PUNGS] = 1;
             }
             break;
-        case 3:
+        case 3:  // 3暗杠
             if (concealed_pung_cnt == 0) {
                 fan_table[THREE_CONCEALED_PUNGS] = 1;
             }
@@ -694,23 +685,19 @@ static void calculate_kongs(const pack_t *pung_packs, long pung_cnt, fan_table_t
             }
             break;
         default:
-            assert(0);
             break;
         }
         break;
     case 4:  // 4个杠
         fan_table[FOUR_KONGS] = 1;
         switch (concealed_kong_cnt) {
-        case 0: break;
-        case 1: break;
         case 2: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
         case 3: fan_table[THREE_CONCEALED_PUNGS] = 1; break;
         case 4: fan_table[FOUR_CONCEALED_PUNGS] = 1; break;
-        default: assert(0); break;
+        default: break;
         }
         break;
     default:
-        assert(0);
         break;
     }
 
