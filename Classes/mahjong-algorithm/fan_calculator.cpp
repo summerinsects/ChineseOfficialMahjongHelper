@@ -157,8 +157,7 @@ static bool divide_recursively(tile_table_t &cnt_table, long fixed_cnt, long ste
         }
 
         // 顺子（只能是数牌）
-        bool is_numbered = is_numbered_suit(t);
-        if (is_numbered) {
+        if (is_numbered_suit(t)) {
             if (tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
                 work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, t + 1);
                 if (!is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
