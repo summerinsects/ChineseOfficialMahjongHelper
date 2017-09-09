@@ -1140,11 +1140,8 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, long pack_cnt,
         }
     }
 
-    // 统计听牌张数
-    long waiting_cnt = std::count(std::begin(waiting_table), std::end(waiting_table), true);
-
-    // 听牌数大于1张，不计边张、嵌张、单钓将
-    if (waiting_cnt != 1) {
+    // 统计听牌张数，听牌数大于1张，不计边张、嵌张、单钓将
+    if (1 != std::count(std::begin(waiting_table), std::end(waiting_table), true)) {
         return;
     }
 
