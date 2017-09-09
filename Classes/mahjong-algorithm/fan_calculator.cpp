@@ -1241,7 +1241,7 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, long pack_cnt,
         return;
     }
 
-    if (pack_cnt == 5) {
+    if (pack_cnt == 5) {  // 门清状态
         // 判断是否为七对听牌
         useful_table_t temp_table;
         if (is_seven_pairs_wait(standing_tiles, standing_cnt, &temp_table)) {
@@ -1265,20 +1265,23 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, long pack_cnt,
 
     for (long i = 0; i < pack_cnt; ++i) {
         switch (pack_get_type(concealed_packs[i])) {
-        case PACK_TYPE_CHOW:
-            if (pack_get_tile(concealed_packs[i]) == win_tile) {
+        case PACK_TYPE_CHOW: {
+            tile_t mid_tile = pack_get_tile(concealed_packs[i]);
+            if (mid_tile == win_tile) {
                 pos_flag |= 0x02;  // 嵌张
             }
-            else if (pack_get_tile(concealed_packs[i]) + 1 == win_tile
-                || pack_get_tile(concealed_packs[i]) - 1 == win_tile) {
+            else if (mid_tile + 1 == win_tile || mid_tile - 1 == win_tile) {
                 pos_flag |= 0x01;  // 边张
             }
             break;
-        case PACK_TYPE_PAIR:
-            if (pack_get_tile(concealed_packs[i]) == win_tile) {
+        }
+        case PACK_TYPE_PAIR: {
+            tile_t mid_tile = pack_get_tile(concealed_packs[i]);
+            if (mid_tile == win_tile) {
                 pos_flag |= 0x04;  // 单钓将
             }
             break;
+        }
         default:
             break;
         }
