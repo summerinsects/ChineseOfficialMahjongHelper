@@ -41,11 +41,12 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
 
     _colWidth[0] = visibleSize.width * 0.1f;
     _colWidth[1] = visibleSize.width * 0.1f;
-    _colWidth[2] = visibleSize.width * 0.25f;
-    _colWidth[3] = visibleSize.width * 0.1f;
-    _colWidth[4] = visibleSize.width * 0.1f;
+    _colWidth[2] = visibleSize.width * 0.2f;
+
+    _colWidth[3] = visibleSize.width * 0.15f;
+    _colWidth[4] = visibleSize.width * 0.15f;
     _colWidth[5] = visibleSize.width * 0.15f;
-    _colWidth[6] = visibleSize.width * 0.2f;
+    _colWidth[6] = visibleSize.width * 0.15f;
 
     _posX[0] = _colWidth[0] * 0.5f;
     _posX[1] = _posX[0] + _colWidth[0] * 0.5f + _colWidth[1] * 0.5f;
@@ -55,12 +56,13 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     _posX[5] = _posX[4] + _colWidth[4] * 0.5f + _colWidth[5] * 0.5f;
     _posX[6] = _posX[5] + _colWidth[5] * 0.5f + _colWidth[6] * 0.5f;
 
-    const char *titleTexts[] = { "名次", "编号", "选手姓名", "桌号", "座次", "标准分", "比赛分" };
+    const char *titleTexts[] = { "名次", "编号", "选手姓名", "标准分", "比赛分", "标准分", "比赛分" };
     for (int i = 0; i < 7; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 100.0f));
+        Common::scaleLabelToFitWidth(label, _colWidth[i] - 4);
     }
 
     cw::TableView *tableView = cw::TableView::create();
@@ -86,6 +88,34 @@ ssize_t CompetitionRoundScene::numberOfCellsInTableView(cw::TableView *table) {
 
 cocos2d::Size CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
     return Size(0, 30);
+}
+
+
+static std::pair<unsigned, int> getScoresTotalByRound(const CompetitionPlayer &p, size_t round) {
+    unsigned r = 0;
+    int s = 0;
+    round = std::min(p.scores.size(), round);
+    for (size_t i = 0; i < round; ++i) {
+        r += standard_score_12[p.scores[i].first];
+        s += p.scores[i].second;
+    }
+    return std::make_pair(r, s);
+}
+
+static std::pair<unsigned, int> getScoresCurrentByRound(const CompetitionPlayer &p, size_t round) {
+    if (p.scores.size() > round) {
+        return std::make_pair(standard_score_12[p.scores[round].first], p.scores[round].second);
+    }
+    return std::make_pair(0U, 0);
+}
+
+static std::string getStandardScoreString(unsigned s) {
+    float a = s / 12.0f;
+    std::ostringstream os;
+    os << a;
+    std::string ret1 = os.str();
+    std::string ret2 = Common::format<32>("%.3f", a);
+    return ret1.length() < ret2.length() ? ret1 : ret2;
 }
 
 cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
@@ -125,21 +155,28 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     layerColor[0]->setVisible(!(idx & 1));
     layerColor[1]->setVisible(!!(idx & 1));
 
-    static const char *seatText[] = { "东", "南", "西", "北" };
     const CompetitionPlayer &player = *_players[idx];
     labels[0]->setString(std::to_string(idx + 1));
     labels[1]->setString(std::to_string(player.serial));
     labels[2]->setString(player.name);
-    labels[3]->setString(std::to_string((idx >> 2) + 1));
-    labels[4]->setString(seatText[idx & 3]);
-    labels[5]->setString("0");
-    labels[6]->setString("0");
+
+    std::pair<unsigned, int> ret = getScoresCurrentByRound(player, _competitionData->current_round);
+    labels[3]->setString(getStandardScoreString(ret.first));
+    Common::scaleLabelToFitWidth(labels[3], _colWidth[3] - 4);
+    labels[4]->setString(std::to_string(ret.second));
+    Common::scaleLabelToFitWidth(labels[4], _colWidth[4] - 4);
+
+    ret = getScoresTotalByRound(player, _competitionData->current_round);
+    labels[5]->setString(getStandardScoreString(ret.first));
+    Common::scaleLabelToFitWidth(labels[5], _colWidth[5] - 4);
+    labels[6]->setString(std::to_string(ret.second));
+    Common::scaleLabelToFitWidth(labels[6], _colWidth[6] - 4);
 
     return cell;
 }
 
 void CompetitionRoundScene::onRankButton(cocos2d::Ref *sender) {
-
+    rankSeats(_competitionData, nullptr);
 }
 
 void CompetitionRoundScene::rankSeats(std::shared_ptr<CompetitionData> &competitionData, const std::function<void ()> &callback) {

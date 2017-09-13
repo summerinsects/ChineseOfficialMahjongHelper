@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 // 4 2 1 0
 // 并列12：(4+2)/2=3
@@ -31,8 +32,7 @@ class CompetitionPlayer {
 public:
     unsigned serial;  // 编号
     std::string name;  // 姓名
-    std::vector<RANK_TYPE> ranks;  // 每一轮的名次（用于标准分）
-    std::vector<unsigned> scores;  // 比赛分
+    std::vector<std::pair<RANK_TYPE, int> > scores;
     size_t team_index;  // 队伍索引
 };
 
@@ -41,8 +41,7 @@ public:
     unsigned serial;  // 编号
     std::string name;  // 队名
     std::vector<size_t> player_indices;  // 队员
-    std::vector<unsigned> standard_scores;  // 标准分
-    std::vector<unsigned> scores;  // 比赛分
+    std::vector<std::pair<RANK_TYPE, int> > scores;
 };
 
 struct CompetitionTable {
