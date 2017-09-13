@@ -53,12 +53,12 @@ namespace mahjong {
 extern long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size);
 #endif
 
-/** @brief 每一种划分类型 */
+/** @brief 划分 */
 struct division_t {
     pack_t packs[5];  ///< 牌组。4面子1雀头，共5组
 };
 
-/** @brief 所有的划分类型 */
+/** @brief 划分结果类型 */
 struct division_result_t {
     division_t divisions[MAX_DIVISION_CNT];  ///< 每一种划分
     long count;  ///< 划分方式总数
@@ -145,13 +145,14 @@ static bool divide_recursively(tile_table_t &cnt_table, long fixed_cnt, long ste
 
         // 刻子
         if (cnt_table[t] > 2) {
-            work_division->packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);
+            work_division->packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);  // 记录刻子
             if (!is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
                 // 削减这组刻子，递归
                 cnt_table[t] -= 3;
                 if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
                     ret = true;
                 }
+                // 还原
                 cnt_table[t] += 3;
             }
         }
@@ -159,7 +160,7 @@ static bool divide_recursively(tile_table_t &cnt_table, long fixed_cnt, long ste
         // 顺子（只能是数牌）
         if (is_numbered_suit(t)) {
             if (tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-                work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, t + 1);
+                work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, t + 1);  // 记录顺子
                 if (!is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
                     // 削减这组顺子，递归
                     --cnt_table[t];
@@ -168,6 +169,7 @@ static bool divide_recursively(tile_table_t &cnt_table, long fixed_cnt, long ste
                     if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
                         ret = true;
                     }
+                    // 还原
                     ++cnt_table[t];
                     ++cnt_table[t + 1];
                     ++cnt_table[t + 2];
