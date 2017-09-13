@@ -20,6 +20,9 @@
     <Filter Include="Classes\FanTable">
       <UniqueIdentifier>{22e817f3-066b-43a2-baee-cbfb5aff9b9b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Classes\LastestCompetition">
+      <UniqueIdentifier>{29a8342e-4bff-4ffb-ba80-e7543464adaa}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Classes\mahjong-algorithm">
       <UniqueIdentifier>{1be7c848-dca1-4806-9df9-30b2c349cdf3}</UniqueIdentifier>
     </Filter>
@@ -63,6 +66,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Classes\FanTable\FanTable.cpp">
       <Filter>Classes\FanTable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
+      <Filter>Classes\LastestCompetition</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Classes\mahjong-algorithm\fan_calculator.cpp">
       <Filter>Classes\mahjong-algorithm</Filter>
@@ -134,6 +140,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Classes\FanTable\FanTable.h">
       <Filter>Classes\FanTable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Classes\LatestCompetition\LatestCompetitionScene.h">
+      <Filter>Classes\LastestCompetition</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Classes\mahjong-algorithm\fan_calculator.h">
       <Filter>Classes\mahjong-algorithm</Filter>

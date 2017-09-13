@@ -226,6 +226,7 @@
     <ClInclude Include="..\..\Classes\FanTable\FanDefinition.h" />
     <ClInclude Include="..\..\Classes\FanTable\FanTable.h" />
     <ClInclude Include="..\..\Classes\HelloWorldScene.h" />
+    <ClInclude Include="..\..\Classes\LatestCompetition\LatestCompetitionScene.h" />
     <ClInclude Include="..\..\Classes\mahjong-algorithm\fan_calculator.h" />
     <ClInclude Include="..\..\Classes\mahjong-algorithm\shanten.h" />
     <ClInclude Include="..\..\Classes\mahjong-algorithm\stringify.h" />
@@ -272,6 +273,7 @@
     <ClCompile Include="..\..\Classes\FanTable\FanDefinition.cpp" />
     <ClCompile Include="..\..\Classes\FanTable\FanTable.cpp" />
     <ClCompile Include="..\..\Classes\HelloWorldScene.cpp" />
+    <ClCompile Include="..\..\Classes\LatestCompetition\LatestCompetitionScene.cpp" />
     <ClCompile Include="..\..\Classes\mahjong-algorithm\fan_calculator.cpp" />
     <ClCompile Include="..\..\Classes\mahjong-algorithm\shanten.cpp" />
     <ClCompile Include="..\..\Classes\mahjong-algorithm\stringify.cpp" />
