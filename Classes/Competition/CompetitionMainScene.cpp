@@ -21,7 +21,7 @@ bool CompetitionMainScene::init() {
     button->setTitleText("创建比赛");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 30));
     button->addClickEventListener([this](Ref *) {
-        this->showCompetitionCreatingAlert("", 8, 5);
+        this->showCompetitionCreatingAlert("测试比赛", 8, 5);
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
