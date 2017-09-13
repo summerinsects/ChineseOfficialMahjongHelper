@@ -208,11 +208,12 @@ static void save_work_path(const long fixed_cnt, const work_path_t *work_path, w
 static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool has_pair, const uint16_t pack_cnt, const uint16_t incomplete_cnt,
     const long fixed_cnt, work_path_t *work_path, work_state_t *work_state) {
     if (pack_cnt == 4) {  // 已经有4组面子
-        return has_pair ? -1 : 0;  // 有雀头：和了；无雀头：听牌
+        return has_pair ? -1 : 0;  // 如果有雀头，则和了；如果无雀头，则是听牌
     }
 
     int max_ret;  // 当前状态能返回的最大上听数
 
+    // 算法说明：
     // 缺少的面子数=4-完成的面子数
     // 缺少的搭子数=缺少的面子数-已有的搭子数
     // 两式合并：缺少的搭子数=4-完成的面子数-已有的搭子数
@@ -247,26 +248,28 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
 
         // 雀头
         if (!has_pair && cnt_table[t] > 1) {
-            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PAIR, t);
+            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PAIR, t);  // 记录雀头
             if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
                 // 削减雀头，递归
                 cnt_table[t] -= 2;
                 int ret = basic_form_shanten_recursively(cnt_table, true, pack_cnt, incomplete_cnt,
                     fixed_cnt, work_path, work_state);
                 result = std::min(ret, result);
+                // 还原
                 cnt_table[t] += 2;
             }
         }
 
         // 刻子
         if (cnt_table[t] > 2) {
-            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PUNG, t);
+            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PUNG, t);  // 记录刻子
             if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
                 // 削减这组刻子，递归
                 cnt_table[t] -= 3;
                 int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
                     fixed_cnt, work_path, work_state);
                 result = std::min(ret, result);
+                // 还原
                 cnt_table[t] += 3;
             }
         }
@@ -275,7 +278,7 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
         bool is_numbered = is_numbered_suit(t);
         // 顺子t t+1 t+2，显然t不能是8点以上的数牌
         if (is_numbered && tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW, t);
+            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW, t);  // 记录顺子
             if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
                 // 削减这组顺子，递归
                 --cnt_table[t];
@@ -284,6 +287,7 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
                 int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
                     fixed_cnt, work_path, work_state);
                 result = std::min(ret, result);
+                // 还原
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
                 ++cnt_table[t + 2];
@@ -297,42 +301,46 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
 
         // 刻子搭子
         if (cnt_table[t] > 1) {
-            // 削减刻子搭子，递归
-            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_INCOMPLETE_PUNG, t);
+            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_INCOMPLETE_PUNG, t);  // 记录刻子搭子
             if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
+                // 削减刻子搭子，递归
                 cnt_table[t] -= 2;
                 int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
                     fixed_cnt, work_path, work_state);
                 result = std::min(ret, result);
+                // 还原
                 cnt_table[t] += 2;
             }
         }
 
         // 顺子搭子（只能是数牌）
         if (is_numbered) {
-            // 削减搭子，递归
             // 两面或者边张搭子t t+1，显然t不能是9点以上的数牌
             if (tile_get_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
-                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_OPEN_END, t);
+                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_OPEN_END, t);  // 记录两面或者边张搭子
                 if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
+                    // 削减搭子，递归
                     --cnt_table[t];
                     --cnt_table[t + 1];
                     int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
                         fixed_cnt, work_path, work_state);
                     result = std::min(ret, result);
+                    // 还原
                     ++cnt_table[t];
                     ++cnt_table[t + 1];
                 }
             }
             // 嵌张搭子t t+2，显然t不能是8点以上的数牌
             if (tile_get_rank(t) < 8 && cnt_table[t + 2]) {  // 嵌张
-                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_CLOSED, t);
+                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_CLOSED, t);  // 记录嵌张搭子
                 if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
+                    // 削减搭子，递归
                     --cnt_table[t];
                     --cnt_table[t + 2];
                     int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
                         fixed_cnt, work_path, work_state);
                     result = std::min(ret, result);
+                    // 还原
                     ++cnt_table[t];
                     ++cnt_table[t + 2];
                 }
@@ -497,6 +505,7 @@ static bool is_basic_form_wait_4(tile_table_t &cnt_table, useful_table_t *waitin
         if (is_basic_form_wait_2(cnt_table, waiting_table)) {
             ret = true;
         }
+        // 还原
         cnt_table[t] += 2;
         if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
             return true;
@@ -533,6 +542,7 @@ static bool is_basic_form_wait_recursively(tile_table_t &cnt_table, long left_cn
             if (is_basic_form_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
                 ret = true;
             }
+            // 还原
             cnt_table[t] += 3;
             if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
                 return true;
@@ -550,6 +560,7 @@ static bool is_basic_form_wait_recursively(tile_table_t &cnt_table, long left_cn
                 if (is_basic_form_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
                     ret = true;
                 }
+                // 还原
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
                 ++cnt_table[t + 2];
@@ -612,6 +623,7 @@ static bool is_basic_form_win_recursively(tile_table_t &cnt_table, long left_cnt
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
             bool ret = is_basic_form_win_recursively(cnt_table, left_cnt - 3);
+            // 还原
             cnt_table[t] += 3;
             if (ret) {
                 return true;
@@ -627,6 +639,7 @@ static bool is_basic_form_win_recursively(tile_table_t &cnt_table, long left_cnt
                 --cnt_table[t + 1];
                 --cnt_table[t + 2];
                 bool ret = is_basic_form_win_recursively(cnt_table, left_cnt - 3);
+                // 还原
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
                 ++cnt_table[t + 2];
