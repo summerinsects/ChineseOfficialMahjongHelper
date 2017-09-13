@@ -80,15 +80,15 @@ bool FanCalculatorScene::init() {
 
 static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth) {
     // 有n个番种，每行排2个
-    long n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
-    long rows = (n >> 1) + (n & 1);  // 需要这么多行
+    ptrdiff_t n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
+    ptrdiff_t rows = (n >> 1) + (n & 1);  // 需要这么多行
 
     // 排列
     Node *node = Node::create();
     const int lineHeight = fontSize + 2;
-    long resultAreaHeight = lineHeight * rows;  // 每行间隔2像素
+    ptrdiff_t resultAreaHeight = lineHeight * rows;  // 每行间隔2像素
     resultAreaHeight += (5 + lineHeight) + 20;  // 总计+提示
-    node->setContentSize(Size(resultAreaWidth, resultAreaHeight));
+    node->setContentSize(Size(resultAreaWidth, (float)resultAreaHeight));
 
     long fan = 0;
     for (int i = 0, j = 0; i < n; ++i) {
@@ -101,12 +101,12 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
             : Common::format<128>("%s %d番x%ld\n", mahjong::fan_name[j], f, fan_table[j]);
 
         // 创建label，每行排2个
-        Label *label = Label::createWithSystemFont(str, "Arial", fontSize);
+        Label *label = Label::createWithSystemFont(str, "Arial", (float)fontSize);
         label->setColor(Color3B(0x60, 0x60, 0x60));
         node->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         div_t ret = div(i, 2);
-        label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, resultAreaHeight - lineHeight * (ret.quot + 1)));
+        label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, (float)(resultAreaHeight - lineHeight * (ret.quot + 1))));
 
         // 创建与label同位置的button
         ui::Button *button = ui::Button::create();
@@ -120,7 +120,7 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         });
     }
 
-    Label *label = Label::createWithSystemFont(Common::format<64>("总计：%ld番", fan), "Arial", fontSize);
+    Label *label = Label::createWithSystemFont(Common::format<64>("总计：%ld番", fan), "Arial", (float)fontSize);
     label->setColor(Color3B::BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);

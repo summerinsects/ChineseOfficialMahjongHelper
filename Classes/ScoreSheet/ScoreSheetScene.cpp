@@ -812,7 +812,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     // 横线
     const float startX[11] = { 0, gap, gap, 0, 0, gap, 0, 0, 0, 0, 0 };
     for (int i = 0; i < 11; ++i) {
-        drawNode->drawLine(Vec2(startX[i], 20 * i), Vec2(width, 20 * i), Color4F::BLACK);
+        drawNode->drawLine(Vec2(startX[i], 20.0f * i), Vec2(width, 20.0f * i), Color4F::BLACK);
     }
 
     // 竖线
@@ -837,8 +837,8 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
         Common::scaleLabelToFitWidth(label, gap - 4);
     }
 
-    const int nameY[3] = { 150, 100, 30 };
-    const int numbersStartY[3] = { 150, 110, 50 };
+    const float nameY[3] = { 150, 100, 30 };
+    const float numbersStartY[3] = { 150, 110, 50 };
 
     // n位。n=1表示二位，以此类推
     for (int n = 1; n < 4; ++n) {
@@ -850,7 +850,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
 
         // 追k位。k=0表示1位，以此类推
         for (int k = 0; k < n; ++k) {
-            const int posY = numbersStartY[n - 1] - k * 20;
+            const float posY = numbersStartY[n - 1] - k * 20;
 
             label = Label::createWithSystemFont(name[indices[k]], "Arail", 12);
             label->setColor(titleColor[1]);

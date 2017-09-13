@@ -658,7 +658,7 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
     }
 
     long utf8Len = StringUtils::getCharacterCountInUTF8String(str);
-    long pos = width / size.width * utf8Len;  // 切这么多
+    long pos = (long)(width / size.width * utf8Len);  // 切这么多
 
     // 切没了，全部放在第2个label上
     if (pos <= 0) {
@@ -706,7 +706,7 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ss
     const uint16_t key = ((!!result->discard_tile) << 9) | ((!!result->shanten) << 8) | result->count_in_tiles;
     std::unordered_map<uint16_t, int>::iterator it = _cellHeightMap.find(key);
     if (it != _cellHeightMap.end()) {
-        return Size(0, it->second);
+        return Size(0, (float)it->second);
     }
 
     const float cellWidth = _cellWidth - SPACE * 2;  // 前后各留2像素
@@ -729,7 +729,7 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ss
             bool inOneLine = remainCnt * TILE_WIDTH_SMALL + _totalLabelWidth <= remainWidth;
             int height = 25 + 25 * (inOneLine ? lineCnt : lineCnt + 1);
             _cellHeightMap.insert(std::make_pair(key, height));
-            return Size(0, height);
+            return Size(0, (float)height);
         }
         remainCnt -= limitedCnt;
         ++lineCnt;

@@ -103,23 +103,23 @@ bool TilesKeyboard::init() {
     const int height = buttonAreaHeight + TILE_HEIGHT + GAP * 3 + 10;
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(width, height));
+    rootNode->setContentSize(Size((float)width, (float)height));
     rootNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 
     // 背景
-    LayerColor *background = LayerColor::create(Color4B(238, 238, 238, 0xFF), width, buttonAreaHeight);
+    LayerColor *background = LayerColor::create(Color4B(238, 238, 238, 0xFF), (GLfloat)width, (GLfloat)buttonAreaHeight);
     rootNode->addChild(background);
 
-    background = LayerColor::create(Color4B(224, 224, 224, 0xFF), width, TILE_HEIGHT + GAP * 3 + 10);
+    background = LayerColor::create(Color4B(224, 224, 224, 0xFF), width, (GLfloat)(TILE_HEIGHT + GAP * 3 + 10));
     rootNode->addChild(background);
-    background->setPosition(Vec2(0, buttonAreaHeight));
+    background->setPosition(Vec2(0, (float)buttonAreaHeight));
 
     // 牌数量label
     Label *label = Label::createWithSystemFont("当前牌数目：0", "Arial", 10);
     rootNode->addChild(label);
     label->setColor(Color3B::BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(INPUT_GAP, buttonAreaHeight + TILE_HEIGHT + GAP * 2 + 5));
+    label->setPosition(Vec2(INPUT_GAP, buttonAreaHeight + (GLfloat)(TILE_HEIGHT + GAP * 2 + 5)));
     _countLabel = label;
 
     // 牌的根结点
@@ -138,7 +138,7 @@ bool TilesKeyboard::init() {
         rootNode->addChild(button);
         button->setScale9Enabled(true);
         if (buttonInfo.fontSize > 0) {
-            button->setTitleFontSize(buttonInfo.fontSize);
+            button->setTitleFontSize((float)buttonInfo.fontSize);
             button->setTitleColor(buttonInfo.fontColor);
             button->setTitleText(buttonInfo.buttonFace);
         }
@@ -167,7 +167,7 @@ bool TilesKeyboard::init() {
     LayerColor *inputBg = LayerColor::create(Color4B(238, 238, 238, 238), 0, INPUT_HEIGHT);
     _inputBg = inputBg;
     rootNode->addChild(inputBg);
-    inputBg->setPosition(Vec2(0, height));
+    inputBg->setPosition(Vec2(0.0f, (float)height));
 
     // 输入文本
     label = Label::createWithSystemFont("", "Arial", 12);

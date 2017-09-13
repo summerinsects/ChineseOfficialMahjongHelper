@@ -55,7 +55,7 @@ bool HelloWorld::init() {
 #endif
 
     const float buttonWidth = (visibleSize.width - 16) / 3;
-    const float buttonHeight = buttonWidth * 0.8;
+    const float buttonHeight = buttonWidth * 0.8f;
 
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
