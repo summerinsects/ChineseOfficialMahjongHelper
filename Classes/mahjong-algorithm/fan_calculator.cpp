@@ -37,14 +37,6 @@
 #define LOG(...) do { } while (0)
 #endif
 
-#ifndef UINT8_C
-#define UINT8_C(x)   (x)
-#endif
-
-#ifndef UINT16_C
-#define UINT16_C(x)  (x)
-#endif
-
 //#define STRICT_98_RULE
 
 namespace mahjong {
@@ -946,31 +938,31 @@ static void adjust_by_suits(const tile_t *tiles, long tile_cnt, fan_table_t &fan
     }
 
     // 1111 0001
-    if (!(suit_flag & UINT8_C(0xF1))) {
+    if (!(suit_flag & 0xF1U)) {
         fan_table[NO_HONORS] = 1;  // 无字
     }
 
     // 1110 0011
-    if (!(suit_flag & UINT8_C(0xE3))) {
+    if (!(suit_flag & 0xE3U)) {
         ++fan_table[ONE_VOIDED_SUIT];  // 缺一门（万）
     }
     // 1110 0101
-    if (!(suit_flag & UINT8_C(0xE5))) {
+    if (!(suit_flag & 0xE5U)) {
         ++fan_table[ONE_VOIDED_SUIT];  // 缺一门（条）
     }
     // 1110 1001
-    if (!(suit_flag & UINT8_C(0xE9))) {
+    if (!(suit_flag & 0xE9U)) {
         ++fan_table[ONE_VOIDED_SUIT];  // 缺一门（饼）
     }
 
     // 当缺2门时，根据有字和无字，修正为混一色和清一色
     if (fan_table[ONE_VOIDED_SUIT] == 2) {
         fan_table[ONE_VOIDED_SUIT] = 0;
-        fan_table[suit_flag & UINT8_C(0xF1) ? HALF_FLUSH : FULL_FLUSH] = 1;
+        fan_table[suit_flag & 0xF1U ? HALF_FLUSH : FULL_FLUSH] = 1;
     }
 
     // 0001 1110
-    if (suit_flag == UINT8_C(0x1E)) {  // 三门数牌和字牌都有
+    if (suit_flag == 0x1EU) {  // 三门数牌和字牌都有
         if (std::any_of(tiles, tiles + tile_cnt, &is_winds)
             && std::any_of(tiles, tiles + tile_cnt, &is_dragons)) {
             fan_table[ALL_TYPES] = 1;  // 五门齐
@@ -997,21 +989,21 @@ static void adjust_by_rank_range(const tile_t *tiles, long tile_cnt, fan_table_t
 
     // 1111 1111 1110 0001
     // 检测是否只包含1234
-    if (!(rank_flag & UINT16_C(0xFFE1))) {
+    if (!(rank_flag & 0xFFE1)) {
         // 包含4为小于五，否则为全小
-        fan_table[rank_flag & UINT16_C(0x0010) ? LOWER_FOUR : LOWER_TILES] = 1;
+        fan_table[rank_flag & 0x0010 ? LOWER_FOUR : LOWER_TILES] = 1;
         return;
     }
     // 1111 1100 0011 1111
     // 检测是否只包含6789
-    if (!(rank_flag & UINT16_C(0xFC3F))) {
+    if (!(rank_flag & 0xFC3F)) {
         // 包含6为大于五，否则为全大
-        fan_table[rank_flag & UINT16_C(0x0040) ? UPPER_FOUR : UPPER_TILES] = 1;
+        fan_table[rank_flag & 0x0040 ? UPPER_FOUR : UPPER_TILES] = 1;
         return;
     }
     // 1111 1111 1000 1111
     // 检测是否只包含456
-    if (!(rank_flag & UINT16_C(0xFF8F))) {
+    if (!(rank_flag & 0xFF8F)) {
         // 全中
         fan_table[MIDDLE_TILES] = 1;
     }
@@ -1156,17 +1148,17 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, long pack_cnt,
         case PACK_TYPE_CHOW: {
             tile_t mid_tile = pack_get_tile(concealed_packs[i]);
             if (mid_tile == win_tile) {
-                pos_flag |= 0x02;  // 嵌张
+                pos_flag |= 0x02U;  // 嵌张
             }
             else if (mid_tile + 1 == win_tile || mid_tile - 1 == win_tile) {
-                pos_flag |= 0x01;  // 边张
+                pos_flag |= 0x01U;  // 边张
             }
             break;
         }
         case PACK_TYPE_PAIR: {
             tile_t mid_tile = pack_get_tile(concealed_packs[i]);
             if (mid_tile == win_tile) {
-                pos_flag |= 0x04;  // 单钓将
+                pos_flag |= 0x04U;  // 单钓将
             }
             break;
         }
@@ -1176,13 +1168,13 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, long pack_cnt,
     }
 
     // 当多种可能存在时，只能计其中一种
-    if (pos_flag & 0x01) {
+    if (pos_flag & 0x01U) {
         fan_table[EDGE_WAIT] = 1;
     }
-    else if (pos_flag & 0x02) {
+    else if (pos_flag & 0x02U) {
         fan_table[CLOSED_WAIT] = 1;
     }
-    else if (pos_flag & 0x04) {
+    else if (pos_flag & 0x04U) {
         fan_table[SINGLE_WAIT] = 1;
     }
 }
