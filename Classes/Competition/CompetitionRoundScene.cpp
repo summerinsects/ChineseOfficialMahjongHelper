@@ -139,6 +139,10 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
 }
 
 void CompetitionRoundScene::onRankButton(cocos2d::Ref *sender) {
+
+}
+
+void CompetitionRoundScene::rankSeats(std::shared_ptr<CompetitionData> &competitionData, const std::function<void ()> &callback) {
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(80, 120));
 
@@ -163,6 +167,14 @@ void CompetitionRoundScene::onRankButton(cocos2d::Ref *sender) {
         label->setPosition(Vec2(25.0f, 110.0f - i * 25.0f));
     }
 
-    AlertView::showWithNode("排列座位", rootNode, []() {
+    AlertView::showWithNode("排列座位", rootNode, [radioGroup]() {
+        switch (radioGroup->getSelectedButtonIndex()) {
+        case 0: break;
+        case 1: break;
+        case 2: break;
+        case 3: break;
+        case 4: break;
+        default: break;
+        }
     }, nullptr);
 }

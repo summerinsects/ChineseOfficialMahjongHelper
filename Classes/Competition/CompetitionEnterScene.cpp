@@ -24,7 +24,7 @@ bool CompetitionEnterScene::initWithName(const std::string &name, unsigned num, 
     _competitionData = std::make_shared<CompetitionData>();
 
     _competitionData->name = name;
-    _competitionData->round_count = round;
+    _competitionData->round.resize(round);
     _competitionData->current_round = 0;
     _competitionData->players.resize(num);
     for (unsigned i = 0; i < num; ++i) {

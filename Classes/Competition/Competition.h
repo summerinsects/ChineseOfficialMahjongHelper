@@ -45,18 +45,23 @@ public:
     std::vector<unsigned> scores;  // 比赛分
 };
 
-class CompetitionData {
-public:
-    std::string name;  // 赛事名称
-    unsigned round_count;  // 总轮数
-    unsigned current_round;  // 当前轮数
-    std::vector<CompetitionPlayer> players;  // 参赛选手
-    std::vector<CompetitionTeam> teams;  // 参赛队伍
-};
-
 struct CompetitionTable {
     unsigned serial;  // 编号
     size_t player_indices[4];  // 参赛选手
+};
+
+class CompetitionRound {
+public:
+    std::vector<CompetitionTable> tables;  // 桌
+};
+
+class CompetitionData {
+public:
+    std::string name;  // 赛事名称
+    std::vector<CompetitionPlayer> players;  // 参赛选手
+    std::vector<CompetitionTeam> teams;  // 参赛队伍
+    std::vector<CompetitionRound> round;
+    unsigned current_round;  // 当前轮数
 };
 
 #endif
