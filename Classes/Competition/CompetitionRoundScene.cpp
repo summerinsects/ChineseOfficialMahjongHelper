@@ -119,7 +119,7 @@ static std::string getStandardScoreString(unsigned s) {
 }
 
 cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *[7], ui::EditBox *, LayerColor *[2]> CustomCell;
+    typedef cw::TableViewCellEx<Label *[7], LayerColor *[2]> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
@@ -127,8 +127,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *(&labels)[7] = std::get<0>(ext);
-        ui::EditBox *&editBox = std::get<1>(ext);
-        LayerColor *(&layerColor)[2] = std::get<2>(ext);
+        LayerColor *(&layerColor)[2] = std::get<1>(ext);
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -149,8 +148,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
 
     const CustomCell::ExtDataType ext = cell->getExtData();
     Label *const (&labels)[7] = std::get<0>(ext);
-    ui::EditBox *editBox = std::get<1>(ext);
-    LayerColor *const (&layerColor)[2] = std::get<2>(ext);
+    LayerColor *const (&layerColor)[2] = std::get<1>(ext);
 
     layerColor[0]->setVisible(!(idx & 1));
     layerColor[1]->setVisible(!!(idx & 1));
