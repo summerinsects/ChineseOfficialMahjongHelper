@@ -3,12 +3,15 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 // 成绩
 struct CompetitionResult {
     unsigned rank;  // 顺位
     float standard_score;  // 标准分
     int competition_score;  // 比赛分
+
+    static std::string getStandardScoreString(float ss);
 };
 
 class CompetitionTeam;
@@ -20,6 +23,9 @@ public:
     std::string name;  // 姓名
     std::vector<CompetitionResult> competition_results;  // 每轮成绩
     CompetitionTeam *team;  // 所在队伍
+
+    std::pair<float, int> getTotalScoresByRound(size_t round) const;
+    std::pair<float, int> getCurrentScoresByRound(size_t round) const;
 };
 
 // 队伍

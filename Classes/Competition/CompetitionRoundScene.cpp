@@ -121,33 +121,6 @@ cocos2d::Size CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table,
     return Size(0, 30);
 }
 
-
-static std::pair<float, int> getScoresTotalByRound(const CompetitionPlayer &p, size_t round) {
-    float ss = 0;
-    int cs = 0;
-    round = std::min(p.competition_results.size(), round);
-    for (size_t i = 0; i < round; ++i) {
-        ss += p.competition_results[i].standard_score;
-        cs += p.competition_results[i].competition_score;
-    }
-    return std::make_pair(ss, cs);
-}
-
-static std::pair<float, int> getScoresCurrentByRound(const CompetitionPlayer &p, size_t round) {
-    if (p.competition_results.size() > round) {
-        return std::make_pair(p.competition_results[round].standard_score, p.competition_results[round].competition_score);
-    }
-    return std::make_pair(0.0f, 0);
-}
-
-static std::string getStandardScoreString(float ss) {
-    std::ostringstream os;
-    os << ss;
-    std::string ret1 = os.str();
-    std::string ret2 = Common::format<32>("%.3f", ss);
-    return ret1.length() < ret2.length() ? ret1 : ret2;
-}
-
 cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
     typedef cw::TableViewCellEx<Label *[7], LayerColor *[2]> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
@@ -188,14 +161,14 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     labels[1]->setString(std::to_string(player.serial));
     labels[2]->setString(player.name);
 
-    std::pair<float, int> ret = getScoresCurrentByRound(player, _currentRound);
-    labels[3]->setString(getStandardScoreString(ret.first));
+    std::pair<float, int> ret = player.getCurrentScoresByRound(_currentRound);
+    labels[3]->setString(CompetitionResult::getStandardScoreString(ret.first));
     Common::scaleLabelToFitWidth(labels[3], _colWidth[3] - 4);
     labels[4]->setString(std::to_string(ret.second));
     Common::scaleLabelToFitWidth(labels[4], _colWidth[4] - 4);
 
-    ret = getScoresTotalByRound(player, _currentRound);
-    labels[5]->setString(getStandardScoreString(ret.first));
+    ret = player.getTotalScoresByRound(_currentRound);
+    labels[5]->setString(CompetitionResult::getStandardScoreString(ret.first));
     Common::scaleLabelToFitWidth(labels[5], _colWidth[5] - 4);
     labels[6]->setString(std::to_string(ret.second));
     Common::scaleLabelToFitWidth(labels[6], _colWidth[6] - 4);
