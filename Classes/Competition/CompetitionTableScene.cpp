@@ -287,8 +287,9 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
 
 void CompetitionTableScene::rankBySerial() {
     std::vector<CompetitionPlayer> &players = _competitionData->players;
-    _competitionTables->resize(players.size() / 4);
-    for (size_t i = 0, cnt = players.size(); i < cnt; i += 4) {
+    const size_t cnt = players.size();
+    _competitionTables->resize(cnt / 4);
+    for (size_t i = 0; i < cnt; i += 4) {
         CompetitionTable &table = _competitionTables->at(i / 4);
         table.players[0] = &players[i];
         table.players[1] = &players[i + 1];
@@ -299,14 +300,15 @@ void CompetitionTableScene::rankBySerial() {
 
 void CompetitionTableScene::rankByRandom() {
     std::vector<CompetitionPlayer> &players = _competitionData->players;
-    _competitionTables->resize(players.size() / 4);
+    const size_t cnt = players.size();
+    _competitionTables->resize(cnt / 4);
 
     std::vector<CompetitionPlayer *> temp;
     temp.reserve(players.size());
     std::transform(players.begin(), players.end(), std::back_inserter(temp), [](CompetitionPlayer &p) { return &p; });
     std::random_shuffle(temp.begin(), temp.end());
 
-    for (size_t i = 0, cnt = temp.size(); i < cnt; i += 4) {
+    for (size_t i = 0; i < cnt; i += 4) {
         CompetitionTable &table = _competitionTables->at(i / 4);
         table.players[0] = temp[i];
         table.players[1] = temp[i + 1];
