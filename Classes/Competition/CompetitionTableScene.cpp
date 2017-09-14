@@ -322,7 +322,21 @@ void CompetitionTableScene::rankByScores() {
 }
 
 void CompetitionTableScene::rankBySerialSnake() {
+    std::vector<CompetitionPlayer> &players = _competitionData->players;
+    const size_t cnt = players.size();
+    _competitionTables->resize(cnt / 4);
 
+    size_t east = 0;
+    size_t south = players.size() / 2 - 1;
+    size_t west = south + 1;
+    size_t north = players.size() - 1;
+    for (size_t i = 0; i < cnt; i += 4) {
+        CompetitionTable &table = _competitionTables->at(i / 4);
+        table.players[0] = &players[east++];
+        table.players[1] = &players[south--];
+        table.players[2] = &players[west++];
+        table.players[3] = &players[north--];
+    }
 }
 
 void CompetitionTableScene::rankByScoresSnake() {
@@ -357,7 +371,7 @@ void CompetitionTableScene::onRankButton(cocos2d::Ref *sender) {
     AlertView::showWithNode("排列座位", rootNode, [this, radioGroup]() {
         switch (radioGroup->getSelectedButtonIndex()) {
         case 0: rankByRandom(); _tableView->reloadData(); break;
-        case 1: break;
+        case 1: rankBySerialSnake(); _tableView->reloadData(); break;
         case 2: break;
         case 3: break;
         case 4: break;
