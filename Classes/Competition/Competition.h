@@ -3,52 +3,41 @@
 
 #include <string>
 #include <vector>
-#include <utility>
 
-// 4 2 1 0
-// 并列12：(4+2)/2=3
-// 并列23：(2+1)/2=1.5
-// 并列34：(1+0)/2=0.5
-// 并列123：(4+2+1)/3=2.333
-// 并列234：(2+1+0)/3=1
-// 并列1234：(4+2+1+0)/4=1.75
-
-enum RANK_TYPE {
-    RANK_1, RANK_TIED_12, RANK_TIED_123, RANK_TIED_1234,
-    RANK_2, RANK_TIED_23, RANK_TIED_234,
-    RANK_3, RANK_TIED_34,
-    RANK_4
+// 成绩
+struct CompetitionResult {
+    unsigned rank;  // 顺位
+    float standard_score;  // 标准分
+    int competition_score;  // 比赛分
 };
 
-// *12 使得所有分化为整数
-static const unsigned standard_score_12[] = {
-    48, 36, 28, 21,
-    24, 18, 12,
-    12, 6,
-    0
-};
+class CompetitionTeam;
 
+// 队员
 class CompetitionPlayer {
 public:
     unsigned serial;  // 编号
     std::string name;  // 姓名
-    std::vector<std::pair<RANK_TYPE, int> > scores;
-    size_t team_index;  // 队伍索引
+    std::vector<CompetitionResult> competition_results;  // 每轮成绩
+    CompetitionTeam *team;  // 所在队伍
 };
 
+// 队伍
 class CompetitionTeam {
 public:
     unsigned serial;  // 编号
     std::string name;  // 队名
-    std::vector<size_t> player_indices;  // 队员
-    std::vector<std::pair<RANK_TYPE, int> > scores;
+    std::vector<CompetitionPlayer *> player_indices;  // 队员
+    std::vector<CompetitionResult> scores;  // 全队成绩
 };
 
+// 桌
 struct CompetitionTable {
     unsigned serial;  // 编号
-    size_t player_indices[4];  // 参赛选手
+    CompetitionPlayer *players[4];  // 参赛选手
 };
 
+// 轮
 class CompetitionRound {
 public:
     std::vector<CompetitionTable> tables;  // 桌
@@ -59,7 +48,7 @@ public:
     std::string name;  // 赛事名称
     std::vector<CompetitionPlayer> players;  // 参赛选手
     std::vector<CompetitionTeam> teams;  // 参赛队伍
-    std::vector<CompetitionRound> round;
+    std::vector<CompetitionRound> round;  // 每一轮数据
     unsigned current_round;  // 当前轮数
 };
 

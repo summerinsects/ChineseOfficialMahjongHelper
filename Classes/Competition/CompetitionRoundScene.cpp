@@ -122,30 +122,29 @@ cocos2d::Size CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table,
 }
 
 
-static std::pair<unsigned, int> getScoresTotalByRound(const CompetitionPlayer &p, size_t round) {
-    unsigned r = 0;
-    int s = 0;
-    round = std::min(p.scores.size(), round);
+static std::pair<float, int> getScoresTotalByRound(const CompetitionPlayer &p, size_t round) {
+    float ss = 0;
+    int cs = 0;
+    round = std::min(p.competition_results.size(), round);
     for (size_t i = 0; i < round; ++i) {
-        r += standard_score_12[p.scores[i].first];
-        s += p.scores[i].second;
+        ss += p.competition_results[i].standard_score;
+        cs += p.competition_results[i].competition_score;
     }
-    return std::make_pair(r, s);
+    return std::make_pair(ss, cs);
 }
 
-static std::pair<unsigned, int> getScoresCurrentByRound(const CompetitionPlayer &p, size_t round) {
-    if (p.scores.size() > round) {
-        return std::make_pair(standard_score_12[p.scores[round].first], p.scores[round].second);
+static std::pair<float, int> getScoresCurrentByRound(const CompetitionPlayer &p, size_t round) {
+    if (p.competition_results.size() > round) {
+        return std::make_pair(p.competition_results[round].standard_score, p.competition_results[round].competition_score);
     }
-    return std::make_pair(0U, 0);
+    return std::make_pair(0.0f, 0);
 }
 
-static std::string getStandardScoreString(unsigned s) {
-    float a = s / 12.0f;
+static std::string getStandardScoreString(float ss) {
     std::ostringstream os;
-    os << a;
+    os << ss;
     std::string ret1 = os.str();
-    std::string ret2 = Common::format<32>("%.3f", a);
+    std::string ret2 = Common::format<32>("%.3f", ss);
     return ret1.length() < ret2.length() ? ret1 : ret2;
 }
 
@@ -189,7 +188,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     labels[1]->setString(std::to_string(player.serial));
     labels[2]->setString(player.name);
 
-    std::pair<unsigned, int> ret = getScoresCurrentByRound(player, _currentRound);
+    std::pair<float, int> ret = getScoresCurrentByRound(player, _currentRound);
     labels[3]->setString(getStandardScoreString(ret.first));
     Common::scaleLabelToFitWidth(labels[3], _colWidth[3] - 4);
     labels[4]->setString(std::to_string(ret.second));
