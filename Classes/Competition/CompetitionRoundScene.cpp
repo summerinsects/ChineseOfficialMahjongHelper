@@ -177,42 +177,5 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
 }
 
 void CompetitionRoundScene::onRankButton(cocos2d::Ref *sender) {
-    rankSeats(_competitionData, nullptr);
-}
 
-void CompetitionRoundScene::rankSeats(std::shared_ptr<CompetitionData> &competitionData, const std::function<void ()> &callback) {
-    Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(80, 120));
-
-    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
-    rootNode->addChild(radioGroup);
-
-    static const char *titles[] = { "随机", "编号蛇形", "排名蛇形", "高高碰", "自定义" };
-
-    for (int i = 0; i < 5; ++i) {
-        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        rootNode->addChild(radioButton);
-        radioButton->setZoomScale(0.0f);
-        radioButton->ignoreContentAdaptWithSize(false);
-        radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(10.0f, 110.0f - i * 25.0f));
-        radioGroup->addRadioButton(radioButton);
-
-        Label *label = Label::createWithSystemFont(titles[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
-        rootNode->addChild(label);
-        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(25.0f, 110.0f - i * 25.0f));
-    }
-
-    AlertView::showWithNode("排列座位", rootNode, [radioGroup]() {
-        switch (radioGroup->getSelectedButtonIndex()) {
-        case 0: break;
-        case 1: break;
-        case 2: break;
-        case 3: break;
-        case 4: break;
-        default: break;
-        }
-    }, nullptr);
 }

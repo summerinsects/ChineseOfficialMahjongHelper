@@ -13,8 +13,6 @@ public:
 
     static CompetitionRoundScene *create(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound);
 
-    static void rankSeats(std::shared_ptr<CompetitionData> &competitionData, const std::function<void ()> &callback);
-
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
     virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
