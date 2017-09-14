@@ -9,9 +9,9 @@ class CompetitionPlayer;
 
 class CompetitionRoundScene : public BaseScene, cw::TableViewDelegate {
 public:
-    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData);
+    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound);
 
-    static CompetitionRoundScene *create(const std::shared_ptr<CompetitionData> &competitionData);
+    static CompetitionRoundScene *create(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound);
 
     static void rankSeats(std::shared_ptr<CompetitionData> &competitionData, const std::function<void ()> &callback);
 
@@ -26,6 +26,8 @@ private:
     float _posX[7];
 
     std::shared_ptr<CompetitionData> _competitionData;
+    unsigned _currentRound;
+
     std::vector<CompetitionPlayer *> _players;
 };
 

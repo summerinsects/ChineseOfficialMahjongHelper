@@ -209,7 +209,7 @@ void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
     }
 
     // TODO:
-    Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData));
+    Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, 0));
 }
 
 void CompetitionEnterScene::onNameButton(cocos2d::Ref *sender) {

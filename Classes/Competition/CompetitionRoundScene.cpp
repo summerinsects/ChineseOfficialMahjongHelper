@@ -5,9 +5,9 @@
 
 USING_NS_CC;
 
-CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<CompetitionData> &competitionData) {
+CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound) {
     CompetitionRoundScene *ret = new (std::nothrow) CompetitionRoundScene();
-    if (ret != nullptr && ret->initWithData(competitionData)) {
+    if (ret != nullptr && ret->initWithData(competitionData, currentRound)) {
         ret->autorelease();
         return ret;
     }
@@ -15,12 +15,13 @@ CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<Compe
     return nullptr;
 }
 
-bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData) {
-    if (UNLIKELY(!BaseScene::initWithTitle("第N轮"))) {
+bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound) {
+    if (UNLIKELY(!BaseScene::initWithTitle(Common::format<256>("%s第%u轮", competitionData->name.c_str(), currentRound + 1)))) {
         return false;
     }
 
     _competitionData = competitionData;
+    _currentRound = currentRound;
 
     _players.reserve(competitionData->players.size());
     std::transform(competitionData->players.begin(), competitionData->players.end(), std::back_inserter(_players),
@@ -29,8 +30,23 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    // 排列座位按钮
+    // 上一轮按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("上一轮");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 65, origin.y + visibleSize.height - 70.0f));
+    button->addClickEventListener([this](Ref *) {
+        if (_currentRound > 0) {
+            Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, _currentRound - 1));
+        }
+    });
+    button->setEnabled(_currentRound > 0);
+
+    // 排列座位按钮
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -38,6 +54,21 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setTitleText("排列座位");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 70.0f));
     button->addClickEventListener(std::bind(&CompetitionRoundScene::onRankButton, this, std::placeholders::_1));
+
+    // 下一轮按钮
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("下一轮");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 65, origin.y + visibleSize.height - 70.0f));
+    button->addClickEventListener([this](Ref *) {
+        if (_currentRound < _competitionData->round.size()) {
+            Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, _currentRound + 1));
+        }
+    });
+    button->setEnabled(_currentRound < _competitionData->round.size());
 
     _colWidth[0] = visibleSize.width * 0.1f;
     _colWidth[1] = visibleSize.width * 0.1f;
@@ -158,13 +189,13 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     labels[1]->setString(std::to_string(player.serial));
     labels[2]->setString(player.name);
 
-    std::pair<unsigned, int> ret = getScoresCurrentByRound(player, _competitionData->current_round);
+    std::pair<unsigned, int> ret = getScoresCurrentByRound(player, _currentRound);
     labels[3]->setString(getStandardScoreString(ret.first));
     Common::scaleLabelToFitWidth(labels[3], _colWidth[3] - 4);
     labels[4]->setString(std::to_string(ret.second));
     Common::scaleLabelToFitWidth(labels[4], _colWidth[4] - 4);
 
-    ret = getScoresTotalByRound(player, _competitionData->current_round);
+    ret = getScoresTotalByRound(player, _currentRound);
     labels[5]->setString(getStandardScoreString(ret.first));
     Common::scaleLabelToFitWidth(labels[5], _colWidth[5] - 4);
     labels[6]->setString(std::to_string(ret.second));
