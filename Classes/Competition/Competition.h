@@ -84,6 +84,8 @@ public:
 
     static void fromJson(const rapidjson::Value &json, CompetitionData &data);
     static void toJson(const CompetitionData &data, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
+
+    bool isRoundStarted(unsigned round) const;
 };
 
 #endif

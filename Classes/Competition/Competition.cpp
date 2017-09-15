@@ -59,6 +59,12 @@ void CompetitionRound::sortPlayers(unsigned round, const std::vector<Competition
     std::transform(ptemp.begin(), ptemp.end(), std::back_inserter(output), [](ScoresSortInfo *pssi) { return pssi->player; });
 }
 
+bool CompetitionData::isRoundStarted(unsigned round) const {
+    return std::any_of(players.begin(), players.end(), [round](const CompetitionPlayer &player) {
+        return player.competition_results[round].rank != 0;
+    });
+}
+
 void CompetitionResult::fromJson(const rapidjson::Value &json, CompetitionResult &result) {
     rapidjson::Value::ConstMemberIterator it = json.FindMember("rank");
     if (it != json.MemberEnd() && it->value.IsUint()) {

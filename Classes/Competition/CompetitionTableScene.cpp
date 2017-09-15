@@ -518,6 +518,11 @@ void CompetitionTableScene::rankByScoresSnake() {
 }
 
 void CompetitionTableScene::onRankButton(cocos2d::Ref *sender) {
+    if (_competitionData->isRoundStarted(_currentRound)) {
+        AlertView::showWithMessage("排列座位", "开始记录成绩后不允许重新排座位", 12, nullptr, nullptr);
+        return;
+    }
+
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(80, 120));
 
