@@ -69,7 +69,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
             Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, _currentRound + 1));
         }
     });
-    button->setEnabled(_currentRound < _competitionData->rounds.size());
+    button->setEnabled(_currentRound + 1 < _competitionData->rounds.size());
 
     _colWidth[0] = visibleSize.width * 0.1f;
     _colWidth[1] = visibleSize.width * 0.1f;
