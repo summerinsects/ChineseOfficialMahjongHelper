@@ -2,6 +2,7 @@
 #include "Competition.h"
 #include "../common.h"
 #include "../widget/AlertView.h"
+#include <array>
 
 USING_NS_CC;
 
@@ -122,23 +123,23 @@ cocos2d::Size CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table,
 }
 
 cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *[7], LayerColor *[2]> CustomCell;
+    typedef cw::TableViewCellEx<std::array<Label *, 7>, std::array<LayerColor *, 2> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        Label *(&labels)[7] = std::get<0>(ext);
-        LayerColor *(&layerColor)[2] = std::get<1>(ext);
+        std::array<Label *, 7> &labels = std::get<0>(ext);
+        std::array<LayerColor *, 2> &layerColors = std::get<1>(ext);
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
-        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 29);
-        cell->addChild(layerColor[0]);
+        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 29);
+        cell->addChild(layerColors[0]);
 
-        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 29);
-        cell->addChild(layerColor[1]);
+        layerColors[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 29);
+        cell->addChild(layerColors[1]);
 
         for (int i = 0; i < 7; ++i) {
             Label *label = Label::createWithSystemFont("", "Arail", 12);
@@ -150,11 +151,11 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     }
 
     const CustomCell::ExtDataType ext = cell->getExtData();
-    Label *const (&labels)[7] = std::get<0>(ext);
-    LayerColor *const (&layerColor)[2] = std::get<1>(ext);
+    const std::array<Label *, 7> &labels = std::get<0>(ext);
+    const std::array<LayerColor *, 2> &layerColors = std::get<1>(ext);
 
-    layerColor[0]->setVisible(!(idx & 1));
-    layerColor[1]->setVisible(!!(idx & 1));
+    layerColors[0]->setVisible(!(idx & 1));
+    layerColors[1]->setVisible(!!(idx & 1));
 
     const CompetitionPlayer &player = *_players[idx];
     labels[0]->setString(std::to_string(idx + 1));

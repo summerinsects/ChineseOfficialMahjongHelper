@@ -3,6 +3,7 @@
 #include "Competition.h"
 #include "../common.h"
 #include "../widget/AlertView.h"
+#include <array>
 
 USING_NS_CC;
 
@@ -96,7 +97,7 @@ cocos2d::Size CompetitionEnterScene::tableCellSizeForIndex(cw::TableView *table,
 }
 
 cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *[4], ui::Button *[2], LayerColor *[2]> CustomCell;
+    typedef cw::TableViewCellEx<std::array<Label *, 4>, std::array<ui::Button *, 2>, std::array<LayerColor *, 2> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -105,15 +106,15 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        Label *(&labels)[4] = std::get<0>(ext);
-        ui::Button *(&buttons)[2] = std::get<1>(ext);
-        LayerColor *(&layerColor)[2] = std::get<2>(ext);
+        std::array<Label *, 4> &labels = std::get<0>(ext);
+        std::array<ui::Button *, 2> &buttons = std::get<1>(ext);
+        std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
-        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 29);
-        cell->addChild(layerColor[0]);
+        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 29);
+        cell->addChild(layerColors[0]);
 
-        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 29);
-        cell->addChild(layerColor[1]);
+        layerColors[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 29);
+        cell->addChild(layerColors[1]);
 
         Label *label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(Color3B::BLACK);
@@ -157,12 +158,12 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
     }
 
     const CustomCell::ExtDataType ext = cell->getExtData();
-    Label *const (&labels)[4] = std::get<0>(ext);
-    ui::Button *const (&buttons)[2] = std::get<1>(ext);
-    LayerColor *const (&layerColor)[2] = std::get<2>(ext);
+    const std::array<Label *, 4> &labels = std::get<0>(ext);
+    const std::array<ui::Button *, 2> &buttons = std::get<1>(ext);
+    const std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
-    layerColor[0]->setVisible(!(idx & 1));
-    layerColor[1]->setVisible(!!(idx & 1));
+    layerColors[0]->setVisible(!(idx & 1));
+    layerColors[1]->setVisible(!!(idx & 1));
 
     size_t idx0 = idx << 1;
     size_t idx1 = idx0 | 1;

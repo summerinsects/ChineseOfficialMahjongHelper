@@ -95,7 +95,8 @@ cocos2d::Size CompetitionTableScene::tableCellSizeForIndex(cw::TableView *table,
 }
 
 cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *, Label *[4], Label *[4], Label *[4], Label *[4], ui::Button *, LayerColor *[2]> CustomCell;
+    typedef cw::TableViewCellEx<Label *, std::array<Label *, 4>, std::array<Label *, 4>, std::array<Label *, 4>, std::array<Label *, 4>,
+        ui::Button *, std::array<LayerColor *, 2> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
@@ -103,12 +104,12 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&tableLabel = std::get<0>(ext);
-        Label *(&serialLabels)[4] = std::get<1>(ext);
-        Label *(&nameLabels)[4] = std::get<2>(ext);
-        Label *(&standardLabels)[4] = std::get<3>(ext);
-        Label *(&competitionLabels)[4] = std::get<4>(ext);
+        std::array<Label *, 4> &serialLabels = std::get<1>(ext);
+        std::array<Label *, 4> &nameLabels = std::get<2>(ext);
+        std::array<Label *, 4> &standardLabels = std::get<3>(ext);
+        std::array<Label *, 4> &competitionLabels = std::get<4>(ext);
         ui::Button *&button = std::get<5>(ext);
-        LayerColor *(&layerColors)[2] = std::get<6>(ext);
+        std::array<LayerColor *, 2> &layerColors = std::get<6>(ext);
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -168,12 +169,12 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
 
     const CustomCell::ExtDataType ext = cell->getExtData();
     Label *tableLabel = std::get<0>(ext);
-    Label *const (&serialLabels)[4] = std::get<1>(ext);
-    Label *const (&nameLabels)[4] = std::get<2>(ext);
-    Label *const (&standardLabels)[4] = std::get<3>(ext);
-    Label *const (&competitionLabels)[4] = std::get<4>(ext);
+    const std::array<Label *, 4> &serialLabels = std::get<1>(ext);
+    const std::array<Label *, 4> &nameLabels = std::get<2>(ext);
+    const std::array<Label *, 4> &standardLabels = std::get<3>(ext);
+    const std::array<Label *, 4> &competitionLabels = std::get<4>(ext);
     ui::Button *button = std::get<5>(ext);
-    LayerColor *const (&layerColors)[2] = std::get<6>(ext);
+    const std::array<LayerColor *, 2> &layerColors = std::get<6>(ext);
 
     layerColors[0]->setVisible(!(idx & 1));
     layerColors[1]->setVisible(!!(idx & 1));
