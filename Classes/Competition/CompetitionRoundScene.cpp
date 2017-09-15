@@ -179,6 +179,9 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
 
 void CompetitionRoundScene::onRankButton(cocos2d::Ref *sender) {
     CompetitionTableScene *scene = CompetitionTableScene::create(_competitionData, _currentRound);
-    scene->setOnExitCallback(std::bind(&cw::TableView::reloadData, _tableView));
+    scene->setOnExitCallback([this]() {
+        CompetitionRound::sortPlayers(_currentRound, _competitionData->players, _players);
+        _tableView->reloadData();
+    });
     Director::getInstance()->pushScene(scene);
 }
