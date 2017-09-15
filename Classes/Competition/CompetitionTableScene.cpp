@@ -22,7 +22,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
 
     _competitionData = competitionData;
     _currentRound = currentRound;
-    _competitionTables = &_competitionData->round[currentRound].tables;
+    _competitionTables = &_competitionData->rounds[currentRound].tables;
 
     if (_competitionTables->empty()) {
         rankBySerial();
@@ -179,16 +179,19 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
 
     tableLabel->setString(std::to_string(idx + 1));
 
+    const std::vector<CompetitionPlayer> &players = _competitionData->players;
+
     for (int i = 0; i < 4; ++i) {
         const CompetitionTable &currentTable = _competitionTables->at(idx);
-        const CompetitionPlayer *player = currentTable.players[i];
-        if (player == nullptr) {
+        ptrdiff_t playerIndex = currentTable.player_indices[i];
+        if (playerIndex == INVALID_INDEX) {
             serialLabels[i]->setString("");
             nameLabels[i]->setString("");
             standardLabels[i]->setString("");
             competitionLabels[i]->setString("");
         }
         else {
+            const CompetitionPlayer *player = &players[currentTable.player_indices[i]];
             serialLabels[i]->setString(std::to_string(player->serial));
             nameLabels[i]->setString(player->name);
             std::pair<float, int> ret = player->getCurrentScoresByRound(_currentRound);
@@ -255,8 +258,10 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         Common::scaleLabelToFitWidth(label, colWidth[i]);
     }
 
+    std::vector<CompetitionPlayer> &players = _competitionData->players;
+
     for (int i = 0; i < 4; ++i) {
-        CompetitionPlayer *player = currentTable.players[i];
+        CompetitionPlayer *player = &players[currentTable.player_indices[i]];
 
         Label *label = Label::createWithSystemFont(std::to_string(player->serial), "Arail", 12);
         label->setColor(Color3B::BLACK);
@@ -303,13 +308,14 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     }
 
     AlertView::showWithNode(Common::format<128>("第%lu桌成绩", (unsigned long)table + 1), drawNode, [this, table, labels]() {
+        std::vector<CompetitionPlayer> &players = _competitionData->players;
         CompetitionTable &currentTable = _competitionTables->at(table);
         for (int i = 0; i < 4; ++i) {
             const std::string &rank = labels[i][0]->getString();
             const std::string &ss = labels[i][1]->getString();
             const std::string &cs = labels[i][2]->getString();
 
-            CompetitionResult &result = currentTable.players[i]->competition_results[_currentRound];
+            CompetitionResult &result = players[currentTable.player_indices[i]].competition_results[_currentRound];
             result.rank = atoi(rank.c_str());
             result.standard_score = atof(ss.c_str());
             result.competition_score = atoi(cs.c_str());
@@ -424,12 +430,12 @@ void CompetitionTableScene::rankBySerial() {
     std::vector<CompetitionPlayer> &players = _competitionData->players;
     const size_t cnt = players.size();
     _competitionTables->resize(cnt / 4);
-    for (size_t i = 0; i < cnt; i += 4) {
+    for (size_t i = 0; i < cnt; ) {
         CompetitionTable &table = _competitionTables->at(i / 4);
-        table.players[0] = &players[i];
-        table.players[1] = &players[i + 1];
-        table.players[2] = &players[i + 2];
-        table.players[3] = &players[i + 3];
+        table.player_indices[0] = i++;
+        table.player_indices[1] = i++;
+        table.player_indices[2] = i++;
+        table.player_indices[3] = i++;
     }
 }
 
@@ -444,10 +450,10 @@ void CompetitionTableScene::rankBySerialSnake() {
     size_t north = cnt - 1;
     for (size_t i = 0; i < cnt; i += 4) {
         CompetitionTable &table = _competitionTables->at(i / 4);
-        table.players[0] = &players[east++];
-        table.players[1] = &players[south--];
-        table.players[2] = &players[west++];
-        table.players[3] = &players[north--];
+        table.player_indices[0] = east++;
+        table.player_indices[1] = south--;
+        table.player_indices[2] = west++;
+        table.player_indices[3] = north--;
     }
 }
 
@@ -461,12 +467,12 @@ void CompetitionTableScene::rankByRandom() {
     std::transform(players.begin(), players.end(), std::back_inserter(temp), [](CompetitionPlayer &p) { return &p; });
     std::random_shuffle(temp.begin(), temp.end());
 
-    for (size_t i = 0; i < cnt; i += 4) {
+    for (size_t i = 0; i < cnt; ) {
         CompetitionTable &table = _competitionTables->at(i / 4);
-        table.players[0] = temp[i];
-        table.players[1] = temp[i + 1];
-        table.players[2] = temp[i + 2];
-        table.players[3] = temp[i + 3];
+        table.player_indices[0] = temp[i++] - &players[0];
+        table.player_indices[1] = temp[i++] - &players[0];
+        table.player_indices[2] = temp[i++] - &players[0];
+        table.player_indices[3] = temp[i++] - &players[0];
     }
 }
 
@@ -511,12 +517,12 @@ void CompetitionTableScene::rankByScores() {
     sortByInfo(temp, ptemp);
 
     // 排座位
-    for (size_t i = 0; i < cnt; i += 4) {
+    for (size_t i = 0; i < cnt; ) {
         CompetitionTable &table = _competitionTables->at(i / 4);
-        table.players[0] = ptemp[i]->player;
-        table.players[1] = ptemp[i + 1]->player;
-        table.players[2] = ptemp[i + 2]->player;
-        table.players[3] = ptemp[i + 3]->player;
+        table.player_indices[0] = ptemp[i++]->player - &players[0];
+        table.player_indices[1] = ptemp[i++]->player - &players[0];
+        table.player_indices[2] = ptemp[i++]->player - &players[0];
+        table.player_indices[3] = ptemp[i++]->player - &players[0];
     }
 }
 
@@ -537,10 +543,10 @@ void CompetitionTableScene::rankByScoresSnake() {
     size_t north = cnt - 1;
     for (size_t i = 0; i < cnt; i += 4) {
         CompetitionTable &table = _competitionTables->at(i / 4);
-        table.players[0] = &players[east++];
-        table.players[1] = &players[south--];
-        table.players[2] = &players[west++];
-        table.players[3] = &players[north--];
+        table.player_indices[0] = ptemp[east++]->player - &players[0];
+        table.player_indices[1] = ptemp[south--]->player - &players[0];
+        table.player_indices[2] = ptemp[west++]->player - &players[0];
+        table.player_indices[3] = ptemp[north--]->player - &players[0];
     }
 }
 

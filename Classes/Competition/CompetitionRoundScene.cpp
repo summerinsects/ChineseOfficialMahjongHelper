@@ -64,11 +64,11 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setTitleText("下一轮");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 65, origin.y + visibleSize.height - 70.0f));
     button->addClickEventListener([this](Ref *) {
-        if (_currentRound < _competitionData->round.size()) {
+        if (_currentRound < _competitionData->rounds.size()) {
             Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, _currentRound + 1));
         }
     });
-    button->setEnabled(_currentRound < _competitionData->round.size());
+    button->setEnabled(_currentRound < _competitionData->rounds.size());
 
     _colWidth[0] = visibleSize.width * 0.1f;
     _colWidth[1] = visibleSize.width * 0.1f;

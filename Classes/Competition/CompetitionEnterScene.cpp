@@ -24,7 +24,7 @@ bool CompetitionEnterScene::initWithName(const std::string &name, unsigned num, 
     _competitionData = std::make_shared<CompetitionData>();
 
     _competitionData->name = name;
-    _competitionData->round.resize(round);
+    _competitionData->rounds.resize(round);
     _competitionData->current_round = 0;
     _competitionData->players.resize(num);
     for (unsigned i = 0; i < num; ++i) {
@@ -200,7 +200,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
 void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
     for (size_t i = 0, cnt = _competitionData->players.size(); i < cnt; ++i) {
         _competitionData->players.at(i).name = Common::format<32>("%lu号选手", (unsigned long)i + 1);
-        _competitionData->players.at(i).competition_results.resize(_competitionData->round.size());
+        _competitionData->players.at(i).competition_results.resize(_competitionData->rounds.size());
     }
 
     if (std::any_of(_competitionData->players.begin(), _competitionData->players.end(),
