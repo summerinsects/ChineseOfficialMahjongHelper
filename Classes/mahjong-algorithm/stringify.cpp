@@ -26,21 +26,21 @@
 namespace mahjong {
 
 // 解析牌实现函数
-static long parse_tiles_impl(const char *str, tile_t *tiles, long max_cnt, long *out_tile_cnt) {
+static intptr_t parse_tiles_impl(const char *str, tile_t *tiles, intptr_t max_cnt, intptr_t *out_tile_cnt) {
     //if (strspn(str, "123456789mpsESWNCFP") != strlen(str)) {
     //    return PARSE_ERROR_ILLEGAL_CHARACTER;
     //}
 
-    long tile_cnt = 0;
+    intptr_t tile_cnt = 0;
 
 #define SET_SUIT_FOR_NUMBERED(value_)       \
-    for (long i = tile_cnt; i > 0;) {       \
+    for (intptr_t i = tile_cnt; i > 0;) {   \
         if (tiles[--i] & 0xF0) break;       \
         tiles[i] |= value_;                 \
         } (void)0
 
 #define SET_SUIT_FOR_HONOR() \
-    for (long i = tile_cnt; i > 0;) {       \
+    for (intptr_t i = tile_cnt; i > 0;) {   \
         if (tiles[--i] & 0xF0) break;       \
         if (tiles[i] > 7) return PARSE_ERROR_ILLEGAL_CHARACTER; \
         tiles[i] |= 0x40;                   \
@@ -108,8 +108,8 @@ parse_finish:
 }
 
 // 解析牌
-long parse_tiles(const char *str, tile_t *tiles, long max_cnt) {
-    long tile_cnt;
+intptr_t parse_tiles(const char *str, tile_t *tiles, intptr_t max_cnt) {
+    intptr_t tile_cnt;
     if (parse_tiles_impl(str, tiles, max_cnt, &tile_cnt) > 0) {
         return tile_cnt;
     }
@@ -117,7 +117,7 @@ long parse_tiles(const char *str, tile_t *tiles, long max_cnt) {
 }
 
 // 生成副露
-static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
+static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *pack) {
     if (tile_cnt > 0) {
         if (tile_cnt != 3 && tile_cnt != 4) {
             return PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK;
@@ -162,17 +162,17 @@ static long make_fixed_pack(const tile_t *tiles, long tile_cnt, pack_t *pack) {
 }
 
 // 字符串转换为手牌结构和上牌
-long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile) {
+intptr_t string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile) {
     size_t len = strlen(str);
     if (strspn(str, "0123456789mpszESWNCFP []") != len) {
         return PARSE_ERROR_ILLEGAL_CHARACTER;
     }
 
     pack_t packs[4];
-    long pack_cnt = 0;
+    intptr_t pack_cnt = 0;
     bool is_concealed_kong = false;
     tile_t tiles[14];
-    long tile_cnt = 0;
+    intptr_t tile_cnt = 0;
 
     const char *p = str;
     while (char c = *p) {
@@ -182,7 +182,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
             if (pack_cnt > 4) {
                 return PARSE_ERROR_TOO_MANY_FIXED_PACKS;
             }
-            long ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt]);
+            intptr_t ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt]);
             if (ret < 0) {
                 return ret;
             }
@@ -195,7 +195,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
             if (pack_cnt > 4) {
                 return PARSE_ERROR_TOO_MANY_FIXED_PACKS;
             }
-            long ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt]);
+            intptr_t ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt]);
             if (ret < 0) {
                 return ret;
             }
@@ -218,7 +218,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
             tile_cnt = 0;
             break;
         default: {
-                long ret = parse_tiles_impl(p, tiles, 14, &tile_cnt);
+                intptr_t ret = parse_tiles_impl(p, tiles, 14, &tile_cnt);
                 if (ret < 0) {
                     return ret;
                 }
@@ -234,7 +234,7 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
 
     memcpy(hand_tiles->fixed_packs, packs, pack_cnt * sizeof(pack_t));
     hand_tiles->pack_count = pack_cnt;
-    long max_cnt = 13 - pack_cnt * 3;
+    intptr_t max_cnt = 13 - pack_cnt * 3;
     if (tile_cnt > max_cnt) {
         memcpy(hand_tiles->standing_tiles, tiles, max_cnt * sizeof(tile_t));
         hand_tiles->tile_count = max_cnt;
@@ -254,14 +254,14 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
 }
 
 // 牌转换为字符串
-long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_size) {
+intptr_t tiles_to_string(const tile_t *tiles, intptr_t tile_cnt, char *str, intptr_t max_size) {
     bool tenhon = false;
     char *p = str, *end = str + max_size;
 
     static const char suffix[] = "mspz";
     static const char honor_text[] = "ESWNCFP";
     suit_t last_suit = 0;
-    for (long i = 0; i < tile_cnt && p < end; ++i) {
+    for (intptr_t i = 0; i < tile_cnt && p < end; ++i) {
         tile_t t = tiles[i];
         suit_t s = tile_get_suit(t);
         rank_t r = tile_get_rank(t);
@@ -310,10 +310,10 @@ long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_siz
 }
 
 // 牌组转换为字符串
-long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size) {
+intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intptr_t max_size) {
     char *p = str, *end = str + max_size;
     tile_t temp[4];
-    for (long i = 0; i < pack_cnt && p < end; ++i) {
+    for (intptr_t i = 0; i < pack_cnt && p < end; ++i) {
         pack_t pack = packs[i];
         tile_t t = pack_get_tile(pack);
         uint8_t pt = pack_get_type(pack);
@@ -351,7 +351,7 @@ long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_siz
 }
 
 // 手牌结构转换为字符串
-long hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, long max_size) {
+intptr_t hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, intptr_t max_size) {
     char *p = str, *end = str + max_size;
     p += packs_to_string(hand_tiles->fixed_packs, hand_tiles->pack_count, str, max_size);
     if (p < end) p += tiles_to_string(hand_tiles->standing_tiles, hand_tiles->tile_count, p, end - p);

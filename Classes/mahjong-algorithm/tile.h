@@ -23,6 +23,7 @@
 #ifndef __MAHJONG_ALGORITHM__TILE_H__
 #define __MAHJONG_ALGORITHM__TILE_H__
 
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef _MSC_VER  // for MSVC
@@ -236,9 +237,9 @@ static forceinline tile_t pack_get_tile(pack_t pack) {
  */
 struct hand_tiles_t {
     pack_t fixed_packs[5];      ///< 副露的牌组（面子），包括暗杠
-    long pack_count;            ///< 副露的牌组（面子）数，包括暗杠
+    intptr_t pack_count;        ///< 副露的牌组（面子）数，包括暗杠
     tile_t standing_tiles[13];  ///< 立牌
-    long tile_count;            ///< 立牌数
+    intptr_t tile_count;        ///< 立牌数
 };
 
 

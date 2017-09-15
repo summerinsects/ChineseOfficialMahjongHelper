@@ -68,7 +68,7 @@ namespace mahjong {
  * @retval > 0 实际牌的数量
  * @retval == 0 失败
  */
-long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
+intptr_t parse_tiles(const char *str, tile_t *tiles, intptr_t max_cnt);
 
 /**
  * @brief 字符串转换为手牌结构和上牌
@@ -82,7 +82,7 @@ long parse_tiles(const char *str, tile_t *tiles, long max_cnt);
  * @retval PARSE_ERROR_CANNOT_MAKE_FIXED_PACK 无法正确解析副露
  * @retval PARSE_ERROR_TOO_MANY_FIXED_PACKS 过多组副露（一副合法手牌最多4副露）
  */
-long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile);
+intptr_t string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile);
 
 /**
  * @brief 牌转换为字符串
@@ -90,9 +90,9 @@ long string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_
  * @param [in] tile_cnt 牌的数量
  * @param [out] str 字符串
  * @param [in] max_size 字符串最大长度
- * @return long 写入的字符串数
+ * @return intptr_t 写入的字符串数
  */
-long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_size);
+intptr_t tiles_to_string(const tile_t *tiles, intptr_t tile_cnt, char *str, intptr_t max_size);
 
 /**
  * @brief 牌组转换为字符串
@@ -100,18 +100,18 @@ long tiles_to_string(const tile_t *tiles, long tile_cnt, char *str, long max_siz
  * @param [in] pack_cnt 牌组的数量
  * @param [out] str 字符串
  * @param [in] max_size 字符串最大长度
- * @return long 写入的字符串数
+ * @return intptr_t 写入的字符串数
  */
-long packs_to_string(const pack_t *packs, long pack_cnt, char *str, long max_size);
+intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intptr_t max_size);
 
 /**
  * @brief 手牌结构转换为字符串
  * @param [in] hand_tiles 手牌结构
  * @param [out] str 字符串
  * @param [in] max_size 字符串最大长度
- * @return long 写入的字符串数
+ * @return intptr_t 写入的字符串数
  */
-long hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, long max_size);
+intptr_t hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, intptr_t max_size);
 
 /**
  * end group
