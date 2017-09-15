@@ -15,7 +15,7 @@ std::string CompetitionResult::getStandardScoreString(float ss) {
 std::pair<float, int> CompetitionPlayer::getTotalScoresByRound(size_t round) const {
     float ss = 0;
     int cs = 0;
-    for (size_t i = 0; i < round; ++i) {
+    for (size_t i = 0; i <= round; ++i) {
         ss += competition_results[i].standard_score;
         cs += competition_results[i].competition_score;
     }
@@ -24,6 +24,39 @@ std::pair<float, int> CompetitionPlayer::getTotalScoresByRound(size_t round) con
 
 std::pair<float, int> CompetitionPlayer::getCurrentScoresByRound(size_t round) const {
     return std::make_pair(competition_results[round].standard_score, competition_results[round].competition_score);
+}
+
+struct ScoresSortInfo {
+    const CompetitionPlayer *player = nullptr;
+    float standard_score = 0.0f;
+    int competition_score = 0;
+};
+
+void CompetitionRound::sortPlayers(unsigned round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output) {
+    std::vector<ScoresSortInfo> temp;
+    temp.reserve(players.size());
+    std::transform(players.begin(), players.end(), std::back_inserter(temp), [round](const CompetitionPlayer &player) {
+        ScoresSortInfo ret;
+        ret.player = &player;
+        auto s = player.getTotalScoresByRound(round);
+        ret.standard_score = s.first;
+        ret.competition_score = s.second;
+        return ret;
+    });
+
+    std::vector<ScoresSortInfo *> ptemp;
+    ptemp.reserve(temp.size());
+    std::transform(temp.begin(), temp.end(), std::back_inserter(ptemp), [](ScoresSortInfo &ssi) { return &ssi; });
+
+    std::sort(ptemp.begin(), ptemp.end(), [](const ScoresSortInfo *a, const ScoresSortInfo *b) {
+        if (a->standard_score > b->standard_score) return true;
+        if (a->standard_score == b->standard_score && a->competition_score > b->competition_score) return true;
+        return false;
+    });
+
+    output.clear();
+    output.reserve(ptemp.size());
+    std::transform(ptemp.begin(), ptemp.end(), std::back_inserter(output), [](ScoresSortInfo *pssi) { return pssi->player; });
 }
 
 void CompetitionResult::fromJson(const rapidjson::Value &json, CompetitionResult &result) {

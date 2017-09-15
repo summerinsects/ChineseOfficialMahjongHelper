@@ -478,53 +478,21 @@ void CompetitionTableScene::rankByRandom() {
     }
 }
 
-struct ScoresSortInfo {
-    CompetitionPlayer *player;
-    float standard_score;
-    int competition_score;
-};
-
-static void caculateInfo(std::vector<CompetitionPlayer> &players, unsigned round, std::vector<ScoresSortInfo> &temp) {
-    temp.reserve(players.size());
-    std::transform(players.begin(), players.end(), std::back_inserter(temp), [round](CompetitionPlayer &p) {
-        ScoresSortInfo ret;
-        ret.player = &p;
-        auto s = p.getTotalScoresByRound(round + 1);
-        ret.standard_score = s.first;
-        ret.competition_score = s.second;
-        return ret;
-    });
-}
-
-static void sortByInfo(std::vector<ScoresSortInfo> &temp, std::vector<ScoresSortInfo *> &ptemp) {
-    ptemp.reserve(temp.size());
-    std::transform(temp.begin(), temp.end(), std::back_inserter(ptemp), [](ScoresSortInfo &ssi) { return &ssi; });
-
-    std::sort(ptemp.begin(), ptemp.end(), [](const ScoresSortInfo *a, const ScoresSortInfo *b) {
-        if (a->standard_score > b->standard_score) return true;
-        if (a->standard_score == b->standard_score && a->competition_score > b->competition_score) return true;
-        return false;
-    });
-}
-
 void CompetitionTableScene::rankByScores() {
     std::vector<CompetitionPlayer> &players = _competitionData->players;
     const size_t cnt = players.size();
     _competitionTables->resize(cnt / 4);
 
-    std::vector<ScoresSortInfo> temp;
-    caculateInfo(players, _currentRound, temp);
-
-    std::vector<ScoresSortInfo *> ptemp;
-    sortByInfo(temp, ptemp);
+    std::vector<const CompetitionPlayer *> output;
+    CompetitionRound::sortPlayers(_currentRound, players, output);
 
     // 排座位
     for (size_t i = 0; i < cnt; ) {
         CompetitionTable &table = _competitionTables->at(i / 4);
-        table.player_indices[0] = ptemp[i++]->player - &players[0];
-        table.player_indices[1] = ptemp[i++]->player - &players[0];
-        table.player_indices[2] = ptemp[i++]->player - &players[0];
-        table.player_indices[3] = ptemp[i++]->player - &players[0];
+        table.player_indices[0] = output[i++] - &players[0];
+        table.player_indices[1] = output[i++] - &players[0];
+        table.player_indices[2] = output[i++] - &players[0];
+        table.player_indices[3] = output[i++] - &players[0];
     }
 }
 
@@ -533,11 +501,8 @@ void CompetitionTableScene::rankByScoresSnake() {
     const size_t cnt = players.size();
     _competitionTables->resize(cnt / 4);
 
-    std::vector<ScoresSortInfo> temp;
-    caculateInfo(players, _currentRound, temp);
-
-    std::vector<ScoresSortInfo *> ptemp;
-    sortByInfo(temp, ptemp);
+    std::vector<const CompetitionPlayer *> output;
+    CompetitionRound::sortPlayers(_currentRound, players, output);
 
     size_t east = 0;
     size_t south = cnt / 2 - 1;
@@ -545,10 +510,10 @@ void CompetitionTableScene::rankByScoresSnake() {
     size_t north = cnt - 1;
     for (size_t i = 0; i < cnt; i += 4) {
         CompetitionTable &table = _competitionTables->at(i / 4);
-        table.player_indices[0] = ptemp[east++]->player - &players[0];
-        table.player_indices[1] = ptemp[south--]->player - &players[0];
-        table.player_indices[2] = ptemp[west++]->player - &players[0];
-        table.player_indices[3] = ptemp[north--]->player - &players[0];
+        table.player_indices[0] = output[east++] - &players[0];
+        table.player_indices[1] = output[south--] - &players[0];
+        table.player_indices[2] = output[west++] - &players[0];
+        table.player_indices[3] = output[north--] - &players[0];
     }
 }
 

@@ -26,7 +26,7 @@ private:
     std::shared_ptr<CompetitionData> _competitionData;
     unsigned _currentRound;
 
-    std::vector<CompetitionPlayer *> _players;
+    std::vector<const CompetitionPlayer *> _players;
 };
 
 #endif

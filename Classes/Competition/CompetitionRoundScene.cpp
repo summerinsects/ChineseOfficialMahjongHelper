@@ -24,9 +24,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     _competitionData = competitionData;
     _currentRound = currentRound;
 
-    _players.reserve(competitionData->players.size());
-    std::transform(competitionData->players.begin(), competitionData->players.end(), std::back_inserter(_players),
-        [](CompetitionPlayer &p) { return &p; });
+    CompetitionRound::sortPlayers(_currentRound, competitionData->players, _players);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();

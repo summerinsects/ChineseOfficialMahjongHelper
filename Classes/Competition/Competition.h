@@ -70,6 +70,8 @@ public:
 
     static void fromJson(const rapidjson::Value &json, CompetitionRound &round);
     static void toJson(const CompetitionRound &round, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
+
+    static void sortPlayers(unsigned round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output);
 };
 
 class CompetitionData {
