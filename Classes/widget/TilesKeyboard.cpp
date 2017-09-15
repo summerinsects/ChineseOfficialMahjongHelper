@@ -103,23 +103,23 @@ bool TilesKeyboard::init() {
     const int height = buttonAreaHeight + TILE_HEIGHT + GAP * 3 + 10;
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size((float)width, (float)height));
+    rootNode->setContentSize(Size(static_cast<float>(width), static_cast<float>(height)));
     rootNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 
     // 背景
-    LayerColor *background = LayerColor::create(Color4B(238, 238, 238, 0xFF), (GLfloat)width, (GLfloat)buttonAreaHeight);
+    LayerColor *background = LayerColor::create(Color4B(238, 238, 238, 0xFF), static_cast<GLfloat>(width), static_cast<GLfloat>(buttonAreaHeight));
     rootNode->addChild(background);
 
-    background = LayerColor::create(Color4B(224, 224, 224, 0xFF), width, (GLfloat)(TILE_HEIGHT + GAP * 3 + 10));
+    background = LayerColor::create(Color4B(224, 224, 224, 0xFF), static_cast<GLfloat>(width), static_cast<GLfloat>(TILE_HEIGHT + GAP * 3 + 10));
     rootNode->addChild(background);
-    background->setPosition(Vec2(0, (float)buttonAreaHeight));
+    background->setPosition(Vec2(0, static_cast<float>(buttonAreaHeight)));
 
     // 牌数量label
     Label *label = Label::createWithSystemFont("当前牌数目：0", "Arial", 10);
     rootNode->addChild(label);
     label->setColor(Color3B::BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(INPUT_GAP, buttonAreaHeight + (GLfloat)(TILE_HEIGHT + GAP * 2 + 5)));
+    label->setPosition(Vec2(INPUT_GAP, static_cast<GLfloat>(buttonAreaHeight + TILE_HEIGHT + GAP * 2 + 5)));
     _countLabel = label;
 
     // 牌的根结点
@@ -138,7 +138,7 @@ bool TilesKeyboard::init() {
         rootNode->addChild(button);
         button->setScale9Enabled(true);
         if (buttonInfo.fontSize > 0) {
-            button->setTitleFontSize((float)buttonInfo.fontSize);
+            button->setTitleFontSize(static_cast<float>(buttonInfo.fontSize));
             button->setTitleColor(buttonInfo.fontColor);
             button->setTitleText(buttonInfo.buttonFace);
         }
@@ -167,7 +167,7 @@ bool TilesKeyboard::init() {
     LayerColor *inputBg = LayerColor::create(Color4B(238, 238, 238, 238), 0, INPUT_HEIGHT);
     _inputBg = inputBg;
     rootNode->addChild(inputBg);
-    inputBg->setPosition(Vec2(0.0f, (float)height));
+    inputBg->setPosition(Vec2(0, static_cast<float>(height)));
 
     // 输入文本
     label = Label::createWithSystemFont("", "Arial", 12);
@@ -633,7 +633,7 @@ const char *TilesKeyboard::parseInput(const char *input, const std::function<voi
 
     mahjong::hand_tiles_t hand_tiles;
     mahjong::tile_t win_tile;
-    long ret = mahjong::string_to_tiles(input, &hand_tiles, &win_tile);
+    intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &win_tile);
     if (ret != PARSE_NO_ERROR) {
         switch (ret) {
         case PARSE_ERROR_ILLEGAL_CHARACTER: return "无法解析的字符";

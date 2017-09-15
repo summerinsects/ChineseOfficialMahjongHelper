@@ -6,6 +6,7 @@
 #include "FanDefinition.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../common.h"
+#include <array>
 
 USING_NS_CC;
 
@@ -55,7 +56,7 @@ cocos2d::Size FanTableScene::tableCellSizeForIndex(cw::TableView *table, ssize_t
 }
 
 cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *, ui::Button *[13]> CustomCell;
+    typedef cw::TableViewCellEx<Label *, std::array<ui::Button *, 13> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -66,7 +67,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&label = std::get<0>(ext);
-        ui::Button *(&buttons)[13] = std::get<1>(ext);
+        std::array<ui::Button *, 13> &buttons = std::get<1>(ext);
 
         label = Label::createWithSystemFont("1番", "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -91,7 +92,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
 
     const CustomCell::ExtDataType ext = cell->getExtData();
     Label *label = std::get<0>(ext);
-    ui::Button *const (&buttons)[13] = std::get<1>(ext);
+    const std::array<ui::Button *, 13> &buttons = std::get<1>(ext);
 
     size_t idx0;
     const char **titleTexts;

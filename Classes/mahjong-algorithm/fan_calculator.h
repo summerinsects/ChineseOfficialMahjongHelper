@@ -203,7 +203,7 @@ struct calculate_param_t {
 /**
  * @brief 番表
  */
-typedef long fan_table_t[FAN_TABLE_SIZE];
+typedef uint8_t fan_table_t[FAN_TABLE_SIZE];
 
 /**
  * @brief 算番
@@ -306,7 +306,7 @@ static const int fan_value_table[FAN_TABLE_SIZE] = {
  * @param [in] win_tile 和牌张
  * @return bool
  */
-bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long standing_cnt, tile_t win_tile);
+bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, intptr_t standing_cnt, tile_t win_tile);
 
 /**
  * @brief 统计和牌在副露牌组中出现的张数
@@ -317,7 +317,7 @@ bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, long stan
  * @param [in] win_tile 和牌张
  * @return size_t
  */
-size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, long fixed_cnt, tile_t win_tile);
+size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, intptr_t fixed_cnt, tile_t win_tile);
 
 /**
  * @brief 判断副露牌组是否包含杠
@@ -326,7 +326,7 @@ size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, long fixed_cnt, 
  * @param [in] fixed_cnt 副露牌组数
  * @return bool
  */
-bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, long fixed_cnt);
+bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, intptr_t fixed_cnt);
 
 /**
  * end group

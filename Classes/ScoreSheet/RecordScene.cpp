@@ -7,6 +7,7 @@
 #include "../widget/AlertView.h"
 #include "../widget/CWTableView.h"
 #include "../mahjong-algorithm/fan_calculator.h"
+#include <array>
 
 USING_NS_CC;
 
@@ -369,7 +370,7 @@ cocos2d::Size RecordScene::tableCellSizeForIndex(cw::TableView *table, ssize_t i
 }
 
 cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *, ui::Button *[9]> CustomCell;
+    typedef cw::TableViewCellEx<Label *, std::array<ui::Button *, 9> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -380,7 +381,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&label = std::get<0>(ext);
-        ui::Button *(&buttons)[9] = std::get<1>(ext);
+        std::array<ui::Button *, 9> &buttons = std::get<1>(ext);
 
         label = Label::createWithSystemFont("1番", "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -405,7 +406,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
-    ui::Button *const (&buttons)[9] = std::get<1>(ext);
+    const std::array<ui::Button *, 9> &buttons = std::get<1>(ext);
 
     for (size_t k = 0; k < 9; ++k) {
         ui::Button *button = buttons[k];

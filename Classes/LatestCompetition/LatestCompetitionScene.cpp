@@ -4,6 +4,7 @@
 #include "network/HttpClient.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
+#include <array>
 
 USING_NS_CC;
 
@@ -160,7 +161,7 @@ cocos2d::Size LatestCompetitionScene::tableCellSizeForIndex(cw::TableView *table
 }
 
 cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<LayerColor *[2], Label *[2], ui::Button *> CustomCell;
+    typedef cw::TableViewCellEx<std::array<LayerColor *, 2>, std::array<Label *, 2>, ui::Button *> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
@@ -170,8 +171,8 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         const float width = visibleSize.width - 5.0f;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        LayerColor *(&layerColor)[2] = std::get<0>(ext);
-        Label *(&label)[2] = std::get<1>(ext);
+        std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
+        std::array<Label *, 2> &label = std::get<1>(ext);
         ui::Button *&detailBtn = std::get<2>(ext);
 
         layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 48);
@@ -205,8 +206,8 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    LayerColor *const (&layerColor)[2] = std::get<0>(ext);
-    Label *const (&label)[2] = std::get<1>(ext);
+    const std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
+    const std::array<Label *, 2> &label = std::get<1>(ext);
     ui::Button *detailBtn = std::get<2>(ext);
 
     layerColor[0]->setVisible(!(idx & 1));

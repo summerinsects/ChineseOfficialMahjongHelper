@@ -9,6 +9,7 @@
 #include "../widget/CWTableView.h"
 #include <thread>
 #include <mutex>
+#include <array>
 
 #include "json/stringbuffer.h"
 #include "json/prettywriter.h"
@@ -62,6 +63,7 @@ static void saveRecords(const std::vector<Record> &records) {
     if (LIKELY(file != nullptr)) {
         try {
             rapidjson::Document doc(rapidjson::Type::kArrayType);
+            doc.Reserve(static_cast<rapidjson::SizeType>(records.size()), doc.GetAllocator());
             std::for_each(records.begin(), records.end(), [&doc](const Record &record) {
                 rapidjson::Value json(rapidjson::Type::kObjectType);
                 RecordToJson(record, json, doc.GetAllocator());
@@ -197,7 +199,7 @@ cocos2d::Size HistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t 
 }
 
 cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<LayerColor *[2], Label *, ui::Button *> CustomCell;
+    typedef cw::TableViewCellEx<std::array<LayerColor *, 2>, Label *, ui::Button *> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
@@ -207,7 +209,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
         const float width = visibleSize.width - 5.0f;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        LayerColor *(&layerColor)[2] = std::get<0>(ext);
+        std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
 
@@ -237,7 +239,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    LayerColor *const (&layerColor)[2] = std::get<0>(ext);
+    const std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
     Label *label = std::get<1>(ext);
     ui::Button *delBtn = std::get<2>(ext);
 

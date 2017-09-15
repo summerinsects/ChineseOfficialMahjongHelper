@@ -1,5 +1,5 @@
-﻿#ifndef _ALERT_LAYER_H_
-#define _ALERT_LAYER_H_
+﻿#ifndef _ALERT_VIEW_H_
+#define _ALERT_VIEW_H_
 
 #include "cocos2d.h"
 
