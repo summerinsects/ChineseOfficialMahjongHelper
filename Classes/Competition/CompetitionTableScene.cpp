@@ -317,8 +317,54 @@ void CompetitionTableScene::rankByRandom() {
     }
 }
 
-void CompetitionTableScene::rankByScores() {
+struct ScoresSortInfo {
+    CompetitionPlayer *player;
+    float standard_score;
+    int competition_score;
+};
 
+static void caculateInfo(std::vector<CompetitionPlayer> &players, unsigned round, std::vector<ScoresSortInfo> &temp) {
+    temp.reserve(players.size());
+    std::transform(players.begin(), players.end(), std::back_inserter(temp), [round](CompetitionPlayer &p) {
+        ScoresSortInfo ret;
+        ret.player = &p;
+        auto s = p.getTotalScoresByRound(round + 1);
+        ret.standard_score = s.first;
+        ret.competition_score = s.second;
+        return ret;
+    });
+}
+
+static void sortByInfo(std::vector<ScoresSortInfo> &temp, std::vector<ScoresSortInfo *> &ptemp) {
+    ptemp.reserve(temp.size());
+    std::transform(temp.begin(), temp.end(), std::back_inserter(ptemp), [](ScoresSortInfo &ssi) { return &ssi; });
+
+    std::sort(ptemp.begin(), ptemp.end(), [](const ScoresSortInfo *a, const ScoresSortInfo *b) {
+        if (a->standard_score > b->standard_score) return true;
+        if (a->standard_score == b->standard_score && a->competition_score > b->competition_score) return true;
+        return false;
+    });
+}
+
+void CompetitionTableScene::rankByScores() {
+    std::vector<CompetitionPlayer> &players = _competitionData->players;
+    const size_t cnt = players.size();
+    _competitionTables->resize(cnt / 4);
+
+    std::vector<ScoresSortInfo> temp;
+    caculateInfo(players, _currentRound, temp);
+
+    std::vector<ScoresSortInfo *> ptemp;
+    sortByInfo(temp, ptemp);
+
+    // 排座位
+    for (size_t i = 0; i < cnt; i += 4) {
+        CompetitionTable &table = _competitionTables->at(i / 4);
+        table.players[0] = ptemp[i]->player;
+        table.players[1] = ptemp[i + 1]->player;
+        table.players[2] = ptemp[i + 2]->player;
+        table.players[3] = ptemp[i + 3]->player;
+    }
 }
 
 void CompetitionTableScene::rankBySerialSnake() {
@@ -327,9 +373,9 @@ void CompetitionTableScene::rankBySerialSnake() {
     _competitionTables->resize(cnt / 4);
 
     size_t east = 0;
-    size_t south = players.size() / 2 - 1;
+    size_t south = cnt / 2 - 1;
     size_t west = south + 1;
-    size_t north = players.size() - 1;
+    size_t north = cnt - 1;
     for (size_t i = 0; i < cnt; i += 4) {
         CompetitionTable &table = _competitionTables->at(i / 4);
         table.players[0] = &players[east++];
@@ -340,7 +386,27 @@ void CompetitionTableScene::rankBySerialSnake() {
 }
 
 void CompetitionTableScene::rankByScoresSnake() {
+    std::vector<CompetitionPlayer> &players = _competitionData->players;
+    const size_t cnt = players.size();
+    _competitionTables->resize(cnt / 4);
 
+    std::vector<ScoresSortInfo> temp;
+    caculateInfo(players, _currentRound, temp);
+
+    std::vector<ScoresSortInfo *> ptemp;
+    sortByInfo(temp, ptemp);
+
+    size_t east = 0;
+    size_t south = cnt / 2 - 1;
+    size_t west = south + 1;
+    size_t north = cnt - 1;
+    for (size_t i = 0; i < cnt; i += 4) {
+        CompetitionTable &table = _competitionTables->at(i / 4);
+        table.players[0] = &players[east++];
+        table.players[1] = &players[south--];
+        table.players[2] = &players[west++];
+        table.players[3] = &players[north--];
+    }
 }
 
 void CompetitionTableScene::onRankButton(cocos2d::Ref *sender) {
@@ -372,8 +438,8 @@ void CompetitionTableScene::onRankButton(cocos2d::Ref *sender) {
         switch (radioGroup->getSelectedButtonIndex()) {
         case 0: rankByRandom(); _tableView->reloadData(); break;
         case 1: rankBySerialSnake(); _tableView->reloadData(); break;
-        case 2: break;
-        case 3: break;
+        case 2: rankByScoresSnake(); _tableView->reloadData(); break;
+        case 3: rankByScores(); _tableView->reloadData(); break;
         case 4: break;
         default: break;
         }

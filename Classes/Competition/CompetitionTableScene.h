@@ -22,9 +22,9 @@ private:
     void onRecordButton(cocos2d::Ref *sender);
 
     void rankBySerial();
+    void rankBySerialSnake();
     void rankByRandom();
     void rankByScores();
-    void rankBySerialSnake();
     void rankByScoresSnake();
 
     float _colWidth[7];
