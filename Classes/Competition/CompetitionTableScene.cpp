@@ -2,6 +2,7 @@
 #include "Competition.h"
 #include "../common.h"
 #include "../widget/AlertView.h"
+#include <array>
 
 USING_NS_CC;
 
@@ -247,7 +248,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         drawNode->drawLine(Vec2(x, 0), Vec2(x, 100), Color4F::BLACK);
     }
 
-    Label *labels[4][3] = { { nullptr } };
+    std::array<std::array<Label *, 3>, 4> labels;
 
     const char *titleTexts[] = { "编号", "选手姓名", "顺位", "标准分", "比赛分" };
     for (int i = 0; i < 5; ++i) {
@@ -338,7 +339,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     char buf[32];
     snprintf(buf, sizeof(buf), "%u", result->rank);
 
-    ui::EditBox *editBoxes[3];
+    std::array<ui::EditBox *, 3> editBoxes;
 
     ui::EditBox *editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);

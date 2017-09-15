@@ -50,7 +50,14 @@ public:
 // 桌
 struct CompetitionTable {
     unsigned serial = 0;  // 编号
-    ptrdiff_t player_indices[4] = { INVALID_INDEX, INVALID_INDEX, INVALID_INDEX, INVALID_INDEX };  // 参赛选手
+    ptrdiff_t player_indices[4];  // 参赛选手
+
+    CompetitionTable() {
+        player_indices[0] = INVALID_INDEX;
+        player_indices[1] = INVALID_INDEX;
+        player_indices[2] = INVALID_INDEX;
+        player_indices[3] = INVALID_INDEX;
+    }
 
     static void fromJson(const rapidjson::Value &json, CompetitionTable &table);
     static void toJson(const CompetitionTable &table, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
