@@ -311,7 +311,7 @@ void HandTilesWidget::refreshStandingTiles() {
 // 刷新立牌位置
 void HandTilesWidget::refreshStandingTilesPos() {
     size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    _standingContainer->setContentSize(Size(TILE_WIDTH * (maxCnt + 1) + GAP, TILE_HEIGHT));
+    _standingContainer->setContentSize(Size(static_cast<float>(TILE_WIDTH * (maxCnt + 1) + GAP), TILE_HEIGHT));
 
     // 重新设置UserData及位置
     for (size_t i = 0, cnt = _standingTileButtons.size(); i < cnt; ++i) {
@@ -347,7 +347,7 @@ void HandTilesWidget::sortStandingTiles() {
 // 添加一组吃
 void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
     const Size fixedSize = _fixedContainer->getContentSize();
-    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
+    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0.0f;
     const float startX = fixedSize.width + offsetX;
     const float totalWidth = fixedSize.width + offsetX + TILE_HEIGHT + TILE_WIDTH * 2;
     _fixedContainer->setContentSize(Size(totalWidth, fixedSize.height));
@@ -395,7 +395,7 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
 // 添加一组碰
 void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
     const Size fixedSize = _fixedContainer->getContentSize();
-    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
+    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0.0f;
     const float startX = fixedSize.width + offsetX;
     const float totalWidth = fixedSize.width + offsetX + TILE_HEIGHT + TILE_WIDTH * 2;
     _fixedContainer->setContentSize(Size(totalWidth, fixedSize.height));
@@ -438,7 +438,7 @@ void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
 // 添加一组明杠
 void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx) {
     const Size fixedSize = _fixedContainer->getContentSize();
-    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
+    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0.0f;
     const float startX = fixedSize.width + offsetX;
     const float totalWidth = fixedSize.width + offsetX + TILE_HEIGHT + TILE_WIDTH * 3;
     _fixedContainer->setContentSize(Size(totalWidth, fixedSize.height));
@@ -485,7 +485,7 @@ void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx
 // 添加一组暗杠
 void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
     const Size fixedSize = _fixedContainer->getContentSize();
-    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0;
+    const float offsetX = _fixedPacks.size() > 1 ? GAP : 0.0f;
     const float startX = fixedSize.width + offsetX;
     const float totalWidth = fixedSize.width + offsetX + TILE_WIDTH * 4;
     _fixedContainer->setContentSize(Size(totalWidth, fixedSize.height));
@@ -973,7 +973,7 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
     }
 
     Node *node = Node::create();
-    node->setContentSize(Size(totalWidth, TILE_HEIGHT));
+    node->setContentSize(Size(static_cast<float>(totalWidth), TILE_HEIGHT));
     node->setIgnoreAnchorPointForPosition(false);
     node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 

@@ -128,7 +128,7 @@ bool TilePickWidget::init() {
         button->setTitleColor(Color3B::BLACK);
         button->setTitleText(titleText[i]);
         buttonsContainer->addChild(button);
-        button->setPosition(Vec2(BUTTON_WIDHT * (col + 0.5f) + col * GAP, (3 - row) * (BUTTON_HEIGHT + GAP_H) + BUTTON_HEIGHT / 2));
+        button->setPosition(Vec2(BUTTON_WIDHT * (col + 0.5f) + col * GAP, static_cast<float>((3 - row) * (BUTTON_HEIGHT + GAP_H) + BUTTON_HEIGHT / 2)));
         buttons[i] = button;
     }
 

@@ -210,7 +210,7 @@ void MahjongTheoryScene::setRandomInput() {
     _handTilesWidget->setData(handTiles, servingTile);
 
     char str[64];
-    long ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
+    intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
     mahjong::tiles_to_string(&servingTile, 1, str + ret, sizeof(str) - ret);
     _editBox->setText(str);
 
@@ -256,7 +256,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
     do {
         mahjong::hand_tiles_t hand_tiles = { 0 };
         mahjong::tile_t serving_tile = 0;
-        long ret = mahjong::string_to_tiles(input, &hand_tiles, &serving_tile);
+        intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &serving_tile);
         if (ret != PARSE_NO_ERROR) {
             switch (ret) {
             case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
@@ -461,7 +461,7 @@ mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong:
 
     // 没用到的牌
     mahjong::tile_t remainTiles[136];
-    long remainCnt = mahjong::table_to_tiles(remainTable, remainTiles, 136);
+    intptr_t remainCnt = mahjong::table_to_tiles(remainTable, remainTiles, 136);
 
     // 随机给一张牌
     mahjong::tile_t servingTile;
@@ -521,7 +521,7 @@ void MahjongTheoryScene::recoverFromState(StateData &state) {
     _handTilesWidget->setData(state.handTiles, state.servingTile);
 
     char str[64];
-    long ret = mahjong::hand_tiles_to_string(&state.handTiles, str, sizeof(str));
+    intptr_t ret = mahjong::hand_tiles_to_string(&state.handTiles, str, sizeof(str));
     mahjong::tiles_to_string(&state.servingTile, 1, str + ret, sizeof(str) - ret);
     _editBox->setText(str);
 
@@ -589,7 +589,7 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t ser
     }
 
     // 从表恢复成立牌
-    const long prevCnt = handTiles.tile_count;
+    const intptr_t prevCnt = handTiles.tile_count;
     handTiles.tile_count = mahjong::table_to_tiles(cntTable, handTiles.standing_tiles, 13);
     if (prevCnt != handTiles.tile_count) {
         return;
@@ -599,7 +599,7 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t ser
     _handTilesWidget->setData(handTiles, servingTile);
 
     char str[64];
-    long ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
+    intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
     mahjong::tiles_to_string(&servingTile, 1, str + ret, sizeof(str) - ret);
     _editBox->setText(str);
 
@@ -659,7 +659,7 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
     }
 
     long utf8Len = StringUtils::getCharacterCountInUTF8String(str);
-    long pos = (long)(width / size.width * utf8Len);  // 切这么多
+    long pos = static_cast<long>(width / size.width * utf8Len);  // 切这么多
 
     // 切没了，全部放在第2个label上
     if (pos <= 0) {
@@ -707,7 +707,7 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ss
     const uint16_t key = ((!!result->discard_tile) << 9) | ((!!result->shanten) << 8) | result->count_in_tiles;
     std::unordered_map<uint16_t, int>::iterator it = _cellHeightMap.find(key);
     if (it != _cellHeightMap.end()) {
-        return Size(0, (float)it->second);
+        return Size(0, static_cast<float>(it->second));
     }
 
     const float cellWidth = _cellWidth - SPACE * 2;  // 前后各留2像素
@@ -730,7 +730,7 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ss
             bool inOneLine = remainCnt * TILE_WIDTH_SMALL + _totalLabelWidth <= remainWidth;
             int height = 25 + 25 * (inOneLine ? lineCnt : lineCnt + 1);
             _cellHeightMap.insert(std::make_pair(key, height));
-            return Size(0, (float)height);
+            return Size(0, static_cast<float>(height));
         }
         remainCnt -= limitedCnt;
         ++lineCnt;

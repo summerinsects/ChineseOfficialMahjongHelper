@@ -88,7 +88,7 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
     const int lineHeight = fontSize + 2;
     ptrdiff_t resultAreaHeight = lineHeight * rows;  // 每行间隔2像素
     resultAreaHeight += (5 + lineHeight) + 20;  // 总计+提示
-    node->setContentSize(Size(resultAreaWidth, (float)resultAreaHeight));
+    node->setContentSize(Size(resultAreaWidth, static_cast<float>(resultAreaHeight)));
 
     long fan = 0;
     for (int i = 0, j = 0; i < n; ++i) {
@@ -101,12 +101,12 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
             : Common::format<128>("%s %d番x%ld\n", mahjong::fan_name[j], f, fan_table[j]);
 
         // 创建label，每行排2个
-        Label *label = Label::createWithSystemFont(str, "Arial", (float)fontSize);
+        Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
         label->setColor(Color3B(0x60, 0x60, 0x60));
         node->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         div_t ret = div(i, 2);
-        label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, (float)(resultAreaHeight - lineHeight * (ret.quot + 1))));
+        label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, static_cast<float>(resultAreaHeight - lineHeight * (ret.quot + 1))));
 
         // 创建与label同位置的button
         ui::Button *button = ui::Button::create();
@@ -120,7 +120,7 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         });
     }
 
-    Label *label = Label::createWithSystemFont(Common::format<64>("总计：%ld番", fan), "Arial", (float)fontSize);
+    Label *label = Label::createWithSystemFont(Common::format<64>("总计：%ld番", fan), "Arial", static_cast<float>(fontSize));
     label->setColor(Color3B::BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);

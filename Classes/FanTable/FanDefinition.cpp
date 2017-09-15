@@ -22,7 +22,7 @@ static std::vector<std::string> g_definitions;
 static void replaceTilesToImage(std::string &text, float scale) {
     char tilesStr[128];
     mahjong::tile_t tiles[14];
-    long tilesCnt;
+    intptr_t tilesCnt;
     char imgStr[1024];
 
     std::string::size_type pos = text.find('[');
@@ -33,7 +33,7 @@ static void replaceTilesToImage(std::string &text, float scale) {
             && str[pos + readLen + 1] == ']'
             && (tilesCnt = mahjong::parse_tiles(tilesStr, tiles, 14)) >= 0) {
             size_t totalWriteLen = 0;
-            for (long i = 0; i < tilesCnt; ++i) {
+            for (intptr_t i = 0; i < tilesCnt; ++i) {
                 int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
                     "<img src=\"%s\" width=\"%d\" height=\"%d\"/>",
                     tilesImageName[tiles[i]], (int)(TILE_WIDTH * scale), (int)(TILE_HEIGHT * scale));
