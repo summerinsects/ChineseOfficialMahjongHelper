@@ -298,6 +298,24 @@ void CompetitionTableScene::rankBySerial() {
     }
 }
 
+void CompetitionTableScene::rankBySerialSnake() {
+    std::vector<CompetitionPlayer> &players = _competitionData->players;
+    const size_t cnt = players.size();
+    _competitionTables->resize(cnt / 4);
+
+    size_t east = 0;
+    size_t south = cnt / 2 - 1;
+    size_t west = south + 1;
+    size_t north = cnt - 1;
+    for (size_t i = 0; i < cnt; i += 4) {
+        CompetitionTable &table = _competitionTables->at(i / 4);
+        table.players[0] = &players[east++];
+        table.players[1] = &players[south--];
+        table.players[2] = &players[west++];
+        table.players[3] = &players[north--];
+    }
+}
+
 void CompetitionTableScene::rankByRandom() {
     std::vector<CompetitionPlayer> &players = _competitionData->players;
     const size_t cnt = players.size();
@@ -364,24 +382,6 @@ void CompetitionTableScene::rankByScores() {
         table.players[1] = ptemp[i + 1]->player;
         table.players[2] = ptemp[i + 2]->player;
         table.players[3] = ptemp[i + 3]->player;
-    }
-}
-
-void CompetitionTableScene::rankBySerialSnake() {
-    std::vector<CompetitionPlayer> &players = _competitionData->players;
-    const size_t cnt = players.size();
-    _competitionTables->resize(cnt / 4);
-
-    size_t east = 0;
-    size_t south = cnt / 2 - 1;
-    size_t west = south + 1;
-    size_t north = cnt - 1;
-    for (size_t i = 0; i < cnt; i += 4) {
-        CompetitionTable &table = _competitionTables->at(i / 4);
-        table.players[0] = &players[east++];
-        table.players[1] = &players[south--];
-        table.players[2] = &players[west++];
-        table.players[3] = &players[north--];
     }
 }
 
