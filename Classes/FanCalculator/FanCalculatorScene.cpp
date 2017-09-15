@@ -97,8 +97,8 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         uint16_t f = mahjong::fan_value_table[j];
         uint16_t n = fan_table[j];
         fan += f * n;
-        std::string str = (n == 1) ? Common::format<128>("%s %hd番\n", mahjong::fan_name[j], f)
-            : Common::format<128>("%s %hd番x%hd\n", mahjong::fan_name[j], f, fan_table[j]);
+        std::string str = (n == 1) ? Common::format<128>("%s %hu番\n", mahjong::fan_name[j], f)
+            : Common::format<128>("%s %hu番x%hu\n", mahjong::fan_name[j], f, fan_table[j]);
 
         // 创建label，每行排2个
         Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
@@ -120,7 +120,7 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         });
     }
 
-    Label *label = Label::createWithSystemFont(Common::format<64>("总计：%ld番", fan), "Arial", static_cast<float>(fontSize));
+    Label *label = Label::createWithSystemFont(Common::format<64>("总计：%hu番", fan), "Arial", static_cast<float>(fontSize));
     label->setColor(Color3B::BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
