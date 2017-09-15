@@ -5,6 +5,7 @@
 #include "../widget/CWTableView.h"
 
 class CompetitionData;
+struct CompetitionResult;
 struct CompetitionTable;
 
 class CompetitionTableScene : public BaseScene, cw::TableViewDelegate {
@@ -20,6 +21,7 @@ private:
 
     void onRankButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender);
+    void showCompetitionResultInputAlert(const std::string &title, CompetitionResult *result, const std::function<void ()> &callback);
 
     void rankBySerial();
     void rankBySerialSnake();

@@ -244,45 +244,180 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         drawNode->drawLine(Vec2(x, 0), Vec2(x, 100), Color4F::BLACK);
     }
 
+    Label *labels[4][3] = { { nullptr } };
+
     const char *titleTexts[] = { "编号", "选手姓名", "顺位", "标准分", "比赛分" };
     for (int i = 0; i < 5; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         drawNode->addChild(label);
         label->setPosition(Vec2(posX[i], 90.0f));
+        Common::scaleLabelToFitWidth(label, colWidth[i]);
     }
 
     for (int i = 0; i < 4; ++i) {
-        const CompetitionPlayer *player = currentTable.players[i];
-        if (player == nullptr) {
-            continue;
-        }
+        CompetitionPlayer *player = currentTable.players[i];
 
         Label *label = Label::createWithSystemFont(std::to_string(player->serial), "Arail", 12);
         label->setColor(Color3B::BLACK);
         drawNode->addChild(label);
         label->setPosition(Vec2(posX[0], 70.0f - 20.0f * i));
+        Common::scaleLabelToFitWidth(label, colWidth[0]);
 
         label = Label::createWithSystemFont(player->name, "Arail", 12);
         label->setColor(Color3B::BLACK);
         drawNode->addChild(label);
         label->setPosition(Vec2(posX[1], 70.0f - 20.0f * i));
+        Common::scaleLabelToFitWidth(label, colWidth[1]);
 
         for (int k = 0; k < 3; ++k) {
-            ui::EditBox *editBox = ui::EditBox::create(Size(colWidth[2 + k], 20.0f), ui::Scale9Sprite::create());
-            editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-            editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-            editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-            editBox->setTextHorizontalAlignment(TextHAlignment::CENTER);
-            editBox->setFontColor(Color4B::BLACK);
-            editBox->setFontSize(12);
-            editBox->setPlaceHolder(titleTexts[k + 2]);
-            drawNode->addChild(editBox);
-            editBox->setPosition(Vec2(posX[2 + k], 70.0f - 20.0f * i));
+            label = Label::createWithSystemFont("", "Arail", 12);
+            label->setColor(Color3B::BLACK);
+            drawNode->addChild(label);
+            label->setPosition(Vec2(posX[2 + k], 70.0f - 20.0f * i));
+            labels[i][k] = label;
         }
+
+        CompetitionResult *result = &player->competition_results[_currentRound];
+        std::function<void ()> callback = [result, labels, i]() {
+            std::string text[3] = {
+                std::to_string(result->rank),
+                CompetitionResult::getStandardScoreString(result->standard_score),
+                std::to_string(result->competition_score)
+            };
+            for (int k = 0; k < 3; ++k) {
+                labels[i][k]->setString(text[k]);
+            }
+        };
+        callback();
+
+        ui::Button *button = ui::Button::create();
+        button->setScale9Enabled(true);
+        button->setPosition(Vec2(posX[3], 70.0f - 20.0f * i));
+        button->setContentSize(Size(colWidth[2] + colWidth[3]+ colWidth[4], 20.0f));
+        drawNode->addChild(button);
+        button->setUserData(label);
+        button->addClickEventListener([this, player, result, callback](Ref *) {
+            showCompetitionResultInputAlert(Common::format<64>("选手编号%u，姓名「%s」", player->serial, player->name.c_str()), result, callback);
+        });
     }
 
-    AlertView::showWithNode(Common::format<128>("第%lu桌成绩", (unsigned long)table + 1), drawNode, nullptr, nullptr);
+    AlertView::showWithNode(Common::format<128>("第%lu桌成绩", (unsigned long)table + 1), drawNode, [this, table, labels]() {
+        CompetitionTable &currentTable = _competitionTables->at(table);
+        for (int i = 0; i < 4; ++i) {
+            const std::string &rank = labels[i][0]->getString();
+            const std::string &ss = labels[i][1]->getString();
+            const std::string &cs = labels[i][2]->getString();
+
+            CompetitionResult &result = currentTable.players[i]->competition_results[_currentRound];
+            result.rank = atoi(rank.c_str());
+            result.standard_score = atof(ss.c_str());
+            result.competition_score = atoi(cs.c_str());
+
+            _tableView->updateCellAtIndex(table);
+        }
+    }, nullptr);
+}
+
+void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &title, CompetitionResult *result, const std::function<void ()> &callback) {
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(115, 90));
+
+    Label *label = Label::createWithSystemFont("顺位", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5, 75));
+
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%u", result->rank);
+
+    ui::EditBox *editBoxes[3];
+
+    ui::EditBox *editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setText(buf);
+    rootNode->addChild(editBox);
+    editBox->setPosition(Vec2(85, 75));
+    editBoxes[0] = editBox;
+
+    label = Label::createWithSystemFont("标准分", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5, 45));
+
+    editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::DECIMAL);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setText(CompetitionResult::getStandardScoreString(result->standard_score).c_str());
+    rootNode->addChild(editBox);
+    editBox->setPosition(Vec2(85, 45));
+    editBoxes[1] = editBox;
+
+    label = Label::createWithSystemFont("比赛分", "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5, 15));
+
+    snprintf(buf, sizeof(buf), "%d", result->competition_score);
+
+    editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setText(buf);
+    rootNode->addChild(editBox);
+    editBox->setPosition(Vec2(85, 15));
+    editBoxes[2] = editBox;
+
+    AlertView::showWithNode(title, rootNode, [this, editBoxes, title, result, callback]() {
+        unsigned rank = 0;
+        float standardScore = 0;
+        int competitionScore = 0;
+
+        const char *text = editBoxes[0]->getText();
+        if (*text != '\0') {
+            rank = atoi(text);
+        }
+
+        text = editBoxes[1]->getText();
+        if (*text != '\0') {
+            standardScore = (float)atof(text);
+        }
+
+        text = editBoxes[2]->getText();
+        if (*text != '\0') {
+            competitionScore = atoi(text);
+        }
+
+        if (rank < 1 || rank > 4) {
+            AlertView::showWithMessage("登记成绩", "顺位只能是1到4", 12,
+                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, std::ref(callback)), nullptr);
+            return;
+        }
+
+        if (standardScore < 0) {
+            AlertView::showWithMessage("登记成绩", "标准分必须大于0", 12,
+                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, std::ref(callback)), nullptr);
+            return;
+        }
+
+        result->rank = rank;
+        result->standard_score = standardScore;
+        result->competition_score = competitionScore;
+        callback();
+    }, nullptr);
 }
 
 void CompetitionTableScene::rankBySerial() {
