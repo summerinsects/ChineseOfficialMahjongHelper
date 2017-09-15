@@ -203,7 +203,7 @@ struct calculate_param_t {
 /**
  * @brief 番表
  */
-typedef uint8_t fan_table_t[FAN_TABLE_SIZE];
+typedef uint16_t fan_table_t[FAN_TABLE_SIZE];
 
 /**
  * @brief 算番
@@ -277,7 +277,7 @@ static const char *fan_name[] = {
 /**
  * @brief 番值
  */
-static const int fan_value_table[FAN_TABLE_SIZE] = {
+static const uint16_t fan_value_table[FAN_TABLE_SIZE] = {
     0,
     88, 88, 88, 88, 88, 88, 88,
     64, 64, 64, 64, 64, 64,
