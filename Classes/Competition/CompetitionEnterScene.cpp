@@ -200,6 +200,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
 void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
     for (size_t i = 0, cnt = _competitionData->players.size(); i < cnt; ++i) {
         _competitionData->players.at(i).name = Common::format<32>("%lu号选手", (unsigned long)i + 1);
+        _competitionData->players.at(i).competition_results.resize(_competitionData->round.size());
     }
 
     if (std::any_of(_competitionData->players.begin(), _competitionData->players.end(),
