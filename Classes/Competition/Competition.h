@@ -42,7 +42,6 @@ public:
     unsigned serial = 0;  // 编号
     std::string name;  // 队名
     std::vector<ptrdiff_t> player_indices;  // 队员
-    std::vector<CompetitionResult> scores;  // 全队成绩
 
     static void fromJson(const rapidjson::Value &json, CompetitionTeam &team);
     static void toJson(const CompetitionTeam &team, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);

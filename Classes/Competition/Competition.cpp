@@ -93,8 +93,39 @@ void CompetitionPlayer::toJson(const CompetitionPlayer &player, rapidjson::Value
     json.AddMember("team_index", rapidjson::Value(static_cast<int64_t>(player.team_index)), alloc);
 }
 
-void CompetitionTeam::fromJson(const rapidjson::Value &json, CompetitionTeam &team) {}
-void CompetitionTeam::toJson(const CompetitionTeam &team, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {}
+void CompetitionTeam::fromJson(const rapidjson::Value &json, CompetitionTeam &team) {
+    rapidjson::Value::ConstMemberIterator it = json.FindMember("serial");
+    if (it != json.MemberEnd() && it->value.IsUint()) {
+        team.serial = it->value.GetUint();
+    }
+
+    it = json.FindMember("name");
+    if (it != json.MemberEnd() && it->value.IsString()) {
+        team.name = it->value.GetString();
+    }
+
+    it = json.FindMember("player_indices");
+    if (it != json.MemberEnd() && it->value.IsArray()) {
+        rapidjson::Value::ConstArray indices = it->value.GetArray();
+        team.player_indices.clear();
+        team.player_indices.reserve(indices.Size());
+        std::for_each(indices.Begin(), indices.End(), [&team](const rapidjson::Value &json) {
+            team.player_indices.push_back(static_cast<ptrdiff_t>(json.GetInt64()));
+        });
+    }
+}
+
+void CompetitionTeam::toJson(const CompetitionTeam &team, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
+    json.AddMember("serial", rapidjson::Value(team.serial), alloc);
+    json.AddMember("name", rapidjson::StringRef(team.name.c_str()), alloc);
+
+    rapidjson::Value indices(rapidjson::Type::kArrayType);
+    indices.Reserve((rapidjson::SizeType)team.player_indices.size(), alloc);
+    std::for_each(team.player_indices.begin(), team.player_indices.end(), [&indices, &alloc](ptrdiff_t idx) {
+        indices.PushBack(rapidjson::Value(static_cast<int64_t>(idx)), alloc);
+    });
+    json.AddMember("player_indices", std::move(indices), alloc);
+}
 
 void CompetitionTable::fromJson(const rapidjson::Value &json, CompetitionTable &table) {
     rapidjson::Value::ConstMemberIterator it = json.FindMember("serial");
@@ -129,9 +160,25 @@ void CompetitionTable::toJson(const CompetitionTable &table, rapidjson::Value &j
 }
 
 void CompetitionRound::fromJson(const rapidjson::Value &json, CompetitionRound &round) {
+    rapidjson::Value::ConstMemberIterator it = json.FindMember("tables");
+    if (it != json.MemberEnd() && it->value.IsArray()) {
+        rapidjson::Value::ConstArray tables = it->value.GetArray();
+        std::for_each(tables.Begin(), tables.End(), [&round](const rapidjson::Value &json) {
+            round.tables.push_back(CompetitionTable());
+            CompetitionTable::fromJson(json, round.tables.back());
+        });
+    }
 }
 
 void CompetitionRound::toJson(const CompetitionRound &round, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
+    rapidjson::Value tables(rapidjson::Type::kArrayType);
+    tables.Reserve((rapidjson::SizeType)round.tables.size(), alloc);
+    std::for_each(round.tables.begin(), round.tables.end(), [&tables, &alloc](const CompetitionTable &table) {
+        rapidjson::Value json(rapidjson::Type::kObjectType);
+        CompetitionTable::toJson(table, json, alloc);
+        tables.PushBack(std::move(json), alloc);
+    });
+    json.AddMember("tables", std::move(tables), alloc);
 }
 
 void CompetitionData::fromJson(const rapidjson::Value &json, CompetitionData &data) {
