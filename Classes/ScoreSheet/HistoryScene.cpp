@@ -62,6 +62,7 @@ static void saveRecords(const std::vector<Record> &records) {
     if (LIKELY(file != nullptr)) {
         try {
             rapidjson::Document doc(rapidjson::Type::kArrayType);
+            doc.Reserve(static_cast<rapidjson::SizeType>(records.size()), doc.GetAllocator());
             std::for_each(records.begin(), records.end(), [&doc](const Record &record) {
                 rapidjson::Value json(rapidjson::Type::kObjectType);
                 RecordToJson(record, json, doc.GetAllocator());

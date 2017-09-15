@@ -68,12 +68,14 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
 
 void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
     rapidjson::Value name(rapidjson::Type::kArrayType);
+    name.Reserve(4, alloc);
     for (int i = 0; i < 4; ++i) {
         name.PushBack(rapidjson::StringRef(record.name[i]), alloc);
     }
     json.AddMember("name", std::move(name), alloc);
 
     rapidjson::Value detail(rapidjson::Type::kArrayType);
+    detail.Reserve(static_cast<rapidjson::SizeType>(record.current_index), alloc);
     for (size_t i = 0; i < record.current_index; ++i) {
         const Record::Detail &detail_data = record.detail[i];
         rapidjson::Value detail_json(rapidjson::Type::kObjectType);
