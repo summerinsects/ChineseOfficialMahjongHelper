@@ -78,8 +78,8 @@ void CompetitionPlayer::fromJson(const rapidjson::Value &json, CompetitionPlayer
 }
 
 void CompetitionPlayer::toJson(const CompetitionPlayer &player, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
-    json.AddMember("rank", rapidjson::Value(player.serial), alloc);
-    json.AddMember("standard_score", rapidjson::StringRef(player.name.c_str()), alloc);
+    json.AddMember("serial", rapidjson::Value(player.serial), alloc);
+    json.AddMember("name", rapidjson::StringRef(player.name.c_str()), alloc);
 
     rapidjson::Value results(rapidjson::Type::kArrayType);
     results.Reserve((rapidjson::SizeType)player.competition_results.size(), alloc);
