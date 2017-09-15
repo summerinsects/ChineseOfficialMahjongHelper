@@ -82,7 +82,7 @@ void CompetitionPlayer::toJson(const CompetitionPlayer &player, rapidjson::Value
     json.AddMember("name", rapidjson::StringRef(player.name.c_str()), alloc);
 
     rapidjson::Value results(rapidjson::Type::kArrayType);
-    results.Reserve((rapidjson::SizeType)player.competition_results.size(), alloc);
+    results.Reserve(static_cast<rapidjson::SizeType>(player.competition_results.size()), alloc);
     std::for_each(player.competition_results.begin(), player.competition_results.end(), [&results, &alloc](const CompetitionResult &result) {
         rapidjson::Value json(rapidjson::Type::kObjectType);
         CompetitionResult::toJson(result, json, alloc);
@@ -120,7 +120,7 @@ void CompetitionTeam::toJson(const CompetitionTeam &team, rapidjson::Value &json
     json.AddMember("name", rapidjson::StringRef(team.name.c_str()), alloc);
 
     rapidjson::Value indices(rapidjson::Type::kArrayType);
-    indices.Reserve((rapidjson::SizeType)team.player_indices.size(), alloc);
+    indices.Reserve(static_cast<rapidjson::SizeType>(team.player_indices.size()), alloc);
     std::for_each(team.player_indices.begin(), team.player_indices.end(), [&indices, &alloc](ptrdiff_t idx) {
         indices.PushBack(rapidjson::Value(static_cast<int64_t>(idx)), alloc);
     });
@@ -172,7 +172,7 @@ void CompetitionRound::fromJson(const rapidjson::Value &json, CompetitionRound &
 
 void CompetitionRound::toJson(const CompetitionRound &round, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
     rapidjson::Value tables(rapidjson::Type::kArrayType);
-    tables.Reserve((rapidjson::SizeType)round.tables.size(), alloc);
+    tables.Reserve(static_cast<rapidjson::SizeType>(round.tables.size()), alloc);
     std::for_each(round.tables.begin(), round.tables.end(), [&tables, &alloc](const CompetitionTable &table) {
         rapidjson::Value json(rapidjson::Type::kObjectType);
         CompetitionTable::toJson(table, json, alloc);
@@ -230,7 +230,7 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     json.AddMember("name", rapidjson::StringRef(data.name.c_str()), alloc);
 
     rapidjson::Value players(rapidjson::Type::kArrayType);
-    players.Reserve((rapidjson::SizeType)data.players.size(), alloc);
+    players.Reserve(static_cast<rapidjson::SizeType>(data.players.size()), alloc);
     std::for_each(data.players.begin(), data.players.end(), [&players, &alloc](const CompetitionPlayer &player) {
         rapidjson::Value json(rapidjson::Type::kObjectType);
         CompetitionPlayer::toJson(player, json, alloc);
@@ -239,7 +239,7 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     json.AddMember("players", std::move(players), alloc);
 
     rapidjson::Value teams(rapidjson::Type::kArrayType);
-    teams.Reserve((rapidjson::SizeType)data.teams.size(), alloc);
+    teams.Reserve(static_cast<rapidjson::SizeType>(data.teams.size()), alloc);
     std::for_each(data.teams.begin(), data.teams.end(), [&teams, &alloc](const CompetitionTeam &team) {
         rapidjson::Value json(rapidjson::Type::kObjectType);
         CompetitionTeam::toJson(team, json, alloc);
@@ -248,7 +248,7 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     json.AddMember("teams", std::move(teams), alloc);
 
     rapidjson::Value rounds(rapidjson::Type::kArrayType);
-    rounds.Reserve((rapidjson::SizeType)data.rounds.size(), alloc);
+    rounds.Reserve(static_cast<rapidjson::SizeType>(data.rounds.size()), alloc);
     std::for_each(data.rounds.begin(), data.rounds.end(), [&rounds, &alloc](const CompetitionRound &round) {
         rapidjson::Value json(rapidjson::Type::kObjectType);
         CompetitionRound::toJson(round, json, alloc);
