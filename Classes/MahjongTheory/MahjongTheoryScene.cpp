@@ -12,6 +12,7 @@
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
 #include "../widget/TilesKeyboard.h"
+#include <array>
 
 USING_NS_CC;
 
@@ -740,18 +741,18 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ss
 }
 
 cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<LayerColor *[2], Label *, Label *, ui::Button *, Label *, ui::Button *[34], Label *, Label *> CustomCell;
+    typedef cw::TableViewCellEx<std::array<LayerColor *, 2>, Label *, Label *, ui::Button *, Label *, std::array<ui::Button *, 34>, Label *, Label *> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
     if (cell == nullptr) {
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        LayerColor *(&layerColor)[2] = std::get<0>(ext);
+        std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
         Label *&typeLabel = std::get<1>(ext);
         Label *&discardLabel = std::get<2>(ext);
         ui::Button *&discardButton = std::get<3>(ext);
         Label *&usefulLabel = std::get<4>(ext);
-        ui::Button *(&usefulButton)[34] = std::get<5>(ext);
+        std::array<ui::Button *, 34> &usefulButton = std::get<5>(ext);
         Label *&cntLabel1 = std::get<6>(ext);
         Label *&cntLabel2 = std::get<7>(ext);
 
@@ -808,12 +809,12 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    LayerColor *const (&layerColor)[2] = std::get<0>(ext);
+    const std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
     Label *typeLabel = std::get<1>(ext);
     Label *discardLabel = std::get<2>(ext);
     ui::Button *discardButton = std::get<3>(ext);
     Label *usefulLabel = std::get<4>(ext);
-    ui::Button *const (&usefulButton)[34] = std::get<5>(ext);
+    const std::array<ui::Button *, 34> &usefulButton = std::get<5>(ext);
     Label *cntLabel1 = std::get<6>(ext);
     Label *cntLabel2 = std::get<7>(ext);
 
