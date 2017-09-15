@@ -1,5 +1,6 @@
 ﻿#include "CompetitionRoundScene.h"
 #include "Competition.h"
+#include "CompetitionTableScene.h"
 #include "../common.h"
 #include "../widget/AlertView.h"
 #include <array>
@@ -108,6 +109,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 55.0f));
     tableView->reloadData();
     this->addChild(tableView);
+    _tableView = tableView;
 
     return true;
 }
@@ -176,5 +178,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
 }
 
 void CompetitionRoundScene::onRankButton(cocos2d::Ref *sender) {
-
+    CompetitionTableScene *scene = CompetitionTableScene::create(_competitionData, _currentRound);
+    scene->setOnExitCallback(std::bind(&cw::TableView::reloadData, _tableView));
+    Director::getInstance()->pushScene(scene);
 }

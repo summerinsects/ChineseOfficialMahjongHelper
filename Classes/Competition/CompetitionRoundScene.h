@@ -23,6 +23,8 @@ private:
     float _colWidth[7];
     float _posX[7];
 
+    cw::TableView *_tableView = nullptr;
+
     std::shared_ptr<CompetitionData> _competitionData;
     unsigned _currentRound;
 
