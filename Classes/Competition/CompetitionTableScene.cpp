@@ -240,9 +240,8 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
 
     drawNode->drawRect(Vec2(0, 0), Vec2(width, height), Color4F::BLACK);
     for (int i = 0; i < 4; ++i) {
-        drawNode->drawLine(Vec2(0, i * 20 + 20), Vec2(width, i * 20 + 20), Color4F::BLACK);
+        drawNode->drawLine(Vec2(0, static_cast<float>(i * 20 + 20)), Vec2(width, static_cast<float>(i * 20 + 20)), Color4F::BLACK);
     }
-
 
     for (int i = 0; i < 4; ++i) {
         const float x = posX[i] + colWidth[i] * 0.5f;
@@ -319,7 +318,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
 
             CompetitionResult &result = players[currentTable.player_indices[i]].competition_results[_currentRound];
             result.rank = atoi(rank.c_str());
-            result.standard_score = atof(ss.c_str());
+            result.standard_score = static_cast<float>(atof(ss.c_str()));
             result.competition_score = atoi(cs.c_str());
 
             _tableView->updateCellAtIndex(table);
