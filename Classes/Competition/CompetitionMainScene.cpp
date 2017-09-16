@@ -1,5 +1,6 @@
 ﻿#include "CompetitionMainScene.h"
 #include "CompetitionEnterScene.h"
+#include "CompetitionRoundScene.h"
 #include "../common.h"
 #include "../widget/AlertView.h"
 #include "Competition.h"
@@ -35,6 +36,17 @@ bool CompetitionMainScene::init() {
     button->addClickEventListener([](Ref *) {
 
     });
+
+    _competitionData = std::make_shared<CompetitionData>();
+
+    std::string fileName = FileUtils::getInstance()->getWritablePath();
+    fileName.append("competition.json");
+    _competitionData->readFromFile(fileName.c_str());
+    if (_competitionData->finish_time == 0) {
+        this->scheduleOnce([this](float) {
+            Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, _competitionData->current_round));
+        }, 0.0f, "push_round_scene");
+    }
 
     return true;
 }
@@ -138,7 +150,6 @@ void CompetitionMainScene::showCompetitionCreatingAlert(const std::string &name,
         label->setHorizontalAlignment(TextHAlignment::CENTER);
 
         AlertView::showWithNode("创建比赛", label, [this, name, num, round]() {
-            _competitionData = std::make_shared<CompetitionData>();
             _competitionData->name = name;
             _competitionData->rounds.resize(round);
             _competitionData->current_round = 0;

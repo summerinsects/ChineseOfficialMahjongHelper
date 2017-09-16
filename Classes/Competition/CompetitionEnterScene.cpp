@@ -203,6 +203,11 @@ void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
     }
 
     // TODO:
+    std::string fileName = FileUtils::getInstance()->getWritablePath();
+    fileName.append("competition.json");
+    _competitionData->start_time = time(nullptr);
+    _competitionData->writeToFile(fileName.c_str());
+
     Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, 0));
 }
 
