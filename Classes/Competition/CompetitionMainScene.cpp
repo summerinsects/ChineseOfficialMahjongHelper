@@ -23,7 +23,7 @@ bool CompetitionMainScene::init() {
     button->setTitleText("创建比赛");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 50));
     button->addClickEventListener([this](Ref *) {
-        this->showCompetitionCreatingAlert("测试比赛", 8, 5);
+        this->showCompetitionCreatingAlert("", 8, 5);
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -81,6 +81,9 @@ void CompetitionMainScene::showCompetitionCreatingAlert(const std::string &name,
     editBox1->setText(name.c_str());
     rootNode->addChild(editBox1);
     editBox1->setPosition(Vec2(135, 75));
+#if 1  // test
+    editBox1->setText("测试比赛");
+#endif
 
     label = Label::createWithSystemFont("参赛人数", "Arial", 12);
     label->setColor(Color3B::BLACK);
