@@ -23,7 +23,13 @@ bool CompetitionMainScene::init() {
     button->setTitleText("新建比赛");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 50));
     button->addClickEventListener([this](Ref *) {
-        this->showNewCompetitionAlert("", 8, 5);
+        if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
+            AlertView::showWithMessage("新建比赛", "当前有未完成的比赛，新建比赛将会覆盖旧的比赛，是否继续？", 12,
+                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, "", 8, 5), nullptr);
+        }
+        else {
+            this->showNewCompetitionAlert("", 8, 5);
+        }
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -35,8 +41,19 @@ bool CompetitionMainScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
     button->addClickEventListener([this](Ref *) {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
-            Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, _competitionData->current_round));
+            Scene *scene = nullptr;
+            if (_competitionData->isRegistrationFull()) {
+                scene = CompetitionRoundScene::create(_competitionData, _competitionData->current_round);
+            }
+            else {
+                scene = CompetitionEnterScene::create(_competitionData);
+            }
+            Director::getInstance()->pushScene(scene);
         }
+    });
+
+    this->setOnEnterCallback([this, button]() {
+        button->setEnabled(_competitionData->start_time != 0 && _competitionData->finish_time == 0);
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -51,13 +68,7 @@ bool CompetitionMainScene::init() {
     });
 
     _competitionData = std::make_shared<CompetitionData>();
-
     _competitionData->readFromFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
-    if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
-        this->scheduleOnce([this](float) {
-            Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, _competitionData->current_round));
-        }, 0.0f, "push_round_scene");
-    }
 
     return true;
 }
