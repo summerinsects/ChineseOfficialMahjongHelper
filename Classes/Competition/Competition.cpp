@@ -63,9 +63,12 @@ void CompetitionRound::sortPlayers(unsigned round, const std::vector<Competition
 void CompetitionData::prepare() {
     start_time = time(nullptr);
     size_t round = rounds.size();
-    std::for_each(players.begin(), players.end(), [round](CompetitionPlayer &player) {
+
+    for (size_t i = 0, cnt = players.size(); i < cnt; ++i) {
+        CompetitionPlayer &player = players[i];
+        player.serial = static_cast<unsigned>(1 + i);
         player.competition_results.resize(round);
-    });
+    }
 }
 
 bool CompetitionData::isRoundStarted(unsigned round) const {

@@ -174,9 +174,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, unsi
             _competitionData->current_round = 0;
             _competitionData->players.resize(num);
 
-            for (unsigned i = 0; i < num; ++i) {
-                _competitionData->players[i].serial = 1 + i;
-            }
+            _competitionData->prepare();
 
             Director::getInstance()->pushScene(CompetitionEnterScene::create(_competitionData));
         }, nullptr);
