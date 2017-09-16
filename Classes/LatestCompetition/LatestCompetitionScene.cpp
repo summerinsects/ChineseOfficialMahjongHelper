@@ -64,8 +64,11 @@ void LatestCompetitionScene::requestCompetitions() {
 
         loadingView->removeFromParent();
 
+        LatestCompetitionScene *pthis = thiz.get();
         if (response == nullptr) {
-            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, std::bind(&LatestCompetitionScene::requestCompetitions, thiz.get()), nullptr);
+            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, [pthis]() {
+                pthis->requestCompetitions();
+            }, nullptr);
             return;
         }
 
@@ -74,7 +77,9 @@ void LatestCompetitionScene::requestCompetitions() {
         if (!response->isSucceed()) {
             log("response failed");
             log("error buffer: %s", response->getErrorBuffer());
-            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, std::bind(&LatestCompetitionScene::requestCompetitions, thiz.get()), nullptr);
+            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, [pthis]() {
+                pthis->requestCompetitions();
+            }, nullptr);
             return;
         }
 
