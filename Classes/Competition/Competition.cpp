@@ -309,8 +309,8 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     json.AddMember("rounds", std::move(rounds), alloc);
 
     json.AddMember("current_round", rapidjson::Value(data.current_round), alloc);
-    json.AddMember("start_time", rapidjson::Value(data.start_time), alloc);
-    json.AddMember("finish_time", rapidjson::Value(data.finish_time), alloc);
+    json.AddMember("start_time", rapidjson::Value(static_cast<uint64_t>(data.start_time)), alloc);
+    json.AddMember("finish_time", rapidjson::Value(static_cast<uint64_t>(data.finish_time)), alloc);
 }
 
 bool CompetitionData::readFromFile(const char *file) {
