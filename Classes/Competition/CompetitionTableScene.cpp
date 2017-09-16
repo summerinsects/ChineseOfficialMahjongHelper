@@ -129,30 +129,30 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
             Label *label = Label::createWithSystemFont(seatText[i], "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[1], (float)(105 - i * 30)));
+            label->setPosition(Vec2(_posX[1], static_cast<float>(105 - i * 30)));
 
             label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[2], (float)(105 - i * 30)));
+            label->setPosition(Vec2(_posX[2], static_cast<float>(105 - i * 30)));
             serialLabels[i] = label;
 
             label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[3], (float)(105 - i * 30)));
+            label->setPosition(Vec2(_posX[3], static_cast<float>(105 - i * 30)));
             nameLabels[i] = label;
 
             label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[4], (float)(105 - i * 30)));
+            label->setPosition(Vec2(_posX[4], static_cast<float>(105 - i * 30)));
             standardLabels[i] = label;
 
             label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[5], (float)(105 - i * 30)));
+            label->setPosition(Vec2(_posX[5], static_cast<float>(105 - i * 30)));
             competitionLabels[i] = label;
         }
 
