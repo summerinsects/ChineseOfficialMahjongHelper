@@ -202,8 +202,6 @@ void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
         return;
     }
 
-    _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
-
     Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, 0));
 }
 
@@ -223,6 +221,7 @@ void CompetitionEnterScene::onNameButton(cocos2d::Ref *sender) {
 
     AlertView::showWithNode(Common::format<64>("序号「%lu」", (unsigned long)idx + 1), editBox, [this, editBox, idx]() {
         _competitionData->players[idx].name = editBox->getText();
+        _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
         _tableView->updateCellAtIndex(idx >> 1);
     }, nullptr);
 
