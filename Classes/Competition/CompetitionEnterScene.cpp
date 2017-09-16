@@ -1,9 +1,8 @@
 ﻿#include "CompetitionEnterScene.h"
-#include "CompetitionRoundScene.h"
-#include "Competition.h"
-#include "../common.h"
-#include "../widget/AlertView.h"
 #include <array>
+#include "../widget/AlertView.h"
+#include "Competition.h"
+#include "CompetitionRoundScene.h"
 
 USING_NS_CC;
 

@@ -1,8 +1,7 @@
 ﻿#include "CompetitionTableScene.h"
-#include "Competition.h"
-#include "../common.h"
-#include "../widget/AlertView.h"
 #include <array>
+#include "../widget/AlertView.h"
+#include "Competition.h"
 
 USING_NS_CC;
 

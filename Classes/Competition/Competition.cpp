@@ -1,11 +1,9 @@
 ﻿#include "Competition.h"
-
 #include <sstream>
 #include <algorithm>
-#include "../common.h"
-
 #include "json/stringbuffer.h"
 #include "json/prettywriter.h"
+#include "../common.h"
 
 std::string CompetitionResult::getStandardScoreString(float ss) {
     std::ostringstream os;
