@@ -193,7 +193,6 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
 void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
     for (size_t i = 0, cnt = _competitionData->players.size(); i < cnt; ++i) {
         _competitionData->players.at(i).name = Common::format<32>("%lu号选手", (unsigned long)i + 1);
-        _competitionData->players.at(i).competition_results.resize(_competitionData->rounds.size());
     }
 
     if (std::any_of(_competitionData->players.begin(), _competitionData->players.end(),
@@ -202,10 +201,10 @@ void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
         return;
     }
 
-    // TODO:
+    _competitionData->prepare();
+
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("competition.json");
-    _competitionData->start_time = time(nullptr);
     _competitionData->writeToFile(fileName.c_str());
 
     Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, 0));

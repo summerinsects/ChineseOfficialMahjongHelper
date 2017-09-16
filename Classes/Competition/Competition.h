@@ -1,6 +1,8 @@
 ﻿#ifndef __COMPETITION_H__
 #define __COMPETITION_H__
 
+#include <stddef.h>
+#include <time.h>
 #include <string>
 #include <vector>
 #include <utility>
@@ -89,6 +91,8 @@ public:
 
     bool readFromFile(const char *file);
     bool writeToFile(const char *file) const;
+
+    void prepare();
 
     bool isRoundStarted(unsigned round) const;
 };

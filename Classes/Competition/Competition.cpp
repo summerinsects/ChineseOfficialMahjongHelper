@@ -62,6 +62,14 @@ void CompetitionRound::sortPlayers(unsigned round, const std::vector<Competition
     std::transform(ptemp.begin(), ptemp.end(), std::back_inserter(output), [](ScoresSortInfo *pssi) { return pssi->player; });
 }
 
+void CompetitionData::prepare() {
+    start_time = time(nullptr);
+    size_t round = rounds.size();
+    std::for_each(players.begin(), players.end(), [round](CompetitionPlayer &player) {
+        player.competition_results.resize(round);
+    });
+}
+
 bool CompetitionData::isRoundStarted(unsigned round) const {
     return std::any_of(players.begin(), players.end(), [round](const CompetitionPlayer &player) {
         return player.competition_results[round].rank != 0;
