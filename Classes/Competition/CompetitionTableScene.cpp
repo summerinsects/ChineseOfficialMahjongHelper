@@ -401,7 +401,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
 
         text = editBoxes[1]->getText();
         if (*text != '\0') {
-            standardScore = (float)atof(text);
+            standardScore = static_cast<float>(atof(text));
         }
 
         text = editBoxes[2]->getText();
