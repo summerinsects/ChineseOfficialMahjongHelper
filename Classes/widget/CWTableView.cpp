@@ -185,7 +185,7 @@ namespace cw {
             return;
         }
 
-        long newIdx = 0;
+        ssize_t newIdx = 0;
 
         auto cell = cellAtIndex(idx);
         if (cell != nullptr) {
@@ -301,16 +301,16 @@ namespace cw {
         return offset;
     }
 
-    long TableView::_indexFromOffset(Vec2 offset, ssize_t cellsCount) {
-        long index = 0;
-        const long maxIdx = cellsCount - 1;
+    ssize_t TableView::_indexFromOffset(Vec2 offset, ssize_t cellsCount) {
+        ssize_t index = 0;
+        const ssize_t maxIdx = cellsCount - 1;
 
         if (_vordering == VerticalFillOrder::TOP_DOWN) {
             offset.y = _innerContainer->getContentSize().height - offset.y;
         }
         index = this->__indexFromOffset(offset, cellsCount);
         if (index != -1) {
-            index = std::max(0L, index);
+            index = std::max((ssize_t)0, index);
             if (index > maxIdx) {
                 index = CC_INVALID_INDEX;
             }
@@ -319,14 +319,14 @@ namespace cw {
         return index;
     }
 
-    long TableView::__indexFromOffset(const Vec2 &offset, ssize_t cellsCount) {
-        long low = 0;
-        long high = cellsCount - 1;
+    ssize_t TableView::__indexFromOffset(const Vec2 &offset, ssize_t cellsCount) {
+        ssize_t low = 0;
+        ssize_t high = cellsCount - 1;
         const float search = (_direction == Direction::HORIZONTAL ? offset.x : offset.y);
 
         // binary search
         while (high >= low) {
-            long index = low + (high - low) / 2;
+            ssize_t index = low + (high - low) / 2;
             const float cellStart = _cellsPositions[index];
             const float cellEnd = _cellsPositions[index + 1];
 
@@ -412,7 +412,7 @@ namespace cw {
 
         offset.x = -offset.x;
         offset.y = -offset.y;
-        maxIdx = std::max((long)cellsCount - 1, 0L);
+        maxIdx = std::max(cellsCount - 1, (ssize_t)0);
 
         if (_vordering == VerticalFillOrder::TOP_DOWN) {
             offset.y = offset.y + _contentSize.height / _innerContainer->getScaleY();

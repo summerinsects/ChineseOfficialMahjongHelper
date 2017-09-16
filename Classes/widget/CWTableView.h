@@ -204,8 +204,8 @@ namespace cw {
 
         virtual void moveInnerContainer(const cocos2d::Vec2 &deltaMove, bool canStartBounceBack) override;
 
-        long __indexFromOffset(const cocos2d::Vec2 &offset, ssize_t cellsCount);
-        long _indexFromOffset(cocos2d::Vec2 offset, ssize_t cellsCount);
+        ssize_t __indexFromOffset(const cocos2d::Vec2 &offset, ssize_t cellsCount);
+        ssize_t _indexFromOffset(cocos2d::Vec2 offset, ssize_t cellsCount);
         cocos2d::Vec2 __offsetFromIndex(ssize_t index);
         cocos2d::Vec2 _offsetFromIndex(ssize_t index);
 
