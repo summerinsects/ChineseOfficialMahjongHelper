@@ -6,8 +6,8 @@
 
 USING_NS_CC;
 
-CompetitionEnterScene *CompetitionEnterScene::create(const std::shared_ptr<CompetitionData> &competitionData) {
-    auto ret = new (std::nothrow) CompetitionEnterScene();
+CompetitionEnrollScene *CompetitionEnrollScene::create(const std::shared_ptr<CompetitionData> &competitionData) {
+    auto ret = new (std::nothrow) CompetitionEnrollScene();
     if (ret != nullptr && ret->initWithData(competitionData)) {
         ret->autorelease();
         return ret;
@@ -16,7 +16,7 @@ CompetitionEnterScene *CompetitionEnterScene::create(const std::shared_ptr<Compe
     return nullptr;
 }
 
-bool CompetitionEnterScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData) {
+bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData) {
     if (UNLIKELY(!BaseScene::initWithTitle(competitionData->name))) {
         return false;
     }
@@ -39,7 +39,7 @@ bool CompetitionEnterScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setTitleFontSize(12);
     button->setTitleText("下一步");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 70.0f));
-    button->addClickEventListener(std::bind(&CompetitionEnterScene::onOkButton, this, std::placeholders::_1));
+    button->addClickEventListener(std::bind(&CompetitionEnrollScene::onOkButton, this, std::placeholders::_1));
 
     label = Label::createWithSystemFont("序号", "Arail", 12);
     label->setColor(Color3B::BLACK);
@@ -79,15 +79,15 @@ bool CompetitionEnterScene::initWithData(const std::shared_ptr<CompetitionData> 
     return true;
 }
 
-ssize_t CompetitionEnterScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t CompetitionEnrollScene::numberOfCellsInTableView(cw::TableView *table) {
     return _competitionData->players.size() >> 1;
 }
 
-cocos2d::Size CompetitionEnterScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+cocos2d::Size CompetitionEnrollScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
     return Size(0, 30);
 }
 
-cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
+cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
     typedef cw::TableViewCellEx<std::array<Label *, 4>, std::array<ui::Button *, 2>, std::array<LayerColor *, 2> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
@@ -136,7 +136,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
         button->setPosition(labels[1]->getPosition());
         button->setContentSize(Size(visibleSize.width * 0.5f - 50.0f, 25.0f));
         cell->addChild(button);
-        button->addClickEventListener(std::bind(&CompetitionEnterScene::onNameButton, this, std::placeholders::_1));
+        button->addClickEventListener(std::bind(&CompetitionEnrollScene::onNameButton, this, std::placeholders::_1));
         buttons[0] = button;
 
         button = ui::Button::create();
@@ -144,7 +144,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
         button->setPosition(labels[3]->getPosition());
         button->setContentSize(Size(visibleSize.width * 0.5f - 50.0f, 25.0f));
         cell->addChild(button);
-        button->addClickEventListener(std::bind(&CompetitionEnterScene::onNameButton, this, std::placeholders::_1));
+        button->addClickEventListener(std::bind(&CompetitionEnrollScene::onNameButton, this, std::placeholders::_1));
         buttons[1] = button;
     }
 
@@ -189,7 +189,7 @@ cw::TableViewCell *CompetitionEnterScene::tableCellAtIndex(cw::TableView *table,
     return cell;
 }
 
-void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
+void CompetitionEnrollScene::onOkButton(cocos2d::Ref *sender) {
 #if 1  // test
     for (size_t i = 0, cnt = _competitionData->players.size(); i < cnt; ++i) {
         _competitionData->players.at(i).name = Common::format<32>("%lu号选手", (unsigned long)i + 1);
@@ -204,7 +204,7 @@ void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
     Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, 0));
 }
 
-void CompetitionEnterScene::onNameButton(cocos2d::Ref *sender) {
+void CompetitionEnrollScene::onNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
 

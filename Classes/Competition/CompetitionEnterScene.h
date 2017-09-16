@@ -1,14 +1,14 @@
-﻿#ifndef __COMPETITION_ENTER_SCENE__
-#define __COMPETITION_ENTER_SCENE__
+﻿#ifndef __COMPETITION_ENROLL_SCENE__
+#define __COMPETITION_ENROLL_SCENE__
 
 #include "../BaseScene.h"
 #include "../widget/CWTableView.h"
 
 class CompetitionData;
 
-class CompetitionEnterScene : public BaseScene, cw::TableViewDelegate {
+class CompetitionEnrollScene : public BaseScene, cw::TableViewDelegate {
 public:
-    static CompetitionEnterScene *create(const std::shared_ptr<CompetitionData> &competitionData);
+    static CompetitionEnrollScene *create(const std::shared_ptr<CompetitionData> &competitionData);
     bool initWithData(const std::shared_ptr<CompetitionData> &competitionData);
 
 private:

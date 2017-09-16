@@ -46,7 +46,7 @@ bool CompetitionMainScene::init() {
                 scene = CompetitionRoundScene::create(_competitionData, _competitionData->current_round);
             }
             else {
-                scene = CompetitionEnterScene::create(_competitionData);
+                scene = CompetitionEnrollScene::create(_competitionData);
             }
             Director::getInstance()->pushScene(scene);
         }
@@ -187,7 +187,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, unsi
 
             _competitionData->prepare();
 
-            Director::getInstance()->pushScene(CompetitionEnterScene::create(_competitionData));
+            Director::getInstance()->pushScene(CompetitionEnrollScene::create(_competitionData));
         }, nullptr);
     }, nullptr);
 }
