@@ -151,7 +151,7 @@ bool MahjongTheoryScene::init() {
     _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 60));
     this->addChild(_tableView);
 
-    srand((unsigned)time(nullptr));
+    srand(static_cast<unsigned>(time(nullptr)));
 
     this->scheduleOnce([this](float) { setRandomInput(); }, 0.0f, "set_random_input");
 
@@ -724,7 +724,7 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ss
     int lineCnt = 1;
     int remainCnt = result->count_in_tiles;
     do {
-        int limitedCnt = (int)remainWidth / TILE_WIDTH_SMALL;  // 第N行可以排这么多
+        int limitedCnt = static_cast<int>(remainWidth / TILE_WIDTH_SMALL);  // 第N行可以排这么多
         if (limitedCnt >= remainCnt) {  // 排得下
             // 包括后面的字是否排得下
             bool inOneLine = remainCnt * TILE_WIDTH_SMALL + _totalLabelWidth <= remainWidth;

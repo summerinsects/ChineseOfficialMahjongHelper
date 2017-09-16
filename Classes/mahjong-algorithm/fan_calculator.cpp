@@ -1182,10 +1182,10 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, intptr_t pack_
 // 单个牌组用风校正，确定圈风刻、门风刻
 static void adjust_by_winds(tile_t tile, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
     rank_t delta = tile - TILE_E;
-    if (delta == (int)prevalent_wind - (int)wind_t::EAST) {
+    if (delta == static_cast<int>(prevalent_wind) - static_cast<int>(wind_t::EAST)) {
         fan_table[PREVALENT_WIND] = 1;
     }
-    if (delta == (int)seat_wind - (int)wind_t::EAST) {
+    if (delta == static_cast<int>(seat_wind) - static_cast<int>(wind_t::EAST)) {
         fan_table[SEAT_WIND] = 1;
     }
 }

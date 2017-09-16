@@ -89,8 +89,8 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
     }
     json.AddMember("detail", std::move(detail), alloc);
 
-    json.AddMember("start_time", rapidjson::Value((uint64_t)record.start_time), alloc);
-    json.AddMember("end_time", rapidjson::Value((uint64_t)record.end_time), alloc);
+    json.AddMember("start_time", rapidjson::Value(static_cast<uint64_t>(record.start_time)), alloc);
+    json.AddMember("end_time", rapidjson::Value(static_cast<uint64_t>(record.end_time)), alloc);
 }
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
