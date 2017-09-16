@@ -2,7 +2,7 @@
 #include <array>
 #include "../widget/AlertView.h"
 #include "Competition.h"
-#include "CompetitionEnterScene.h"
+#include "CompetitionEnrollScene.h"
 #include "CompetitionRoundScene.h"
 
 USING_NS_CC;
