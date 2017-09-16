@@ -222,7 +222,7 @@
     <ClInclude Include="..\..\Classes\BaseScene.h" />
     <ClInclude Include="..\..\Classes\common.h" />
     <ClInclude Include="..\..\Classes\Competition\Competition.h" />
-    <ClInclude Include="..\..\Classes\Competition\CompetitionEnterScene.h" />
+    <ClInclude Include="..\..\Classes\Competition\CompetitionEnrollScene.h" />
     <ClInclude Include="..\..\Classes\Competition\CompetitionFinalScene.h" />
     <ClInclude Include="..\..\Classes\Competition\CompetitionMainScene.h" />
     <ClInclude Include="..\..\Classes\Competition\CompetitionRoundScene.h" />
@@ -276,7 +276,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\..\Classes\Competition\Competition.cpp" />
-    <ClCompile Include="..\..\Classes\Competition\CompetitionEnterScene.cpp" />
+    <ClCompile Include="..\..\Classes\Competition\CompetitionEnrollScene.cpp" />
     <ClCompile Include="..\..\Classes\Competition\CompetitionFinalScene.cpp" />
     <ClCompile Include="..\..\Classes\Competition\CompetitionMainScene.cpp" />
     <ClCompile Include="..\..\Classes\Competition\CompetitionRoundScene.cpp" />

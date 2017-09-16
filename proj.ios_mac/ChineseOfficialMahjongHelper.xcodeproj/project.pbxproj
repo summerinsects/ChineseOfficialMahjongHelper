@@ -25,8 +25,8 @@
 		1F2D25881E076FC20071ADE2 /* AlertView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertView.cpp */; };
 		1F4192741E10A10200CDC47D /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4192721E10A10200CDC47D /* CWTableView.cpp */; };
 		1F4192751E10A10200CDC47D /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4192721E10A10200CDC47D /* CWTableView.cpp */; };
-		1F68AFC91F03366900B4BB97 /* CompetitionEnterScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC51F03366800B4BB97 /* CompetitionEnterScene.cpp */; };
-		1F68AFCA1F03366900B4BB97 /* CompetitionEnterScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC51F03366800B4BB97 /* CompetitionEnterScene.cpp */; };
+		1F68AFC91F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */; };
+		1F68AFCA1F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */; };
 		1F68AFCB1F03366900B4BB97 /* CompetitionMainScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC71F03366800B4BB97 /* CompetitionMainScene.cpp */; };
 		1F68AFCC1F03366900B4BB97 /* CompetitionMainScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC71F03366800B4BB97 /* CompetitionMainScene.cpp */; };
 		1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
@@ -172,8 +172,8 @@
 		1F2D25861E076FC20071ADE2 /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
 		1F4192721E10A10200CDC47D /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
 		1F4192731E10A10200CDC47D /* CWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWTableView.h; sourceTree = "<group>"; };
-		1F68AFC51F03366800B4BB97 /* CompetitionEnterScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionEnterScene.cpp; path = Competition/CompetitionEnterScene.cpp; sourceTree = "<group>"; };
-		1F68AFC61F03366800B4BB97 /* CompetitionEnterScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionEnterScene.h; path = Competition/CompetitionEnterScene.h; sourceTree = "<group>"; };
+		1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionEnrollScene.cpp; path = Competition/CompetitionEnrollScene.cpp; sourceTree = "<group>"; };
+		1F68AFC61F03366800B4BB97 /* CompetitionEnrollScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionEnrollScene.h; path = Competition/CompetitionEnrollScene.h; sourceTree = "<group>"; };
 		1F68AFC71F03366800B4BB97 /* CompetitionMainScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionMainScene.cpp; path = Competition/CompetitionMainScene.cpp; sourceTree = "<group>"; };
 		1F68AFC81F03366900B4BB97 /* CompetitionMainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionMainScene.h; path = Competition/CompetitionMainScene.h; sourceTree = "<group>"; };
 		1F6A373D1CBDD3C9001617E6 /* BaseScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseScene.h; sourceTree = "<group>"; };
@@ -364,8 +364,8 @@
 			children = (
 				1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */,
 				1FE17A6E1EE0FF9300B47FE3 /* Competition.h */,
-				1F68AFC51F03366800B4BB97 /* CompetitionEnterScene.cpp */,
-				1F68AFC61F03366800B4BB97 /* CompetitionEnterScene.h */,
+				1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */,
+				1F68AFC61F03366800B4BB97 /* CompetitionEnrollScene.h */,
 				1FE17A6F1EE0FF9300B47FE3 /* CompetitionFinalScene.cpp */,
 				1FE17A701EE0FF9300B47FE3 /* CompetitionFinalScene.h */,
 				1F68AFC71F03366800B4BB97 /* CompetitionMainScene.cpp */,
@@ -739,7 +739,7 @@
 				1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
 				1FE0DAAE1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */,
-				1F68AFC91F03366900B4BB97 /* CompetitionEnterScene.cpp in Sources */,
+				1F68AFC91F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */,
 				1FE2A3ED1CBB30D1008C45C5 /* FanTable.cpp in Sources */,
 				1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
 				1F154E411E440A160083F8B3 /* stringify.cpp in Sources */,
@@ -782,7 +782,7 @@
 				1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
 				1F2D25881E076FC20071ADE2 /* AlertView.cpp in Sources */,
 				1F4192751E10A10200CDC47D /* CWTableView.cpp in Sources */,
-				1F68AFCA1F03366900B4BB97 /* CompetitionEnterScene.cpp in Sources */,
+				1F68AFCA1F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */,
 				1F0828A61ED26F8C00F4C424 /* Record.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,

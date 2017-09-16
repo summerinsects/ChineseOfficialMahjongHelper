@@ -13,7 +13,7 @@ LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/Competition/Competition.cpp \
-                   ../../Classes/Competition/CompetitionEnterScene.cpp \
+                   ../../Classes/Competition/CompetitionEnrollScene.cpp \
                    ../../Classes/Competition/CompetitionFinalScene.cpp \
                    ../../Classes/Competition/CompetitionMainScene.cpp \
                    ../../Classes/Competition/CompetitionRoundScene.cpp \
