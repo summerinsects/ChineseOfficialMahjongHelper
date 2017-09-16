@@ -274,7 +274,7 @@ void CompetitionData::fromJson(const rapidjson::Value &json, CompetitionData &da
 
     it = json.FindMember("finish_time");
     if (it != json.MemberEnd() && it->value.IsUint()) {
-        data.finish_time = static_cast<time_t>(it->value.GetUint());
+        data.finish_time = static_cast<time_t>(it->value.GetUint64());
     }
 }
 
