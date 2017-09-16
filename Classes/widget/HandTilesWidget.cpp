@@ -1,7 +1,7 @@
 ﻿#include "HandTilesWidget.h"
+#include "../mahjong-algorithm/fan_calculator.h"
 #include "../compiler.h"
 #include "../TilesImage.h"
-#include "../mahjong-algorithm/fan_calculator.h"
 
 USING_NS_CC;
 

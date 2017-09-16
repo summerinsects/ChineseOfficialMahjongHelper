@@ -1,16 +1,15 @@
 ﻿#include "HelloWorldScene.h"
+#include "network/HttpClient.h"
+#include "json/document.h"
+#include "json/stringbuffer.h"
+#include "common.h"
+#include "widget/AlertView.h"
 #include "FanCalculator/FanCalculatorScene.h"
 #include "ScoreSheet/ScoreSheetScene.h"
 #include "FanTable/FanTable.h"
 #include "Other/OtherScene.h"
 #include "MahjongTheory/MahjongTheoryScene.h"
 #include "LatestCompetition/LatestCompetitionScene.h"
-#include "widget/AlertView.h"
-#include "common.h"
-
-#include "network/HttpClient.h"
-#include "json/document.h"
-#include "json/stringbuffer.h"
 
 #define VERSION 0x010108
 

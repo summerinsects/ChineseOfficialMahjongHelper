@@ -2,9 +2,9 @@
 #define __MAHJONG_THEORY_SCENE_H__
 
 #include "../BaseScene.h"
+#include <unordered_map>
 #include "../mahjong-algorithm/shanten.h"
 #include "../widget/CWTableView.h"
-#include <unordered_map>
 
 class HandTilesWidget;
 

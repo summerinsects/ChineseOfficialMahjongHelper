@@ -1,5 +1,4 @@
 ﻿#include "AlertView.h"
-#include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "../compiler.h"
 

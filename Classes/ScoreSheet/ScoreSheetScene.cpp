@@ -1,14 +1,12 @@
 ﻿#include "ScoreSheetScene.h"
-#include "Record.h"
-#include "RecordScene.h"
-#include "HistoryScene.h"
+#include "json/stringbuffer.h"
+#include "json/prettywriter.h"
 #include "../widget/AlertView.h"
 #include "../widget/CWEditBoxDelegate.h"
 #include "../widget/HandTilesWidget.h"
-#include "../common.h"
-
-#include "json/stringbuffer.h"
-#include "json/prettywriter.h"
+#include "Record.h"
+#include "RecordScene.h"
+#include "HistoryScene.h"
 
 USING_NS_CC;
 

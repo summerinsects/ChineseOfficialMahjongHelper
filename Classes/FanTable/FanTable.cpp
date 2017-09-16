@@ -1,12 +1,7 @@
-﻿#ifdef _MSC_VER
-#pragma warning(disable: 4351)
-#endif
-
-#include "FanTable.h"
-#include "FanDefinition.h"
-#include "../mahjong-algorithm/fan_calculator.h"
-#include "../common.h"
+﻿#include "FanTable.h"
 #include <array>
+#include "../mahjong-algorithm/fan_calculator.h"
+#include "FanDefinition.h"
 
 USING_NS_CC;
 
