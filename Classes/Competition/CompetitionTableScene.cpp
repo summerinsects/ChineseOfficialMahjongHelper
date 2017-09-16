@@ -322,6 +322,8 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
             result.competition_score = atoi(cs.c_str());
 
             _tableView->updateCellAtIndex(table);
+
+            _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
         }
     }, nullptr);
 }
