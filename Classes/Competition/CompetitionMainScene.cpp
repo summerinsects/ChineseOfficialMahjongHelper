@@ -33,8 +33,10 @@ bool CompetitionMainScene::init() {
     button->setTitleFontSize(20);
     button->setTitleText("继续");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
-    button->addClickEventListener([](Ref *) {
-
+    button->addClickEventListener([this](Ref *) {
+        if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
+            Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, _competitionData->current_round));
+        }
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -51,7 +53,7 @@ bool CompetitionMainScene::init() {
     _competitionData = std::make_shared<CompetitionData>();
 
     _competitionData->readFromFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
-    if (_competitionData->finish_time == 0) {
+    if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
         this->scheduleOnce([this](float) {
             Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, _competitionData->current_round));
         }, 0.0f, "push_round_scene");
