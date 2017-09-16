@@ -18,7 +18,8 @@ CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<Compe
 }
 
 bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound) {
-    if (UNLIKELY(!BaseScene::initWithTitle(Common::format<256>("%s第%u轮", competitionData->name.c_str(), currentRound + 1)))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(Common::format<256>("%s第%u/%lu轮",
+        competitionData->name.c_str(), currentRound + 1, static_cast<unsigned long>(competitionData->rounds.size()))))) {
         return false;
     }
 
