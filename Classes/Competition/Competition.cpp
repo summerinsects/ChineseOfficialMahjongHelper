@@ -39,6 +39,7 @@ struct ScoresSortInfo {
 
 // 高高碰排序
 void CompetitionRound::sortPlayers(unsigned round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output) {
+    // 1. 逐个计算标准分和比赛分
     std::vector<ScoresSortInfo> temp;
     temp.reserve(players.size());
     std::transform(players.begin(), players.end(), std::back_inserter(temp), [round](const CompetitionPlayer &player) {
@@ -50,16 +51,19 @@ void CompetitionRound::sortPlayers(unsigned round, const std::vector<Competition
         return ret;
     });
 
+    // 2. 转换为指针数组
     std::vector<ScoresSortInfo *> ptemp;
     ptemp.reserve(temp.size());
     std::transform(temp.begin(), temp.end(), std::back_inserter(ptemp), [](ScoresSortInfo &ssi) { return &ssi; });
 
+    // 3. 排序指针数组
     std::sort(ptemp.begin(), ptemp.end(), [](const ScoresSortInfo *a, const ScoresSortInfo *b) {
         if (a->standard_score > b->standard_score) return true;
         if (a->standard_score == b->standard_score && a->competition_score > b->competition_score) return true;
         return false;
     });
 
+    // 4. 输出
     output.clear();
     output.reserve(ptemp.size());
     std::transform(ptemp.begin(), ptemp.end(), std::back_inserter(output), [](ScoresSortInfo *pssi) { return pssi->player; });
@@ -333,6 +337,7 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     json.AddMember("finish_time", rapidjson::Value(static_cast<uint64_t>(data.finish_time)), alloc);
 }
 
+// 从文件中读
 bool CompetitionData::readFromFile(const std::string &file) {
     std::string str;
     FILE *fp = fopen(file.c_str(), "rb");
@@ -366,6 +371,7 @@ bool CompetitionData::readFromFile(const std::string &file) {
     }
 }
 
+// 写入到文件
 bool CompetitionData::writeToFile(const std::string &file) const {
     try {
         rapidjson::Document doc(rapidjson::Type::kObjectType);

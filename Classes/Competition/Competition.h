@@ -90,8 +90,8 @@ public:
     static void fromJson(const rapidjson::Value &json, CompetitionData &data);
     static void toJson(const CompetitionData &data, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 
-    bool readFromFile(const std::string &file);
-    bool writeToFile(const std::string &file) const;
+    bool readFromFile(const std::string &file);  // 从文件中读
+    bool writeToFile(const std::string &file) const;  // 写入到文件
 
     void prepare();  // 准备
 
