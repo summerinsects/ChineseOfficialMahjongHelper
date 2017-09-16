@@ -1,13 +1,8 @@
-﻿#ifdef _MSC_VER
-#pragma warning(disable: 4351)
-#endif
-
-#include "RecordScene.h"
-#include "../common.h"
+﻿#include "RecordScene.h"
+#include <array>
+#include "../mahjong-algorithm/fan_calculator.h"
 #include "../widget/AlertView.h"
 #include "../widget/CWTableView.h"
-#include "../mahjong-algorithm/fan_calculator.h"
-#include <array>
 
 USING_NS_CC;
 

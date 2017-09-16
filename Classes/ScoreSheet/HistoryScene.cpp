@@ -1,18 +1,13 @@
-﻿#ifdef _MSC_VER
-#pragma warning(disable: 4351)
-#endif
-
-#include "HistoryScene.h"
+﻿#include "HistoryScene.h"
+#include <thread>
+#include <mutex>
+#include <array>
+#include "json/stringbuffer.h"
+#include "json/prettywriter.h"
 #include "Record.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
 #include "../widget/CWTableView.h"
-#include <thread>
-#include <mutex>
-#include <array>
-
-#include "json/stringbuffer.h"
-#include "json/prettywriter.h"
 
 USING_NS_CC;
 

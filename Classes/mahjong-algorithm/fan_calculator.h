@@ -23,7 +23,6 @@
 #ifndef __MAHJONG_ALGORITHM__FAN_CALCULATOR_H__
 #define __MAHJONG_ALGORITHM__FAN_CALCULATOR_H__
 
-#include <stddef.h>
 #include "tile.h"
 
 #define SUPPORT_CONCEALED_KONG_AND_MELDED_KONG 1  // 支持明暗杠

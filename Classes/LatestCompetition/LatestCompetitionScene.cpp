@@ -1,10 +1,10 @@
 ﻿#include "LatestCompetitionScene.h"
-#include "../widget/LoadingView.h"
-#include "../widget/AlertView.h"
+#include <array>
 #include "network/HttpClient.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
-#include <array>
+#include "../widget/LoadingView.h"
+#include "../widget/AlertView.h"
 
 USING_NS_CC;
 

@@ -1,9 +1,8 @@
 ﻿#include "FanDefinition.h"
 #include "ui/UIWebView.h"
-#include "../compiler.h"
-#include "../TilesImage.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
+#include "../TilesImage.h"
 #include "../widget/LoadingView.h"
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)

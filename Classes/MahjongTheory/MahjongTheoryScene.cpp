@@ -1,18 +1,12 @@
-﻿#ifdef _MSC_VER
-#pragma warning(disable: 4351)
-#endif
-
-#include "MahjongTheoryScene.h"
-#include "../widget/CWTableView.h"
+﻿#include "MahjongTheoryScene.h"
+#include <array>
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
-#include "../compiler.h"
 #include "../TilesImage.h"
 #include "../widget/HandTilesWidget.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
 #include "../widget/TilesKeyboard.h"
-#include <array>
 
 USING_NS_CC;
 

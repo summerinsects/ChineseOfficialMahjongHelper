@@ -3,7 +3,6 @@
 
 #include "cocos2d.h"
 #include "compiler.h"
-#include <string>
 
 namespace Common {
 
