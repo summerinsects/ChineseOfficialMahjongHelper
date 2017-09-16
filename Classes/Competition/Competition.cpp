@@ -266,6 +266,16 @@ void CompetitionData::fromJson(const rapidjson::Value &json, CompetitionData &da
     if (it != json.MemberEnd() && it->value.IsUint()) {
         data.current_round = it->value.GetUint();
     }
+
+    it = json.FindMember("start_time");
+    if (it != json.MemberEnd() && it->value.IsUint64()) {
+        data.start_time = static_cast<time_t>(it->value.GetUint64());
+    }
+
+    it = json.FindMember("finish_time");
+    if (it != json.MemberEnd() && it->value.IsUint()) {
+        data.finish_time = static_cast<time_t>(it->value.GetUint());
+    }
 }
 
 void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
@@ -299,6 +309,8 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     json.AddMember("rounds", std::move(rounds), alloc);
 
     json.AddMember("current_round", rapidjson::Value(data.current_round), alloc);
+    json.AddMember("start_time", rapidjson::Value(data.start_time), alloc);
+    json.AddMember("finish_time", rapidjson::Value(data.finish_time), alloc);
 }
 
 bool CompetitionData::readFromFile(const char *file) {

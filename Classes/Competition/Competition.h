@@ -81,6 +81,8 @@ public:
     std::vector<CompetitionTeam> teams;  // 参赛队伍
     std::vector<CompetitionRound> rounds;  // 每一轮数据
     unsigned current_round = 0;  // 当前轮数
+    time_t start_time = 0;  // 开始时间
+    time_t finish_time = 0;  // 结束时间
 
     static void fromJson(const rapidjson::Value &json, CompetitionData &data);
     static void toJson(const CompetitionData &data, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
