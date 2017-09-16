@@ -21,7 +21,7 @@ bool CompetitionMainScene::init() {
     button->setContentSize(Size(90.0, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleText("创建比赛");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 30));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 50));
     button->addClickEventListener([this](Ref *) {
         this->showCompetitionCreatingAlert("测试比赛", 8, 5);
     });
@@ -31,8 +31,19 @@ bool CompetitionMainScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0, 32.0f));
     button->setTitleFontSize(20);
+    button->setTitleText("继续");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
+    button->addClickEventListener([](Ref *) {
+
+    });
+
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(90.0, 32.0f));
+    button->setTitleFontSize(20);
     button->setTitleText("历史记录");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 30));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 50));
     button->addClickEventListener([](Ref *) {
 
     });
