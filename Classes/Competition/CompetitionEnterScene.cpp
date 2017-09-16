@@ -196,8 +196,7 @@ void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
     }
 #endif
 
-    if (std::any_of(_competitionData->players.begin(), _competitionData->players.end(),
-        [](const CompetitionPlayer &p) { return p.name.empty(); })) {
+    if (!_competitionData->isRegistrationFull()) {
         AlertView::showWithMessage("提示", "请录入所有选手姓名", 12, nullptr, nullptr);
         return;
     }

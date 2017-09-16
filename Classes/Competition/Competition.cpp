@@ -71,6 +71,11 @@ void CompetitionData::prepare() {
     }
 }
 
+// 报名是否已满
+bool CompetitionData::isRegistrationFull() const {
+    return std::all_of(players.begin(), players.end(), [](const CompetitionPlayer &p) { return !p.name.empty(); });
+}
+
 bool CompetitionData::isRoundStarted(unsigned round) const {
     return std::any_of(players.begin(), players.end(), [round](const CompetitionPlayer &player) {
         return player.competition_results[round].rank != 0;

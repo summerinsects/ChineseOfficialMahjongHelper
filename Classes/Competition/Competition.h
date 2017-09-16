@@ -94,6 +94,7 @@ public:
 
     void prepare();
 
+    bool isRegistrationFull() const;  // 报名是否已满
     bool isRoundStarted(unsigned round) const;
 };
 
