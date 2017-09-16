@@ -1,4 +1,4 @@
-﻿#include "CompetitionEnterScene.h"
+﻿#include "CompetitionEnrollScene.h"
 #include <array>
 #include "../widget/AlertView.h"
 #include "Competition.h"
