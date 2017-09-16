@@ -85,6 +85,9 @@ public:
     static void fromJson(const rapidjson::Value &json, CompetitionData &data);
     static void toJson(const CompetitionData &data, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 
+    bool readFromFile(const char *file);
+    bool writeToFile(const char *file) const;
+
     bool isRoundStarted(unsigned round) const;
 };
 

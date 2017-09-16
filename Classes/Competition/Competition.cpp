@@ -4,6 +4,9 @@
 #include <algorithm>
 #include "../common.h"
 
+#include "json/stringbuffer.h"
+#include "json/prettywriter.h"
+
 std::string CompetitionResult::getStandardScoreString(float ss) {
     std::ostringstream os;
     os << ss;
@@ -296,4 +299,63 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     json.AddMember("rounds", std::move(rounds), alloc);
 
     json.AddMember("current_round", rapidjson::Value(data.current_round), alloc);
+}
+
+bool CompetitionData::readFromFile(const char *file) {
+    std::string str;
+    FILE *fp = fopen(file, "rb");
+    if (LIKELY(fp != nullptr)) {
+        fseek(fp, 0, SEEK_END);
+        long size = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+        try {
+            str.resize(size + 1);
+            fread(&str[0], sizeof(char), size, fp);
+        }
+        catch (...) {
+        }
+        fclose(fp);
+    }
+
+    try {
+        CCLOG("%s", str.c_str());
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError()) {
+            return false;
+        }
+
+        fromJson(doc, *this);
+        return true;
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+        return false;
+    }
+}
+
+bool CompetitionData::writeToFile(const char *file) const {
+    try {
+        rapidjson::Document doc(rapidjson::Type::kObjectType);
+        toJson(*this, doc, doc.GetAllocator());
+
+        rapidjson::StringBuffer buf;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+        doc.Accept(writer);
+
+        CCLOG("%.*s", (int)buf.GetSize(), buf.GetString());
+
+        FILE *fp = fopen(file, "wb");
+        if (LIKELY(fp != nullptr)) {
+            fwrite(buf.GetString(), sizeof(char), buf.GetSize(), fp);
+            fclose(fp);
+            return true;
+        }
+
+        return false;
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+        return false;
+    }
 }
