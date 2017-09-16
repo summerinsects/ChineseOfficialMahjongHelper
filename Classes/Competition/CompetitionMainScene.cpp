@@ -50,9 +50,7 @@ bool CompetitionMainScene::init() {
 
     _competitionData = std::make_shared<CompetitionData>();
 
-    std::string fileName = FileUtils::getInstance()->getWritablePath();
-    fileName.append("competition.json");
-    _competitionData->readFromFile(fileName.c_str());
+    _competitionData->readFromFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
     if (_competitionData->finish_time == 0) {
         this->scheduleOnce([this](float) {
             Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, _competitionData->current_round));

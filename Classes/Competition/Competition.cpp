@@ -321,9 +321,9 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     json.AddMember("finish_time", rapidjson::Value(static_cast<uint64_t>(data.finish_time)), alloc);
 }
 
-bool CompetitionData::readFromFile(const char *file) {
+bool CompetitionData::readFromFile(const std::string &file) {
     std::string str;
-    FILE *fp = fopen(file, "rb");
+    FILE *fp = fopen(file.c_str(), "rb");
     if (LIKELY(fp != nullptr)) {
         fseek(fp, 0, SEEK_END);
         long size = ftell(fp);
@@ -354,7 +354,7 @@ bool CompetitionData::readFromFile(const char *file) {
     }
 }
 
-bool CompetitionData::writeToFile(const char *file) const {
+bool CompetitionData::writeToFile(const std::string &file) const {
     try {
         rapidjson::Document doc(rapidjson::Type::kObjectType);
         toJson(*this, doc, doc.GetAllocator());
@@ -365,7 +365,7 @@ bool CompetitionData::writeToFile(const char *file) const {
 
         CCLOG("%.*s", (int)buf.GetSize(), buf.GetString());
 
-        FILE *fp = fopen(file, "wb");
+        FILE *fp = fopen(file.c_str(), "wb");
         if (LIKELY(fp != nullptr)) {
             fwrite(buf.GetString(), sizeof(char), buf.GetSize(), fp);
             fclose(fp);

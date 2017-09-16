@@ -205,9 +205,7 @@ void CompetitionEnterScene::onOkButton(cocos2d::Ref *sender) {
 
     _competitionData->prepare();
 
-    std::string fileName = FileUtils::getInstance()->getWritablePath();
-    fileName.append("competition.json");
-    _competitionData->writeToFile(fileName.c_str());
+    _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
 
     Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, 0));
 }
