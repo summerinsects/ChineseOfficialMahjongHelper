@@ -8,8 +8,8 @@ class CompetitionData;
 
 class CompetitionEnterScene : public BaseScene, cw::TableViewDelegate {
 public:
-    static CompetitionEnterScene *create(const std::string &name, unsigned num, unsigned round);
-    bool initWithName(const std::string &name, unsigned num, unsigned round);
+    static CompetitionEnterScene *create(const std::shared_ptr<CompetitionData> &competitionData);
+    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData);
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;

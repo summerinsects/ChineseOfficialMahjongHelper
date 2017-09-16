@@ -2,6 +2,7 @@
 #include "CompetitionEnterScene.h"
 #include "../common.h"
 #include "../widget/AlertView.h"
+#include "Competition.h"
 
 USING_NS_CC;
 
@@ -132,12 +133,22 @@ void CompetitionMainScene::showCompetitionCreatingAlert(const std::string &name,
             return;
         }
 
-        Label *label = Label::createWithSystemFont(StringUtils::format("%s\n%u人\n%u轮", name.c_str(), num, round), "Arial", 12);
+        Label *label = Label::createWithSystemFont(StringUtils::format("「%s」\n%u人\n%u轮", name.c_str(), num, round), "Arial", 12);
         label->setColor(Color3B::BLACK);
         label->setHorizontalAlignment(TextHAlignment::CENTER);
 
-        AlertView::showWithNode("创建比赛", label, [name, num, round]() {
-            Director::getInstance()->pushScene(CompetitionEnterScene::create(name, num, round));
+        AlertView::showWithNode("创建比赛", label, [this, name, num, round]() {
+            _competitionData = std::make_shared<CompetitionData>();
+            _competitionData->name = name;
+            _competitionData->rounds.resize(round);
+            _competitionData->current_round = 0;
+            _competitionData->players.resize(num);
+
+            for (unsigned i = 0; i < num; ++i) {
+                _competitionData->players[i].serial = 1 + i;
+            }
+
+            Director::getInstance()->pushScene(CompetitionEnterScene::create(_competitionData));
         }, nullptr);
     }, nullptr);
 }

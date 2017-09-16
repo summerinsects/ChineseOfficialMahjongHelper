@@ -3,6 +3,8 @@
 
 #include "../BaseScene.h"
 
+class CompetitionData;
+
 class CompetitionMainScene : public BaseScene {
 public:
     virtual bool init() override;
@@ -11,6 +13,8 @@ public:
 
 private:
     void showCompetitionCreatingAlert(const std::string &name, unsigned num, unsigned round);
+
+    std::shared_ptr<CompetitionData> _competitionData;
 };
 
 #endif

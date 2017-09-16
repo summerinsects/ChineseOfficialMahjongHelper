@@ -7,9 +7,9 @@
 
 USING_NS_CC;
 
-CompetitionEnterScene *CompetitionEnterScene::create(const std::string &name, unsigned num, unsigned round) {
+CompetitionEnterScene *CompetitionEnterScene::create(const std::shared_ptr<CompetitionData> &competitionData) {
     auto ret = new (std::nothrow) CompetitionEnterScene();
-    if (ret != nullptr && ret->initWithName(name, num, round)) {
+    if (ret != nullptr && ret->initWithData(competitionData)) {
         ret->autorelease();
         return ret;
     }
@@ -17,20 +17,12 @@ CompetitionEnterScene *CompetitionEnterScene::create(const std::string &name, un
     return nullptr;
 }
 
-bool CompetitionEnterScene::initWithName(const std::string &name, unsigned num, unsigned round) {
-    if (UNLIKELY(!BaseScene::initWithTitle(name))) {
+bool CompetitionEnterScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData) {
+    if (UNLIKELY(!BaseScene::initWithTitle(competitionData->name))) {
         return false;
     }
 
-    _competitionData = std::make_shared<CompetitionData>();
-
-    _competitionData->name = name;
-    _competitionData->rounds.resize(round);
-    _competitionData->current_round = 0;
-    _competitionData->players.resize(num);
-    for (unsigned i = 0; i < num; ++i) {
-        _competitionData->players[i].serial = 1 + i;
-    }
+    _competitionData = competitionData;
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
