@@ -12,7 +12,7 @@ public:
     CREATE_FUNC(CompetitionMainScene);
 
 private:
-    void showCompetitionCreatingAlert(const std::string &name, unsigned num, unsigned round);
+    void showNewCompetitionAlert(const std::string &name, unsigned num, unsigned round);
 
     std::shared_ptr<CompetitionData> _competitionData;
 };
