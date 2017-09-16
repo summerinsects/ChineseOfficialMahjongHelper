@@ -221,6 +221,12 @@
     <ClInclude Include="..\..\Classes\AppDelegate.h" />
     <ClInclude Include="..\..\Classes\BaseScene.h" />
     <ClInclude Include="..\..\Classes\common.h" />
+    <ClInclude Include="..\..\Classes\Competition\Competition.h" />
+    <ClInclude Include="..\..\Classes\Competition\CompetitionEnterScene.h" />
+    <ClInclude Include="..\..\Classes\Competition\CompetitionFinalScene.h" />
+    <ClInclude Include="..\..\Classes\Competition\CompetitionMainScene.h" />
+    <ClInclude Include="..\..\Classes\Competition\CompetitionRoundScene.h" />
+    <ClInclude Include="..\..\Classes\Competition\CompetitionTableScene.h" />
     <ClInclude Include="..\..\Classes\compiler.h" />
     <ClInclude Include="..\..\Classes\FanCalculator\FanCalculatorScene.h" />
     <ClInclude Include="..\..\Classes\FanTable\FanDefinition.h" />
@@ -269,6 +275,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\..\Classes\Competition\Competition.cpp" />
+    <ClCompile Include="..\..\Classes\Competition\CompetitionEnterScene.cpp" />
+    <ClCompile Include="..\..\Classes\Competition\CompetitionFinalScene.cpp" />
+    <ClCompile Include="..\..\Classes\Competition\CompetitionMainScene.cpp" />
+    <ClCompile Include="..\..\Classes\Competition\CompetitionRoundScene.cpp" />
+    <ClCompile Include="..\..\Classes\Competition\CompetitionTableScene.cpp" />
     <ClCompile Include="..\..\Classes\FanCalculator\FanCalculatorScene.cpp" />
     <ClCompile Include="..\..\Classes\FanTable\FanDefinition.cpp" />
     <ClCompile Include="..\..\Classes\FanTable\FanTable.cpp" />
