@@ -5,7 +5,8 @@
 #include "json/prettywriter.h"
 #include "../common.h"
 
-std::string CompetitionResult::getStandardScoreString(float ss) {
+// 标准分转换为字符串
+std::string CompetitionResult::standardScoreToString(float ss) {
     std::ostringstream os;
     os << ss;
     std::string ret1 = os.str();
@@ -13,6 +14,7 @@ std::string CompetitionResult::getStandardScoreString(float ss) {
     return ret1.length() < ret2.length() ? ret1 : ret2;
 }
 
+// 获取指定一轮总成绩
 std::pair<float, int> CompetitionPlayer::getTotalScoresByRound(size_t round) const {
     float ss = 0;
     int cs = 0;
@@ -23,16 +25,19 @@ std::pair<float, int> CompetitionPlayer::getTotalScoresByRound(size_t round) con
     return std::make_pair(ss, cs);
 }
 
+// 获取指定一轮单轮成绩
 std::pair<float, int> CompetitionPlayer::getCurrentScoresByRound(size_t round) const {
     return std::make_pair(competition_results[round].standard_score, competition_results[round].competition_score);
 }
 
+// 排序附加信息，用来保存标准分和比赛分，使之仅计算一次
 struct ScoresSortInfo {
     const CompetitionPlayer *player = nullptr;
     float standard_score = 0.0f;
     int competition_score = 0;
 };
 
+// 高高碰排序
 void CompetitionRound::sortPlayers(unsigned round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output) {
     std::vector<ScoresSortInfo> temp;
     temp.reserve(players.size());
@@ -60,6 +65,7 @@ void CompetitionRound::sortPlayers(unsigned round, const std::vector<Competition
     std::transform(ptemp.begin(), ptemp.end(), std::back_inserter(output), [](ScoresSortInfo *pssi) { return pssi->player; });
 }
 
+// 准备
 void CompetitionData::prepare() {
     start_time = time(nullptr);
     size_t round = rounds.size();

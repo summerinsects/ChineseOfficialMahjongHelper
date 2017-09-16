@@ -197,7 +197,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
             serialLabels[i]->setString(std::to_string(player->serial));
             nameLabels[i]->setString(player->name);
             std::pair<float, int> ret = player->getCurrentScoresByRound(_currentRound);
-            standardLabels[i]->setString(CompetitionResult::getStandardScoreString(ret.first));
+            standardLabels[i]->setString(CompetitionResult::standardScoreToString(ret.first));
             competitionLabels[i]->setString(std::to_string(ret.second));
         }
     }
@@ -288,7 +288,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         std::function<void ()> callback = [result, labels, i]() {
             std::string text[3] = {
                 std::to_string(result->rank),
-                CompetitionResult::getStandardScoreString(result->standard_score),
+                CompetitionResult::standardScoreToString(result->standard_score),
                 std::to_string(result->competition_score)
             };
             for (int k = 0; k < 3; ++k) {
@@ -366,7 +366,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
-    editBox->setText(CompetitionResult::getStandardScoreString(result->standard_score).c_str());
+    editBox->setText(CompetitionResult::standardScoreToString(result->standard_score).c_str());
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(85, 45));
     editBoxes[1] = editBox;

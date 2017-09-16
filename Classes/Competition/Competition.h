@@ -17,7 +17,7 @@ struct CompetitionResult {
     float standard_score = 0;  // 标准分
     int competition_score = 0;  // 比赛分
 
-    static std::string getStandardScoreString(float ss);
+    static std::string standardScoreToString(float ss);  // 标准分转换为字符串
 
     static void fromJson(const rapidjson::Value &json, CompetitionResult &result);
     static void toJson(const CompetitionResult &result, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
@@ -31,8 +31,8 @@ public:
     std::vector<CompetitionResult> competition_results;  // 每轮成绩
     ptrdiff_t team_index = INVALID_INDEX;  // 所在队伍
 
-    std::pair<float, int> getTotalScoresByRound(size_t round) const;
-    std::pair<float, int> getCurrentScoresByRound(size_t round) const;
+    std::pair<float, int> getTotalScoresByRound(size_t round) const;  // 获取指定一轮总成绩
+    std::pair<float, int> getCurrentScoresByRound(size_t round) const;  // 获取指定一轮单轮成绩
 
     static void fromJson(const rapidjson::Value &json, CompetitionPlayer &player);
     static void toJson(const CompetitionPlayer &player, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
@@ -73,6 +73,7 @@ public:
     static void fromJson(const rapidjson::Value &json, CompetitionRound &round);
     static void toJson(const CompetitionRound &round, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 
+    // 高高碰排序
     static void sortPlayers(unsigned round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output);
 };
 
@@ -92,7 +93,7 @@ public:
     bool readFromFile(const std::string &file);
     bool writeToFile(const std::string &file) const;
 
-    void prepare();
+    void prepare();  // 准备
 
     bool isRegistrationFull() const;  // 报名是否已满
     bool isRoundStarted(unsigned round) const;

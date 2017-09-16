@@ -164,13 +164,13 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     labels[2]->setString(player.name);
 
     std::pair<float, int> ret = player.getCurrentScoresByRound(_currentRound);
-    labels[3]->setString(CompetitionResult::getStandardScoreString(ret.first));
+    labels[3]->setString(CompetitionResult::standardScoreToString(ret.first));
     Common::scaleLabelToFitWidth(labels[3], _colWidth[3] - 4);
     labels[4]->setString(std::to_string(ret.second));
     Common::scaleLabelToFitWidth(labels[4], _colWidth[4] - 4);
 
     ret = player.getTotalScoresByRound(_currentRound);
-    labels[5]->setString(CompetitionResult::getStandardScoreString(ret.first));
+    labels[5]->setString(CompetitionResult::standardScoreToString(ret.first));
     Common::scaleLabelToFitWidth(labels[5], _colWidth[5] - 4);
     labels[6]->setString(std::to_string(ret.second));
     Common::scaleLabelToFitWidth(labels[6], _colWidth[6] - 4);
