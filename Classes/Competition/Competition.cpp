@@ -92,6 +92,102 @@ bool CompetitionData::isRoundStarted(unsigned round) const {
     });
 }
 
+// 按编号排桌
+void CompetitionData::rankTablesBySerial(unsigned round) {
+    const size_t cnt = players.size();
+    std::vector<CompetitionTable> &tables = rounds[round].tables;
+    tables.resize(cnt / 4);
+    for (size_t i = 0; i < cnt; ) {
+        CompetitionTable &table = tables[i / 4];
+        table.player_indices[0] = i++;
+        table.player_indices[1] = i++;
+        table.player_indices[2] = i++;
+        table.player_indices[3] = i++;
+    }
+}
+
+// 按编号蛇形排桌
+void CompetitionData::rankTablesBySerialSnake(unsigned round) {
+    const size_t cnt = players.size();
+    std::vector<CompetitionTable> &tables = rounds[round].tables;
+    tables.resize(cnt / 4);
+
+    size_t east = 0;
+    size_t south = cnt / 2 - 1;
+    size_t west = south + 1;
+    size_t north = cnt - 1;
+    for (size_t i = 0; i < cnt; i += 4) {
+        CompetitionTable &table = tables[i / 4];
+        table.player_indices[0] = east++;
+        table.player_indices[1] = south--;
+        table.player_indices[2] = west++;
+        table.player_indices[3] = north--;
+    }
+}
+
+// 随机排桌
+
+void CompetitionData::rankTablesByRandom(unsigned round) {
+    const size_t cnt = players.size();
+    std::vector<CompetitionTable> &tables = rounds[round].tables;
+    tables.resize(cnt / 4);
+
+    std::vector<CompetitionPlayer *> temp;
+    temp.reserve(players.size());
+    std::transform(players.begin(), players.end(), std::back_inserter(temp), [](CompetitionPlayer &p) { return &p; });
+    std::random_shuffle(temp.begin(), temp.end());
+    
+    for (size_t i = 0; i < cnt; ) {
+        CompetitionTable &table = tables[i / 4];
+        table.player_indices[0] = temp[i++] - &players[0];
+        table.player_indices[1] = temp[i++] - &players[0];
+        table.player_indices[2] = temp[i++] - &players[0];
+        table.player_indices[3] = temp[i++] - &players[0];
+    }
+}
+
+// 高高碰排桌
+void CompetitionData::rankTablesByScores(unsigned round) {
+    const size_t cnt = players.size();
+    std::vector<CompetitionTable> &tables = rounds[round].tables;
+    tables.resize(cnt / 4);
+    
+    std::vector<const CompetitionPlayer *> output;
+    CompetitionRound::sortPlayers(round, players, output);
+
+    for (size_t i = 0; i < cnt; ) {
+        CompetitionTable &table = tables[i / 4];
+        table.player_indices[0] = output[i++] - &players[0];
+        table.player_indices[1] = output[i++] - &players[0];
+        table.player_indices[2] = output[i++] - &players[0];
+        table.player_indices[3] = output[i++] - &players[0];
+    }
+}
+
+// 蛇形名次排桌
+void CompetitionData::rankTablesByScoresSnake(unsigned round) {
+    const size_t cnt = players.size();
+    std::vector<CompetitionTable> &tables = rounds[round].tables;
+    tables.resize(cnt / 4);
+
+    std::vector<const CompetitionPlayer *> output;
+    CompetitionRound::sortPlayers(round, players, output);
+
+    size_t east = 0;
+    size_t south = cnt / 2 - 1;
+    size_t west = south + 1;
+    size_t north = cnt - 1;
+    for (size_t i = 0; i < cnt; i += 4) {
+        CompetitionTable &table = tables[i / 4];
+        table.player_indices[0] = output[east++] - &players[0];
+        table.player_indices[1] = output[south--] - &players[0];
+        table.player_indices[2] = output[west++] - &players[0];
+        table.player_indices[3] = output[north--] - &players[0];
+    }
+}
+
+
+
 void CompetitionResult::fromJson(const rapidjson::Value &json, CompetitionResult &result) {
     rapidjson::Value::ConstMemberIterator it = json.FindMember("rank");
     if (it != json.MemberEnd() && it->value.IsUint()) {

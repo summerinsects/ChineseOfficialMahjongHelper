@@ -97,6 +97,12 @@ public:
 
     bool isRegistrationFull() const;  // 报名是否已满
     bool isRoundStarted(unsigned round) const;
+
+    void rankTablesBySerial(unsigned round);  // 按编号排桌
+    void rankTablesBySerialSnake(unsigned round);  // 按编号蛇形排桌
+    void rankTablesByRandom(unsigned round);  // 随机排桌
+    void rankTablesByScores(unsigned round);  // 高高碰排桌
+    void rankTablesByScoresSnake(unsigned round);  // 蛇形名次排桌
 };
 
 #endif

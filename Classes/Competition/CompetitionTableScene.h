@@ -23,12 +23,6 @@ private:
     void onRecordButton(cocos2d::Ref *sender);
     void showCompetitionResultInputAlert(const std::string &title, CompetitionResult *result, const std::function<void ()> &callback);
 
-    void rankBySerial();
-    void rankBySerialSnake();
-    void rankByRandom();
-    void rankByScores();
-    void rankByScoresSnake();
-
     float _colWidth[7];
     float _posX[7];
 

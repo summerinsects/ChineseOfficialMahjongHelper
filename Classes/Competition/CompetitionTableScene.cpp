@@ -26,7 +26,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     _competitionTables = &_competitionData->rounds[currentRound].tables;
 
     if (_competitionTables->empty()) {
-        rankBySerial();
+        _competitionData->rankTablesBySerial(_currentRound);
     }
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -429,95 +429,6 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     }, nullptr);
 }
 
-void CompetitionTableScene::rankBySerial() {
-    std::vector<CompetitionPlayer> &players = _competitionData->players;
-    const size_t cnt = players.size();
-    _competitionTables->resize(cnt / 4);
-    for (size_t i = 0; i < cnt; ) {
-        CompetitionTable &table = _competitionTables->at(i / 4);
-        table.player_indices[0] = i++;
-        table.player_indices[1] = i++;
-        table.player_indices[2] = i++;
-        table.player_indices[3] = i++;
-    }
-}
-
-void CompetitionTableScene::rankBySerialSnake() {
-    std::vector<CompetitionPlayer> &players = _competitionData->players;
-    const size_t cnt = players.size();
-    _competitionTables->resize(cnt / 4);
-
-    size_t east = 0;
-    size_t south = cnt / 2 - 1;
-    size_t west = south + 1;
-    size_t north = cnt - 1;
-    for (size_t i = 0; i < cnt; i += 4) {
-        CompetitionTable &table = _competitionTables->at(i / 4);
-        table.player_indices[0] = east++;
-        table.player_indices[1] = south--;
-        table.player_indices[2] = west++;
-        table.player_indices[3] = north--;
-    }
-}
-
-void CompetitionTableScene::rankByRandom() {
-    std::vector<CompetitionPlayer> &players = _competitionData->players;
-    const size_t cnt = players.size();
-    _competitionTables->resize(cnt / 4);
-
-    std::vector<CompetitionPlayer *> temp;
-    temp.reserve(players.size());
-    std::transform(players.begin(), players.end(), std::back_inserter(temp), [](CompetitionPlayer &p) { return &p; });
-    std::random_shuffle(temp.begin(), temp.end());
-
-    for (size_t i = 0; i < cnt; ) {
-        CompetitionTable &table = _competitionTables->at(i / 4);
-        table.player_indices[0] = temp[i++] - &players[0];
-        table.player_indices[1] = temp[i++] - &players[0];
-        table.player_indices[2] = temp[i++] - &players[0];
-        table.player_indices[3] = temp[i++] - &players[0];
-    }
-}
-
-void CompetitionTableScene::rankByScores() {
-    std::vector<CompetitionPlayer> &players = _competitionData->players;
-    const size_t cnt = players.size();
-    _competitionTables->resize(cnt / 4);
-
-    std::vector<const CompetitionPlayer *> output;
-    CompetitionRound::sortPlayers(_currentRound, players, output);
-
-    // 排座位
-    for (size_t i = 0; i < cnt; ) {
-        CompetitionTable &table = _competitionTables->at(i / 4);
-        table.player_indices[0] = output[i++] - &players[0];
-        table.player_indices[1] = output[i++] - &players[0];
-        table.player_indices[2] = output[i++] - &players[0];
-        table.player_indices[3] = output[i++] - &players[0];
-    }
-}
-
-void CompetitionTableScene::rankByScoresSnake() {
-    std::vector<CompetitionPlayer> &players = _competitionData->players;
-    const size_t cnt = players.size();
-    _competitionTables->resize(cnt / 4);
-
-    std::vector<const CompetitionPlayer *> output;
-    CompetitionRound::sortPlayers(_currentRound, players, output);
-
-    size_t east = 0;
-    size_t south = cnt / 2 - 1;
-    size_t west = south + 1;
-    size_t north = cnt - 1;
-    for (size_t i = 0; i < cnt; i += 4) {
-        CompetitionTable &table = _competitionTables->at(i / 4);
-        table.player_indices[0] = output[east++] - &players[0];
-        table.player_indices[1] = output[south--] - &players[0];
-        table.player_indices[2] = output[west++] - &players[0];
-        table.player_indices[3] = output[north--] - &players[0];
-    }
-}
-
 void CompetitionTableScene::onRankButton(cocos2d::Ref *sender) {
     if (_competitionData->isRoundStarted(_currentRound)) {
         AlertView::showWithMessage("排列座位", "开始记录成绩后不允许重新排座位", 12, nullptr, nullptr);
@@ -550,10 +461,10 @@ void CompetitionTableScene::onRankButton(cocos2d::Ref *sender) {
 
     AlertView::showWithNode("排列座位", rootNode, [this, radioGroup]() {
         switch (radioGroup->getSelectedButtonIndex()) {
-        case 0: rankByRandom(); _tableView->reloadData(); break;
-        case 1: rankBySerialSnake(); _tableView->reloadData(); break;
-        case 2: rankByScoresSnake(); _tableView->reloadData(); break;
-        case 3: rankByScores(); _tableView->reloadData(); break;
+        case 0: _competitionData->rankTablesByRandom(_currentRound); _tableView->reloadData(); break;
+        case 1: _competitionData->rankTablesBySerialSnake(_currentRound); _tableView->reloadData(); break;
+        case 2: _competitionData->rankTablesByScoresSnake(_currentRound); _tableView->reloadData(); break;
+        case 3: _competitionData->rankTablesByScores(_currentRound); _tableView->reloadData(); break;
         case 4: break;
         default: break;
         }
