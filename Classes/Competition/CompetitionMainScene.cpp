@@ -31,7 +31,7 @@ bool CompetitionMainScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleText("继续");
+    button->setTitleText("继续比赛");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
     button->addClickEventListener([this](Ref *) {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
