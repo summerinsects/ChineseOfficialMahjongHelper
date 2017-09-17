@@ -72,8 +72,6 @@ void CompetitionRound::sortPlayers(size_t round, const std::vector<CompetitionPl
 // 准备
 void CompetitionData::prepare(const std::string &name, size_t player, size_t round) {
     this->name = name;
-    std::vector<CompetitionPlayer> temp(player);
-    players.swap(temp);
     teams.clear();
     teams.shrink_to_fit();
     rounds.clear();
@@ -83,10 +81,11 @@ void CompetitionData::prepare(const std::string &name, size_t player, size_t rou
     start_time = time(nullptr);
     finish_time = 0;
 
-    for (size_t i = 0, cnt = players.size(); i < cnt; ++i) {
-        CompetitionPlayer &player = players[i];
-        player.serial = 1 + i;
+    std::vector<CompetitionPlayer> temp(player);
+    for (size_t i = 0; i < player; ++i) {
+        temp[i].serial = 1 + i;
     }
+    players.swap(temp);
 }
 
 // 报名是否截止
