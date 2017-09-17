@@ -136,7 +136,9 @@ void CompetitionData::rankTablesBySerial(size_t round) {
     std::vector<CompetitionTable> &tables = rounds[round].tables;
     tables.resize(cnt / 4);
     for (size_t i = 0; i < cnt; ) {
-        CompetitionTable &table = tables[i / 4];
+        size_t serial = i / 4;
+        CompetitionTable &table = tables[serial];
+        table.serial = serial;
         table.player_indices[0] = i++;
         table.player_indices[1] = i++;
         table.player_indices[2] = i++;
@@ -155,7 +157,9 @@ void CompetitionData::rankTablesBySerialSnake(size_t round) {
     size_t west = south + 1;
     size_t north = cnt - 1;
     for (size_t i = 0; i < cnt; i += 4) {
-        CompetitionTable &table = tables[i / 4];
+        size_t serial = i / 4;
+        CompetitionTable &table = tables[serial];
+        table.serial = serial;
         table.player_indices[0] = east++;
         table.player_indices[1] = south--;
         table.player_indices[2] = west++;
@@ -177,7 +181,9 @@ void CompetitionData::rankTablesByRandom(size_t round) {
     std::random_shuffle(temp.begin(), temp.end());
     
     for (size_t i = 0; i < cnt; ) {
-        CompetitionTable &table = tables[i / 4];
+        size_t serial = i / 4;
+        CompetitionTable &table = tables[serial];
+        table.serial = serial;
         table.player_indices[0] = temp[i++] - &players[0];
         table.player_indices[1] = temp[i++] - &players[0];
         table.player_indices[2] = temp[i++] - &players[0];
@@ -195,7 +201,9 @@ void CompetitionData::rankTablesByScores(size_t round) {
     CompetitionRound::sortPlayers(round, players, output);
 
     for (size_t i = 0; i < cnt; ) {
-        CompetitionTable &table = tables[i / 4];
+        size_t serial = i / 4;
+        CompetitionTable &table = tables[serial];
+        table.serial = serial;
         table.player_indices[0] = output[i++] - &players[0];
         table.player_indices[1] = output[i++] - &players[0];
         table.player_indices[2] = output[i++] - &players[0];
@@ -217,7 +225,9 @@ void CompetitionData::rankTablesByScoresSnake(size_t round) {
     size_t west = south + 1;
     size_t north = cnt - 1;
     for (size_t i = 0; i < cnt; i += 4) {
-        CompetitionTable &table = tables[i / 4];
+        size_t serial = i / 4;
+        CompetitionTable &table = tables[serial];
+        table.serial = serial;
         table.player_indices[0] = output[east++] - &players[0];
         table.player_indices[1] = output[south--] - &players[0];
         table.player_indices[2] = output[west++] - &players[0];

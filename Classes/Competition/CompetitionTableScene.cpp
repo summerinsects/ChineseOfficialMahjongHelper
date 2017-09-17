@@ -210,13 +210,13 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
     layerColors[0]->setVisible(!(idx & 1));
     layerColors[1]->setVisible(!!(idx & 1));
 
-    tableLabel->setString(std::to_string(idx + 1));  // 桌号
+    const CompetitionTable &currentTable = _competitionTables->at(idx);
+    tableLabel->setString(std::to_string(currentTable.serial + 1));  // 桌号
 
     const std::vector<CompetitionPlayer> &players = _competitionData->players;
 
     // 座次、编号、选手姓名、标准分、比赛分，共5个Label
     for (int i = 0; i < 4; ++i) {
-        const CompetitionTable &currentTable = _competitionTables->at(idx);
         ptrdiff_t playerIndex = currentTable.player_indices[i];
         if (playerIndex == INVALID_INDEX) {
             for (int k = 0; k < 4; ++k) {
