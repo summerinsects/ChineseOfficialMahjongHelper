@@ -279,7 +279,7 @@ void CompetitionPlayer::fromJson(const rapidjson::Value &json, CompetitionPlayer
 }
 
 void CompetitionPlayer::toJson(const CompetitionPlayer &player, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
-    json.AddMember("serial", rapidjson::Value(player.serial), alloc);
+    json.AddMember("serial", rapidjson::Value(static_cast<uint64_t>(player.serial)), alloc);
     json.AddMember("name", rapidjson::StringRef(player.name.c_str()), alloc);
 
     rapidjson::Value results(rapidjson::Type::kArrayType);
@@ -317,7 +317,7 @@ void CompetitionTeam::fromJson(const rapidjson::Value &json, CompetitionTeam &te
 }
 
 void CompetitionTeam::toJson(const CompetitionTeam &team, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
-    json.AddMember("serial", rapidjson::Value(team.serial), alloc);
+    json.AddMember("serial", rapidjson::Value(static_cast<uint64_t>(team.serial)), alloc);
     json.AddMember("name", rapidjson::StringRef(team.name.c_str()), alloc);
 
     rapidjson::Value indices(rapidjson::Type::kArrayType);
@@ -350,7 +350,7 @@ void CompetitionTable::fromJson(const rapidjson::Value &json, CompetitionTable &
 }
 
 void CompetitionTable::toJson(const CompetitionTable &table, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
-    json.AddMember("serial", rapidjson::Value(table.serial), alloc);
+    json.AddMember("serial", rapidjson::Value(static_cast<uint64_t>(table.serial)), alloc);
 
     rapidjson::Value indices(rapidjson::Type::kArrayType);
     indices.Reserve(4, alloc);
@@ -467,7 +467,7 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     });
     json.AddMember("rounds", std::move(rounds), alloc);
 
-    json.AddMember("round_count", rapidjson::Value(data.round_count), alloc);
+    json.AddMember("round_count", rapidjson::Value(static_cast<uint64_t>(data.round_count)), alloc);
     json.AddMember("start_time", rapidjson::Value(static_cast<uint64_t>(data.start_time)), alloc);
     json.AddMember("finish_time", rapidjson::Value(static_cast<uint64_t>(data.finish_time)), alloc);
 }
