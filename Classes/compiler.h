@@ -168,6 +168,13 @@
 #endif
 #endif
 
+// format for size_t
+#if (defined _MSC_VER) && (_MSC_VER < 1900)
+#define PRIS "Iu"
+#else
+#define PRIS "zu"
+#endif
+
 #ifdef ANDROID
 
 #ifdef __cplusplus
