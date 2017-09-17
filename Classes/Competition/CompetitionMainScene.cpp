@@ -151,7 +151,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
                 editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
             }, 0.0f, "open_keyboard");
         }
-    };
+    });
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
 

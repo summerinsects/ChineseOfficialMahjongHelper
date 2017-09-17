@@ -436,7 +436,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
                 editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
             }, 0.0f, "open_keyboard");
         }
-    };
+    });
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
 
