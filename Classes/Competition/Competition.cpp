@@ -75,7 +75,10 @@ void CompetitionData::prepare(const std::string &name, size_t player, size_t rou
     std::vector<CompetitionPlayer> temp(player);
     players.swap(temp);
     teams.clear();
+    teams.shrink_to_fit();
     rounds.clear();
+    rounds.shrink_to_fit();
+    rounds.reserve(round);
     round_count = round;
     start_time = time(nullptr);
     finish_time = 0;
