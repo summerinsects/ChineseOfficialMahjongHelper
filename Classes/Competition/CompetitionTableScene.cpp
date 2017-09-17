@@ -225,7 +225,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         }
         else {
             const CompetitionPlayer *player = &players[currentTable.player_indices[i]];
-            labels[i][0]->setString(std::to_string(player->serial));
+            labels[i][0]->setString(std::to_string(player->serial + 1));
             labels[i][1]->setString(player->name);
             std::pair<float, int> ret = player->getCurrentScoresByRound(_currentRound);
             labels[i][2]->setString(CompetitionResult::standardScoreToString(ret.first));
@@ -295,7 +295,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     for (int i = 0; i < 4; ++i) {
         CompetitionPlayer *player = &players[currentTable.player_indices[i]];
 
-        Label *label = Label::createWithSystemFont(std::to_string(player->serial), "Arail", 12);
+        Label *label = Label::createWithSystemFont(std::to_string(player->serial + 1), "Arail", 12);
         label->setColor(Color3B::BLACK);
         drawNode->addChild(label);
         label->setPosition(Vec2(posX[0], 70.0f - 20.0f * i));
@@ -336,7 +336,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         widget->setContentSize(Size(colWidth[2] + colWidth[3] + colWidth[4], 20.0f));
         drawNode->addChild(widget);
         widget->addClickEventListener([this, player, result, callback](Ref *) {
-            showCompetitionResultInputAlert(Common::format<64>("选手编号%" PRIS "，姓名「%s」", player->serial, player->name.c_str()), result, callback);
+            showCompetitionResultInputAlert(Common::format<64>("选手编号%" PRIS "，姓名「%s」", player->serial + 1, player->name.c_str()), result, callback);
         });
     }
 

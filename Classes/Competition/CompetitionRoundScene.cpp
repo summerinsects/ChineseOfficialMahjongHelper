@@ -206,7 +206,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
 
     // 名次、编号、选手姓名
     labels[0]->setString(std::to_string(idx + 1));
-    labels[1]->setString(std::to_string(player.serial));
+    labels[1]->setString(std::to_string(player.serial + 1));
     labels[2]->setString(player.name);
 
     // 本轮标准分和比赛分

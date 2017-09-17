@@ -90,7 +90,7 @@ void CompetitionData::prepare(const std::string &name, size_t player, size_t rou
 
     std::vector<CompetitionPlayer> temp(player);
     for (size_t i = 0; i < player; ++i) {
-        temp[i].serial = 1 + i;
+        temp[i].serial = i;
     }
     players.swap(temp);
 }
