@@ -45,15 +45,15 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     });
     button->setEnabled(_currentRound > 0);
 
-    // 排列座位按钮
+    // 登记成绩按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("排列座位");
+    button->setTitleText("登记成绩");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 70.0f));
-    button->addClickEventListener(std::bind(&CompetitionRoundScene::onRankButton, this, std::placeholders::_1));
+    button->addClickEventListener(std::bind(&CompetitionRoundScene::onReportButton, this, std::placeholders::_1));
 
     // 下一轮按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -80,6 +80,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     });
     button->setEnabled(_currentRound + 1 < _competitionData->round_count);
 
+    // 列宽
     _colWidth[0] = visibleSize.width * 0.1f;
     _colWidth[1] = visibleSize.width * 0.1f;
     _colWidth[2] = visibleSize.width * 0.2f;
@@ -89,6 +90,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     _colWidth[5] = visibleSize.width * 0.15f;
     _colWidth[6] = visibleSize.width * 0.15f;
 
+    // 中心位置
     _posX[0] = _colWidth[0] * 0.5f;
     _posX[1] = _posX[0] + _colWidth[0] * 0.5f + _colWidth[1] * 0.5f;
     _posX[2] = _posX[1] + _colWidth[1] * 0.5f + _colWidth[2] * 0.5f;
@@ -97,6 +99,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     _posX[5] = _posX[4] + _colWidth[4] * 0.5f + _colWidth[5] * 0.5f;
     _posX[6] = _posX[5] + _colWidth[5] * 0.5f + _colWidth[6] * 0.5f;
 
+    // 表头
     const char *titleTexts[] = { "名次", "编号", "选手姓名", "标准分", "比赛分", "标准分", "比赛分" };
     for (int i = 0; i < 7; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
@@ -106,6 +109,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
         Common::scaleLabelToFitWidth(label, _colWidth[i] - 4);
     }
 
+    // 表格
     cw::TableView *tableView = cw::TableView::create();
     tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 115.0f));
     tableView->setDelegate(this);
@@ -187,7 +191,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     return cell;
 }
 
-void CompetitionRoundScene::onRankButton(cocos2d::Ref *sender) {
+void CompetitionRoundScene::onReportButton(cocos2d::Ref *sender) {
     CompetitionTableScene *scene = CompetitionTableScene::create(_competitionData, _currentRound);
     scene->setOnExitCallback([this]() {
         CompetitionRound::sortPlayers(_currentRound, _competitionData->players, _players);

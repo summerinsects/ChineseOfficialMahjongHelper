@@ -56,6 +56,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     _posX[5] = _posX[4] + _colWidth[4] * 0.5f + _colWidth[5] * 0.5f;
     _posX[6] = _posX[5] + _colWidth[5] * 0.5f + _colWidth[6] * 0.5f;
 
+    // 表头
     const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "标准分", "比赛分" };
     for (int i = 0; i < 6; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
@@ -64,6 +65,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
         label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 100.0f));
     }
 
+    // 表格
     cw::TableView *tableView = cw::TableView::create();
     tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 115.0f));
     tableView->setDelegate(this);
@@ -281,6 +283,8 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         }
 
         CompetitionResult *result = &player->competition_results[_currentRound];
+
+        // 刷新三个label的回调函数
         std::function<void ()> callback = [result, labels, i]() {
             std::string text[3] = {
                 std::to_string(result->rank),
@@ -317,6 +321,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
             result.competition_score = atoi(cs.c_str());
         }
 
+        // 刷新外面的UI
         _tableView->updateCellAtIndex(table);
         _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
     }, nullptr);
