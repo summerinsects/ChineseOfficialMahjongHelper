@@ -17,7 +17,7 @@ private:
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
     void onOkButton(cocos2d::Ref *sender);
-    void onNameButton(cocos2d::Ref *sender);
+    void onNameWidget(cocos2d::Ref *sender);
 
     cw::TableView *_tableView = nullptr;
 

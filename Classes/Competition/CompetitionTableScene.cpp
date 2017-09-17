@@ -297,13 +297,12 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         };
         callback();
 
-        ui::Button *button = ui::Button::create();
-        button->setScale9Enabled(true);
-        button->setPosition(Vec2(posX[3], 70.0f - 20.0f * i));
-        button->setContentSize(Size(colWidth[2] + colWidth[3]+ colWidth[4], 20.0f));
-        drawNode->addChild(button);
-        button->setUserData(label);
-        button->addClickEventListener([this, player, result, callback](Ref *) {
+        ui::Widget *widget = ui::Widget::create();
+        widget->setTouchEnabled(true);
+        widget->setPosition(Vec2(posX[3], 70.0f - 20.0f * i));
+        widget->setContentSize(Size(colWidth[2] + colWidth[3] + colWidth[4], 20.0f));
+        drawNode->addChild(widget);
+        widget->addClickEventListener([this, player, result, callback](Ref *) {
             showCompetitionResultInputAlert(Common::format<64>("选手编号%u，姓名「%s」", player->serial, player->name.c_str()), result, callback);
         });
     }

@@ -88,7 +88,7 @@ cocos2d::Size CompetitionEnrollScene::tableCellSizeForIndex(cw::TableView *table
 }
 
 cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<std::array<Label *, 4>, std::array<ui::Button *, 2>, std::array<LayerColor *, 2> > CustomCell;
+    typedef cw::TableViewCellEx<std::array<Label *, 4>, std::array<ui::Widget *, 2>, std::array<LayerColor *, 2> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -98,7 +98,7 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         std::array<Label *, 4> &labels = std::get<0>(ext);
-        std::array<ui::Button *, 2> &buttons = std::get<1>(ext);
+        std::array<ui::Widget *, 2> &widgets = std::get<1>(ext);
         std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
         layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 29);
@@ -131,26 +131,26 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
         label->setPosition(Vec2(visibleSize.width * 0.75f + 15.0f, 15.0f));
         labels[3] = label;
 
-        ui::Button *button = ui::Button::create();
-        button->setScale9Enabled(true);
-        button->setPosition(labels[1]->getPosition());
-        button->setContentSize(Size(visibleSize.width * 0.5f - 50.0f, 25.0f));
-        cell->addChild(button);
-        button->addClickEventListener(std::bind(&CompetitionEnrollScene::onNameButton, this, std::placeholders::_1));
-        buttons[0] = button;
+        ui::Widget *widget = ui::Widget::create();
+        widget->setTouchEnabled(true);
+        widget->setPosition(labels[1]->getPosition());
+        widget->setContentSize(Size(visibleSize.width * 0.5f - 50.0f, 25.0f));
+        cell->addChild(widget);
+        widget->addClickEventListener(std::bind(&CompetitionEnrollScene::onNameWidget, this, std::placeholders::_1));
+        widgets[0] = widget;
 
-        button = ui::Button::create();
-        button->setScale9Enabled(true);
-        button->setPosition(labels[3]->getPosition());
-        button->setContentSize(Size(visibleSize.width * 0.5f - 50.0f, 25.0f));
-        cell->addChild(button);
-        button->addClickEventListener(std::bind(&CompetitionEnrollScene::onNameButton, this, std::placeholders::_1));
-        buttons[1] = button;
+        widget = ui::Widget::create();
+        widget->setTouchEnabled(true);
+        widget->setPosition(labels[3]->getPosition());
+        widget->setContentSize(Size(visibleSize.width * 0.5f - 50.0f, 25.0f));
+        cell->addChild(widget);
+        widget->addClickEventListener(std::bind(&CompetitionEnrollScene::onNameWidget, this, std::placeholders::_1));
+        widgets[1] = widget;
     }
 
     const CustomCell::ExtDataType ext = cell->getExtData();
     const std::array<Label *, 4> &labels = std::get<0>(ext);
-    const std::array<ui::Button *, 2> &buttons = std::get<1>(ext);
+    const std::array<ui::Widget *, 2> &widgets = std::get<1>(ext);
     const std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
     layerColors[0]->setVisible(!(idx & 1));
@@ -159,9 +159,9 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
     size_t idx0 = idx << 1;
     size_t idx1 = idx0 | 1;
     labels[0]->setString(std::to_string(idx0 + 1));
-    buttons[0]->setUserData(reinterpret_cast<void *>(idx0));
+    widgets[0]->setUserData(reinterpret_cast<void *>(idx0));
     labels[2]->setString(std::to_string(idx1 + 1));
-    buttons[1]->setUserData(reinterpret_cast<void *>(idx1));
+    widgets[1]->setUserData(reinterpret_cast<void *>(idx1));
 
     const std::string &name0 = _competitionData->players[idx0].name;
     const std::string &name1 = _competitionData->players[idx1].name;
@@ -204,9 +204,9 @@ void CompetitionEnrollScene::onOkButton(cocos2d::Ref *sender) {
     Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, 0));
 }
 
-void CompetitionEnrollScene::onNameButton(cocos2d::Ref *sender) {
-    ui::Button *button = (ui::Button *)sender;
-    size_t idx = reinterpret_cast<size_t>(button->getUserData());
+void CompetitionEnrollScene::onNameWidget(cocos2d::Ref *sender) {
+    ui::Widget *widget = (ui::Widget *)sender;
+    size_t idx = reinterpret_cast<size_t>(widget->getUserData());
 
     ui::EditBox *editBox = ui::EditBox::create(Size(120.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
