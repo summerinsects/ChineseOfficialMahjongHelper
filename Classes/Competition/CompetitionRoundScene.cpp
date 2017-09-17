@@ -214,16 +214,16 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     // 本轮标准分和比赛分
     std::pair<float, int> ret = player.getCurrentScoresByRound(_currentRound);
     labels[3]->setString(CompetitionResult::standardScoreToString(ret.first));
-    Common::scaleLabelToFitWidth(labels[3], _colWidth[3] - 4);
     labels[4]->setString(std::to_string(ret.second));
-    Common::scaleLabelToFitWidth(labels[4], _colWidth[4] - 4);
 
     // 累计标准分和比赛分
     ret = player.getTotalScoresByRound(_currentRound);
     labels[5]->setString(CompetitionResult::standardScoreToString(ret.first));
-    Common::scaleLabelToFitWidth(labels[5], _colWidth[5] - 4);
     labels[6]->setString(std::to_string(ret.second));
-    Common::scaleLabelToFitWidth(labels[6], _colWidth[6] - 4);
+
+    for (int i = 0; i < 7; ++i) {
+        Common::scaleLabelToFitWidth(labels[i], _colWidth[i] - 4);
+    }
 
     return cell;
 }

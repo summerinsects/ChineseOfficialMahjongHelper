@@ -217,7 +217,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
 
     const std::vector<CompetitionPlayer> &players = _competitionData->players;
 
-    // 座次、编号、选手姓名、标准分、比赛分，共5个Label
+    // 编号、选手姓名、标准分、比赛分，共5个Label
     for (int i = 0; i < 4; ++i) {
         ptrdiff_t playerIndex = currentTable.player_indices[i];
         if (playerIndex == INVALID_INDEX) {
@@ -232,6 +232,10 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
             std::pair<float, int> ret = player->getCurrentScoresByRound(_currentRound);
             labels[i][2]->setString(CompetitionResult::standardScoreToString(ret.first));
             labels[i][3]->setString(std::to_string(ret.second));
+
+            for (int k = 0; k < 4; ++k) {
+                Common::scaleLabelToFitWidth(labels[i][k], _colWidth[k]);
+            }
         }
     }
 
