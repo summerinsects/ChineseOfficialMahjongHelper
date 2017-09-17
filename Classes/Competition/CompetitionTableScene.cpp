@@ -88,11 +88,11 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     DrawNode *drawNode = DrawNode::create();
     this->addChild(drawNode);
     drawNode->setPosition(Vec2(origin.x, visibleSize.height - 80.0f));
-    drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
-    drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::GRAY);
+    drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::BLACK);
     for (int i = 0; i < 6; ++i) {
         const float posX = _posX[i] + _colWidth[i] * 0.5f;
-        drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::GRAY);
+        drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::BLACK);
     }
 
     // 当表格可拖动时，画下方一条线
@@ -189,16 +189,16 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         // 画线
         DrawNode *drawNode = DrawNode::create();
         cell->addChild(drawNode);
-        drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
-        drawNode->drawLine(Vec2(0, 80), Vec2(visibleSize.width, 80), Color4F::GRAY);
+        drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::BLACK);
+        drawNode->drawLine(Vec2(0, 80), Vec2(visibleSize.width, 80), Color4F::BLACK);
         const float posX = visibleSize.width - _colWidth[6];
         for (int i = 0; i < 3; ++i) {
             const float posY = 20.0f * (i + 1);
-            drawNode->drawLine(Vec2(_colWidth[0], posY), Vec2(posX, posY), Color4F::GRAY);
+            drawNode->drawLine(Vec2(_colWidth[0], posY), Vec2(posX, posY), Color4F::BLACK);
         }
         for (int i = 0; i < 6; ++i) {
             const float posX = _posX[i] + _colWidth[i] * 0.5f;
-            drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 80), Color4F::GRAY);
+            drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 80), Color4F::BLACK);
         }
     }
 

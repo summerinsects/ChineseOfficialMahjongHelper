@@ -131,17 +131,17 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     DrawNode *drawNode = DrawNode::create();
     this->addChild(drawNode);
     drawNode->setPosition(Vec2(origin.x, visibleSize.height - 80.0f));
-    drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
-    drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::GRAY);
+    drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::BLACK);
     for (int i = 0; i < 6; ++i) {
         const float posX = _posX[i] + _colWidth[i] * 0.5f;
-        drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::GRAY);
+        drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::BLACK);
     }
 
     // 当表格可拖动时，画下方一条横线
     if (tableView->getInnerContainerSize().height > tableHeight) {
         const float posY = -tableHeight;
-        drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::GRAY);
+        drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::BLACK);
     }
 
     return true;
@@ -187,11 +187,11 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
         // 画线
         DrawNode *drawNode = DrawNode::create();
         cell->addChild(drawNode);
-        drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
-        drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::GRAY);
+        drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::BLACK);
+        drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::BLACK);
         for (int i = 0; i < 6; ++i) {
             const float posX = _posX[i] + _colWidth[i] * 0.5f;
-            drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::GRAY);
+            drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::BLACK);
         }
     }
 
