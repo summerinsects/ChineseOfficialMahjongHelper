@@ -93,7 +93,7 @@ public:
     bool readFromFile(const std::string &file);  // 从文件中读
     bool writeToFile(const std::string &file) const;  // 写入到文件
 
-    void prepare();  // 准备
+    void prepare(const std::string &name, unsigned player, unsigned round);  // 准备
 
     bool isRegistrationFull() const;  // 报名是否已满
     bool isRoundStarted(unsigned round) const;

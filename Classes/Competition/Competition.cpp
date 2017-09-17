@@ -70,9 +70,14 @@ void CompetitionRound::sortPlayers(unsigned round, const std::vector<Competition
 }
 
 // 准备
-void CompetitionData::prepare() {
+void CompetitionData::prepare(const std::string &name, unsigned player, unsigned round) {
+    this->name = name;
+    players.swap(std::vector<CompetitionPlayer>(player));
+    teams.clear();
+    rounds.swap(std::vector<CompetitionRound>(round));
+    current_round = 0;
     start_time = time(nullptr);
-    size_t round = rounds.size();
+    finish_time = 0;
 
     for (size_t i = 0, cnt = players.size(); i < cnt; ++i) {
         CompetitionPlayer &player = players[i];
@@ -126,7 +131,6 @@ void CompetitionData::rankTablesBySerialSnake(unsigned round) {
 }
 
 // 随机排桌
-
 void CompetitionData::rankTablesByRandom(unsigned round) {
     const size_t cnt = players.size();
     std::vector<CompetitionTable> &tables = rounds[round].tables;

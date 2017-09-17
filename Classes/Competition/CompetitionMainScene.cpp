@@ -180,15 +180,8 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, unsi
         label->setHorizontalAlignment(TextHAlignment::CENTER);
 
         AlertView::showWithNode("新建比赛", label, [this, name, num, round]() {
-            _competitionData->name = name;
-            _competitionData->rounds.resize(round);
-            _competitionData->current_round = 0;
-            _competitionData->players.resize(num);
-
-            _competitionData->prepare();
-
+            _competitionData->prepare(name, num, round);
             Director::getInstance()->pushScene(CompetitionEnrollScene::create(_competitionData));
         }, nullptr);
     }, nullptr);
 }
-
