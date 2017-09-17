@@ -2,7 +2,11 @@
 #include <sstream>
 #include <algorithm>
 #include "json/stringbuffer.h"
+#ifdef COCOS2D_DEBUG
 #include "json/prettywriter.h"
+#else
+#include "json/writer.h"
+#endif
 #include "../common.h"
 
 // 标准分转换为字符串
@@ -504,7 +508,11 @@ bool CompetitionData::writeToFile(const std::string &file) const {
         toJson(*this, doc, doc.GetAllocator());
 
         rapidjson::StringBuffer buf;
+#ifdef COCOS2D_DEBUG
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+#else
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+#endif
         doc.Accept(writer);
 
         CCLOG("%.*s", (int)buf.GetSize(), buf.GetString());
