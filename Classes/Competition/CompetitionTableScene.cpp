@@ -17,7 +17,7 @@ CompetitionTableScene *CompetitionTableScene::create(const std::shared_ptr<Compe
 
 bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound) {
     if (UNLIKELY(!BaseScene::initWithTitle(Common::format<256>("%s第%u/%lu轮",
-        competitionData->name.c_str(), currentRound + 1, static_cast<unsigned long>(competitionData->rounds.size()))))) {
+        competitionData->name.c_str(), currentRound + 1, static_cast<unsigned long>(competitionData->round_count))))) {
         return false;
     }
 
@@ -319,17 +319,10 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
             result.rank = atoi(rank.c_str());
             result.standard_score = static_cast<float>(atof(ss.c_str()));
             result.competition_score = atoi(cs.c_str());
-
-            _tableView->updateCellAtIndex(table);
-
-            if (_competitionData->isRoundFinished(_currentRound)) {
-                unsigned nextRound = _currentRound + 1;
-                if (_competitionData->current_round < nextRound) {
-                    _competitionData->current_round = nextRound;
-                }
-            }
-            _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
         }
+
+        _tableView->updateCellAtIndex(table);
+        _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
     }, nullptr);
 }
 

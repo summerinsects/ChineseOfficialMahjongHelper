@@ -18,7 +18,7 @@ CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<Compe
 
 bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound) {
     if (UNLIKELY(!BaseScene::initWithTitle(Common::format<256>("%s第%u/%lu轮",
-        competitionData->name.c_str(), currentRound + 1, static_cast<unsigned long>(competitionData->rounds.size()))))) {
+        competitionData->name.c_str(), currentRound + 1, static_cast<unsigned long>(competitionData->round_count))))) {
         return false;
     }
 
@@ -65,7 +65,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 65, origin.y + visibleSize.height - 70.0f));
     button->addClickEventListener([this](Ref *) {
         unsigned nextRound = _currentRound + 1;
-        if (nextRound < _competitionData->rounds.size()) {
+        if (nextRound < _competitionData->round_count) {
             if (_competitionData->isRoundFinished(_currentRound)) {
                 Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, nextRound));
             }
@@ -74,7 +74,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
             }
         }
     });
-    button->setEnabled(_currentRound + 1 < _competitionData->rounds.size());
+    button->setEnabled(_currentRound + 1 < _competitionData->round_count);
 
     _colWidth[0] = visibleSize.width * 0.1f;
     _colWidth[1] = visibleSize.width * 0.1f;

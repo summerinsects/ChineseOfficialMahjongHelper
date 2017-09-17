@@ -74,15 +74,14 @@ void CompetitionData::prepare(const std::string &name, unsigned player, unsigned
     this->name = name;
     players.swap(std::vector<CompetitionPlayer>(player));
     teams.clear();
-    rounds.swap(std::vector<CompetitionRound>(round));
-    current_round = 0;
+    rounds.clear();
+    round_count = round;
     start_time = time(nullptr);
     finish_time = 0;
 
     for (size_t i = 0, cnt = players.size(); i < cnt; ++i) {
         CompetitionPlayer &player = players[i];
         player.serial = static_cast<unsigned>(1 + i);
-        player.competition_results.resize(round);
     }
 }
 
@@ -394,9 +393,9 @@ void CompetitionData::fromJson(const rapidjson::Value &json, CompetitionData &da
         });
     }
 
-    it = json.FindMember("current_round");
-    if (it != json.MemberEnd() && it->value.IsUint()) {
-        data.current_round = it->value.GetUint();
+    it = json.FindMember("round_count");
+    if (it != json.MemberEnd() && it->value.IsUint64()) {
+        data.round_count = it->value.GetUint64();
     }
 
     it = json.FindMember("start_time");
@@ -440,7 +439,7 @@ void CompetitionData::toJson(const CompetitionData &data, rapidjson::Value &json
     });
     json.AddMember("rounds", std::move(rounds), alloc);
 
-    json.AddMember("current_round", rapidjson::Value(data.current_round), alloc);
+    json.AddMember("round_count", rapidjson::Value(data.round_count), alloc);
     json.AddMember("start_time", rapidjson::Value(static_cast<uint64_t>(data.start_time)), alloc);
     json.AddMember("finish_time", rapidjson::Value(static_cast<uint64_t>(data.finish_time)), alloc);
 }

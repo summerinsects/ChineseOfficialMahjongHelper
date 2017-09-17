@@ -43,7 +43,7 @@ bool CompetitionMainScene::init() {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
             Scene *scene = nullptr;
             if (_competitionData->isEnrollmentOver()) {
-                scene = CompetitionRoundScene::create(_competitionData, _competitionData->current_round);
+                scene = CompetitionRoundScene::create(_competitionData, _competitionData->rounds.size() - 1);
             }
             else {
                 scene = CompetitionEnrollScene::create(_competitionData);
