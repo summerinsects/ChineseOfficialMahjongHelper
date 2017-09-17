@@ -72,7 +72,8 @@ void CompetitionRound::sortPlayers(size_t round, const std::vector<CompetitionPl
 // 准备
 void CompetitionData::prepare(const std::string &name, size_t player, size_t round) {
     this->name = name;
-    players.swap(std::vector<CompetitionPlayer>(player));
+    std::vector<CompetitionPlayer> temp(player);
+    players.swap(temp);
     teams.clear();
     rounds.clear();
     round_count = round;
