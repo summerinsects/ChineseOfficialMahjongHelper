@@ -199,6 +199,7 @@ void CompetitionEnrollScene::onOkButton(cocos2d::Ref *sender) {
     }
 
     _competitionData->startNewRound();
+    _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
     Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, 0));
 }
 
