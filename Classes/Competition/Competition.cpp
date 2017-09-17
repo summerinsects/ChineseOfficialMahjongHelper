@@ -91,8 +91,16 @@ bool CompetitionData::isRegistrationFull() const {
     return std::all_of(players.begin(), players.end(), [](const CompetitionPlayer &p) { return !p.name.empty(); });
 }
 
+// 一轮是否已经开始
 bool CompetitionData::isRoundStarted(unsigned round) const {
     return std::any_of(players.begin(), players.end(), [round](const CompetitionPlayer &player) {
+        return player.competition_results[round].rank != 0;
+    });
+}
+
+// 一轮是否已经结束
+bool CompetitionData::isRoundFinished(unsigned round) const {
+    return std::all_of(players.begin(), players.end(), [round](const CompetitionPlayer &player) {
         return player.competition_results[round].rank != 0;
     });
 }
