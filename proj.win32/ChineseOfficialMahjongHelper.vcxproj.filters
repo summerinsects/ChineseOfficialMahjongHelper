@@ -173,6 +173,9 @@
     <ClInclude Include="..\Classes\widget\AlertView.h">
       <Filter>src\widget</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\widget\CWEditBoxDelegate.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\widget\CWTableView.h">
       <Filter>src\widget</Filter>
     </ClInclude>

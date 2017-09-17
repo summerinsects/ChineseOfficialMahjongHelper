@@ -922,7 +922,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     }
 
     // EditBox的代理
-    std::shared_ptr<cw::EditBoxDelegate> delegate = std::make_shared<cw::EditBoxDelegate>(
+    auto delegate = std::make_shared<cw::EditBoxReturnDelegate>(
         [](ui::EditBox *editBox) {
         const char *text = editBox->getText();
         if (!Common::isCStringEmpty(text)) {

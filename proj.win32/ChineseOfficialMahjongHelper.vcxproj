@@ -189,6 +189,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\ScoreSheet\ScoreSheetScene.h" />
     <ClInclude Include="..\Classes\TilesImage.h" />
     <ClInclude Include="..\Classes\widget\AlertView.h" />
+    <ClInclude Include="..\Classes\widget\CWEditBoxDelegate.h" />
     <ClInclude Include="..\Classes\widget\CWTableView.h" />
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h" />
     <ClInclude Include="..\Classes\widget\HandTilesWidget.h" />
