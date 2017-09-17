@@ -181,6 +181,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, unsi
 
         AlertView::showWithNode("新建比赛", label, [this, name, num, round]() {
             _competitionData->prepare(name, num, round);
+            _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
             Director::getInstance()->pushScene(CompetitionEnrollScene::create(_competitionData));
         }, nullptr);
     }, nullptr);
