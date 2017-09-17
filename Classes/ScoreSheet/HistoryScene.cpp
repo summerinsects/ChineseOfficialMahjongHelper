@@ -3,7 +3,11 @@
 #include <mutex>
 #include <array>
 #include "json/stringbuffer.h"
+#ifdef COCOS2D_DEBUG
 #include "json/prettywriter.h"
+#else
+#include "json/writer.h"
+#endif
 #include "Record.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
@@ -66,7 +70,11 @@ static void saveRecords(const std::vector<Record> &records) {
             });
 
             rapidjson::StringBuffer buf;
+#ifdef COCOS2D_DEBUG
             rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+#else
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+#endif
             doc.Accept(writer);
 
             fwrite(buf.GetString(), 1, buf.GetSize(), file);
