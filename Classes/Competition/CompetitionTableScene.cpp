@@ -123,8 +123,7 @@ cocos2d::Size CompetitionTableScene::tableCellSizeForIndex(cw::TableView *table,
 }
 
 cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *, std::array<Label *, 4>, std::array<Label *, 4>, std::array<Label *, 4>, std::array<Label *, 4>,
-        ui::Button *, std::array<LayerColor *, 2> > CustomCell;
+    typedef cw::TableViewCellEx<Label *, std::array<std::array<Label *, 4>, 4>, ui::Button *, std::array<LayerColor *, 2> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
@@ -132,26 +131,26 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&tableLabel = std::get<0>(ext);
-        std::array<Label *, 4> &serialLabels = std::get<1>(ext);
-        std::array<Label *, 4> &nameLabels = std::get<2>(ext);
-        std::array<Label *, 4> &standardLabels = std::get<3>(ext);
-        std::array<Label *, 4> &competitionLabels = std::get<4>(ext);
-        ui::Button *&button = std::get<5>(ext);
-        std::array<LayerColor *, 2> &layerColors = std::get<6>(ext);
+        std::array<std::array<Label *, 4>, 4> &labels = std::get<1>(ext);
+        ui::Button *&button = std::get<2>(ext);
+        std::array<LayerColor *, 2> &layerColors = std::get<3>(ext);
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
+        // 背景色
         layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 79);
         cell->addChild(layerColors[0]);
 
         layerColors[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 79);
         cell->addChild(layerColors[1]);
 
+        // 桌号
         tableLabel = Label::createWithSystemFont("", "Arail", 12);
         tableLabel->setColor(Color3B::BLACK);
         cell->addChild(tableLabel);
         tableLabel->setPosition(Vec2(_posX[0], 40.0f));
 
+        // 座次
         static const char *seatText[] = { "东", "南", "西", "北" };
         for (int i = 0; i < 4; ++i) {
             const float posY = static_cast<float>(70 - i * 20);
@@ -160,32 +159,22 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
             label->setPosition(Vec2(_posX[1], posY));
-
-            label = Label::createWithSystemFont("", "Arail", 12);
-            label->setColor(Color3B::BLACK);
-            cell->addChild(label);
-            label->setPosition(Vec2(_posX[2], posY));
-            serialLabels[i] = label;
-
-            label = Label::createWithSystemFont("", "Arail", 12);
-            label->setColor(Color3B::BLACK);
-            cell->addChild(label);
-            label->setPosition(Vec2(_posX[3], posY));
-            nameLabels[i] = label;
-
-            label = Label::createWithSystemFont("", "Arail", 12);
-            label->setColor(Color3B::BLACK);
-            cell->addChild(label);
-            label->setPosition(Vec2(_posX[4], posY));
-            standardLabels[i] = label;
-
-            label = Label::createWithSystemFont("", "Arail", 12);
-            label->setColor(Color3B::BLACK);
-            cell->addChild(label);
-            label->setPosition(Vec2(_posX[5], posY));
-            competitionLabels[i] = label;
         }
 
+        // 编号、选手姓名、标准分、比赛分，共4个Label
+        for (int i = 0; i < 4; ++i) {
+            const float posY = static_cast<float>(70 - i * 20);
+
+            for (int k = 0; k < 4; ++k) {
+                Label *label = Label::createWithSystemFont("", "Arail", 12);
+                label->setColor(Color3B::BLACK);
+                cell->addChild(label);
+                label->setPosition(Vec2(_posX[2 + k], posY));
+                labels[i][k] = label;
+            }
+        }
+
+        // 登记成绩按钮
         button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         cell->addChild(button);
         button->setScale9Enabled(true);
@@ -196,6 +185,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         button->addClickEventListener(std::bind(&CompetitionTableScene::onRecordButton, this, std::placeholders::_1));
         Common::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10);
 
+        // 画线
         DrawNode *drawNode = DrawNode::create();
         cell->addChild(drawNode);
         drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
@@ -213,36 +203,33 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
 
     const CustomCell::ExtDataType ext = cell->getExtData();
     Label *tableLabel = std::get<0>(ext);
-    const std::array<Label *, 4> &serialLabels = std::get<1>(ext);
-    const std::array<Label *, 4> &nameLabels = std::get<2>(ext);
-    const std::array<Label *, 4> &standardLabels = std::get<3>(ext);
-    const std::array<Label *, 4> &competitionLabels = std::get<4>(ext);
-    ui::Button *button = std::get<5>(ext);
-    const std::array<LayerColor *, 2> &layerColors = std::get<6>(ext);
+    const std::array<std::array<Label *, 4>, 4> &labels = std::get<1>(ext);
+    ui::Button *button = std::get<2>(ext);
+    const std::array<LayerColor *, 2> &layerColors = std::get<3>(ext);
 
     layerColors[0]->setVisible(!(idx & 1));
     layerColors[1]->setVisible(!!(idx & 1));
 
-    tableLabel->setString(std::to_string(idx + 1));
+    tableLabel->setString(std::to_string(idx + 1));  // 桌号
 
     const std::vector<CompetitionPlayer> &players = _competitionData->players;
 
+    // 座次、编号、选手姓名、标准分、比赛分，共5个Label
     for (int i = 0; i < 4; ++i) {
         const CompetitionTable &currentTable = _competitionTables->at(idx);
         ptrdiff_t playerIndex = currentTable.player_indices[i];
         if (playerIndex == INVALID_INDEX) {
-            serialLabels[i]->setString("");
-            nameLabels[i]->setString("");
-            standardLabels[i]->setString("");
-            competitionLabels[i]->setString("");
+            for (int k = 0; k < 4; ++k) {
+                labels[i][k]->setString("");
+            }
         }
         else {
             const CompetitionPlayer *player = &players[currentTable.player_indices[i]];
-            serialLabels[i]->setString(std::to_string(player->serial));
-            nameLabels[i]->setString(player->name);
+            labels[i][0]->setString(std::to_string(player->serial));
+            labels[i][1]->setString(player->name);
             std::pair<float, int> ret = player->getCurrentScoresByRound(_currentRound);
-            standardLabels[i]->setString(CompetitionResult::standardScoreToString(ret.first));
-            competitionLabels[i]->setString(std::to_string(ret.second));
+            labels[i][2]->setString(CompetitionResult::standardScoreToString(ret.first));
+            labels[i][3]->setString(std::to_string(ret.second));
         }
     }
 
