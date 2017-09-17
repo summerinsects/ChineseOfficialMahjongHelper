@@ -322,6 +322,12 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
 
             _tableView->updateCellAtIndex(table);
 
+            if (_competitionData->isRoundFinished(_currentRound)) {
+                unsigned nextRound = _currentRound + 1;
+                if (_competitionData->current_round < nextRound) {
+                    _competitionData->current_round = nextRound;
+                }
+            }
             _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
         }
     }, nullptr);

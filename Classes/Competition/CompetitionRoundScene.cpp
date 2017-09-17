@@ -65,8 +65,14 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setTitleText("下一轮");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 65, origin.y + visibleSize.height - 70.0f));
     button->addClickEventListener([this](Ref *) {
-        if (_currentRound + 1 < _competitionData->rounds.size()) {
-            Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, _currentRound + 1));
+        unsigned nextRound = _currentRound + 1;
+        if (nextRound < _competitionData->rounds.size()) {
+            if (_competitionData->isRoundFinished(_currentRound)) {
+                Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, nextRound));
+            }
+            else {
+                AlertView::showWithMessage("下一轮", "当前一轮尚未结束，请先将所有桌的成绩登记完毕。", 12, nullptr, nullptr);
+            }
         }
     });
     button->setEnabled(_currentRound + 1 < _competitionData->rounds.size());
