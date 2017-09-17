@@ -662,13 +662,11 @@ void RecordScene::showPackedFanAlert(const std::function<void ()> &callback) {
         label->setPosition(Vec2(25.0f, 10.0f));
 
         // 这一段是实现RadioButton可以取消选中的
-        radioButton->addTouchEventListener([radioGroup](Ref *sender, ui::Widget::TouchEventType event) {
+        radioButton->addClickEventListener([radioGroup](Ref *sender) {
             ui::RadioButton *radioButton = (ui::RadioButton *)sender;
-            if (event == ui::Widget::TouchEventType::ENDED) {
-                if (radioButton->isSelected()) {
-                    // 需要在下一帧调用
-                    radioGroup->scheduleOnce([radioGroup](float) { radioGroup->setSelectedButton(nullptr); }, 0.0f, "deselect");
-                }
+            if (radioButton->isSelected()) {
+                // 需要在下一帧调用
+                radioGroup->scheduleOnce([radioGroup](float) { radioGroup->setSelectedButton(nullptr); }, 0.0f, "deselect");
             }
         });
     }
