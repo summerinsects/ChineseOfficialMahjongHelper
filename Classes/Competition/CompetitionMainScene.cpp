@@ -143,8 +143,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBoxes[2] = editBox;
 
     // EditBox的代理，使得能连续输入
-    std::shared_ptr<cw::EditBoxEndWithActionDelegate> delegate = std::make_shared<cw::EditBoxEndWithActionDelegate>();
-    delegate->callback = [editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
+    auto delegate = std::make_shared<cw::EditBoxEndWithActionDelegate>([editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
         if (action == ui::EditBoxDelegate::EditBoxEndAction::TAB_TO_NEXT) {
             int tag = editBox->getTag();
             editBox = editBoxes[tag + 1];
