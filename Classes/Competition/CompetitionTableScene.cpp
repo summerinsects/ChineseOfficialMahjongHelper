@@ -397,7 +397,11 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
 
     editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    //editBox->setInputMode(ui::EditBox::InputMode::DECIMAL);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+#else
+    editBox->setInputMode(ui::EditBox::InputMode::DECIMAL);
+#endif
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
@@ -417,7 +421,11 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
 
     editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    //editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+#else
+    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+#endif
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
