@@ -63,7 +63,10 @@ void CompetitionRound::sortPlayers(size_t round, const std::vector<CompetitionPl
     // 3. 排序指针数组
     std::sort(ptemp.begin(), ptemp.end(), [](const ScoresSortInfo *a, const ScoresSortInfo *b) {
         if (a->standard_score > b->standard_score) return true;
-        if (a->standard_score == b->standard_score && a->competition_score > b->competition_score) return true;
+        if (a->standard_score == b->standard_score) {
+            if (a->competition_score > b->competition_score) return true;
+            if (a->competition_score == b->competition_score) return a->player->serial < b->player->serial;
+        }
         return false;
     });
 
