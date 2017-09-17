@@ -163,12 +163,13 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         }
 
         // 编号、选手姓名、标准分、比赛分，共4个Label
+        Color3B textColor[] = { Color3B(0x60, 0x60, 0x60), Color3B::ORANGE, Color3B(254, 87, 110), Color3B(44, 121, 178) };
         for (int i = 0; i < 4; ++i) {
             const float posY = static_cast<float>(70 - i * 20);
 
             for (int k = 0; k < 4; ++k) {
                 Label *label = Label::createWithSystemFont("", "Arail", 12);
-                label->setColor(Color3B::BLACK);
+                label->setColor(textColor[k]);
                 cell->addChild(label);
                 label->setPosition(Vec2(_posX[2 + k], posY));
                 labels[i][k] = label;

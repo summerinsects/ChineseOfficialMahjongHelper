@@ -175,10 +175,12 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
         layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 20);
         cell->addChild(layerColors[1]);
 
-        // 名次、编号、选手姓名、本轮标准分、本轮比赛分、累计标准分、累计比赛分，共7个Label 
+        // 名次、编号、选手姓名、本轮标准分、本轮比赛分、累计标准分、累计比赛分，共7个Label
+        Color3B textColor[] = { Color3B::BLACK, Color3B(0x60, 0x60, 0x60), Color3B::ORANGE,
+            Color3B(89, 16, 89), Color3B(101, 196, 59), Color3B(254, 87, 110), Color3B(44, 121, 178) };
         for (int i = 0; i < 7; ++i) {
             Label *label = Label::createWithSystemFont("", "Arail", 12);
-            label->setColor(Color3B::BLACK);
+            label->setColor(textColor[i]);
             cell->addChild(label);
             label->setPosition(Vec2(_posX[i], 10.0f));
             labels[i] = label;
