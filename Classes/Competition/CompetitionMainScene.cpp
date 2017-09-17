@@ -1,5 +1,6 @@
 ﻿#include "CompetitionMainScene.h"
 #include <array>
+#include "../widget/CWEditBoxDelegate.h"
 #include "../widget/AlertView.h"
 #include "Competition.h"
 #include "CompetitionEnrollScene.h"
@@ -88,12 +89,13 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     ui::EditBox *editBox = ui::EditBox::create(Size(150.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(name.c_str());
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(135, 75));
+    editBox->setTag(0);
     editBoxes[0] = editBox;
 #if 1  // test
     editBox->setText("测试比赛");
@@ -111,12 +113,13 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(buf);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(85, 45));
+    editBox->setTag(1);
     editBoxes[1] = editBox;
 
     label = Label::createWithSystemFont("比赛轮数", "Arial", 12);
@@ -136,9 +139,24 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setText(buf);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(85, 15));
+    editBox->setTag(2);
     editBoxes[2] = editBox;
 
-    AlertView::showWithNode("新建比赛", rootNode, [this, editBoxes]() {
+    // EditBox的代理，使得能连续输入
+    std::shared_ptr<cw::EditBoxEndWithActionDelegate> delegate = std::make_shared<cw::EditBoxEndWithActionDelegate>();
+    delegate->callback = [editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
+        if (action == ui::EditBoxDelegate::EditBoxEndAction::TAB_TO_NEXT) {
+            int tag = editBox->getTag();
+            editBox = editBoxes[tag + 1];
+            editBox->scheduleOnce([editBox](float) {
+                editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
+            }, 0.0f, "open_keyboard");
+        }
+    };
+    editBoxes[0]->setDelegate(delegate.get());
+    editBoxes[1]->setDelegate(delegate.get());
+
+    AlertView::showWithNode("新建比赛", rootNode, [this, editBoxes, delegate]() {
         std::string name;
         size_t player = 8, round = 5;
 
