@@ -4,7 +4,6 @@
 #include "Competition.h"
 #include "CompetitionTableScene.h"
 
-
 USING_NS_CC;
 
 CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound) {

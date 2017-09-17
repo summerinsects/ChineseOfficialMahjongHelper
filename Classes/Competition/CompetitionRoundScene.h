@@ -26,7 +26,7 @@ private:
     cw::TableView *_tableView = nullptr;
 
     std::shared_ptr<CompetitionData> _competitionData;
-    unsigned _currentRound;
+    unsigned _currentRound = 0;
 
     std::vector<const CompetitionPlayer *> _players;
 };
