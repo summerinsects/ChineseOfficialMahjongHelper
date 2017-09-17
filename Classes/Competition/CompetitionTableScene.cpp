@@ -65,9 +65,11 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
         label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 70.0f));
     }
 
+    const float tableHeight = visibleSize.height - 110.0f;
+
     // 表格
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 115.0f));
+    tableView->setContentSize(Size(visibleSize.width, tableHeight));
     tableView->setDelegate(this);
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
@@ -80,6 +82,23 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     tableView->reloadData();
     _tableView = tableView;
     this->addChild(tableView);
+
+    // 表头的线
+    DrawNode *drawNode = DrawNode::create();
+    this->addChild(drawNode);
+    drawNode->setPosition(Vec2(origin.x, visibleSize.height - 80.0f));
+    drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
+    drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::GRAY);
+    for (int i = 0; i < 6; ++i) {
+        const float posX = _posX[i] + _colWidth[i] * 0.5f;
+        drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::GRAY);
+    }
+
+    // 当表格可拖动时，画下方一条线
+    if (tableView->getInnerContainerSize().height > tableHeight) {
+        float posY = -tableHeight;
+        drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::GRAY);
+    }
 
     // 确定按钮
     _okButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
@@ -100,7 +119,7 @@ ssize_t CompetitionTableScene::numberOfCellsInTableView(cw::TableView *table) {
 }
 
 cocos2d::Size CompetitionTableScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
-    return Size(0, 120);
+    return Size(0, 80);
 }
 
 cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
@@ -122,46 +141,48 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
-        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 119);
+        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 79);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 119);
+        layerColors[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 79);
         cell->addChild(layerColors[1]);
 
         tableLabel = Label::createWithSystemFont("", "Arail", 12);
         tableLabel->setColor(Color3B::BLACK);
         cell->addChild(tableLabel);
-        tableLabel->setPosition(Vec2(_posX[0], 60.0f));
+        tableLabel->setPosition(Vec2(_posX[0], 40.0f));
 
         static const char *seatText[] = { "东", "南", "西", "北" };
         for (int i = 0; i < 4; ++i) {
+            const float posY = static_cast<float>(70 - i * 20);
+
             Label *label = Label::createWithSystemFont(seatText[i], "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[1], static_cast<float>(105 - i * 30)));
+            label->setPosition(Vec2(_posX[1], posY));
 
             label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[2], static_cast<float>(105 - i * 30)));
+            label->setPosition(Vec2(_posX[2], posY));
             serialLabels[i] = label;
 
             label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[3], static_cast<float>(105 - i * 30)));
+            label->setPosition(Vec2(_posX[3], posY));
             nameLabels[i] = label;
 
             label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[4], static_cast<float>(105 - i * 30)));
+            label->setPosition(Vec2(_posX[4], posY));
             standardLabels[i] = label;
 
             label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[5], static_cast<float>(105 - i * 30)));
+            label->setPosition(Vec2(_posX[5], posY));
             competitionLabels[i] = label;
         }
 
@@ -171,9 +192,23 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         button->setContentSize(Size(_colWidth[6] - 8, 20.0f));
         button->setTitleFontSize(12);
         button->setTitleText("登记成绩");
-        button->setPosition(Vec2(_posX[6], 60.0f));
+        button->setPosition(Vec2(_posX[6], 40.0f));
         button->addClickEventListener(std::bind(&CompetitionTableScene::onRecordButton, this, std::placeholders::_1));
         Common::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10);
+
+        DrawNode *drawNode = DrawNode::create();
+        cell->addChild(drawNode);
+        drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
+        drawNode->drawLine(Vec2(0, 80), Vec2(visibleSize.width, 80), Color4F::GRAY);
+        const float posX = visibleSize.width - _colWidth[6];
+        for (int i = 0; i < 3; ++i) {
+            const float posY = 20.0f * (i + 1);
+            drawNode->drawLine(Vec2(_colWidth[0], posY), Vec2(posX, posY), Color4F::GRAY);
+        }
+        for (int i = 0; i < 6; ++i) {
+            const float posX = _posX[i] + _colWidth[i] * 0.5f;
+            drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 80), Color4F::GRAY);
+        }
     }
 
     const CustomCell::ExtDataType ext = cell->getExtData();

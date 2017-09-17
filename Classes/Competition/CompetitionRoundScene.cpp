@@ -109,9 +109,11 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
         Common::scaleLabelToFitWidth(label, _colWidth[i] - 2);
     }
 
+    const float tableHeight = visibleSize.height - 85.0f;
+
     // 表格
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 85.0f));
+    tableView->setContentSize(Size(visibleSize.width, tableHeight));
     tableView->setDelegate(this);
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
@@ -120,11 +122,27 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     tableView->setScrollBarWidth(4);
     tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 40.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 37.5f));
     tableView->reloadData();
     this->addChild(tableView);
     _tableView = tableView;
 
+    // 表头的线
+    DrawNode *drawNode = DrawNode::create();
+    this->addChild(drawNode);
+    drawNode->setPosition(Vec2(origin.x, visibleSize.height - 80.0f));
+    drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
+    drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::GRAY);
+    for (int i = 0; i < 6; ++i) {
+        const float posX = _posX[i] + _colWidth[i] * 0.5f;
+        drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::GRAY);
+    }
+
+    // 当表格可拖动时，画下方一条横线
+    if (tableView->getInnerContainerSize().height > tableHeight) {
+        const float posY = -tableHeight;
+        drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::GRAY);
+    }
     return true;
 }
 
@@ -133,7 +151,7 @@ ssize_t CompetitionRoundScene::numberOfCellsInTableView(cw::TableView *table) {
 }
 
 cocos2d::Size CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
-    return Size(0, 30);
+    return Size(0, 20);
 }
 
 cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
@@ -149,18 +167,27 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
-        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 29);
+        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 20);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 29);
+        layerColors[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 20);
         cell->addChild(layerColors[1]);
 
         for (int i = 0; i < 7; ++i) {
             Label *label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(_posX[i], 15.0f));
+            label->setPosition(Vec2(_posX[i], 10.0f));
             labels[i] = label;
+        }
+
+        DrawNode *drawNode = DrawNode::create();
+        cell->addChild(drawNode);
+        drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
+        drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::GRAY);
+        for (int i = 0; i < 6; ++i) {
+            const float posX = _posX[i] + _colWidth[i] * 0.5f;
+            drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::GRAY);
         }
     }
 
