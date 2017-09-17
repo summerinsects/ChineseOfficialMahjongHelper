@@ -162,6 +162,8 @@ void CompetitionData::rankTablesBySerialSnake(size_t round) {
 
 // 随机排桌
 void CompetitionData::rankTablesByRandom(size_t round) {
+    srand(static_cast<unsigned>(time(nullptr)));
+
     const size_t cnt = players.size();
     std::vector<CompetitionTable> &tables = rounds[round].tables;
     tables.resize(cnt / 4);
