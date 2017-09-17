@@ -67,6 +67,10 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
         unsigned nextRound = _currentRound + 1;
         if (nextRound < _competitionData->round_count) {
             if (_competitionData->isRoundFinished(_currentRound)) {
+                if (_currentRound == _competitionData->rounds.size() - 1) {
+                    _competitionData->startNewRound();
+                    _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
+                }
                 Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, nextRound));
             }
             else {

@@ -25,10 +25,6 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     _currentRound = currentRound;
     _competitionTables = &_competitionData->rounds[currentRound].tables;
 
-    if (_competitionTables->empty()) {
-        _competitionData->rankTablesBySerial(_currentRound);
-    }
-
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 

@@ -90,6 +90,22 @@ bool CompetitionData::isEnrollmentOver() const {
     return std::all_of(players.begin(), players.end(), [](const CompetitionPlayer &p) { return !p.name.empty(); });
 }
 
+// 开始新一轮
+bool CompetitionData::startNewRound() {
+    if (rounds.size() >= round_count) {
+        return false;
+    }
+
+    rounds.push_back(CompetitionRound());
+    std::for_each(players.begin(), players.end(), [](CompetitionPlayer &player) {
+        player.competition_results.push_back(CompetitionResult());
+    });
+
+    rankTablesBySerial(rounds.size() - 1);
+
+    return true;
+}
+
 // 一轮是否已经开始
 bool CompetitionData::isRoundStarted(unsigned round) const {
     return std::any_of(players.begin(), players.end(), [round](const CompetitionPlayer &player) {

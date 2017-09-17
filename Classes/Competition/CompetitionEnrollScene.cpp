@@ -201,6 +201,7 @@ void CompetitionEnrollScene::onOkButton(cocos2d::Ref *sender) {
         return;
     }
 
+    _competitionData->startNewRound();
     Director::getInstance()->pushScene(CompetitionRoundScene::create(_competitionData, 0));
 }
 
