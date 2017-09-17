@@ -230,7 +230,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
 
         cell->setContentSize(Size(width, 70));
         cell->setTouchEnabled(true);
-        cell->addTouchEventListener(std::bind(&HistoryScene::onCellEvent, this, std::placeholders::_1, std::placeholders::_2));
+        cell->addClickEventListener(std::bind(&HistoryScene::onCellClicked, this, std::placeholders::_1));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -288,11 +288,7 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     }, nullptr);
 }
 
-void HistoryScene::onCellEvent(cocos2d::Ref *sender, cocos2d::ui::Widget::TouchEventType event) {
-    if (event != ui::Widget::TouchEventType::ENDED) {
-        return;
-    }
-
+void HistoryScene::onCellClicked(cocos2d::Ref *sender) {
     cw::TableViewCell *cell = (cw::TableViewCell *)sender;
     _viewCallback(&g_records[cell->getIdx()]);
 }

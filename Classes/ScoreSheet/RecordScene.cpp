@@ -73,19 +73,19 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     _editBox = editBox;
 
     // 输入框同位置的按钮，以实现点击后清除内容的效果
-    ui::Button *button = ui::Button::create();
-    editBox->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(35.0f, 20.0f));
-    button->setPosition(Vec2(35.0f * 0.5f, 20.0f * 0.5f));
-    button->addClickEventListener([editBox](Ref *) {
+    ui::Widget *widget = ui::Widget::create();
+    editBox->addChild(widget);
+    widget->setTouchEnabled(true);
+    widget->setContentSize(Size(35.0f, 20.0f));
+    widget->setPosition(Vec2(35.0f * 0.5f, 20.0f * 0.5f));
+    widget->addClickEventListener([editBox](Ref *) {
         editBox->setPlaceHolder(editBox->getText());
         editBox->setText("");
         editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
     });
 
     // +-按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(25.0f, 20.0f));
@@ -662,13 +662,11 @@ void RecordScene::showPackedFanAlert(const std::function<void ()> &callback) {
         label->setPosition(Vec2(25.0f, 10.0f));
 
         // 这一段是实现RadioButton可以取消选中的
-        radioButton->addTouchEventListener([radioGroup](Ref *sender, ui::Widget::TouchEventType event) {
+        radioButton->addClickEventListener([radioGroup](Ref *sender) {
             ui::RadioButton *radioButton = (ui::RadioButton *)sender;
-            if (event == ui::Widget::TouchEventType::ENDED) {
-                if (radioButton->isSelected()) {
-                    // 需要在下一帧调用
-                    radioGroup->scheduleOnce([radioGroup](float) { radioGroup->setSelectedButton(nullptr); }, 0.0f, "deselect");
-                }
+            if (radioButton->isSelected()) {
+                // 需要在下一帧调用
+                radioGroup->scheduleOnce([radioGroup](float) { radioGroup->setSelectedButton(nullptr); }, 0.0f, "deselect");
             }
         });
     }

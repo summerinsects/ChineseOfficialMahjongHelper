@@ -573,15 +573,15 @@ void TilesKeyboard::onClear() {
 
 void TilesKeyboard::hookEditBox(cocos2d::ui::EditBox *editBox) {
     const Size &size = editBox->getContentSize();
-    ui::Button *button = ui::Button::create();
-    button->setScale9Enabled(true);
-    button->setContentSize(size);
-    button->addClickEventListener([editBox](Ref *) {
+    ui::Widget *widget = ui::Widget::create();
+    widget->setTouchEnabled(true);
+    widget->setContentSize(size);
+    widget->addClickEventListener([editBox](Ref *) {
         TilesKeyboard::showByEditBox(editBox);
     });
 
-    editBox->addChild(button);
-    button->setPosition(Vec2(size.width * 0.5f, size.height * 0.5f));
+    editBox->addChild(widget);
+    widget->setPosition(Vec2(size.width * 0.5f, size.height * 0.5f));
 }
 
 void TilesKeyboard::showByEditBox(cocos2d::ui::EditBox *editBox) {
