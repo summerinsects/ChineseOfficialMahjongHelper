@@ -98,7 +98,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     // 当表格可拖动时，画下方一条线
     if (tableView->getInnerContainerSize().height > tableHeight) {
         float posY = -tableHeight;
-        drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::GRAY);
+        drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::BLACK);
     }
 
     // 确定按钮
