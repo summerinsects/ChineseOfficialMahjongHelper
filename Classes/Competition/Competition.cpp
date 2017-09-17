@@ -179,7 +179,7 @@ void CompetitionData::rankTablesByRandom(size_t round) {
     temp.reserve(players.size());
     std::transform(players.begin(), players.end(), std::back_inserter(temp), [](CompetitionPlayer &p) { return &p; });
     std::random_shuffle(temp.begin(), temp.end());
-    
+
     for (size_t i = 0; i < cnt; ) {
         size_t serial = i / 4;
         CompetitionTable &table = tables[serial];
@@ -196,7 +196,7 @@ void CompetitionData::rankTablesByScores(size_t round) {
     const size_t cnt = players.size();
     std::vector<CompetitionTable> &tables = rounds[round].tables;
     tables.resize(cnt / 4);
-    
+
     std::vector<const CompetitionPlayer *> output;
     CompetitionRound::sortPlayers(round, players, output);
 
