@@ -21,8 +21,13 @@ static inline bool isCStringEmpty(const char *str) {
     return *str == '\0';
 }
 
+#ifdef _MSC_VER
+template <size_t BufferSize>
+static std::string format(_Printf_format_string_ const char *fmt, ...);
+#else
 template <size_t BufferSize>
 static std::string format(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
+#endif
 
 template <size_t BufferSize>
 inline std::string format(const char *fmt, ...) {
