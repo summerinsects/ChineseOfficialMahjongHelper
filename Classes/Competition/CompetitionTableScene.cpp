@@ -460,12 +460,14 @@ void CompetitionTableScene::onRankButton(cocos2d::Ref *sender) {
 
     AlertView::showWithNode("排列座位", rootNode, [this, radioGroup]() {
         switch (radioGroup->getSelectedButtonIndex()) {
-        case 0: _competitionData->rankTablesByRandom(_currentRound); _tableView->reloadData(); break;
-        case 1: _competitionData->rankTablesBySerialSnake(_currentRound); _tableView->reloadData(); break;
-        case 2: _competitionData->rankTablesByScoresSnake(_currentRound); _tableView->reloadData(); break;
-        case 3: _competitionData->rankTablesByScores(_currentRound); _tableView->reloadData(); break;
-        case 4: break;
-        default: break;
+        case 0: _competitionData->rankTablesByRandom(_currentRound); break;
+        case 1: _competitionData->rankTablesBySerialSnake(_currentRound); break;
+        case 2: _competitionData->rankTablesByScoresSnake(_currentRound); break;
+        case 3: _competitionData->rankTablesByScores(_currentRound); break;
+        case 4: return;  // TODO: 自定义排桌
+        default: return;
         }
+        _tableView->reloadData();
+        _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
     }, nullptr);
 }
