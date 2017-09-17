@@ -1881,10 +1881,10 @@ static int get_fan_by_table(const fan_table_t &fan_table) {
         fan += fan_value_table[i] * fan_table[i];
 #if 0  // Debug
         if (fan_table[i] == 1) {
-            LOG("%s %d\n", fan_name[i], fan_value_table[i]);
+            LOG("%s %hu\n", fan_name[i], fan_value_table[i]);
         }
         else {
-            LOG("%s %d*%ld\n", fan_name[i], fan_value_table[i], fan_table[i]);
+            LOG("%s %hu*%hu\n", fan_name[i], fan_value_table[i], fan_table[i]);
         }
 #endif
     }
