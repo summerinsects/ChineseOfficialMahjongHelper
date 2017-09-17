@@ -73,7 +73,7 @@ bool CompetitionMainScene::init() {
     return true;
 }
 
-void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, unsigned num, unsigned round) {
+void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size_t player, size_t round) {
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(215, 90));
 
@@ -106,7 +106,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, unsi
     label->setPosition(Vec2(5, 45));
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "%u", num);
+    snprintf(buf, sizeof(buf), "%lu", static_cast<unsigned long>(player));
 
     editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
@@ -140,7 +140,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, unsi
 
     AlertView::showWithNode("新建比赛", rootNode, [this, editBoxes]() {
         std::string name;
-        unsigned num = 8, round = 5;
+        size_t player = 8, round = 5;
 
         const char *text = editBoxes[0]->getText();
         if (*text != '\0') {
@@ -149,38 +149,38 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, unsi
 
         text = editBoxes[1]->getText();
         if (*text != '\0') {
-            num = atoi(text);
+            player = atoll(text);
         }
 
         text = editBoxes[2]->getText();
         if (*text != '\0') {
-            round = atoi(text);
+            round = atoll(text);
         }
 
         if (name.empty()) {
             AlertView::showWithMessage("新建比赛", "请输入赛事名称", 12,
-                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, name, num, round), nullptr);
+                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, name, player, round), nullptr);
             return;
         }
 
-        if ((num & 0x3) || num == 0) {
+        if ((player & 0x3) || player == 0) {
             AlertView::showWithMessage("新建比赛", "参赛人数必须为4的倍数，且大于0", 12,
-                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, name, num, round), nullptr);
+                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, name, player, round), nullptr);
             return;
         }
 
         if (round == 0) {
             AlertView::showWithMessage("新建比赛", "比赛轮数必须大于0", 12,
-                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, name, num, round), nullptr);
+                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, name, player, round), nullptr);
             return;
         }
 
-        Label *label = Label::createWithSystemFont(StringUtils::format("「%s」\n%u人\n%u轮", name.c_str(), num, round), "Arial", 12);
+        Label *label = Label::createWithSystemFont(StringUtils::format("「%s」\n%u人\n%u轮", name.c_str(), player, round), "Arial", 12);
         label->setColor(Color3B::BLACK);
         label->setHorizontalAlignment(TextHAlignment::CENTER);
 
-        AlertView::showWithNode("新建比赛", label, [this, name, num, round]() {
-            _competitionData->prepare(name, num, round);
+        AlertView::showWithNode("新建比赛", label, [this, name, player, round]() {
+            _competitionData->prepare(name, player, round);
             _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
             Director::getInstance()->pushScene(CompetitionEnrollScene::create(_competitionData));
         }, nullptr);

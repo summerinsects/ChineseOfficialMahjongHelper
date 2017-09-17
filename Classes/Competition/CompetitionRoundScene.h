@@ -9,9 +9,9 @@ class CompetitionPlayer;
 
 class CompetitionRoundScene : public BaseScene, cw::TableViewDelegate {
 public:
-    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound);
+    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
 
-    static CompetitionRoundScene *create(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound);
+    static CompetitionRoundScene *create(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
@@ -26,7 +26,7 @@ private:
     cw::TableView *_tableView = nullptr;
 
     std::shared_ptr<CompetitionData> _competitionData;
-    unsigned _currentRound = 0;
+    size_t _currentRound = 0;
 
     std::vector<const CompetitionPlayer *> _players;
 };

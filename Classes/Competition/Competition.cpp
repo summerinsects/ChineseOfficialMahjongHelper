@@ -38,7 +38,7 @@ struct ScoresSortInfo {
 };
 
 // 高高碰排序
-void CompetitionRound::sortPlayers(unsigned round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output) {
+void CompetitionRound::sortPlayers(size_t round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output) {
     // 1. 逐个计算标准分和比赛分
     std::vector<ScoresSortInfo> temp;
     temp.reserve(players.size());
@@ -70,7 +70,7 @@ void CompetitionRound::sortPlayers(unsigned round, const std::vector<Competition
 }
 
 // 准备
-void CompetitionData::prepare(const std::string &name, unsigned player, unsigned round) {
+void CompetitionData::prepare(const std::string &name, size_t player, size_t round) {
     this->name = name;
     players.swap(std::vector<CompetitionPlayer>(player));
     teams.clear();
@@ -81,7 +81,7 @@ void CompetitionData::prepare(const std::string &name, unsigned player, unsigned
 
     for (size_t i = 0, cnt = players.size(); i < cnt; ++i) {
         CompetitionPlayer &player = players[i];
-        player.serial = static_cast<unsigned>(1 + i);
+        player.serial = 1 + i;
     }
 }
 
@@ -107,21 +107,21 @@ bool CompetitionData::startNewRound() {
 }
 
 // 一轮是否已经开始
-bool CompetitionData::isRoundStarted(unsigned round) const {
+bool CompetitionData::isRoundStarted(size_t round) const {
     return std::any_of(players.begin(), players.end(), [round](const CompetitionPlayer &player) {
         return player.competition_results[round].rank != 0;
     });
 }
 
 // 一轮是否已经结束
-bool CompetitionData::isRoundFinished(unsigned round) const {
+bool CompetitionData::isRoundFinished(size_t round) const {
     return std::all_of(players.begin(), players.end(), [round](const CompetitionPlayer &player) {
         return player.competition_results[round].rank != 0;
     });
 }
 
 // 按编号排桌
-void CompetitionData::rankTablesBySerial(unsigned round) {
+void CompetitionData::rankTablesBySerial(size_t round) {
     const size_t cnt = players.size();
     std::vector<CompetitionTable> &tables = rounds[round].tables;
     tables.resize(cnt / 4);
@@ -135,7 +135,7 @@ void CompetitionData::rankTablesBySerial(unsigned round) {
 }
 
 // 按编号蛇形排桌
-void CompetitionData::rankTablesBySerialSnake(unsigned round) {
+void CompetitionData::rankTablesBySerialSnake(size_t round) {
     const size_t cnt = players.size();
     std::vector<CompetitionTable> &tables = rounds[round].tables;
     tables.resize(cnt / 4);
@@ -154,7 +154,7 @@ void CompetitionData::rankTablesBySerialSnake(unsigned round) {
 }
 
 // 随机排桌
-void CompetitionData::rankTablesByRandom(unsigned round) {
+void CompetitionData::rankTablesByRandom(size_t round) {
     const size_t cnt = players.size();
     std::vector<CompetitionTable> &tables = rounds[round].tables;
     tables.resize(cnt / 4);
@@ -174,7 +174,7 @@ void CompetitionData::rankTablesByRandom(unsigned round) {
 }
 
 // 高高碰排桌
-void CompetitionData::rankTablesByScores(unsigned round) {
+void CompetitionData::rankTablesByScores(size_t round) {
     const size_t cnt = players.size();
     std::vector<CompetitionTable> &tables = rounds[round].tables;
     tables.resize(cnt / 4);
@@ -192,7 +192,7 @@ void CompetitionData::rankTablesByScores(unsigned round) {
 }
 
 // 蛇形名次排桌
-void CompetitionData::rankTablesByScoresSnake(unsigned round) {
+void CompetitionData::rankTablesByScoresSnake(size_t round) {
     const size_t cnt = players.size();
     std::vector<CompetitionTable> &tables = rounds[round].tables;
     tables.resize(cnt / 4);

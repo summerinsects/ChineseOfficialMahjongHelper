@@ -10,9 +10,9 @@ struct CompetitionTable;
 
 class CompetitionTableScene : public BaseScene, cw::TableViewDelegate {
 public:
-    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound);
+    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
 
-    static CompetitionTableScene *create(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound);
+    static CompetitionTableScene *create(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
@@ -30,7 +30,7 @@ private:
     cocos2d::ui::Button *_okButton = nullptr;
 
     std::shared_ptr<CompetitionData> _competitionData;
-    unsigned _currentRound;
+    size_t _currentRound;
 
     std::vector<CompetitionTable> *_competitionTables;
 };

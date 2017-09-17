@@ -26,7 +26,7 @@ struct CompetitionResult {
 // 队员
 class CompetitionPlayer {
 public:
-    unsigned serial = 0;  // 编号
+    size_t serial = 0;  // 编号
     std::string name;  // 姓名
     std::vector<CompetitionResult> competition_results;  // 每轮成绩
     ptrdiff_t team_index = INVALID_INDEX;  // 所在队伍
@@ -41,7 +41,7 @@ public:
 // 队伍
 class CompetitionTeam {
 public:
-    unsigned serial = 0;  // 编号
+    size_t serial = 0;  // 编号
     std::string name;  // 队名
     std::vector<ptrdiff_t> player_indices;  // 队员
 
@@ -51,7 +51,7 @@ public:
 
 // 桌
 struct CompetitionTable {
-    unsigned serial = 0;  // 编号
+    size_t serial = 0;  // 编号
     ptrdiff_t player_indices[4];  // 参赛选手
 
     CompetitionTable() {
@@ -74,7 +74,7 @@ public:
     static void toJson(const CompetitionRound &round, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 
     // 高高碰排序
-    static void sortPlayers(unsigned round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output);
+    static void sortPlayers(size_t round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output);
 };
 
 class CompetitionData {
@@ -93,19 +93,19 @@ public:
     bool readFromFile(const std::string &file);  // 从文件中读
     bool writeToFile(const std::string &file) const;  // 写入到文件
 
-    void prepare(const std::string &name, unsigned player, unsigned round);  // 准备
+    void prepare(const std::string &name, size_t player, size_t round);  // 准备
 
     bool isEnrollmentOver() const;  // 报名是否截止
 
     bool startNewRound();  // 开始新一轮
-    bool isRoundStarted(unsigned round) const;  // 一轮是否已经开始
-    bool isRoundFinished(unsigned round) const;  // 一轮是否已经结束
+    bool isRoundStarted(size_t round) const;  // 一轮是否已经开始
+    bool isRoundFinished(size_t round) const;  // 一轮是否已经结束
 
-    void rankTablesBySerial(unsigned round);  // 按编号排桌
-    void rankTablesBySerialSnake(unsigned round);  // 按编号蛇形排桌
-    void rankTablesByRandom(unsigned round);  // 随机排桌
-    void rankTablesByScores(unsigned round);  // 高高碰排桌
-    void rankTablesByScoresSnake(unsigned round);  // 蛇形名次排桌
+    void rankTablesBySerial(size_t round);  // 按编号排桌
+    void rankTablesBySerialSnake(size_t round);  // 按编号蛇形排桌
+    void rankTablesByRandom(size_t round);  // 随机排桌
+    void rankTablesByScores(size_t round);  // 高高碰排桌
+    void rankTablesByScoresSnake(size_t round);  // 蛇形名次排桌
 };
 
 #endif

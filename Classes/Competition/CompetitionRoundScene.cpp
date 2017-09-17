@@ -6,7 +6,7 @@
 
 USING_NS_CC;
 
-CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound) {
+CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
     CompetitionRoundScene *ret = new (std::nothrow) CompetitionRoundScene();
     if (ret != nullptr && ret->initWithData(competitionData, currentRound)) {
         ret->autorelease();
@@ -16,7 +16,7 @@ CompetitionRoundScene *CompetitionRoundScene::create(const std::shared_ptr<Compe
     return nullptr;
 }
 
-bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, unsigned currentRound) {
+bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
     if (UNLIKELY(!BaseScene::initWithTitle(Common::format<256>("%s第%u/%lu轮",
         competitionData->name.c_str(), currentRound + 1, static_cast<unsigned long>(competitionData->round_count))))) {
         return false;
@@ -64,7 +64,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setTitleText("下一轮");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 65, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener([this](Ref *) {
-        unsigned nextRound = _currentRound + 1;
+        size_t nextRound = _currentRound + 1;
         if (nextRound < _competitionData->round_count) {
             if (_competitionData->isRoundFinished(_currentRound)) {
                 if (_currentRound == _competitionData->rounds.size() - 1) {
