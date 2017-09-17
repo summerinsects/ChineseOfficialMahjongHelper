@@ -42,7 +42,7 @@ bool CompetitionMainScene::init() {
     button->addClickEventListener([this](Ref *) {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
             Scene *scene = nullptr;
-            if (_competitionData->isRegistrationFull()) {
+            if (_competitionData->isEnrollmentOver()) {
                 scene = CompetitionRoundScene::create(_competitionData, _competitionData->current_round);
             }
             else {

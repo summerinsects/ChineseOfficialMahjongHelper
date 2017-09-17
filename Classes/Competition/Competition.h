@@ -95,7 +95,7 @@ public:
 
     void prepare(const std::string &name, unsigned player, unsigned round);  // 准备
 
-    bool isRegistrationFull() const;  // 报名是否已满
+    bool isEnrollmentOver() const;  // 报名是否截止
     bool isRoundStarted(unsigned round) const;  // 一轮是否已经开始
     bool isRoundFinished(unsigned round) const;  // 一轮是否已经结束
 

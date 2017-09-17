@@ -86,8 +86,8 @@ void CompetitionData::prepare(const std::string &name, unsigned player, unsigned
     }
 }
 
-// 报名是否已满
-bool CompetitionData::isRegistrationFull() const {
+// 报名是否截止
+bool CompetitionData::isEnrollmentOver() const {
     return std::all_of(players.begin(), players.end(), [](const CompetitionPlayer &p) { return !p.name.empty(); });
 }
 

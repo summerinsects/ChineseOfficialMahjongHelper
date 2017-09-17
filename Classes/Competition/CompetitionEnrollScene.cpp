@@ -196,7 +196,7 @@ void CompetitionEnrollScene::onOkButton(cocos2d::Ref *sender) {
     }
 #endif
 
-    if (!_competitionData->isRegistrationFull()) {
+    if (!_competitionData->isEnrollmentOver()) {
         AlertView::showWithMessage("提示", "请录入所有选手姓名", 12, nullptr, nullptr);
         return;
     }
