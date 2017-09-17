@@ -234,7 +234,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
             labels[i][3]->setString(std::to_string(ret.second));
 
             for (int k = 0; k < 4; ++k) {
-                Common::scaleLabelToFitWidth(labels[i][k], _colWidth[k]);
+                Common::scaleLabelToFitWidth(labels[i][k], _colWidth[2 + k]);
             }
         }
     }
