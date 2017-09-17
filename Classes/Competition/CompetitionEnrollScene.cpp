@@ -17,7 +17,7 @@ CompetitionEnrollScene *CompetitionEnrollScene::create(const std::shared_ptr<Com
 }
 
 bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData) {
-    if (UNLIKELY(!BaseScene::initWithTitle(competitionData->name))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(std::string(competitionData->name).append("报名表")))) {
         return false;
     }
 
@@ -26,43 +26,30 @@ bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData>
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Label *label = Label::createWithSystemFont("报名表", "Arail", 12);
+    // 表头
+    Label *label = Label::createWithSystemFont("序号", "Arail", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
-
-    // 下一步按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("下一步");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 70.0f));
-    button->addClickEventListener(std::bind(&CompetitionEnrollScene::onOkButton, this, std::placeholders::_1));
-
-    label = Label::createWithSystemFont("序号", "Arail", 12);
-    label->setColor(Color3B::BLACK);
-    this->addChild(label);
-    label->setPosition(Vec2(origin.x + 20.0f, origin.y + visibleSize.height - 100.0f));
+    label->setPosition(Vec2(origin.x + 20.0f, origin.y + visibleSize.height - 50.0f));
 
     label = Label::createWithSystemFont("选手姓名", "Arail", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.25f + 15.0f, origin.y + visibleSize.height - 100.0f));
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.25f + 15.0f, origin.y + visibleSize.height - 50.0f));
 
     label = Label::createWithSystemFont("序号", "Arail", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 20.0f, origin.y + visibleSize.height - 100.0f));
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 20.0f, origin.y + visibleSize.height - 50.0f));
 
     label = Label::createWithSystemFont("选手姓名", "Arail", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.75f + 15.0f, origin.y + visibleSize.height - 100.0f));
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.75f + 15.0f, origin.y + visibleSize.height - 50.0f));
 
+    // 表格
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 115.0f));
+    tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 95.0f));
     tableView->setDelegate(this);
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
@@ -71,10 +58,20 @@ bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData>
     tableView->setScrollBarWidth(4);
     tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 55.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     tableView->reloadData();
     this->addChild(tableView);
     _tableView = tableView;
+
+    // 下一步按钮
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("下一步");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
+    button->addClickEventListener(std::bind(&CompetitionEnrollScene::onOkButton, this, std::placeholders::_1));
 
     return true;
 }

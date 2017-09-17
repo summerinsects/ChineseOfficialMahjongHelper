@@ -27,6 +27,7 @@ private:
     float _posX[7];
 
     cw::TableView *_tableView = nullptr;
+    cocos2d::ui::Button *_okButton = nullptr;
 
     std::shared_ptr<CompetitionData> _competitionData;
     unsigned _currentRound;

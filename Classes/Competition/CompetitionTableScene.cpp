@@ -35,7 +35,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("排列座位");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 70.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&CompetitionTableScene::onRankButton, this, std::placeholders::_1));
 
     // 列宽
@@ -62,7 +62,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         this->addChild(label);
-        label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 100.0f));
+        label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 70.0f));
     }
 
     // 表格
@@ -76,10 +76,21 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     tableView->setScrollBarWidth(4);
     tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 55.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 25.0f));
     tableView->reloadData();
     _tableView = tableView;
     this->addChild(tableView);
+
+    // 确定按钮
+    _okButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    this->addChild(_okButton);
+    _okButton->setScale9Enabled(true);
+    _okButton->setContentSize(Size(50.0f, 20.0f));
+    _okButton->setTitleFontSize(12);
+    _okButton->setTitleText("确定");
+    _okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
+    _okButton->addClickEventListener([](Ref *) { cocos2d::Director::getInstance()->popScene(); });
+    _okButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
 
     return true;
 }
@@ -322,6 +333,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         }
 
         // 刷新外面的UI
+        _okButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
         _tableView->updateCellAtIndex(table);
         _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
     }, nullptr);

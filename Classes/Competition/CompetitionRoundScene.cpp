@@ -37,7 +37,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("上一轮");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 65, origin.y + visibleSize.height - 70.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 65, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener([this](Ref *) {
         if (_currentRound > 0) {
             Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, _currentRound - 1));
@@ -52,7 +52,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("登记成绩");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 70.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&CompetitionRoundScene::onReportButton, this, std::placeholders::_1));
 
     // 下一轮按钮
@@ -62,7 +62,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("下一轮");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 65, origin.y + visibleSize.height - 70.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 65, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener([this](Ref *) {
         unsigned nextRound = _currentRound + 1;
         if (nextRound < _competitionData->round_count) {
@@ -100,18 +100,18 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     _posX[6] = _posX[5] + _colWidth[5] * 0.5f + _colWidth[6] * 0.5f;
 
     // 表头
-    const char *titleTexts[] = { "名次", "编号", "选手姓名", "标准分", "比赛分", "标准分", "比赛分" };
+    const char *titleTexts[] = { "名次", "编号", "选手姓名", "本轮标准分", "本轮比赛分", "累计标准分", "累计比赛分" };
     for (int i = 0; i < 7; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         this->addChild(label);
-        label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 100.0f));
-        Common::scaleLabelToFitWidth(label, _colWidth[i] - 4);
+        label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 70.0f));
+        Common::scaleLabelToFitWidth(label, _colWidth[i] - 2);
     }
 
     // 表格
     cw::TableView *tableView = cw::TableView::create();
-    tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 115.0f));
+    tableView->setContentSize(Size(visibleSize.width, visibleSize.height - 85.0f));
     tableView->setDelegate(this);
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
@@ -120,7 +120,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     tableView->setScrollBarWidth(4);
     tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 55.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 40.0f));
     tableView->reloadData();
     this->addChild(tableView);
     _tableView = tableView;
