@@ -1,6 +1,10 @@
 ﻿#include "ScoreSheetScene.h"
 #include "json/stringbuffer.h"
+#ifdef COCOS2D_DEBUG
 #include "json/prettywriter.h"
+#else
+#include "json/writer.h"
+#endif
 #include "../widget/AlertView.h"
 #include "../widget/CWEditBoxDelegate.h"
 #include "../widget/HandTilesWidget.h"
@@ -37,7 +41,11 @@ static void writeToJson(const Record &record) {
         RecordToJson(record, doc, doc.GetAllocator());
 
         rapidjson::StringBuffer buf;
+#ifdef COCOS2D_DEBUG
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+#else
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+#endif
         doc.Accept(writer);
 
         CCLOG("%.*s", static_cast<int>(buf.GetSize()), buf.GetString());
