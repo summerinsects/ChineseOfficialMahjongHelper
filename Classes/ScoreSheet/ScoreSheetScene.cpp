@@ -164,12 +164,12 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     // 4个用于弹出输入框的AlertLayer及同位置的label
     // 这里不直接使用Button内部Label，因为内部Label在点击后会恢复scale
     for (int i = 0; i < 4; ++i) {
-        button = ui::Button::create();
-        button->setScale9Enabled(true);
-        button->setPosition(Vec2(colPosX[i + 1], line1Y));
-        button->setContentSize(Size(gap, cellHeight));
-        node->addChild(button);
-        button->addClickEventListener(std::bind(&ScoreSheetScene::onNameButton, this, std::placeholders::_1, i));
+        ui::Widget *widget = ui::Widget::create();
+        widget->setTouchEnabled(true);
+        widget->setPosition(Vec2(colPosX[i + 1], line1Y));
+        widget->setContentSize(Size(gap, cellHeight));
+        node->addChild(widget);
+        widget->addClickEventListener(std::bind(&ScoreSheetScene::onNameButton, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(Color3B::ORANGE);
@@ -222,12 +222,12 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         node->addChild(label);
         _totalLabel[i] = label;
 
-        ui::Button *button = ui::Button::create();
-        button->setScale9Enabled(true);
-        button->setPosition(Vec2(colPosX[i + 1], line4Y));
-        button->setContentSize(Size(gap, cellHeight));
-        node->addChild(button);
-        button->addClickEventListener(std::bind(&ScoreSheetScene::onScoreButton, this, std::placeholders::_1, i));
+        ui::Widget *widget = ui::Widget::create();
+        widget->setTouchEnabled(true);
+        widget->setPosition(Vec2(colPosX[i + 1], line4Y));
+        widget->setContentSize(Size(gap, cellHeight));
+        node->addChild(widget);
+        widget->addClickEventListener(std::bind(&ScoreSheetScene::onScoreButton, this, std::placeholders::_1, i));
     }
 
     // 第5栏：名次
@@ -294,14 +294,14 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         _fanNameLabel[k] = label;
 
         // 查看详情按钮
-        button = ui::Button::create();
-        node->addChild(button);
-        button->setScale9Enabled(true);
-        button->setContentSize(Size(gap, cellHeight));
-        button->setPosition(Vec2(colPosX[5], y));
-        button->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1, k));
-        button->setEnabled(false);
-        _detailButton[k] = button;
+        ui::Widget *widget = ui::Widget::create();
+        node->addChild(widget);
+        widget->setTouchEnabled(true);
+        widget->setContentSize(Size(gap, cellHeight));
+        widget->setPosition(Vec2(colPosX[5], y));
+        widget->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1, k));
+        widget->setEnabled(false);
+        _detailWidget[k] = widget;
     }
 
     // 恢复界面数据
@@ -317,7 +317,7 @@ void ScoreSheetScene::cleanRow(size_t handIdx) {
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
     _fanNameLabel[handIdx]->setVisible(false);
-    _detailButton[handIdx]->setEnabled(false);
+    _detailWidget[handIdx]->setEnabled(false);
 }
 
 void ScoreSheetScene::fillRow(size_t handIdx) {
@@ -337,7 +337,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     // 禁用并隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
-    _detailButton[handIdx]->setEnabled(true);
+    _detailWidget[handIdx]->setEnabled(true);
 
     Label *label = _fanNameLabel[handIdx];
     label->setString(GetShortFanText(detail));

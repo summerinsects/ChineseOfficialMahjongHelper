@@ -19,7 +19,7 @@ private:
     cocos2d::Label *_totalLabel[4];
     cocos2d::Label *_scoreLabels[16][4];
     cocos2d::ui::Button *_recordButton[16];
-    cocos2d::ui::Button *_detailButton[16];
+    cocos2d::ui::Widget *_detailWidget[16];
     cocos2d::Label *_fanNameLabel[16];
     cocos2d::Label *_rankLabels[4];
     cocos2d::Label *_timeLabel = nullptr;

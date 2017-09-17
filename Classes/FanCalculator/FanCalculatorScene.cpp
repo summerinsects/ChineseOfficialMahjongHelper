@@ -108,14 +108,14 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         div_t ret = div(i, 2);
         label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, static_cast<float>(resultAreaHeight - lineHeight * (ret.quot + 1))));
 
-        // 创建与label同位置的button
-        ui::Button *button = ui::Button::create();
-        button->setScale9Enabled(true);
-        button->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        button->setPosition(label->getPosition());
-        button->setContentSize(label->getContentSize());
-        node->addChild(button);
-        button->addClickEventListener([j](Ref *) {
+        // 创建与label同位置的widget
+        ui::Widget *widget = ui::Widget::create();
+        widget->setTouchEnabled(true);
+        widget->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        widget->setPosition(label->getPosition());
+        widget->setContentSize(label->getContentSize());
+        node->addChild(widget);
+        widget->addClickEventListener([j](Ref *) {
             Director::getInstance()->pushScene(FanDefinitionScene::create(j));
         });
     }
