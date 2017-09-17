@@ -1,6 +1,8 @@
 ﻿#ifndef _CW_EDIT_BOX_DELETATE_H_
 #define _CW_EDIT_BOX_DELETATE_H_
 
+#include <type_traits>
+#include <utility>
 #include "ui/UIEditBox/UIEditBox.h"
 
 namespace cw {
@@ -9,7 +11,9 @@ namespace cw {
         typedef std::function<void (cocos2d::ui::EditBox *editBox)> ccEditBoxReturnCallback;
 
         template <class _Callable>
-        EditBoxReturnDelegate(_Callable &&callback) : _callback(callback) { }
+        EditBoxReturnDelegate(_Callable &&callback) : _callback(std::forward<_Callable>(callback)) {
+            static_assert(std::is_constructible<ccEditBoxReturnCallback, _Callable>::value, "");
+        }
 
         virtual ~EditBoxReturnDelegate() { CCLOG("%s", __FUNCTION__); }
 
@@ -33,7 +37,9 @@ namespace cw {
         typedef std::function<void (cocos2d::ui::EditBox *, cocos2d::ui::EditBoxDelegate::EditBoxEndAction)> ccEditBoxEndWithActionCallback;
 
         template <class _Callable>
-        EditBoxEndWithActionDelegate(_Callable &&callback) : _callback(callback) { }
+        EditBoxEndWithActionDelegate(_Callable &&callback) : _callback(std::forward<_Callable>(callback)) {
+            static_assert(std::is_constructible<ccEditBoxEndWithActionCallback, _Callable>::value, "");
+        }
 
         virtual ~EditBoxEndWithActionDelegate() { CCLOG("%s", __FUNCTION__); };
 
@@ -45,10 +51,10 @@ namespace cw {
 
         virtual void editBoxReturn(cocos2d::ui::EditBox *) { }
         virtual void editBoxEditingDidEndWithAction(cocos2d::ui::EditBox *editBox, cocos2d::ui::EditBoxDelegate::EditBoxEndAction action) {
-            callback(editBox, action);
+            _callback(editBox, action);
         };
 
-        ccEditBoxEndWithActionCallback callback;
+        ccEditBoxEndWithActionCallback _callback;
     };
 }
 
