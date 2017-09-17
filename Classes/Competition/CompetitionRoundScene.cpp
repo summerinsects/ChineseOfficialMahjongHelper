@@ -143,6 +143,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
         const float posY = -tableHeight;
         drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::GRAY);
     }
+
     return true;
 }
 
@@ -167,12 +168,14 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
+        // 背景色
         layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 20);
         cell->addChild(layerColors[0]);
 
         layerColors[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 20);
         cell->addChild(layerColors[1]);
 
+        // 名次、编号、选手姓名、本轮标准分、本轮比赛分、累计标准分、累计比赛分，共7个Label 
         for (int i = 0; i < 7; ++i) {
             Label *label = Label::createWithSystemFont("", "Arail", 12);
             label->setColor(Color3B::BLACK);
@@ -181,6 +184,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
             labels[i] = label;
         }
 
+        // 画线
         DrawNode *drawNode = DrawNode::create();
         cell->addChild(drawNode);
         drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::GRAY);
@@ -199,16 +203,20 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     layerColors[1]->setVisible(!!(idx & 1));
 
     const CompetitionPlayer &player = *_players[idx];
+
+    // 名次、编号、选手姓名
     labels[0]->setString(std::to_string(idx + 1));
     labels[1]->setString(std::to_string(player.serial));
     labels[2]->setString(player.name);
 
+    // 本轮标准分和比赛分
     std::pair<float, int> ret = player.getCurrentScoresByRound(_currentRound);
     labels[3]->setString(CompetitionResult::standardScoreToString(ret.first));
     Common::scaleLabelToFitWidth(labels[3], _colWidth[3] - 4);
     labels[4]->setString(std::to_string(ret.second));
     Common::scaleLabelToFitWidth(labels[4], _colWidth[4] - 4);
 
+    // 累计标准分和比赛分
     ret = player.getTotalScoresByRound(_currentRound);
     labels[5]->setString(CompetitionResult::standardScoreToString(ret.first));
     Common::scaleLabelToFitWidth(labels[5], _colWidth[5] - 4);
