@@ -137,18 +137,19 @@ bool HistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    _tableView = cw::TableView::create();
-    _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    _tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
-    _tableView->setScrollBarWidth(4);
-    _tableView->setScrollBarOpacity(0x99);
-    _tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35));
-    _tableView->setDelegate(this);
-    _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
+    cw::TableView *tableView = cw::TableView::create();
+    tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
+    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
+    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarOpacity(0x99);
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35));
+    tableView->setDelegate(this);
+    tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
-    this->addChild(_tableView);
+    tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
+    this->addChild(tableView);
+    _tableView = tableView;
 
     if (UNLIKELY(g_records.empty())) {
         this->scheduleOnce([this](float) {

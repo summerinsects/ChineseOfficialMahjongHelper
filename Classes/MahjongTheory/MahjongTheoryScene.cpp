@@ -20,19 +20,19 @@ bool MahjongTheoryScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    _editBox = ui::EditBox::create(Size(visibleSize.width - 95, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    this->addChild(_editBox);
-    _editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    _editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-    _editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-    _editBox->setFontColor(Color4B::BLACK);
-    _editBox->setFontSize(12);
-    _editBox->setPlaceholderFontColor(Color4B::GRAY);
-    _editBox->setPlaceHolder("在此处输入");
-    _editBox->setDelegate(this);
-    _editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40, origin.y + visibleSize.height - 50));
-
-    TilesKeyboard::hookEditBox(_editBox);
+    ui::EditBox *editBox= ui::EditBox::create(Size(visibleSize.width - 95, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    this->addChild(editBox);
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setPlaceholderFontColor(Color4B::GRAY);
+    editBox->setPlaceHolder("在此处输入");
+    editBox->setDelegate(this);
+    editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40, origin.y + visibleSize.height - 50));
+    TilesKeyboard::hookEditBox(editBox);
+    _editBox = editBox;
 
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
@@ -52,39 +52,42 @@ bool MahjongTheoryScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 50));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
 
-    _handTilesWidget = HandTilesWidget::create();
-    _handTilesWidget->setTileClickCallback(std::bind(&MahjongTheoryScene::onStandingTileEvent, this));
-    this->addChild(_handTilesWidget);
-    Size widgetSize = _handTilesWidget->getContentSize();
+    HandTilesWidget *handTilesWidget = HandTilesWidget::create();
+    handTilesWidget->setTileClickCallback(std::bind(&MahjongTheoryScene::onStandingTileEvent, this));
+    this->addChild(handTilesWidget);
+    Size widgetSize = handTilesWidget->getContentSize();
 
     // 根据情况缩放
     if (widgetSize.width - 4 > visibleSize.width) {
         float scale = (visibleSize.width - 4) / widgetSize.width;
-        _handTilesWidget->setScale(scale);
+        handTilesWidget->setScale(scale);
         widgetSize.width = visibleSize.width - 4;
         widgetSize.height *= scale;
     }
-    _handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 65 - widgetSize.height * 0.5f));
+    handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 65 - widgetSize.height * 0.5f));
+    _handTilesWidget = handTilesWidget;
 
-    _undoButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    _undoButton->setScale9Enabled(true);
-    _undoButton->setContentSize(Size(35.0f, 20.0f));
-    _undoButton->setTitleFontSize(12);
-    _undoButton->setTitleText("撤销");
-    this->addChild(_undoButton);
-    _undoButton->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 80 - widgetSize.height));
-    _undoButton->addClickEventListener(std::bind(&MahjongTheoryScene::onUndoButton, this, std::placeholders::_1));
-    _undoButton->setEnabled(false);
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("撤销");
+    this->addChild(button);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 80 - widgetSize.height));
+    button->addClickEventListener(std::bind(&MahjongTheoryScene::onUndoButton, this, std::placeholders::_1));
+    button->setEnabled(false);
+    _undoButton = button;
 
-    _redoButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    _redoButton->setScale9Enabled(true);
-    _redoButton->setContentSize(Size(35.0f, 20.0f));
-    _redoButton->setTitleFontSize(12);
-    _redoButton->setTitleText("重做");
-    this->addChild(_redoButton);
-    _redoButton->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 80 - widgetSize.height));
-    _redoButton->addClickEventListener(std::bind(&MahjongTheoryScene::onRedoButton, this, std::placeholders::_1));
-    _redoButton->setEnabled(false);
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("重做");
+    this->addChild(button);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 80 - widgetSize.height));
+    button->addClickEventListener(std::bind(&MahjongTheoryScene::onRedoButton, this, std::placeholders::_1));
+    button->setEnabled(false);
+    _redoButton = button;
 
     Label *label = Label::createWithSystemFont("考虑特殊和型", "Arial", 12);
     label->setColor(Color3B::BLACK);
@@ -132,18 +135,19 @@ bool MahjongTheoryScene::init() {
     tempLabel->setString("」共0种，00枚");
     _totalLabelWidth = tempLabel->getContentSize().width;
 
-    _tableView = cw::TableView::create();
-    _tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    _tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
-    _tableView->setScrollBarWidth(4);
-    _tableView->setScrollBarOpacity(0x99);
-    _tableView->setContentSize(Size(visibleSize.width - 5, visibleSize.height - 130 - widgetSize.height));
-    _tableView->setDelegate(this);
-    _tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
+    cw::TableView *tableView = cw::TableView::create();
+    tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
+    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
+    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarOpacity(0x99);
+    tableView->setContentSize(Size(visibleSize.width - 5, visibleSize.height - 130 - widgetSize.height));
+    tableView->setDelegate(this);
+    tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    _tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 60));
-    this->addChild(_tableView);
+    tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 60));
+    this->addChild(tableView);
+    _tableView = tableView;
 
     srand(static_cast<unsigned>(time(nullptr)));
 
