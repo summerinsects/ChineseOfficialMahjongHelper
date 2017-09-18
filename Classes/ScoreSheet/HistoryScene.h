@@ -8,11 +8,10 @@ struct Record;
 
 class HistoryScene : public BaseScene, cw::TableViewDelegate {
 public:
-    static cocos2d::Scene *create(const std::function<void (Record *)> &viewCallback);
+    typedef std::function<void (Record *)> ViewCallback;
 
-    virtual bool init() override;
-
-    CREATE_FUNC(HistoryScene);
+    CREATE_FUNC_WITH_PARAM_1(HistoryScene, initWithCallback, const ViewCallback &, viewCallback);
+    bool initWithCallback(const ViewCallback &viewCallback);
 
     virtual void onEnter() override;
 
@@ -37,7 +36,7 @@ private:
     void onCellClicked(cocos2d::Ref *sender);
 
     cw::TableView *_tableView = nullptr;
-    std::function<void (Record *)> _viewCallback;
+    ViewCallback _viewCallback;
 };
 
 #endif

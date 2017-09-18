@@ -47,13 +47,6 @@ static void replaceTilesToImage(std::string &text, float scale) {
     }
 }
 
-Scene *FanDefinitionScene::create(size_t idx) {
-    auto scene = new (std::nothrow) FanDefinitionScene();
-    scene->initWithIndex(idx);
-    scene->autorelease();
-    return scene;
-}
-
 bool FanDefinitionScene::initWithIndex(size_t idx) {
     const char *title = idx < 100 ? mahjong::fan_name[idx] : principle_title[idx - 100];
     if (UNLIKELY(!BaseScene::initWithTitle(title))) {

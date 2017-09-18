@@ -16,154 +16,105 @@ bool ExtraInfoWidget::init() {
 
     this->setContentSize(Size(visibleSize.width, 110));
 
-    // 点和与自摸互斥
-    _winTypeGroup = ui::RadioButtonGroup::create();
-    this->addChild(_winTypeGroup);
-    _winTypeGroup->addEventListener(std::bind(&ExtraInfoWidget::onWinTypeGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
-    // 点和
     const float gapX = 65;
-    ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    this->addChild(radioButton);
-    radioButton->setZoomScale(0.0f);
-    radioButton->ignoreContentAdaptWithSize(false);
-    radioButton->setContentSize(Size(20.0f, 20.0f));
-    radioButton->setPosition(Vec2(20.0f, 100.0f));
-    _winTypeGroup->addRadioButton(radioButton);
 
-    Label *label = Label::createWithSystemFont("点和", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f, 100.0f));
+    // 点和与自摸互斥
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    this->addChild(radioGroup);
+    radioGroup->addEventListener(std::bind(&ExtraInfoWidget::onWinTypeGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-    // 自摸
-    radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    this->addChild(radioButton);
-    radioButton->setZoomScale(0.0f);
-    radioButton->ignoreContentAdaptWithSize(false);
-    radioButton->setContentSize(Size(20.0f, 20.0f));
-    radioButton->setPosition(Vec2(20.0f + gapX, 100.0f));
-    _winTypeGroup->addRadioButton(radioButton);
+    const char *winTypeTexts[] = { "点和", "自摸" };
+    for (int i = 0; i < 2; ++i) {
+        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        this->addChild(radioButton);
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(20.0f + gapX * i, 100.0f));
+        radioGroup->addRadioButton(radioButton);
 
-    label = Label::createWithSystemFont("自摸", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f + gapX, 100.0f));
+        Label *label = Label::createWithSystemFont(winTypeTexts[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        this->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(35.0f + gapX * i, 100.0f));
+    }
+    _winTypeGroup = radioGroup;
 
     // 绝张
-    _fourthTileBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-    this->addChild(_fourthTileBox);
-    _fourthTileBox->setZoomScale(0.0f);
-    _fourthTileBox->ignoreContentAdaptWithSize(false);
-    _fourthTileBox->setContentSize(Size(20.0f, 20.0f));
-    _fourthTileBox->setPosition(Vec2(20.0f + gapX * 2, 100.0f));
-    _fourthTileBox->setEnabled(false);
-    _fourthTileBox->addEventListener(std::bind(&ExtraInfoWidget::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
+    ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+    this->addChild(checkBox);
+    checkBox->setZoomScale(0.0f);
+    checkBox->ignoreContentAdaptWithSize(false);
+    checkBox->setContentSize(Size(20.0f, 20.0f));
+    checkBox->setPosition(Vec2(20.0f + gapX * 2, 100.0f));
+    checkBox->setEnabled(false);
+    checkBox->addEventListener(std::bind(&ExtraInfoWidget::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
+    _fourthTileBox = checkBox;
 
-    label = Label::createWithSystemFont("绝张", "Arial", 12);
+    Label *label = Label::createWithSystemFont("绝张", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f + gapX * 2, 100.0f));
 
-    // 杠开
-    _replacementBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-    this->addChild(_replacementBox);
-    _replacementBox->setZoomScale(0.0f);
-    _replacementBox->ignoreContentAdaptWithSize(false);
-    _replacementBox->setContentSize(Size(20.0f, 20.0f));
-    _replacementBox->setPosition(Vec2(20.0f, 70.0f));
-    _replacementBox->setEnabled(false);
+    const char *extTexts[] = { "杠开", "抢杠", "海底" };
+    ui::CheckBox *checkBoxes[3];
+    for (int i = 0; i < 3; ++i) {
+        ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        this->addChild(checkBox);
+        checkBox->setZoomScale(0.0f);
+        checkBox->ignoreContentAdaptWithSize(false);
+        checkBox->setContentSize(Size(20.0f, 20.0f));
+        checkBox->setPosition(Vec2(20.0f + gapX * i, 70.0f));
+        checkBoxes[i] = checkBox;
 
-    label = Label::createWithSystemFont("杠开", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f, 70.0f));
-
-    // 抢杠
-    _robKongBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-    this->addChild(_robKongBox);
-    _robKongBox->setZoomScale(0.0f);
-    _robKongBox->ignoreContentAdaptWithSize(false);
-    _robKongBox->setContentSize(Size(20.0f, 20.0f));
-    _robKongBox->setPosition(Vec2(20.0f + gapX, 70.0f));
-    _robKongBox->setEnabled(false);
-    _robKongBox->addEventListener(std::bind(&ExtraInfoWidget::onRobKongBox, this, std::placeholders::_1, std::placeholders::_2));
-
-    label = Label::createWithSystemFont("抢杠", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f + gapX, 70.0f));
-
-    // 海底
-    _lastTileBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-    this->addChild(_lastTileBox);
-    _lastTileBox->setZoomScale(0.0f);
-    _lastTileBox->ignoreContentAdaptWithSize(false);
-    _lastTileBox->setContentSize(Size(20.0f, 20.0f));
-    _lastTileBox->setPosition(Vec2(20.0f + gapX * 2, 70.0f));
-    _lastTileBox->addEventListener(std::bind(&ExtraInfoWidget::onLastTileBox, this, std::placeholders::_1, std::placeholders::_2));
-
-    label = Label::createWithSystemFont("海底", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f + gapX * 2, 70.0f));
-
-    const char *windName[4] = { "东", "南", "西", "北" };
-
-    // 圈风
-    label = Label::createWithSystemFont("圈风", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    this->addChild(label);
-    label->setPosition(Vec2(20.0f, 40.0f));
-
-    _prevalentWindGroup = ui::RadioButtonGroup::create();
-    this->addChild(_prevalentWindGroup);
-
-    for (int i = 0; i < 4; ++i) {
-        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        radioButton->setZoomScale(0.0f);
-        radioButton->ignoreContentAdaptWithSize(false);
-        radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(50.0f + i * 30, 40.0f));
-        this->addChild(radioButton);
-
-        label = Label::createWithSystemFont(windName[i], "Arial", 12);
+        label = Label::createWithSystemFont(extTexts[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
-        radioButton->addChild(label);
-        label->setPosition(Vec2(10.0f, 10.0f));
-
-        _prevalentWindGroup->addRadioButton(radioButton);
+        this->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(35.0f + gapX * i, 70.0f));
     }
 
-    // 门风
-    label = Label::createWithSystemFont("门风", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    this->addChild(label);
-    label->setPosition(Vec2(20.0f, 10.0f));
+    checkBoxes[0]->setEnabled(false);
+    _replacementBox = checkBoxes[0];
 
-    _seatWindGroup = ui::RadioButtonGroup::create();
-    this->addChild(_seatWindGroup);
+    checkBoxes[1]->setEnabled(false);
+    checkBoxes[1]->addEventListener(std::bind(&ExtraInfoWidget::onRobKongBox, this, std::placeholders::_1, std::placeholders::_2));
+    _robKongBox = checkBoxes[1];
 
-    for (int i = 0; i < 4; ++i) {
-        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        radioButton->setZoomScale(0.0f);
-        radioButton->ignoreContentAdaptWithSize(false);
-        radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(50.0f + i * 30, 10.0f));
-        this->addChild(radioButton);
+    checkBoxes[2]->addEventListener(std::bind(&ExtraInfoWidget::onLastTileBox, this, std::placeholders::_1, std::placeholders::_2));
+    _lastTileBox = checkBoxes[2];
 
-        label = Label::createWithSystemFont(windName[i], "Arial", 12);
+    // 圈风和门风
+    const char *windName[4] = { "东", "南", "西", "北" };
+    const char *windType[2] = { "圈风", "门风" };
+    for (int k = 0; k < 2; ++k) {
+        const float posY = 40.0f - k * 30;
+
+        label = Label::createWithSystemFont(windType[k], "Arial", 12);
         label->setColor(Color3B::BLACK);
-        radioButton->addChild(label);
-        label->setPosition(Vec2(10.0f, 10.0f));
+        this->addChild(label);
+        label->setPosition(Vec2(20.0f, posY));
 
-        _seatWindGroup->addRadioButton(radioButton);
+        radioGroup = ui::RadioButtonGroup::create();
+        this->addChild(radioGroup);
+        for (int i = 0; i < 4; ++i) {
+            ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            radioButton->setZoomScale(0.0f);
+            radioButton->ignoreContentAdaptWithSize(false);
+            radioButton->setContentSize(Size(20.0f, 20.0f));
+            radioButton->setPosition(Vec2(50.0f + i * 30, posY));
+            this->addChild(radioButton);
+
+            label = Label::createWithSystemFont(windName[i], "Arial", 12);
+            label->setColor(Color3B::BLACK);
+            radioButton->addChild(label);
+            label->setPosition(Vec2(10.0f, 10.0f));
+
+            radioGroup->addRadioButton(radioButton);
+        }
+        _windGroups[k] = radioGroup;
     }
 
     // 使用说明
@@ -245,28 +196,28 @@ void ExtraInfoWidget::setWinFlag(mahjong::win_flag_t flag) {
 }
 
 mahjong::wind_t ExtraInfoWidget::getPrevalentWind() const {
-    return static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _prevalentWindGroup->getSelectedButtonIndex());
+    return static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _windGroups[0]->getSelectedButtonIndex());
 }
 
 void ExtraInfoWidget::setPrevalentWind(mahjong::wind_t wind) {
     switch (wind) {
-    case mahjong::wind_t::EAST: _prevalentWindGroup->setSelectedButton(0); break;
-    case mahjong::wind_t::SOUTH: _prevalentWindGroup->setSelectedButton(1); break;
-    case mahjong::wind_t::WEST: _prevalentWindGroup->setSelectedButton(2); break;
-    case mahjong::wind_t::NORTH: _prevalentWindGroup->setSelectedButton(3); break;
+    case mahjong::wind_t::EAST: _windGroups[0]->setSelectedButton(0); break;
+    case mahjong::wind_t::SOUTH: _windGroups[0]->setSelectedButton(1); break;
+    case mahjong::wind_t::WEST: _windGroups[0]->setSelectedButton(2); break;
+    case mahjong::wind_t::NORTH: _windGroups[0]->setSelectedButton(3); break;
     }
 }
 
 mahjong::wind_t ExtraInfoWidget::getSeatWind() const {
-    return static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _seatWindGroup->getSelectedButtonIndex());
+    return static_cast<mahjong::wind_t>(static_cast<int>(mahjong::wind_t::EAST) + _windGroups[1]->getSelectedButtonIndex());
 }
 
 void ExtraInfoWidget::setSeatWind(mahjong::wind_t wind) {
     switch (wind) {
-    case mahjong::wind_t::EAST: _seatWindGroup->setSelectedButton(0); break;
-    case mahjong::wind_t::SOUTH: _seatWindGroup->setSelectedButton(1); break;
-    case mahjong::wind_t::WEST: _seatWindGroup->setSelectedButton(2); break;
-    case mahjong::wind_t::NORTH: _seatWindGroup->setSelectedButton(3); break;
+    case mahjong::wind_t::EAST: _windGroups[1]->setSelectedButton(0); break;
+    case mahjong::wind_t::SOUTH: _windGroups[1]->setSelectedButton(1); break;
+    case mahjong::wind_t::WEST: _windGroups[1]->setSelectedButton(2); break;
+    case mahjong::wind_t::NORTH: _windGroups[1]->setSelectedButton(3); break;
     }
 }
 

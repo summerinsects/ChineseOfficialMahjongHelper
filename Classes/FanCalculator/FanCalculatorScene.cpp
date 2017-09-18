@@ -55,12 +55,13 @@ bool FanCalculatorScene::init() {
 
     // 番种显示的Node
     Size areaSize(visibleSize.width, visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height - 10);
-    _fanAreaNode = Node::create();
-    _fanAreaNode->setContentSize(areaSize);
-    _fanAreaNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _fanAreaNode->setIgnoreAnchorPointForPosition(false);
-    this->addChild(_fanAreaNode);
-    _fanAreaNode->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + areaSize.height * 0.5f + 5));
+    Node *node = Node::create();
+    node->setContentSize(areaSize);
+    node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    node->setIgnoreAnchorPointForPosition(false);
+    this->addChild(node);
+    node->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + areaSize.height * 0.5f + 5));
+    _fanAreaNode = node;
 
     tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {
         extraInfo->refreshByKong(tilePicker->isFixedPacksContainsKong());

@@ -5,7 +5,7 @@
 
 class FanDefinitionScene : public BaseScene {
 public:
-    static cocos2d::Scene *create(size_t idx);
+    CREATE_FUNC_WITH_PARAM_1(FanDefinitionScene, initWithIndex, size_t, idx);
 
     bool initWithIndex(size_t idx);
 

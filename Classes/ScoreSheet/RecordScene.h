@@ -13,9 +13,10 @@ static const char *handNameText[] = {
 
 class RecordScene : public BaseScene, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
 public:
-    static cocos2d::Scene *create(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback);
+    typedef std::function<void (const Record::Detail &)> OkCallback;
 
-    bool initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail);
+    CREATE_FUNC_WITH_PARAM_4(RecordScene, initWithIndex, size_t, handIdx, const char **, playerNames, const Record::Detail *, detail, const OkCallback &, okCallback);
+    bool initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const OkCallback &callback);
 
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
 
@@ -37,7 +38,7 @@ private:
 
     int _winIndex = -1;
     Record::Detail _detail;
-    std::function<void (const Record::Detail &)> _okCallback;
+    OkCallback _okCallback;
     uint8_t _seatFlag;
     uint8_t _playerFlag;
 
