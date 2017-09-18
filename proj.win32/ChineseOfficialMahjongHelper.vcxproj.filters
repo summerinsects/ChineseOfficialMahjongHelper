@@ -54,10 +54,10 @@
     <ClCompile Include="..\Classes\Competition\CompetitionEnrollScene.cpp">
       <Filter>src\Competition</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\CompetitionFinalScene.cpp">
+    <ClCompile Include="..\Classes\Competition\CompetitionMainScene.cpp">
       <Filter>src\Competition</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\CompetitionMainScene.cpp">
+    <ClCompile Include="..\Classes\Competition\CompetitionRankCustomScene.cpp">
       <Filter>src\Competition</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Competition\CompetitionRoundScene.cpp">
@@ -152,10 +152,10 @@
     <ClInclude Include="..\Classes\Competition\CompetitionEnrollScene.h">
       <Filter>src\Competition</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\CompetitionFinalScene.h">
+    <ClInclude Include="..\Classes\Competition\CompetitionMainScene.h">
       <Filter>src\Competition</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\CompetitionMainScene.h">
+    <ClInclude Include="..\Classes\Competition\CompetitionRankCustomScene.h">
       <Filter>src\Competition</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Competition\CompetitionRoundScene.h">

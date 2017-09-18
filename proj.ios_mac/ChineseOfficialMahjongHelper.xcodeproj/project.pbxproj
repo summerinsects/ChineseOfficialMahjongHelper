@@ -53,8 +53,8 @@
 		1FE0DAAF1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */; };
 		1FE17A751EE0FF9300B47FE3 /* Competition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */; };
 		1FE17A761EE0FF9300B47FE3 /* Competition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */; };
-		1FE17A771EE0FF9300B47FE3 /* CompetitionFinalScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A6F1EE0FF9300B47FE3 /* CompetitionFinalScene.cpp */; };
-		1FE17A781EE0FF9300B47FE3 /* CompetitionFinalScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A6F1EE0FF9300B47FE3 /* CompetitionFinalScene.cpp */; };
+		1FE17A771EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A6F1EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp */; };
+		1FE17A781EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A6F1EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp */; };
 		1FE17A791EE0FF9300B47FE3 /* CompetitionRoundScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A711EE0FF9300B47FE3 /* CompetitionRoundScene.cpp */; };
 		1FE17A7A1EE0FF9300B47FE3 /* CompetitionRoundScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A711EE0FF9300B47FE3 /* CompetitionRoundScene.cpp */; };
 		1FE17A7B1EE0FF9300B47FE3 /* CompetitionTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */; };
@@ -203,8 +203,8 @@
 		1FE0DAAD1E8A0C94008BCC2F /* TilesKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilesKeyboard.h; sourceTree = "<group>"; };
 		1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Competition.cpp; path = Competition/Competition.cpp; sourceTree = "<group>"; };
 		1FE17A6E1EE0FF9300B47FE3 /* Competition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Competition.h; path = Competition/Competition.h; sourceTree = "<group>"; };
-		1FE17A6F1EE0FF9300B47FE3 /* CompetitionFinalScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionFinalScene.cpp; path = Competition/CompetitionFinalScene.cpp; sourceTree = "<group>"; };
-		1FE17A701EE0FF9300B47FE3 /* CompetitionFinalScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionFinalScene.h; path = Competition/CompetitionFinalScene.h; sourceTree = "<group>"; };
+		1FE17A6F1EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionRankCustomScene.cpp; path = Competition/CompetitionRankCustomScene.cpp; sourceTree = "<group>"; };
+		1FE17A701EE0FF9300B47FE3 /* CompetitionRankCustomScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionRankCustomScene.h; path = Competition/CompetitionRankCustomScene.h; sourceTree = "<group>"; };
 		1FE17A711EE0FF9300B47FE3 /* CompetitionRoundScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionRoundScene.cpp; path = Competition/CompetitionRoundScene.cpp; sourceTree = "<group>"; };
 		1FE17A721EE0FF9300B47FE3 /* CompetitionRoundScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionRoundScene.h; path = Competition/CompetitionRoundScene.h; sourceTree = "<group>"; };
 		1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionTableScene.cpp; path = Competition/CompetitionTableScene.cpp; sourceTree = "<group>"; };
@@ -366,10 +366,10 @@
 				1FE17A6E1EE0FF9300B47FE3 /* Competition.h */,
 				1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */,
 				1F68AFC61F03366800B4BB97 /* CompetitionEnrollScene.h */,
-				1FE17A6F1EE0FF9300B47FE3 /* CompetitionFinalScene.cpp */,
-				1FE17A701EE0FF9300B47FE3 /* CompetitionFinalScene.h */,
 				1F68AFC71F03366800B4BB97 /* CompetitionMainScene.cpp */,
 				1F68AFC81F03366900B4BB97 /* CompetitionMainScene.h */,
+				1FE17A6F1EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp */,
+				1FE17A701EE0FF9300B47FE3 /* CompetitionRankCustomScene.h */,
 				1FE17A711EE0FF9300B47FE3 /* CompetitionRoundScene.cpp */,
 				1FE17A721EE0FF9300B47FE3 /* CompetitionRoundScene.h */,
 				1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */,
@@ -745,7 +745,7 @@
 				1F154E411E440A160083F8B3 /* stringify.cpp in Sources */,
 				1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
 				1F2D25871E076FC20071ADE2 /* AlertView.cpp in Sources */,
-				1FE17A771EE0FF9300B47FE3 /* CompetitionFinalScene.cpp in Sources */,
+				1FE17A771EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				1FDD94451C8337140031BC38 /* shanten.cpp in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
@@ -773,7 +773,7 @@
 				1FDD94441C8337140031BC38 /* fan_calculator.cpp in Sources */,
 				1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */,
 				1FE17A7A1EE0FF9300B47FE3 /* CompetitionRoundScene.cpp in Sources */,
-				1FE17A781EE0FF9300B47FE3 /* CompetitionFinalScene.cpp in Sources */,
+				1FE17A781EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp in Sources */,
 				1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
 				1FE2A3EE1CBB30D1008C45C5 /* FanTable.cpp in Sources */,
 				1FE2A3EC1CBB30D1008C45C5 /* FanDefinition.cpp in Sources */,

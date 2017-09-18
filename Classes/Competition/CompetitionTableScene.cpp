@@ -3,6 +3,7 @@
 #include "../widget/CWEditBoxDelegate.h"
 #include "../widget/AlertView.h"
 #include "Competition.h"
+#include "CompetitionRankCustomScene.h"
 
 USING_NS_CC;
 
@@ -518,7 +519,7 @@ void CompetitionTableScene::onRankButton(cocos2d::Ref *sender) {
         case 1: _competitionData->rankTablesBySerialSnake(_currentRound); break;
         case 2: _competitionData->rankTablesByScoresSnake(_currentRound); break;
         case 3: _competitionData->rankTablesByScores(_currentRound); break;
-        case 4: return;  // TODO: 自定义排桌
+        case 4: Director::getInstance()->pushScene(CompetitionRankCustomScene::create(_competitionData, _currentRound)); return;  // TODO: 自定义排桌
         default: return;
         }
         _tableView->reloadData();
