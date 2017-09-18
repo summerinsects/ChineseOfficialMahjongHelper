@@ -6,16 +6,6 @@
 
 USING_NS_CC;
 
-CompetitionEnrollScene *CompetitionEnrollScene::create(const std::shared_ptr<CompetitionData> &competitionData) {
-    auto ret = new (std::nothrow) CompetitionEnrollScene();
-    if (ret != nullptr && ret->initWithData(competitionData)) {
-        ret->autorelease();
-        return ret;
-    }
-    CC_SAFE_DELETE(ret);
-    return nullptr;
-}
-
 bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData) {
     if (UNLIKELY(!BaseScene::initWithTitle(std::string(competitionData->name).append("报名表")))) {
         return false;

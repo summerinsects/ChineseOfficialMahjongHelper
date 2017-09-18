@@ -6,16 +6,6 @@
 
 USING_NS_CC;
 
-CompetitionTableScene *CompetitionTableScene::create(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
-    CompetitionTableScene *ret = new (std::nothrow) CompetitionTableScene();
-    if (ret != nullptr && ret->initWithData(competitionData, currentRound)) {
-        ret->autorelease();
-        return ret;
-    }
-    CC_SAFE_DELETE(ret);
-    return nullptr;
-}
-
 bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
     if (UNLIKELY(!BaseScene::initWithTitle(Common::format<256>("%s第%" PRIS "/%" PRIS "轮",
         competitionData->name.c_str(), currentRound + 1, competitionData->round_count)))) {

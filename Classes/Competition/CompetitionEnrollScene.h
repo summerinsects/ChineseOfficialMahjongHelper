@@ -8,7 +8,7 @@ class CompetitionData;
 
 class CompetitionEnrollScene : public BaseScene, cw::TableViewDelegate {
 public:
-    static CompetitionEnrollScene *create(const std::shared_ptr<CompetitionData> &competitionData);
+    CREATE_FUNC_WITH_PARAM_1(CompetitionEnrollScene, initWithData, const std::shared_ptr<CompetitionData> &, competitionData);
     bool initWithData(const std::shared_ptr<CompetitionData> &competitionData);
 
 private:

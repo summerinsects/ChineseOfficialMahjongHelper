@@ -10,9 +10,8 @@ struct CompetitionTable;
 
 class CompetitionTableScene : public BaseScene, cw::TableViewDelegate {
 public:
+    CREATE_FUNC_WITH_PARAM_2(CompetitionTableScene, initWithData, const std::shared_ptr<CompetitionData> &, competitionData, size_t, currentRound);
     bool initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
-
-    static CompetitionTableScene *create(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;

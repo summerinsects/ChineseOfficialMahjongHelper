@@ -9,9 +9,8 @@ class CompetitionPlayer;
 
 class CompetitionRoundScene : public BaseScene, cw::TableViewDelegate {
 public:
+    CREATE_FUNC_WITH_PARAM_2(CompetitionRoundScene, initWithData, const std::shared_ptr<CompetitionData> &, competitionData, size_t, currentRound);
     bool initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
-
-    static CompetitionRoundScene *create(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
