@@ -18,12 +18,6 @@ USING_NS_CC;
 static std::vector<Record> g_records;
 static std::mutex g_mutex;
 
-Scene *HistoryScene::create(const std::function<void (Record *)> &viewCallback) {
-    auto scene = HistoryScene::create();
-    scene->_viewCallback = viewCallback;
-    return scene;
-}
-
 static void loadRecords(std::vector<Record> &records) {
     std::lock_guard<std::mutex> lg(g_mutex);
 
@@ -133,10 +127,12 @@ void HistoryScene::updateRecordTexts() {
     });
 }
 
-bool HistoryScene::init() {
+bool HistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     if (UNLIKELY(!BaseScene::initWithTitle("历史记录"))) {
         return false;
     }
+
+    _viewCallback = viewCallback;
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();

@@ -6,14 +6,6 @@
 
 USING_NS_CC;
 
-Scene *RecordScene::create(size_t handIdx, const char **playerNames, const Record::Detail *detail, const std::function<void (const Record::Detail &)> &okCallback) {
-    auto scene = new (std::nothrow) RecordScene();
-    scene->initWithIndex(handIdx, playerNames, detail);
-    scene->_okCallback = okCallback;
-    scene->autorelease();
-    return scene;
-}
-
 static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
 static const size_t eachLevelBeginIndex[] = { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 static const size_t eachLevelCounts[] = { 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
@@ -24,10 +16,12 @@ static inline size_t computeRowsAlign4(size_t cnt) {
 
 #define ORDER(flag_, i_) (((flag_) >> ((i_) << 1)) & 0x3)
 
-bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail) {
+bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const OkCallback &callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
     }
+
+    _okCallback = callback;
 
     switch (handIdx >> 2) {
     default:
