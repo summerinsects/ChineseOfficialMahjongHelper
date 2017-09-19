@@ -335,7 +335,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 
     // 填入这一盘四位选手的得分
     for (int i = 0; i < 4; ++i) {
-        _scoreLabels[handIdx][i]->setString(Common::format<32>("%+d", scoreTable[i]));
+        _scoreLabels[handIdx][i]->setString(Common::format("%+d", scoreTable[i]));
         _totalScores[i] += scoreTable[i];  // 更新总分
     }
 
@@ -373,7 +373,7 @@ void ScoreSheetScene::refreshRank() {
 
 void ScoreSheetScene::refreshStartTime() {
     struct tm ret = *localtime(&_record->start_time);
-    _timeLabel->setString(Common::format<256>("开始时间：%d年%d月%d日%.2d:%.2d",
+    _timeLabel->setString(Common::format("开始时间：%d年%d月%d日%.2d:%.2d",
         ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
     _timeLabel->setScale(1);
 }
@@ -381,7 +381,7 @@ void ScoreSheetScene::refreshStartTime() {
 void ScoreSheetScene::refreshEndTime() {
     struct tm ret0 = *localtime(&_record->start_time);
     struct tm ret1 = *localtime(&_record->end_time);
-    _timeLabel->setString(Common::format<256>("起止时间：%d年%d月%d日%.2d:%.2d——%d年%d月%d日%.2d:%.2d",
+    _timeLabel->setString(Common::format("起止时间：%d年%d月%d日%.2d:%.2d——%d年%d月%d日%.2d:%.2d",
         ret0.tm_year + 1900, ret0.tm_mon + 1, ret0.tm_mday, ret0.tm_hour, ret0.tm_min,
         ret1.tm_year + 1900, ret1.tm_mon + 1, ret1.tm_mday, ret1.tm_hour, ret1.tm_min));
 
@@ -423,7 +423,7 @@ void ScoreSheetScene::recover() {
 
     // 刷新总分和名次label
     for (int i = 0; i < 4; ++i) {
-        _totalLabel[i]->setString(Common::format<32>("%+d", _totalScores[i]));
+        _totalLabel[i]->setString(Common::format("%+d", _totalScores[i]));
         _rankLabels[i]->setVisible(false);
     }
     if (_record->current_index > 0) {
@@ -493,7 +493,7 @@ void ScoreSheetScene::editName(size_t idx) {
     editBox->setPlaceHolder("输入选手姓名");
 
     const char *wind[] = { "东", "南", "西", "北" };
-    AlertView::showWithNode(Common::format<64>("开局座位「%s」", wind[idx]), editBox, [this, editBox, idx]() {
+    AlertView::showWithNode(Common::format("开局座位「%s」", wind[idx]), editBox, [this, editBox, idx]() {
         const char *text = editBox->getText();
         if (!Common::isCStringEmpty(text)) {
             strncpy(_record->name[idx], text, 255);
@@ -573,7 +573,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
 
         // 更新总分
         for (int i = 0; i < 4; ++i) {
-            _totalLabel[i]->setString(Common::format<32>("%+d", _totalScores[i]));
+            _totalLabel[i]->setString(Common::format("%+d", _totalScores[i]));
         }
 
         // 更新名次
@@ -615,10 +615,10 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
     int winIndex = WIN_INDEX(wc);
     int claimIndex = CLAIM_INDEX(wc);
     if (winIndex == claimIndex) {
-        ret.append(Common::format<128>("「%s」自摸%s%d番。\n", record->name[winIndex], fanText.c_str(), detail.score));
+        ret.append(Common::format("「%s」自摸%s%d番。\n", record->name[winIndex], fanText.c_str(), detail.score));
     }
     else {
-        ret.append(Common::format<128>("「%s」和%s%d番，「%s」点炮。\n", record->name[winIndex], fanText.c_str(), detail.score, record->name[claimIndex]));
+        ret.append(Common::format("「%s」和%s%d番，「%s」点炮。\n", record->name[winIndex], fanText.c_str(), detail.score, record->name[claimIndex]));
     }
 
     if (detail.false_win != 0) {
@@ -654,7 +654,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
 void ScoreSheetScene::onTimeScheduler(float dt) {
     time_t t = time(nullptr);
     struct tm ret = *localtime(&t);
-    _timeLabel->setString(Common::format<256>("当前时间：%d年%d月%d日%.2d:%.2d",
+    _timeLabel->setString(Common::format("当前时间：%d年%d月%d日%.2d:%.2d",
         ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
     _timeLabel->setScale(1);
 }
@@ -760,7 +760,7 @@ static void showPursuit(int delta) {
     if (delta < 0) {
         delta = -delta;
     }
-    msg.append(Common::format<128>("分差%d分\n\n超分需", delta));
+    msg.append(Common::format("分差%d分\n\n超分需", delta));
 
     int d1 = delta - 32;
     if (d1 < 8) {
@@ -769,15 +769,15 @@ static void showPursuit(int delta) {
     else {
         int d2 = d1 >> 1;
         if (d2 < 8) {
-            msg.append(Common::format<256>("任意自摸或对点，旁点至少%d番", d1 + 1));
+            msg.append(Common::format("任意自摸或对点，旁点至少%d番", d1 + 1));
         }
         else {
             int d4 = d2 >> 1;
             if (d4 < 8) {
-                msg.append(Common::format<256>("任意自摸，对点至少%d番，旁点至少%d番", d2 + 1, d1 + 1));
+                msg.append(Common::format("任意自摸，对点至少%d番，旁点至少%d番", d2 + 1, d1 + 1));
             }
             else {
-                msg.append(Common::format<256>("自摸至少%d番，对点至少%d番，旁点至少%d番", d4 + 1, d2 + 1, d1 + 1));
+                msg.append(Common::format("自摸至少%d番，对点至少%d番，旁点至少%d番", d4 + 1, d2 + 1, d1 + 1));
             }
         }
     }
@@ -788,10 +788,10 @@ static void showPursuit(int delta) {
     else {
         int d2 = d1 >> 1;
         if (d2 <= 8) {
-            msg.append(Common::format<256>("\n\n对点无法保位，保位可旁点至多%d番", delta - 1));
+            msg.append(Common::format("\n\n对点无法保位，保位可旁点至多%d番", delta - 1));
         }
         else {
-            msg.append(Common::format<256>("\n\n保位可对点至多%d番，旁点至多%d番", (d1 & 1) ? d2 : d2 - 1, delta - 1));
+            msg.append(Common::format("\n\n保位可对点至多%d番，旁点至多%d番", (d1 & 1) ? d2 : d2 - 1, delta - 1));
         }
     }
 
@@ -963,13 +963,13 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
         button->setContentSize(Size(150.0f, 20.0f));
         button->setTitleFontSize(12);
         if (delta > 0) {
-            button->setTitleText(Common::format<128>("领先「%s」%d分", name[dst], delta));
+            button->setTitleText(Common::format("领先「%s」%d分", name[dst], delta));
         }
         else if (delta < 0) {
-            button->setTitleText(Common::format<128>("落后「%s」%d分", name[dst], -delta));
+            button->setTitleText(Common::format("落后「%s」%d分", name[dst], -delta));
         }
         else {
-            button->setTitleText(Common::format<128>("与「%s」平分", name[dst]));
+            button->setTitleText(Common::format("与「%s」平分", name[dst]));
         }
         Common::scaleLabelToFitWidth(button->getTitleLabel(), 148.0f);
         rootNode->addChild(button);

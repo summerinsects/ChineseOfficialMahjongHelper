@@ -231,35 +231,35 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         date = "具体时间待定";
         break;
     case TIME_ACCURACY::MONTHS:
-        date = Common::format<256>("%d年%d月", ret.tm_year + 1900, ret.tm_mon + 1);
+        date = Common::format("%d年%d月", ret.tm_year + 1900, ret.tm_mon + 1);
         if (info.endTime != 0) {
             date.append("——");
             ret = *localtime(&info.endTime);
-            date.append(Common::format<256>("%d年%d月", ret.tm_year + 1900, ret.tm_mon + 1));
+            date.append(Common::format("%d年%d月", ret.tm_year + 1900, ret.tm_mon + 1));
         }
         break;
     case TIME_ACCURACY::DAYS:
-        date = Common::format<256>("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
+        date = Common::format("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
         if (info.endTime != 0) {
             date.append("——");
             ret = *localtime(&info.endTime);
-            date.append(Common::format<256>("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday));
+            date.append(Common::format("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday));
         }
         break;
     case TIME_ACCURACY::HONRS:
-        date = Common::format<256>("%d年%d月%d日%.2d点", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour);
+        date = Common::format("%d年%d月%d日%.2d点", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour);
         if (info.endTime != 0) {
             date.append("——");
             ret = *localtime(&info.endTime);
-            date.append(Common::format<256>("%d年%d月%d日%.2d点", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour));
+            date.append(Common::format("%d年%d月%d日%.2d点", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour));
         }
         break;
     case TIME_ACCURACY::MINUTES:
-        date = Common::format<256>("%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        date = Common::format("%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (info.endTime != 0) {
             date.append("——");
             ret = *localtime(&info.endTime);
-            date.append(Common::format<256>("%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
+            date.append(Common::format("%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
         }
         break;
     }

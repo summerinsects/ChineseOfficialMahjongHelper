@@ -74,23 +74,24 @@ static inline bool isCStringEmpty(const char *str) {
 }
 
 #ifdef _MSC_VER
-template <size_t BufferSize>
 static std::string format(_Printf_format_string_ const char *fmt, ...);
 #else
-template <size_t BufferSize>
 static std::string format(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
 #endif
 
-template <size_t BufferSize>
-inline std::string format(const char *fmt, ...) {
+std::string format(const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
-
-    char buf[BufferSize];
-    vsnprintf(buf, BufferSize, fmt, ap);
+    int size = vsnprintf(nullptr, 0, fmt, ap);
     va_end(ap);
 
-    return buf;
+    std::string ret;
+    ret.resize(size + 1);
+    va_start(ap, fmt);
+    vsnprintf(&ret[0], size, fmt, ap);
+    va_end(ap);
+
+    return ret;
 }
 
 }
