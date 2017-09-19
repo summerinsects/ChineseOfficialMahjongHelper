@@ -214,7 +214,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
         else {
             rootWidgets[n]->setVisible(true);
 
-            const CompetitionTable &currentTable = _competitionTables[idx];
+            const CompetitionTable &currentTable = _competitionTables[readIdx + n];
             tableLabels[n]->setString(std::to_string(readIdx + n + 1));
 
             // 编号、选手姓名
