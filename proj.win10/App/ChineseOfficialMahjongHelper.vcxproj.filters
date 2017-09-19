@@ -61,10 +61,10 @@
     <ClCompile Include="..\..\Classes\FanCalculator\FanCalculatorScene.cpp">
       <Filter>Classes\FanCalculator</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\FanTable\FanDefinition.cpp">
+    <ClCompile Include="..\..\Classes\FanTable\FanDefinitionScene.cpp">
       <Filter>Classes\FanTable</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\FanTable\FanTable.cpp">
+    <ClCompile Include="..\..\Classes\FanTable\FanTableScene.cpp">
       <Filter>Classes\FanTable</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
@@ -135,10 +135,10 @@
     <ClInclude Include="..\..\Classes\FanCalculator\FanCalculatorScene.h">
       <Filter>Classes\FanCalculator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\FanTable\FanDefinition.h">
+    <ClInclude Include="..\..\Classes\FanTable\FanDefinitionScene.h">
       <Filter>Classes\FanTable</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\FanTable\FanTable.h">
+    <ClInclude Include="..\..\Classes\FanTable\FanTableScene.h">
       <Filter>Classes\FanTable</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Classes\LatestCompetition\LatestCompetitionScene.h">

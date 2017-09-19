@@ -5,7 +5,7 @@
 #include "../widget/ExtraInfoWidget.h"
 #include "../widget/AlertView.h"
 #include "../widget/TilesKeyboard.h"
-#include "../FanTable/FanDefinition.h"
+#include "../FanTable/FanDefinitionScene.h"
 
 USING_NS_CC;
 

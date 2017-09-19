@@ -48,10 +48,10 @@
     <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp">
       <Filter>src\FanCalculator</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\FanTable\FanDefinition.cpp">
+    <ClCompile Include="..\Classes\FanTable\FanDefinitionScene.cpp">
       <Filter>src\FanTable</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\FanTable\FanTable.cpp">
+    <ClCompile Include="..\Classes\FanTable\FanTableScene.cpp">
       <Filter>src\FanTable</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
@@ -125,10 +125,10 @@
     <ClInclude Include="..\Classes\TilesImage.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\FanTable\FanDefinition.h">
+    <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h">
       <Filter>src\FanTable</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\FanTable\FanTable.h">
+    <ClInclude Include="..\Classes\FanTable\FanTableScene.h">
       <Filter>src\FanTable</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h">

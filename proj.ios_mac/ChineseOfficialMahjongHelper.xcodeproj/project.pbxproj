@@ -47,10 +47,10 @@
 		1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
 		1FE0DAAE1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */; };
 		1FE0DAAF1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */; };
-		1FE2A3EB1CBB30D1008C45C5 /* FanDefinition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinition.cpp */; };
-		1FE2A3EC1CBB30D1008C45C5 /* FanDefinition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinition.cpp */; };
-		1FE2A3ED1CBB30D1008C45C5 /* FanTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTable.cpp */; };
-		1FE2A3EE1CBB30D1008C45C5 /* FanTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTable.cpp */; };
+		1FE2A3EB1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */; };
+		1FE2A3EC1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */; };
+		1FE2A3ED1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */; };
+		1FE2A3EE1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */; };
 		1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */; };
 		1FE5CFDE1CAE029200A5C38B /* TilePickWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */; };
 		1FE5D0481CAE046300A5C38B /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = 1FE5D0471CAE046300A5C38B /* tiles */; };
@@ -185,10 +185,10 @@
 		1FE04ADD1C94682A008401EA /* ScoreSheetScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreSheetScene.h; sourceTree = "<group>"; };
 		1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilesKeyboard.cpp; sourceTree = "<group>"; };
 		1FE0DAAD1E8A0C94008BCC2F /* TilesKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilesKeyboard.h; sourceTree = "<group>"; };
-		1FE2A3E71CBB30D1008C45C5 /* FanDefinition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanDefinition.cpp; sourceTree = "<group>"; };
-		1FE2A3E81CBB30D1008C45C5 /* FanDefinition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanDefinition.h; sourceTree = "<group>"; };
-		1FE2A3E91CBB30D1008C45C5 /* FanTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanTable.cpp; sourceTree = "<group>"; };
-		1FE2A3EA1CBB30D1008C45C5 /* FanTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanTable.h; sourceTree = "<group>"; };
+		1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanDefinitionScene.cpp; sourceTree = "<group>"; };
+		1FE2A3E81CBB30D1008C45C5 /* FanDefinitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanDefinitionScene.h; sourceTree = "<group>"; };
+		1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanTableScene.cpp; sourceTree = "<group>"; };
+		1FE2A3EA1CBB30D1008C45C5 /* FanTableScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanTableScene.h; sourceTree = "<group>"; };
 		1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilePickWidget.cpp; sourceTree = "<group>"; };
 		1FE5CFDC1CAE029200A5C38B /* TilePickWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilePickWidget.h; sourceTree = "<group>"; };
 		1FE5D0471CAE046300A5C38B /* tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tiles; sourceTree = "<group>"; };
@@ -386,10 +386,10 @@
 		1FE2A3E61CBB30D1008C45C5 /* FanTable */ = {
 			isa = PBXGroup;
 			children = (
-				1FE2A3E71CBB30D1008C45C5 /* FanDefinition.cpp */,
-				1FE2A3E81CBB30D1008C45C5 /* FanDefinition.h */,
-				1FE2A3E91CBB30D1008C45C5 /* FanTable.cpp */,
-				1FE2A3EA1CBB30D1008C45C5 /* FanTable.h */,
+				1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */,
+				1FE2A3E81CBB30D1008C45C5 /* FanDefinitionScene.h */,
+				1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */,
+				1FE2A3EA1CBB30D1008C45C5 /* FanTableScene.h */,
 			);
 			path = FanTable;
 			sourceTree = "<group>";
@@ -694,7 +694,7 @@
 				1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
 				1FE0DAAE1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */,
-				1FE2A3ED1CBB30D1008C45C5 /* FanTable.cpp in Sources */,
+				1FE2A3ED1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
 				1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
 				1F154E411E440A160083F8B3 /* stringify.cpp in Sources */,
 				1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
@@ -709,7 +709,7 @@
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
 				1FCC3C021CC47200001C9555 /* HistoryScene.cpp in Sources */,
 				1FE04AE01C94682A008401EA /* RecordScene.cpp in Sources */,
-				1FE2A3EB1CBB30D1008C45C5 /* FanDefinition.cpp in Sources */,
+				1FE2A3EB1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
 				1FE04ADE1C94682A008401EA /* FanCalculatorScene.cpp in Sources */,
 				1FE04AE21C94682A008401EA /* ScoreSheetScene.cpp in Sources */,
 			);
@@ -723,8 +723,8 @@
 				1FDD94441C8337140031BC38 /* fan_calculator.cpp in Sources */,
 				1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */,
 				1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
-				1FE2A3EE1CBB30D1008C45C5 /* FanTable.cpp in Sources */,
-				1FE2A3EC1CBB30D1008C45C5 /* FanDefinition.cpp in Sources */,
+				1FE2A3EE1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
+				1FE2A3EC1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
 				1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
 				1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */,
 				1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,

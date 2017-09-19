@@ -1,5 +1,5 @@
-﻿#ifndef __FAN_DEFINITION_H__
-#define __FAN_DEFINITION_H__
+﻿#ifndef __FAN_DEFINITION_SCENE_H__
+#define __FAN_DEFINITION_SCENE_H__
 
 #include "../BaseScene.h"
 

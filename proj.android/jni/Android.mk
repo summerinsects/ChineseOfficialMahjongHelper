@@ -13,8 +13,8 @@ LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/FanCalculator/FanCalculatorScene.cpp \
-                   ../../Classes/FanTable/FanDefinition.cpp \
-                   ../../Classes/FanTable/FanTable.cpp \
+                   ../../Classes/FanTable/FanDefinitionScene.cpp \
+                   ../../Classes/FanTable/FanTableScene.cpp \
                    ../../Classes/LatestCompetition/LatestCompetitionScene.cpp \
                    ../../Classes/mahjong-algorithm/fan_calculator.cpp \
                    ../../Classes/mahjong-algorithm/stringify.cpp \
