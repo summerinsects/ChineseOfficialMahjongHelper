@@ -542,7 +542,7 @@ void RecordScene::updateScoreLabel() {
     TranslateDetailToScoreTable(_detail, scoreTable);
 
     for (int i = 0; i < 4; ++i) {
-        _scoreLabel[i]->setString(Common::format<32>("%+d", scoreTable[ORDER(_seatFlag, i)]));
+        _scoreLabel[i]->setString(Common::format("%+d", scoreTable[ORDER(_seatFlag, i)]));
     }
     // 使用不同颜色
     _SetScoreLabelColor(_scoreLabel, scoreTable, _playerFlag, _detail.win_claim, _detail.false_win);
