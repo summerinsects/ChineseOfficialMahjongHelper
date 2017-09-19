@@ -250,5 +250,151 @@ void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
     ui::Widget *widget = (ui::Widget *)sender;
     size_t readIdx = reinterpret_cast<size_t>(widget->getUserData());
     int tag = widget->getTag();
-    CCLOG("%s table = %" PRIS " seat = %d", __FUNCTION__, readIdx, tag);
+
+    showSelectPlayerAlert(readIdx, tag);
+}
+
+void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
+    class AlertInnerNode : public Node, cw::TableViewDelegate {
+    private:
+        const std::vector<CompetitionPlayer> *_players;
+        const std::vector<uint8_t> *_originFlags;
+        std::vector<uint8_t> _currentFlags;
+
+    public:
+        const std::vector<uint8_t> &getCurrentFlags() { return _currentFlags; }
+
+        CREATE_FUNC_WITH_PARAM_2(AlertInnerNode, initWithPlayers, const std::vector<CompetitionPlayer> *, players, const std::vector<uint8_t> *, originFlags);
+        bool initWithPlayers(const std::vector<CompetitionPlayer> *players, const std::vector<uint8_t> *originFlags) {
+            if (UNLIKELY(!Node::init())) {
+                return false;
+            }
+
+            _players = players;
+            _originFlags = originFlags;
+            _currentFlags.resize(originFlags->size());
+
+            Size visibleSize = Director::getInstance()->getVisibleSize();
+            const float width = visibleSize.width * 0.8f - 10;
+            const float height = visibleSize.height * 0.8f - 80;
+
+            this->setContentSize(Size(width, height));
+
+            // 表格
+            cw::TableView *tableView = cw::TableView::create();
+            tableView->setContentSize(Size(width, height));
+            tableView->setDelegate(this);
+            tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
+            tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
+            
+            tableView->setScrollBarPositionFromCorner(Vec2(5, 2));
+            tableView->setScrollBarWidth(4);
+            tableView->setScrollBarOpacity(0x99);
+            tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+            tableView->setPosition(Vec2(width * 0.5f, height * 0.5f));
+            tableView->reloadData();
+            this->addChild(tableView);
+
+            return true;
+        }
+
+        virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override {
+            return _players->size();
+        }
+
+        virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override {
+            return Size(0, 30);
+        }
+
+        virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override {
+            typedef cw::TableViewCellEx<ui::CheckBox *, std::array<Label *, 2>, std::array<LayerColor *, 2> > CustomCell;
+            CustomCell *cell = (CustomCell *)table->dequeueCell();
+
+            Size visibleSize = Director::getInstance()->getVisibleSize();
+            const float cellWidth = visibleSize.width * 0.8f - 10;
+
+            if (cell == nullptr) {
+                cell = CustomCell::create();
+
+                CustomCell::ExtDataType &ext = cell->getExtData();
+                ui::CheckBox *&checkBox = std::get<0>(ext);
+                std::array<Label *, 2> &labels = std::get<1>(ext);
+                std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+
+                // 背景色
+                layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 29);
+                cell->addChild(layerColors[0]);
+
+                layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 29);
+                cell->addChild(layerColors[1]);
+
+                // 选择框
+                checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+                cell->addChild(checkBox);
+                checkBox->setZoomScale(0.0f);
+                checkBox->ignoreContentAdaptWithSize(false);
+                checkBox->setContentSize(Size(20.0f, 20.0f));
+                checkBox->setPosition(Vec2(15.0f, 15.0f));
+                checkBox->addEventListener(std::bind(&AlertInnerNode::onCheckBox, this, std::placeholders::_1, std::placeholders::_2));
+
+                // 编号、名字
+                const Color3B textColors[] = { Color3B::BLACK, Color3B::ORANGE };
+                const float posX[] = { 40, (cellWidth - 55) * 0.5f };
+                for (int i = 0; i < 2; ++i) {
+                    Label *label = Label::createWithSystemFont("", "Arail", 12);
+                    label->setColor(textColors[i]);
+                    cell->addChild(label);
+                    label->setPosition(Vec2(posX[i], 15.0f));
+                    labels[i] = label;
+                }
+            }
+
+            const CustomCell::ExtDataType &ext = cell->getExtData();
+            ui::CheckBox *checkBox = std::get<0>(ext);
+            const std::array<Label *, 2> &labels = std::get<1>(ext);
+            const std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+
+            layerColors[0]->setVisible(!(idx & 1));
+            layerColors[1]->setVisible(!!(idx & 1));
+
+            const CompetitionPlayer &player = _players->at(idx);
+            labels[0]->setString(std::to_string(player.serial + 1));
+            Common::scaleLabelToFitWidth(labels[0], 18);
+            labels[1]->setString(player.name);
+            Common::scaleLabelToFitWidth(labels[1], (cellWidth - 55) * 0.5f - 4);
+
+            checkBox->setUserData(reinterpret_cast<void *>(idx));
+            checkBox->setEnabled(!_originFlags->at(idx));
+            checkBox->setSelected(!!_currentFlags[idx]);
+
+            return cell;
+        }
+
+        void onCheckBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+            ui::CheckBox *checkBox = (ui::CheckBox *)sender;
+            ssize_t idx = reinterpret_cast<ssize_t>(checkBox->getUserData());
+            _currentFlags[idx] = !!(event == ui::CheckBox::EventType::SELECTED);
+        }
+    };
+
+    AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &_playerFlags);
+    std::string title = Common::format<128>("table = %" PRIS " seat = %d", table, seat);
+    AlertView::showWithNode(title, innerNode, [this, innerNode, table, seat]() {
+        const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
+        std::vector<size_t> selected;
+        selected.reserve(8);
+        for (size_t i = 0, cnt = currentFlags.size(); i < cnt; ++i) {
+            if (currentFlags[i]) {
+                selected.push_back(i);
+            }
+        }
+
+        if (selected.size() == 1) {
+            size_t idx = selected[0];
+            _competitionTables[table].player_indices[seat] = idx;
+            _playerFlags[idx] = 1;
+
+            _tableView->updateCellAtIndex(table >> 1);
+        }
+    }, nullptr);
 }

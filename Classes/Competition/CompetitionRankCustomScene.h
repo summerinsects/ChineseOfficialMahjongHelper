@@ -18,6 +18,7 @@ private:
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
     void onNameWidget(cocos2d::Ref *sender);
+    void showSelectPlayerAlert(size_t table, int seat);
 
     float _colWidth[8];
     float _posX[8];
