@@ -100,7 +100,7 @@ bool MahjongTheoryScene::init() {
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float xPos = origin.x + gap * (i + 0.5f);
-        ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
         this->addChild(checkBox);
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
