@@ -30,6 +30,7 @@ private:
     size_t _currentRound;
 
     std::vector<CompetitionTable> _competitionTables;
+    std::vector<uint8_t> _playerFlags;
 };
 
 #endif

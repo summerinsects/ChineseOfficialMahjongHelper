@@ -14,6 +14,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     _competitionData = competitionData;
     _currentRound = currentRound;
     _competitionTables.resize(_competitionData->rounds[currentRound].tables.size());
+    _playerFlags.resize(_competitionData->players.size());
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
