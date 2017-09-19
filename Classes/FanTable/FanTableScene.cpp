@@ -1,7 +1,7 @@
-﻿#include "FanTable.h"
+﻿#include "FanTableScene.h"
 #include <array>
 #include "../mahjong-algorithm/fan_calculator.h"
-#include "FanDefinition.h"
+#include "FanDefinitionScene.h"
 
 USING_NS_CC;
 

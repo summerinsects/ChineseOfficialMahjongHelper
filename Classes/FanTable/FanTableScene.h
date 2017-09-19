@@ -1,5 +1,5 @@
-﻿#ifndef __FAN_TABLE_H__
-#define __FAN_TABLE_H__
+﻿#ifndef __FAN_TABLE_SCENE_H__
+#define __FAN_TABLE_SCENE_H__
 
 #include "../BaseScene.h"
 #include "../widget/CWTableView.h"
