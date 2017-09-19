@@ -31,7 +31,7 @@
     <Filter Include="src\MahjongTheory">
       <UniqueIdentifier>{0d3ab171-ddea-44a5-bacd-63f9043728ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Competition">
+    <Filter Include="src\CompetitionSystem">
       <UniqueIdentifier>{ec2ebec7-c428-4bb6-8308-3e4f802a6fe0}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\LatestCompetition">
@@ -48,23 +48,23 @@
     <ClCompile Include="..\Classes\HelloWorldScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\Competition.cpp">
-      <Filter>src\Competition</Filter>
+    <ClCompile Include="..\Classes\CompetitionSystem\Competition.cpp">
+      <Filter>src\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\CompetitionEnrollScene.cpp">
-      <Filter>src\Competition</Filter>
+    <ClCompile Include="..\Classes\CompetitionSystem\CompetitionEnrollScene.cpp">
+      <Filter>src\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\CompetitionMainScene.cpp">
-      <Filter>src\Competition</Filter>
+    <ClCompile Include="..\Classes\CompetitionSystem\CompetitionMainScene.cpp">
+      <Filter>src\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\CompetitionRankCustomScene.cpp">
-      <Filter>src\Competition</Filter>
+    <ClCompile Include="..\Classes\CompetitionSystem\CompetitionRankCustomScene.cpp">
+      <Filter>src\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\CompetitionRoundScene.cpp">
-      <Filter>src\Competition</Filter>
+    <ClCompile Include="..\Classes\CompetitionSystem\CompetitionRoundScene.cpp">
+      <Filter>src\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Competition\CompetitionTableScene.cpp">
-      <Filter>src\Competition</Filter>
+    <ClCompile Include="..\Classes\CompetitionSystem\CompetitionTableScene.cpp">
+      <Filter>src\CompetitionSystem</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp">
       <Filter>src\FanCalculator</Filter>
@@ -146,23 +146,23 @@
     <ClInclude Include="..\Classes\TilesImage.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\Competition.h">
-      <Filter>src\Competition</Filter>
+    <ClInclude Include="..\Classes\CompetitionSystem\Competition.h">
+      <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\CompetitionEnrollScene.h">
-      <Filter>src\Competition</Filter>
+    <ClInclude Include="..\Classes\CompetitionSystem\CompetitionEnrollScene.h">
+      <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\CompetitionMainScene.h">
-      <Filter>src\Competition</Filter>
+    <ClInclude Include="..\Classes\CompetitionSystem\CompetitionMainScene.h">
+      <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\CompetitionRankCustomScene.h">
-      <Filter>src\Competition</Filter>
+    <ClInclude Include="..\Classes\CompetitionSystem\CompetitionRankCustomScene.h">
+      <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\CompetitionRoundScene.h">
-      <Filter>src\Competition</Filter>
+    <ClInclude Include="..\Classes\CompetitionSystem\CompetitionRoundScene.h">
+      <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Competition\CompetitionTableScene.h">
-      <Filter>src\Competition</Filter>
+    <ClInclude Include="..\Classes\CompetitionSystem\CompetitionTableScene.h">
+      <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h">
       <Filter>src\FanTable</Filter>

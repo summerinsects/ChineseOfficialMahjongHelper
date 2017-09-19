@@ -12,12 +12,12 @@ LOCAL_MODULE := MyGame_shared
 LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
-                   ../../Classes/Competition/Competition.cpp \
-                   ../../Classes/Competition/CompetitionEnrollScene.cpp \
-                   ../../Classes/Competition/CompetitionMainScene.cpp \
-                   ../../Classes/Competition/CompetitionRankCustomScene.cpp \
-                   ../../Classes/Competition/CompetitionRoundScene.cpp \
-                   ../../Classes/Competition/CompetitionTableScene.cpp \
+                   ../../Classes/CompetitionSystem/Competition.cpp \
+                   ../../Classes/CompetitionSystem/CompetitionEnrollScene.cpp \
+                   ../../Classes/CompetitionSystem/CompetitionMainScene.cpp \
+                   ../../Classes/CompetitionSystem/CompetitionRankCustomScene.cpp \
+                   ../../Classes/CompetitionSystem/CompetitionRoundScene.cpp \
+                   ../../Classes/CompetitionSystem/CompetitionTableScene.cpp \
                    ../../Classes/FanCalculator/FanCalculatorScene.cpp \
                    ../../Classes/FanTable/FanDefinitionScene.cpp \
                    ../../Classes/FanTable/FanTableScene.cpp \

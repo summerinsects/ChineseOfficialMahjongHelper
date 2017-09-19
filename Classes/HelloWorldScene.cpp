@@ -10,7 +10,7 @@
 #include "Other/OtherScene.h"
 #include "MahjongTheory/MahjongTheoryScene.h"
 #include "LatestCompetition/LatestCompetitionScene.h"
-#include "Competition/CompetitionMainScene.h"
+#include "CompetitionSystem/CompetitionMainScene.h"
 
 #define VERSION 0x010108
 

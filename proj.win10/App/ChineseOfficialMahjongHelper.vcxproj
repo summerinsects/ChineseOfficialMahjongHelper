@@ -221,12 +221,12 @@
     <ClInclude Include="..\..\Classes\AppDelegate.h" />
     <ClInclude Include="..\..\Classes\BaseScene.h" />
     <ClInclude Include="..\..\Classes\common.h" />
-    <ClInclude Include="..\..\Classes\Competition\Competition.h" />
-    <ClInclude Include="..\..\Classes\Competition\CompetitionEnrollScene.h" />
-    <ClInclude Include="..\..\Classes\Competition\CompetitionMainScene.h" />
-    <ClInclude Include="..\..\Classes\Competition\CompetitionRankCustomScene.h" />
-    <ClInclude Include="..\..\Classes\Competition\CompetitionRoundScene.h" />
-    <ClInclude Include="..\..\Classes\Competition\CompetitionTableScene.h" />
+    <ClInclude Include="..\..\Classes\CompetitionSystem\Competition.h" />
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionEnrollScene.h" />
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionMainScene.h" />
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionRankCustomScene.h" />
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionRoundScene.h" />
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionTableScene.h" />
     <ClInclude Include="..\..\Classes\compiler.h" />
     <ClInclude Include="..\..\Classes\FanCalculator\FanCalculatorScene.h" />
     <ClInclude Include="..\..\Classes\FanTable\FanDefinitionScene.h" />
@@ -275,12 +275,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Classes\AppDelegate.cpp" />
-    <ClCompile Include="..\..\Classes\Competition\Competition.cpp" />
-    <ClCompile Include="..\..\Classes\Competition\CompetitionEnrollScene.cpp" />
-    <ClCompile Include="..\..\Classes\Competition\CompetitionMainScene.cpp" />
-    <ClCompile Include="..\..\Classes\Competition\CompetitionRankCustomScene.cpp" />
-    <ClCompile Include="..\..\Classes\Competition\CompetitionRoundScene.cpp" />
-    <ClCompile Include="..\..\Classes\Competition\CompetitionTableScene.cpp" />
+    <ClCompile Include="..\..\Classes\CompetitionSystem\Competition.cpp" />
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionEnrollScene.cpp" />
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionMainScene.cpp" />
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionRankCustomScene.cpp" />
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionRoundScene.cpp" />
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionTableScene.cpp" />
     <ClCompile Include="..\..\Classes\FanCalculator\FanCalculatorScene.cpp" />
     <ClCompile Include="..\..\Classes\FanTable\FanDefinitionScene.cpp" />
     <ClCompile Include="..\..\Classes\FanTable\FanTableScene.cpp" />

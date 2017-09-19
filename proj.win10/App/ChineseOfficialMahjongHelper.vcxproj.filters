@@ -14,7 +14,7 @@
     <Filter Include="Classes">
       <UniqueIdentifier>{a18967bc-4fa1-4c67-bf7e-3f9c8b6a1129}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Classes\Competition">
+    <Filter Include="Classes\CompetitionSystem">
       <UniqueIdentifier>{fc0d8098-87b5-4188-b7e9-6b01aa1d33c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Classes\FanCalculator">
@@ -61,23 +61,23 @@
     <ClCompile Include="..\..\Classes\HelloWorldScene.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\Competition\Competition.cpp">
-      <Filter>Classes\Competition</Filter>
+    <ClCompile Include="..\..\Classes\CompetitionSystem\Competition.cpp">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\Competition\CompetitionEnrollScene.cpp">
-      <Filter>Classes\Competition</Filter>
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionEnrollScene.cpp">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\Competition\CompetitionMainScene.cpp">
-      <Filter>Classes\Competition</Filter>
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionMainScene.cpp">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\Competition\CompetitionRankCustomScene.cpp">
-      <Filter>Classes\Competition</Filter>
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionRankCustomScene.cpp">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\Competition\CompetitionRoundScene.cpp">
-      <Filter>Classes\Competition</Filter>
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionRoundScene.cpp">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\Competition\CompetitionTableScene.cpp">
-      <Filter>Classes\Competition</Filter>
+    <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionTableScene.cpp">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Classes\FanCalculator\FanCalculatorScene.cpp">
       <Filter>Classes\FanCalculator</Filter>
@@ -153,23 +153,23 @@
     <ClInclude Include="..\..\Classes\HelloWorldScene.h">
       <Filter>Classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\Competition\Competition.h">
-      <Filter>Classes\Competition</Filter>
+    <ClInclude Include="..\..\Classes\CompetitionSystem\Competition.h">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\Competition\CompetitionEnrollScene.h">
-      <Filter>Classes\Competition</Filter>
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionEnrollScene.h">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\Competition\CompetitionMainScene.h">
-      <Filter>Classes\Competition</Filter>
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionMainScene.h">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\Competition\CompetitionRankCustomScene.h">
-      <Filter>Classes\Competition</Filter>
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionRankCustomScene.h">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\Competition\CompetitionRoundScene.h">
-      <Filter>Classes\Competition</Filter>
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionRoundScene.h">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\Competition\CompetitionTableScene.h">
-      <Filter>Classes\Competition</Filter>
+    <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionTableScene.h">
+      <Filter>Classes\CompetitionSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Classes\FanCalculator\FanCalculatorScene.h">
       <Filter>Classes\FanCalculator</Filter>
