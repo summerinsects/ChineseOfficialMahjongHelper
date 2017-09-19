@@ -8,7 +8,7 @@
 USING_NS_CC;
 
 bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
-    if (UNLIKELY(!BaseScene::initWithTitle(Common::format<256>("%s第%" PRIS "/%" PRIS "轮",
+    if (UNLIKELY(!BaseScene::initWithTitle(Common::format("%s第%" PRIS "/%" PRIS "轮",
         competitionData->name.c_str(), currentRound + 1, competitionData->round_count)))) {
         return false;
     }
@@ -333,11 +333,11 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         widget->setContentSize(Size(colWidth[2] + colWidth[3] + colWidth[4], 20.0f));
         drawNode->addChild(widget);
         widget->addClickEventListener([this, player, result, callback](Ref *) {
-            showCompetitionResultInputAlert(Common::format<64>("选手编号%" PRIS "，姓名「%s」", player->serial + 1, player->name.c_str()), result, callback);
+            showCompetitionResultInputAlert(Common::format("选手编号%" PRIS "，姓名「%s」", player->serial + 1, player->name.c_str()), result, callback);
         });
     }
 
-    AlertView::showWithNode(Common::format<128>("第%" PRIS "桌成绩", table + 1), drawNode, [this, table, labels]() {
+    AlertView::showWithNode(Common::format("第%" PRIS "桌成绩", table + 1), drawNode, [this, table, labels]() {
         std::vector<CompetitionPlayer> &players = _competitionData->players;
         CompetitionTable &currentTable = _competitionTables->at(table);
         for (int i = 0; i < 4; ++i) {

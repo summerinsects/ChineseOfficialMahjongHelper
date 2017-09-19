@@ -379,7 +379,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
     };
 
     AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &_playerFlags);
-    std::string title = Common::format<128>("table = %" PRIS " seat = %d", table, seat);
+    std::string title = Common::format("table = %" PRIS " seat = %d", table, seat);
     AlertView::showWithNode(title, innerNode, [this, innerNode, table, seat]() {
         const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
         std::vector<size_t> selected;

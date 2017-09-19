@@ -14,7 +14,7 @@ std::string CompetitionResult::standardScoreToString(float ss) {
     std::ostringstream os;
     os << ss;
     std::string ret1 = os.str();
-    std::string ret2 = Common::format<32>("%.3f", ss);
+    std::string ret2 = Common::format("%.3f", ss);
     return ret1.length() < ret2.length() ? ret1 : ret2;
 }
 

@@ -179,7 +179,7 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
 void CompetitionEnrollScene::onOkButton(cocos2d::Ref *sender) {
 #if 1  // test
     for (size_t i = 0, cnt = _competitionData->players.size(); i < cnt; ++i) {
-        _competitionData->players.at(i).name = Common::format<32>("%" PRIS "号选手", i + 1);
+        _competitionData->players.at(i).name = Common::format("%" PRIS "号选手", i + 1);
     }
 #endif
 
@@ -207,7 +207,7 @@ void CompetitionEnrollScene::onNameWidget(cocos2d::Ref *sender) {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
-    AlertView::showWithNode(Common::format<64>("序号「%" PRIS "」", idx + 1), editBox, [this, editBox, idx]() {
+    AlertView::showWithNode(Common::format("序号「%" PRIS "」", idx + 1), editBox, [this, editBox, idx]() {
         _competitionData->players[idx].name = editBox->getText();
         _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
         _tableView->updateCellAtIndex(idx >> 1);
