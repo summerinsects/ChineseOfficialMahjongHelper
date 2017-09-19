@@ -106,17 +106,17 @@ cocos2d::Size CompetitionRankCustomScene::tableCellSizeForIndex(cw::TableView *t
 }
 
 cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<std::array<DrawNode *, 2>, std::array<Label *, 2>, std::array<std::array<std::array<Label *, 2>, 4>, 2>, std::array<std::array<ui::Widget *, 4>, 2>, std::array<LayerColor *, 2> > CustomCell;
+    typedef cw::TableViewCellEx<std::array<ui::Widget *, 2>, std::array<Label *, 2>, std::array<std::array<std::array<Label *, 2>, 4>, 2>, std::array<std::array<ui::Widget *, 4>, 2>, std::array<LayerColor *, 2> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<DrawNode *, 2> &drawNodes = std::get<0>(ext);
+        std::array<ui::Widget *, 2> &rootWidgets = std::get<0>(ext);
         std::array<Label *, 2> &tableLabels = std::get<1>(ext);
         std::array<std::array<std::array<Label *, 2>, 4>, 2> &labels = std::get<2>(ext);
-        std::array<std::array<ui::Widget *, 4>, 2> &widgets = std::get<3>(ext);
+        std::array<std::array<ui::Widget *, 4>, 2> &touchedWidgets = std::get<3>(ext);
         std::array<LayerColor *, 2> &layerColors = std::get<4>(ext);
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -128,12 +128,58 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
         layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 79);
         cell->addChild(layerColors[1]);
 
+        DrawNode *drawNodes[2];
         const float halfWidth = visibleSize.width * 0.5f;
         for (int n = 0; n < 2; ++n) {
+            ui::Widget *rootWidget = ui::Widget::create();
+            cell->addChild(rootWidget);
+            rootWidget->setPosition(Vec2(halfWidth * n, 0));
+            rootWidgets[n] = rootWidget;
+
+            // 桌号
+            Label *label = Label::createWithSystemFont("", "Arail", 12);
+            label->setColor(Color3B::BLACK);
+            rootWidget->addChild(label);
+            label->setPosition(Vec2(_posX[0], 40.0f));
+            tableLabels[n] = label;
+
+            // 座次
+            static const char *seatText[] = { "东", "南", "西", "北" };
+            for (int i = 0; i < 4; ++i) {
+                const float posY = static_cast<float>(70 - i * 20);
+
+                Label *label = Label::createWithSystemFont(seatText[i], "Arail", 12);
+                label->setColor(Color3B::BLACK);
+                rootWidget->addChild(label);
+                label->setPosition(Vec2(_posX[1], posY));
+            }
+
+            // 编号、选手姓名
+            Color3B textColor[] = { Color3B(0x60, 0x60, 0x60), Color3B::ORANGE, Color3B(254, 87, 110), Color3B(44, 121, 178) };
+            for (int i = 0; i < 4; ++i) {
+                const float posY = static_cast<float>(70 - i * 20);
+
+                for (int k = 0; k < 2; ++k) {
+                    Label *label = Label::createWithSystemFont("", "Arail", 12);
+                    label->setColor(textColor[k]);
+                    rootWidget->addChild(label);
+                    label->setPosition(Vec2(_posX[2 + k], posY));
+                    labels[n][i][k] = label;
+                }
+
+                // 按钮
+                ui::Widget *widget = ui::Widget::create();
+                widget->setTouchEnabled(true);
+                widget->setPosition(Vec2(_posX[3], posY));
+                widget->setContentSize(Size(_colWidth[3], 20));
+                rootWidget->addChild(widget);
+                widget->addClickEventListener(std::bind(&CompetitionRankCustomScene::onNameWidget, this, std::placeholders::_1));
+                touchedWidgets[n][i] = widget;
+            }
+
             // 画线
             DrawNode *drawNode = DrawNode::create();
-            cell->addChild(drawNode);
-            drawNode->setPosition(Vec2(halfWidth * n, 0));
+            rootWidget->addChild(drawNode);
             drawNode->drawLine(Vec2(0, 0), Vec2(halfWidth, 0), Color4F::BLACK);
             drawNode->drawLine(Vec2(0, 80), Vec2(halfWidth, 80), Color4F::BLACK);
             const float posX = halfWidth * (n + 1);
@@ -146,56 +192,15 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                 drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 80), Color4F::BLACK);
             }
             drawNodes[n] = drawNode;
-
-            // 桌号
-            Label *label = Label::createWithSystemFont("", "Arail", 12);
-            label->setColor(Color3B::BLACK);
-            drawNode->addChild(label);
-            label->setPosition(Vec2(_posX[0], 40.0f));
-            tableLabels[n] = label;
-
-            // 座次
-            static const char *seatText[] = { "东", "南", "西", "北" };
-            for (int i = 0; i < 4; ++i) {
-                const float posY = static_cast<float>(70 - i * 20);
-
-                Label *label = Label::createWithSystemFont(seatText[i], "Arail", 12);
-                label->setColor(Color3B::BLACK);
-                drawNode->addChild(label);
-                label->setPosition(Vec2(_posX[1], posY));
-            }
-
-            // 编号、选手姓名
-            Color3B textColor[] = { Color3B(0x60, 0x60, 0x60), Color3B::ORANGE, Color3B(254, 87, 110), Color3B(44, 121, 178) };
-            for (int i = 0; i < 4; ++i) {
-                const float posY = static_cast<float>(70 - i * 20);
-
-                for (int k = 0; k < 2; ++k) {
-                    Label *label = Label::createWithSystemFont("", "Arail", 12);
-                    label->setColor(textColor[k]);
-                    drawNode->addChild(label);
-                    label->setPosition(Vec2(_posX[2 + k], posY));
-                    labels[n][i][k] = label;
-                }
-
-                // 按钮
-                ui::Widget *widget = ui::Widget::create();
-                widget->setTouchEnabled(true);
-                widget->setPosition(Vec2(_posX[3], posY));
-                widget->setContentSize(Size(_colWidth[3], 20));
-                drawNode->addChild(widget);
-                widget->addClickEventListener(std::bind(&CompetitionRankCustomScene::onNameWidget, this, std::placeholders::_1));
-                widgets[n][i] = widget;
-            }
         }
         drawNodes[0]->drawLine(Vec2(halfWidth, 0), Vec2(halfWidth, 80), Color4F::BLACK);
     }
 
     const CustomCell::ExtDataType ext = cell->getExtData();
-    const std::array<DrawNode *, 2> &drawNodes = std::get<0>(ext);
+    const std::array<ui::Widget *, 2> &rootWidgets = std::get<0>(ext);
     const std::array<Label *, 2> &tableLabels = std::get<1>(ext);
     const std::array<std::array<std::array<Label *, 2>, 4>, 2> &labels = std::get<2>(ext);
-    const std::array<std::array<ui::Widget *, 4>, 2> &widgets = std::get<3>(ext);
+    const std::array<std::array<ui::Widget *, 4>, 2> &touchedWidgets = std::get<3>(ext);
     const std::array<LayerColor *, 2> &layerColors = std::get<4>(ext);
 
     layerColors[0]->setVisible(!(idx & 1));
@@ -204,10 +209,10 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
     size_t readIdx = idx << 1;
     for (size_t n = 0; n < 2; ++n) {
         if (readIdx + n >= _competitionTables.size()) {
-            drawNodes[n]->setVisible(false);
+            rootWidgets[n]->setVisible(false);
         }
         else {
-            drawNodes[n]->setVisible(true);
+            rootWidgets[n]->setVisible(true);
 
             const CompetitionTable &currentTable = _competitionTables[idx];
             tableLabels[n]->setString(std::to_string(readIdx + n + 1));
@@ -232,8 +237,8 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                     Common::scaleLabelToFitWidth(labels[n][i][k], _colWidth[2 + k]);
                 }
 
-                widgets[n][i]->setTag(i);
-                widgets[n][i]->setUserData(reinterpret_cast<void *>(readIdx + n));
+                touchedWidgets[n][i]->setTag(i);
+                touchedWidgets[n][i]->setUserData(reinterpret_cast<void *>(readIdx + n));
             }
         }
     }
