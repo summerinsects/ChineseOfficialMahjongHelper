@@ -501,7 +501,7 @@ void RecordScene::_SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&sc
                     scoreLabel[ORDER(seatFlag, i)]->setColor(Color3B(44, 121, 178));
                 }
                 else {  // 其他：绿色
-                    scoreLabel[ORDER(seatFlag, i)]->setColor(Color3B(101, 196, 59));
+                    scoreLabel[ORDER(seatFlag, i)]->setColor(Color3B(49, 155, 28));
                 }
             }
         }

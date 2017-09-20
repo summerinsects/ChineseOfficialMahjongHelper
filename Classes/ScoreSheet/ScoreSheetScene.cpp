@@ -833,7 +833,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     drawNode->drawLine(Vec2(width, 0), Vec2(width, 200), Color4F::BLACK);
 
     const char *titleText[] = { "追者", "被追", "分差", "自摸", "对点", "旁点" };
-    const Color3B titleColor[] = { Color3B::ORANGE, Color3B::ORANGE, Color3B(0x60, 0x60, 0x60), Color3B(254, 87, 110), Color3B(44, 121, 178), Color3B(101, 196, 59) };
+    const Color3B titleColor[] = { Color3B::ORANGE, Color3B::ORANGE, Color3B(0x60, 0x60, 0x60), Color3B(254, 87, 110), Color3B(44, 121, 178), Color3B(49, 155, 28) };
 
     for (int i = 0; i < 6; ++i) {
         Label *label = Label::createWithSystemFont(titleText[i], "Arail", 12);
