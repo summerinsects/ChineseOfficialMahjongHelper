@@ -172,10 +172,10 @@
 		1F2D25861E076FC20071ADE2 /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
 		1F4192721E10A10200CDC47D /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
 		1F4192731E10A10200CDC47D /* CWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWTableView.h; sourceTree = "<group>"; };
-		1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionEnrollScene.cpp; path = Competition/CompetitionEnrollScene.cpp; sourceTree = "<group>"; };
-		1F68AFC61F03366800B4BB97 /* CompetitionEnrollScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionEnrollScene.h; path = Competition/CompetitionEnrollScene.h; sourceTree = "<group>"; };
-		1F68AFC71F03366800B4BB97 /* CompetitionMainScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionMainScene.cpp; path = Competition/CompetitionMainScene.cpp; sourceTree = "<group>"; };
-		1F68AFC81F03366900B4BB97 /* CompetitionMainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionMainScene.h; path = Competition/CompetitionMainScene.h; sourceTree = "<group>"; };
+		1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionEnrollScene.cpp; path = CompetitionSystem/CompetitionEnrollScene.cpp; sourceTree = "<group>"; };
+		1F68AFC61F03366800B4BB97 /* CompetitionEnrollScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionEnrollScene.h; path = CompetitionSystem/CompetitionEnrollScene.h; sourceTree = "<group>"; };
+		1F68AFC71F03366800B4BB97 /* CompetitionMainScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionMainScene.cpp; path = CompetitionSystem/CompetitionMainScene.cpp; sourceTree = "<group>"; };
+		1F68AFC81F03366900B4BB97 /* CompetitionMainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionMainScene.h; path = CompetitionSystem/CompetitionMainScene.h; sourceTree = "<group>"; };
 		1F6A373D1CBDD3C9001617E6 /* BaseScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseScene.h; sourceTree = "<group>"; };
 		1F6A373E1CBDD3C9001617E6 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OtherScene.cpp; sourceTree = "<group>"; };
@@ -201,14 +201,14 @@
 		1FE04ADD1C94682A008401EA /* ScoreSheetScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreSheetScene.h; sourceTree = "<group>"; };
 		1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilesKeyboard.cpp; sourceTree = "<group>"; };
 		1FE0DAAD1E8A0C94008BCC2F /* TilesKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilesKeyboard.h; sourceTree = "<group>"; };
-		1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Competition.cpp; path = Competition/Competition.cpp; sourceTree = "<group>"; };
-		1FE17A6E1EE0FF9300B47FE3 /* Competition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Competition.h; path = Competition/Competition.h; sourceTree = "<group>"; };
-		1FE17A6F1EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionRankCustomScene.cpp; path = Competition/CompetitionRankCustomScene.cpp; sourceTree = "<group>"; };
-		1FE17A701EE0FF9300B47FE3 /* CompetitionRankCustomScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionRankCustomScene.h; path = Competition/CompetitionRankCustomScene.h; sourceTree = "<group>"; };
-		1FE17A711EE0FF9300B47FE3 /* CompetitionRoundScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionRoundScene.cpp; path = Competition/CompetitionRoundScene.cpp; sourceTree = "<group>"; };
-		1FE17A721EE0FF9300B47FE3 /* CompetitionRoundScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionRoundScene.h; path = Competition/CompetitionRoundScene.h; sourceTree = "<group>"; };
-		1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionTableScene.cpp; path = Competition/CompetitionTableScene.cpp; sourceTree = "<group>"; };
-		1FE17A741EE0FF9300B47FE3 /* CompetitionTableScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionTableScene.h; path = Competition/CompetitionTableScene.h; sourceTree = "<group>"; };
+		1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Competition.cpp; path = CompetitionSystem/Competition.cpp; sourceTree = "<group>"; };
+		1FE17A6E1EE0FF9300B47FE3 /* Competition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Competition.h; path = CompetitionSystem/Competition.h; sourceTree = "<group>"; };
+		1FE17A6F1EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionRankCustomScene.cpp; path = CompetitionSystem/CompetitionRankCustomScene.cpp; sourceTree = "<group>"; };
+		1FE17A701EE0FF9300B47FE3 /* CompetitionRankCustomScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionRankCustomScene.h; path = CompetitionSystem/CompetitionRankCustomScene.h; sourceTree = "<group>"; };
+		1FE17A711EE0FF9300B47FE3 /* CompetitionRoundScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionRoundScene.cpp; path = CompetitionSystem/CompetitionRoundScene.cpp; sourceTree = "<group>"; };
+		1FE17A721EE0FF9300B47FE3 /* CompetitionRoundScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionRoundScene.h; path = CompetitionSystem/CompetitionRoundScene.h; sourceTree = "<group>"; };
+		1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionTableScene.cpp; path = CompetitionSystem/CompetitionTableScene.cpp; sourceTree = "<group>"; };
+		1FE17A741EE0FF9300B47FE3 /* CompetitionTableScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionTableScene.h; path = CompetitionSystem/CompetitionTableScene.h; sourceTree = "<group>"; };
 		1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanDefinitionScene.cpp; sourceTree = "<group>"; };
 		1FE2A3E81CBB30D1008C45C5 /* FanDefinitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanDefinitionScene.h; sourceTree = "<group>"; };
 		1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanTableScene.cpp; sourceTree = "<group>"; };
@@ -359,7 +359,7 @@
 			path = MahjongTheory;
 			sourceTree = "<group>";
 		};
-		1F31F1E71EDEA6A800EBEE2C /* Competition */ = {
+		1F31F1E71EDEA6A800EBEE2C /* CompetitionSystem */ = {
 			isa = PBXGroup;
 			children = (
 				1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */,
@@ -375,7 +375,7 @@
 				1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */,
 				1FE17A741EE0FF9300B47FE3 /* CompetitionTableScene.h */,
 			);
-			name = Competition;
+			name = CompetitionSystem;
 			sourceTree = "<group>";
 		};
 		1F764BE81CC5DB1F00844DAF /* Other */ = {
@@ -528,7 +528,7 @@
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
 				1F6A373D1CBDD3C9001617E6 /* BaseScene.h */,
 				1F6A373E1CBDD3C9001617E6 /* common.h */,
-				1F31F1E71EDEA6A800EBEE2C /* Competition */,
+				1F31F1E71EDEA6A800EBEE2C /* CompetitionSystem */,
 				1FF8820A1F5E60BE009C3449 /* compiler.h */,
 				1FE04AD61C94682A008401EA /* FanCalculator */,
 				1FE2A3E61CBB30D1008C45C5 /* FanTable */,
