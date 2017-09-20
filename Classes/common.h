@@ -80,16 +80,35 @@ static std::string format(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
 #endif
 
 std::string format(const char *fmt, ...) {
-    va_list ap;
-    va_start(ap, fmt);
-    int size = vsnprintf(nullptr, 0, fmt, ap);
-    va_end(ap);
-
     std::string ret;
-    ret.resize(size + 1);
-    va_start(ap, fmt);
-    vsnprintf(&ret[0], size, fmt, ap);
-    va_end(ap);
+    va_list ap;
+
+    size_t fmtlen = strlen(fmt);
+    if (LIKELY(fmtlen < INT_MAX)) {  // Ensure fmtlen is in an int
+        int len = static_cast<int>(fmtlen) + 1;
+
+        // For each %, reserve 64 characters
+        for (const char *p = strchr(fmt, '%'); p != nullptr; p = strchr(p + 1, '%')) len += 64;
+
+        do {
+            ret.resize(len);
+
+            va_start(ap, fmt);
+            int size = vsnprintf(&ret[0], len, fmt, ap);
+            va_end(ap);
+
+            if (LIKELY(size >= 0)) {
+                if (LIKELY(size < len)) {  // Everything worked
+                    ret.resize(size);
+                    ret.shrink_to_fit();
+                    break;
+                }
+                len = size + 1;  // Needed size returned
+                continue;
+            }
+            len *= 2;  // Guess at a larger size
+        } while (1);
+    }
 
     return ret;
 }
