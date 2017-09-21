@@ -88,7 +88,9 @@ std::string format(const char *fmt, ...) {
         int len = static_cast<int>(fmtlen) + 1;
 
         // For each %, reserve 64 characters
-        for (const char *p = strchr(fmt, '%'); p != nullptr; p = strchr(p + 1, '%')) len += 64;
+        for (const char *p = strchr(fmt, '%'); p != nullptr; p = strchr(p, '%')) {
+            if (*++p != '%') len += 64;  // skip %%
+        }
 
         do {
             ret.resize(len);
