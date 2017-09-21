@@ -89,7 +89,7 @@ std::string format(const char *fmt, ...) {
 
         // For each %, reserve 64 characters
         for (const char *p = strchr(fmt, '%'); p != nullptr; p = strchr(p, '%')) {
-            if (*++p != '%') len += 64;  // skip %%
+            if (*++p != '%') len += 64;  // skip %%. issue: '\0'!='%' is true
         }
 
         do {
