@@ -22,11 +22,11 @@
     <Filter Include="src\LatestCompetition">
       <UniqueIdentifier>{0c098f96-90e5-4fd6-87d0-c74d284ea39a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\MahjongTheory">
-      <UniqueIdentifier>{0d3ab171-ddea-44a5-bacd-63f9043728ea}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\mahjong-algorithm">
       <UniqueIdentifier>{b30a3da7-0281-44fa-b97c-3fef043608b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\MahjongTheory">
+      <UniqueIdentifier>{0d3ab171-ddea-44a5-bacd-63f9043728ea}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Other">
       <UniqueIdentifier>{70992fc8-7be4-4c25-907b-0ae6ce812762}</UniqueIdentifier>
@@ -48,9 +48,6 @@
     <ClCompile Include="..\Classes\AppDelegate.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\HelloWorldScene.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\cocos-wheels\CWTableView.cpp">
       <Filter>src\cocos-wheels</Filter>
     </ClCompile>
@@ -63,11 +60,11 @@
     <ClCompile Include="..\Classes\FanTable\FanTableScene.cpp">
       <Filter>src\FanTable</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\HelloWorldScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
       <Filter>src\LatestCompetition</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp">
-      <Filter>src\MahjongTheory</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp">
       <Filter>src\mahjong-algorithm</Filter>
@@ -77,6 +74,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp">
       <Filter>src\mahjong-algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp">
+      <Filter>src\MahjongTheory</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Other\OtherScene.cpp">
       <Filter>src\Other</Filter>
@@ -119,12 +119,6 @@
     <ClInclude Include="..\Classes\BaseScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\HelloWorldScene.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\TilesImage.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\cocos-wheels\CWEditBoxDelegate.h">
       <Filter>src\cocos-wheels</Filter>
     </ClInclude>
@@ -140,11 +134,11 @@
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h">
       <Filter>src\FanCalculator</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\HelloWorldScene.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h">
       <Filter>src\LatestCompetition</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h">
-      <Filter>src\MahjongTheory</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h">
       <Filter>src\mahjong-algorithm</Filter>
@@ -161,6 +155,9 @@
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h">
+      <Filter>src\MahjongTheory</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\Other\OtherScene.h">
       <Filter>src\Other</Filter>
     </ClInclude>
@@ -175,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\ScoreSheet\RecordScene.h">
       <Filter>src\ScoreSheet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\TilesImage.h">
+      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\utils\common.h">
       <Filter>src\utils</Filter>

@@ -150,10 +150,10 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\FanTable\FanTableScene.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp" />
-    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp" />
+    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp" />
     <ClCompile Include="..\Classes\Other\OtherScene.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\Record.cpp" />
@@ -176,12 +176,12 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\FanTable\FanTableScene.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h" />
-    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\shanten.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\standard_tiles.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\stringify.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h" />
+    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h" />
     <ClInclude Include="..\Classes\Other\OtherScene.h" />
     <ClInclude Include="..\Classes\ScoreSheet\HistoryScene.h" />
     <ClInclude Include="..\Classes\ScoreSheet\Record.h" />
