@@ -59,7 +59,6 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
     }
 
     this->scheduleOnce([this, idx](float) {
-        Size visibleSize = Director::getInstance()->getVisibleSize();
         Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
         LoadingView *loadingView = LoadingView::create();
@@ -67,6 +66,8 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
         loadingView->setPosition(origin);
 
 #if HAS_WEBVIEW
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+
         float scale = 1.0f;
         float maxWidth = (visibleSize.width - 10) / 18;
         if (maxWidth < 25) {
