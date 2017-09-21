@@ -2,7 +2,7 @@
 #define  __LATEST_COMPETITION_SCENE_H__
 
 #include "../BaseScene.h"
-#include "../widget/CWTableView.h"
+#include "../cocos-wheels/CWTableView.h"
 
 class  LatestCompetitionScene : public BaseScene, cw::TableViewDelegate {
 public:

@@ -4,7 +4,7 @@
 #include "../BaseScene.h"
 #include <unordered_map>
 #include "../mahjong-algorithm/shanten.h"
-#include "../widget/CWTableView.h"
+#include "../cocos-wheels/CWTableView.h"
 
 class HandTilesWidget;
 

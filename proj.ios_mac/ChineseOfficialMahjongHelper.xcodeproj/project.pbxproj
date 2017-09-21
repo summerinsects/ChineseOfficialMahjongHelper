@@ -23,8 +23,6 @@
 		1F154E421E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
 		1F2D25871E076FC20071ADE2 /* AlertView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertView.cpp */; };
 		1F2D25881E076FC20071ADE2 /* AlertView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertView.cpp */; };
-		1F4192741E10A10200CDC47D /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4192721E10A10200CDC47D /* CWTableView.cpp */; };
-		1F4192751E10A10200CDC47D /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4192721E10A10200CDC47D /* CWTableView.cpp */; };
 		1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1FA6933A1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
@@ -33,6 +31,8 @@
 		1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */; };
 		1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */; };
 		1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */; };
+		1FDCF7BF1F738E1D00D9C608 /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */; };
+		1FDCF7C01F738E1D00D9C608 /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */; };
 		1FDD94431C8337140031BC38 /* fan_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* fan_calculator.cpp */; };
 		1FDD94441C8337140031BC38 /* fan_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943C1C8337140031BC38 /* fan_calculator.cpp */; };
 		1FDD94451C8337140031BC38 /* shanten.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* shanten.cpp */; };
@@ -158,10 +158,7 @@
 		1F16A6311F5F8CFB00974F88 /* LoadingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingView.h; sourceTree = "<group>"; };
 		1F2D25851E076FC20071ADE2 /* AlertView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertView.cpp; sourceTree = "<group>"; };
 		1F2D25861E076FC20071ADE2 /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
-		1F4192721E10A10200CDC47D /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
-		1F4192731E10A10200CDC47D /* CWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWTableView.h; sourceTree = "<group>"; };
 		1F6A373D1CBDD3C9001617E6 /* BaseScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseScene.h; sourceTree = "<group>"; };
-		1F6A373E1CBDD3C9001617E6 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OtherScene.cpp; sourceTree = "<group>"; };
 		1F764BEA1CC5DB1F00844DAF /* OtherScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OtherScene.h; sourceTree = "<group>"; };
 		1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtraInfoWidget.cpp; sourceTree = "<group>"; };
@@ -171,6 +168,11 @@
 		1FCC3C011CC47200001C9555 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Record.h; sourceTree = "<group>"; };
 		1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HandTilesWidget.cpp; sourceTree = "<group>"; };
 		1FD228F11E39837E00DF5C1D /* HandTilesWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandTilesWidget.h; sourceTree = "<group>"; };
+		1FDCF7BC1F738E1C00D9C608 /* CWEditBoxDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWEditBoxDelegate.h; sourceTree = "<group>"; };
+		1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
+		1FDCF7BE1F738E1D00D9C608 /* CWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWTableView.h; sourceTree = "<group>"; };
+		1FDCF7C51F738EE400D9C608 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		1FDCF7C61F738EE400D9C608 /* compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compiler.h; sourceTree = "<group>"; };
 		1FDD943C1C8337140031BC38 /* fan_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fan_calculator.cpp; sourceTree = "<group>"; };
 		1FDD943D1C8337140031BC38 /* fan_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fan_calculator.h; sourceTree = "<group>"; };
 		1FDD943E1C8337140031BC38 /* tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tile.h; sourceTree = "<group>"; };
@@ -194,7 +196,6 @@
 		1FE5D0471CAE046300A5C38B /* tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tiles; sourceTree = "<group>"; };
 		1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LatestCompetitionScene.cpp; sourceTree = "<group>"; };
 		1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LatestCompetitionScene.h; sourceTree = "<group>"; };
-		1FF8820A1F5E60BE009C3449 /* compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compiler.h; sourceTree = "<group>"; };
 		1FF8820B1F5E60BE009C3449 /* TilesImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilesImage.h; sourceTree = "<group>"; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		294D0D631D0D56D500F7F5D4 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
@@ -344,6 +345,25 @@
 			path = Other;
 			sourceTree = "<group>";
 		};
+		1FDCF7BB1F738E1C00D9C608 /* cocos-wheels */ = {
+			isa = PBXGroup;
+			children = (
+				1FDCF7BC1F738E1C00D9C608 /* CWEditBoxDelegate.h */,
+				1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */,
+				1FDCF7BE1F738E1D00D9C608 /* CWTableView.h */,
+			);
+			path = "cocos-wheels";
+			sourceTree = "<group>";
+		};
+		1FDCF7C41F738EE400D9C608 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				1FDCF7C51F738EE400D9C608 /* common.h */,
+				1FDCF7C61F738EE400D9C608 /* compiler.h */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
 		1FDD943B1C8337140031BC38 /* mahjong-algorithm */ = {
 			isa = PBXGroup;
 			children = (
@@ -399,8 +419,6 @@
 			children = (
 				1F2D25851E076FC20071ADE2 /* AlertView.cpp */,
 				1F2D25861E076FC20071ADE2 /* AlertView.h */,
-				1F4192721E10A10200CDC47D /* CWTableView.cpp */,
-				1F4192731E10A10200CDC47D /* CWTableView.h */,
 				1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */,
 				1FA693391E83552300E839CC /* ExtraInfoWidget.h */,
 				1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */,
@@ -484,8 +502,7 @@
 				46880B8419C43A87006E1F66 /* AppDelegate.cpp */,
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
 				1F6A373D1CBDD3C9001617E6 /* BaseScene.h */,
-				1F6A373E1CBDD3C9001617E6 /* common.h */,
-				1FF8820A1F5E60BE009C3449 /* compiler.h */,
+				1FDCF7BB1F738E1C00D9C608 /* cocos-wheels */,
 				1FE04AD61C94682A008401EA /* FanCalculator */,
 				1FE2A3E61CBB30D1008C45C5 /* FanTable */,
 				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
@@ -496,6 +513,7 @@
 				1F764BE81CC5DB1F00844DAF /* Other */,
 				1FE04AD91C94682A008401EA /* ScoreSheet */,
 				1FF8820B1F5E60BE009C3449 /* TilesImage.h */,
+				1FDCF7C41F738EE400D9C608 /* utils */,
 				1FE5CFDA1CAE029200A5C38B /* widget */,
 			);
 			name = Classes;
@@ -693,6 +711,7 @@
 				1F0828A51ED26F8C00F4C424 /* Record.cpp in Sources */,
 				1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
+				1FDCF7BF1F738E1D00D9C608 /* CWTableView.cpp in Sources */,
 				1FE0DAAE1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */,
 				1FE2A3ED1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
 				1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
@@ -703,7 +722,6 @@
 				1FDD94451C8337140031BC38 /* shanten.cpp in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
-				1F4192741E10A10200CDC47D /* CWTableView.cpp in Sources */,
 				1FF6025B1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
@@ -723,13 +741,13 @@
 				1FDD94441C8337140031BC38 /* fan_calculator.cpp in Sources */,
 				1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */,
 				1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
+				1FDCF7C01F738E1D00D9C608 /* CWTableView.cpp in Sources */,
 				1FE2A3EE1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
 				1FE2A3EC1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
 				1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
 				1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */,
 				1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
 				1F2D25881E076FC20071ADE2 /* AlertView.cpp in Sources */,
-				1F4192751E10A10200CDC47D /* CWTableView.cpp in Sources */,
 				1F0828A61ED26F8C00F4C424 /* Record.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,

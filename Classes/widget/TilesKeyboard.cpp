@@ -1,7 +1,7 @@
 ﻿#include "TilesKeyboard.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
-#include "../common.h"
+#include "../utils/common.h"
 #include "../TilesImage.h"
 
 USING_NS_CC;

@@ -12,6 +12,7 @@ LOCAL_MODULE := MyGame_shared
 LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
+                   ../../Classes/cocos-wheels/CWTableView.cpp \
                    ../../Classes/FanCalculator/FanCalculatorScene.cpp \
                    ../../Classes/FanTable/FanDefinitionScene.cpp \
                    ../../Classes/FanTable/FanTableScene.cpp \
@@ -26,7 +27,6 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/ScoreSheet/RecordScene.cpp \
                    ../../Classes/ScoreSheet/ScoreSheetScene.cpp \
                    ../../Classes/widget/AlertView.cpp \
-                   ../../Classes/widget/CWTableView.cpp \
                    ../../Classes/widget/ExtraInfoWidget.cpp \
                    ../../Classes/widget/HandTilesWidget.cpp \
                    ../../Classes/widget/TilePickWidget.cpp \

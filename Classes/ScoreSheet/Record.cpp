@@ -1,6 +1,6 @@
 ﻿#include "Record.h"
 #include "../mahjong-algorithm/fan_calculator.h"
-#include "../compiler.h"
+#include "../utils/compiler.h"
 
 static const char *packedFanNames[] = {
     "门断平", "门清平和", "断幺平和", "连风刻", "番牌暗杠", "双同幺九", "门清双暗", "双暗暗杠"

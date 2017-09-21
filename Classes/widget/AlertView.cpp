@@ -1,6 +1,6 @@
 ﻿#include "AlertView.h"
 #include "ui/CocosGUI.h"
-#include "../compiler.h"
+#include "../utils/compiler.h"
 
 USING_NS_CC;
 

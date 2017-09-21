@@ -2,7 +2,7 @@
 #define __LOADING_VIEW_H__
 
 #include "cocos2d.h"
-#include "../compiler.h"
+#include "../utils/compiler.h"
 
 class LoadingView : public cocos2d::Layer {
 public:

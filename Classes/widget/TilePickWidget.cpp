@@ -1,5 +1,5 @@
 ﻿#include "TilePickWidget.h"
-#include "../compiler.h"
+#include "../utils/compiler.h"
 #include "../TilesImage.h"
 
 USING_NS_CC;
