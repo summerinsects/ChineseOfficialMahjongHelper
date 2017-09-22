@@ -144,6 +144,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\Classes\cocos-wheels\CWTableView.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\Competition.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionEnrollScene.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionMainScene.cpp" />
@@ -155,17 +156,17 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\FanTable\FanTableScene.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp" />
-    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp" />
+    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp" />
     <ClCompile Include="..\Classes\Other\OtherScene.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\Record.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp" />
     <ClCompile Include="..\Classes\ScoreSheet\ScoreSheetScene.cpp" />
+    <ClCompile Include="..\Classes\utils\common.cpp" />
     <ClCompile Include="..\Classes\widget\AlertView.cpp" />
-    <ClCompile Include="..\Classes\widget\CWTableView.cpp" />
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp" />
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp" />
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp" />
@@ -175,34 +176,34 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   <ItemGroup>
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\BaseScene.h" />
-    <ClInclude Include="..\Classes\common.h" />
+    <ClInclude Include="..\Classes\cocos-wheels\CWEditBoxDelegate.h" />
+    <ClInclude Include="..\Classes\cocos-wheels\CWTableView.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\Competition.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionEnrollScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionMainScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionRankCustomScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionRoundScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionTableScene.h" />
-    <ClInclude Include="..\Classes\compiler.h" />
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanTableScene.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h" />
-    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\shanten.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\standard_tiles.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\stringify.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h" />
+    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h" />
     <ClInclude Include="..\Classes\Other\OtherScene.h" />
     <ClInclude Include="..\Classes\ScoreSheet\HistoryScene.h" />
     <ClInclude Include="..\Classes\ScoreSheet\Record.h" />
     <ClInclude Include="..\Classes\ScoreSheet\RecordScene.h" />
     <ClInclude Include="..\Classes\ScoreSheet\ScoreSheetScene.h" />
     <ClInclude Include="..\Classes\TilesImage.h" />
+    <ClInclude Include="..\Classes\utils\common.h" />
+    <ClInclude Include="..\Classes\utils\compiler.h" />
     <ClInclude Include="..\Classes\widget\AlertView.h" />
-    <ClInclude Include="..\Classes\widget\CWEditBoxDelegate.h" />
-    <ClInclude Include="..\Classes\widget\CWTableView.h" />
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h" />
     <ClInclude Include="..\Classes\widget\HandTilesWidget.h" />
     <ClInclude Include="..\Classes\widget\LoadingView.h" />

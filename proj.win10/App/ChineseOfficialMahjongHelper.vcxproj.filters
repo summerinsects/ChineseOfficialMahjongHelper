@@ -14,6 +14,9 @@
     <Filter Include="Classes">
       <UniqueIdentifier>{a18967bc-4fa1-4c67-bf7e-3f9c8b6a1129}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Classes\cocos-wheels">
+      <UniqueIdentifier>{e4d86c3d-002e-45d1-a96c-e6bbc7163a40}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Classes\CompetitionSystem">
       <UniqueIdentifier>{fc0d8098-87b5-4188-b7e9-6b01aa1d33c4}</UniqueIdentifier>
     </Filter>
@@ -32,14 +35,17 @@
     <Filter Include="Classes\MahjongTheory">
       <UniqueIdentifier>{e1dbc7dd-de64-4259-909e-be6ffeeb2c8a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Classes\widget">
-      <UniqueIdentifier>{1cde9bb1-9467-4604-bda5-d8b5de0e6acb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Classes\Other">
       <UniqueIdentifier>{875d831d-35c2-49f1-851e-ec8a08795b2b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Classes\ScoreSheet">
       <UniqueIdentifier>{d259cdbb-3fd5-4923-bb04-6ca63720ba34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\utils">
+      <UniqueIdentifier>{ce04f426-024b-4224-b40f-dfdf6aff5b5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\widget">
+      <UniqueIdentifier>{1cde9bb1-9467-4604-bda5-d8b5de0e6acb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -58,8 +64,8 @@
     <ClCompile Include="..\..\Classes\AppDelegate.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\HelloWorldScene.cpp">
-      <Filter>Classes</Filter>
+    <ClCompile Include="..\..\Classes\cocos-wheels\CWTableView.cpp">
+      <Filter>Classes\cocos-wheels</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Classes\CompetitionSystem\Competition.cpp">
       <Filter>Classes\CompetitionSystem</Filter>
@@ -87,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Classes\FanTable\FanTableScene.cpp">
       <Filter>Classes\FanTable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Classes\HelloWorldScene.cpp">
+      <Filter>Classes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
       <Filter>Classes\LastestCompetition</Filter>
@@ -118,10 +127,10 @@
     <ClCompile Include="..\..\Classes\ScoreSheet\ScoreSheetScene.cpp">
       <Filter>Classes\ScoreSheet</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\widget\AlertView.cpp">
-      <Filter>Classes\widget</Filter>
+    <ClCompile Include="..\..\Classes\utils\common.cpp">
+      <Filter>Classes\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Classes\widget\CWTableView.cpp">
+    <ClCompile Include="..\..\Classes\widget\AlertView.cpp">
       <Filter>Classes\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Classes\widget\ExtraInfoWidget.cpp">
@@ -150,9 +159,14 @@
     <ClInclude Include="..\..\Classes\AppDelegate.h">
       <Filter>Classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Classes\HelloWorldScene.h">
+    <ClInclude Include="..\..\Classes\BaseScene.h">
       <Filter>Classes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Classes\cocos-wheels\CWEditBoxDelegate.h">
+      <Filter>Classes\cocos-wheels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Classes\cocos-wheels\CWTableView.h">
+      <Filter>Classes\cocos-wheels</Filter>
     <ClInclude Include="..\..\Classes\CompetitionSystem\Competition.h">
       <Filter>Classes\CompetitionSystem</Filter>
     </ClInclude>
@@ -179,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Classes\FanTable\FanTableScene.h">
       <Filter>Classes\FanTable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Classes\HelloWorldScene.h">
+      <Filter>Classes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Classes\LatestCompetition\LatestCompetitionScene.h">
       <Filter>Classes\LastestCompetition</Filter>
@@ -213,13 +230,16 @@
     <ClInclude Include="..\..\Classes\ScoreSheet\ScoreSheetScene.h">
       <Filter>Classes\ScoreSheet</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Classes\TilesImage.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Classes\utils\common.h">
+      <Filter>Classes\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Classes\utils\compiler.h">
+      <Filter>Classes\utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Classes\widget\AlertView.h">
-      <Filter>Classes\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Classes\widget\CWEditBoxDelegate.h">
-      <Filter>Classes\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Classes\widget\CWTableView.h">
       <Filter>Classes\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Classes\widget\ExtraInfoWidget.h">
@@ -236,18 +256,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Classes\widget\TilesKeyboard.h">
       <Filter>Classes\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Classes\BaseScene.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Classes\common.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Classes\compiler.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Classes\TilesImage.h">
-      <Filter>Classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

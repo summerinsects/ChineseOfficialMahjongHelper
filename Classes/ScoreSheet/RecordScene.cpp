@@ -1,8 +1,8 @@
 ﻿#include "RecordScene.h"
 #include <array>
 #include "../mahjong-algorithm/fan_calculator.h"
+#include "../cocos-wheels/CWTableView.h"
 #include "../widget/AlertView.h"
-#include "../widget/CWTableView.h"
 
 USING_NS_CC;
 

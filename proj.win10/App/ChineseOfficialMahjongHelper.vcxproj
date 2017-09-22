@@ -220,18 +220,18 @@
   <ItemGroup>
     <ClInclude Include="..\..\Classes\AppDelegate.h" />
     <ClInclude Include="..\..\Classes\BaseScene.h" />
-    <ClInclude Include="..\..\Classes\common.h" />
+    <ClInclude Include="..\..\Classes\cocos-wheels\CWEditBoxDelegate.h" />
+    <ClInclude Include="..\..\Classes\cocos-wheels\CWTableView.h" />
     <ClInclude Include="..\..\Classes\CompetitionSystem\Competition.h" />
     <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionEnrollScene.h" />
     <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionMainScene.h" />
     <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionRankCustomScene.h" />
     <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionRoundScene.h" />
     <ClInclude Include="..\..\Classes\CompetitionSystem\CompetitionTableScene.h" />
-    <ClInclude Include="..\..\Classes\compiler.h" />
+    <ClInclude Include="..\..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\..\Classes\FanCalculator\FanCalculatorScene.h" />
     <ClInclude Include="..\..\Classes\FanTable\FanDefinitionScene.h" />
     <ClInclude Include="..\..\Classes\FanTable\FanTableScene.h" />
-    <ClInclude Include="..\..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\..\Classes\LatestCompetition\LatestCompetitionScene.h" />
     <ClInclude Include="..\..\Classes\mahjong-algorithm\fan_calculator.h" />
     <ClInclude Include="..\..\Classes\mahjong-algorithm\shanten.h" />
@@ -244,9 +244,9 @@
     <ClInclude Include="..\..\Classes\ScoreSheet\RecordScene.h" />
     <ClInclude Include="..\..\Classes\ScoreSheet\ScoreSheetScene.h" />
     <ClInclude Include="..\..\Classes\TilesImage.h" />
+    <ClInclude Include="..\..\Classes\utils\common.h" />
+    <ClInclude Include="..\..\Classes\utils\compiler.h" />
     <ClInclude Include="..\..\Classes\widget\AlertView.h" />
-    <ClInclude Include="..\..\Classes\widget\CWEditBoxDelegate.h" />
-    <ClInclude Include="..\..\Classes\widget\CWTableView.h" />
     <ClInclude Include="..\..\Classes\widget\ExtraInfoWidget.h" />
     <ClInclude Include="..\..\Classes\widget\HandTilesWidget.h" />
     <ClInclude Include="..\..\Classes\widget\LoadingView.h" />
@@ -275,6 +275,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\..\Classes\cocos-wheels\CWTableView.cpp" />
     <ClCompile Include="..\..\Classes\CompetitionSystem\Competition.cpp" />
     <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionEnrollScene.cpp" />
     <ClCompile Include="..\..\Classes\CompetitionSystem\CompetitionMainScene.cpp" />
@@ -295,8 +296,8 @@
     <ClCompile Include="..\..\Classes\ScoreSheet\Record.cpp" />
     <ClCompile Include="..\..\Classes\ScoreSheet\RecordScene.cpp" />
     <ClCompile Include="..\..\Classes\ScoreSheet\ScoreSheetScene.cpp" />
+    <ClCompile Include="..\..\Classes\utils\common.cpp" />
     <ClCompile Include="..\..\Classes\widget\AlertView.cpp" />
-    <ClCompile Include="..\..\Classes\widget\CWTableView.cpp" />
     <ClCompile Include="..\..\Classes\widget\ExtraInfoWidget.cpp" />
     <ClCompile Include="..\..\Classes\widget\HandTilesWidget.cpp" />
     <ClCompile Include="..\..\Classes\widget\TilePickWidget.cpp" />

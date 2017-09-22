@@ -1,5 +1,5 @@
 ﻿#include "ExtraInfoWidget.h"
-#include "../compiler.h"
+#include "../utils/compiler.h"
 #include "AlertView.h"
 
 USING_NS_CC;

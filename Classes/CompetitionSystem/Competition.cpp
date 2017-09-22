@@ -7,7 +7,7 @@
 #else
 #include "json/writer.h"
 #endif
-#include "../common.h"
+#include "../utils/common.h"
 
 // 标准分转换为字符串
 std::string CompetitionResult::standardScoreToString(float ss) {

@@ -2,7 +2,7 @@
 #define __HISTORY_SCENE_H__
 
 #include "../BaseScene.h"
-#include "../widget/CWTableView.h"
+#include "../cocos-wheels/CWTableView.h"
 
 struct Record;
 

@@ -2,7 +2,7 @@
 #define __COMPETITION_TABLE_SCENE__
 
 #include "../BaseScene.h"
-#include "../widget/CWTableView.h"
+#include "../cocos-wheels/CWTableView.h"
 
 class CompetitionData;
 struct CompetitionResult;

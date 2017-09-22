@@ -2,7 +2,7 @@
 #include "network/HttpClient.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
-#include "common.h"
+#include "utils/common.h"
 #include "widget/AlertView.h"
 #include "FanCalculator/FanCalculatorScene.h"
 #include "ScoreSheet/ScoreSheetScene.h"

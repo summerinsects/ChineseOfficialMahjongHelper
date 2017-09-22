@@ -2,7 +2,7 @@
 #define _RECORD_SCENE_H_
 
 #include "../BaseScene.h"
-#include "../widget/CWTableView.h"
+#include "../cocos-wheels/CWTableView.h"
 #include "Record.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 

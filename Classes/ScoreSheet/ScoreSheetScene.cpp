@@ -6,7 +6,7 @@
 #include "json/writer.h"
 #endif
 #include "../widget/AlertView.h"
-#include "../widget/CWEditBoxDelegate.h"
+#include "../cocos-wheels/CWEditBoxDelegate.h"
 #include "../widget/HandTilesWidget.h"
 #include "Record.h"
 #include "RecordScene.h"

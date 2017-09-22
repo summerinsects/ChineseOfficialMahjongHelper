@@ -2,7 +2,7 @@
 #define __FAN_TABLE_SCENE_H__
 
 #include "../BaseScene.h"
-#include "../widget/CWTableView.h"
+#include "../cocos-wheels/CWTableView.h"
 
 class FanTableScene : public BaseScene, cw::TableViewDelegate {
 public:

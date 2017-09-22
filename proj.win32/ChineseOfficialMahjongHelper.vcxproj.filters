@@ -10,32 +10,40 @@
     <Filter Include="src">
       <UniqueIdentifier>{bb6c862e-70e9-49d9-81b7-3829a6f50471}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\mahjong-algorithm">
-      <UniqueIdentifier>{b30a3da7-0281-44fa-b97c-3fef043608b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\ScoreSheet">
-      <UniqueIdentifier>{c70d58d3-f21e-45b5-8fdb-54c4d378ccfa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\FanCalculator">
-      <UniqueIdentifier>{ee88c5ab-d66e-486f-9367-a564efe30b78}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\widget">
-      <UniqueIdentifier>{2f551755-0a71-4dde-9a7d-314583535ec8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\FanTable">
-      <UniqueIdentifier>{c45dcad3-107b-4c78-a709-2ca8c957501f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Other">
-      <UniqueIdentifier>{70992fc8-7be4-4c25-907b-0ae6ce812762}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\MahjongTheory">
-      <UniqueIdentifier>{0d3ab171-ddea-44a5-bacd-63f9043728ea}</UniqueIdentifier>
+    <Filter Include="src\cocos-wheels">
+      <UniqueIdentifier>{069be9d5-bc9f-45f0-9357-fbd661ca6f96}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\CompetitionSystem">
       <UniqueIdentifier>{ec2ebec7-c428-4bb6-8308-3e4f802a6fe0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\FanCalculator">
+      <UniqueIdentifier>{ee88c5ab-d66e-486f-9367-a564efe30b78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\FanTable">
+      <UniqueIdentifier>{c45dcad3-107b-4c78-a709-2ca8c957501f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\LatestCompetition">
       <UniqueIdentifier>{0c098f96-90e5-4fd6-87d0-c74d284ea39a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\mahjong-algorithm">
+      <UniqueIdentifier>{b30a3da7-0281-44fa-b97c-3fef043608b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\MahjongTheory">
+      <UniqueIdentifier>{0d3ab171-ddea-44a5-bacd-63f9043728ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\LatestCompetition">
+      <UniqueIdentifier>{0c098f96-90e5-4fd6-87d0-c74d284ea39a}</UniqueIdentifier>
+    <Filter Include="src\Other">
+      <UniqueIdentifier>{70992fc8-7be4-4c25-907b-0ae6ce812762}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ScoreSheet">
+      <UniqueIdentifier>{c70d58d3-f21e-45b5-8fdb-54c4d378ccfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{57936c23-410a-4c04-8a19-6f3859e6f844}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\widget">
+      <UniqueIdentifier>{2f551755-0a71-4dde-9a7d-314583535ec8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,8 +53,8 @@
     <ClCompile Include="..\Classes\AppDelegate.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\HelloWorldScene.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\Classes\cocos-wheels\CWTableView.cpp">
+      <Filter>src\cocos-wheels</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\CompetitionSystem\Competition.cpp">
       <Filter>src\CompetitionSystem</Filter>
@@ -75,11 +83,11 @@
     <ClCompile Include="..\Classes\FanTable\FanTableScene.cpp">
       <Filter>src\FanTable</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\HelloWorldScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
       <Filter>src\LatestCompetition</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp">
-      <Filter>src\MahjongTheory</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp">
       <Filter>src\mahjong-algorithm</Filter>
@@ -89,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp">
       <Filter>src\mahjong-algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp">
+      <Filter>src\MahjongTheory</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Other\OtherScene.cpp">
       <Filter>src\Other</Filter>
@@ -105,10 +116,10 @@
     <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp">
       <Filter>src\ScoreSheet</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\widget\AlertView.cpp">
-      <Filter>src\widget</Filter>
+    <ClCompile Include="..\Classes\utils\common.cpp">
+      <Filter>src\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\widget\CWTableView.cpp">
+    <ClCompile Include="..\Classes\widget\AlertView.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp">
@@ -134,17 +145,11 @@
     <ClInclude Include="..\Classes\BaseScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\common.h">
-      <Filter>src</Filter>
+    <ClInclude Include="..\Classes\cocos-wheels\CWEditBoxDelegate.h">
+      <Filter>src\cocos-wheels</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\compiler.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\HelloWorldScene.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\TilesImage.h">
-      <Filter>src</Filter>
+    <ClInclude Include="..\Classes\cocos-wheels\CWTableView.h">
+      <Filter>src\cocos-wheels</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\CompetitionSystem\Competition.h">
       <Filter>src\CompetitionSystem</Filter>
@@ -173,11 +178,11 @@
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h">
       <Filter>src\FanCalculator</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\HelloWorldScene.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h">
       <Filter>src\LatestCompetition</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h">
-      <Filter>src\MahjongTheory</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h">
       <Filter>src\mahjong-algorithm</Filter>
@@ -194,6 +199,9 @@
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h">
       <Filter>src\mahjong-algorithm</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h">
+      <Filter>src\MahjongTheory</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\Other\OtherScene.h">
       <Filter>src\Other</Filter>
     </ClInclude>
@@ -209,13 +217,16 @@
     <ClInclude Include="..\Classes\ScoreSheet\RecordScene.h">
       <Filter>src\ScoreSheet</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\TilesImage.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\common.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\compiler.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\widget\AlertView.h">
-      <Filter>src\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\widget\CWEditBoxDelegate.h">
-      <Filter>src\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\widget\CWTableView.h">
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h">
