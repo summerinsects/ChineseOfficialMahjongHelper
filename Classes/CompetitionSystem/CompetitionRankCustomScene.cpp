@@ -282,18 +282,26 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
 
             // 表格
             cw::TableView *tableView = cw::TableView::create();
-            tableView->setContentSize(Size(width, height));
+            tableView->setContentSize(Size(width, height - 40.0f));
             tableView->setDelegate(this);
             tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
             tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
-            
+
             tableView->setScrollBarPositionFromCorner(Vec2(5, 2));
             tableView->setScrollBarWidth(4);
             tableView->setScrollBarOpacity(0x99);
             tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-            tableView->setPosition(Vec2(width * 0.5f, height * 0.5f));
+            tableView->setPosition(Vec2(width * 0.5f, height * 0.5f + 20.0f));
             tableView->reloadData();
             this->addChild(tableView);
+
+            ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+            this->addChild(button);
+            button->setScale9Enabled(true);
+            button->setContentSize(Size(55.0f, 20.0f));
+            button->setTitleFontSize(12);
+            button->setTitleText("清除选手");
+            button->setPosition(Vec2(width * 0.5f, 15.0f));
 
             return true;
         }
