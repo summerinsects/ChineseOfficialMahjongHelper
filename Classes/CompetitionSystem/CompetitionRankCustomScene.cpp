@@ -227,8 +227,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                     labels[n][i][1]->setColor(Color3B::GRAY);
                 }
                 else {
-                    const std::vector<CompetitionPlayer> &players = _competitionData->players;
-                    const CompetitionPlayer &player = players[currentTable.player_indices[i]];
+                    const CompetitionPlayer &player = _competitionData->players[playerIndex];
                     labels[n][i][0]->setString(std::to_string(player.serial + 1));
                     labels[n][i][1]->setString(player.name);
                     labels[n][i][1]->setColor(Color3B::ORANGE);
