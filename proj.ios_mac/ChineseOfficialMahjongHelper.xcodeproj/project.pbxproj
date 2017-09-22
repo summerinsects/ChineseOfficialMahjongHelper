@@ -47,6 +47,8 @@
 		1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
 		1FE0DAAE1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */; };
 		1FE0DAAF1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */; };
+		1FE1019A1F74964E001C3FA8 /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDCF7C51F738EE400D9C608 /* common.cpp */; };
+		1FE1019E1F74964E001C3FA8 /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDCF7C51F738EE400D9C608 /* common.cpp */; };
 		1FE2A3EB1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */; };
 		1FE2A3EC1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */; };
 		1FE2A3ED1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */; };
@@ -171,8 +173,9 @@
 		1FDCF7BC1F738E1C00D9C608 /* CWEditBoxDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWEditBoxDelegate.h; sourceTree = "<group>"; };
 		1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
 		1FDCF7BE1F738E1D00D9C608 /* CWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWTableView.h; sourceTree = "<group>"; };
-		1FDCF7C51F738EE400D9C608 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
-		1FDCF7C61F738EE400D9C608 /* compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compiler.h; sourceTree = "<group>"; };
+		1FDCF7C51F738EE400D9C608 /* common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common.cpp; sourceTree = "<group>"; };
+		1FDCF7C61F738EE400D9C608 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		1FDCF7C71F738EE400D9C608 /* compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compiler.h; sourceTree = "<group>"; };
 		1FDD943C1C8337140031BC38 /* fan_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fan_calculator.cpp; sourceTree = "<group>"; };
 		1FDD943D1C8337140031BC38 /* fan_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fan_calculator.h; sourceTree = "<group>"; };
 		1FDD943E1C8337140031BC38 /* tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tile.h; sourceTree = "<group>"; };
@@ -358,8 +361,9 @@
 		1FDCF7C41F738EE400D9C608 /* utils */ = {
 			isa = PBXGroup;
 			children = (
-				1FDCF7C51F738EE400D9C608 /* common.h */,
-				1FDCF7C61F738EE400D9C608 /* compiler.h */,
+				1FDCF7C51F738EE400D9C608 /* common.cpp */,
+				1FDCF7C61F738EE400D9C608 /* common.h */,
+				1FDCF7C71F738EE400D9C608 /* compiler.h */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -715,6 +719,7 @@
 				1FE0DAAE1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */,
 				1FE2A3ED1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
 				1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
+				1FE1019A1F74964E001C3FA8 /* common.cpp in Sources */,
 				1F154E411E440A160083F8B3 /* stringify.cpp in Sources */,
 				1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
 				1F2D25871E076FC20071ADE2 /* AlertView.cpp in Sources */,
@@ -740,6 +745,7 @@
 				1FE0DAAF1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */,
 				1FDD94441C8337140031BC38 /* fan_calculator.cpp in Sources */,
 				1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */,
+				1FE1019E1F74964E001C3FA8 /* common.cpp in Sources */,
 				1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
 				1FDCF7C01F738E1D00D9C608 /* CWTableView.cpp in Sources */,
 				1FE2A3EE1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,

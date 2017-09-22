@@ -12,10 +12,12 @@ LOCAL_MODULE := MyGame_shared
 LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
+                   ../../Classes/AppDelegate.cpp \
                    ../../Classes/cocos-wheels/CWTableView.cpp \
                    ../../Classes/FanCalculator/FanCalculatorScene.cpp \
                    ../../Classes/FanTable/FanDefinitionScene.cpp \
                    ../../Classes/FanTable/FanTableScene.cpp \
+                   ../../Classes/HelloWorldScene.cpp \
                    ../../Classes/LatestCompetition/LatestCompetitionScene.cpp \
                    ../../Classes/mahjong-algorithm/fan_calculator.cpp \
                    ../../Classes/mahjong-algorithm/stringify.cpp \
@@ -26,13 +28,13 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/ScoreSheet/Record.cpp \
                    ../../Classes/ScoreSheet/RecordScene.cpp \
                    ../../Classes/ScoreSheet/ScoreSheetScene.cpp \
+                   ../../Classes/utils/common.cpp \
                    ../../Classes/widget/AlertView.cpp \
                    ../../Classes/widget/ExtraInfoWidget.cpp \
                    ../../Classes/widget/HandTilesWidget.cpp \
                    ../../Classes/widget/TilePickWidget.cpp \
-                   ../../Classes/widget/TilesKeyboard.cpp \
-                   ../../Classes/AppDelegate.cpp \
-                   ../../Classes/HelloWorldScene.cpp
+                   ../../Classes/widget/TilesKeyboard.cpp
+
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 

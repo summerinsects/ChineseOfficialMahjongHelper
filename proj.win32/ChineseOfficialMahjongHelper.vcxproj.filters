@@ -93,6 +93,9 @@
     <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp">
       <Filter>src\ScoreSheet</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\utils\common.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\widget\AlertView.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>

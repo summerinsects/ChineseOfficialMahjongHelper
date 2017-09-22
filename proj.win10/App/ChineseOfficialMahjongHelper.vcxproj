@@ -284,6 +284,7 @@
     <ClCompile Include="..\..\Classes\ScoreSheet\Record.cpp" />
     <ClCompile Include="..\..\Classes\ScoreSheet\RecordScene.cpp" />
     <ClCompile Include="..\..\Classes\ScoreSheet\ScoreSheetScene.cpp" />
+    <ClCompile Include="..\..\Classes\utils\common.cpp" />
     <ClCompile Include="..\..\Classes\widget\AlertView.cpp" />
     <ClCompile Include="..\..\Classes\widget\ExtraInfoWidget.cpp" />
     <ClCompile Include="..\..\Classes\widget\HandTilesWidget.cpp" />
