@@ -33,6 +33,7 @@
     </Filter>
     <Filter Include="src\LatestCompetition">
       <UniqueIdentifier>{0c098f96-90e5-4fd6-87d0-c74d284ea39a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Other">
       <UniqueIdentifier>{70992fc8-7be4-4c25-907b-0ae6ce812762}</UniqueIdentifier>
     </Filter>
