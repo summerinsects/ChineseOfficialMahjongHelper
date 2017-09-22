@@ -259,13 +259,15 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
     private:
         const std::vector<CompetitionPlayer> *_players;
         const std::vector<uint8_t> *_originFlags;
+
         std::vector<uint8_t> _currentFlags;
 
     public:
         const std::vector<uint8_t> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_2(AlertInnerNode, initWithPlayers, const std::vector<CompetitionPlayer> *, players, const std::vector<uint8_t> *, originFlags);
-        bool initWithPlayers(const std::vector<CompetitionPlayer> *players, const std::vector<uint8_t> *originFlags) {
+        CREATE_FUNC_WITH_PARAM_5(AlertInnerNode, initWithPlayers, CompetitionTable *, currentTable,
+            const std::vector<CompetitionPlayer> *, players, const std::vector<uint8_t> *, originFlags, size_t, table, int, seat);
+        bool initWithPlayers(CompetitionTable *currentTable, const std::vector<CompetitionPlayer> *players, const std::vector<uint8_t> *originFlags, size_t table, int seat) {
             if (UNLIKELY(!Node::init())) {
                 return false;
             }
@@ -302,6 +304,15 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
             button->setTitleFontSize(12);
             button->setTitleText("清除选手");
             button->setPosition(Vec2(width * 0.5f, 15.0f));
+            button->addClickEventListener([this, currentTable, table, seat, tableView](Ref *) {
+                ptrdiff_t &idx = currentTable->player_indices[seat];
+                ptrdiff_t temp = idx;
+                if (temp != INVALID_INDEX) {
+                    idx = INVALID_INDEX;
+                    _currentFlags[temp] = false;
+                    tableView->updateCellAtIndex(temp);
+                }
+            });
 
             return true;
         }
@@ -385,7 +396,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
         }
     };
 
-    AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &_playerFlags);
+    AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionTables[table], &_competitionData->players, &_playerFlags, table, seat);
     std::string title = Common::format("table = %" PRIS " seat = %d", table, seat);
     AlertView::showWithNode(title, innerNode, [this, innerNode, table, seat]() {
         const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
