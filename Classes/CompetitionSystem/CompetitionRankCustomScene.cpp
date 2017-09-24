@@ -258,7 +258,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
     class AlertInnerNode : public Node, cw::TableViewDelegate {
     private:
         const std::vector<CompetitionPlayer> *_players;
-        const std::vector<uint8_t> *_originFlags;
+        std::vector<uint8_t> *_originFlags;
 
         std::vector<uint8_t> _currentFlags;
 
@@ -266,8 +266,8 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
         const std::vector<uint8_t> &getCurrentFlags() { return _currentFlags; }
 
         CREATE_FUNC_WITH_PARAM_5(AlertInnerNode, initWithPlayers, CompetitionTable *, currentTable,
-            const std::vector<CompetitionPlayer> *, players, const std::vector<uint8_t> *, originFlags, size_t, table, int, seat);
-        bool initWithPlayers(CompetitionTable *currentTable, const std::vector<CompetitionPlayer> *players, const std::vector<uint8_t> *originFlags, size_t table, int seat) {
+            const std::vector<CompetitionPlayer> *, players, std::vector<uint8_t> *, originFlags, size_t, table, int, seat);
+        bool initWithPlayers(CompetitionTable *currentTable, const std::vector<CompetitionPlayer> *players, std::vector<uint8_t> *originFlags, size_t table, int seat) {
             if (UNLIKELY(!Node::init())) {
                 return false;
             }
@@ -310,6 +310,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
                 if (temp != INVALID_INDEX) {
                     idx = INVALID_INDEX;
                     _currentFlags[temp] = false;
+                    _originFlags->at(temp) = false;
                     tableView->updateCellAtIndex(temp);
                 }
             });
@@ -412,8 +413,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
             size_t idx = selected[0];
             _competitionTables[table].player_indices[seat] = idx;
             _playerFlags[idx] = 1;
-
-            _tableView->updateCellAtIndex(table >> 1);
         }
+        _tableView->updateCellAtIndex(table >> 1);
     }, nullptr);
 }
