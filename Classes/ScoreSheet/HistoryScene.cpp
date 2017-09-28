@@ -192,8 +192,8 @@ ssize_t HistoryScene::numberOfCellsInTableView(cw::TableView *table) {
     return _recordTexts.size();
 }
 
-cocos2d::Size HistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
-    return Size(0, 70);
+float HistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+    return 70.0f;
 }
 
 cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {

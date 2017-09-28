@@ -79,9 +79,10 @@ namespace cw {
          * cell size for a given index
          *
          * @param idx the index of a cell to get a size
-         * @return size of a cell at given index
+         * @return size of a cell at given index, height of a cell if the table view is VERTICAL or width if HORIZONTAL
+
          */
-        virtual cocos2d::Size tableCellSizeForIndex(TableView *table, ssize_t idx) { return cocos2d::Size::ZERO; }
+        virtual float tableCellSizeForIndex(TableView *table, ssize_t idx) { return 0.0f; }
 
         /**
          * a cell instance at a given index

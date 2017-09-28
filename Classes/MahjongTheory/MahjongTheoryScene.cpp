@@ -698,14 +698,14 @@ ssize_t MahjongTheoryScene::numberOfCellsInTableView(cw::TableView *table) {
     return _orderedIndices.size();
 }
 
-cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
     size_t realIdx = _orderedIndices[idx];
     const ResultEx *result = &_resultSources[realIdx];  // 当前cell的数据
 
     const uint16_t key = ((!!result->discard_tile) << 9) | ((!!result->shanten) << 8) | result->count_in_tiles;
     std::unordered_map<uint16_t, int>::iterator it = _cellHeightMap.find(key);
     if (it != _cellHeightMap.end()) {
-        return Size(0, static_cast<float>(it->second));
+        return static_cast<float>(it->second);
     }
 
     const float cellWidth = _cellWidth - SPACE * 2;  // 前后各留2像素
@@ -728,14 +728,14 @@ cocos2d::Size MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ss
             bool inOneLine = remainCnt * TILE_WIDTH_SMALL + _totalLabelWidth <= remainWidth;
             int height = 25 + 25 * (inOneLine ? lineCnt : lineCnt + 1);
             _cellHeightMap.insert(std::make_pair(key, height));
-            return Size(0, static_cast<float>(height));
+            return static_cast<float>(height);
         }
         remainCnt -= limitedCnt;
         ++lineCnt;
         remainWidth = cellWidth;
     } while (remainCnt > 0);
 
-    return Size(0, 50);
+    return 50.0f;
 }
 
 cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
@@ -816,27 +816,27 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     Label *cntLabel1 = std::get<6>(ext);
     Label *cntLabel2 = std::get<7>(ext);
 
-    const Size cellSize = tableCellSizeForIndex(table, idx);
+    const float cellHeight = tableCellSizeForIndex(table, idx);
     size_t realIdx = _orderedIndices[idx];
     const ResultEx *result = &_resultSources[realIdx];
 
     if (idx & 1) {
         layerColor[0]->setVisible(false);
         layerColor[1]->setVisible(true);
-        layerColor[1]->setContentSize(Size(_cellWidth, cellSize.height - 2));
+        layerColor[1]->setContentSize(Size(_cellWidth, cellHeight - 2));
     }
     else {
         layerColor[0]->setVisible(true);
         layerColor[1]->setVisible(false);
-        layerColor[0]->setContentSize(Size(_cellWidth, cellSize.height - 2));
+        layerColor[0]->setContentSize(Size(_cellWidth, cellHeight - 2));
     }
 
     typeLabel->setString(getResultTypeString(result->form_flag, result->shanten));
-    typeLabel->setPosition(Vec2(SPACE, cellSize.height - 10));
+    typeLabel->setPosition(Vec2(SPACE, cellHeight - 10));
     typeLabel->setColor(result->shanten != -1 ? Color3B(0x60, 0x60, 0x60) : Color3B::ORANGE);
 
     float xPos = SPACE;
-    float yPos = cellSize.height - 35;
+    float yPos = cellHeight - 35;
 
     if (result->discard_tile != 0) {
         discardLabel->setVisible(true);
