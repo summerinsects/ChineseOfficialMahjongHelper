@@ -260,6 +260,7 @@ void CompetitionRankCustomScene::onSubmitButton(cocos2d::Ref *sender)  {
         tables[i].player_indices[3] = _playerIndices[i * 4 + 3];
     }
 
+    _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
     cocos2d::Director::getInstance()->popScene();
 }
 
