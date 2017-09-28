@@ -53,15 +53,15 @@ bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData>
     this->addChild(tableView);
     _tableView = tableView;
 
-    // 下一步按钮
+    // 提交按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("下一步");
+    button->setTitleText("提交");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
-    button->addClickEventListener(std::bind(&CompetitionEnrollScene::onOkButton, this, std::placeholders::_1));
+    button->addClickEventListener(std::bind(&CompetitionEnrollScene::onSubmitButton, this, std::placeholders::_1));
 
     return true;
 }
@@ -176,7 +176,7 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
     return cell;
 }
 
-void CompetitionEnrollScene::onOkButton(cocos2d::Ref *sender) {
+void CompetitionEnrollScene::onSubmitButton(cocos2d::Ref *sender) {
 #if 1  // test
     for (size_t i = 0, cnt = _competitionData->players.size(); i < cnt; ++i) {
         _competitionData->players.at(i).name = Common::format("%" PRIS "号选手", i + 1);

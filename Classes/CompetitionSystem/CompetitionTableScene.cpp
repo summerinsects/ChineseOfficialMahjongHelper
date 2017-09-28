@@ -93,16 +93,17 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     }
     tableView->setOnEnterCallback(std::bind(&cw::TableView::reloadDataInplacement, tableView));
 
-    // 确定按钮
-    _okButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
-    this->addChild(_okButton);
-    _okButton->setScale9Enabled(true);
-    _okButton->setContentSize(Size(50.0f, 20.0f));
-    _okButton->setTitleFontSize(12);
-    _okButton->setTitleText("确定");
-    _okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
-    _okButton->addClickEventListener([](Ref *) { cocos2d::Director::getInstance()->popScene(); });
-    _okButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
+    // 提交按钮
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(50.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("提交");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
+    button->addClickEventListener([](Ref *) { cocos2d::Director::getInstance()->popScene(); });
+    button->setEnabled(_competitionData->isRoundFinished(_currentRound));
+    _submitButton = button;
 
     return true;
 }
@@ -353,7 +354,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         }
 
         // 刷新外面的UI
-        _okButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
+        _submitButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
         _tableView->updateCellAtIndex(table);
         _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
     }, nullptr);
