@@ -330,6 +330,14 @@ namespace {
             tableView->reloadData();
             this->addChild(tableView);
 
+            // 使表格跳到第一个未选择的选项处
+            for (ssize_t i = 0, cnt = _playerFlags->size(); i < cnt; ++i) {
+                if (!_playerFlags->at(i) && !_currentFlags[i]) {
+                    tableView->jumpToCell(i);
+                    break;
+                }
+            }
+
             return true;
         }
 
