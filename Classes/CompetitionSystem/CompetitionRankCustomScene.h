@@ -14,7 +14,7 @@ public:
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
-    virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
+    virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
     void onSubmitButton(cocos2d::Ref *sender);

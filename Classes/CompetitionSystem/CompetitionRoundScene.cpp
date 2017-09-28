@@ -141,8 +141,8 @@ ssize_t CompetitionRoundScene::numberOfCellsInTableView(cw::TableView *table) {
     return _players.size();
 }
 
-cocos2d::Size CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
-    return Size(0, 20);
+float CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+    return 20.0f;
 }
 
 cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {

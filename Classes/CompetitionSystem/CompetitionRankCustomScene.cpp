@@ -106,8 +106,8 @@ ssize_t CompetitionRankCustomScene::numberOfCellsInTableView(cw::TableView *tabl
     return ((_tableCount >> 1) + (_tableCount & 1));
 }
 
-cocos2d::Size CompetitionRankCustomScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
-    return Size(0, 80);
+float CompetitionRankCustomScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+    return 80.0f;
 }
 
 cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
@@ -345,8 +345,8 @@ namespace {
             return _playerFlags->size();
         }
 
-        virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override {
-            return Size(0, 30);
+        virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override {
+            return 30.0f;
         }
 
         virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override {

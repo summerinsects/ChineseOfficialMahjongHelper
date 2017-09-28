@@ -70,8 +70,8 @@ ssize_t CompetitionEnrollScene::numberOfCellsInTableView(cw::TableView *table) {
     return _competitionData->players.size() >> 1;
 }
 
-cocos2d::Size CompetitionEnrollScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
-    return Size(0, 30);
+float CompetitionEnrollScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+    return 30.0f;
 }
 
 cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
