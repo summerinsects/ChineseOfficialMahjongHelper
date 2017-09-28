@@ -268,7 +268,7 @@ void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
     }
 }
 
-void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
+namespace {
     class AlertInnerNode : public Node, cw::TableViewDelegate {
     private:
         const std::vector<CompetitionPlayer> *_players = nullptr;
@@ -394,9 +394,10 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
             _currentFlags[idx] = !!(event == ui::CheckBox::EventType::SELECTED);
         }
     };
+}
 
-    // vs2013需要用this->
-    AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &this->_playerFlags, &this->_playerIndices, realIndex);
+void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
+    AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &_playerFlags, &_playerIndices, realIndex);
     std::string title = Common::format("%" PRIS "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
     AlertView::showWithNode(title, innerNode, [this, innerNode, realIndex]() {
         const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
