@@ -151,6 +151,13 @@ bool HistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     this->addChild(tableView);
     _tableView = tableView;
 
+    tableView->setOnEnterCallback([this]() {
+        if (LIKELY(!g_records.empty())) {
+            updateRecordTexts();
+            _tableView->reloadDataInplacement();
+        }
+    });
+
     if (UNLIKELY(g_records.empty())) {
         this->scheduleOnce([this](float) {
             Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -179,15 +186,6 @@ bool HistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     }
 
     return true;
-}
-
-void HistoryScene::onEnter() {
-    Scene::onEnter();
-
-    if (LIKELY(!g_records.empty())) {
-        updateRecordTexts();
-        _tableView->reloadDataInplacement();
-    }
 }
 
 ssize_t HistoryScene::numberOfCellsInTableView(cw::TableView *table) {

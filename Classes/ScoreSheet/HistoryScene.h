@@ -13,8 +13,6 @@ public:
     CREATE_FUNC_WITH_PARAM_1(HistoryScene, initWithCallback, const ViewCallback &, viewCallback);
     bool initWithCallback(const ViewCallback &viewCallback);
 
-    virtual void onEnter() override;
-
     static void modifyRecord(const Record *record);
 
 private:

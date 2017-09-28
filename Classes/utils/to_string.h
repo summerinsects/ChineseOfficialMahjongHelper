@@ -91,6 +91,12 @@ typedef uint64_t _ULonglong;
     inline string to_string(float _Val) {  // convert float to string
         return (to_string((long double)_Val));
     }
+
+#undef _CSTD
+#undef _MAX_INT_DIG
+#undef _LLFMT
+#undef _TOSTRING
+
 }
 
 #endif  // __cplusplus

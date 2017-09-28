@@ -99,7 +99,7 @@ void test_points(const char *str, win_flag_t win_flag, wind_t prevalent_wind, wi
             printf("%s %d\n", fan_name[i], fan_value_table[i]);
         }
         else {
-            printf("%s %d*%ld\n", fan_name[i], fan_value_table[i], fan_table[i]);
+            printf("%s %d*%hd\n", fan_name[i], fan_value_table[i], fan_table[i]);
         }
     }
 }
