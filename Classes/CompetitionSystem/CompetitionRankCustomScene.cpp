@@ -13,8 +13,10 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
 
     _competitionData = competitionData;
     _currentRound = currentRound;
-    _competitionTables.resize(_competitionData->rounds[currentRound].tables.size());
-    _playerFlags.resize(_competitionData->players.size());
+
+    _playerFlags.resize(competitionData->players.size());
+    _playerIndices.assign(_playerFlags.size(), INVALID_INDEX);
+    _tableCount = _playerIndices.size() >> 2;
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -91,15 +93,14 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     _okButton->setTitleFontSize(12);
     _okButton->setTitleText("确定");
     _okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
-    _okButton->addClickEventListener([](Ref *) { cocos2d::Director::getInstance()->popScene(); });
-    _okButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
+    //_okButton->addClickEventListener([](Ref *) { cocos2d::Director::getInstance()->popScene(); });
+    //_okButton->setEnabled(false);
 
     return true;
 }
 
 ssize_t CompetitionRankCustomScene::numberOfCellsInTableView(cw::TableView *table) {
-    size_t s = _competitionTables.size();
-    return ((s >> 1) + (s & 1));
+    return ((_tableCount >> 1) + (_tableCount & 1));
 }
 
 cocos2d::Size CompetitionRankCustomScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
@@ -207,27 +208,28 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
     layerColors[0]->setVisible(!(idx & 1));
     layerColors[1]->setVisible(!!(idx & 1));
 
-    size_t readIdx = idx << 1;
-    for (size_t n = 0; n < 2; ++n) {
-        if (readIdx + n >= _competitionTables.size()) {
+    const std::vector<CompetitionPlayer> &players = _competitionData->players;
+    ssize_t realTableIdx = idx << 1;
+    for (ssize_t n = 0; n < 2; ++n) {
+        if (realTableIdx + n >= _tableCount) {
             rootWidgets[n]->setVisible(false);
         }
         else {
             rootWidgets[n]->setVisible(true);
 
-            const CompetitionTable &currentTable = _competitionTables[readIdx + n];
-            tableLabels[n]->setString(std::to_string(readIdx + n + 1));
+            tableLabels[n]->setString(std::to_string(realTableIdx + n + 1));
 
             // 编号、选手姓名
-            for (int i = 0; i < 4; ++i) {
-                ptrdiff_t playerIndex = currentTable.player_indices[i];
+            for (ssize_t i = 0; i < 4; ++i) {
+                ssize_t realIndex = ((realTableIdx + n) * 4) + i;
+                ptrdiff_t playerIndex = _playerIndices[realIndex];
                 if (playerIndex == INVALID_INDEX) {
                     labels[n][i][0]->setString("");
                     labels[n][i][1]->setString("选择");
                     labels[n][i][1]->setColor(Color3B::GRAY);
                 }
                 else {
-                    const CompetitionPlayer &player = _competitionData->players[playerIndex];
+                    const CompetitionPlayer &player = players[playerIndex];
                     labels[n][i][0]->setString(std::to_string(player.serial + 1));
                     labels[n][i][1]->setString(player.name);
                     labels[n][i][1]->setColor(Color3B::ORANGE);
@@ -237,8 +239,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                     Common::scaleLabelToFitWidth(labels[n][i][k], _colWidth[2 + k]);
                 }
 
-                touchedWidgets[n][i]->setTag(i);
-                touchedWidgets[n][i]->setUserData(reinterpret_cast<void *>(readIdx + n));
+                touchedWidgets[n][i]->setUserData(reinterpret_cast<void *>(realIndex));
             }
         }
     }
@@ -248,33 +249,34 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
 
 void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
     ui::Widget *widget = (ui::Widget *)sender;
-    size_t readIdx = reinterpret_cast<size_t>(widget->getUserData());
-    int tag = widget->getTag();
+    ssize_t realIndex = reinterpret_cast<ssize_t>(widget->getUserData());
 
-    showSelectPlayerAlert(readIdx, tag);
+    showSelectPlayerAlert(realIndex);
 }
 
-void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
+void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
     class AlertInnerNode : public Node, cw::TableViewDelegate {
     private:
-        const std::vector<CompetitionPlayer> *_players;
-        std::vector<uint8_t> *_originFlags;
+        const std::vector<CompetitionPlayer> *_players = nullptr;
+        std::vector<uint8_t> *_playerFlags = nullptr;
+        std::vector<ptrdiff_t> *_playerIndices = nullptr;
 
         std::vector<uint8_t> _currentFlags;
 
     public:
         const std::vector<uint8_t> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_5(AlertInnerNode, initWithPlayers, CompetitionTable *, currentTable,
-            const std::vector<CompetitionPlayer> *, players, std::vector<uint8_t> *, originFlags, size_t, table, int, seat);
-        bool initWithPlayers(CompetitionTable *currentTable, const std::vector<CompetitionPlayer> *players, std::vector<uint8_t> *originFlags, size_t table, int seat) {
+        CREATE_FUNC_WITH_PARAM_4(AlertInnerNode, initWithPlayers, const std::vector<CompetitionPlayer> *, players, std::vector<uint8_t> *, playerFlags, std::vector<ptrdiff_t> *, playerIndices, ssize_t, realIndex);
+        bool initWithPlayers(const std::vector<CompetitionPlayer> *players, std::vector<uint8_t> *playerFlags, std::vector<ptrdiff_t> *playerIndices, ssize_t realIndex) {
             if (UNLIKELY(!Node::init())) {
                 return false;
             }
 
             _players = players;
-            _originFlags = originFlags;
-            _currentFlags.resize(originFlags->size());
+            _playerFlags = playerFlags;
+            _playerIndices = playerIndices;
+
+            _currentFlags.resize(playerFlags->size());
 
             Size visibleSize = Director::getInstance()->getVisibleSize();
             const float width = visibleSize.width * 0.8f - 10;
@@ -304,14 +306,13 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
             button->setTitleFontSize(12);
             button->setTitleText("清除选手");
             button->setPosition(Vec2(width * 0.5f, 15.0f));
-            button->addClickEventListener([this, currentTable, table, seat, tableView](Ref *) {
-                ptrdiff_t &idx = currentTable->player_indices[seat];
-                ptrdiff_t temp = idx;
-                if (temp != INVALID_INDEX) {
-                    idx = INVALID_INDEX;
-                    _currentFlags[temp] = false;
-                    _originFlags->at(temp) = false;
-                    tableView->updateCellAtIndex(temp);
+            button->addClickEventListener([this, realIndex, tableView](Ref *) {
+                ptrdiff_t prevIndex = _playerIndices->at(realIndex);
+                if (prevIndex != INVALID_INDEX) {
+                    _playerIndices->at(realIndex) = INVALID_INDEX;
+                    _currentFlags[prevIndex] = false;
+                    _playerFlags->at(realIndex) = false;
+                    tableView->updateCellAtIndex(prevIndex);
                 }
             });
 
@@ -319,7 +320,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
         }
 
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override {
-            return _players->size();
+            return _playerFlags->size();
         }
 
         virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override {
@@ -384,7 +385,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
             Common::scaleLabelToFitWidth(labels[1], (cellWidth - 55) * 0.5f - 4);
 
             checkBox->setUserData(reinterpret_cast<void *>(idx));
-            checkBox->setEnabled(!_originFlags->at(idx));
+            checkBox->setEnabled(!_playerFlags->at(idx));
             checkBox->setSelected(!!_currentFlags[idx]);
 
             return cell;
@@ -397,9 +398,10 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
         }
     };
 
-    AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionTables[table], &_competitionData->players, &_playerFlags, table, seat);
-    std::string title = Common::format("table = %" PRIS " seat = %d", table, seat);
-    AlertView::showWithNode(title, innerNode, [this, innerNode, table, seat]() {
+    // vs2013需要用this->
+    AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &this->_playerFlags, &this->_playerIndices, realIndex);
+    std::string title = Common::format("table = %" PRIS " seat = %" PRIS, realIndex >> 2, realIndex & 3);
+    AlertView::showWithNode(title, innerNode, [this, innerNode, realIndex]() {
         const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
         std::vector<size_t> selected;
         selected.reserve(8);
@@ -411,9 +413,14 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(size_t table, int seat) {
 
         if (selected.size() == 1) {
             size_t idx = selected[0];
-            _competitionTables[table].player_indices[seat] = idx;
-            _playerFlags[idx] = 1;
+
+            ptrdiff_t prevIndex = _playerIndices[realIndex];
+            if (prevIndex != INVALID_INDEX) {  // 之前这个座位有人
+                _playerFlags[prevIndex] = false;
+            }
+            _playerIndices[realIndex] = idx;
+            _playerFlags[idx] = true;
         }
-        _tableView->updateCellAtIndex(table >> 1);
+        _tableView->updateCellAtIndex(realIndex >> 3);
     }, nullptr);
 }

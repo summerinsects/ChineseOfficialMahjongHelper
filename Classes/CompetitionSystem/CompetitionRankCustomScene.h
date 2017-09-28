@@ -18,7 +18,7 @@ private:
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
     void onNameWidget(cocos2d::Ref *sender);
-    void showSelectPlayerAlert(size_t table, int seat);
+    void showSelectPlayerAlert(ssize_t realIndex);
 
     float _colWidth[8];
     float _posX[8];
@@ -29,8 +29,9 @@ private:
     std::shared_ptr<CompetitionData> _competitionData;
     size_t _currentRound;
 
-    std::vector<CompetitionTable> _competitionTables;
     std::vector<uint8_t> _playerFlags;
+    std::vector<ptrdiff_t> _playerIndices;
+    ssize_t _tableCount = 0;
 };
 
 #endif
