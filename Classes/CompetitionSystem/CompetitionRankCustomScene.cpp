@@ -87,16 +87,17 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
         drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::BLACK);
     }
 
-    // 确定按钮
-    _okButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
-    this->addChild(_okButton);
-    _okButton->setScale9Enabled(true);
-    _okButton->setContentSize(Size(50.0f, 20.0f));
-    _okButton->setTitleFontSize(12);
-    _okButton->setTitleText("确定");
-    _okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
-    //_okButton->addClickEventListener([](Ref *) { cocos2d::Director::getInstance()->popScene(); });
-    _okButton->setEnabled(false);
+    // 提交按钮
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(50.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("提交");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
+    button->addClickEventListener(std::bind(&CompetitionRankCustomScene::onSubmitButton, this, std::placeholders::_1));
+    button->setEnabled(false);
+    _submitButton = button;
 
     return true;
 }
@@ -248,6 +249,20 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
     return cell;
 }
 
+void CompetitionRankCustomScene::onSubmitButton(cocos2d::Ref *sender)  {
+    std::vector<CompetitionTable> &tables = _competitionData->rounds[_currentRound].tables;
+    tables.resize(_tableCount);
+    for (ssize_t i = 0; i < _tableCount; ++i) {
+        tables[i].serial = i;
+        tables[i].player_indices[0] = _playerIndices[i * 4 + 0];
+        tables[i].player_indices[1] = _playerIndices[i * 4 + 1];
+        tables[i].player_indices[2] = _playerIndices[i * 4 + 2];
+        tables[i].player_indices[3] = _playerIndices[i * 4 + 3];
+    }
+
+    cocos2d::Director::getInstance()->popScene();
+}
+
 void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
     ui::Widget *widget = (ui::Widget *)sender;
     ssize_t realIndex = reinterpret_cast<ssize_t>(widget->getUserData());
@@ -262,7 +277,7 @@ void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
             _playerIndices[realIndex] = INVALID_INDEX;
             _playerFlags[playerIndex] = false;
             _tableView->updateCellAtIndex(realIndex >> 3);
-            _okButton->setEnabled(false);
+            _submitButton->setEnabled(false);
 
             showSelectPlayerAlert(realIndex);
         }, nullptr);
@@ -418,7 +433,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
         }
         _tableView->updateCellAtIndex(realIndex >> 3);
 
-        _okButton->setEnabled(std::none_of(_playerIndices.begin(), _playerIndices.end(),
+        _submitButton->setEnabled(std::none_of(_playerIndices.begin(), _playerIndices.end(),
             [](ptrdiff_t idx) { return idx == INVALID_INDEX; }));
     }, nullptr);
 }

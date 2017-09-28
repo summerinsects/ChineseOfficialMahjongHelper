@@ -17,6 +17,7 @@ private:
     virtual cocos2d::Size tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
+    void onSubmitButton(cocos2d::Ref *sender);
     void onNameWidget(cocos2d::Ref *sender);
     void showSelectPlayerAlert(ssize_t realIndex);
 
@@ -24,7 +25,7 @@ private:
     float _posX[8];
 
     cw::TableView *_tableView = nullptr;
-    cocos2d::ui::Button *_okButton = nullptr;
+    cocos2d::ui::Button *_submitButton = nullptr;
 
     std::shared_ptr<CompetitionData> _competitionData;
     size_t _currentRound;
