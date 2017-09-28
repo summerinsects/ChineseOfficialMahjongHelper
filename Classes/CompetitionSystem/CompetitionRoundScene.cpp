@@ -7,7 +7,7 @@
 USING_NS_CC;
 
 bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
-    if (UNLIKELY(!BaseScene::initWithTitle(Common::format("%s第%" PRIS "/%" PRIS "轮",
+    if (UNLIKELY(!BaseScene::initWithTitle(Common::format("%s第%" PRIzu "/%" PRIzu "轮",
         competitionData->name.c_str(), currentRound + 1, competitionData->round_count)))) {
         return false;
     }

@@ -108,7 +108,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     label->setPosition(Vec2(5, 45));
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "%" PRIS, player);
+    snprintf(buf, sizeof(buf), "%" PRIzu, player);
 
     editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
@@ -128,7 +128,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5, 15));
 
-    snprintf(buf, sizeof(buf), "%" PRIS, round);
+    snprintf(buf, sizeof(buf), "%" PRIzu, round);
 
     editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
@@ -192,7 +192,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
             return;
         }
 
-        Label *label = Label::createWithSystemFont(StringUtils::format("「%s」\n%" PRIS "人\n%" PRIS "轮", name.c_str(), player, round), "Arial", 12);
+        Label *label = Label::createWithSystemFont(StringUtils::format("「%s」\n%" PRIzu "人\n%" PRIzu "轮", name.c_str(), player, round), "Arial", 12);
         label->setColor(Color3B::BLACK);
         label->setHorizontalAlignment(TextHAlignment::CENTER);
 

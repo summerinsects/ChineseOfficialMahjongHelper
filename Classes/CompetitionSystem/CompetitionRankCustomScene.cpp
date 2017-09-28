@@ -273,7 +273,7 @@ void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
         showSelectPlayerAlert(realIndex);
     }
     else {
-        std::string title = Common::format("%" PRIS "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
+        std::string title = Common::format("%" PRIzd "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
         AlertView::showWithMessage(title, "该座位已经有人了，是否清除并重新选择", 12, [this, playerIndex, realIndex]() {
             _playerIndices[realIndex] = INVALID_INDEX;
             _playerFlags[playerIndex] = false;
@@ -423,7 +423,7 @@ namespace {
 
 void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
     AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &_playerFlags, &_playerIndices, realIndex);
-    std::string title = Common::format("%" PRIS "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
+    std::string title = Common::format("%" PRIzd "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
     AlertView::showWithNode(title, innerNode, [this, innerNode, realIndex]() {
         const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
         std::vector<size_t> selected;
