@@ -289,8 +289,8 @@ namespace cw {
         Vec2 offset = this->__offsetFromIndex(index);
 
         if (_vordering == VerticalFillOrder::TOP_DOWN) {
-            Size cellSize = _delegate->tableCellSizeForIndex(this, index);
-            offset.y = _innerContainer->getContentSize().height - offset.y - cellSize.height;
+            float cellSize = _delegate->tableCellSizeForIndex(this, index);
+            offset.y = _innerContainer->getContentSize().height - offset.y - cellSize;
         }
         return offset;
     }
@@ -368,11 +368,9 @@ namespace cw {
 
         if (cellsCount > 0) {
             float currentPos = 0;
-            Size cellSize;
             for (ssize_t i = 0; i < cellsCount; ++i) {
                 _cellsPositions[i] = currentPos;
-                cellSize = _delegate->tableCellSizeForIndex(this, i);
-                currentPos += (_direction == Direction::HORIZONTAL ? cellSize.width : cellSize.height);
+                currentPos += _delegate->tableCellSizeForIndex(this, i);
             }
             _cellsPositions[cellsCount] = currentPos;//1 extra value allows us to get right/bottom of the last cell
         }

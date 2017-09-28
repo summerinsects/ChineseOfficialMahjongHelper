@@ -44,10 +44,10 @@ ssize_t FanTableScene::numberOfCellsInTableView(cw::TableView *table) {
     return 13;
 }
 
-cocos2d::Size FanTableScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float FanTableScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
     size_t cnt = eachLevelCounts[idx];
     float height = computeRowsAlign4(cnt) * 25.0f;
-    return Size(0, height + 15.0f);
+    return (height + 15.0f);
 }
 
 cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {

@@ -358,10 +358,10 @@ ssize_t RecordScene::numberOfCellsInTableView(cw::TableView *table) {
     return 10;
 }
 
-cocos2d::Size RecordScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float RecordScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
     size_t cnt = eachLevelCounts[idx];
     float height = computeRowsAlign4(cnt) * 25.0f;
-    return Size(0, height + 15.0f);
+    return (height + 15.0f);
 }
 
 cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {

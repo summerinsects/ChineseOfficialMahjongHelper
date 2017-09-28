@@ -161,8 +161,8 @@ ssize_t LatestCompetitionScene::numberOfCellsInTableView(cw::TableView *table) {
     return _competitions.size();
 }
 
-cocos2d::Size LatestCompetitionScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
-    return Size(0, 50);
+float LatestCompetitionScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+    return 50.0f;
 }
 
 cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
