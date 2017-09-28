@@ -6,6 +6,8 @@
 
 USING_NS_CC;
 
+static const char *seatText[] = { "东", "南", "西", "北" };
+
 bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
     if (UNLIKELY(!BaseScene::initWithTitle("自定义排座次"))) {
         return false;
@@ -146,7 +148,6 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
             tableLabels[n] = label;
 
             // 座次
-            static const char *seatText[] = { "东", "南", "西", "北" };
             for (int i = 0; i < 4; ++i) {
                 const float posY = static_cast<float>(70 - i * 20);
 
@@ -251,23 +252,36 @@ void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
     ui::Widget *widget = (ui::Widget *)sender;
     ssize_t realIndex = reinterpret_cast<ssize_t>(widget->getUserData());
 
-    showSelectPlayerAlert(realIndex);
+    ptrdiff_t playerIndex = _playerIndices[realIndex];
+    if (playerIndex == INVALID_INDEX) {
+        showSelectPlayerAlert(realIndex);
+    }
+    else {
+        std::string title = Common::format("%" PRIS "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
+        AlertView::showWithMessage(title, "该座位已经有人了，是否重新选择", 12, [this, playerIndex, realIndex]() {
+            _playerIndices[realIndex] = INVALID_INDEX;
+            _playerFlags[playerIndex] = false;
+            _tableView->updateCellAtIndex(realIndex >> 3);
+
+            showSelectPlayerAlert(realIndex);
+        }, nullptr);
+    }
 }
 
 void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
     class AlertInnerNode : public Node, cw::TableViewDelegate {
     private:
         const std::vector<CompetitionPlayer> *_players = nullptr;
-        std::vector<uint8_t> *_playerFlags = nullptr;
-        std::vector<ptrdiff_t> *_playerIndices = nullptr;
+        const std::vector<uint8_t> *_playerFlags = nullptr;
+        const std::vector<ptrdiff_t> *_playerIndices = nullptr;
 
         std::vector<uint8_t> _currentFlags;
 
     public:
         const std::vector<uint8_t> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_4(AlertInnerNode, initWithPlayers, const std::vector<CompetitionPlayer> *, players, std::vector<uint8_t> *, playerFlags, std::vector<ptrdiff_t> *, playerIndices, ssize_t, realIndex);
-        bool initWithPlayers(const std::vector<CompetitionPlayer> *players, std::vector<uint8_t> *playerFlags, std::vector<ptrdiff_t> *playerIndices, ssize_t realIndex) {
+        CREATE_FUNC_WITH_PARAM_4(AlertInnerNode, initWithPlayers, const std::vector<CompetitionPlayer> *, players, const std::vector<uint8_t> *, playerFlags, const std::vector<ptrdiff_t> *, playerIndices, ssize_t, realIndex);
+        bool initWithPlayers(const std::vector<CompetitionPlayer> *players, const std::vector<uint8_t> *playerFlags, const std::vector<ptrdiff_t> *playerIndices, ssize_t realIndex) {
             if (UNLIKELY(!Node::init())) {
                 return false;
             }
@@ -286,7 +300,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
 
             // 表格
             cw::TableView *tableView = cw::TableView::create();
-            tableView->setContentSize(Size(width, height - 40.0f));
+            tableView->setContentSize(Size(width, height));
             tableView->setDelegate(this);
             tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
             tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
@@ -295,26 +309,9 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
             tableView->setScrollBarWidth(4);
             tableView->setScrollBarOpacity(0x99);
             tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-            tableView->setPosition(Vec2(width * 0.5f, height * 0.5f + 20.0f));
+            tableView->setPosition(Vec2(width * 0.5f, height * 0.5f));
             tableView->reloadData();
             this->addChild(tableView);
-
-            ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-            this->addChild(button);
-            button->setScale9Enabled(true);
-            button->setContentSize(Size(55.0f, 20.0f));
-            button->setTitleFontSize(12);
-            button->setTitleText("清除选手");
-            button->setPosition(Vec2(width * 0.5f, 15.0f));
-            button->addClickEventListener([this, realIndex, tableView](Ref *) {
-                ptrdiff_t prevIndex = _playerIndices->at(realIndex);
-                if (prevIndex != INVALID_INDEX) {
-                    _playerIndices->at(realIndex) = INVALID_INDEX;
-                    _currentFlags[prevIndex] = false;
-                    _playerFlags->at(realIndex) = false;
-                    tableView->updateCellAtIndex(prevIndex);
-                }
-            });
 
             return true;
         }
@@ -400,7 +397,7 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
 
     // vs2013需要用this->
     AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &this->_playerFlags, &this->_playerIndices, realIndex);
-    std::string title = Common::format("table = %" PRIS " seat = %" PRIS, realIndex >> 2, realIndex & 3);
+    std::string title = Common::format("%" PRIS "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
     AlertView::showWithNode(title, innerNode, [this, innerNode, realIndex]() {
         const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
         std::vector<size_t> selected;
@@ -414,10 +411,6 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
         if (selected.size() == 1) {
             size_t idx = selected[0];
 
-            ptrdiff_t prevIndex = _playerIndices[realIndex];
-            if (prevIndex != INVALID_INDEX) {  // 之前这个座位有人
-                _playerFlags[prevIndex] = false;
-            }
             _playerIndices[realIndex] = idx;
             _playerFlags[idx] = true;
         }
