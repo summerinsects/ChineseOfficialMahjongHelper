@@ -96,7 +96,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     _okButton->setTitleText("确定");
     _okButton->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
     //_okButton->addClickEventListener([](Ref *) { cocos2d::Director::getInstance()->popScene(); });
-    //_okButton->setEnabled(false);
+    _okButton->setEnabled(false);
 
     return true;
 }
@@ -258,10 +258,11 @@ void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
     }
     else {
         std::string title = Common::format("%" PRIS "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
-        AlertView::showWithMessage(title, "该座位已经有人了，是否重新选择", 12, [this, playerIndex, realIndex]() {
+        AlertView::showWithMessage(title, "该座位已经有人了，是否清除并重新选择", 12, [this, playerIndex, realIndex]() {
             _playerIndices[realIndex] = INVALID_INDEX;
             _playerFlags[playerIndex] = false;
             _tableView->updateCellAtIndex(realIndex >> 3);
+            _okButton->setEnabled(false);
 
             showSelectPlayerAlert(realIndex);
         }, nullptr);
@@ -416,5 +417,8 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
             _playerFlags[idx] = true;
         }
         _tableView->updateCellAtIndex(realIndex >> 3);
+
+        _okButton->setEnabled(std::none_of(_playerIndices.begin(), _playerIndices.end(),
+            [](ptrdiff_t idx) { return idx == INVALID_INDEX; }));
     }, nullptr);
 }
