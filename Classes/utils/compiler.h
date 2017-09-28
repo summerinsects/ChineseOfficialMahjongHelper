@@ -170,10 +170,18 @@
 
 // format for size_t
 #if (defined _MSC_VER) && (_MSC_VER < 1900)
-#define PRIS "Iu"
+#define _PFX_z "I"
 #else
-#define PRIS "zu"
+#define _PFX_z "z"
 #endif
+
+#define PRIzd        _PFX_z "d"
+#define PRIzi        _PFX_z "i"
+#define PRIzo        _PFX_z "o"
+#define PRIzx        _PFX_z "x"
+#define PRIzu        _PFX_z "u"
+#define PRIzx        _PFX_z "x"
+#define PRIzX        _PFX_z "X"
 
 #ifdef ANDROID
 #include "to_string.h"
