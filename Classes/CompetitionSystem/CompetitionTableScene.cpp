@@ -91,6 +91,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
         float posY = -tableHeight;
         drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::BLACK);
     }
+    tableView->setOnEnterCallback(std::bind(&cw::TableView::reloadDataInplacement, tableView));
 
     // 确定按钮
     _okButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
