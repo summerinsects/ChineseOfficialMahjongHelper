@@ -13,10 +13,10 @@ static const char *handNameText[] = {
 
 class RecordScene : public BaseScene, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
 public:
-    typedef std::function<void (const Record::Detail &)> OkCallback;
+    typedef std::function<void (const Record::Detail &)> SubmitCallback;
 
-    CREATE_FUNC_WITH_PARAM_4(RecordScene, initWithIndex, size_t, handIdx, const char **, playerNames, const Record::Detail *, detail, const OkCallback &, okCallback);
-    bool initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const OkCallback &callback);
+    CREATE_FUNC_WITH_PARAM_4(RecordScene, initWithIndex, size_t, handIdx, const char **, playerNames, const Record::Detail *, detail, const SubmitCallback &, okCallback);
+    bool initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const SubmitCallback &callback);
 
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
 
@@ -34,11 +34,11 @@ private:
     cocos2d::ui::CheckBox *_falseWinBox[4];
     cocos2d::Label *_scoreLabel[4];
     cw::TableView *_tableView = nullptr;
-    cocos2d::ui::Button *_okButton = nullptr;
+    cocos2d::ui::Button *_submitButton = nullptr;
 
     int _winIndex = -1;
     Record::Detail _detail;
-    OkCallback _okCallback;
+    SubmitCallback _submitCallback;
     uint8_t _seatFlag;
     uint8_t _playerFlag;
 
@@ -58,7 +58,7 @@ private:
     void onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
 
     void onPointsNameButton(cocos2d::Ref *sender);
-    void onOkButton(cocos2d::Ref *sender);
+    void onSubmitButton(cocos2d::Ref *sender);
 };
 
 #endif

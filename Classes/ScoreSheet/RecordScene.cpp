@@ -16,12 +16,12 @@ static inline size_t computeRowsAlign4(size_t cnt) {
 
 #define ORDER(flag_, i_) (((flag_) >> ((i_) << 1)) & 0x3)
 
-bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const OkCallback &callback) {
+bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const SubmitCallback &callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
     }
 
-    _okCallback = callback;
+    _submitCallback = callback;
 
     switch (handIdx >> 2) {
     default:
@@ -336,17 +336,17 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setPosition(Vec2(labelPosX + 35.0f * (0.5f + i), 10.0f));
     }
 
-    // 确定按钮
+    // 提交按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(50.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("确定");
+    button->setTitleText("提交");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15));
-    button->addClickEventListener(std::bind(&RecordScene::onOkButton, this, std::placeholders::_1));
+    button->addClickEventListener(std::bind(&RecordScene::onSubmitButton, this, std::placeholders::_1));
     button->setEnabled(false);
-    _okButton = button;
+    _submitButton = button;
 
     if (detail != nullptr) {
         refresh();
@@ -550,15 +550,15 @@ void RecordScene::updateScoreLabel() {
     // 四位选手的总分加起来和为0
     if (scoreTable[0] + scoreTable[1] + scoreTable[2] + scoreTable[3] == 0) {
         if (_drawBox->isSelected()) {  // 荒庄
-            _okButton->setEnabled(true);
+            _submitButton->setEnabled(true);
         }
         else {
-            _okButton->setEnabled(_winGroup->getSelectedButtonIndex() != -1);
+            _submitButton->setEnabled(_winGroup->getSelectedButtonIndex() != -1);
         }
     }
     else {
         // 四位选手的总分加起来和不为0，则说明还没有选择是自摸还是点炮
-        _okButton->setEnabled(false);
+        _submitButton->setEnabled(false);
     }
 }
 
@@ -722,31 +722,31 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     updateScoreLabel();
 }
 
-void RecordScene::onOkButton(cocos2d::Ref *sender) {
+void RecordScene::onSubmitButton(cocos2d::Ref *sender) {
     if (_detail.fan_flag != 0) {  // 标记了番种
         if (_drawBox->isSelected()) {  // 荒庄
             AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", 12,
                 [this]() {
                 _detail.fan_flag = 0;
                 _detail.packed_fan = 0;
-                _okCallback(_detail);
+                _submitCallback(_detail);
                 Director::getInstance()->popScene();
             }, nullptr);
         }
         else {
-            _okCallback(_detail);
+            _submitCallback(_detail);
             Director::getInstance()->popScene();
         }
     }
     else {  // 未标记番种
         if (_winIndex != -1) {  // 有人和牌
             showPackedFanAlert([this]() {
-                _okCallback(_detail);
+                _submitCallback(_detail);
                 Director::getInstance()->popScene();
             });
         }
         else {
-            _okCallback(_detail);
+            _submitCallback(_detail);
             Director::getInstance()->popScene();
         }
     }
