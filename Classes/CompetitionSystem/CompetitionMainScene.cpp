@@ -53,7 +53,7 @@ bool CompetitionMainScene::init() {
         }
     });
 
-    this->setOnEnterCallback([this, button]() {
+    button->setOnEnterCallback([this, button]() {
         button->setEnabled(_competitionData->start_time != 0 && _competitionData->finish_time == 0);
     });
 
