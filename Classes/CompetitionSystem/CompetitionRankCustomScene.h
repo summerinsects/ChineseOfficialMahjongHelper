@@ -17,6 +17,7 @@ private:
     virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
+    void onResetButton(cocos2d::Ref *sender);
     void onSubmitButton(cocos2d::Ref *sender);
     void onNameWidget(cocos2d::Ref *sender);
     void showSelectPlayerAlert(ssize_t realIndex);

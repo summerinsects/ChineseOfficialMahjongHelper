@@ -9,7 +9,7 @@ USING_NS_CC;
 static const char *seatText[] = { "东", "南", "西", "北" };
 
 bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
-    if (UNLIKELY(!BaseScene::initWithTitle("自定义排座次"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle("自定义排座位"))) {
         return false;
     }
 
@@ -87,14 +87,24 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
         drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::BLACK);
     }
 
+    // 清空按钮
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("清空");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f, origin.y + 15.0f));
+    button->addClickEventListener(std::bind(&CompetitionRankCustomScene::onResetButton, this, std::placeholders::_1));
+
     // 提交按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(50.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("提交");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.75f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&CompetitionRankCustomScene::onSubmitButton, this, std::placeholders::_1));
     button->setEnabled(false);
     _submitButton = button;
@@ -247,6 +257,15 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
     }
 
     return cell;
+}
+
+void CompetitionRankCustomScene::onResetButton(cocos2d::Ref *sender)  {
+    AlertView::showWithMessage("清空", "确定清空？", 12, [this]() {
+        _playerFlags.assign(_playerFlags.size(), false);
+        _playerIndices.assign(_playerFlags.size(), INVALID_INDEX);
+        _tableView->reloadData();
+        _submitButton->setEnabled(false);
+    }, nullptr);
 }
 
 void CompetitionRankCustomScene::onSubmitButton(cocos2d::Ref *sender)  {
