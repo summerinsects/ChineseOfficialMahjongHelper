@@ -111,7 +111,12 @@ bool CompetitionData::startNewRound() {
         player.competition_results.push_back(CompetitionResult());
     });
 
-    rankTablesBySerial(rounds.size() - 1);
+    const size_t cnt = players.size() / 4;
+    std::vector<CompetitionTable> &tables = rounds.back().tables;
+    tables.resize(cnt);
+    for (size_t i = 0; i < cnt; ++i) {
+        tables[i].serial = i;
+    }
 
     return true;
 }

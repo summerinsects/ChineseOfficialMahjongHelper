@@ -28,7 +28,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setTitleFontSize(12);
     button->setTitleText("排列座位");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener(std::bind(&CompetitionTableScene::onRankButton, this, std::placeholders::_1));
+    button->addClickEventListener([this](Ref *) { showRankAlert(); });
 
     // 列宽
     _colWidth[0] = visibleSize.width * 0.1f;
@@ -241,6 +241,13 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t table = reinterpret_cast<size_t>(button->getUserData());
     const CompetitionTable &currentTable = _competitionTables->at(table);
+
+    // 有空位
+    if (std::any_of(std::begin(currentTable.player_indices), std::end(currentTable.player_indices),
+        [](ptrdiff_t idx) { return idx == INVALID_INDEX; })) {
+        AlertView::showWithMessage("登记成绩", "请先排好座位", 12, std::bind(&CompetitionTableScene::showRankAlert, this), nullptr);
+        return;
+    }
 
     DrawNode *drawNode = DrawNode::create();
 
@@ -485,7 +492,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     }, nullptr);
 }
 
-void CompetitionTableScene::onRankButton(cocos2d::Ref *sender) {
+void CompetitionTableScene::showRankAlert() {
     if (_competitionData->isRoundStarted(_currentRound)) {
         AlertView::showWithMessage("排列座位", "开始记录成绩后不允许重新排座位", 12, nullptr, nullptr);
         return;

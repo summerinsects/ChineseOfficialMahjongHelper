@@ -18,9 +18,9 @@ private:
     virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
-    void onRankButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender);
     void showCompetitionResultInputAlert(const std::string &title, CompetitionResult *result, const std::function<void ()> &callback);
+    void showRankAlert();
 
     float _colWidth[7];
     float _posX[7];
