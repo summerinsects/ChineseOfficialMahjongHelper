@@ -16,8 +16,8 @@ static inline size_t computeRowsAlign4(size_t cnt) {
 
 #define ORDER(flag_, i_) (((flag_) >> ((i_) << 1)) & 0x3)
 
-#define PLAYER_2_UI(p_) ORDER(_seatFlag, (p_))
-#define UI_2_PLAYER(u_) ORDER(_playerFlag, (u_))
+#define PLAYER_TO_UI(p_) ORDER(_seatFlag, (p_))
+#define UI_TO_PLAYER(u_) ORDER(_playerFlag, (u_))
 
 bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const SubmitCallback &callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
@@ -166,7 +166,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         const float x = origin.x + gap * (i + 0.5f);
 
         // 名字
-        label = Label::createWithSystemFont(playerNames[ORDER(_seatFlag, i)], "Arial", 12);
+        label = Label::createWithSystemFont(playerNames[PLAYER_TO_UI(i)], "Arial", 12);
         label->setColor(Color3B::ORANGE);
         this->addChild(label);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 90));
@@ -466,16 +466,16 @@ void RecordScene::refresh() {
     // 错和
     if (_detail.false_win != 0) {
         for (int i = 0; i < 4; ++i) {
-            _falseWinBox[i]->setSelected(TEST_FALSE_WIN(_detail.false_win, ORDER(_playerFlag, i)));
+            _falseWinBox[i]->setSelected(TEST_FALSE_WIN(_detail.false_win, UI_TO_PLAYER(i)));
         }
     }
 
     _winIndex = WIN_INDEX(wc);
     if (_winIndex != -1) {  // 有人和牌
         int claimIndex = CLAIM_INDEX(wc);  // 点炮者
-        _winGroup->setSelectedButton(ORDER(_playerFlag, _winIndex));
+        _winGroup->setSelectedButton(UI_TO_PLAYER(_winIndex));
         if (claimIndex != -1) {
-            _claimGroup->setSelectedButton(ORDER(_playerFlag, claimIndex));
+            _claimGroup->setSelectedButton(UI_TO_PLAYER(claimIndex));
         }
     }
 
@@ -524,9 +524,9 @@ void RecordScene::updateScoreLabel() {
 
         // 记录和牌和点炮
         _detail.win_claim = 0;
-        SET_WIN(_detail.win_claim, ORDER(_seatFlag, _winIndex));
+        SET_WIN(_detail.win_claim, PLAYER_TO_UI(_winIndex));
         if (claimIndex != -1) {
-            SET_CLAIM(_detail.win_claim, ORDER(_seatFlag, claimIndex));
+            SET_CLAIM(_detail.win_claim, PLAYER_TO_UI(claimIndex));
         }
     }
     else {  // 荒庄
@@ -537,7 +537,7 @@ void RecordScene::updateScoreLabel() {
     _detail.false_win = 0;
     for (int i = 0; i < 4; ++i) {
         if (_falseWinBox[i]->isEnabled() && _falseWinBox[i]->isSelected()) {
-            SET_FALSE_WIN(_detail.false_win, ORDER(_seatFlag, i));
+            SET_FALSE_WIN(_detail.false_win, PLAYER_TO_UI(i));
         }
     }
 
@@ -545,11 +545,11 @@ void RecordScene::updateScoreLabel() {
     TranslateDetailToScoreTable(_detail, scoreTable);
 
     for (int i = 0; i < 4; ++i) {
-        _scoreLabel[i]->setString(Common::format("%+d", scoreTable[ORDER(_seatFlag, i)]));
+        _scoreLabel[i]->setString(Common::format("%+d", scoreTable[PLAYER_TO_UI(i)]));
     }
 
     // 使用不同颜色
-    Label *tempLabel[4] = { _scoreLabel[UI_2_PLAYER(0)], _scoreLabel[UI_2_PLAYER(1)], _scoreLabel[UI_2_PLAYER(2)], _scoreLabel[UI_2_PLAYER(3)] };
+    Label *tempLabel[4] = { _scoreLabel[UI_TO_PLAYER(0)], _scoreLabel[UI_TO_PLAYER(1)], _scoreLabel[UI_TO_PLAYER(2)], _scoreLabel[UI_TO_PLAYER(3)] };
     SetScoreLabelColor(tempLabel, scoreTable, _detail.win_claim, _detail.false_win);
 
     // 四位选手的总分加起来和为0
