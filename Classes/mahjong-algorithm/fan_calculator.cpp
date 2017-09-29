@@ -44,16 +44,19 @@ namespace mahjong {
 extern intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intptr_t max_size);
 #endif
 
-/** @brief 划分 */
-struct division_t {
-    pack_t packs[5];  ///< 牌组。4面子1雀头，共5组
-};
+namespace {
 
-/** @brief 划分结果类型 */
-struct division_result_t {
-    division_t divisions[MAX_DIVISION_CNT];  ///< 每一种划分
-    intptr_t count;  ///< 划分方式总数
-};
+    // 划分
+    struct division_t {
+        pack_t packs[5];  // 牌组。4面子1雀头，共5组
+    };
+
+    // 划分结果类型
+    struct division_result_t {
+        division_t divisions[MAX_DIVISION_CNT];  // 每一种划分
+        intptr_t count;  // 划分方式总数
+    };
+}
 
 // 递归划分算法的最后一步，添加划分
 static void divide_tail_add_division(tile_t tile, intptr_t fixed_cnt, const division_t *work_division, division_result_t *result) {
@@ -1550,7 +1553,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], intptr_t fixed_cn
         }
     }
 
-    if (pung_cnt > 0)  { // 有刻子
+    if (pung_cnt > 0) { // 有刻子
         calculate_kongs(pung_packs, pung_cnt, fan_table);
     }
 
