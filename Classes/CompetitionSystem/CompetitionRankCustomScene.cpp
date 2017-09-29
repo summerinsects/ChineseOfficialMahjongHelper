@@ -49,10 +49,10 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         this->addChild(label);
-        label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 50.0f));
+        label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 45.0f));
     }
 
-    const float tableHeight = visibleSize.height - 90.0f;
+    const float tableHeight = visibleSize.height - 85.0f;
 
     // 表格
     cw::TableView *tableView = cw::TableView::create();
@@ -65,7 +65,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     tableView->setScrollBarWidth(4);
     tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 12.5f));
     tableView->reloadData();
     _tableView = tableView;
     this->addChild(tableView);
@@ -73,7 +73,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     // 表头的线
     DrawNode *drawNode = DrawNode::create();
     this->addChild(drawNode);
-    drawNode->setPosition(Vec2(origin.x, visibleSize.height - 60.0f));
+    drawNode->setPosition(Vec2(origin.x, visibleSize.height - 55.0f));
     drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::BLACK);
     drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::BLACK);
     for (int i = 0; i < 7; ++i) {
@@ -259,7 +259,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
     return cell;
 }
 
-void CompetitionRankCustomScene::onResetButton(cocos2d::Ref *sender)  {
+void CompetitionRankCustomScene::onResetButton(cocos2d::Ref *sender) {
     AlertView::showWithMessage("清空", "确定清空？", 12, [this]() {
         _playerFlags.assign(_playerFlags.size(), false);
         _playerIndices.assign(_playerFlags.size(), INVALID_INDEX);
@@ -268,7 +268,7 @@ void CompetitionRankCustomScene::onResetButton(cocos2d::Ref *sender)  {
     }, nullptr);
 }
 
-void CompetitionRankCustomScene::onSubmitButton(cocos2d::Ref *sender)  {
+void CompetitionRankCustomScene::onSubmitButton(cocos2d::Ref *sender) {
     std::vector<CompetitionTable> &tables = _competitionData->rounds[_currentRound].tables;
     tables.resize(_tableCount);
     for (ssize_t i = 0; i < _tableCount; ++i) {
