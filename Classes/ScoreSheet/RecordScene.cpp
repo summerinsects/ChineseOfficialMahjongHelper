@@ -16,6 +16,9 @@ static inline size_t computeRowsAlign4(size_t cnt) {
 
 #define ORDER(flag_, i_) (((flag_) >> ((i_) << 1)) & 0x3)
 
+#define PLAYER_2_UI(p_) ORDER(_seatFlag, (p_))
+#define UI_2_PLAYER(u_) ORDER(_playerFlag, (u_))
+
 bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const SubmitCallback &callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
@@ -487,26 +490,26 @@ void RecordScene::refresh() {
     _tableView->reloadDataInplacement();
 }
 
-void RecordScene::_SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t seatFlag, uint8_t win_claim, uint8_t false_win) {
+void RecordScene::SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, uint8_t false_win) {
     for (int i = 0; i < 4; ++i) {
         if (scoreTable[i] != 0) {
             if (TEST_WIN(win_claim, i)) {  // 和牌：红色
-                scoreLabel[ORDER(seatFlag, i)]->setColor(Color3B(254, 87, 110));
+                scoreLabel[i]->setColor(Color3B(254, 87, 110));
             }
             else {
                 if (UNLIKELY(TEST_FALSE_WIN(false_win, i))) {  // 错和：紫色
-                    scoreLabel[ORDER(seatFlag, i)]->setColor(Color3B(89, 16, 89));
+                    scoreLabel[i]->setColor(Color3B(89, 16, 89));
                 }
                 else if (UNLIKELY(TEST_CLAIM(win_claim, i))) {  // 点炮：蓝色
-                    scoreLabel[ORDER(seatFlag, i)]->setColor(Color3B(44, 121, 178));
+                    scoreLabel[i]->setColor(Color3B(44, 121, 178));
                 }
                 else {  // 其他：绿色
-                    scoreLabel[ORDER(seatFlag, i)]->setColor(Color3B(49, 155, 28));
+                    scoreLabel[i]->setColor(Color3B(49, 155, 28));
                 }
             }
         }
         else {
-            scoreLabel[ORDER(seatFlag, i)]->setColor(Color3B(0x60, 0x60, 0x60));
+            scoreLabel[i]->setColor(Color3B(0x60, 0x60, 0x60));
         }
     }
 }
@@ -544,8 +547,10 @@ void RecordScene::updateScoreLabel() {
     for (int i = 0; i < 4; ++i) {
         _scoreLabel[i]->setString(Common::format("%+d", scoreTable[ORDER(_seatFlag, i)]));
     }
+
     // 使用不同颜色
-    _SetScoreLabelColor(_scoreLabel, scoreTable, _playerFlag, _detail.win_claim, _detail.false_win);
+    Label *tempLabel[4] = { _scoreLabel[UI_2_PLAYER(0)], _scoreLabel[UI_2_PLAYER(1)], _scoreLabel[UI_2_PLAYER(2)], _scoreLabel[UI_2_PLAYER(3)] };
+    SetScoreLabelColor(tempLabel, scoreTable, _detail.win_claim, _detail.false_win);
 
     // 四位选手的总分加起来和为0
     if (scoreTable[0] + scoreTable[1] + scoreTable[2] + scoreTable[3] == 0) {

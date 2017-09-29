@@ -22,7 +22,7 @@ public:
 
     const Record::Detail &getDetail() const { return _detail; }
 
-    static void _SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t seatFlag, uint8_t win_claim, uint8_t false_win);
+    static void SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, uint8_t false_win);
 
 private:
     cocos2d::ui::EditBox *_editBox = nullptr;
