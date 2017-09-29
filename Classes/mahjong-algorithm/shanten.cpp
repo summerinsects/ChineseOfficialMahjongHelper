@@ -128,11 +128,14 @@ int count_useful_tile(const tile_table_t &used_table, const useful_table_t &usef
     return cnt;
 }
 
-// 路径单元，单元有面子、雀头、搭子等种类，见下面的宏
-// 高8位表示类型，低8位表示牌
-// 对于顺子和顺子搭子，牌指的是最小的一张牌，
-// 例如在顺子123万中，牌为1万，在两面搭子45条中，牌为4条等等
-typedef uint16_t path_unit_t;
+namespace {
+
+    // 路径单元，单元有面子、雀头、搭子等种类，见下面的宏
+    // 高8位表示类型，低8位表示牌
+    // 对于顺子和顺子搭子，牌指的是最小的一张牌，
+    // 例如在顺子123万中，牌为1万，在两面搭子45条中，牌为4条等等
+    typedef uint16_t path_unit_t;
+
 #define UNIT_TYPE_CHOW 1                // 顺子
 #define UNIT_TYPE_PUNG 2                // 刻子
 #define UNIT_TYPE_PAIR 4                // 雀头
@@ -147,17 +150,18 @@ typedef uint16_t path_unit_t;
 #define MAX_STATE 512
 #define UNIT_SIZE 7
 
-/** @brief 一条路径 */
-struct work_path_t {
-    path_unit_t units[UNIT_SIZE];  ///< 14/2=7最多7个搭子
-    uint16_t depth;  ///< 当前路径深度
-};
+    // 一条路径
+    struct work_path_t {
+        path_unit_t units[UNIT_SIZE];  // 14/2=7最多7个搭子
+        uint16_t depth;  // 当前路径深度
+    };
 
-/** @brief 当前工作状态 */
-struct work_state_t {
-    work_path_t paths[MAX_STATE];  ///< 所有路径
-    intptr_t count;  ///< 路径数量
-};
+    // 当前工作状态
+    struct work_state_t {
+        work_path_t paths[MAX_STATE];  // 所有路径
+        intptr_t count;  // 路径数量
+    };
+}
 
 // 路径是否来过了
 static bool is_basic_form_branch_exist(const intptr_t fixed_cnt, const work_path_t *work_path, const work_state_t *work_state) {
