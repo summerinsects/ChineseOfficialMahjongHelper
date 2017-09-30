@@ -14,10 +14,10 @@
 
 USING_NS_CC;
 
-static std::vector<CompetitionData> g_datas;
+static std::vector<CompetitionData> g_competitions;
 static std::mutex g_mutex;
 
-static void loadDatas(std::vector<CompetitionData> &datas) {
+static void loadCompetitions(std::vector<CompetitionData> &competitions) {
     std::lock_guard<std::mutex> lg(g_mutex);
 
     std::string fileName = FileUtils::getInstance()->getWritablePath();
@@ -31,22 +31,22 @@ static void loadDatas(std::vector<CompetitionData> &datas) {
             return;
         }
 
-        datas.clear();
-        datas.reserve(doc.Size());
-        std::transform(doc.Begin(), doc.End(), std::back_inserter(datas), [](const rapidjson::Value &json) {
+        competitions.clear();
+        competitions.reserve(doc.Size());
+        std::transform(doc.Begin(), doc.End(), std::back_inserter(competitions), [](const rapidjson::Value &json) {
             CompetitionData data;
             CompetitionData::fromJson(json, data);
             return data;
         });
 
-        std::sort(datas.begin(), datas.end(), [](const CompetitionData &r1, const CompetitionData &r2) { return r1.start_time > r2.start_time; });
+        std::sort(competitions.begin(), competitions.end(), [](const CompetitionData &c1, const CompetitionData &c2) { return c1.start_time > c2.start_time; });
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
     }
 }
 
-static void savedatas(const std::vector<CompetitionData> &datas) {
+static void savecompetitions(const std::vector<CompetitionData> &competitions) {
     std::lock_guard<std::mutex> lg(g_mutex);
 
     std::string fileName = FileUtils::getInstance()->getWritablePath();
@@ -55,8 +55,8 @@ static void savedatas(const std::vector<CompetitionData> &datas) {
     if (LIKELY(file != nullptr)) {
         try {
             rapidjson::Document doc(rapidjson::Type::kArrayType);
-            doc.Reserve(static_cast<rapidjson::SizeType>(datas.size()), doc.GetAllocator());
-            std::for_each(datas.begin(), datas.end(), [&doc](const CompetitionData &data) {
+            doc.Reserve(static_cast<rapidjson::SizeType>(competitions.size()), doc.GetAllocator());
+            std::for_each(competitions.begin(), competitions.end(), [&doc](const CompetitionData &data) {
                 rapidjson::Value json(rapidjson::Type::kObjectType);
                 CompetitionData::toJson(data, json, doc.GetAllocator());
                 doc.PushBack(std::move(json), doc.GetAllocator());
@@ -83,9 +83,9 @@ static void savedatas(const std::vector<CompetitionData> &datas) {
 
 void CompetitionHistoryScene::updateDataTexts() {
     _dataTexts.clear();
-    _dataTexts.reserve(g_datas.size());
+    _dataTexts.reserve(g_competitions.size());
 
-    std::transform(g_datas.begin(), g_datas.end(), std::back_inserter(_dataTexts), [](const CompetitionData &data)->std::string {
+    std::transform(g_competitions.begin(), g_competitions.end(), std::back_inserter(_dataTexts), [](const CompetitionData &data)->std::string {
         char str[BUF_SIZE + 1];
         str[BUF_SIZE] = '\0';
         int len = snprintf(str, BUF_SIZE, "%s\n", data.name.c_str());
@@ -128,13 +128,13 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
     _tableView = tableView;
 
     tableView->setOnEnterCallback([this]() {
-        if (LIKELY(!g_datas.empty())) {
+        if (LIKELY(!g_competitions.empty())) {
             updateDataTexts();
             _tableView->reloadDataInplacement();
         }
     });
 
-    if (UNLIKELY(g_datas.empty())) {
+    if (UNLIKELY(g_competitions.empty())) {
         this->scheduleOnce([this](float) {
             Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -145,11 +145,11 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
             auto thiz = makeRef(this);  // 保证线程回来之前不析构
             std::thread([thiz, loadingView]() {
                 std::vector<CompetitionData> temp;
-                loadDatas(temp);
+                loadCompetitions(temp);
 
                 // 切换到cocos线程
                 Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
-                    g_datas.swap(temp);
+                    g_competitions.swap(temp);
 
                     if (LIKELY(thiz->isRunning())) {
                         thiz->updateDataTexts();
@@ -158,7 +158,7 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
                     }
                 });
             }).detach();
-        }, 0.0f, "load_datas");
+        }, 0.0f, "load_competitions");
     }
 
     return true;
@@ -235,12 +235,12 @@ void CompetitionHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         this->addChild(loadingView);
         loadingView->setPosition(Director::getInstance()->getVisibleSize());
 
-        g_datas.erase(g_datas.begin() + idx);
+        g_competitions.erase(g_competitions.begin() + idx);
 
         auto thiz = makeRef(this);  // 保证线程回来之前不析构
-        std::vector<CompetitionData> temp = g_datas;
+        std::vector<CompetitionData> temp = g_competitions;
         std::thread([thiz, temp, loadingView](){
-            savedatas(temp);
+            savecompetitions(temp);
 
             // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
@@ -256,33 +256,33 @@ void CompetitionHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
 
 void CompetitionHistoryScene::onCellClicked(cocos2d::Ref *sender) {
     cw::TableViewCell *cell = (cw::TableViewCell *)sender;
-    _viewCallback(&g_datas[cell->getIdx()]);
+    _viewCallback(&g_competitions[cell->getIdx()]);
 }
 
 static void __modifyData(const CompetitionData *data) {
-    auto it = std::find_if(g_datas.begin(), g_datas.end(), [data](const CompetitionData &r) {
-        return (r.start_time == data->start_time);  // 我们认为开始时间相同的为同一个记录
+    auto it = std::find_if(g_competitions.begin(), g_competitions.end(), [data](const CompetitionData &c) {
+        return (c.start_time == data->start_time);  // 我们认为开始时间相同的为同一个记录
     });
 
-    if (it == g_datas.end()) {
-        g_datas.push_back(*data);
+    if (it == g_competitions.end()) {
+        g_competitions.push_back(*data);
     }
 
-    std::sort(g_datas.begin(), g_datas.end(), [](const CompetitionData &r1, const CompetitionData &r2) { return r1.start_time > r2.start_time; });
+    std::sort(g_competitions.begin(), g_competitions.end(), [](const CompetitionData &c1, const CompetitionData &c2) { return c1.start_time > c2.start_time; });
 
-    std::vector<CompetitionData> temp = g_datas;
-    std::thread(&savedatas, temp).detach();
+    std::vector<CompetitionData> temp = g_competitions;
+    std::thread(&savecompetitions, temp).detach();
 }
 
 void CompetitionHistoryScene::modifyData(const CompetitionData *data) {
-    if (UNLIKELY(g_datas.empty())) {
+    if (UNLIKELY(g_competitions.empty())) {
         CompetitionData dataCopy = *data;
         std::thread([dataCopy]() {
             std::vector<CompetitionData> temp;
-            loadDatas(temp);
+            loadCompetitions(temp);
 
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([dataCopy, temp]() mutable {
-                g_datas.swap(temp);
+                g_competitions.swap(temp);
                 __modifyData(&dataCopy);
             });
         }).detach();
