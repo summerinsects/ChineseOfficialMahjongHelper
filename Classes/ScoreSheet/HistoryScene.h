@@ -16,13 +16,7 @@ public:
     static void modifyRecord(const Record *record);
 
 private:
-    struct RecordText {
-        char startTime[32];
-        char endTime[32];
-        char score[255];
-    };
-
-    std::vector<RecordText> _recordTexts;
+    std::vector<std::string> _recordTexts;
 
     void updateRecordTexts();
 
