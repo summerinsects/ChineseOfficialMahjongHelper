@@ -528,7 +528,7 @@ void CompetitionTableScene::showRankAlert() {
         case 1: _competitionData->rankTablesBySerialSnake(_currentRound); break;
         case 2: _competitionData->rankTablesByScoresSnake(_currentRound); break;
         case 3: _competitionData->rankTablesByScores(_currentRound); break;
-        case 4: Director::getInstance()->pushScene(CompetitionRankCustomScene::create(_competitionData, _currentRound)); return;  // TODO: 自定义排桌
+        case 4: Director::getInstance()->pushScene(CompetitionRankCustomScene::create(_competitionData, _currentRound)); return;
         default: return;
         }
         _tableView->reloadData();

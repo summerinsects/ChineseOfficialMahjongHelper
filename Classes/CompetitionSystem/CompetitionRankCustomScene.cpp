@@ -280,7 +280,7 @@ void CompetitionRankCustomScene::onSubmitButton(cocos2d::Ref *sender) {
     }
 
     _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
-    cocos2d::Director::getInstance()->popScene();
+    Director::getInstance()->popScene();
 }
 
 void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {

@@ -535,7 +535,7 @@ bool CompetitionData::writeToFile(const std::string &file) const {
 #endif
         doc.Accept(writer);
 
-        CCLOG("%.*s", (int)buf.GetSize(), buf.GetString());
+        CCLOG("%.*s", static_cast<int>(buf.GetSize()), buf.GetString());
 
         FILE *fp = fopen(file.c_str(), "wb");
         if (LIKELY(fp != nullptr)) {
