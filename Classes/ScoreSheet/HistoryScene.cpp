@@ -9,7 +9,6 @@
 #include "json/writer.h"
 #endif
 #include "Record.h"
-#include "../cocos-wheels/CWTableView.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
 
@@ -80,21 +79,24 @@ static void saveRecords(const std::vector<Record> &records) {
     }
 }
 
+#define BUF_SIZE 511
+
 void HistoryScene::updateRecordTexts() {
     _recordTexts.clear();
     _recordTexts.reserve(g_records.size());
 
-    std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record) {
-        RecordText rt;
+    std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record)->std::string {
+        char str[BUF_SIZE + 1];
+        str[BUF_SIZE] = '\0';
 
         struct tm ret = *localtime(&record.start_time);
-        snprintf(rt.startTime, sizeof(rt.startTime), "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        int len = snprintf(str, BUF_SIZE, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (record.end_time != 0) {
             ret = *localtime(&record.end_time);
-            snprintf(rt.endTime, sizeof(rt.endTime), "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+            len += snprintf(str + len, BUF_SIZE - len, "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         }
         else {
-            rt.endTime[0] = '\0';
+            len += snprintf(str + len, BUF_SIZE - len, "——(未结束)");
         }
 
         typedef std::pair<int, int> SeatScore;
@@ -118,12 +120,12 @@ void HistoryScene::updateRecordTexts() {
         });
 
         static const char *seatText[] = { "东", "南", "西", "北" };
-        snprintf(rt.score, sizeof(rt.score), "%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)",
+        len += snprintf(str + len, BUF_SIZE - len, "\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)",
             seatText[seatscore[0].first], record.name[seatscore[0].first], seatscore[0].second,
             seatText[seatscore[1].first], record.name[seatscore[1].first], seatscore[1].second,
             seatText[seatscore[2].first], record.name[seatscore[2].first], seatscore[2].second,
             seatText[seatscore[3].first], record.name[seatscore[3].first], seatscore[3].second);
-        return rt;
+        return str;
     });
 }
 
@@ -246,20 +248,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
 
     delBtn->setUserData(reinterpret_cast<void *>(idx));
 
-    const RecordText &rt = _recordTexts[idx];
-
-    std::string str = rt.startTime;
-    if (rt.endTime[0] != '\0') {
-        str.append("——");
-        str.append(rt.endTime);
-    }
-    else {
-        str.append("(未结束)");
-    }
-    str.append("\n");
-    str.append(rt.score);
-
-    label->setString(str);
+    label->setString(_recordTexts[idx]);
 
     return cell;
 }
