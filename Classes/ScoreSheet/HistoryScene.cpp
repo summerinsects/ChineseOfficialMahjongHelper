@@ -9,7 +9,6 @@
 #include "json/writer.h"
 #endif
 #include "Record.h"
-#include "../cocos-wheels/CWTableView.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
 
