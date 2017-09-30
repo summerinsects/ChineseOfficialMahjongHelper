@@ -1,5 +1,5 @@
-﻿#ifndef __COMPETITION_MAIN_SCENE__
-#define __COMPETITION_MAIN_SCENE__
+﻿#ifndef __COMPETITION_MAIN_SCENE_H__
+#define __COMPETITION_MAIN_SCENE_H__
 
 #include "../BaseScene.h"
 

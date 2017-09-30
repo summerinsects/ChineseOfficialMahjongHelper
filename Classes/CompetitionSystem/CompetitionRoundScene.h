@@ -1,5 +1,5 @@
-﻿#ifndef __COMPETITION_ROUND_SCENE__
-#define __COMPETITION_ROUND_SCENE__
+﻿#ifndef __COMPETITION_ROUND_SCENE_H__
+#define __COMPETITION_ROUND_SCENE_H__
 
 #include "../BaseScene.h"
 #include "../cocos-wheels/CWTableView.h"
