@@ -79,19 +79,25 @@ static void savedatas(const std::vector<CompetitionData> &datas) {
     }
 }
 
+#define BUF_SIZE 511
+
 void CompetitionHistoryScene::updateDataTexts() {
     _dataTexts.clear();
     _dataTexts.reserve(g_datas.size());
 
-    std::transform(g_datas.begin(), g_datas.end(), std::back_inserter(_dataTexts), [](const CompetitionData &data) {
+    std::transform(g_datas.begin(), g_datas.end(), std::back_inserter(_dataTexts), [](const CompetitionData &data)->std::string {
+        char str[BUF_SIZE + 1];
+        str[BUF_SIZE] = '\0';
+        int len = snprintf(str, BUF_SIZE, "%s\n", data.name.c_str());
+
         struct tm ret = *localtime(&data.start_time);
-        std::string str = Common::format("%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        len += snprintf(str + len, BUF_SIZE - len, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (data.finish_time != 0) {
             ret = *localtime(&data.finish_time);
-            str.append(Common::format("——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
+            len += snprintf(str + len, BUF_SIZE - len, "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         }
         else {
-            str.append("——(未结束)");
+            len += snprintf(str + len, BUF_SIZE - len, "%s", "——(未结束)");
         }
         return str;
     });
