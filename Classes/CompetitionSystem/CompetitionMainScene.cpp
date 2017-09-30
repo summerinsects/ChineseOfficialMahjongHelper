@@ -5,6 +5,7 @@
 #include "Competition.h"
 #include "CompetitionEnrollScene.h"
 #include "CompetitionRoundScene.h"
+#include "CompetitionHistoryScene.h"
 
 USING_NS_CC;
 
@@ -65,6 +66,7 @@ bool CompetitionMainScene::init() {
     button->setTitleText("历史记录");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 50));
     button->addClickEventListener([](Ref *) {
+        //Director::getInstance()->pushScene(CompetitionHistoryScene::create([](CompetitionData *){ }));
 
     });
 
