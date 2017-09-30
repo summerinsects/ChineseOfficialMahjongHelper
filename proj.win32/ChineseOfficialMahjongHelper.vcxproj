@@ -147,6 +147,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\cocos-wheels\CWTableView.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\Competition.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionEnrollScene.cpp" />
+    <ClCompile Include="..\Classes\CompetitionSystem\CompetitionHistoryScene.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionMainScene.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionRankCustomScene.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionRoundScene.cpp" />
@@ -180,6 +181,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\cocos-wheels\CWTableView.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\Competition.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionEnrollScene.h" />
+    <ClInclude Include="..\Classes\CompetitionSystem\CompetitionHistoryScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionMainScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionRankCustomScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionRoundScene.h" />

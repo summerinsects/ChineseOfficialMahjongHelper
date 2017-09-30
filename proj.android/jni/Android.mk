@@ -16,6 +16,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/cocos-wheels/CWTableView.cpp \
                    ../../Classes/CompetitionSystem/Competition.cpp \
                    ../../Classes/CompetitionSystem/CompetitionEnrollScene.cpp \
+                   ../../Classes/CompetitionSystem/CompetitionHistoryScene.cpp \
                    ../../Classes/CompetitionSystem/CompetitionMainScene.cpp \
                    ../../Classes/CompetitionSystem/CompetitionRankCustomScene.cpp \
                    ../../Classes/CompetitionSystem/CompetitionRoundScene.cpp \

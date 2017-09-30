@@ -63,6 +63,9 @@
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionEnrollScene.cpp">
       <Filter>src\CompetitionSystem</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\CompetitionSystem\CompetitionHistoryScene.cpp">
+      <Filter>src\CompetitionSystem</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionMainScene.cpp">
       <Filter>src\CompetitionSystem</Filter>
     </ClCompile>
@@ -156,6 +159,9 @@
       <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionEnrollScene.h">
+      <Filter>src\CompetitionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\CompetitionSystem\CompetitionHistoryScene.h">
       <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionMainScene.h">
