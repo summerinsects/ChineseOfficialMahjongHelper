@@ -34,14 +34,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     _colWidth[7] = visibleSize.width * 0.2f;
 
     // 中心位置
-    _posX[0] = _colWidth[0] * 0.5f;
-    _posX[1] = _posX[0] + _colWidth[0] * 0.5f + _colWidth[1] * 0.5f;
-    _posX[2] = _posX[1] + _colWidth[1] * 0.5f + _colWidth[2] * 0.5f;
-    _posX[3] = _posX[2] + _colWidth[2] * 0.5f + _colWidth[3] * 0.5f;
-    _posX[4] = _posX[3] + _colWidth[3] * 0.5f + _colWidth[4] * 0.5f;
-    _posX[5] = _posX[4] + _colWidth[4] * 0.5f + _colWidth[5] * 0.5f;
-    _posX[6] = _posX[5] + _colWidth[5] * 0.5f + _colWidth[6] * 0.5f;
-    _posX[7] = _posX[6] + _colWidth[6] * 0.5f + _colWidth[7] * 0.5f;
+    Common::calculateColumnsCenterX(_colWidth, 8, _posX);
 
     // 表头
     const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "桌号", "座次", "编号", "选手姓名" };
