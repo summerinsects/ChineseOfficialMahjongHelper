@@ -64,7 +64,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText("8");
-    editBox->setPosition(Vec2(origin.x + 86.0f, origin.y + visibleSize.height - 50));
+    editBox->setPosition(Vec2(origin.x + 86.0f, origin.y + visibleSize.height - 50.0f));
     editBox->setDelegate(this);
     _editBox = editBox;
 
@@ -87,7 +87,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("-5");
-    button->setPosition(Vec2(origin.x + 20.0f, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + 20.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener(std::bind(&RecordScene::onMinusButton, this, std::placeholders::_1, 5));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -96,7 +96,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("-1");
-    button->setPosition(Vec2(origin.x + 50.0f, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + 50.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener(std::bind(&RecordScene::onMinusButton, this, std::placeholders::_1, 1));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -105,7 +105,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("+1");
-    button->setPosition(Vec2(origin.x + 135.0f, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + 135.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1, 1));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -114,14 +114,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("+5");
-    button->setPosition(Vec2(origin.x + 165.0f, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + 165.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1, 5));
 
     Label *label = Label::createWithSystemFont("番", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 106.0f, origin.y + visibleSize.height - 50));
+    label->setPosition(Vec2(origin.x + 106.0f, origin.y + visibleSize.height - 50.0f));
 
     // 荒庄
     ui::CheckBox *drawBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -129,7 +129,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     drawBox->setZoomScale(0.0f);
     drawBox->ignoreContentAdaptWithSize(false);
     drawBox->setContentSize(Size(20.0f, 20.0f));
-    drawBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, origin.y + visibleSize.height - 50));
+    drawBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, origin.y + visibleSize.height - 50.0f));
     drawBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
     _drawBox = drawBox;
 
@@ -137,15 +137,15 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 50));
+    label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 50.0f));
 
     // 说明文本
     label = Label::createWithSystemFont("番数支持直接输入。标记主番可快速增加番数，取消标记不减少。", "Arial", 10);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5, origin.y + visibleSize.height - 70));
-    Common::scaleLabelToFitWidth(label, visibleSize.width - 10);
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 70.0f));
+    Common::scaleLabelToFitWidth(label, visibleSize.width - 10.0f);
 
     ui::RadioButtonGroup *winGroup = ui::RadioButtonGroup::create();
     winGroup->setAllowedNoSelection(true);
@@ -165,17 +165,17 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         const float x = origin.x + gap * (i + 0.5f);
 
         // 名字
-        label = Label::createWithSystemFont(playerNames[PLAYER_TO_UI(i)], "Arial", 12);
+        label = Label::createWithSystemFont(playerNames[PLAYER_TO_UI(i)], "Arial", 12.0f);
         label->setColor(Color3B::ORANGE);
         this->addChild(label);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 90));
-        Common::scaleLabelToFitWidth(label, gap - 4);
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 90.0f));
+        Common::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 得分
         label = Label::createWithSystemFont("+0", "Arial", 12);
         label->setColor(Color3B(0x60, 0x60, 0x60));
         this->addChild(label);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 110));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 110.0f));
         _scoreLabel[i] = label;
 
         // 和牌
@@ -185,14 +185,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 135));
+        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 135.0f));
         winGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("和牌", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 135));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 135.0f));
 
         // 点炮或自摸
         button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
@@ -201,21 +201,21 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 165));
+        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 165.0f));
         claimGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 165));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 165.0f));
         _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 165));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 165.0f));
         label->setVisible(false);
         _selfDrawnLabel[i] = label;
 
@@ -226,7 +226,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
         checkBox->setContentSize(Size(20.0f, 20.0f));
-        checkBox->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 195));
+        checkBox->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 195.0f));
         checkBox->addEventListener(std::bind(&RecordScene::onFalseWinBox, this, std::placeholders::_1, std::placeholders::_2));
         _falseWinBox[i] = checkBox;
 
@@ -234,7 +234,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 195));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 195.0f));
     }
     _winGroup = winGroup;
     _claimGroup = claimGroup;
@@ -242,12 +242,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     // 根结点
     ui::Layout *rootLayout = ui::Layout::create();
     this->addChild(rootLayout);
-    rootLayout->setPosition(Vec2(origin.x, origin.y + 30));
+    rootLayout->setPosition(Vec2(origin.x, origin.y + 30.0f));
     rootLayout->setTouchEnabled(true);
 
     // 上方所有东西
     Node *topNode = Node::create();
-    topNode->setContentSize(Size(visibleSize.width, 45));
+    topNode->setContentSize(Size(visibleSize.width, 45.0f));
     topNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     topNode->setIgnoreAnchorPointForPosition(false);
     rootLayout->addChild(topNode);
@@ -279,14 +279,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
-    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+    tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
-    tableView->setPosition(Vec2(visibleSize.width * 0.5f, 0));
+    tableView->setPosition(Vec2(visibleSize.width * 0.5f, 0.0f));
     rootLayout->addChild(tableView);
     _tableView = tableView;
 
@@ -297,21 +297,21 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         Size layoutSize;
         layoutSize.width = visibleSize.width;
         if (layoutButton->getUserData()) {
-            layoutSize.height = visibleSize.height - 140;
+            layoutSize.height = visibleSize.height - 140.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
             layoutButton->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
             radioNode->setVisible(false);
         }
         else {
-            layoutSize.height = visibleSize.height - 230;
+            layoutSize.height = visibleSize.height - 230.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(true));
             layoutButton->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E展开");
             radioNode->setVisible(true);
         }
 
         rootLayout->setContentSize(layoutSize);
-        topNode->setPosition(Vec2(visibleSize.width * 0.5f, layoutSize.height - 35));
-        tableView->setContentSize(Size(visibleSize.width - 5, layoutSize.height - 65));
+        topNode->setPosition(Vec2(visibleSize.width * 0.5f, layoutSize.height - 35.0f));
+        tableView->setContentSize(Size(visibleSize.width - 5.0f, layoutSize.height - 65.0f));
         tableView->reloadData();
     };
     onLayoutButton(layoutButton);
@@ -325,7 +325,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setPosition(Vec2(5.0f, 10.0f));
 
     // 6 8 12 16 24
-    const float labelPosX = label->getContentSize().width + 5 + 2;
+    const float labelPosX = label->getContentSize().width + 5.0f + 2.0f;
     const char *text[] = { "6番", "8番", "12番", "16番", "24番" };
     for (size_t i = 0; i < 5; ++i) {
         button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -345,7 +345,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     button->setContentSize(Size(50.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("提交");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&RecordScene::onSubmitButton, this, std::placeholders::_1));
     button->setEnabled(false);
     _submitButton = button;

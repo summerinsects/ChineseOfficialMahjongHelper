@@ -112,7 +112,7 @@ bool TilesKeyboard::init() {
 
     background = LayerColor::create(Color4B(224, 224, 224, 0xFF), static_cast<GLfloat>(width), static_cast<GLfloat>(TILE_HEIGHT + GAP * 3 + 10));
     rootNode->addChild(background);
-    background->setPosition(Vec2(0, static_cast<float>(buttonAreaHeight)));
+    background->setPosition(Vec2(0.0f, static_cast<float>(buttonAreaHeight)));
 
     // 牌数量label
     Label *label = Label::createWithSystemFont("当前牌数目：0", "Arial", 10);
@@ -167,7 +167,7 @@ bool TilesKeyboard::init() {
     LayerColor *inputBg = LayerColor::create(Color4B(238, 238, 238, 238), 0, INPUT_HEIGHT);
     _inputBg = inputBg;
     rootNode->addChild(inputBg);
-    inputBg->setPosition(Vec2(0, static_cast<float>(height)));
+    inputBg->setPosition(Vec2(0.0f, static_cast<float>(height)));
 
     // 输入文本
     label = Label::createWithSystemFont("", "Arial", 12);
@@ -346,7 +346,7 @@ void TilesKeyboard::dismissWithEvent(DismissEvent event) {
 
     _onDismiss(event);
     _rootNode->runAction(
-        MoveBy::create(MOVE_DURATION, Vec2(0, -_rootNode->getContentSize().height * _rootNode->getScale())));
+        MoveBy::create(MOVE_DURATION, Vec2(0.0f, -_rootNode->getContentSize().height * _rootNode->getScale())));
     this->runAction(Sequence::create(DelayTime::create(MOVE_DURATION), RemoveSelf::create(), nullptr));
 }
 
@@ -565,7 +565,7 @@ void TilesKeyboard::onClear() {
     _tilesContainer->removeAllChildren();
     _tilesSprite.clear();
 
-    _tilesContainer->setContentSize(Size(0, TILE_HEIGHT));
+    _tilesContainer->setContentSize(Size(0.0f, TILE_HEIGHT));
     _tilesContainer->setScale(1.0f);
 
     _countLabel->setString("当前牌数目：0");
@@ -606,12 +606,12 @@ void TilesKeyboard::associateWithEditBox(cocos2d::ui::EditBox *editBox) {
         for (Node *temp = movedNode->getParent(); temp != scene; temp = temp->getParent()) {
             movedNode = temp;
         }
-        movedNode->runAction(MoveBy::create(MOVE_DURATION, Vec2(0, -delta)));
+        movedNode->runAction(MoveBy::create(MOVE_DURATION, Vec2(0.0f, -delta)));
     }
 
     _onDismiss = [editBox, delta, movedNode](DismissEvent event) {
         if (delta < 0) {
-            movedNode->runAction(MoveBy::create(MOVE_DURATION, Vec2(0, delta)));
+            movedNode->runAction(MoveBy::create(MOVE_DURATION, Vec2(0.0f, delta)));
         }
 
         if (event == DismissEvent::GLOBAL) {

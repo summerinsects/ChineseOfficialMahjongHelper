@@ -78,8 +78,8 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    const float buttonWidth = 54;
-    const float buttonGap = (visibleSize.width - 4 - buttonWidth) / 3;
+    const float buttonWidth = 54.0f;
+    const float buttonGap = (visibleSize.width - 4.0f - buttonWidth) / 3.0f;
 
     // 使用说明按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -88,7 +88,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("使用说明");
-    button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap * 3, origin.y + visibleSize.height - 45));
+    button->setPosition(Vec2(origin.x + 2.0f + buttonWidth * 0.5f + buttonGap * 3, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onInstructionButton, this, std::placeholders::_1));
 
     // 历史记录按钮
@@ -98,7 +98,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("历史记录");
-    button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap * 2, origin.y + visibleSize.height - 45));
+    button->setPosition(Vec2(origin.x + 2.0f + buttonWidth * 0.5f + buttonGap * 2, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onHistoryButton, this, std::placeholders::_1));
     button->setEnabled(record == &g_currentRecord);
 
@@ -109,7 +109,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("清空表格");
-    button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f + buttonGap, origin.y + visibleSize.height - 45));
+    button->setPosition(Vec2(origin.x + 2.0f + buttonWidth * 0.5f + buttonGap, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
     button->setEnabled(record == &g_currentRecord);
 
@@ -120,7 +120,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("追分策略");
-    button->setPosition(Vec2(origin.x + 2 + buttonWidth * 0.5f, origin.y + visibleSize.height - 45));
+    button->setPosition(Vec2(origin.x + 2.0f + buttonWidth * 0.5f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
     Common::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
 
@@ -128,7 +128,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Label *label = Label::createWithSystemFont("当前时间", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5, origin.y + 12));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + 12.0f));
     label->setColor(Color3B::BLACK);
     _timeLabel = label;
 
@@ -140,10 +140,10 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     _cellWidth = gap;
 
     const int cellCount = 21;  // 姓名+开局+每圈+累计+16盘+名次=21行
-    const float cellHeight = std::min<float>((visibleSize.height - 85) / cellCount, 20);
+    const float cellHeight = std::min<float>((visibleSize.height - 85.0f) / cellCount, 20.0f);
     const float tableHeight = cellHeight * cellCount;
 
-    node->setPosition(Vec2(origin.x, origin.y + (visibleSize.height - 85 - cellHeight * cellCount) * 0.5f + 25));
+    node->setPosition(Vec2(origin.x, origin.y + (visibleSize.height - 85.0f - cellHeight * cellCount) * 0.5f + 25.0f));
 
     // 5条竖线
     for (int i = 0; i < 5; ++i) {
@@ -167,7 +167,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line1Y));
     node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
+    Common::scaleLabelToFitWidth(label, gap - 4.0f);
 
     // 4个用于弹出输入框的AlertLayer及同位置的label
     // 这里不直接使用Button内部Label，因为内部Label在点击后会恢复scale
@@ -206,13 +206,13 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label->setColor(Color3B::BLACK);
         label->setPosition(Vec2(colPosX[i], line2Y));
         node->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4);
+        Common::scaleLabelToFitWidth(label, gap - 4.0f);
 
         label = Label::createWithSystemFont(row1Text[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         label->setPosition(Vec2(colPosX[i], line3Y));
         node->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4);
+        Common::scaleLabelToFitWidth(label, gap - 4.0f);
     }
 
     // 第4栏：累计
@@ -221,7 +221,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line4Y));
     node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
+    Common::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("+0", "Arail", 12);
@@ -245,7 +245,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line5Y));
     node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
+    Common::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("", "Arail", 12);
@@ -260,7 +260,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label->setColor(Color3B::BLACK);
     label->setPosition(Vec2(colPosX[5], line5Y));
     node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4);
+    Common::scaleLabelToFitWidth(label, gap - 4.0f);
 
     // 第6~21栏，东风东~北风北的计分
     for (int k = 0; k < 16; ++k) {
@@ -271,7 +271,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label->setColor(Color3B(0x60, 0x60, 0x60));
         label->setPosition(Vec2(colPosX[0], y));
         node->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4);
+        Common::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 四位选手得分
         for (int i = 0; i < 4; ++i) {
@@ -350,7 +350,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     Label *label = _fanNameLabel[handIdx];
     label->setString(GetShortFanText(detail));
     label->setVisible(true);
-    Common::scaleLabelToFitWidth(label, _cellWidth - 4);
+    Common::scaleLabelToFitWidth(label, _cellWidth - 4.0f);
 }
 
 void ScoreSheetScene::refreshRank() {
@@ -386,7 +386,7 @@ void ScoreSheetScene::refreshEndTime() {
         ret1.tm_year + 1900, ret1.tm_mon + 1, ret1.tm_mday, ret1.tm_hour, ret1.tm_min));
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    Common::scaleLabelToFitWidth(_timeLabel, visibleSize.width - 10);
+    Common::scaleLabelToFitWidth(_timeLabel, visibleSize.width - 10.0f);
 }
 
 void ScoreSheetScene::recover() {
@@ -403,7 +403,7 @@ void ScoreSheetScene::recover() {
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setString(name[i]);
         _nameLabel[i]->setVisible(true);
-        Common::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4);
+        Common::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);
     }
 
     // 禁用和隐藏锁定按钮
@@ -499,7 +499,7 @@ void ScoreSheetScene::editName(size_t idx) {
             strncpy(_record->name[idx], text, 255);
             _nameLabel[idx]->setVisible(true);
             _nameLabel[idx]->setString(text);
-            Common::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4);
+            Common::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
 
             if (_record->current_index >= 16) {
                 RecordHistoryScene::modifyRecord(_record);
@@ -528,7 +528,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setVisible(true);
         _nameLabel[i]->setString(_record->name[i]);
-        Common::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4);
+        Common::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);
     }
 
     _recordButton[0]->setVisible(true);
@@ -822,15 +822,15 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     }
 
     // 竖线
-    drawNode->drawLine(Vec2(0, 0), Vec2(0, 200), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(0.0f, 200.0f), Color4F::BLACK);
     for (int i = 1; i < 6; ++i) {
         const float x = i * gap;
-        drawNode->drawLine(Vec2(x, 0), Vec2(x, 60), Color4F::BLACK);
-        drawNode->drawLine(Vec2(x, 80), Vec2(x, 120), Color4F::BLACK);
-        drawNode->drawLine(Vec2(x, 140), Vec2(x, 160), Color4F::BLACK);
-        drawNode->drawLine(Vec2(x, 180), Vec2(x, 200), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 0.0f), Vec2(x, 60.0f), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 80.0f), Vec2(x, 120.0f), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 140.0f), Vec2(x, 160.0f), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 180.0f), Vec2(x, 200.0f), Color4F::BLACK);
     }
-    drawNode->drawLine(Vec2(width, 0), Vec2(width, 200), Color4F::BLACK);
+    drawNode->drawLine(Vec2(width, 0.0f), Vec2(width, 200.0f), Color4F::BLACK);
 
     const char *titleText[] = { "追者", "被追", "分差", "自摸", "对点", "旁点" };
     const Color3B titleColor[] = { Color3B::ORANGE, Color3B::ORANGE, Color3B(0x60, 0x60, 0x60), Color3B(254, 87, 110), Color3B(44, 121, 178), Color3B(49, 155, 28) };
@@ -838,9 +838,9 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     for (int i = 0; i < 6; ++i) {
         Label *label = Label::createWithSystemFont(titleText[i], "Arail", 12);
         label->setColor(titleColor[i]);
-        label->setPosition(Vec2(gap * (0.5f + i), 190));
+        label->setPosition(Vec2(gap * (0.5f + i), 190.0f));
         drawNode->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4);
+        Common::scaleLabelToFitWidth(label, gap - 4.0f);
     }
 
     const float nameY[3] = { 150, 100, 30 };
@@ -852,7 +852,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
         label->setColor(titleColor[0]);
         label->setPosition(Vec2(gap * 0.5f, nameY[n - 1]));
         drawNode->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4);
+        Common::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 追k位。k=0表示1位，以此类推
         for (int k = 0; k < n; ++k) {
@@ -862,7 +862,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
             label->setColor(titleColor[1]);
             label->setPosition(Vec2(gap * 1.5f, posY));
             drawNode->addChild(label);
-            Common::scaleLabelToFitWidth(label, gap - 4);
+            Common::scaleLabelToFitWidth(label, gap - 4.0f);
 
             int delta = totalScores[indices[k]] - totalScores[indices[n]];
             int d = delta - 32;
@@ -877,7 +877,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
                 label->setColor(titleColor[i + 2]);
                 label->setPosition(Vec2(gap * (2.5f + i), posY));
                 drawNode->addChild(label);
-                Common::scaleLabelToFitWidth(label, gap - 4);
+                Common::scaleLabelToFitWidth(label, gap - 4.0f);
             }
         }
     }
@@ -897,9 +897,9 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
         DrawNode *drawNode = createPursuitTable(_record->name, _totalScores);
         const Size &drawNodeSize = drawNode->getContentSize();
 
-        rootNode->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30));
+        rootNode->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30.0f));
         rootNode->addChild(drawNode);
-        drawNode->setPosition(Vec2(0, 30));
+        drawNode->setPosition(Vec2(0.0f, 30.0f));
     }
 
     // 自定义分差输入

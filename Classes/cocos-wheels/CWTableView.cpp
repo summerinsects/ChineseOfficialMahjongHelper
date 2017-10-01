@@ -377,7 +377,7 @@ namespace cw {
     }
 
     Vec2 TableView::maxContainerOffset() {
-        return Vec2(0, 0);
+        return Vec2(0.0f, 0.0f);
     }
 
     Vec2 TableView::minContainerOffset() {

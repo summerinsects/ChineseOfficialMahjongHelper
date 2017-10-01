@@ -23,8 +23,8 @@ bool LatestCompetitionScene::init() {
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
-    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+    tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
     tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 65.0f));
     tableView->setDelegate(this);
@@ -180,13 +180,13 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         std::array<Label *, 2> &label = std::get<1>(ext);
         ui::Button *&detailBtn = std::get<2>(ext);
 
-        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 48);
+        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 48.0f);
         cell->addChild(layerColor[0]);
-        layerColor[0]->setPosition(Vec2(0, 1));
+        layerColor[0]->setPosition(Vec2(0.0f, 1.0f));
 
-        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), width, 48);
+        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), width, 48.0f);
         cell->addChild(layerColor[1]);
-        layerColor[1]->setPosition(Vec2(0, 1));
+        layerColor[1]->setPosition(Vec2(0.0f, 1.0f));
 
         label[0] = Label::createWithSystemFont("", "Arail", 10);
         label[0]->setColor(Color3B::BLACK);
