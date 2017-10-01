@@ -13,6 +13,13 @@ void scaleLabelToFitWidth(cocos2d::Label *label, float width) {
     }
 }
 
+void calculateColumnsCenterX(const float *colWidth, size_t col, float *xPos) {
+    xPos[0] = colWidth[0] * 0.5f;
+    for (size_t i = 1; i < col; ++i) {
+        xPos[i] = xPos[i - 1] + (colWidth[i - 1] + colWidth[i]) * 0.5f;
+    }
+}
+
 std::string format(const char *fmt, ...) {
     std::string ret;
     va_list ap;

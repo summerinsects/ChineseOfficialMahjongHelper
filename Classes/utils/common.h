@@ -80,6 +80,8 @@ namespace Common {
 
 void scaleLabelToFitWidth(cocos2d::Label *label, float width);
 
+void calculateColumnsCenterX(const float *colWidth, size_t col, float *xPos);
+
 static inline bool isCStringEmpty(const char *str) {
     return *str == '\0';
 }
