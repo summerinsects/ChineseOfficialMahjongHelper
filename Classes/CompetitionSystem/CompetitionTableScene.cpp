@@ -344,11 +344,11 @@ void CompetitionTableScene::showRecordAlert(size_t table) {
         Common::scaleLabelToFitWidth(label, colWidth[i]);
     }
 
-    std::vector<CompetitionPlayer> &players = _competitionData->players;
+    const std::vector<CompetitionPlayer> &players = _competitionData->players;
     const CompetitionTable &currentTable = _competitionTables->at(table);
 
     for (int i = 0; i < 4; ++i) {
-        CompetitionPlayer *player = &players[currentTable.player_indices[i]];
+        const CompetitionPlayer *player = &players[currentTable.player_indices[i]];
 
         Label *label = Label::createWithSystemFont(std::to_string(player->serial + 1), "Arail", 12);
         label->setColor(Color3B::BLACK);
@@ -370,14 +370,14 @@ void CompetitionTableScene::showRecordAlert(size_t table) {
             labels[i][k] = label;
         }
 
-        CompetitionResult *result = &player->competition_results[_currentRound];
+        const CompetitionResult &result = player->competition_results[_currentRound];
 
         // 刷新三个label的回调函数
-        RefreshRecordAlertCallback callback = [labels, i](const CompetitionResult *result) {
+        RefreshRecordAlertCallback callback = [labels, i](const CompetitionResult &result) {
             std::string text[3] = {
-                std::to_string(result->rank),
-                CompetitionResult::standardScoreToString(result->standard_score),
-                std::to_string(result->competition_score)
+                std::to_string(result.rank),
+                CompetitionResult::standardScoreToString(result.standard_score),
+                std::to_string(result.competition_score)
             };
             for (int k = 0; k < 3; ++k) {
                 labels[i][k]->setString(text[k]);
@@ -430,7 +430,7 @@ void CompetitionTableScene::showRecordAlert(size_t table) {
     }, nullptr);
 }
 
-void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &title, const CompetitionResult *result, const RefreshRecordAlertCallback &callback) {
+void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &title, const CompetitionResult &result, const RefreshRecordAlertCallback &callback) {
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(115.0f, 90.0f));
 
@@ -441,7 +441,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     label->setPosition(Vec2(5.0f, 75.0f));
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "%u", result->rank);
+    snprintf(buf, sizeof(buf), "%u", result.rank);
 
     std::array<ui::EditBox *, 3> editBoxes;
 
@@ -473,7 +473,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
-    editBox->setText(CompetitionResult::standardScoreToString(result->standard_score).c_str());
+    editBox->setText(CompetitionResult::standardScoreToString(result.standard_score).c_str());
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(85.0f, 45.0f));
     editBox->setTag(1);
@@ -485,7 +485,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 15.0f));
 
-    snprintf(buf, sizeof(buf), "%d", result->competition_score);
+    snprintf(buf, sizeof(buf), "%d", result.competition_score);
 
     editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
@@ -516,8 +516,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
 
-    CompetitionResult copyResult = *result;
-    AlertView::showWithNode(title, rootNode, [this, editBoxes, title, copyResult, callback, delegate]() {
+    AlertView::showWithNode(title, rootNode, [this, editBoxes, title, result, callback, delegate]() {
         unsigned rank = 0;
         float standardScore = 0;
         int competitionScore = 0;
@@ -539,21 +538,21 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
 
         if (rank < 1 || rank > 4) {
             AlertView::showWithMessage("登记成绩", "顺位只能是1到4", 12,
-                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, &copyResult, callback), nullptr);
+                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, callback), nullptr);
             return;
         }
 
         if (standardScore < 0) {
             AlertView::showWithMessage("登记成绩", "标准分必须大于0", 12,
-                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, &copyResult, callback), nullptr);
+                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, callback), nullptr);
             return;
         }
 
-        CompetitionResult result;
-        result.rank = rank;
-        result.standard_score = standardScore;
-        result.competition_score = competitionScore;
-        callback(&result);
+        CompetitionResult temp;
+        temp.rank = rank;
+        temp.standard_score = standardScore;
+        temp.competition_score = competitionScore;
+        callback(temp);
     }, nullptr);
 }
 

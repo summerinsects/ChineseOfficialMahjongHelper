@@ -18,12 +18,12 @@ private:
     virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
-    typedef std::function<void (const CompetitionResult *)> RefreshRecordAlertCallback;
+    typedef std::function<void (const CompetitionResult &)> RefreshRecordAlertCallback;
 
     void onClearButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender);
     void showRecordAlert(size_t table);
-    void showCompetitionResultInputAlert(const std::string &title, const CompetitionResult *result, const RefreshRecordAlertCallback &callback);
+    void showCompetitionResultInputAlert(const std::string &title, const CompetitionResult &result, const RefreshRecordAlertCallback &callback);
     void showRankAlert();
 
     float _colWidth[8];
