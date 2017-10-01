@@ -14,9 +14,9 @@ bool ExtraInfoWidget::init() {
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
-    this->setContentSize(Size(visibleSize.width, 110));
+    this->setContentSize(Size(visibleSize.width, 110.0f));
 
-    const float gapX = 65;
+    const float gapX = 65.0f;
 
     // 点和与自摸互斥
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
@@ -90,7 +90,7 @@ bool ExtraInfoWidget::init() {
     const char *windName[4] = { "东", "南", "西", "北" };
     const char *windType[2] = { "圈风", "门风" };
     for (int k = 0; k < 2; ++k) {
-        const float posY = 40.0f - k * 30;
+        const float posY = 40.0f - k * 30.0f;
 
         label = Label::createWithSystemFont(windType[k], "Arial", 12);
         label->setColor(Color3B::BLACK);
@@ -124,7 +124,7 @@ bool ExtraInfoWidget::init() {
     button->setTitleFontSize(12);
     button->setTitleText("使用说明");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40, 70.0f));
+    button->setPosition(Vec2(visibleSize.width - 40.0f, 70.0f));
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
@@ -132,13 +132,13 @@ bool ExtraInfoWidget::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(visibleSize.width - 80, 40.0f));
+    label->setPosition(Vec2(visibleSize.width - 80.0f, 40.0f));
 
     label = Label::createWithSystemFont("0", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(visibleSize.width - 80, 40.0f));
+    label->setPosition(Vec2(visibleSize.width - 80.0f, 40.0f));
     _flowerLabel = label;
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -147,7 +147,7 @@ bool ExtraInfoWidget::init() {
     button->setTitleFontSize(12);
     button->setTitleText("-1");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 55, 40.0f));
+    button->setPosition(Vec2(visibleSize.width - 55.0f, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = atoi(label->getString().c_str());
         if (n > 0) {
@@ -161,7 +161,7 @@ bool ExtraInfoWidget::init() {
     button->setTitleFontSize(12);
     button->setTitleText("+1");
     this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 25, 40.0f));
+    button->setPosition(Vec2(visibleSize.width - 25.0f, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = atoi(label->getString().c_str());
         if (n < 8) {
@@ -364,21 +364,21 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
         "13. 双暗杠6番，一明杠一暗杠5番，双明杠4番。暗杠的加计遵循国际麻将联盟（MIL）的规则，即杠系列和暗刻系列最多各计一个。",
         "Arail", 10);
     label->setColor(Color3B::BLACK);
-    label->setDimensions(maxWidth, 0);
+    label->setDimensions(maxWidth, 0.0f);
 
     Node *node = nullptr;
 
     // 超出高度就使用ScrollView
     const Size &labelSize = label->getContentSize();
-    const float maxHeight = visibleSize.height * 0.8f - 80;
+    const float maxHeight = visibleSize.height * 0.8f - 80.0f;
     if (labelSize.height <= maxHeight) {
         node = label;
     }
     else {
         ui::ScrollView *scrollView = ui::ScrollView::create();
         scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-        scrollView->setScrollBarPositionFromCorner(Vec2(2, 2));
-        scrollView->setScrollBarWidth(4);
+        scrollView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+        scrollView->setScrollBarWidth(4.0f);
         scrollView->setScrollBarOpacity(0x99);
         scrollView->setContentSize(Size(maxWidth, maxHeight));
         scrollView->setInnerContainerSize(labelSize);

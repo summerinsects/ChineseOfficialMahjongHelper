@@ -28,7 +28,7 @@ bool HandTilesWidget::init() {
     _highlightBox = DrawNode::create();
     _highlightBox->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
     _highlightBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _highlightBox->drawRect(Vec2(0, 0), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
+    _highlightBox->drawRect(Vec2(0.0f, 0.0f), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
     _standingContainer->addChild(_highlightBox, 2);
 
     const float fixedHeight = TILE_HEIGHT;  // NOTE: 如果将来支持加杠，则应为std::max(TILE_HEIGHT, TILE_WIDTH * 2)

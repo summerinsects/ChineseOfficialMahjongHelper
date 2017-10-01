@@ -62,7 +62,7 @@ bool HelloWorld::init() {
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("算番器");
-    button->setPosition(Vec2(origin.x + buttonWidth * 0.5f + 4, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12));
+    button->setPosition(Vec2(origin.x + buttonWidth * 0.5f + 4.0f, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(FanCalculatorScene::create());
     });
@@ -73,7 +73,7 @@ bool HelloWorld::init() {
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("计分器");
-    button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12));
+    button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8.0f, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(ScoreSheetScene::create());
     });
@@ -84,7 +84,7 @@ bool HelloWorld::init() {
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("番种表");
-    button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12));
+    button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12.0f, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(FanTableScene::create());
     });
@@ -95,7 +95,7 @@ bool HelloWorld::init() {
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("牌理");
-    button->setPosition(Vec2(origin.x + buttonWidth * 0.5f + 4, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8));
+    button->setPosition(Vec2(origin.x + buttonWidth * 0.5f + 4.0f, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(MahjongTheoryScene::create());
     });
@@ -106,7 +106,7 @@ bool HelloWorld::init() {
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("近期赛事");
-    button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8));
+    button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8.0f, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8.0f));
     button->addClickEventListener([](Ref *) {
         //Director::getInstance()->pushScene(LatestCompetitionScene::create());
         Director::getInstance()->pushScene(CompetitionMainScene::create());
@@ -118,7 +118,7 @@ bool HelloWorld::init() {
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
     button->setTitleText("其他");
-    button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8));
+    button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12.0f, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(OtherScene::create());
     });
@@ -129,7 +129,7 @@ bool HelloWorld::init() {
     button->setContentSize(Size(40.0, 25.0f));
     button->setTitleFontSize(14);
     button->setTitleText("关于");
-    button->setPosition(Vec2(origin.x + 23, origin.y + 15));
+    button->setPosition(Vec2(origin.x + 23.0f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -138,7 +138,7 @@ bool HelloWorld::init() {
     button->setContentSize(Size(40.0, 25.0f));
     button->setTitleFontSize(14);
     button->setTitleText("捐赠");
-    button->setPosition(Vec2(origin.x + visibleSize.width - 23, origin.y + 15));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 23.0f, origin.y + 15.0f));
     button->addClickEventListener([](Ref *) {
         Application::getInstance()->openURL("https://git.oschina.net/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
     });
@@ -149,7 +149,7 @@ bool HelloWorld::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAlignment(TextHAlignment::CENTER);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15));
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
 
     requestVersion(false);
 
@@ -158,7 +158,7 @@ bool HelloWorld::init() {
 
 void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10;
+    const float width = visibleSize.width * 0.8f - 10.0f;
 
     Node *rootNode = Node::create();
 
@@ -181,9 +181,9 @@ void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
     rootNode->addChild(button);
 
     const Size &labelSize = label->getContentSize();
-    rootNode->setContentSize(Size(width, labelSize.height + 30));
-    button->setPosition(Vec2(width * 0.5f, 10));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
+    rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
+    button->setPosition(Vec2(width * 0.5f, 10.0f));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
 
     AlertView::showWithNode("关于", rootNode, nullptr, nullptr);
 }

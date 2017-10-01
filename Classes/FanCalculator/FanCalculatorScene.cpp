@@ -22,7 +22,7 @@ bool FanCalculatorScene::init() {
     const Size &widgetSize = tilePicker->getContentSize();
     this->addChild(tilePicker);
     tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
-        origin.y + visibleSize.height - 35 - widgetSize.height * 0.5f));
+        origin.y + visibleSize.height - 35.0f - widgetSize.height * 0.5f));
     _tilePicker = tilePicker;
 
     // 其他信息的相关控件
@@ -30,7 +30,7 @@ bool FanCalculatorScene::init() {
     const Size &extraSize = extraInfo->getContentSize();
     this->addChild(extraInfo);
     extraInfo->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
-        origin.y + visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height * 0.5f));
+        origin.y + visibleSize.height - 35.0f - widgetSize.height - 5.0f - extraSize.height * 0.5f));
     _extraInfo = extraInfo;
 
     // 直接输入
@@ -40,7 +40,7 @@ bool FanCalculatorScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText("直接输入");
     extraInfo->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40, 100.0f));
+    button->setPosition(Vec2(visibleSize.width - 40.0f, 100.0f));
     button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
 
     // 番算按钮
@@ -50,17 +50,17 @@ bool FanCalculatorScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText("算  番");
     extraInfo->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40, 10.0f));
+    button->setPosition(Vec2(visibleSize.width - 40.0f, 10.0f));
     button->addClickEventListener([this](Ref *) { calculate(); });
 
     // 番种显示的Node
-    Size areaSize(visibleSize.width, visibleSize.height - 35 - widgetSize.height - 5 - extraSize.height - 10);
+    Size areaSize(visibleSize.width, visibleSize.height - 35.0f - widgetSize.height - 5.0f - extraSize.height - 10.0f);
     Node *node = Node::create();
     node->setContentSize(areaSize);
     node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     node->setIgnoreAnchorPointForPosition(false);
     this->addChild(node);
-    node->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + areaSize.height * 0.5f + 5));
+    node->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + areaSize.height * 0.5f + 5.0f));
     _fanAreaNode = node;
 
     tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {
@@ -125,20 +125,20 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
     label->setColor(Color3B::BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20));
+    label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20.0f));
 
     label = Label::createWithSystemFont("点击番种名可查看番种介绍。", "Arial", 10);
     label->setColor(Color3B(51, 204, 255));
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(0.0f, 5));
+    label->setPosition(Vec2(0.0f, 5.0f));
 
     return node;
 }
 
 void FanCalculatorScene::showInputAlert(const char *prevInput) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10;
+    const float width = visibleSize.width * 0.8f - 10.0f;
 
     Node *rootNode = Node::create();
 
@@ -154,7 +154,7 @@ void FanCalculatorScene::showInputAlert(const char *prevInput) {
     rootNode->addChild(label);
 
     // 输入手牌
-    ui::EditBox *editBox = ui::EditBox::create(Size(width - 10, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox = ui::EditBox::create(Size(width - 10.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
@@ -169,9 +169,9 @@ void FanCalculatorScene::showInputAlert(const char *prevInput) {
     rootNode->addChild(editBox);
 
     const Size &labelSize = label->getContentSize();
-    rootNode->setContentSize(Size(width, labelSize.height + 30));
-    editBox->setPosition(Vec2(width * 0.5f, 10));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30));
+    rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
+    editBox->setPosition(Vec2(width * 0.5f, 10.0f));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
 
     AlertView::showWithNode("直接输入", rootNode, [this, editBox]() {
         const char *input = editBox->getText();
@@ -239,26 +239,26 @@ void FanCalculatorScene::calculate() {
         return;
     }
 
-    Node *innerNode = createFanResultNode(fan_table, 14, fanAreaSize.width - 10);
+    Node *innerNode = createFanResultNode(fan_table, 14, fanAreaSize.width - 10.0f);
 
     // 超出高度就使用ScrollView
     if (innerNode->getContentSize().height <= fanAreaSize.height) {
         _fanAreaNode->addChild(innerNode);
-        innerNode->setAnchorPoint(Vec2(0.5f, 0.5f));
+        innerNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
         innerNode->setPosition(pos);
     }
     else {
         ui::ScrollView *scrollView = ui::ScrollView::create();
         scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-        scrollView->setScrollBarPositionFromCorner(Vec2(2, 2));
-        scrollView->setScrollBarWidth(4);
+        scrollView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+        scrollView->setScrollBarWidth(4.0f);
         scrollView->setScrollBarOpacity(0x99);
-        scrollView->setContentSize(Size(fanAreaSize.width - 10, fanAreaSize.height));
+        scrollView->setContentSize(Size(fanAreaSize.width - 10.0f, fanAreaSize.height));
         scrollView->setInnerContainerSize(innerNode->getContentSize());
         scrollView->addChild(innerNode);
 
         _fanAreaNode->addChild(scrollView);
-        scrollView->setAnchorPoint(Vec2(0.5f, 0.5f));
+        scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
         scrollView->setPosition(pos);
     }
 }

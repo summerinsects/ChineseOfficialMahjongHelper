@@ -141,10 +141,10 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
-    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+    tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
-    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35));
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35.0f));
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
@@ -213,13 +213,13 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
 
-        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 68);
+        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 69.0f);
         cell->addChild(layerColor[0]);
-        layerColor[0]->setPosition(Vec2(0, 1));
+        layerColor[0]->setPosition(Vec2(0.0f, 1.0f));
 
-        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), width, 68);
+        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), width, 69.0f);
         cell->addChild(layerColor[1]);
-        layerColor[1]->setPosition(Vec2(0, 1));
+        layerColor[1]->setPosition(Vec2(0.0f, 1.0f));
 
         label = Label::createWithSystemFont("", "Arail", 10);
         label->setColor(Color3B::BLACK);
@@ -233,7 +233,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
         cell->addChild(delBtn);
         delBtn->setPosition(Vec2(width - 20.0f, 35.0f));
 
-        cell->setContentSize(Size(width, 70));
+        cell->setContentSize(Size(width, 70.0f));
         cell->setTouchEnabled(true);
         cell->addClickEventListener(std::bind(&RecordHistoryScene::onCellClicked, this, std::placeholders::_1));
     }

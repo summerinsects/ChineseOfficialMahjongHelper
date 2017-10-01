@@ -126,13 +126,13 @@ void FanDefinitionScene::createContentView(size_t idx) {
 
 #if HAS_WEBVIEW
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
-    webView->setContentSize(Size(visibleSize.width, visibleSize.height - 35));
+    webView->setContentSize(Size(visibleSize.width, visibleSize.height - 35.0f));
     webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(text), ""));
     this->addChild(webView);
     webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
 #else
     ui::RichText *richText = ui::RichText::createWithXML("<font face=\"Verdana\" size=\"12\" color=\"#000000\">" + text + "</font>");
-    richText->setContentSize(Size(visibleSize.width - 10, 0));
+    richText->setContentSize(Size(visibleSize.width - 10.0f, 0.0f));
     richText->ignoreContentAdaptWithSize(false);
     richText->setVerticalSpace(2);
     richText->formatText();

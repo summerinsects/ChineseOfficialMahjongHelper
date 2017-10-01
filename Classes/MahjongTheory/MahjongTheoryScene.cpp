@@ -20,7 +20,7 @@ bool MahjongTheoryScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    ui::EditBox *editBox= ui::EditBox::create(Size(visibleSize.width - 95, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox= ui::EditBox::create(Size(visibleSize.width - 95.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     this->addChild(editBox);
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -30,7 +30,7 @@ bool MahjongTheoryScene::init() {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("在此处输入");
     editBox->setDelegate(this);
-    editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40, origin.y + visibleSize.height - 50));
+    editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40.0f, origin.y + visibleSize.height - 50.0f));
     TilesKeyboard::hookEditBox(editBox);
     _editBox = editBox;
 
@@ -40,7 +40,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText("随机");
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 65.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener([this](Ref *) { setRandomInput(); });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -49,7 +49,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText("说明");
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 50));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 25.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
 
     HandTilesWidget *handTilesWidget = HandTilesWidget::create();
@@ -59,12 +59,12 @@ bool MahjongTheoryScene::init() {
 
     // 根据情况缩放
     if (widgetSize.width - 4 > visibleSize.width) {
-        float scale = (visibleSize.width - 4) / widgetSize.width;
+        float scale = (visibleSize.width - 4.0f) / widgetSize.width;
         handTilesWidget->setScale(scale);
-        widgetSize.width = visibleSize.width - 4;
+        widgetSize.width = visibleSize.width - 4.0f;
         widgetSize.height *= scale;
     }
-    handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 65 - widgetSize.height * 0.5f));
+    handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 65.0f - widgetSize.height * 0.5f));
     _handTilesWidget = handTilesWidget;
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -73,7 +73,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText("撤销");
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + visibleSize.height - 80 - widgetSize.height));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 65.0f, origin.y + visibleSize.height - 80.0f - widgetSize.height));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onUndoButton, this, std::placeholders::_1));
     button->setEnabled(false);
     _undoButton = button;
@@ -84,7 +84,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText("重做");
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 25, origin.y + visibleSize.height - 80 - widgetSize.height));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 25.0f, origin.y + visibleSize.height - 80.0f - widgetSize.height));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onRedoButton, this, std::placeholders::_1));
     button->setEnabled(false);
     _redoButton = button;
@@ -93,10 +93,10 @@ bool MahjongTheoryScene::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 80 - widgetSize.height));
+    label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 80.0f - widgetSize.height));
 
     static const char *title[] = { "七对", "十三幺", "全不靠", "组合龙" };
-    const float yPos = origin.y + visibleSize.height - 105 - widgetSize.height;
+    const float yPos = origin.y + visibleSize.height - 105.0f - widgetSize.height;
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float xPos = origin.x + gap * (i + 0.5f);
@@ -105,7 +105,7 @@ bool MahjongTheoryScene::init() {
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
         checkBox->setContentSize(Size(20.0f, 20.0f));
-        checkBox->setPosition(Vec2(xPos - 20, yPos));
+        checkBox->setPosition(Vec2(xPos - 20.0f, yPos));
         checkBox->setSelected(true);
         checkBox->addEventListener([this](Ref *sender, ui::CheckBox::EventType event) {
             filterResultsByFlag(getFilterFlag());
@@ -117,7 +117,7 @@ bool MahjongTheoryScene::init() {
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(xPos - 5, yPos));
+        label->setPosition(Vec2(xPos - 5.0f, yPos));
     }
 
     // 预先算好Cell及各label的Size
@@ -137,15 +137,15 @@ bool MahjongTheoryScene::init() {
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
-    tableView->setScrollBarPositionFromCorner(Vec2(2, 2));
-    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+    tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
-    tableView->setContentSize(Size(visibleSize.width - 5, visibleSize.height - 130 - widgetSize.height));
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 130.0f - widgetSize.height));
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 60));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 60.0f));
     this->addChild(tableView);
     _tableView = tableView;
 
@@ -754,13 +754,13 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         Label *&cntLabel1 = std::get<6>(ext);
         Label *&cntLabel2 = std::get<7>(ext);
 
-        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), _cellWidth, 0);
+        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), _cellWidth, 0.0f);
         cell->addChild(layerColor[0]);
-        layerColor[0]->setPosition(Vec2(0, 1));
+        layerColor[0]->setPosition(Vec2(0.0f, 1.0f));
 
-        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), _cellWidth, 0);
+        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), _cellWidth, 0.0f);
         cell->addChild(layerColor[1]);
-        layerColor[1]->setPosition(Vec2(0, 1));
+        layerColor[1]->setPosition(Vec2(0.0f, 1.0f));
 
         typeLabel = Label::createWithSystemFont("", "Arial", 12);
         typeLabel->setColor(Color3B(0x60, 0x60, 0x60));
@@ -823,20 +823,20 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     if (idx & 1) {
         layerColor[0]->setVisible(false);
         layerColor[1]->setVisible(true);
-        layerColor[1]->setContentSize(Size(_cellWidth, cellHeight - 2));
+        layerColor[1]->setContentSize(Size(_cellWidth, cellHeight - 2.0f));
     }
     else {
         layerColor[0]->setVisible(true);
         layerColor[1]->setVisible(false);
-        layerColor[0]->setContentSize(Size(_cellWidth, cellHeight - 2));
+        layerColor[0]->setContentSize(Size(_cellWidth, cellHeight - 2.0f));
     }
 
     typeLabel->setString(getResultTypeString(result->form_flag, result->shanten));
-    typeLabel->setPosition(Vec2(SPACE, cellHeight - 10));
+    typeLabel->setPosition(Vec2(SPACE, cellHeight - 10.0f));
     typeLabel->setColor(result->shanten != -1 ? Color3B(0x60, 0x60, 0x60) : Color3B::ORANGE);
 
     float xPos = SPACE;
-    float yPos = cellHeight - 35;
+    float yPos = cellHeight - 35.0f;
 
     if (result->discard_tile != 0) {
         discardLabel->setVisible(true);
