@@ -293,6 +293,10 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         return;
     }
 
+    showRecordAlert(table);
+}
+
+void CompetitionTableScene::showRecordAlert(size_t table) {
     DrawNode *drawNode = DrawNode::create();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -341,6 +345,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     }
 
     std::vector<CompetitionPlayer> &players = _competitionData->players;
+    const CompetitionTable &currentTable = _competitionTables->at(table);
 
     for (int i = 0; i < 4; ++i) {
         CompetitionPlayer *player = &players[currentTable.player_indices[i]];
@@ -390,18 +395,32 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         });
     }
 
-    AlertView::showWithNode(Common::format("第%" PRIzu "桌成绩", table + 1), drawNode, [this, table, labels]() {
-        std::vector<CompetitionPlayer> &players = _competitionData->players;
-        CompetitionTable &currentTable = _competitionTables->at(table);
+    std::string title = Common::format("第%" PRIzu "桌成绩", table + 1);
+    AlertView::showWithNode(title, drawNode, [this, table, labels, title]() {
+        CompetitionResult inputResult[4];
         for (int i = 0; i < 4; ++i) {
             const std::string &rank = labels[i][0]->getString();
             const std::string &ss = labels[i][1]->getString();
             const std::string &cs = labels[i][2]->getString();
 
-            CompetitionResult &result = players[currentTable.player_indices[i]].competition_results[_currentRound];
+            CompetitionResult &result = inputResult[i];
             result.rank = atoi(rank.c_str());
             result.standard_score = static_cast<float>(atof(ss.c_str()));
             result.competition_score = atoi(cs.c_str());
+        }
+
+        if (std::any_of(std::begin(inputResult), std::end(inputResult),
+            [](const CompetitionResult &result) { return result.rank == 0; })) {
+            AlertView::showWithMessage(title, "顺位不能为0", 12, [this, table]() {
+                showRecordAlert(table);
+            }, nullptr);
+            return;
+        }
+
+        std::vector<CompetitionPlayer> &players = _competitionData->players;
+        CompetitionTable &currentTable = _competitionTables->at(table);
+        for (int i = 0; i < 4; ++i) {
+            players[currentTable.player_indices[i]].competition_results[_currentRound] = inputResult[i];
         }
 
         // 刷新外面的UI
