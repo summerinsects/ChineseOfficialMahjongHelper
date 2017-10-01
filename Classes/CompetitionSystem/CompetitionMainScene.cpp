@@ -20,10 +20,10 @@ bool CompetitionMainScene::init() {
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(90.0, 32.0f));
+    button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleText("新建比赛");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 50));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 50.0f));
     button->addClickEventListener([this](Ref *) {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
             AlertView::showWithMessage("新建比赛", "当前有未完成的比赛，新建比赛将会覆盖旧的比赛，是否继续？", 12,
@@ -37,7 +37,7 @@ bool CompetitionMainScene::init() {
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(90.0, 32.0f));
+    button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleText("继续比赛");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
@@ -61,10 +61,10 @@ bool CompetitionMainScene::init() {
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(90.0, 32.0f));
+    button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleText("历史记录");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 50));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 50.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(CompetitionHistoryScene::create([](CompetitionData *){ }));
     });
@@ -77,13 +77,13 @@ bool CompetitionMainScene::init() {
 
 void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size_t player, size_t round) {
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(215, 90));
+    rootNode->setContentSize(Size(215.0f, 90.0f));
 
     Label *label = Label::createWithSystemFont("赛事名称", "Arial", 12);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5, 75));
+    label->setPosition(Vec2(5.0f, 75.0f));
 
     std::array<ui::EditBox *, 3> editBoxes;
 
@@ -95,7 +95,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setFontSize(12);
     editBox->setText(name.c_str());
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(135, 75));
+    editBox->setPosition(Vec2(135.0f, 75.0f));
     editBox->setTag(0);
     editBoxes[0] = editBox;
 #if 1  // test
@@ -106,7 +106,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5, 45));
+    label->setPosition(Vec2(5.0f, 45.0f));
 
     char buf[32];
     snprintf(buf, sizeof(buf), "%" PRIzu, player);
@@ -119,7 +119,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setFontSize(12);
     editBox->setText(buf);
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85, 45));
+    editBox->setPosition(Vec2(85.0f, 45.0f));
     editBox->setTag(1);
     editBoxes[1] = editBox;
 
@@ -127,7 +127,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5, 15));
+    label->setPosition(Vec2(5.0f, 15.0f));
 
     snprintf(buf, sizeof(buf), "%" PRIzu, round);
 
@@ -139,7 +139,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setFontSize(12);
     editBox->setText(buf);
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85, 15));
+    editBox->setPosition(Vec2(85.0f, 15.0f));
     editBox->setTag(2);
     editBoxes[2] = editBox;
 

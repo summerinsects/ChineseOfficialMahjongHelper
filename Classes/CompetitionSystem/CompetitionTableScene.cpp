@@ -66,8 +66,8 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    tableView->setScrollBarPositionFromCorner(Vec2(5, 2));
-    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarPositionFromCorner(Vec2(5.0f, 2.0f));
+    tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 25.0f));
@@ -79,17 +79,17 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     DrawNode *drawNode = DrawNode::create();
     this->addChild(drawNode);
     drawNode->setPosition(Vec2(origin.x, visibleSize.height - 80.0f));
-    drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::BLACK);
-    drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(visibleSize.width, 0.0f), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0.0f, 20.0f), Vec2(visibleSize.width, 20.0f), Color4F::BLACK);
     for (int i = 0; i < 6; ++i) {
         const float posX = _posX[i] + _colWidth[i] * 0.5f;
-        drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::BLACK);
+        drawNode->drawLine(Vec2(posX, 0.0f), Vec2(posX, 20.0f), Color4F::BLACK);
     }
 
     // 当表格可拖动时，画下方一条线
     if (tableView->getInnerContainerSize().height > tableHeight) {
         float posY = -tableHeight;
-        drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::BLACK);
+        drawNode->drawLine(Vec2(0.0f, posY), Vec2(visibleSize.width, posY), Color4F::BLACK);
     }
     tableView->setOnEnterCallback(std::bind(&cw::TableView::reloadDataInplacement, tableView));
 
@@ -178,13 +178,13 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         button->setTitleText("登记成绩");
         button->setPosition(Vec2(_posX[6], 40.0f));
         button->addClickEventListener(std::bind(&CompetitionTableScene::onRecordButton, this, std::placeholders::_1));
-        Common::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10);
+        Common::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10.0f);
 
         // 画线
         DrawNode *drawNode = DrawNode::create();
         cell->addChild(drawNode);
-        drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::BLACK);
-        drawNode->drawLine(Vec2(0, 80), Vec2(visibleSize.width, 80), Color4F::BLACK);
+        drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(visibleSize.width, 0.0f), Color4F::BLACK);
+        drawNode->drawLine(Vec2(0.0f, 80.0f), Vec2(visibleSize.width, 80.0f), Color4F::BLACK);
         const float posX = visibleSize.width - _colWidth[6];
         for (int i = 0; i < 3; ++i) {
             const float posY = 20.0f * (i + 1);
@@ -192,7 +192,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         }
         for (int i = 0; i < 6; ++i) {
             const float posX = _posX[i] + _colWidth[i] * 0.5f;
-            drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 80), Color4F::BLACK);
+            drawNode->drawLine(Vec2(posX, 0.0f), Vec2(posX, 80.0f), Color4F::BLACK);
         }
     }
 
@@ -275,14 +275,14 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     const float height = 100;
     drawNode->setContentSize(Size(width, height));
 
-    drawNode->drawRect(Vec2(0, 0), Vec2(width, height), Color4F::BLACK);
+    drawNode->drawRect(Vec2(0.0f, 0.0f), Vec2(width, height), Color4F::BLACK);
     for (int i = 0; i < 4; ++i) {
-        drawNode->drawLine(Vec2(0, static_cast<float>(i * 20 + 20)), Vec2(width, static_cast<float>(i * 20 + 20)), Color4F::BLACK);
+        drawNode->drawLine(Vec2(0.0f, static_cast<float>(i * 20 + 20)), Vec2(width, static_cast<float>(i * 20 + 20)), Color4F::BLACK);
     }
 
     for (int i = 0; i < 4; ++i) {
         const float x = posX[i] + colWidth[i] * 0.5f;
-        drawNode->drawLine(Vec2(x, 0), Vec2(x, 100), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 0.0f), Vec2(x, 100.0f), Color4F::BLACK);
     }
 
     std::array<std::array<Label *, 3>, 4> labels;
@@ -369,13 +369,13 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
 
 void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &title, CompetitionResult *result, const std::function<void ()> &callback) {
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(115, 90));
+    rootNode->setContentSize(Size(115.0f, 90.0f));
 
     Label *label = Label::createWithSystemFont("顺位", "Arial", 12);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5, 75));
+    label->setPosition(Vec2(5.0f, 75.0f));
 
     char buf[32];
     snprintf(buf, sizeof(buf), "%u", result->rank);
@@ -390,7 +390,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setFontSize(12);
     editBox->setText(buf);
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85, 75));
+    editBox->setPosition(Vec2(85.0f, 75.0f));
     editBox->setTag(0);
     editBoxes[0] = editBox;
 
@@ -398,7 +398,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5, 45));
+    label->setPosition(Vec2(5.0f, 45.0f));
 
     editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
@@ -412,7 +412,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setFontSize(12);
     editBox->setText(CompetitionResult::standardScoreToString(result->standard_score).c_str());
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85, 45));
+    editBox->setPosition(Vec2(85.0f, 45.0f));
     editBox->setTag(1);
     editBoxes[1] = editBox;
 
@@ -420,7 +420,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5, 15));
+    label->setPosition(Vec2(5.0f, 15.0f));
 
     snprintf(buf, sizeof(buf), "%d", result->competition_score);
 
@@ -436,7 +436,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setFontSize(12);
     editBox->setText(buf);
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85, 15));
+    editBox->setPosition(Vec2(85.0f, 15.0f));
     editBox->setTag(2);
     editBoxes[2] = editBox;
 
@@ -499,7 +499,7 @@ void CompetitionTableScene::showRankAlert() {
     }
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(80, 120));
+    rootNode->setContentSize(Size(80.0f, 120.0f));
 
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
     rootNode->addChild(radioGroup);

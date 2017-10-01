@@ -61,8 +61,8 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-    tableView->setScrollBarPositionFromCorner(Vec2(5, 2));
-    tableView->setScrollBarWidth(4);
+    tableView->setScrollBarPositionFromCorner(Vec2(5.0f, 2.0f));
+    tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 12.5f));
@@ -74,17 +74,17 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     DrawNode *drawNode = DrawNode::create();
     this->addChild(drawNode);
     drawNode->setPosition(Vec2(origin.x, visibleSize.height - 55.0f));
-    drawNode->drawLine(Vec2(0, 0), Vec2(visibleSize.width, 0), Color4F::BLACK);
-    drawNode->drawLine(Vec2(0, 20), Vec2(visibleSize.width, 20), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(visibleSize.width, 0.0f), Color4F::BLACK);
+    drawNode->drawLine(Vec2(0.0f, 20.0f), Vec2(visibleSize.width, 20.0f), Color4F::BLACK);
     for (int i = 0; i < 7; ++i) {
         const float posX = _posX[i] + _colWidth[i] * 0.5f;
-        drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 20), Color4F::BLACK);
+        drawNode->drawLine(Vec2(posX, 0.0f), Vec2(posX, 20.0f), Color4F::BLACK);
     }
 
     // 当表格可拖动时，画下方一条线
     if (tableView->getInnerContainerSize().height > tableHeight) {
         float posY = -tableHeight;
-        drawNode->drawLine(Vec2(0, posY), Vec2(visibleSize.width, posY), Color4F::BLACK);
+        drawNode->drawLine(Vec2(0.0f, posY), Vec2(visibleSize.width, posY), Color4F::BLACK);
     }
 
     // 清空按钮
@@ -148,7 +148,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
         for (int n = 0; n < 2; ++n) {
             ui::Widget *rootWidget = ui::Widget::create();
             cell->addChild(rootWidget);
-            rootWidget->setPosition(Vec2(halfWidth * n, 0));
+            rootWidget->setPosition(Vec2(halfWidth * n, 0.0f));
             rootWidgets[n] = rootWidget;
 
             // 桌号
@@ -185,7 +185,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                 ui::Widget *widget = ui::Widget::create();
                 widget->setTouchEnabled(true);
                 widget->setPosition(Vec2(_posX[3], posY));
-                widget->setContentSize(Size(_colWidth[3], 20));
+                widget->setContentSize(Size(_colWidth[3], 20.0f));
                 rootWidget->addChild(widget);
                 widget->addClickEventListener(std::bind(&CompetitionRankCustomScene::onNameWidget, this, std::placeholders::_1));
                 touchedWidgets[n][i] = widget;
@@ -194,8 +194,8 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
             // 画线
             DrawNode *drawNode = DrawNode::create();
             rootWidget->addChild(drawNode);
-            drawNode->drawLine(Vec2(0, 0), Vec2(halfWidth, 0), Color4F::BLACK);
-            drawNode->drawLine(Vec2(0, 80), Vec2(halfWidth, 80), Color4F::BLACK);
+            drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(halfWidth, 0.0f), Color4F::BLACK);
+            drawNode->drawLine(Vec2(0.0f, 80.0f), Vec2(halfWidth, 80.0f), Color4F::BLACK);
             const float posX = halfWidth * (n + 1);
             for (int i = 0; i < 3; ++i) {
                 const float posY = 20.0f * (i + 1);
@@ -203,11 +203,11 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
             }
             for (int i = 0; i < 3; ++i) {
                 const float posX = _posX[i] + _colWidth[i] * 0.5f;
-                drawNode->drawLine(Vec2(posX, 0), Vec2(posX, 80), Color4F::BLACK);
+                drawNode->drawLine(Vec2(posX, 0.0f), Vec2(posX, 80.0f), Color4F::BLACK);
             }
             drawNodes[n] = drawNode;
         }
-        drawNodes[0]->drawLine(Vec2(halfWidth, 0), Vec2(halfWidth, 80), Color4F::BLACK);
+        drawNodes[0]->drawLine(Vec2(halfWidth, 0.0f), Vec2(halfWidth, 80.0f), Color4F::BLACK);
     }
 
     const CustomCell::ExtDataType ext = cell->getExtData();
@@ -329,8 +329,8 @@ namespace {
             _currentFlags.resize(playerFlags->size());
 
             Size visibleSize = Director::getInstance()->getVisibleSize();
-            const float width = visibleSize.width * 0.8f - 10;
-            const float height = visibleSize.height * 0.8f - 80;
+            const float width = visibleSize.width * 0.8f - 10.0f;
+            const float height = visibleSize.height * 0.8f - 80.0f;
 
             this->setContentSize(Size(width, height));
 
@@ -341,8 +341,8 @@ namespace {
             tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
             tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
-            tableView->setScrollBarPositionFromCorner(Vec2(5, 2));
-            tableView->setScrollBarWidth(4);
+            tableView->setScrollBarPositionFromCorner(Vec2(5.0f, 2.0f));
+            tableView->setScrollBarWidth(4.0f);
             tableView->setScrollBarOpacity(0x99);
             tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
             tableView->setPosition(Vec2(width * 0.5f, height * 0.5f));
@@ -421,9 +421,9 @@ namespace {
 
             const CompetitionPlayer &player = _players->at(idx);
             labels[0]->setString(std::to_string(player.serial + 1));
-            Common::scaleLabelToFitWidth(labels[0], 18);
+            Common::scaleLabelToFitWidth(labels[0], 18.0f);
             labels[1]->setString(player.name);
-            Common::scaleLabelToFitWidth(labels[1], (cellWidth - 55) * 0.5f - 4);
+            Common::scaleLabelToFitWidth(labels[1], (cellWidth - 55) * 0.5f - 4.0f);
 
             checkBox->setUserData(reinterpret_cast<void *>(idx));
             checkBox->setEnabled(!_playerFlags->at(idx));
