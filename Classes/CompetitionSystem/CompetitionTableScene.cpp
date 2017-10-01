@@ -246,7 +246,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
     }
 
     buttons[0]->setUserData(reinterpret_cast<void *>(idx));
-    buttons[0]->setUserData(reinterpret_cast<void *>(idx));
+    buttons[1]->setUserData(reinterpret_cast<void *>(idx));
 
     return cell;
 }
