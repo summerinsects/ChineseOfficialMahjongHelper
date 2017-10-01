@@ -117,7 +117,7 @@ float CompetitionTableScene::tableCellSizeForIndex(cw::TableView *table, ssize_t
 }
 
 cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *, std::array<std::array<Label *, 4>, 4>, ui::Button *, std::array<LayerColor *, 2> > CustomCell;
+    typedef cw::TableViewCellEx<Label *, std::array<std::array<Label *, 4>, 4>, std::array<ui::Button *, 2>, std::array<LayerColor *, 2> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     if (cell == nullptr) {
@@ -126,7 +126,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&tableLabel = std::get<0>(ext);
         std::array<std::array<Label *, 4>, 4> &labels = std::get<1>(ext);
-        ui::Button *&button = std::get<2>(ext);
+        std::array<ui::Button *, 2> &buttons = std::get<2>(ext);
         std::array<LayerColor *, 2> &layerColors = std::get<3>(ext);
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -169,16 +169,29 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
             }
         }
 
-        // 登记成绩按钮
+        // 输入按钮
+        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        cell->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(_colWidth[6] - 8, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText("输入");
+        button->setPosition(Vec2(_posX[6], 55.0f));
+        button->addClickEventListener(std::bind(&CompetitionTableScene::onRecordButton, this, std::placeholders::_1));
+        Common::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10.0f);
+        buttons[0] = button;
+
+        // 清空按钮
         button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         cell->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(_colWidth[6] - 8, 20.0f));
         button->setTitleFontSize(12);
-        button->setTitleText("登记成绩");
-        button->setPosition(Vec2(_posX[6], 40.0f));
-        button->addClickEventListener(std::bind(&CompetitionTableScene::onRecordButton, this, std::placeholders::_1));
+        button->setTitleText("清空");
+        button->setPosition(Vec2(_posX[6], 25.0f));
+        button->addClickEventListener(std::bind(&CompetitionTableScene::onClearButton, this, std::placeholders::_1));
         Common::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10.0f);
+        buttons[1] = button;
 
         // 画线
         DrawNode *drawNode = DrawNode::create();
@@ -199,7 +212,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
     const CustomCell::ExtDataType ext = cell->getExtData();
     Label *tableLabel = std::get<0>(ext);
     const std::array<std::array<Label *, 4>, 4> &labels = std::get<1>(ext);
-    ui::Button *button = std::get<2>(ext);
+    const std::array<ui::Button *, 2> &buttons = std::get<2>(ext);
     const std::array<LayerColor *, 2> &layerColors = std::get<3>(ext);
 
     layerColors[0]->setVisible(!(idx & 1));
@@ -232,9 +245,37 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         }
     }
 
-    button->setUserData(reinterpret_cast<void *>(idx));
+    buttons[0]->setUserData(reinterpret_cast<void *>(idx));
+    buttons[0]->setUserData(reinterpret_cast<void *>(idx));
 
     return cell;
+}
+
+void CompetitionTableScene::onClearButton(cocos2d::Ref *sender) {
+    ui::Button *button = (ui::Button *)sender;
+    size_t table = reinterpret_cast<size_t>(button->getUserData());
+    const CompetitionTable &currentTable = _competitionTables->at(table);
+    std::vector<CompetitionPlayer> &players = _competitionData->players;
+    bool updateFlag = false;
+    for (int i = 0; i < 4; ++i) {
+        ptrdiff_t idx = currentTable.player_indices[i];
+        if (idx == INVALID_INDEX) {
+            continue;
+        }
+
+        CompetitionResult &result = players[idx].competition_results[_currentRound];
+        result.rank = 0;
+        result.standard_score = 0;
+        result.competition_score = 0;
+        updateFlag = true;
+    }
+
+    if (updateFlag) {
+        // 刷新外面的UI
+        _submitButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
+        _tableView->updateCellAtIndex(table);
+        _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
+    }
 }
 
 void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
@@ -245,7 +286,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     // 有空位
     if (std::any_of(std::begin(currentTable.player_indices), std::end(currentTable.player_indices),
         [](ptrdiff_t idx) { return idx == INVALID_INDEX; })) {
-        AlertView::showWithMessage("登记成绩", "请先排好座位", 12, std::bind(&CompetitionTableScene::showRankAlert, this), nullptr);
+        AlertView::showWithMessage("登记成绩", "请先排座位", 12, std::bind(&CompetitionTableScene::showRankAlert, this), nullptr);
         return;
     }
 
