@@ -159,10 +159,10 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
         // 背景色
-        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 20);
+        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 20.0f);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 20);
+        layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 20.0f);
         cell->addChild(layerColors[1]);
 
         // 名次、编号、选手姓名、本轮标准分、本轮比赛分、累计标准分、累计比赛分，共7个Label

@@ -187,11 +187,11 @@ cw::TableViewCell *CompetitionHistoryScene::tableCellAtIndex(cw::TableView *tabl
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
 
-        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 68);
+        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 68.0f);
         cell->addChild(layerColor[0]);
         layerColor[0]->setPosition(Vec2(0.0f, 1.0f));
 
-        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), width, 68);
+        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), width, 68.0f);
         cell->addChild(layerColor[1]);
         layerColor[1]->setPosition(Vec2(0.0f, 1.0f));
 

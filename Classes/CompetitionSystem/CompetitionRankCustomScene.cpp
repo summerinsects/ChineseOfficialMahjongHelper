@@ -137,10 +137,10 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
         // 背景色
-        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 79);
+        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 80.0f);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 79);
+        layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 80.0f);
         cell->addChild(layerColors[1]);
 
         DrawNode *drawNodes[2];
@@ -384,11 +384,13 @@ namespace {
                 std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
                 // 背景色
-                layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 29);
+                layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 28.0f);
                 cell->addChild(layerColors[0]);
+                layerColors[0]->setPosition(Vec2(0.0f, 1.0f));
 
-                layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 29);
+                layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 28.0f);
                 cell->addChild(layerColors[1]);
+                layerColors[1]->setPosition(Vec2(0.0f, 1.0f));
 
                 // 选择框
                 checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
