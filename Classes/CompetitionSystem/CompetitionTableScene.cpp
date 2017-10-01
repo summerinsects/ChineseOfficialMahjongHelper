@@ -244,7 +244,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
             labels[i][4]->setString(std::to_string(ret.second));
 
             for (int k = 0; k < 5; ++k) {
-                Common::scaleLabelToFitWidth(labels[i][k], _colWidth[2 + k]);
+                Common::scaleLabelToFitWidth(labels[i][k], _colWidth[2 + k] - 2.0f);
             }
         }
     }
@@ -316,6 +316,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         visibleSize.width * 0.15f,
         visibleSize.width * 0.15f,
     };
+    std::array<float, 5> colWidthArray = { colWidth[0], colWidth[1], colWidth[2], colWidth[3], colWidth[4] };
 
     // 中心位置
     const float posX[5] = {
@@ -380,7 +381,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         const CompetitionResult &result = prevResult[i];
 
         // 刷新三个label的回调函数
-        RefreshRecordAlertCallback callback = [labels, i](const CompetitionResult &result) {
+        RefreshRecordAlertCallback callback = [labels, i, colWidthArray](const CompetitionResult &result) {
             std::string text[3] = {
                 std::to_string(result.rank),
                 CompetitionResult::standardScoreToString(result.standard_score),
@@ -388,7 +389,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             };
             for (int k = 0; k < 3; ++k) {
                 labels[i][k]->setString(text[k]);
-                //Common::scaleLabelToFitWidth(labels[i][k], colWidth[2 + k]);//这句先看实际会不会超过再决定要不要
+                Common::scaleLabelToFitWidth(labels[i][k], colWidthArray[2 + k] - 2.0f);
             }
         };
         callback(result);

@@ -249,7 +249,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                 }
 
                 for (int k = 0; k < 2; ++k) {
-                    Common::scaleLabelToFitWidth(labels[n][i][k], _colWidth[2 + k]);
+                    Common::scaleLabelToFitWidth(labels[n][i][k], _colWidth[2 + k] - 2.0f);
                 }
 
                 touchedWidgets[n][i]->setUserData(reinterpret_cast<void *>(realIndex));
