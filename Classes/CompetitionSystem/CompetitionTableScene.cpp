@@ -20,16 +20,6 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    // 排列座位按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("排列座位");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener([this](Ref *) { showRankAlert(); });
-
     // 列宽
     _colWidth[0] = visibleSize.width * 0.1f;
     _colWidth[1] = visibleSize.width * 0.1f;
@@ -54,10 +44,10 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         this->addChild(label);
-        label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 70.0f));
+        label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 45.0f));
     }
 
-    const float tableHeight = visibleSize.height - 110.0f;
+    const float tableHeight = visibleSize.height - 85.0f;
 
     // 表格
     cw::TableView *tableView = cw::TableView::create();
@@ -70,7 +60,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 25.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 12.5f));
     tableView->reloadData();
     _tableView = tableView;
     this->addChild(tableView);
@@ -78,7 +68,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     // 表头的线
     DrawNode *drawNode = DrawNode::create();
     this->addChild(drawNode);
-    drawNode->setPosition(Vec2(origin.x, visibleSize.height - 80.0f));
+    drawNode->setPosition(Vec2(origin.x, visibleSize.height - 55.0f));
     drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(visibleSize.width, 0.0f), Color4F::BLACK);
     drawNode->drawLine(Vec2(0.0f, 20.0f), Vec2(visibleSize.width, 20.0f), Color4F::BLACK);
     for (int i = 0; i < 6; ++i) {
@@ -93,6 +83,16 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     }
     tableView->setOnEnterCallback(std::bind(&cw::TableView::reloadDataInplacement, tableView));
 
+    // 排列座位按钮
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("排列座位");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f, origin.y + 15.0f));
+    button->addClickEventListener([this](Ref *) { showRankAlert(); });
+
     // 提交按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
     this->addChild(button);
@@ -100,7 +100,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setContentSize(Size(50.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("提交");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.75f, origin.y + 15.0f));
     button->addClickEventListener([](Ref *) { cocos2d::Director::getInstance()->popScene(); });
     button->setEnabled(_competitionData->isRoundFinished(_currentRound));
     _submitButton = button;
