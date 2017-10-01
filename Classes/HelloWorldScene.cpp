@@ -5,7 +5,7 @@
 #include "utils/common.h"
 #include "widget/AlertView.h"
 #include "FanCalculator/FanCalculatorScene.h"
-#include "ScoreSheet/ScoreSheetScene.h"
+#include "RecordSystem/ScoreSheetScene.h"
 #include "FanTable/FanTableScene.h"
 #include "Other/OtherScene.h"
 #include "MahjongTheory/MahjongTheoryScene.h"

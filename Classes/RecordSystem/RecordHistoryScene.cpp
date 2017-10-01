@@ -1,4 +1,4 @@
-﻿#include "HistoryScene.h"
+﻿#include "RecordHistoryScene.h"
 #include <thread>
 #include <mutex>
 #include <array>
@@ -81,7 +81,7 @@ static void saveRecords(const std::vector<Record> &records) {
 
 #define BUF_SIZE 511
 
-void HistoryScene::updateRecordTexts() {
+void RecordHistoryScene::updateRecordTexts() {
     _recordTexts.clear();
     _recordTexts.reserve(g_records.size());
 
@@ -129,7 +129,7 @@ void HistoryScene::updateRecordTexts() {
     });
 }
 
-bool HistoryScene::initWithCallback(const ViewCallback &viewCallback) {
+bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     if (UNLIKELY(!BaseScene::initWithTitle("历史记录"))) {
         return false;
     }
@@ -190,15 +190,15 @@ bool HistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     return true;
 }
 
-ssize_t HistoryScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t RecordHistoryScene::numberOfCellsInTableView(cw::TableView *table) {
     return _recordTexts.size();
 }
 
-float HistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float RecordHistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
     return 70.0f;
 }
 
-cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
+cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
     typedef cw::TableViewCellEx<std::array<LayerColor *, 2>, Label *, ui::Button *> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
@@ -229,13 +229,13 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
 
         delBtn = ui::Button::create("drawable/btn_trash_bin.png");
         delBtn->setScale(Director::getInstance()->getContentScaleFactor() * 0.5f);
-        delBtn->addClickEventListener(std::bind(&HistoryScene::onDeleteButton, this, std::placeholders::_1));
+        delBtn->addClickEventListener(std::bind(&RecordHistoryScene::onDeleteButton, this, std::placeholders::_1));
         cell->addChild(delBtn);
         delBtn->setPosition(Vec2(width - 20.0f, 35.0f));
 
         cell->setContentSize(Size(width, 70));
         cell->setTouchEnabled(true);
-        cell->addClickEventListener(std::bind(&HistoryScene::onCellClicked, this, std::placeholders::_1));
+        cell->addClickEventListener(std::bind(&RecordHistoryScene::onCellClicked, this, std::placeholders::_1));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -253,7 +253,7 @@ cw::TableViewCell *HistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t 
     return cell;
 }
 
-void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
+void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
     AlertView::showWithMessage("删除记录", "删除后无法找回，确认删除？", 12, [this, idx]() {
@@ -280,7 +280,7 @@ void HistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     }, nullptr);
 }
 
-void HistoryScene::onCellClicked(cocos2d::Ref *sender) {
+void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {
     cw::TableViewCell *cell = (cw::TableViewCell *)sender;
     _viewCallback(&g_records[cell->getIdx()]);
 }
@@ -300,7 +300,7 @@ static void __modifyRecord(const Record *record) {
     std::thread(&saveRecords, temp).detach();
 }
 
-void HistoryScene::modifyRecord(const Record *record) {
+void RecordHistoryScene::modifyRecord(const Record *record) {
     if (UNLIKELY(g_records.empty())) {
         Record recordCopy = *record;
         std::thread([recordCopy]() {

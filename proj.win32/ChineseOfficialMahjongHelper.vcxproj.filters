@@ -31,7 +31,7 @@
     <Filter Include="src\Other">
       <UniqueIdentifier>{70992fc8-7be4-4c25-907b-0ae6ce812762}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\ScoreSheet">
+    <Filter Include="src\RecordSystem">
       <UniqueIdentifier>{c70d58d3-f21e-45b5-8fdb-54c4d378ccfa}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\utils">
@@ -81,17 +81,17 @@
     <ClCompile Include="..\Classes\Other\OtherScene.cpp">
       <Filter>src\Other</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\ScoreSheet\HistoryScene.cpp">
-      <Filter>src\ScoreSheet</Filter>
+    <ClCompile Include="..\Classes\RecordSystem\Record.cpp">
+      <Filter>src\RecordSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\ScoreSheet\ScoreSheetScene.cpp">
-      <Filter>src\ScoreSheet</Filter>
+    <ClCompile Include="..\Classes\RecordSystem\RecordHistoryScene.cpp">
+      <Filter>src\RecordSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\ScoreSheet\Record.cpp">
-      <Filter>src\ScoreSheet</Filter>
+    <ClCompile Include="..\Classes\RecordSystem\RecordScene.cpp">
+      <Filter>src\RecordSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\ScoreSheet\RecordScene.cpp">
-      <Filter>src\ScoreSheet</Filter>
+    <ClCompile Include="..\Classes\RecordSystem\ScoreSheetScene.cpp">
+      <Filter>src\RecordSystem</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\utils\common.cpp">
       <Filter>src\utils</Filter>
@@ -164,17 +164,17 @@
     <ClInclude Include="..\Classes\Other\OtherScene.h">
       <Filter>src\Other</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\ScoreSheet\HistoryScene.h">
-      <Filter>src\ScoreSheet</Filter>
+    <ClInclude Include="..\Classes\RecordSystem\Record.h">
+      <Filter>src\RecordSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\ScoreSheet\ScoreSheetScene.h">
-      <Filter>src\ScoreSheet</Filter>
+    <ClInclude Include="..\Classes\RecordSystem\RecordHistoryScene.h">
+      <Filter>src\RecordSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\ScoreSheet\Record.h">
-      <Filter>src\ScoreSheet</Filter>
+    <ClInclude Include="..\Classes\RecordSystem\RecordScene.h">
+      <Filter>src\RecordSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\ScoreSheet\RecordScene.h">
-      <Filter>src\ScoreSheet</Filter>
+    <ClInclude Include="..\Classes\RecordSystem\ScoreSheetScene.h">
+      <Filter>src\RecordSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\TilesImage.h">
       <Filter>src</Filter>

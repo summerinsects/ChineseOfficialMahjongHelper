@@ -27,8 +27,8 @@
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1FA6933A1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
 		1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
-		1FCC3C021CC47200001C9555 /* HistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */; };
-		1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */; };
+		1FCC3C021CC47200001C9555 /* RecordHistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */; };
+		1FCC3C031CC47200001C9555 /* RecordHistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */; };
 		1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */; };
 		1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */; };
 		1FDCF7BF1F738E1D00D9C608 /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */; };
@@ -165,8 +165,8 @@
 		1F764BEA1CC5DB1F00844DAF /* OtherScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OtherScene.h; sourceTree = "<group>"; };
 		1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtraInfoWidget.cpp; sourceTree = "<group>"; };
 		1FA693391E83552300E839CC /* ExtraInfoWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtraInfoWidget.h; sourceTree = "<group>"; };
-		1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HistoryScene.cpp; sourceTree = "<group>"; };
-		1FCC3C001CC47200001C9555 /* HistoryScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HistoryScene.h; sourceTree = "<group>"; };
+		1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecordHistoryScene.cpp; sourceTree = "<group>"; };
+		1FCC3C001CC47200001C9555 /* RecordHistoryScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordHistoryScene.h; sourceTree = "<group>"; };
 		1FCC3C011CC47200001C9555 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Record.h; sourceTree = "<group>"; };
 		1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HandTilesWidget.cpp; sourceTree = "<group>"; };
 		1FD228F11E39837E00DF5C1D /* HandTilesWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandTilesWidget.h; sourceTree = "<group>"; };
@@ -392,19 +392,19 @@
 			path = FanCalculator;
 			sourceTree = "<group>";
 		};
-		1FE04AD91C94682A008401EA /* ScoreSheet */ = {
+		1FE04AD91C94682A008401EA /* RecordSystem */ = {
 			isa = PBXGroup;
 			children = (
-				1FCC3BFF1CC47200001C9555 /* HistoryScene.cpp */,
-				1FCC3C001CC47200001C9555 /* HistoryScene.h */,
 				1F0828A41ED26F8C00F4C424 /* Record.cpp */,
 				1FCC3C011CC47200001C9555 /* Record.h */,
+				1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */,
+				1FCC3C001CC47200001C9555 /* RecordHistoryScene.h */,
 				1FE04ADA1C94682A008401EA /* RecordScene.cpp */,
 				1FE04ADB1C94682A008401EA /* RecordScene.h */,
 				1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */,
 				1FE04ADD1C94682A008401EA /* ScoreSheetScene.h */,
 			);
-			path = ScoreSheet;
+			path = RecordSystem;
 			sourceTree = "<group>";
 		};
 		1FE2A3E61CBB30D1008C45C5 /* FanTable */ = {
@@ -515,7 +515,7 @@
 				1FDD943B1C8337140031BC38 /* mahjong-algorithm */,
 				1F154E391E4409420083F8B3 /* MahjongTheory */,
 				1F764BE81CC5DB1F00844DAF /* Other */,
-				1FE04AD91C94682A008401EA /* ScoreSheet */,
+				1FE04AD91C94682A008401EA /* RecordSystem */,
 				1FF8820B1F5E60BE009C3449 /* TilesImage.h */,
 				1FDCF7C41F738EE400D9C608 /* utils */,
 				1FE5CFDA1CAE029200A5C38B /* widget */,
@@ -730,7 +730,7 @@
 				1FF6025B1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
-				1FCC3C021CC47200001C9555 /* HistoryScene.cpp in Sources */,
+				1FCC3C021CC47200001C9555 /* RecordHistoryScene.cpp in Sources */,
 				1FE04AE01C94682A008401EA /* RecordScene.cpp in Sources */,
 				1FE2A3EB1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
 				1FE04ADE1C94682A008401EA /* FanCalculatorScene.cpp in Sources */,
@@ -744,7 +744,7 @@
 			files = (
 				1FE0DAAF1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */,
 				1FDD94441C8337140031BC38 /* fan_calculator.cpp in Sources */,
-				1FCC3C031CC47200001C9555 /* HistoryScene.cpp in Sources */,
+				1FCC3C031CC47200001C9555 /* RecordHistoryScene.cpp in Sources */,
 				1FE1019E1F74964E001C3FA8 /* common.cpp in Sources */,
 				1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
 				1FDCF7C01F738E1D00D9C608 /* CWTableView.cpp in Sources */,
