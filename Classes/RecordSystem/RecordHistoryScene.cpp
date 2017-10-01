@@ -170,12 +170,12 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
 
             auto thiz = makeRef(this);  // 保证线程回来之前不析构
             std::thread([thiz, loadingView]() {
-                std::vector<Record> temp;
-                loadRecords(temp);
+                auto temp = std::make_shared<std::vector<Record> >();
+                loadRecords(*temp);
 
                 // 切换到cocos线程
                 Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
-                    g_records.swap(temp);
+                    g_records.swap(*temp);
 
                     if (LIKELY(thiz->isRunning())) {
                         thiz->updateRecordTexts();
@@ -262,9 +262,9 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         g_records.erase(g_records.begin() + idx);
 
         auto thiz = makeRef(this);  // 保证线程回来之前不析构
-        std::vector<Record> temp = g_records;
+        auto temp = std::make_shared<std::vector<Record> >(g_records);
         std::thread([thiz, temp, loadingView](){
-            saveRecords(temp);
+            saveRecords(*temp);
 
             // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
@@ -294,19 +294,21 @@ static void __modifyRecord(const Record *record) {
 
     std::sort(g_records.begin(), g_records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
 
-    std::vector<Record> temp = g_records;
-    std::thread(&saveRecords, temp).detach();
+    auto temp = std::make_shared<std::vector<Record> >(g_records);
+    std::thread([temp]() {
+        saveRecords(*temp);
+    }).detach();
 }
 
 void RecordHistoryScene::modifyRecord(const Record *record) {
     if (UNLIKELY(g_records.empty())) {
         Record recordCopy = *record;
         std::thread([recordCopy]() {
-            std::vector<Record> temp;
-            loadRecords(temp);
+            auto temp = std::make_shared<std::vector<Record> >();
+            loadRecords(*temp);
 
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([recordCopy, temp]() mutable {
-                g_records.swap(temp);
+                g_records.swap(*temp);
                 __modifyRecord(&recordCopy);
             });
         }).detach();
