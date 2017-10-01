@@ -384,13 +384,11 @@ namespace {
                 std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
                 // 背景色
-                layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 28.0f);
+                layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 30.0f);
                 cell->addChild(layerColors[0]);
-                layerColors[0]->setPosition(Vec2(0.0f, 1.0f));
 
-                layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 28.0f);
+                layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 30.0f);
                 cell->addChild(layerColors[1]);
-                layerColors[1]->setPosition(Vec2(0.0f, 1.0f));
 
                 // 选择框
                 checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");

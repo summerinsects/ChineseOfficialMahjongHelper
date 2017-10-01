@@ -88,10 +88,10 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
         std::array<ui::Widget *, 2> &widgets = std::get<1>(ext);
         std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
-        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 28.0f);
+        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 30.0f);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), visibleSize.width, 28.0f);
+        layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 30.0f);
         cell->addChild(layerColors[1]);
 
         Label *label = Label::createWithSystemFont("", "Arail", 12);
