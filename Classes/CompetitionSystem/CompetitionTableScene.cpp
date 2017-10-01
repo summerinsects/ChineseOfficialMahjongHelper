@@ -293,10 +293,16 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
         return;
     }
 
-    showRecordAlert(table);
+    CompetitionResult result[4];
+    const std::vector<CompetitionPlayer> &players = _competitionData->players;
+    for (int i = 0; i < 4; ++i) {
+        result[i] = players[currentTable.player_indices[i]].competition_results[_currentRound];
+    };
+
+    showRecordAlert(table, result);
 }
 
-void CompetitionTableScene::showRecordAlert(size_t table) {
+void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResult (&prevResult)[4]) {
     DrawNode *drawNode = DrawNode::create();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -370,7 +376,7 @@ void CompetitionTableScene::showRecordAlert(size_t table) {
             labels[i][k] = label;
         }
 
-        const CompetitionResult &result = player->competition_results[_currentRound];
+        const CompetitionResult &result = prevResult[i];
 
         // 刷新三个label的回调函数
         RefreshRecordAlertCallback callback = [labels, i](const CompetitionResult &result) {
@@ -397,7 +403,7 @@ void CompetitionTableScene::showRecordAlert(size_t table) {
 
     std::string title = Common::format("第%" PRIzu "桌成绩", table + 1);
     AlertView::showWithNode(title, drawNode, [this, table, labels, title]() {
-        CompetitionResult inputResult[4];
+        std::array<CompetitionResult, 4> inputResult;
         for (int i = 0; i < 4; ++i) {
             const std::string &rank = labels[i][0]->getString();
             const std::string &ss = labels[i][1]->getString();
@@ -411,8 +417,9 @@ void CompetitionTableScene::showRecordAlert(size_t table) {
 
         if (std::any_of(std::begin(inputResult), std::end(inputResult),
             [](const CompetitionResult &result) { return result.rank == 0; })) {
-            AlertView::showWithMessage(title, "顺位不能为0", 12, [this, table]() {
-                showRecordAlert(table);
+            AlertView::showWithMessage(title, "顺位不能为0", 12, [this, table, inputResult]() {
+                CompetitionResult result[4] = { inputResult[0], inputResult[1], inputResult[2], inputResult[3] };
+                showRecordAlert(table, result);
             }, nullptr);
             return;
         }
