@@ -137,6 +137,7 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
         }
     });
 
+#if 0
     if (UNLIKELY(g_competitions.empty())) {
         this->scheduleOnce([this](float) {
             Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -163,7 +164,14 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
             }).detach();
         }, 0.0f, "load_competitions");
     }
-
+#else
+    g_competitions.resize(50);
+    for (int i = 0; i < 50; ++i) {
+        g_competitions[i].name = Common::format("测试比赛%d", i + 1);
+        g_competitions[i].start_time = time(nullptr) - 2000;
+        g_competitions[i].finish_time = time(nullptr);
+    }
+#endif
     return true;
 }
 
