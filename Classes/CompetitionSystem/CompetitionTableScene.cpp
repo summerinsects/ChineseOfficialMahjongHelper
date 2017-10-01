@@ -387,6 +387,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             };
             for (int k = 0; k < 3; ++k) {
                 labels[i][k]->setString(text[k]);
+                //Common::scaleLabelToFitWidth(labels[i][k], colWidth[2 + k]);//这句先看实际会不会超过再决定要不要
             }
         };
         callback(result);
