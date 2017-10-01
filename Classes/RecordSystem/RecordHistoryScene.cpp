@@ -209,17 +209,15 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
         const float width = visibleSize.width - 5.0f;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
+        std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
 
-        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 69.0f);
-        cell->addChild(layerColor[0]);
-        layerColor[0]->setPosition(Vec2(0.0f, 1.0f));
+        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 70.0f);
+        cell->addChild(layerColors[0]);
 
-        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), width, 69.0f);
-        cell->addChild(layerColor[1]);
-        layerColor[1]->setPosition(Vec2(0.0f, 1.0f));
+        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 70.0f);
+        cell->addChild(layerColors[1]);
 
         label = Label::createWithSystemFont("", "Arail", 10);
         label->setColor(Color3B::BLACK);
@@ -239,12 +237,12 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    const std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
+    const std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
     Label *label = std::get<1>(ext);
     ui::Button *delBtn = std::get<2>(ext);
 
-    layerColor[0]->setVisible(!(idx & 1));
-    layerColor[1]->setVisible(!!(idx & 1));
+    layerColors[0]->setVisible(!(idx & 1));
+    layerColors[1]->setVisible(!!(idx & 1));
 
     delBtn->setUserData(reinterpret_cast<void *>(idx));
 
