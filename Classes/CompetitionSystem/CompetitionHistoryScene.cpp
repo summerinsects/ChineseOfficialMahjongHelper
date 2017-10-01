@@ -88,10 +88,9 @@ void CompetitionHistoryScene::updateDataTexts() {
     std::transform(g_competitions.begin(), g_competitions.end(), std::back_inserter(_dataTexts), [](const CompetitionData &data)->std::string {
         char str[BUF_SIZE + 1];
         str[BUF_SIZE] = '\0';
-        int len = snprintf(str, BUF_SIZE, "%s\n", data.name.c_str());
 
         struct tm ret = *localtime(&data.start_time);
-        len += snprintf(str + len, BUF_SIZE - len, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        int len = snprintf(str, BUF_SIZE, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (data.finish_time != 0) {
             ret = *localtime(&data.finish_time);
             len += snprintf(str + len, BUF_SIZE - len, "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
@@ -99,6 +98,10 @@ void CompetitionHistoryScene::updateDataTexts() {
         else {
             len += snprintf(str + len, BUF_SIZE - len, "%s", "——(未结束)");
         }
+
+        len += snprintf(str + len, BUF_SIZE - len, "\n%s", data.name.c_str());
+        len += snprintf(str + len, BUF_SIZE - len, "\n%" PRIzd "人，%" PRIzd "轮", data.players.size(), data.round_count);
+
         return str;
     });
 }
@@ -169,7 +172,7 @@ ssize_t CompetitionHistoryScene::numberOfCellsInTableView(cw::TableView *table) 
 }
 
 float CompetitionHistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
-    return 70.0f;
+    return 40.0f;
 }
 
 cw::TableViewCell *CompetitionHistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
@@ -187,25 +190,25 @@ cw::TableViewCell *CompetitionHistoryScene::tableCellAtIndex(cw::TableView *tabl
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
 
-        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 70.0f);
+        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 40.0f);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 70.0f);
+        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 40.0f);
         cell->addChild(layerColors[1]);
 
         label = Label::createWithSystemFont("", "Arail", 10);
         label->setColor(Color3B::BLACK);
         cell->addChild(label);
-        label->setPosition(Vec2(2.0f, 35.0f));
+        label->setPosition(Vec2(2.0f, 20.0f));
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
         delBtn = ui::Button::create("drawable/btn_trash_bin.png");
         delBtn->setScale(Director::getInstance()->getContentScaleFactor() * 0.5f);
         delBtn->addClickEventListener(std::bind(&CompetitionHistoryScene::onDeleteButton, this, std::placeholders::_1));
         cell->addChild(delBtn);
-        delBtn->setPosition(Vec2(width - 20.0f, 35.0f));
+        delBtn->setPosition(Vec2(width - 20.0f, 20.0f));
 
-        cell->setContentSize(Size(width, 70.0f));
+        cell->setContentSize(Size(width, 40.0f));
         cell->setTouchEnabled(true);
         cell->addClickEventListener(std::bind(&CompetitionHistoryScene::onCellClicked, this, std::placeholders::_1));
     }
