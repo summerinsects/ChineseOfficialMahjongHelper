@@ -178,7 +178,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 110));
         _scoreLabel[i] = label;
 
-        // 和
+        // 和牌
         ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
             "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
         radioNode->addChild(button);
@@ -188,7 +188,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setPosition(Vec2(x - 15, origin.y + visibleSize.height - 135));
         winGroup->addRadioButton(button);
 
-        label = Label::createWithSystemFont("和", "Arial", 12);
+        label = Label::createWithSystemFont("和牌", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
