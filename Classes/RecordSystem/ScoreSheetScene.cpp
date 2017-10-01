@@ -810,21 +810,28 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
 
     const float width = visibleSize.width * 0.8f - 20;
     const float height = 10 * 20;
-    const float gap = width / 6;
+
+    // 列宽
+    const float colWidth[6] = {
+        width * 0.2f, width * 0.2f, width * 0.15f, width * 0.15f, width * 0.15f, width * 0.15f
+    };
+    // 中心位置
+    float xPos[6];
+    Common::calculateColumnsCenterX(colWidth, 6, xPos);
 
     DrawNode *drawNode = DrawNode::create();
     drawNode->setContentSize(Size(width, height));
 
     // 横线
-    const float startX[11] = { 0, gap, gap, 0, 0, gap, 0, 0, 0, 0, 0 };
+    const float startX[11] = { 0, colWidth[0], colWidth[0], 0, 0, colWidth[0], 0, 0, 0, 0, 0 };
     for (int i = 0; i < 11; ++i) {
         drawNode->drawLine(Vec2(startX[i], 20.0f * i), Vec2(width, 20.0f * i), Color4F::BLACK);
     }
 
     // 竖线
     drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(0.0f, 200.0f), Color4F::BLACK);
-    for (int i = 1; i < 6; ++i) {
-        const float x = i * gap;
+    for (int i = 0; i < 5; ++i) {
+        const float x = xPos[i] + colWidth[i] * 0.5f;
         drawNode->drawLine(Vec2(x, 0.0f), Vec2(x, 60.0f), Color4F::BLACK);
         drawNode->drawLine(Vec2(x, 80.0f), Vec2(x, 120.0f), Color4F::BLACK);
         drawNode->drawLine(Vec2(x, 140.0f), Vec2(x, 160.0f), Color4F::BLACK);
@@ -838,9 +845,9 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     for (int i = 0; i < 6; ++i) {
         Label *label = Label::createWithSystemFont(titleText[i], "Arail", 12);
         label->setColor(titleColor[i]);
-        label->setPosition(Vec2(gap * (0.5f + i), 190.0f));
+        label->setPosition(Vec2(xPos[i], 190.0f));
         drawNode->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4.0f);
+        Common::scaleLabelToFitWidth(label, colWidth[i] - 4.0f);
     }
 
     const float nameY[3] = { 150, 100, 30 };
@@ -850,9 +857,9 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     for (int n = 1; n < 4; ++n) {
         Label *label = Label::createWithSystemFont(name[indices[n]], "Arail", 12);
         label->setColor(titleColor[0]);
-        label->setPosition(Vec2(gap * 0.5f, nameY[n - 1]));
+        label->setPosition(Vec2(xPos[0], nameY[n - 1]));
         drawNode->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4.0f);
+        Common::scaleLabelToFitWidth(label, colWidth[0] - 4.0f);
 
         // 追k位。k=0表示1位，以此类推
         for (int k = 0; k < n; ++k) {
@@ -860,9 +867,9 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
 
             label = Label::createWithSystemFont(name[indices[k]], "Arail", 12);
             label->setColor(titleColor[1]);
-            label->setPosition(Vec2(gap * 1.5f, posY));
+            label->setPosition(Vec2(xPos[1], posY));
             drawNode->addChild(label);
-            Common::scaleLabelToFitWidth(label, gap - 4.0f);
+            Common::scaleLabelToFitWidth(label, colWidth[1] - 4.0f);
 
             int delta = totalScores[indices[k]] - totalScores[indices[n]];
             int d = delta - 32;
@@ -875,9 +882,9 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
             for (int i = 0; i < 4; ++i) {
                 label = Label::createWithSystemFont(std::to_string(numbers[i]), "Arail", 12);
                 label->setColor(titleColor[i + 2]);
-                label->setPosition(Vec2(gap * (2.5f + i), posY));
+                label->setPosition(Vec2(xPos[2 + i], posY));
                 drawNode->addChild(label);
-                Common::scaleLabelToFitWidth(label, gap - 4.0f);
+                Common::scaleLabelToFitWidth(label, colWidth[2 + i] - 4.0f);
             }
         }
     }
