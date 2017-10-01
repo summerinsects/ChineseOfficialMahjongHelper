@@ -46,7 +46,7 @@ public:
 #endif
 
         // 导航栏
-        cocos2d::LayerColor *navigation = cocos2d::LayerColor::create(COLOR4B_NAVIGATION, visibleSize.width, 30);
+        cocos2d::LayerColor *navigation = cocos2d::LayerColor::create(COLOR4B_NAVIGATION, visibleSize.width, 30.0f);
         this->addChild(navigation);
         navigation->setPosition(cocos2d::Vec2(origin.x, origin.y + visibleSize.height - 30.0f));
 
