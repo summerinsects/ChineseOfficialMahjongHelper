@@ -373,7 +373,7 @@ void CompetitionTableScene::showRecordAlert(size_t table) {
         CompetitionResult *result = &player->competition_results[_currentRound];
 
         // 刷新三个label的回调函数
-        std::function<void ()> callback = [result, labels, i]() {
+        RefreshRecordAlertCallback callback = [labels, i](const CompetitionResult *result) {
             std::string text[3] = {
                 std::to_string(result->rank),
                 CompetitionResult::standardScoreToString(result->standard_score),
@@ -383,7 +383,7 @@ void CompetitionTableScene::showRecordAlert(size_t table) {
                 labels[i][k]->setString(text[k]);
             }
         };
-        callback();
+        callback(result);
 
         ui::Widget *widget = ui::Widget::create();
         widget->setTouchEnabled(true);
@@ -430,7 +430,7 @@ void CompetitionTableScene::showRecordAlert(size_t table) {
     }, nullptr);
 }
 
-void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &title, CompetitionResult *result, const std::function<void ()> &callback) {
+void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &title, const CompetitionResult *result, const RefreshRecordAlertCallback &callback) {
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(115.0f, 90.0f));
 
@@ -516,7 +516,8 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
 
-    AlertView::showWithNode(title, rootNode, [this, editBoxes, title, result, callback, delegate]() {
+    CompetitionResult copyResult = *result;
+    AlertView::showWithNode(title, rootNode, [this, editBoxes, title, copyResult, callback, delegate]() {
         unsigned rank = 0;
         float standardScore = 0;
         int competitionScore = 0;
@@ -538,20 +539,21 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
 
         if (rank < 1 || rank > 4) {
             AlertView::showWithMessage("登记成绩", "顺位只能是1到4", 12,
-                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, callback), nullptr);
+                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, &copyResult, callback), nullptr);
             return;
         }
 
         if (standardScore < 0) {
             AlertView::showWithMessage("登记成绩", "标准分必须大于0", 12,
-                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, callback), nullptr);
+                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, &copyResult, callback), nullptr);
             return;
         }
 
-        result->rank = rank;
-        result->standard_score = standardScore;
-        result->competition_score = competitionScore;
-        callback();
+        CompetitionResult result;
+        result.rank = rank;
+        result.standard_score = standardScore;
+        result.competition_score = competitionScore;
+        callback(&result);
     }, nullptr);
 }
 
