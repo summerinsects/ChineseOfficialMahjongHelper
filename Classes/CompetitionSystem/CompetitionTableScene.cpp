@@ -475,13 +475,13 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
 
         if (rank < 1 || rank > 4) {
             AlertView::showWithMessage("登记成绩", "顺位只能是1到4", 12,
-                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, std::ref(callback)), nullptr);
+                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, callback), nullptr);
             return;
         }
 
         if (standardScore < 0) {
             AlertView::showWithMessage("登记成绩", "标准分必须大于0", 12,
-                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, std::ref(callback)), nullptr);
+                std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, callback), nullptr);
             return;
         }
 
