@@ -745,22 +745,20 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
+        std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
         Label *&typeLabel = std::get<1>(ext);
         Label *&discardLabel = std::get<2>(ext);
         ui::Button *&discardButton = std::get<3>(ext);
         Label *&usefulLabel = std::get<4>(ext);
-        std::array<ui::Button *, 34> &usefulButton = std::get<5>(ext);
+        std::array<ui::Button *, 34> &usefulButtons = std::get<5>(ext);
         Label *&cntLabel1 = std::get<6>(ext);
         Label *&cntLabel2 = std::get<7>(ext);
 
-        layerColor[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), _cellWidth, 0.0f);
-        cell->addChild(layerColor[0]);
-        layerColor[0]->setPosition(Vec2(0.0f, 1.0f));
+        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), _cellWidth, 0.0f);
+        cell->addChild(layerColors[0]);
 
-        layerColor[1] = LayerColor::create(Color4B(0x80, 0x80, 0x80, 0x10), _cellWidth, 0.0f);
-        cell->addChild(layerColor[1]);
-        layerColor[1]->setPosition(Vec2(0.0f, 1.0f));
+        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), _cellWidth, 0.0f);
+        cell->addChild(layerColors[1]);
 
         typeLabel = Label::createWithSystemFont("", "Arial", 12);
         typeLabel->setColor(Color3B(0x60, 0x60, 0x60));
@@ -791,7 +789,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
             cell->addChild(button);
             button->setTag(i);
             button->addClickEventListener(std::bind(&MahjongTheoryScene::onTileButton, this, std::placeholders::_1));
-            usefulButton[i] = button;
+            usefulButtons[i] = button;
         }
 
         cntLabel1 = Label::createWithSystemFont("", "Arial", 12);
@@ -807,12 +805,12 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    const std::array<LayerColor *, 2> &layerColor = std::get<0>(ext);
+    const std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
     Label *typeLabel = std::get<1>(ext);
     Label *discardLabel = std::get<2>(ext);
     ui::Button *discardButton = std::get<3>(ext);
     Label *usefulLabel = std::get<4>(ext);
-    const std::array<ui::Button *, 34> &usefulButton = std::get<5>(ext);
+    const std::array<ui::Button *, 34> &usefulButtons = std::get<5>(ext);
     Label *cntLabel1 = std::get<6>(ext);
     Label *cntLabel2 = std::get<7>(ext);
 
@@ -821,14 +819,14 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     const ResultEx *result = &_resultSources[realIdx];
 
     if (idx & 1) {
-        layerColor[0]->setVisible(false);
-        layerColor[1]->setVisible(true);
-        layerColor[1]->setContentSize(Size(_cellWidth, cellHeight - 2.0f));
+        layerColors[0]->setVisible(false);
+        layerColors[1]->setVisible(true);
+        layerColors[1]->setContentSize(Size(_cellWidth, cellHeight));
     }
     else {
-        layerColor[0]->setVisible(true);
-        layerColor[1]->setVisible(false);
-        layerColor[0]->setContentSize(Size(_cellWidth, cellHeight - 2.0f));
+        layerColors[0]->setVisible(true);
+        layerColors[1]->setVisible(false);
+        layerColors[0]->setContentSize(Size(_cellWidth, cellHeight));
     }
 
     typeLabel->setString(getResultTypeString(result->form_flag, result->shanten));
@@ -878,18 +876,18 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
     for (int i = 0; i < 34; ++i) {
         if (!result->useful_table[mahjong::all_tiles[i]]) {
-            usefulButton[i]->setVisible(false);
+            usefulButtons[i]->setVisible(false);
             continue;
         }
 
-        usefulButton[i]->setUserData(reinterpret_cast<void *>(realIdx));
-        usefulButton[i]->setVisible(true);
+        usefulButtons[i]->setUserData(reinterpret_cast<void *>(realIdx));
+        usefulButtons[i]->setVisible(true);
 
         if (xPos + TILE_WIDTH_SMALL > _cellWidth - SPACE * 2) {
             xPos = SPACE;
             yPos -= 25;
         }
-        usefulButton[i]->setPosition(Vec2(xPos, yPos));
+        usefulButtons[i]->setPosition(Vec2(xPos, yPos));
         xPos += TILE_WIDTH_SMALL;
     }
 
