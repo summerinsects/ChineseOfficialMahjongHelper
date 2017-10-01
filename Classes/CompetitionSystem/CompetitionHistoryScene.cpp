@@ -46,7 +46,7 @@ static void loadCompetitions(std::vector<CompetitionData> &competitions) {
     }
 }
 
-static void savecompetitions(const std::vector<CompetitionData> &competitions) {
+static void saveCompetitions(const std::vector<CompetitionData> &competitions) {
     std::lock_guard<std::mutex> lg(g_mutex);
 
     std::string fileName = FileUtils::getInstance()->getWritablePath();
@@ -144,12 +144,12 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
 
             auto thiz = makeRef(this);  // 保证线程回来之前不析构
             std::thread([thiz, loadingView]() {
-                std::vector<CompetitionData> temp;
-                loadCompetitions(temp);
+                auto temp = std::make_shared<std::vector<CompetitionData> >();
+                loadCompetitions(*temp);
 
                 // 切换到cocos线程
                 Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
-                    g_competitions.swap(temp);
+                    g_competitions.swap(*temp);
 
                     if (LIKELY(thiz->isRunning())) {
                         thiz->updateDataTexts();
@@ -236,9 +236,9 @@ void CompetitionHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         g_competitions.erase(g_competitions.begin() + idx);
 
         auto thiz = makeRef(this);  // 保证线程回来之前不析构
-        std::vector<CompetitionData> temp = g_competitions;
+        auto temp = std::make_shared<std::vector<CompetitionData> >(g_competitions);
         std::thread([thiz, temp, loadingView](){
-            savecompetitions(temp);
+            saveCompetitions(*temp);
 
             // 切换到cocos线程
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
@@ -268,19 +268,21 @@ static void __modifyData(const CompetitionData *data) {
 
     std::sort(g_competitions.begin(), g_competitions.end(), [](const CompetitionData &c1, const CompetitionData &c2) { return c1.start_time > c2.start_time; });
 
-    std::vector<CompetitionData> temp = g_competitions;
-    std::thread(&savecompetitions, temp).detach();
+    auto temp = std::make_shared<std::vector<CompetitionData> >(g_competitions);
+    std::thread([temp]() {
+        saveCompetitions(*temp);
+    }).detach();
 }
 
 void CompetitionHistoryScene::modifyData(const CompetitionData *data) {
     if (UNLIKELY(g_competitions.empty())) {
         CompetitionData dataCopy = *data;
         std::thread([dataCopy]() {
-            std::vector<CompetitionData> temp;
-            loadCompetitions(temp);
+            auto temp = std::make_shared<std::vector<CompetitionData> >();
+            loadCompetitions(*temp);
 
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([dataCopy, temp]() mutable {
-                g_competitions.swap(temp);
+                g_competitions.swap(*temp);
                 __modifyData(&dataCopy);
             });
         }).detach();
