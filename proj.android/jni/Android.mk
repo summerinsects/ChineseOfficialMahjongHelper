@@ -31,10 +31,10 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/mahjong-algorithm/shanten.cpp \
                    ../../Classes/MahjongTheory/MahjongTheoryScene.cpp \
                    ../../Classes/Other/OtherScene.cpp \
-                   ../../Classes/ScoreSheet/HistoryScene.cpp \
-                   ../../Classes/ScoreSheet/Record.cpp \
-                   ../../Classes/ScoreSheet/RecordScene.cpp \
-                   ../../Classes/ScoreSheet/ScoreSheetScene.cpp \
+                   ../../Classes/RecordSystem/Record.cpp \
+                   ../../Classes/RecordSystem/RecordHistoryScene.cpp \
+                   ../../Classes/RecordSystem/RecordScene.cpp \
+                   ../../Classes/RecordSystem/ScoreSheetScene.cpp \
                    ../../Classes/utils/common.cpp \
                    ../../Classes/widget/AlertView.cpp \
                    ../../Classes/widget/ExtraInfoWidget.cpp \

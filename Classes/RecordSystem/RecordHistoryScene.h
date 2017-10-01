@@ -6,11 +6,11 @@
 
 struct Record;
 
-class HistoryScene : public BaseScene, cw::TableViewDelegate {
+class RecordHistoryScene : public BaseScene, cw::TableViewDelegate {
 public:
     typedef std::function<void (Record *)> ViewCallback;
 
-    CREATE_FUNC_WITH_PARAM_1(HistoryScene, initWithCallback, const ViewCallback &, viewCallback);
+    CREATE_FUNC_WITH_PARAM_1(RecordHistoryScene, initWithCallback, const ViewCallback &, viewCallback);
     bool initWithCallback(const ViewCallback &viewCallback);
 
     static void modifyRecord(const Record *record);

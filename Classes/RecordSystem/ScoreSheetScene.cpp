@@ -10,7 +10,7 @@
 #include "../widget/HandTilesWidget.h"
 #include "Record.h"
 #include "RecordScene.h"
-#include "HistoryScene.h"
+#include "RecordHistoryScene.h"
 
 USING_NS_CC;
 
@@ -502,7 +502,7 @@ void ScoreSheetScene::editName(size_t idx) {
             Common::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4);
 
             if (_record->current_index >= 16) {
-                HistoryScene::modifyRecord(_record);
+                RecordHistoryScene::modifyRecord(_record);
             }
 
             if (_record == &g_currentRecord) {
@@ -581,7 +581,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
 
         if (isModify) {
             if (_record->end_time != 0) {
-                HistoryScene::modifyRecord(_record);
+                RecordHistoryScene::modifyRecord(_record);
             }
         }
         else {
@@ -593,7 +593,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
             else {
                 _record->end_time = time(nullptr);
                 refreshEndTime();
-                HistoryScene::modifyRecord(_record);
+                RecordHistoryScene::modifyRecord(_record);
             }
         }
 
@@ -672,7 +672,7 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
-    Director::getInstance()->pushScene(HistoryScene::create([this](Record *record) {
+    Director::getInstance()->pushScene(RecordHistoryScene::create([this](Record *record) {
         if (UNLIKELY(g_currentRecord.start_time == record->start_time)) {  // 我们认为开始时间相同的为同一个记录
             Director::getInstance()->popScene();
         }
@@ -743,7 +743,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
         if (radioGroup->getSelectedButtonIndex() == 0) {
             _record->current_index = 16;
             _record->end_time = time(nullptr);
-            HistoryScene::modifyRecord(_record);
+            RecordHistoryScene::modifyRecord(_record);
         }
         reset();
     }, nullptr);
