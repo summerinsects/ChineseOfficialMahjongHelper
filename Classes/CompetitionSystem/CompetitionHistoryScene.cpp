@@ -187,10 +187,10 @@ cw::TableViewCell *CompetitionHistoryScene::tableCellAtIndex(cw::TableView *tabl
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
 
-        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 70.0f);
+        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 70.0f);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 70.0f);
+        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 70.0f);
         cell->addChild(layerColors[1]);
 
         label = Label::createWithSystemFont("", "Arail", 10);

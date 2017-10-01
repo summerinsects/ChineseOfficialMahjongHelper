@@ -137,10 +137,10 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
         // 背景色
-        layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 80.0f);
+        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 80.0f);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 80.0f);
+        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), visibleSize.width, 80.0f);
         cell->addChild(layerColors[1]);
 
         DrawNode *drawNodes[2];
@@ -384,10 +384,10 @@ namespace {
                 std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
                 // 背景色
-                layerColors[0] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 30.0f);
+                layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 30.0f);
                 cell->addChild(layerColors[0]);
 
-                layerColors[1] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 30.0f);
+                layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 30.0f);
                 cell->addChild(layerColors[1]);
 
                 // 选择框
