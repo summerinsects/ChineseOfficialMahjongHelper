@@ -137,7 +137,7 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
         }
     });
 
-#if 0
+#if 1
     if (UNLIKELY(g_competitions.empty())) {
         this->scheduleOnce([this](float) {
             Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -165,6 +165,7 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
         }, 0.0f, "load_competitions");
     }
 #else
+    // 测试代码
     g_competitions.resize(50);
     for (int i = 0; i < 50; ++i) {
         g_competitions[i].name = Common::format("测试比赛%d", i + 1);

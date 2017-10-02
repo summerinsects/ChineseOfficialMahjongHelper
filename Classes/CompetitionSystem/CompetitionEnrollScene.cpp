@@ -177,9 +177,9 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
 }
 
 void CompetitionEnrollScene::onSubmitButton(cocos2d::Ref *sender) {
-#if 1  // test
+#if 1  // 测试代码
     for (size_t i = 0, cnt = _competitionData->players.size(); i < cnt; ++i) {
-        _competitionData->players.at(i).name = Common::format("%" PRIzu "号选手", i + 1);
+        _competitionData->players.at(i).name = Common::format("第%" PRIzu "号参赛选手", i + 1);
     }
 #endif
 

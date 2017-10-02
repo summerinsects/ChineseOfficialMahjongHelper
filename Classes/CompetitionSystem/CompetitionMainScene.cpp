@@ -98,7 +98,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setPosition(Vec2(135.0f, 75.0f));
     editBox->setTag(0);
     editBoxes[0] = editBox;
-#if 1  // test
+#if 1  // 测试代码
     editBox->setText("测试比赛");
 #endif
 
