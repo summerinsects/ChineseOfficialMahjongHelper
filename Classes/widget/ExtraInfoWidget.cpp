@@ -23,7 +23,7 @@ bool ExtraInfoWidget::init() {
     this->addChild(radioGroup);
     radioGroup->addEventListener(std::bind(&ExtraInfoWidget::onWinTypeGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-    const char *winTypeTexts[] = { "点和", "自摸" };
+    static const char *winTypeTexts[] = { "点和", "自摸" };
     for (int i = 0; i < 2; ++i) {
         ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
         this->addChild(radioButton);
@@ -58,7 +58,7 @@ bool ExtraInfoWidget::init() {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f + gapX * 2, 100.0f));
 
-    const char *extTexts[] = { "杠开", "抢杠", "海底" };
+    static const char *extTexts[] = { "杠开", "抢杠", "海底" };
     ui::CheckBox *checkBoxes[3];
     for (int i = 0; i < 3; ++i) {
         ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
@@ -87,8 +87,8 @@ bool ExtraInfoWidget::init() {
     _lastTileBox = checkBoxes[2];
 
     // 圈风和门风
-    const char *windName[4] = { "东", "南", "西", "北" };
-    const char *windType[2] = { "圈风", "门风" };
+    static const char *windName[4] = { "东", "南", "西", "北" };
+    static const char *windType[2] = { "圈风", "门风" };
     for (int k = 0; k < 2; ++k) {
         const float posY = 40.0f - k * 30.0f;
 

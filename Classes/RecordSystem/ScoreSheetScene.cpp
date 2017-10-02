@@ -199,8 +199,8 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     // 第2、3栏：座位
     const float line2Y = tableHeight - cellHeight * 1.5f;
     const float line3Y = tableHeight - cellHeight * 2.5f;
-    const char *row0Text[] = {"开局座位", "东", "南", "西", "北"};
-    const char *row1Text[] = {"每圈座位", "东南北西", "南东西北", "西北东南", "北西南东"};
+    static const char *row0Text[] = {"开局座位", "东", "南", "西", "北"};
+    static const char *row1Text[] = {"每圈座位", "东南北西", "南东西北", "西北东南", "北西南东"};
     for (int i = 0; i < 5; ++i) {
         label = Label::createWithSystemFont(row0Text[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
@@ -357,7 +357,7 @@ void ScoreSheetScene::refreshRank() {
     int rank[4] = {0};
     Common::calculateRankFromScore(_totalScores, rank);
 
-    const char *text[] = { "一", "二", "三", "四" };
+    static const char *text[] = { "一", "二", "三", "四" };
     for (int i = 0; i < 4; ++i) {
         _rankLabels[i]->setVisible(true);
         _rankLabels[i]->setString(text[rank[i]]);
@@ -485,7 +485,7 @@ void ScoreSheetScene::editName(size_t idx) {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
-    const char *wind[] = { "东", "南", "西", "北" };
+    static const char *wind[] = { "东", "南", "西", "北" };
     AlertView::showWithNode(Common::format("开局座位「%s」", wind[idx]), editBox, [this, editBox, idx]() {
         const char *text = editBox->getText();
         if (!Common::isCStringEmpty(text)) {
@@ -833,7 +833,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     }
     drawNode->drawLine(Vec2(width, 0.0f), Vec2(width, 200.0f), Color4F::BLACK);
 
-    const char *titleText[] = { "追者", "被追", "分差", "自摸", "对点", "旁点" };
+    static const char *titleText[] = { "追者", "被追", "分差", "自摸", "对点", "旁点" };
     const Color3B titleColor[] = { Color3B::ORANGE, Color3B::ORANGE, Color3B(0x60, 0x60, 0x60), Color3B(254, 87, 110), Color3B(44, 121, 178), Color3B(49, 155, 28) };
 
     for (int i = 0; i < 6; ++i) {
