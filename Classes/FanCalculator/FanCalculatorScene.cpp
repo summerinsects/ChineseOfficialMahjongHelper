@@ -150,7 +150,7 @@ void FanCalculatorScene::showInputAlert(const char *prevInput) {
         "输入范例2：1112345678999s9s\n"
         "输入范例3：WWWW 444s 45m678pFF6m\n", "Arial", 10);
     label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0);
+    label->setDimensions(width, 0.0f);
     rootNode->addChild(label);
 
     // 输入手牌

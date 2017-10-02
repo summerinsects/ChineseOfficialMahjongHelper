@@ -166,7 +166,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
         "3. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
         "Arail", 10);
     label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0);
+    label->setDimensions(width, 0.0f);
     rootNode->addChild(label);
 
     // 检测新版本
