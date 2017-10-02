@@ -1,6 +1,5 @@
 ﻿#include "CompetitionRankCustomScene.h"
 #include <array>
-#include "../cocos-wheels/CWEditBoxDelegate.h"
 #include "../widget/AlertView.h"
 #include "Competition.h"
 
