@@ -383,7 +383,7 @@ void ScoreSheetScene::refreshEndTime() {
 
 void ScoreSheetScene::recover() {
     // 有选手名字为空，则清空数据
-    const char (&name)[4][255] = _record->name;
+    const char (&name)[4][NAME_SIZE] = _record->name;
     if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
         memset(_record, 0, sizeof(*_record));
         onTimeScheduler(0.0f);
@@ -481,16 +481,20 @@ void ScoreSheetScene::editName(size_t idx) {
     editBox->setFontColor(Color3B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(_record->name[idx]);
+    editBox->setMaxLength(NAME_SIZE - 1);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
     static const char *wind[] = { "东", "南", "西", "北" };
     AlertView::showWithNode(Common::format("开局座位「%s」", wind[idx]), editBox, [this, editBox, idx]() {
+        char (&name)[NAME_SIZE] = _record->name[idx];
+        memset(name, 0, sizeof(name));
+
         const char *text = editBox->getText();
         if (!Common::isCStringEmpty(text)) {
-            strncpy(_record->name[idx], text, 255);
+            strncpy(name, text, NAME_SIZE - 1);
             _nameLabel[idx]->setVisible(true);
-            _nameLabel[idx]->setString(text);
+            _nameLabel[idx]->setString(name);
             Common::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
 
             if (_record->current_index >= 16) {
@@ -510,7 +514,7 @@ void ScoreSheetScene::editName(size_t idx) {
 }
 
 void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
-    const char (&name)[4][255] = _record->name;
+    const char (&name)[4][NAME_SIZE] = _record->name;
     if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
         AlertView::showWithMessage("锁定", "请先录入四位参赛选手姓名", 12, nullptr, nullptr);
         return;
@@ -679,7 +683,7 @@ void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
-    const char (&name)[4][255] = _record->name;
+    const char (&name)[4][NAME_SIZE] = _record->name;
     if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
         reset();
         return;
@@ -791,7 +795,7 @@ static void showPursuit(int delta) {
     AlertView::showWithMessage("追分与保位", msg, 12, nullptr, nullptr);
 }
 
-static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&totalScores)[4]) {
+static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int (&totalScores)[4]) {
     // 下标
     int indices[4] = { 0, 1, 2, 3 };
     // 按分数排序
@@ -899,7 +903,7 @@ namespace {
 }
 
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
-    const char (&name)[4][255] = _record->name;
+    const char (&name)[4][NAME_SIZE] = _record->name;
     Node *rootNode = nullptr;
 
     // 当当前一局比赛未结束时，显示快捷分差按钮
@@ -949,7 +953,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
-    const char (&name)[4][255] = _record->name;
+    const char (&name)[4][NAME_SIZE] = _record->name;
     if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)
         || _record->current_index == 16) {
         return;
