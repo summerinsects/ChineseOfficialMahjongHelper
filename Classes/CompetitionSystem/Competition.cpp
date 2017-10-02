@@ -1,5 +1,4 @@
 ﻿#include "Competition.h"
-#include <sstream>
 #include <algorithm>
 #include "json/stringbuffer.h"
 #ifdef COCOS2D_DEBUG
@@ -11,11 +10,18 @@
 
 // 标准分转换为字符串
 std::string CompetitionResult::standardScoreToString(float ss) {
-    std::ostringstream os;
-    os << ss;
-    std::string ret1 = os.str();
-    std::string ret2 = Common::format("%.3f", ss);
-    return ret1.length() < ret2.length() ? ret1 : ret2;
+    char str[64];  // FLT_MAX输出为340282346638528859811704183484516925440.00000010
+    int len = snprintf(str, sizeof(str), "%.3f", ss);
+
+    const char *dot = strchr(str, '.');  // 找到小数点
+    if (LIKELY(dot != nullptr)) {
+        char *p = str + len - 1;  // 反向查找'0'
+        while (*p == '0') --p;
+        if (p != dot) ++p;
+        *p = '\0';  // 截断
+    }
+
+    return str;
 }
 
 // 获取指定一轮总成绩
