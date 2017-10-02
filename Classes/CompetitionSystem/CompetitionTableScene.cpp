@@ -40,7 +40,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 45.0f));
-        Common::scaleLabelToFitWidth(label, _colWidth[i] - 2.0f);
+        Common::scaleLabelToFitWidth(label, _colWidth[i] - 4.0f);
     }
 
     const float tableHeight = visibleSize.height - 85.0f;
@@ -237,7 +237,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
             labels[i][4]->setString(std::to_string(ret.second));
 
             for (int k = 0; k < 5; ++k) {
-                Common::scaleLabelToFitWidth(labels[i][k], _colWidth[2 + k] - 2.0f);
+                Common::scaleLabelToFitWidth(labels[i][k], _colWidth[2 + k] - 4.0f);
             }
         }
     }
@@ -337,7 +337,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         label->setColor(Color3B::BLACK);
         drawNode->addChild(label);
         label->setPosition(Vec2(posX[i], 90.0f));
-        Common::scaleLabelToFitWidth(label, colWidth[i]);
+        Common::scaleLabelToFitWidth(label, colWidth[i] - 4.0f);
     }
 
     const std::vector<CompetitionPlayer> &players = _competitionData->players;
@@ -350,13 +350,13 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         label->setColor(Color3B::BLACK);
         drawNode->addChild(label);
         label->setPosition(Vec2(posX[0], 70.0f - 20.0f * i));
-        Common::scaleLabelToFitWidth(label, colWidth[0]);
+        Common::scaleLabelToFitWidth(label, colWidth[0] - 4.0f);
 
         label = Label::createWithSystemFont(player->name, "Arail", 12);
         label->setColor(Color3B::BLACK);
         drawNode->addChild(label);
         label->setPosition(Vec2(posX[1], 70.0f - 20.0f * i));
-        Common::scaleLabelToFitWidth(label, colWidth[1]);
+        Common::scaleLabelToFitWidth(label, colWidth[1] - 4.0f);
 
         for (int k = 0; k < 3; ++k) {
             label = Label::createWithSystemFont("", "Arail", 12);
@@ -377,7 +377,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             };
             for (int k = 0; k < 3; ++k) {
                 labels[i][k]->setString(text[k]);
-                Common::scaleLabelToFitWidth(labels[i][k], colWidthArray[2 + k] - 2.0f);
+                Common::scaleLabelToFitWidth(labels[i][k], colWidthArray[2 + k] - 4.0f);
             }
         };
         callback(result);

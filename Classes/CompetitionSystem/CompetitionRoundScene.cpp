@@ -90,7 +90,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 70.0f));
-        Common::scaleLabelToFitWidth(label, _colWidth[i] - 2.0f);
+        Common::scaleLabelToFitWidth(label, _colWidth[i] - 4.0f);
     }
 
     const float tableHeight = visibleSize.height - 85.0f;
