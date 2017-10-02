@@ -344,9 +344,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             ss += results[i].standard_score;
             cs += results[i].competition_score;
         }
-        std::ostringstream os;
-        os << ss;
-        label->setString(Common::format("检查：标准分总和%s，比赛分总和%d", os.str().c_str(), cs));
+        label->setString(Common::format("检查：标准分总和%s，比赛分总和%d", CompetitionResult::standardScoreToString(ss).c_str(), cs));
     };
     refreshCheckLabel(*results);
 
