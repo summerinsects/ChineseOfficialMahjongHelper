@@ -419,8 +419,9 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         widget->setPosition(Vec2(posX[4], posY));
         widget->setContentSize(Size(colWidth[4] * 3, 20.0f));
         drawNode->addChild(widget);
-        widget->addClickEventListener([this, player, result, callback](Ref *) {
-            showCompetitionResultInputAlert(Common::format("选手编号%" PRIzu "，姓名「%s」", player->serial + 1, player->name.c_str()), *result, callback);
+        widget->addClickEventListener([this, i, player, result, callback](Ref *) {
+            std::string title = Common::format("「%s」：%" PRIzu " 「%s」", seatText[i], player->serial + 1, player->name.c_str());
+            showCompetitionResultInputAlert(title, *result, callback);
         });
     }
 
