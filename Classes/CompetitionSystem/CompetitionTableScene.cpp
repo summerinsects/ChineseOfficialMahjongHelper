@@ -318,12 +318,33 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
     // 根结点
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(width, height + 40.0f));
+    rootNode->setContentSize(Size(width, height + 55.0f));
 
     // 表格画在DrawNode上
     DrawNode *drawNode = DrawNode::create();
     rootNode->addChild(drawNode);
-    drawNode->setPosition(Vec2(0.0f, 40.0f));
+    drawNode->setPosition(Vec2(0.0f, 55.0f));
+
+    // shared_ptr随着AlertView构造，其他lambda捕获裸指针
+    auto sharedResults = std::make_shared<std::array<CompetitionResult, 4> >(std::array<CompetitionResult, 4>({ prevResult[0], prevResult[1], prevResult[2], prevResult[3] }));
+    std::array<CompetitionResult, 4> *results = sharedResults.get();
+
+    // 检查
+    Label *label = Label::createWithSystemFont("检查：标准分总和7，比赛分总和0", "Arail", 10);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setPosition(Vec2(width * 0.5f, 45.0f));
+    Common::scaleLabelToFitWidth(label, width - 4.0f);
+
+    std::function<void (const std::array<CompetitionResult, 4> &)> refreshCheckLabel = [label](const std::array<CompetitionResult, 4> &results) {
+        float ss = 0.0f;
+        int cs = 0;
+        for (int i = 0; i < 4; ++i) {
+            ss += results[i].standard_score;
+            cs += results[i].competition_score;
+        }
+        label->setString(Common::format("检查：标准分总和%.3f，比赛分总和%d", ss, cs));
+    };
 
     drawNode->drawRect(Vec2(0.0f, 0.0f), Vec2(width, height), Color4F::BLACK);
     for (int i = 0; i < 4; ++i) {
@@ -372,10 +393,10 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             labels[i][k] = label;
         }
 
-        const CompetitionResult &result = prevResult[i];
+        const CompetitionResult *result = &results->at(i);
 
         // 刷新三个label的回调函数
-        RefreshRecordAlertCallback callback = [labels, i, colWidthArray](const CompetitionResult &result) {
+        RefreshRecordAlertCallback callback = [labels, i, colWidthArray, results, refreshCheckLabel](const CompetitionResult &result) {
             std::string text[3] = {
                 std::to_string(result.rank),
                 CompetitionResult::standardScoreToString(result.standard_score),
@@ -385,8 +406,10 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
                 labels[i][k]->setString(text[k]);
                 Common::scaleLabelToFitWidth(labels[i][k], colWidthArray[2 + k] - 4.0f);
             }
+            results->at(i) = result;
+            refreshCheckLabel(*results);
         };
-        callback(result);
+        callback(*result);
 
         ui::Widget *widget = ui::Widget::create();
         widget->setTouchEnabled(true);
@@ -394,7 +417,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         widget->setContentSize(Size(colWidth[2] + colWidth[3] + colWidth[4], 20.0f));
         drawNode->addChild(widget);
         widget->addClickEventListener([this, player, result, callback](Ref *) {
-            showCompetitionResultInputAlert(Common::format("选手编号%" PRIzu "，姓名「%s」", player->serial + 1, player->name.c_str()), result, callback);
+            showCompetitionResultInputAlert(Common::format("选手编号%" PRIzu "，姓名「%s」", player->serial + 1, player->name.c_str()), *result, callback);
         });
     }
 
@@ -426,14 +449,14 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     });
 
     // 说明文本
-    Label *label = Label::createWithSystemFont("自动计算的标准分按4210计，不设并列，如需并列请手动输入", "Arail", 10);
+    label = Label::createWithSystemFont("自动计算的标准分按4210计，不设并列，如需并列请手动输入", "Arail", 10);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setPosition(Vec2(width * 0.5f, 5.0f));
     Common::scaleLabelToFitWidth(label, width - 4.0f);
 
     std::string title = Common::format("第%" PRIzu "桌成绩", table + 1);
-    AlertView::showWithNode(title, rootNode, [this, table, labels, title]() {
+    AlertView::showWithNode(title, rootNode, [this, table, labels, title, sharedResults]() {
         std::array<CompetitionResult, 4> inputResult;
         for (int i = 0; i < 4; ++i) {
             const std::string &rank = labels[i][0]->getString();
