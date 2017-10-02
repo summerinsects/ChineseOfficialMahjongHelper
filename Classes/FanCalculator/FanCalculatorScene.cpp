@@ -162,6 +162,7 @@ void FanCalculatorScene::showInputAlert(const char *prevInput) {
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入手牌");
+    editBox->setMaxLength(50);
     if (prevInput != nullptr) {
         editBox->setText(prevInput);
     }
