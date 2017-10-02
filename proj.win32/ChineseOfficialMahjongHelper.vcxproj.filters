@@ -173,6 +173,9 @@
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionTableScene.h">
       <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\CompetitionSystem\EditBoxDelegateWrapper.h">
+      <Filter>src\CompetitionSystem</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h">
       <Filter>src\FanTable</Filter>
     </ClInclude>

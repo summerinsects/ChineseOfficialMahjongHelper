@@ -185,6 +185,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionRankCustomScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionRoundScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionTableScene.h" />
+    <ClInclude Include="..\Classes\CompetitionSystem\EditBoxDelegateWrapper.hpp" />
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanTableScene.h" />
