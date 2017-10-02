@@ -348,6 +348,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         os << ss;
         label->setString(Common::format("检查：标准分总和%s，比赛分总和%d", os.str().c_str(), cs));
     };
+    refreshCheckLabel(*results);
 
     // 横线
     for (int i = 0; i < 6; ++i) {
@@ -400,7 +401,9 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         const CompetitionResult *result = &results->at(i);
 
         // 刷新三个label的回调函数
-        RefreshRecordAlertCallback callback = [labels, i, colWidthArray, results, refreshCheckLabel](const CompetitionResult &result) {
+        auto callback = [labels, i, colWidthArray, results, refreshCheckLabel](const CompetitionResult &result, bool refreshAll) {
+            results->at(i) = result;
+
             std::string text[3] = {
                 std::to_string(result.rank),
                 CompetitionResult::standardScoreToString(result.standard_score),
@@ -411,10 +414,12 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
                 label->setString(text[k]);
                 Common::scaleLabelToFitWidth(label, colWidthArray[k + RANK] - 4.0f);
             }
-            results->at(i) = result;
-            refreshCheckLabel(*results);
+
+            if (refreshAll) {
+                refreshCheckLabel(*results);
+            }
         };
-        callback(*result);
+        callback(*result, false);
 
         ui::Widget *widget = ui::Widget::create();
         widget->setTouchEnabled(true);
@@ -617,7 +622,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
         temp.rank = rank;
         temp.standard_score = standardScore;
         temp.competition_score = competitionScore;
-        callback(temp);
+        callback(temp, true);
     }, nullptr);
 }
 

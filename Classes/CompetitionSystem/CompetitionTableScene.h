@@ -18,7 +18,7 @@ private:
     virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
-    typedef std::function<void (const CompetitionResult &)> RefreshRecordAlertCallback;
+    typedef std::function<void (const CompetitionResult &, bool)> RefreshRecordAlertCallback;
 
     void onClearButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender);
