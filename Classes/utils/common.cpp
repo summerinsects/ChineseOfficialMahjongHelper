@@ -20,6 +20,17 @@ void calculateColumnsCenterX(const float *colWidth, size_t col, float *xPos) {
     }
 }
 
+void calculateRankFromScore(const int (&scores)[4], int (&ranks)[4]) {
+    memset(ranks, 0, sizeof(ranks));
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (i == j) continue;
+            if (scores[i] < scores[j]) ++ranks[i];
+            if (scores[i] == scores[j] && i > j) ++ranks[i];
+        }
+    }
+}
+
 std::string format(const char *fmt, ...) {
     std::string ret;
     va_list ap;
