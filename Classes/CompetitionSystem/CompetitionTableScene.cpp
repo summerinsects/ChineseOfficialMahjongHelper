@@ -1,9 +1,9 @@
 ﻿#include "CompetitionTableScene.h"
 #include <array>
-#include "../cocos-wheels/CWEditBoxDelegate.h"
 #include "../widget/AlertView.h"
 #include "Competition.h"
 #include "CompetitionRankCustomScene.h"
+#include "EditBoxDelegateWrapper.hpp"
 
 USING_NS_CC;
 
@@ -581,16 +581,10 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setPosition(Vec2(90.0f, 30.0f));
     editBoxes[1] = editBox;
 
-    // EditBox的代理，使得能连续输入
-    auto delegate = std::make_shared<cw::EditBoxEndWithActionDelegate>([editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
-        if (action == ui::EditBoxDelegate::EditBoxEndAction::TAB_TO_NEXT) {
-            editBox = editBoxes[1];
-            editBox->scheduleOnce([editBox](float) {
-                editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
-            }, 0.0f, "open_keyboard");
-        }
-    });
+    // EditBox的代理
+    auto delegate = std::make_shared<EditBoxDelegateWrapper>(std::vector<ui::EditBox *>(editBoxes.begin(), editBoxes.end()));
     editBoxes[0]->setDelegate(delegate.get());
+    editBoxes[1]->setDelegate(delegate.get());
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
 

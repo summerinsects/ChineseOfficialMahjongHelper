@@ -1,11 +1,11 @@
 ﻿#include "CompetitionMainScene.h"
 #include <array>
-#include "../cocos-wheels/CWEditBoxDelegate.h"
 #include "../widget/AlertView.h"
 #include "Competition.h"
 #include "CompetitionEnrollScene.h"
 #include "CompetitionRoundScene.h"
 #include "CompetitionHistoryScene.h"
+#include "EditBoxDelegateWrapper.hpp"
 
 USING_NS_CC;
 
@@ -96,7 +96,6 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setText(name.c_str());
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(135.0f, 75.0f));
-    editBox->setTag(0);
     editBoxes[0] = editBox;
 #if 1  // 测试代码
     editBox->setText("测试比赛");
@@ -120,7 +119,6 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setText(buf);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(85.0f, 45.0f));
-    editBox->setTag(1);
     editBoxes[1] = editBox;
 
     label = Label::createWithSystemFont("比赛轮数", "Arial", 12);
@@ -140,19 +138,10 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setText(buf);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(85.0f, 15.0f));
-    editBox->setTag(2);
     editBoxes[2] = editBox;
 
     // EditBox的代理，使得能连续输入
-    auto delegate = std::make_shared<cw::EditBoxEndWithActionDelegate>([editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
-        if (action == ui::EditBoxDelegate::EditBoxEndAction::TAB_TO_NEXT) {
-            int tag = editBox->getTag();
-            editBox = editBoxes[tag + 1];
-            editBox->scheduleOnce([editBox](float) {
-                editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
-            }, 0.0f, "open_keyboard");
-        }
-    });
+    auto delegate = std::make_shared<EditBoxDelegateWrapper>(std::vector<ui::EditBox *>(editBoxes.begin(), editBoxes.end()));
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
 
