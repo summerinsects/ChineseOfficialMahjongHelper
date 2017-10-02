@@ -552,6 +552,12 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
         temp.competition_score = competitionScore;
         callback(temp);
     }, nullptr);
+
+    // 自动打开第1个editBox
+    editBox = editBoxes[0];
+    editBox->scheduleOnce([editBox](float) {
+        editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
+    }, 0.0f, "open_keyboard");
 }
 
 void CompetitionTableScene::showRankAlert() {
