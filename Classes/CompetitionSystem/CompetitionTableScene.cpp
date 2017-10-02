@@ -21,14 +21,14 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 列宽
-    _colWidth[0] = visibleSize.width * 0.1f;
-    _colWidth[1] = visibleSize.width * 0.1f;
-    _colWidth[2] = visibleSize.width * 0.1f;
+    _colWidth[0] = visibleSize.width * 0.08f;
+    _colWidth[1] = visibleSize.width * 0.08f;
+    _colWidth[2] = visibleSize.width * 0.08f;
     _colWidth[3] = visibleSize.width * 0.2f;
-    _colWidth[4] = visibleSize.width * 0.125f;
-    _colWidth[5] = visibleSize.width * 0.125f;
-    _colWidth[6] = visibleSize.width * 0.125f;
-    _colWidth[7] = visibleSize.width * 0.125f;
+    _colWidth[4] = visibleSize.width * 0.14f;
+    _colWidth[5] = visibleSize.width * 0.14f;
+    _colWidth[6] = visibleSize.width * 0.14f;
+    _colWidth[7] = visibleSize.width * 0.14f;
 
     // 中心位置
     Common::calculateColumnsCenterX(_colWidth, 8, _posX);

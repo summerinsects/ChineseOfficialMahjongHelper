@@ -71,14 +71,13 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setEnabled(_currentRound + 1 < _competitionData->round_count);
 
     // 列宽
-    _colWidth[0] = visibleSize.width * 0.1f;
-    _colWidth[1] = visibleSize.width * 0.1f;
+    _colWidth[0] = visibleSize.width * 0.08f;
+    _colWidth[1] = visibleSize.width * 0.08f;
     _colWidth[2] = visibleSize.width * 0.2f;
-
-    _colWidth[3] = visibleSize.width * 0.15f;
-    _colWidth[4] = visibleSize.width * 0.15f;
-    _colWidth[5] = visibleSize.width * 0.15f;
-    _colWidth[6] = visibleSize.width * 0.15f;
+    _colWidth[3] = visibleSize.width * 0.16f;
+    _colWidth[4] = visibleSize.width * 0.16f;
+    _colWidth[5] = visibleSize.width * 0.16f;
+    _colWidth[6] = visibleSize.width * 0.16f;
 
     // 中心位置
     Common::calculateColumnsCenterX(_colWidth, 7, _posX);
