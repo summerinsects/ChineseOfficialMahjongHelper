@@ -437,10 +437,11 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     button->setPosition(Vec2(width * 0.5f, 25.0f));
     button->addClickEventListener([this, labels, results, refreshCheckLabel](Ref *) {
         int scores[4] = {
-            atoi(labels[0][COMPETITION_SCORE]->getString().c_str()),
-            atoi(labels[1][COMPETITION_SCORE]->getString().c_str()),
-            atoi(labels[2][COMPETITION_SCORE]->getString().c_str()),
-            atoi(labels[3][COMPETITION_SCORE]->getString().c_str()) };
+            results->at(0).competition_score,
+            results->at(1).competition_score,
+            results->at(2).competition_score,
+            results->at(3).competition_score
+        };
         int ranks[4];
         Common::calculateRankFromScore(scores, ranks);
         for (int i = 0; i < 4; ++i) {
@@ -466,31 +467,24 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
     std::string title = Common::format("第%" PRIzu "桌成绩", table + 1);
     AlertView::showWithNode(title, rootNode, [this, table, labels, title, sharedResults]() {
-        std::array<CompetitionResult, 4> inputResult;
-        for (int i = 0; i < 4; ++i) {
-            const std::string &rank = labels[i][RANK]->getString();
-            const std::string &ss = labels[i][STANDARD_SCORE]->getString();
-            const std::string &cs = labels[i][COMPETITION_SCORE]->getString();
+        std::array<CompetitionResult, 4> *results = sharedResults.get();
 
-            CompetitionResult &result = inputResult[i];
-            result.rank = atoi(rank.c_str());
-            result.standard_score = static_cast<float>(atof(ss.c_str()));
-            result.competition_score = atoi(cs.c_str());
-        }
-
-        if (std::any_of(std::begin(inputResult), std::end(inputResult),
+        // 如果有顺位为0，则提示重新输入
+        if (std::any_of(std::begin(*results), std::end(*results),
             [](const CompetitionResult &result) { return result.rank == 0; })) {
-            AlertView::showWithMessage(title, "请选择顺位或使用自动计算", 12, [this, table, inputResult]() {
-                CompetitionResult result[4] = { inputResult[0], inputResult[1], inputResult[2], inputResult[3] };
-                showRecordAlert(table, result);
+            AlertView::showWithMessage(title, "请选择顺位或使用自动计算", 12, [this, table, sharedResults]() {
+                std::array<CompetitionResult, 4> *results = sharedResults.get();
+                CompetitionResult temp[4] = { results->at(0), results->at(1), results->at(2), results->at(3) };
+                showRecordAlert(table, temp);
             }, nullptr);
             return;
         }
 
+        // 更新数据
         std::vector<CompetitionPlayer> &players = _competitionData->players;
         CompetitionTable &currentTable = _competitionTables->at(table);
         for (int i = 0; i < 4; ++i) {
-            players[currentTable.player_indices[i]].competition_results[_currentRound] = inputResult[i];
+            players[currentTable.player_indices[i]].competition_results[_currentRound] = results->at(i);
         }
 
         // 刷新外面的UI
