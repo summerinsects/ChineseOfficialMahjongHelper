@@ -355,7 +355,7 @@ namespace {
         }
 
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override {
-            return _playerFlags->size();
+            return _playerFlags->size() >> 1;
         }
 
         virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override {
@@ -363,7 +363,7 @@ namespace {
         }
 
         virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override {
-            typedef cw::TableViewCellEx<ui::CheckBox *, std::array<Label *, 2>, std::array<LayerColor *, 2> > CustomCell;
+            typedef cw::TableViewCellEx<std::array<ui::CheckBox *, 2>, std::array<std::array<Label *, 2>, 2>, std::array<LayerColor *, 2> > CustomCell;
             CustomCell *cell = (CustomCell *)table->dequeueCell();
 
             Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -373,8 +373,8 @@ namespace {
                 cell = CustomCell::create();
 
                 CustomCell::ExtDataType &ext = cell->getExtData();
-                ui::CheckBox *&checkBox = std::get<0>(ext);
-                std::array<Label *, 2> &labels = std::get<1>(ext);
+                std::array<ui::CheckBox *, 2> &checkBoxes = std::get<0>(ext);
+                std::array<std::array<Label *, 2>, 2> &labels = std::get<1>(ext);
                 std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
                 // 背景色
@@ -384,44 +384,52 @@ namespace {
                 layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 30.0f);
                 cell->addChild(layerColors[1]);
 
-                // 选择框
-                checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-                cell->addChild(checkBox);
-                checkBox->setZoomScale(0.0f);
-                checkBox->ignoreContentAdaptWithSize(false);
-                checkBox->setContentSize(Size(20.0f, 20.0f));
-                checkBox->setPosition(Vec2(15.0f, 15.0f));
-                checkBox->addEventListener(std::bind(&AlertInnerNode::onCheckBox, this, std::placeholders::_1, std::placeholders::_2));
-
-                // 编号、名字
-                const Color3B textColors[] = { Color3B::BLACK, Color3B::ORANGE };
-                const float posX[] = { 40.0f, cellWidth * 0.5f + 30.0f };
+                const float startX[] = { 0.0f, cellWidth *0.5f };
                 for (int i = 0; i < 2; ++i) {
-                    Label *label = Label::createWithSystemFont("", "Arail", 12);
-                    label->setColor(textColors[i]);
-                    cell->addChild(label);
-                    label->setPosition(Vec2(posX[i], 15.0f));
-                    labels[i] = label;
+                    // 选择框
+                    ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+                    cell->addChild(checkBox);
+                    checkBox->setZoomScale(0.0f);
+                    checkBox->ignoreContentAdaptWithSize(false);
+                    checkBox->setContentSize(Size(20.0f, 20.0f));
+                    checkBox->setPosition(Vec2(startX[i] + 10.0f, 15.0f));
+                    checkBox->addEventListener(std::bind(&AlertInnerNode::onCheckBox, this, std::placeholders::_1, std::placeholders::_2));
+                    checkBoxes[i] = checkBox;
+
+                    // 编号、名字
+                    const Color3B textColors[] = { Color3B::BLACK, Color3B::ORANGE };
+                    const float posX[] = { startX[i] + 35.0f, startX[i] + cellWidth * 0.25f + 20 };
+                    for (int k = 0; k < 2; ++k) {
+                        Label *label = Label::createWithSystemFont("", "Arail", 12);
+                        label->setColor(textColors[k]);
+                        cell->addChild(label);
+                        label->setPosition(Vec2(posX[k], 15.0f));
+                        labels[i][k] = label;
+                    }
                 }
             }
 
             const CustomCell::ExtDataType &ext = cell->getExtData();
-            ui::CheckBox *checkBox = std::get<0>(ext);
-            const std::array<Label *, 2> &labels = std::get<1>(ext);
+            const std::array<ui::CheckBox *, 2> &checkBoxes = std::get<0>(ext);
+            const std::array<std::array<Label *, 2>, 2> &labels = std::get<1>(ext);
             const std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
 
             layerColors[0]->setVisible(!(idx & 1));
             layerColors[1]->setVisible(!!(idx & 1));
 
-            const CompetitionPlayer &player = _players->at(idx);
-            labels[0]->setString(std::to_string(player.serial + 1));
-            Common::scaleLabelToFitWidth(labels[0], 18.0f);
-            labels[1]->setString(player.name);
-            Common::scaleLabelToFitWidth(labels[1], (cellWidth - 55.0f) * 0.5f - 4.0f);
+            for (int i = 0; i < 2; ++i) {
+                ssize_t realIdx = (idx << 1) + i;
+                const CompetitionPlayer &player = _players->at(realIdx);
+                labels[i][0]->setString(std::to_string(player.serial + 1));
+                Common::scaleLabelToFitWidth(labels[i][0], 18.0f);
+                labels[i][1]->setString(player.name);
+                Common::scaleLabelToFitWidth(labels[i][1], cellWidth * 0.5f - 49.0f);
 
-            checkBox->setUserData(reinterpret_cast<void *>(idx));
-            checkBox->setEnabled(!_playerFlags->at(idx));
-            checkBox->setSelected(!!_currentFlags[idx]);
+                ui::CheckBox *checkBox = checkBoxes[i];
+                checkBox->setUserData(reinterpret_cast<void *>(realIdx));
+                checkBox->setEnabled(!_playerFlags->at(realIdx));
+                checkBox->setSelected(!!_currentFlags[realIdx]);
+            }
 
             return cell;
         }
