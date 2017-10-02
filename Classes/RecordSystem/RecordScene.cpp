@@ -68,18 +68,6 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     editBox->setDelegate(this);
     _editBox = editBox;
 
-    // 输入框同位置的按钮，以实现点击后清除内容的效果
-    ui::Widget *widget = ui::Widget::create();
-    editBox->addChild(widget);
-    widget->setTouchEnabled(true);
-    widget->setContentSize(Size(35.0f, 20.0f));
-    widget->setPosition(Vec2(35.0f * 0.5f, 20.0f * 0.5f));
-    widget->addClickEventListener([editBox](Ref *) {
-        editBox->setPlaceHolder(editBox->getText());
-        editBox->setText("");
-        editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
-    });
-
     // +-按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
@@ -439,16 +427,22 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     return cell;
 }
 
+void RecordScene::editBoxEditingDidBegin(cocos2d::ui::EditBox *editBox) {
+    // 点击后清除内容的效果
+    editBox->setPlaceHolder(editBox->getText());
+    editBox->setText("");
+}
+
 void RecordScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
-    const char *text = _editBox->getText();
+    const char *text = editBox->getText();
     if (*text == '\0') {
-        const char *placeholder = _editBox->getPlaceHolder();
-        _editBox->setText(placeholder);
+        const char *placeholder = editBox->getPlaceHolder();
+        editBox->setText(placeholder);
         text = placeholder;
     }
 
     if (atoi(text) < 8) {
-        _editBox->setText("8");
+        editBox->setText("8");
     }
 
     updateScoreLabel();
