@@ -18,6 +18,7 @@ public:
     CREATE_FUNC_WITH_PARAM_4(RecordScene, initWithIndex, size_t, handIdx, const char **, playerNames, const Record::Detail *, detail, const SubmitCallback &, okCallback);
     bool initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const SubmitCallback &callback);
 
+    virtual void editBoxEditingDidBegin(cocos2d::ui::EditBox* editBox) override;
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
 
     const Record::Detail &getDetail() const { return _detail; }
