@@ -511,6 +511,7 @@ void ScoreSheetScene::editName(size_t idx) {
         }
     }, nullptr);
 
+    // 自动打开editBox
     editBox->scheduleOnce([editBox](float) {
         editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
     }, 0.0f, "open_keyboard");
