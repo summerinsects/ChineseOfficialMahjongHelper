@@ -392,13 +392,13 @@ namespace {
                     checkBox->setZoomScale(0.0f);
                     checkBox->ignoreContentAdaptWithSize(false);
                     checkBox->setContentSize(Size(20.0f, 20.0f));
-                    checkBox->setPosition(Vec2(startX[i] + 10.0f, 15.0f));
+                    checkBox->setPosition(Vec2(startX[i] + 12.0f, 15.0f));
                     checkBox->addEventListener(std::bind(&AlertInnerNode::onCheckBox, this, std::placeholders::_1, std::placeholders::_2));
                     checkBoxes[i] = checkBox;
 
                     // 编号、名字
                     const Color3B textColors[] = { Color3B::BLACK, Color3B::ORANGE };
-                    const float posX[] = { startX[i] + 35.0f, startX[i] + cellWidth * 0.25f + 20 };
+                    const float posX[] = { startX[i] + 35.0f, startX[i] + cellWidth * 0.25f + 20.0f };
                     for (int k = 0; k < 2; ++k) {
                         Label *label = Label::createWithSystemFont("", "Arail", 12);
                         label->setColor(textColors[k]);
@@ -423,7 +423,7 @@ namespace {
                 labels[i][0]->setString(std::to_string(player.serial + 1));
                 Common::scaleLabelToFitWidth(labels[i][0], 18.0f);
                 labels[i][1]->setString(player.name);
-                Common::scaleLabelToFitWidth(labels[i][1], cellWidth * 0.5f - 49.0f);
+                Common::scaleLabelToFitWidth(labels[i][1], cellWidth * 0.5f - 54.0f);
 
                 ui::CheckBox *checkBox = checkBoxes[i];
                 checkBox->setUserData(reinterpret_cast<void *>(realIdx));
