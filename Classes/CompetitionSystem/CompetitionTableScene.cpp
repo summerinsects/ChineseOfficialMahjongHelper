@@ -344,7 +344,9 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             ss += results[i].standard_score;
             cs += results[i].competition_score;
         }
-        label->setString(Common::format("检查：标准分总和%.3f，比赛分总和%d", ss, cs));
+        std::ostringstream os;
+        os << ss;
+        label->setString(Common::format("检查：标准分总和%s，比赛分总和%d", os.str().c_str(), cs));
     };
 
     // 横线
@@ -433,7 +435,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     button->setTitleFontSize(12);
     button->setTitleText("自动计算");
     button->setPosition(Vec2(width * 0.5f, 25.0f));
-    button->addClickEventListener([this, labels](Ref *) {
+    button->addClickEventListener([this, labels, results, refreshCheckLabel](Ref *) {
         int scores[4] = {
             atoi(labels[0][COMPETITION_SCORE]->getString().c_str()),
             atoi(labels[1][COMPETITION_SCORE]->getString().c_str()),
@@ -442,14 +444,17 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         int ranks[4];
         Common::calculateRankFromScore(scores, ranks);
         for (int i = 0; i < 4; ++i) {
+            CompetitionResult &result = results->at(i);
             switch (ranks[i]) {
-            case 0: labels[i][RANK]->setString("1"); labels[i][STANDARD_SCORE]->setString("4"); break;
-            case 1: labels[i][RANK]->setString("2"); labels[i][STANDARD_SCORE]->setString("2"); break;
-            case 2: labels[i][RANK]->setString("3"); labels[i][STANDARD_SCORE]->setString("1"); break;
-            case 3: labels[i][RANK]->setString("4"); labels[i][STANDARD_SCORE]->setString("0"); break;
+            case 0: result.rank = 1; result.standard_score = 4; labels[i][RANK]->setString("1"); labels[i][STANDARD_SCORE]->setString("4"); break;
+            case 1: result.rank = 2; result.standard_score = 2; labels[i][RANK]->setString("2"); labels[i][STANDARD_SCORE]->setString("2"); break;
+            case 2: result.rank = 3; result.standard_score = 1; labels[i][RANK]->setString("3"); labels[i][STANDARD_SCORE]->setString("1"); break;
+            case 3: result.rank = 4; result.standard_score = 0; labels[i][RANK]->setString("4"); labels[i][STANDARD_SCORE]->setString("0"); break;
             default: break;
             }
         }
+
+        refreshCheckLabel(*results);
     });
 
     // 说明文本
