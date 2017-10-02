@@ -408,7 +408,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
         if (std::any_of(std::begin(inputResult), std::end(inputResult),
             [](const CompetitionResult &result) { return result.rank == 0; })) {
-            AlertView::showWithMessage(title, "顺位不能为0", 12, [this, table, inputResult]() {
+            AlertView::showWithMessage(title, "请选择顺位", 12, [this, table, inputResult]() {
                 CompetitionResult result[4] = { inputResult[0], inputResult[1], inputResult[2], inputResult[3] };
                 showRecordAlert(table, result);
             }, nullptr);
@@ -430,7 +430,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
 void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &title, const CompetitionResult &result, const RefreshRecordAlertCallback &callback) {
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(115.0f, 90.0f));
+    rootNode->setContentSize(Size(135.0f, 90.0f));
 
     Label *label = Label::createWithSystemFont("顺位", "Arial", 12);
     label->setColor(Color3B::BLACK);
@@ -438,22 +438,26 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 75.0f));
 
-    char buf[32];
-    snprintf(buf, sizeof(buf), "%u", result.rank);
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    radioGroup->setAllowedNoSelection(true);
+    rootNode->addChild(radioGroup);
+    for (int i = 0; i < 4; ++i) {
+        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(45.0f + i * 25, 75.0f));
+        rootNode->addChild(radioButton);
 
-    std::array<ui::EditBox *, 3> editBoxes;
+        label = Label::createWithSystemFont(std::to_string(i + 1), "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(10.0f, 10.0f));
 
-    ui::EditBox *editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setText(buf);
-    rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85.0f, 75.0f));
-    editBox->setTag(0);
-    editBoxes[0] = editBox;
+        radioGroup->addRadioButton(radioButton);
+    }
+
+    std::array<ui::EditBox *, 2> editBoxes;
 
     label = Label::createWithSystemFont("标准分", "Arial", 12);
     label->setColor(Color3B::BLACK);
@@ -461,7 +465,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 45.0f));
 
-    editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox = ui::EditBox::create(Size(80.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -473,9 +477,18 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setFontSize(12);
     editBox->setText(CompetitionResult::standardScoreToString(result.standard_score).c_str());
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85.0f, 45.0f));
-    editBox->setTag(1);
-    editBoxes[1] = editBox;
+    editBox->setPosition(Vec2(90.0f, 45.0f));
+    editBoxes[0] = editBox;
+
+    radioGroup->addEventListener([editBox](ui::RadioButton *, int index, ui::RadioButtonGroup::EventType) {
+        switch (index) {
+        case 0: editBox->setText("4"); break;
+        case 1: editBox->setText("2"); break;
+        case 2: editBox->setText("1"); break;
+        case 3: editBox->setText("0"); break;
+        default: break;
+        }
+    });
 
     label = Label::createWithSystemFont("比赛分", "Arial", 12);
     label->setColor(Color3B::BLACK);
@@ -483,9 +496,10 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 15.0f));
 
+    char buf[32];
     snprintf(buf, sizeof(buf), "%d", result.competition_score);
 
-    editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox = ui::EditBox::create(Size(80.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -497,45 +511,39 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setFontSize(12);
     editBox->setText(buf);
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85.0f, 15.0f));
-    editBox->setTag(2);
-    editBoxes[2] = editBox;
+    editBox->setPosition(Vec2(90.0f, 15.0f));
+    editBoxes[1] = editBox;
 
     // EditBox的代理，使得能连续输入
     auto delegate = std::make_shared<cw::EditBoxEndWithActionDelegate>([editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
         if (action == ui::EditBoxDelegate::EditBoxEndAction::TAB_TO_NEXT) {
-            int tag = editBox->getTag();
-            editBox = editBoxes[tag + 1];
+            editBox = editBoxes[1];
             editBox->scheduleOnce([editBox](float) {
                 editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
             }, 0.0f, "open_keyboard");
         }
     });
     editBoxes[0]->setDelegate(delegate.get());
-    editBoxes[1]->setDelegate(delegate.get());
 
-    AlertView::showWithNode(title, rootNode, [this, editBoxes, title, result, callback, delegate]() {
+    AlertView::showWithNode(title, rootNode, [this, radioGroup, editBoxes, title, result, callback, delegate]() {
         unsigned rank = 0;
         float standardScore = 0;
         int competitionScore = 0;
 
-        const char *text = editBoxes[0]->getText();
-        if (*text != '\0') {
-            rank = atoi(text);
-        }
+        rank = radioGroup->getSelectedButtonIndex() + 1;
 
-        text = editBoxes[1]->getText();
+        const char *text = editBoxes[0]->getText();
         if (*text != '\0') {
             standardScore = static_cast<float>(atof(text));
         }
 
-        text = editBoxes[2]->getText();
+        text = editBoxes[1]->getText();
         if (*text != '\0') {
             competitionScore = atoi(text);
         }
 
         if (rank < 1 || rank > 4) {
-            AlertView::showWithMessage("登记成绩", "顺位只能是1到4", 12,
+            AlertView::showWithMessage("登记成绩", "请选择顺位", 12,
                 std::bind(&CompetitionTableScene::showCompetitionResultInputAlert, this, title, result, callback), nullptr);
             return;
         }
@@ -552,12 +560,6 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
         temp.competition_score = competitionScore;
         callback(temp);
     }, nullptr);
-
-    // 自动打开第1个editBox
-    editBox = editBoxes[0];
-    editBox->scheduleOnce([editBox](float) {
-        editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
-    }, 0.0f, "open_keyboard");
 }
 
 void CompetitionTableScene::showRankAlert() {
