@@ -37,7 +37,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     Common::calculateColumnsCenterX(_colWidth, 8, _posX);
 
     // 表头
-    const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "桌号", "座次", "编号", "选手姓名" };
+    static const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "桌号", "座次", "编号", "选手姓名" };
     for (int i = 0; i < 8; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);

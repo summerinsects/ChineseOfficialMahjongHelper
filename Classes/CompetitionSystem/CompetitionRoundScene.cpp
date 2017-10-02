@@ -83,7 +83,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     Common::calculateColumnsCenterX(_colWidth, 7, _posX);
 
     // 表头
-    const char *titleTexts[] = { "名次", "编号", "选手姓名", "本轮标准分", "本轮比赛分", "累计标准分", "累计比赛分" };
+    static const char *titleTexts[] = { "名次", "编号", "选手姓名", "本轮标准分", "本轮比赛分", "累计标准分", "累计比赛分" };
     for (int i = 0; i < 7; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);

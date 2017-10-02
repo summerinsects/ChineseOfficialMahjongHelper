@@ -7,6 +7,8 @@
 
 USING_NS_CC;
 
+static const char *seatText[] = { "东", "南", "西", "北" };
+
 bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
     if (UNLIKELY(!BaseScene::initWithTitle(Common::format("%s第%" PRIzu "/%" PRIzu "轮",
         competitionData->name.c_str(), currentRound + 1, competitionData->round_count)))) {
@@ -34,7 +36,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     Common::calculateColumnsCenterX(_colWidth, 8, _posX);
 
     // 表头
-    const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "顺位", "标准分", "比赛分" };
+    static const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "顺位", "标准分", "比赛分" };
     for (int i = 0; i < 7; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
@@ -141,7 +143,6 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         tableLabel->setPosition(Vec2(_posX[0], 40.0f));
 
         // 座次
-        static const char *seatText[] = { "东", "南", "西", "北" };
         for (int i = 0; i < 4; ++i) {
             const float posY = static_cast<float>(70 - i * 20);
 
