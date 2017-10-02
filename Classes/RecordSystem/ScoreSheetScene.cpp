@@ -354,17 +354,10 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 }
 
 void ScoreSheetScene::refreshRank() {
-    // 计算名次
-    const char *text[] = { "一", "二", "三", "四" };
     int rank[4] = {0};
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            if (i == j) continue;
-            if (_totalScores[i] < _totalScores[j]) ++rank[i];
-            if (_totalScores[i] == _totalScores[j] && i > j) ++rank[i];
-        }
-    }
+    Common::calculateRankFromScore(_totalScores, rank);
 
+    const char *text[] = { "一", "二", "三", "四" };
     for (int i = 0; i < 4; ++i) {
         _rankLabels[i]->setVisible(true);
         _rankLabels[i]->setString(text[rank[i]]);

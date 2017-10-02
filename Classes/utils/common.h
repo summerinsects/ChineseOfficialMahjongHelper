@@ -86,6 +86,8 @@ static inline bool isCStringEmpty(const char *str) {
     return *str == '\0';
 }
 
+void calculateRankFromScore(const int (&scores)[4], int (&ranks)[4]);
+
 #ifdef _MSC_VER
 std::string format(_Printf_format_string_ const char *fmt, ...);
 #else
