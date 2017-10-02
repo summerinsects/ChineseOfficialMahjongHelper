@@ -204,6 +204,7 @@ void CompetitionEnrollScene::onNameWidget(cocos2d::Ref *sender) {
     editBox->setFontColor(Color3B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(_competitionData->players[idx].name.c_str());
+    editBox->setMaxLength(64);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 

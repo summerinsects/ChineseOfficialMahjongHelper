@@ -543,6 +543,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(CompetitionResult::standardScoreToString(result.standard_score).c_str());
+    editBox->setMaxLength(10);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(90.0f, 60.0f));
     editBoxes[0] = editBox;
@@ -577,6 +578,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(buf);
+    editBox->setMaxLength(10);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(90.0f, 30.0f));
     editBoxes[1] = editBox;

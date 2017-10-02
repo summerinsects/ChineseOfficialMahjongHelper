@@ -94,6 +94,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(name.c_str());
+    editBox->setMaxLength(128);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(135.0f, 75.0f));
     editBoxes[0] = editBox;
@@ -117,6 +118,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(buf);
+    editBox->setMaxLength(3);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(85.0f, 45.0f));
     editBoxes[1] = editBox;
@@ -136,6 +138,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(buf);
+    editBox->setMaxLength(3);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(85.0f, 15.0f));
     editBoxes[2] = editBox;
