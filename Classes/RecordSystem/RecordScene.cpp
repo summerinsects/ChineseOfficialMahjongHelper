@@ -64,6 +64,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText("8");
+    editBox->setMaxLength(3);  // 理论最高番332番，所以最大为3位
     editBox->setPosition(Vec2(origin.x + 86.0f, origin.y + visibleSize.height - 50.0f));
     editBox->setDelegate(this);
     _editBox = editBox;

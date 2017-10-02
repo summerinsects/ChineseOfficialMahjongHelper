@@ -29,6 +29,7 @@ bool MahjongTheoryScene::init() {
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("在此处输入");
+    editBox->setMaxLength(50);
     editBox->setDelegate(this);
     editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40.0f, origin.y + visibleSize.height - 50.0f));
     TilesKeyboard::hookEditBox(editBox);

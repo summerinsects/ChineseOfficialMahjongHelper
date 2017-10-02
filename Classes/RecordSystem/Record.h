@@ -9,8 +9,10 @@
 
 #include "json/document.h"
 
+#define NAME_SIZE 64
+
 struct Record {
-    char name[4][255];      // 选手姓名
+    char name[4][NAME_SIZE];// 选手姓名
     struct Detail {
         uint8_t win_claim;  // 和牌标记（4567bit）/点炮标记（0123bit）
         uint8_t false_win;  // 错和标记
