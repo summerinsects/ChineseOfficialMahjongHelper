@@ -299,23 +299,23 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
 
 void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResult (&prevResult)[4]) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float width = visibleSize.width * 0.8f - 10.0f;
+    const float height = 100;
 
     // 列宽
-    const float colWidth[5] = {
-        visibleSize.width * 0.1f,
-        visibleSize.width * 0.2f,
-        visibleSize.width * 0.15f,
-        visibleSize.width * 0.15f,
-        visibleSize.width * 0.15f,
+    const float colWidth[6] = {
+        width * 0.1f,
+        width * 0.1f,
+        width * 0.26f,
+        width * 0.18f,
+        width * 0.18f,
+        width * 0.18f,
     };
-    std::array<float, 5> colWidthArray = { colWidth[0], colWidth[1], colWidth[2], colWidth[3], colWidth[4] };
+    std::array<float, 6> colWidthArray = { colWidth[0], colWidth[1], colWidth[2], colWidth[3], colWidth[4], colWidth[5] };
 
     // 中心位置
-    float posX[5];
-    Common::calculateColumnsCenterX(colWidth, 5, posX);
-
-    const float width = visibleSize.width * 0.75f;
-    const float height = 100;
+    float posX[6];
+    Common::calculateColumnsCenterX(colWidth, 6, posX);
 
     // 根结点
     Node *rootNode = Node::create();
@@ -347,20 +347,26 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         label->setString(Common::format("检查：标准分总和%.3f，比赛分总和%d", ss, cs));
     };
 
-    drawNode->drawRect(Vec2(0.0f, 0.0f), Vec2(width, height), Color4F::BLACK);
-    for (int i = 0; i < 4; ++i) {
-        drawNode->drawLine(Vec2(0.0f, static_cast<float>(i * 20 + 20)), Vec2(width, static_cast<float>(i * 20 + 20)), Color4F::BLACK);
+    // 横线
+    for (int i = 0; i < 6; ++i) {
+        const float y = static_cast<float>(i * 20);
+        drawNode->drawLine(Vec2(0.0f, y), Vec2(width, y), Color4F::BLACK);
     }
 
-    for (int i = 0; i < 4; ++i) {
+    // 竖线
+    drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(0.0f, 100.0f), Color4F::BLACK);
+    for (int i = 0; i < 6; ++i) {
         const float x = posX[i] + colWidth[i] * 0.5f;
         drawNode->drawLine(Vec2(x, 0.0f), Vec2(x, 100.0f), Color4F::BLACK);
     }
 
-    std::array<std::array<Label *, 3>, 4> labels;
+    std::array<std::array<Label *, 6>, 4> labels;
+    enum {
+        SEAT, SERIAL, NAME, RANK, STANDARD_SCORE, COMPETITION_SCORE
+    };
 
-    const char *titleTexts[] = { "编号", "选手姓名", "顺位", "标准分", "比赛分" };
-    for (int i = 0; i < 5; ++i) {
+    static const char *titleTexts[] = { "座次", "编号", "选手姓名", "顺位", "标准分", "比赛分" };
+    for (int i = 0; i < 6; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         drawNode->addChild(label);
@@ -374,23 +380,16 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     for (int i = 0; i < 4; ++i) {
         const CompetitionPlayer *player = &players[currentTable.player_indices[i]];
 
-        Label *label = Label::createWithSystemFont(std::to_string(player->serial + 1), "Arail", 12);
-        label->setColor(Color3B::BLACK);
-        drawNode->addChild(label);
-        label->setPosition(Vec2(posX[0], 70.0f - 20.0f * i));
-        Common::scaleLabelToFitWidth(label, colWidth[0] - 4.0f);
+        const float posY = 70.0f - 20.0f * i;
 
-        label = Label::createWithSystemFont(player->name, "Arail", 12);
-        label->setColor(Color3B::BLACK);
-        drawNode->addChild(label);
-        label->setPosition(Vec2(posX[1], 70.0f - 20.0f * i));
-        Common::scaleLabelToFitWidth(label, colWidth[1] - 4.0f);
+        std::string text[6] = { seatText[i], std::to_string(player->serial + 1), player->name, "", "", "" };
 
-        for (int k = 0; k < 3; ++k) {
-            label = Label::createWithSystemFont("", "Arail", 12);
+        for (int k = 0; k < 6; ++k) {
+            Label *label = Label::createWithSystemFont(text[k], "Arail", 12);
             label->setColor(Color3B::BLACK);
             drawNode->addChild(label);
-            label->setPosition(Vec2(posX[2 + k], 70.0f - 20.0f * i));
+            label->setPosition(Vec2(posX[k], posY));
+            Common::scaleLabelToFitWidth(label, colWidth[k] - 4.0f);
             labels[i][k] = label;
         }
 
@@ -404,8 +403,9 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
                 std::to_string(result.competition_score)
             };
             for (int k = 0; k < 3; ++k) {
-                labels[i][k]->setString(text[k]);
-                Common::scaleLabelToFitWidth(labels[i][k], colWidthArray[2 + k] - 4.0f);
+                Label *label = labels[i][k + RANK];
+                label->setString(text[k]);
+                Common::scaleLabelToFitWidth(label, colWidthArray[k + RANK] - 4.0f);
             }
             results->at(i) = result;
             refreshCheckLabel(*results);
@@ -414,8 +414,8 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
         ui::Widget *widget = ui::Widget::create();
         widget->setTouchEnabled(true);
-        widget->setPosition(Vec2(posX[3], 70.0f - 20.0f * i));
-        widget->setContentSize(Size(colWidth[2] + colWidth[3] + colWidth[4], 20.0f));
+        widget->setPosition(Vec2(posX[4], posY));
+        widget->setContentSize(Size(colWidth[4] * 3, 20.0f));
         drawNode->addChild(widget);
         widget->addClickEventListener([this, player, result, callback](Ref *) {
             showCompetitionResultInputAlert(Common::format("选手编号%" PRIzu "，姓名「%s」", player->serial + 1, player->name.c_str()), *result, callback);
@@ -432,18 +432,18 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     button->setPosition(Vec2(width * 0.5f, 25.0f));
     button->addClickEventListener([this, labels](Ref *) {
         int scores[4] = {
-            atoi(labels[0][2]->getString().c_str()),
-            atoi(labels[1][2]->getString().c_str()),
-            atoi(labels[2][2]->getString().c_str()),
-            atoi(labels[3][2]->getString().c_str()) };
+            atoi(labels[0][COMPETITION_SCORE]->getString().c_str()),
+            atoi(labels[1][COMPETITION_SCORE]->getString().c_str()),
+            atoi(labels[2][COMPETITION_SCORE]->getString().c_str()),
+            atoi(labels[3][COMPETITION_SCORE]->getString().c_str()) };
         int ranks[4];
         Common::calculateRankFromScore(scores, ranks);
         for (int i = 0; i < 4; ++i) {
             switch (ranks[i]) {
-            case 0: labels[i][0]->setString("1"); labels[i][1]->setString("4"); break;
-            case 1: labels[i][0]->setString("2"); labels[i][1]->setString("2"); break;
-            case 2: labels[i][0]->setString("3"); labels[i][1]->setString("1"); break;
-            case 3: labels[i][0]->setString("4"); labels[i][1]->setString("0"); break;
+            case 0: labels[i][RANK]->setString("1"); labels[i][STANDARD_SCORE]->setString("4"); break;
+            case 1: labels[i][RANK]->setString("2"); labels[i][STANDARD_SCORE]->setString("2"); break;
+            case 2: labels[i][RANK]->setString("3"); labels[i][STANDARD_SCORE]->setString("1"); break;
+            case 3: labels[i][RANK]->setString("4"); labels[i][STANDARD_SCORE]->setString("0"); break;
             default: break;
             }
         }
@@ -460,9 +460,9 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     AlertView::showWithNode(title, rootNode, [this, table, labels, title, sharedResults]() {
         std::array<CompetitionResult, 4> inputResult;
         for (int i = 0; i < 4; ++i) {
-            const std::string &rank = labels[i][0]->getString();
-            const std::string &ss = labels[i][1]->getString();
-            const std::string &cs = labels[i][2]->getString();
+            const std::string &rank = labels[i][RANK]->getString();
+            const std::string &ss = labels[i][STANDARD_SCORE]->getString();
+            const std::string &cs = labels[i][COMPETITION_SCORE]->getString();
 
             CompetitionResult &result = inputResult[i];
             result.rank = atoi(rank.c_str());
