@@ -453,7 +453,7 @@ void TilesKeyboard::onNumberedSuffix(int suit) {
     std::string::size_type lastSuffixPos
         = std::find_if_not(_tilesText.rbegin(), _tilesText.rend(), isdigit).base() - _tilesText.begin();
 
-    const char *suitFace = "msp";
+    static const char *suitFace = "msp";
     _tilesText.append(1, suitFace[suit]);
     refreshInputLabel();
 
@@ -469,7 +469,7 @@ void TilesKeyboard::onHonor(int honor) {
         return;
     }
 
-    const char *honorFace = "ESWNCFP";
+    static const char *honorFace = "ESWNCFP";
     _tilesText.append(1, honorFace[honor]);
     refreshInputLabel();
 

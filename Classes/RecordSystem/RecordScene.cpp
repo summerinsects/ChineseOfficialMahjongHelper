@@ -326,7 +326,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
 
     // 6 8 12 16 24
     const float labelPosX = label->getContentSize().width + 5.0f + 2.0f;
-    const char *text[] = { "6番", "8番", "12番", "16番", "24番" };
+    static const char *text[] = { "6番", "8番", "12番", "16番", "24番" };
     for (size_t i = 0; i < 5; ++i) {
         button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         button->setScale9Enabled(true);

@@ -115,7 +115,7 @@ bool TilePickWidget::init() {
 
     // 排列按钮
     ui::Button *buttons[8];
-    const char *titleText[8] = {"吃 _XX", "吃 X_X", "吃 XX_", "排序", "碰", "明杠", "暗杠", "清空" };
+    static const char *titleText[8] = {"吃 _XX", "吃 X_X", "吃 XX_", "排序", "碰", "明杠", "暗杠", "清空" };
 
     for (int i = 0; i < 8; ++i) {
         int col = i >> 2;
