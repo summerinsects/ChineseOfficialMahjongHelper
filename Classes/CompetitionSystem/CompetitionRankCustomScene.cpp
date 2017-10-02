@@ -395,7 +395,7 @@ namespace {
 
                 // 编号、名字
                 const Color3B textColors[] = { Color3B::BLACK, Color3B::ORANGE };
-                const float posX[] = { 40, (cellWidth - 55) * 0.5f };
+                const float posX[] = { 40.0f, cellWidth * 0.5f + 30.0f };
                 for (int i = 0; i < 2; ++i) {
                     Label *label = Label::createWithSystemFont("", "Arail", 12);
                     label->setColor(textColors[i]);
@@ -417,7 +417,7 @@ namespace {
             labels[0]->setString(std::to_string(player.serial + 1));
             Common::scaleLabelToFitWidth(labels[0], 18.0f);
             labels[1]->setString(player.name);
-            Common::scaleLabelToFitWidth(labels[1], (cellWidth - 55) * 0.5f - 4.0f);
+            Common::scaleLabelToFitWidth(labels[1], (cellWidth - 55.0f) * 0.5f - 4.0f);
 
             checkBox->setUserData(reinterpret_cast<void *>(idx));
             checkBox->setEnabled(!_playerFlags->at(idx));
