@@ -332,7 +332,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
     // 检查
     Label *label = Label::createWithSystemFont("检查：标准分总和7，比赛分总和0", "Arail", 10);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B(254, 87, 110));
     rootNode->addChild(label);
     label->setPosition(Vec2(width * 0.5f, 45.0f));
     Common::scaleLabelToFitWidth(label, width - 4.0f);
@@ -377,6 +377,8 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     const std::vector<CompetitionPlayer> &players = _competitionData->players;
     const CompetitionTable &currentTable = _competitionTables->at(table);
 
+    Color3B textColors[] = { Color3B::BLACK, Color3B(0x60, 0x60, 0x60), Color3B::ORANGE,
+        Color3B(254, 87, 110), Color3B(44, 121, 178), Color3B(101, 196, 59) };
     for (int i = 0; i < 4; ++i) {
         const CompetitionPlayer *player = &players[currentTable.player_indices[i]];
 
@@ -386,7 +388,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
         for (int k = 0; k < 6; ++k) {
             Label *label = Label::createWithSystemFont(text[k], "Arail", 12);
-            label->setColor(Color3B::BLACK);
+            label->setColor(textColors[k]);
             drawNode->addChild(label);
             label->setPosition(Vec2(posX[k], posY));
             Common::scaleLabelToFitWidth(label, colWidth[k] - 4.0f);
@@ -451,7 +453,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
     // 说明文本
     label = Label::createWithSystemFont("自动计算的标准分按4210计，不设并列，如需并列请手动输入", "Arail", 10);
-    label->setColor(Color3B::BLACK);
+    label->setColor(Color3B(0x60, 0x60, 0x60));
     rootNode->addChild(label);
     label->setPosition(Vec2(width * 0.5f, 5.0f));
     Common::scaleLabelToFitWidth(label, width - 4.0f);
@@ -592,8 +594,8 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
     // 说明文本
-    label = Label::createWithSystemFont("此处可仅输入比赛分，在外部使用「自动计算」计算顺位和标准分", "Arail", 10);
-    label->setColor(Color3B::BLACK);
+    label = Label::createWithSystemFont("此处可仅输入比赛分，再使用「自动计算」", "Arail", 10);
+    label->setColor(Color3B(0x60, 0x60, 0x60));
     rootNode->addChild(label);
     label->setPosition(Vec2(135.0f * 0.5f, 5.0f));
     Common::scaleLabelToFitWidth(label, visibleSize.width * 0.8f - 14.0f);
