@@ -170,7 +170,6 @@
 		1FCC3C011CC47200001C9555 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Record.h; sourceTree = "<group>"; };
 		1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HandTilesWidget.cpp; sourceTree = "<group>"; };
 		1FD228F11E39837E00DF5C1D /* HandTilesWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandTilesWidget.h; sourceTree = "<group>"; };
-		1FDCF7BC1F738E1C00D9C608 /* CWEditBoxDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWEditBoxDelegate.h; sourceTree = "<group>"; };
 		1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
 		1FDCF7BE1F738E1D00D9C608 /* CWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWTableView.h; sourceTree = "<group>"; };
 		1FDCF7C51F738EE400D9C608 /* common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common.cpp; sourceTree = "<group>"; };
@@ -351,7 +350,6 @@
 		1FDCF7BB1F738E1C00D9C608 /* cocos-wheels */ = {
 			isa = PBXGroup;
 			children = (
-				1FDCF7BC1F738E1C00D9C608 /* CWEditBoxDelegate.h */,
 				1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */,
 				1FDCF7BE1F738E1D00D9C608 /* CWTableView.h */,
 			);

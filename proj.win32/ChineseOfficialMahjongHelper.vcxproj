@@ -170,7 +170,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   <ItemGroup>
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\BaseScene.h" />
-    <ClInclude Include="..\Classes\cocos-wheels\CWEditBoxDelegate.h" />
     <ClInclude Include="..\Classes\cocos-wheels\CWTableView.h" />
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h" />

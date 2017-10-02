@@ -122,9 +122,6 @@
     <ClInclude Include="..\Classes\BaseScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\cocos-wheels\CWEditBoxDelegate.h">
-      <Filter>src\cocos-wheels</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\cocos-wheels\CWTableView.h">
       <Filter>src\cocos-wheels</Filter>
     </ClInclude>

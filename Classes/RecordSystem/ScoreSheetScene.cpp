@@ -6,7 +6,6 @@
 #include "json/writer.h"
 #endif
 #include "../widget/AlertView.h"
-#include "../cocos-wheels/CWEditBoxDelegate.h"
 #include "../widget/HandTilesWidget.h"
 #include "Record.h"
 #include "RecordScene.h"
@@ -886,6 +885,19 @@ static DrawNode *createPursuitTable(const char (&name)[4][255], const int (&tota
     return drawNode;
 }
 
+namespace {
+    class EditBoxDelegateWrapper : public cocos2d::ui::EditBoxDelegate {
+    public:
+        virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override {
+            const char *text = editBox->getText();
+            if (!Common::isCStringEmpty(text)) {
+                int delta = atoi(text);
+                showPursuit(delta);
+            }
+        }
+    };
+}
+
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     const char (&name)[4][255] = _record->name;
     Node *rootNode = nullptr;
@@ -923,14 +935,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     }
 
     // EditBox的代理
-    auto delegate = std::make_shared<cw::EditBoxReturnDelegate>(
-        [](ui::EditBox *editBox) {
-        const char *text = editBox->getText();
-        if (!Common::isCStringEmpty(text)) {
-            int delta = atoi(text);
-            showPursuit(delta);
-        }
-    });
+    auto delegate = std::make_shared<EditBoxDelegateWrapper>();
     editBox->setDelegate(delegate.get());
 
     // 使这个代理随AlertView一起析构
