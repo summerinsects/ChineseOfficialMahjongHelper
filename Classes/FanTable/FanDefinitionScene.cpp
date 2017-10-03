@@ -80,22 +80,22 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
         auto thiz = makeRef(this);  // 保证线程回来之前不析构
         std::thread([thiz, idx, scale, loadingView]() {
             // 读文件
-            std::vector<std::string> definitions;
+            auto definitions = std::make_shared<std::vector<std::string> >();
             ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
             if (valueVec.size() == 82) {
-                definitions.reserve(82);
-                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(definitions), [scale](const Value &value) {
+                definitions->reserve(82);
+                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(*definitions), [scale](const Value &value) {
                     std::string ret = value.asString();
                     replaceTilesToImage(ret, scale);
                     return std::move(ret);
                 });
             }
 
-            std::vector<std::string> principles;
+            auto principles = std::make_shared<std::vector<std::string> >();
             valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
             if (valueVec.size() == 5) {
-                principles.reserve(5);
-                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(principles), [scale](const Value &value) {
+                principles->reserve(5);
+                std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(*principles), [scale](const Value &value) {
                     std::string ret = value.asString();
                     replaceTilesToImage(ret, scale);
                     return std::move(ret);
@@ -103,9 +103,9 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
             }
 
             // 切换到cocos线程
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView, definitions, principles]() mutable {
-                g_definitions.swap(definitions);
-                g_principles.swap(principles);
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, idx, loadingView, definitions, principles]() {
+                g_definitions.swap(*definitions);
+                g_principles.swap(*principles);
 
                 if (LIKELY(thiz->isRunning())) {
                     loadingView->removeFromParent();
