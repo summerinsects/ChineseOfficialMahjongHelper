@@ -174,7 +174,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
                 loadRecords(*temp);
 
                 // 切换到cocos线程
-                Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
+                Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() {
                     g_records.swap(*temp);
 
                     if (LIKELY(thiz->isRunning())) {
@@ -293,27 +293,28 @@ static void __modifyRecord(const Record *record) {
     }
 
     std::sort(g_records.begin(), g_records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
-
-    auto temp = std::make_shared<std::vector<Record> >(g_records);
-    std::thread([temp]() {
-        saveRecords(*temp);
-    }).detach();
 }
 
 void RecordHistoryScene::modifyRecord(const Record *record) {
     if (UNLIKELY(g_records.empty())) {
-        Record recordCopy = *record;
+        auto recordCopy = std::make_shared<Record>(*record);
         std::thread([recordCopy]() {
             auto temp = std::make_shared<std::vector<Record> >();
             loadRecords(*temp);
+            __modifyRecord(recordCopy.get());
+            saveRecords(*temp);
 
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([recordCopy, temp]() mutable {
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([recordCopy, temp]() {
                 g_records.swap(*temp);
-                __modifyRecord(&recordCopy);
             });
         }).detach();
     }
     else {
         __modifyRecord(record);
+
+        auto temp = std::make_shared<std::vector<Record> >(g_records);
+        std::thread([temp]() {
+            saveRecords(*temp);
+        }).detach();
     }
 }
