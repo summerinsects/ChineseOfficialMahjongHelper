@@ -1,6 +1,4 @@
 ﻿#include "RecordHistoryScene.h"
-#include <thread>
-#include <mutex>
 #include <array>
 #include "json/stringbuffer.h"
 #ifdef COCOS2D_DEBUG
