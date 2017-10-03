@@ -272,7 +272,7 @@ void CompetitionTableScene::onClearButton(cocos2d::Ref *sender) {
         // 刷新外面的UI
         _submitButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
         _tableView->updateCellAtIndex(table);
-        _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
+        _competitionData->writeToFile();
     }
 }
 
@@ -493,7 +493,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         // 刷新外面的UI
         _submitButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
         _tableView->updateCellAtIndex(table);
-        _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
+        _competitionData->writeToFile();
     }, nullptr);
 }
 
@@ -664,6 +664,6 @@ void CompetitionTableScene::showRankAlert() {
         default: return;
         }
         _tableView->reloadData();
-        _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
+        _competitionData->writeToFile();
     }, nullptr);
 }

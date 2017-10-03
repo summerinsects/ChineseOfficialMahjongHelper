@@ -70,7 +70,8 @@ bool CompetitionMainScene::init() {
     });
 
     _competitionData = std::make_shared<CompetitionData>();
-    _competitionData->readFromFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
+    _competitionData->associated_file = FileUtils::getInstance()->getWritablePath().append("competition.json");
+    _competitionData->readFromFile();
 
     return true;
 }
@@ -191,7 +192,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
 
         AlertView::showWithNode("新建比赛", label, [this, name, player, round]() {
             _competitionData->prepare(name, player, round);
-            _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
+            _competitionData->writeToFile();
             Director::getInstance()->pushScene(CompetitionEnrollScene::create(_competitionData));
         }, nullptr);
     }, nullptr);

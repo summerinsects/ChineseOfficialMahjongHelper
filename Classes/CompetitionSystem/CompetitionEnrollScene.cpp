@@ -189,7 +189,7 @@ void CompetitionEnrollScene::onSubmitButton(cocos2d::Ref *sender) {
     }
 
     _competitionData->startNewRound();
-    _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
+    _competitionData->writeToFile();
     Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, 0));
 }
 
@@ -210,7 +210,7 @@ void CompetitionEnrollScene::onNameWidget(cocos2d::Ref *sender) {
 
     AlertView::showWithNode(Common::format("序号「%" PRIzu "」", idx + 1), editBox, [this, editBox, idx]() {
         _competitionData->players[idx].name = editBox->getText();
-        _competitionData->writeToFile(FileUtils::getInstance()->getWritablePath().append("competition.json"));
+        _competitionData->writeToFile();
         _tableView->updateCellAtIndex(idx >> 1);
     }, nullptr);
 
