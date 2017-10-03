@@ -152,7 +152,7 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
                 loadCompetitions(*temp);
 
                 // 切换到cocos线程
-                Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() mutable {
+                Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() {
                     g_competitions.swap(*temp);
 
                     if (LIKELY(thiz->isRunning())) {
@@ -293,7 +293,7 @@ void CompetitionHistoryScene::modifyData(const CompetitionData *data) {
             auto temp = std::make_shared<std::vector<CompetitionData> >();
             loadCompetitions(*temp);
 
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([dataCopy, temp]() mutable {
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([dataCopy, temp]() {
                 g_competitions.swap(*temp);
                 __modifyData(&dataCopy);
             });
