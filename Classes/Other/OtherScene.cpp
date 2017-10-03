@@ -26,12 +26,14 @@ bool OtherScene::init() {
         std::thread([thiz, loadingView]() {
             // 读文件
             ValueMap valueMap = FileUtils::getInstance()->getValueMapFromFile("text/other.xml");
+            auto text = std::make_shared<std::string>();
             if (LIKELY(!valueMap.empty())) {
-                g_text = valueMap.begin()->second.asString();
+                *text = valueMap.begin()->second.asString();
             }
 
             // 切换到cocos线程
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, text]() {
+                g_text.swap(*text);
                 if (LIKELY(thiz->isRunning())) {
                     loadingView->removeFromParent();
                     thiz->createContentView();
