@@ -1,4 +1,6 @@
 ﻿#include "CompetitionHistoryScene.h"
+#include <algorithm>
+#include <iterator>
 #include <thread>
 #include <mutex>
 #include <array>
