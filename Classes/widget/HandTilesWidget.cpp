@@ -1,4 +1,6 @@
 ﻿#include "HandTilesWidget.h"
+#include <algorithm>
+#include <iterator>
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../utils/compiler.h"
 #include "../TilesImage.h"
