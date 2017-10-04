@@ -25,6 +25,7 @@
 #include <string.h>
 #include <limits>
 #include <algorithm>
+#include <iterator>
 #include "standard_tiles.h"
 
 namespace mahjong {

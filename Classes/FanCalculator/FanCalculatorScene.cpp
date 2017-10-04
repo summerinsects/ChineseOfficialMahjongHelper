@@ -1,4 +1,6 @@
 ﻿#include "FanCalculatorScene.h"
+#include <algorithm>
+#include <iterator>
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../widget/TilePickWidget.h"

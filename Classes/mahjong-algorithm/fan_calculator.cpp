@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <algorithm>
+#include <iterator>
 #include "standard_tiles.h"
 #include "shanten.h"
 

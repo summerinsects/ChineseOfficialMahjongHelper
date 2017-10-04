@@ -1,4 +1,5 @@
 ﻿#include "CWTableView.h"
+#include <algorithm>
 
 using namespace cocos2d;
 using namespace cocos2d::ui;

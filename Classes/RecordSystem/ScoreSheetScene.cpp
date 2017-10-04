@@ -1,4 +1,6 @@
 ﻿#include "ScoreSheetScene.h"
+#include <algorithm>
+#include <iterator>
 #include "json/stringbuffer.h"
 #ifdef COCOS2D_DEBUG
 #include "json/prettywriter.h"

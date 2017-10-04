@@ -1,4 +1,6 @@
 ﻿#include "LatestCompetitionScene.h"
+#include <algorithm>
+#include <iterator>
 #include <array>
 #include "network/HttpClient.h"
 #include "json/document.h"
