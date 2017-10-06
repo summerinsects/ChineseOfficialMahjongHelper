@@ -463,7 +463,7 @@ void TilesKeyboard::onNumberedSuffix(int suit) {
     for (size_t i = lastSuffixPos; i < len; ++i) {
         tiles.push_back(mahjong::make_tile(suit + 1, _tilesText[i] - '0'));
     }
-    addTiles(&tiles.front(), tiles.size());
+    addTiles(tiles.data(), tiles.size());
 }
 
 void TilesKeyboard::onHonor(int honor) {
