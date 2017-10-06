@@ -326,7 +326,8 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     rootNode->addChild(drawNode);
     drawNode->setPosition(Vec2(0.0f, 55.0f));
 
-    // shared_ptr随着AlertView构造，其他lambda捕获裸指针
+    // shared_ptr随着AlertView析构，其他lambda捕获裸指针，
+    // 在次级弹出界面修改数据提交后，lambda刷新之这里的数据及其相关UI
     auto sharedResults = std::make_shared<std::array<CompetitionResult, 4> >(std::array<CompetitionResult, 4>({ prevResult[0], prevResult[1], prevResult[2], prevResult[3] }));
     std::array<CompetitionResult, 4> *results = sharedResults.get();
 
