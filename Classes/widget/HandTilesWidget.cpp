@@ -156,10 +156,7 @@ mahjong::tile_t HandTilesWidget::getServingTile() const {
 }
 
 bool HandTilesWidget::isFixedPacksContainsKong() const {
-    if (_fixedPacks.empty()) {
-        return false;
-    }
-    return mahjong::is_fixed_packs_contains_kong(&_fixedPacks.front(), _fixedPacks.size());
+    return mahjong::is_fixed_packs_contains_kong(_fixedPacks.data(), _fixedPacks.size());
 }
 
 bool HandTilesWidget::isStandingTilesContainsServingTile() const {
@@ -168,7 +165,7 @@ bool HandTilesWidget::isStandingTilesContainsServingTile() const {
         return false;
     }
     return mahjong::is_standing_tiles_contains_win_tile(
-        &_standingTiles.front(), _standingTiles.size() - 1, servingTile);
+        _standingTiles.data(), _standingTiles.size() - 1, servingTile);
 }
 
 size_t HandTilesWidget::countServingTileInFixedPacks() const {
@@ -178,7 +175,7 @@ size_t HandTilesWidget::countServingTileInFixedPacks() const {
     }
 
     return mahjong::count_win_tile_in_fixed_packs(
-        &_fixedPacks.front(), _fixedPacks.size(), servingTile);
+        _fixedPacks.data(), _fixedPacks.size(), servingTile);
 }
 
 void HandTilesWidget::onTileButton(cocos2d::Ref *sender) {
