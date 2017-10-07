@@ -78,7 +78,7 @@ bool CompetitionMainScene::init() {
 
 void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size_t player, size_t round) {
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(215.0f, 90.0f));
+    rootNode->setContentSize(Size(220.0f, 90.0f));
 
     Label *label = Label::createWithSystemFont("赛事名称", "Arial", 12);
     label->setColor(Color3B::BLACK);
@@ -88,7 +88,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
 
     std::array<ui::EditBox *, 3> editBoxes;
 
-    ui::EditBox *editBox = ui::EditBox::create(Size(150.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox = ui::EditBox::create(Size(160.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
@@ -103,51 +103,42 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setText("测试比赛");
 #endif
 
-    label = Label::createWithSystemFont("参赛人数", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 45.0f));
+    static const char *titleText[2] = { "参赛人数", "比赛轮数" };
+    size_t value[2] = { player, round };
 
-    char buf[32];
-    snprintf(buf, sizeof(buf), "%" PRIzu, player);
+    for (int i = 0; i < 2; ++i) {
+        label = Label::createWithSystemFont("参赛人数", "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        rootNode->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(5 + 110.0f * i, 45.0f));
 
-    editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setText(buf);
-    editBox->setMaxLength(3);
-    rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85.0f, 45.0f));
-    editBoxes[1] = editBox;
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%" PRIzu, player);
 
-    label = Label::createWithSystemFont("比赛轮数", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 15.0f));
-
-    snprintf(buf, sizeof(buf), "%" PRIzu, round);
-
-    editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setText(buf);
-    editBox->setMaxLength(3);
-    rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(85.0f, 15.0f));
-    editBoxes[2] = editBox;
+        editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+        editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+        editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+        editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
+        editBox->setFontColor(Color4B::BLACK);
+        editBox->setFontSize(12);
+        editBox->setText(buf);
+        editBox->setMaxLength(3);
+        rootNode->addChild(editBox);
+        editBox->setPosition(Vec2(80.0f + 110.0f * i, 45.0f));
+        editBoxes[i + 1] = editBox;
+    }
 
     // EditBox的代理，使得能连续输入
     auto delegate = std::make_shared<EditBoxDelegateWrapper>(std::vector<ui::EditBox *>(editBoxes.begin(), editBoxes.end()));
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
+
+    label = Label::createWithSystemFont("参赛人数必须为4的倍数。移动设备毕竟不比PC，不建议设置过多人数和轮数", "Arial", 10);
+    label->setColor(Color3B(0x60, 0x60, 0x60));
+    rootNode->addChild(label);
+    label->setPosition(Vec2(110.0f, 15.0f));
+    label->setDimensions(220.0f, 0.0f);
 
     AlertView::showWithNode("新建比赛", rootNode, [this, editBoxes, delegate]() {
         std::string name;
