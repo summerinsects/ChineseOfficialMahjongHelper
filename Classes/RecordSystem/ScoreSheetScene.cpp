@@ -355,7 +355,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
 }
 
 void ScoreSheetScene::refreshRank() {
-    int rank[4] = {0};
+    unsigned rank[4] = {0};
     Common::calculateRankFromScore(_totalScores, rank);
 
     static const char *text[] = { "一", "二", "三", "四" };
@@ -665,8 +665,7 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
         "3. 对于已经记分的，点击「番种备注」一栏可修改记录。\n"
         "4. 对局未完成时，点击「累计」一栏处，可显示分差并有快捷计算追分选项。\n"
         "5. 「北风北」记分完成后，会自动添加入「历史记录」。\n"
-        "6. 「历史记录」里的内容只要不卸载程序就会一直保存。\n"
-        "7. 「名次」一栏对于小分相同的，简便起见按开局座位排列。",
+        "6. 「历史记录」里的内容只要不卸载程序就会一直保存。",
         10, nullptr, nullptr);
 }
 
