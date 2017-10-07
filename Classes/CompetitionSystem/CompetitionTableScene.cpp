@@ -446,28 +446,43 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             results->at(2).competition_score,
             results->at(3).competition_score
         };
-        int ranks[4];
+        unsigned ranks[4];
         Common::calculateRankFromScore(scores, ranks);
+
+        // 并列的数目
+        unsigned rankCnt[4] = { 0 };
+        for (int i = 0; i < 4; ++i) {
+            ++rankCnt[ranks[i]];
+        }
+
+        static const float standardScore[] = { 4, 2, 1, 0 };
         for (int i = 0; i < 4; ++i) {
             CompetitionResult &result = results->at(i);
-            switch (ranks[i]) {
-            case 0: result.rank = 1; result.standard_score = 4; labels[i][RANK]->setString("1"); labels[i][STANDARD_SCORE]->setString("4"); break;
-            case 1: result.rank = 2; result.standard_score = 2; labels[i][RANK]->setString("2"); labels[i][STANDARD_SCORE]->setString("2"); break;
-            case 2: result.rank = 3; result.standard_score = 1; labels[i][RANK]->setString("3"); labels[i][STANDARD_SCORE]->setString("1"); break;
-            case 3: result.rank = 4; result.standard_score = 0; labels[i][RANK]->setString("4"); labels[i][STANDARD_SCORE]->setString("0"); break;
-            default: break;
+            unsigned rank = ranks[i];
+            unsigned tieCnt = rankCnt[rank];  // 并列的人数
+
+            // 累加并列的标准分
+            float ss = standardScore[rank];
+            for (unsigned n = 1, cnt = tieCnt; n < cnt; ++n) {
+                ss += standardScore[rank + n];
             }
+            ss /= tieCnt;
+
+            result.rank = rank + 1;
+            result.standard_score = ss;
+            labels[i][RANK]->setString(std::to_string(rank + 1));
+            labels[i][STANDARD_SCORE]->setString(CompetitionResult::standardScoreToString(ss));
         }
 
         refreshCheckLabel(*results);
     });
 
     // 说明文本
-    label = Label::createWithSystemFont("自动计算的标准分按4210计，不设并列，如需并列请手动输入", "Arail", 10);
+    label = Label::createWithSystemFont("点击格子输入成绩，自动计算的标准分按4210计", "Arail", 10);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     rootNode->addChild(label);
     label->setPosition(Vec2(width * 0.5f, 5.0f));
-    Common::scaleLabelToFitWidth(label, width - 4.0f);
+    Common::scaleLabelToFitWidth(label, width);
 
     std::string title = Common::format("第%" PRIzu "桌成绩", table + 1);
     AlertView::showWithNode(title, rootNode, [this, table, labels, title, sharedResults]() {
@@ -525,6 +540,9 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
         label->setPosition(Vec2(10.0f, 10.0f));
 
         radioGroup->addRadioButton(radioButton);
+    }
+    if (result.rank != 0) {
+        radioGroup->setSelectedButton(static_cast<int>(result.rank - 1));
     }
 
     std::array<ui::EditBox *, 2> editBoxes;
