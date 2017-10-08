@@ -384,20 +384,24 @@ void ScoreSheetScene::refreshEndTime() {
 }
 
 void ScoreSheetScene::recover() {
-    // 有选手名字为空，则清空数据
-    const char (&name)[4][NAME_SIZE] = _record->name;
-    if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
-        memset(_record, 0, sizeof(*_record));
-        onTimeScheduler(0.0f);
-        this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
-        return;
-    }
+    // 备份名字
+    char name[4][NAME_SIZE];
+    memcpy(name, _record->name, sizeof(name));
 
-    // 禁用和隐藏名字输入框，显示名字的label
+    // 显示名字的label
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setString(name[i]);
         _nameLabel[i]->setVisible(true);
         Common::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);
+    }
+
+    // 有选手名字为空，则清空数据
+    if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
+        memset(_record, 0, sizeof(*_record));
+        memcpy(_record->name, name, sizeof(name)); // 恢复名字
+        onTimeScheduler(0.0f);
+        this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
+        return;
     }
 
     // 禁用和隐藏锁定按钮
