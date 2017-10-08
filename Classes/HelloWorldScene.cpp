@@ -200,6 +200,8 @@ void HelloWorld::requestVersion(bool manual) {
     request->setUrl("https://api.github.com/repos/summerinsects/ChineseOfficialMahjongHelper/releases/latest");
 
     request->setResponseCallback([manual](network::HttpClient *client, network::HttpResponse *response) {
+        network::HttpClient::destroyInstance();
+
         checking = false;
 
         if (response == nullptr) {
@@ -225,7 +227,7 @@ void HelloWorld::requestVersion(bool manual) {
         }
     });
 
-    network::HttpClient::getInstance()->send(request);
+    network::HttpClient::getInstance()->sendImmediate(request);
     request->release();
 #else
     if (manual) {
