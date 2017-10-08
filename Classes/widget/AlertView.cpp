@@ -72,7 +72,7 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, flo
     label->setColor(Color3B(51, 204, 255));
     background->addChild(label);
     label->setPosition(Vec2(width * 0.5f, 62.0f + nodeSize.height));
-    Common::scaleLabelToFitWidth(label, width - 4.0f);
+    Common::trimLabelStringWithEllipsisToFitWidth(label, width - 4.0f);
 
     // 分隔线
     LayerColor *line = LayerColor::create(Color4B(227, 227, 227, 255), width, 2.0f);

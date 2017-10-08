@@ -13,6 +13,41 @@ void scaleLabelToFitWidth(cocos2d::Label *label, float width) {
     }
 }
 
+void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width) {
+    const cocos2d::Size orginSize = label->getContentSize();
+    if (orginSize.width <= width) {
+        return;
+    }
+
+    const std::string orginText = label->getString();
+
+    label->setString("...");
+    const cocos2d::Size dotSize = label->getContentSize();
+
+    float cutWidth = orginSize.width + dotSize.width - width;
+    float cutRate = cutWidth / orginSize.width * 0.5f;
+
+    std::u32string utf32;
+    cocos2d::StringUtils::UTF8ToUTF32(orginText, utf32);
+
+    size_t cutLength = static_cast<size_t>(ceilf(utf32.length() * cutRate));
+    size_t leftLength = (utf32.length() - cutLength) / 2;
+
+    while (leftLength > 0) {
+        std::string part1, part2;
+        cocos2d::StringUtils::UTF32ToUTF8(utf32.substr(0, leftLength), part1);
+        cocos2d::StringUtils::UTF32ToUTF8(utf32.substr(utf32.length() - leftLength), part2);
+
+        label->setString(part1.append("...").append(part2));
+        if (label->getContentSize().width <= width) {
+            return;
+        }
+        leftLength--;
+    }
+
+    label->setString(orginText);
+}
+
 void calculateColumnsCenterX(const float *colWidth, size_t col, float *xPos) {
     xPos[0] = colWidth[0] * 0.5f;
     for (size_t i = 1; i < col; ++i) {
