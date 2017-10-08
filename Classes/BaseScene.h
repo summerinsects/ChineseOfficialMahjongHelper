@@ -55,6 +55,7 @@ public:
         this->addChild(titleLabel);
         titleLabel->setPosition(cocos2d::Vec2(origin.x + visibleSize.width * 0.5f,
             origin.y + visibleSize.height - 15));
+        Common::trimLabelStringWithEllipsisToFitWidth(titleLabel, visibleSize.width - 64.0f);
 
         // 返回按钮
         cocos2d::ui::Button *backBtn = cocos2d::ui::Button::create("source_material/btn_left_white.png");

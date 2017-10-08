@@ -79,6 +79,7 @@ static class_name_ *create(arg_type1_ arg1_, arg_type2_ arg2_,                  
 namespace Common {
 
 void scaleLabelToFitWidth(cocos2d::Label *label, float width);
+void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width);
 
 void calculateColumnsCenterX(const float *colWidth, size_t col, float *xPos);
 
