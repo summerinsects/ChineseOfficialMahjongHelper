@@ -113,9 +113,9 @@ bool CompetitionData::startNewRound() {
         return false;
     }
 
-    rounds.push_back(CompetitionRound());
+    rounds.emplace_back();
     std::for_each(players.begin(), players.end(), [](CompetitionPlayer &player) {
-        player.competition_results.push_back(CompetitionResult());
+        player.competition_results.emplace_back();
     });
 
     const size_t cnt = players.size() / 4;
@@ -289,7 +289,7 @@ void CompetitionPlayer::fromJson(const rapidjson::Value &json, CompetitionPlayer
         player.competition_results.clear();
         player.competition_results.reserve(results.Size());
         std::for_each(results.Begin(), results.End(), [&player](const rapidjson::Value &json) {
-            player.competition_results.push_back(CompetitionResult());
+            player.competition_results.emplace_back();
             CompetitionResult::fromJson(json, player.competition_results.back());
         });
     }
@@ -387,7 +387,7 @@ void CompetitionRound::fromJson(const rapidjson::Value &json, CompetitionRound &
     if (it != json.MemberEnd() && it->value.IsArray()) {
         rapidjson::Value::ConstArray tables = it->value.GetArray();
         std::for_each(tables.Begin(), tables.End(), [&round](const rapidjson::Value &json) {
-            round.tables.push_back(CompetitionTable());
+            round.tables.emplace_back();
             CompetitionTable::fromJson(json, round.tables.back());
         });
     }
@@ -416,7 +416,7 @@ void CompetitionData::fromJson(const rapidjson::Value &json, CompetitionData &da
         data.players.clear();
         data.players.reserve(players.Size());
         std::for_each(players.Begin(), players.End(), [&data](const rapidjson::Value &json) {
-            data.players.push_back(CompetitionPlayer());
+            data.players.emplace_back();
             CompetitionPlayer::fromJson(json, data.players.back());
         });
     }
@@ -427,7 +427,7 @@ void CompetitionData::fromJson(const rapidjson::Value &json, CompetitionData &da
         data.teams.clear();
         data.teams.reserve(teams.Size());
         std::for_each(teams.Begin(), teams.End(), [&data](const rapidjson::Value &json) {
-            data.teams.push_back(CompetitionTeam());
+            data.teams.emplace_back();
             CompetitionTeam::fromJson(json, data.teams.back());
         });
     }
@@ -438,7 +438,7 @@ void CompetitionData::fromJson(const rapidjson::Value &json, CompetitionData &da
         data.rounds.clear();
         data.rounds.reserve(players.Size());
         std::for_each(players.Begin(), players.End(), [&data](const rapidjson::Value &json) {
-            data.rounds.push_back(CompetitionRound());
+            data.rounds.emplace_back();
             CompetitionRound::fromJson(json, data.rounds.back());
         });
     }

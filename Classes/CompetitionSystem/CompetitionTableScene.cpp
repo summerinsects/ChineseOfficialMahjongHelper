@@ -426,7 +426,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         widget->setContentSize(Size(colWidth[4] * 3, 20.0f));
         drawNode->addChild(widget);
         widget->addClickEventListener([this, i, player, result, callback](Ref *) {
-            std::string title = Common::format("「%s」：%" PRIzu " 「%s」", seatText[i], player->serial + 1, player->name.c_str());
+            std::string title = Common::format("「%s」：%" PRIzu " 「%s」录入成绩", seatText[i], player->serial + 1, player->name.c_str());
             showCompetitionResultInputAlert(title, *result, callback);
         });
     }
