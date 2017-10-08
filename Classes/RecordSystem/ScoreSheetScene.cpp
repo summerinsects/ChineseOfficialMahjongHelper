@@ -521,8 +521,12 @@ void ScoreSheetScene::editName(size_t idx) {
 
 void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
     const char (&name)[4][NAME_SIZE] = _record->name;
-    if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
-        AlertView::showWithMessage("锁定", "请先录入四位参赛选手姓名", 12, nullptr, nullptr);
+    auto it = std::find_if(std::begin(name), std::end(name), &Common::isCStringEmpty);
+    if (it != std::end(name)) {
+        size_t idx = it - std::begin(name);
+        AlertView::showWithMessage("锁定", "请先录入四位参赛选手姓名", 12, [this, idx]() {
+            editName(idx);
+        }, nullptr);
         return;
     }
 
