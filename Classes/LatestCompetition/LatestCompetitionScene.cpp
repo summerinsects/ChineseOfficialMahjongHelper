@@ -60,6 +60,8 @@ void LatestCompetitionScene::requestCompetitions() {
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
+        network::HttpClient::destroyInstance();
+
         if (UNLIKELY(!thiz->isRunning())) {
             return;
         }
@@ -89,7 +91,7 @@ void LatestCompetitionScene::requestCompetitions() {
         thiz->parseResponse(buffer);
     });
 
-    network::HttpClient::getInstance()->send(request);
+    network::HttpClient::getInstance()->sendImmediate(request);
     request->release();
 }
 
