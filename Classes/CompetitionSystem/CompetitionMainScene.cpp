@@ -107,14 +107,14 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     size_t value[2] = { player, round };
 
     for (int i = 0; i < 2; ++i) {
-        label = Label::createWithSystemFont("参赛人数", "Arial", 12);
+        label = Label::createWithSystemFont(titleText[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(5 + 110.0f * i, 45.0f));
 
         char buf[32];
-        snprintf(buf, sizeof(buf), "%" PRIzu, player);
+        snprintf(buf, sizeof(buf), "%" PRIzu, value[i]);
 
         editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
         editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
