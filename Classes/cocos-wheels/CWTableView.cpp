@@ -85,7 +85,7 @@ namespace cw {
 
             cell->reset();
             if (cell->getParent() == _innerContainer) {
-                _innerContainer->removeChild(cell, true);
+                _innerContainer->removeChild(cell, false);
             }
         }
 
@@ -111,7 +111,7 @@ namespace cw {
 
             cell->reset();
             if (cell->getParent() == _innerContainer) {
-                _innerContainer->removeChild(cell, true);
+                _innerContainer->removeChild(cell, false);
             }
         }
 
@@ -354,7 +354,7 @@ namespace cw {
         cell->reset();
 
         if (cell->getParent() == _innerContainer) {
-            _innerContainer->removeChild(cell, true);
+            _innerContainer->removeChild(cell, false);
         }
     }
 
