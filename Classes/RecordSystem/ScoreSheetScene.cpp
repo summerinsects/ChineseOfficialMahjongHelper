@@ -493,11 +493,15 @@ void ScoreSheetScene::editName(size_t idx) {
 
     static const char *wind[] = { "东", "南", "西", "北" };
     AlertView::showWithNode(Common::format("开局座位「%s」", wind[idx]), editBox, [this, editBox, idx]() {
-        char (&name)[NAME_SIZE] = _record->name[idx];
-        memset(name, 0, sizeof(name));
-
         const char *text = editBox->getText();
-        if (!Common::isCStringEmpty(text)) {
+        if (text != nullptr) {
+            // 开始后不允许清空名字
+            if (_record->start_time != 0 && text[0] == '\0') {
+                return;
+            }
+
+            char (&name)[NAME_SIZE] = _record->name[idx];
+            memset(name, 0, sizeof(name));
             strncpy(name, text, NAME_SIZE - 1);
             _nameLabel[idx]->setVisible(true);
             _nameLabel[idx]->setString(name);
