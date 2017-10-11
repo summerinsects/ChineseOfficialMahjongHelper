@@ -495,14 +495,19 @@ void ScoreSheetScene::editName(size_t idx) {
     AlertView::showWithNode(Common::format("开局座位「%s」", wind[idx]), editBox, [this, editBox, idx]() {
         const char *text = editBox->getText();
         if (text != nullptr) {
+            std::string name = text;
+            Common::trim(name);
+
             // 开始后不允许清空名字
-            if (_record->start_time != 0 && text[0] == '\0') {
+            if (_record->start_time != 0 && name.empty()) {
                 return;
             }
 
-            char (&name)[NAME_SIZE] = _record->name[idx];
-            memset(name, 0, sizeof(name));
-            strncpy(name, text, NAME_SIZE - 1);
+            if (name.length() > NAME_SIZE - 1) {
+                name.erase(NAME_SIZE - 1);
+            }
+
+            strncpy(_record->name[idx], name.c_str(), NAME_SIZE - 1);
             _nameLabel[idx]->setVisible(true);
             _nameLabel[idx]->setString(name);
             Common::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
