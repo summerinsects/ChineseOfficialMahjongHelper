@@ -177,7 +177,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
             return;
         }
 
-        Label *label = Label::createWithSystemFont(StringUtils::format("「%s」\n%" PRIzu "人\n%" PRIzu "轮", name.c_str(), player, round), "Arial", 12);
+        Label *label = Label::createWithSystemFont(Common::format("「%s」\n%" PRIzu "人\n%" PRIzu "轮", name.c_str(), player, round), "Arial", 12);
         label->setColor(Color3B::BLACK);
         label->setHorizontalAlignment(TextHAlignment::CENTER);
 
