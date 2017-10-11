@@ -1,7 +1,6 @@
 ﻿#include "FanDefinitionScene.h"
 #include <algorithm>
 #include <iterator>
-#include "ui/UIWebView.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../TilesImage.h"
@@ -129,6 +128,7 @@ void FanDefinitionScene::createContentView(size_t idx) {
 #if HAS_WEBVIEW
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
     webView->setContentSize(Size(visibleSize.width, visibleSize.height - 35.0f));
+    webView->setBackgroundTransparent();
     webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(text), ""));
     this->addChild(webView);
     webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
