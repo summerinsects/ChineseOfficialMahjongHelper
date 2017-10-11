@@ -644,10 +644,6 @@ static std::string getResultTypeString(uint8_t flag, int step) {
     return str;
 }
 
-static int FORCE_INLINE __isdigit(int c) {
-    return (c >= -1 && c <= 255) ? isdigit(c) : 0;
-}
-
 // 分割string到两个label
 static void spiltStringToLabel(const std::string &str, float width, Label *label1, Label *label2) {
     label2->setVisible(false);
@@ -673,9 +669,9 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
     std::string str2 = utf8.getAsCharSequence(pos, utf8Len - pos);
 
     // 保证不从数字中间切断
-    if (!str2.empty() && __isdigit(str2.front())) {  // 第2个字符串以数字开头
+    if (!str2.empty() && Common::__isdigit(str2.front())) {  // 第2个字符串以数字开头
         // 将第1个字符串尾部的数字都转移到第2个字符串头部
-        while (pos > 0 && !str1.empty() && __isdigit(str1.back())) {
+        while (pos > 0 && !str1.empty() && Common::__isdigit(str1.back())) {
             --pos;
             str2.insert(0, 1, str1.back());
             str1.pop_back();

@@ -95,6 +95,9 @@ std::string format(_Printf_format_string_ const char *fmt, ...);
 std::string format(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
 #endif
 
+static int FORCE_INLINE __isdigit(int c) {
+    return (c >= -1 && c <= 255) ? isdigit(c) : 0;
+}
 
 static int FORCE_INLINE __isspace(int c) {
     return (c >= -1 && c <= 255) ? isspace(c) : 0;
