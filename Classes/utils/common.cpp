@@ -24,26 +24,39 @@ void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width) {
     label->setString("...");
     const cocos2d::Size dotSize = label->getContentSize();
 
-    float cutWidth = orginSize.width + dotSize.width - width;
-    float cutRate = cutWidth / orginSize.width * 0.5f;
+    const float cutWidth = orginSize.width + dotSize.width - width;
+    const float cutRate = cutWidth / orginSize.width * 0.5f;
 
-    std::u32string utf32;
-    cocos2d::StringUtils::UTF8ToUTF32(orginText, utf32);
+    const cocos2d::StringUtils::StringUTF8 utf8(orginText);
+    const cocos2d::StringUtils::StringUTF8::CharUTF8Store &utf8String = utf8.getString();
 
-    size_t cutLength = static_cast<size_t>(ceilf(utf32.length() * cutRate));
-    size_t leftLength = (utf32.length() - cutLength) / 2;
+    const size_t totalLength = utf8String.size();
+    const size_t cutLength = static_cast<size_t>(ceilf(totalLength * cutRate));
+    size_t leftLength = (totalLength - cutLength) / 2;
 
-    while (leftLength > 0) {
-        std::string part1, part2;
-        cocos2d::StringUtils::UTF32ToUTF8(utf32.substr(0, leftLength), part1);
-        cocos2d::StringUtils::UTF32ToUTF8(utf32.substr(utf32.length() - leftLength), part2);
+    if (leftLength == 0) {
+        label->setString(orginText);
+        return;
+    }
 
-        label->setString(part1.append("...").append(part2));
+    std::string newString = utf8.getAsCharSequence(0, leftLength);
+    size_t partLength = newString.length();
+
+    std::string temp = utf8.getAsCharSequence(totalLength - leftLength);
+    newString.append("...").append(temp);
+
+    do {
+        label->setString(newString);
         if (label->getContentSize().width <= width) {
             return;
         }
-        leftLength--;
-    }
+
+        size_t l1 = utf8String[leftLength]._char.size();
+        size_t l2 = utf8String[totalLength - leftLength]._char.size();
+        newString.erase(partLength - l1, l1);
+        partLength -= l1;
+        newString.erase(partLength + 3, l2);
+    } while (--leftLength > 0);
 
     label->setString(orginText);
 }
@@ -76,7 +89,8 @@ std::string format(const char *fmt, ...) {
 
         // For each %, reserve 64 characters
         for (const char *p = strchr(fmt, '%'); p != nullptr; p = strchr(p, '%')) {
-            if (*++p != '%') len += 64;  // skip %%. issue: '\0'!='%' is true
+            char ch = *++p;
+            if (ch != '%' && ch != '\0') len += 64;  // skip %%
         }
 
         do {
