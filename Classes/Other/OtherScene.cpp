@@ -52,6 +52,7 @@ void OtherScene::createContentView() {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
     webView->setContentSize(Size(visibleSize.width, visibleSize.height - 35.0f));
+    webView->setBackgroundTransparent();
     webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(g_text), ""));
     this->addChild(webView);
     webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
