@@ -644,7 +644,7 @@ static std::string getResultTypeString(uint8_t flag, int step) {
     return str;
 }
 
-static int forceinline __isdigit(int c) {
+static int FORCE_INLINE __isdigit(int c) {
     return (c >= -1 && c <= 255) ? isdigit(c) : 0;
 }
 
@@ -657,7 +657,8 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
         return;
     }
 
-    long utf8Len = StringUtils::getCharacterCountInUTF8String(str);
+    StringUtils::StringUTF8 utf8(str);
+    long utf8Len = utf8.length();
     long pos = static_cast<long>(width / size.width * utf8Len);  // 切这么多
 
     // 切没了，全部放在第2个label上
@@ -665,10 +666,11 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
         label1->setString("");
         label2->setVisible(true);
         label2->setString(str);
+        return;
     }
 
-    std::string str1 = ui::Helper::getSubStringOfUTF8String(str, 0, pos);
-    std::string str2 = ui::Helper::getSubStringOfUTF8String(str, pos, utf8Len);
+    std::string str1 = utf8.getAsCharSequence(0, pos);
+    std::string str2 = utf8.getAsCharSequence(pos, utf8Len - pos);
 
     // 保证不从数字中间切断
     if (!str2.empty() && __isdigit(str2.front())) {  // 第2个字符串以数字开头
