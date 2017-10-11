@@ -41,12 +41,14 @@ std::pair<float, int> CompetitionPlayer::getCurrentScoresByRound(size_t round) c
     return std::make_pair(competition_results[round].standard_score, competition_results[round].competition_score);
 }
 
-// 排序附加信息，用来保存标准分和比赛分，使之仅计算一次
-struct ScoresSortInfo {
-    const CompetitionPlayer *player = nullptr;
-    float standard_score = 0.0f;
-    int competition_score = 0;
-};
+namespace {
+    // 排序附加信息，用来保存标准分和比赛分，使之仅计算一次
+    struct ScoresSortInfo {
+        const CompetitionPlayer *player = nullptr;
+        float standard_score = 0.0f;
+        int competition_score = 0;
+    };
+}
 
 // 高高碰排序
 void CompetitionRound::sortPlayers(size_t round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output) {
