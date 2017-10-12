@@ -28,7 +28,9 @@ bool HelloWorld::init() {
     this->addChild(background, -100);
 
     auto listener = EventListenerKeyboard::create();
-    listener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event *unused_event) {
+    listener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
+        CC_UNUSED_PARAM(keyCode);
+        CC_UNUSED_PARAM(unusedEvent);
         AlertView::showWithMessage("提示", "是否确定退出国标小助手？", 12, []() {
             Director::getInstance()->end();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
@@ -154,7 +156,7 @@ bool HelloWorld::init() {
     return true;
 }
 
-void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
+void HelloWorld::onAboutButton(cocos2d::Ref *) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float width = visibleSize.width * 0.8f - 10.0f;
 
@@ -175,7 +177,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *sender) {
     button->setContentSize(Size(65.0, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("检测新版本");
-    button->addClickEventListener([this](Ref *sender) { requestVersion(true); });
+    button->addClickEventListener([this](Ref *) { requestVersion(true); });
     rootNode->addChild(button);
 
     const Size &labelSize = label->getContentSize();

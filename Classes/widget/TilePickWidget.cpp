@@ -271,7 +271,7 @@ void TilePickWidget::refreshActionButtons() {
     _concealedKongButton->setEnabled(_meldedKongButton->isEnabled());
 }
 
-void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t tile) {
+void TilePickWidget::onTileTableButton(cocos2d::Ref *, mahjong::tile_t tile) {
     mahjong::tile_t prevTile = _handTilesWidget->putTile(tile);
     if (prevTile != 0 && prevTile != tile) {  // 如果是替换牌，则会删了一张旧的牌
         refreshTilesTableButton(prevTile);
@@ -282,7 +282,7 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t til
     }
 }
 
-void TilePickWidget::onChow1Button(cocos2d::Ref *sender) {
+void TilePickWidget::onChow1Button(cocos2d::Ref *) {
     if (LIKELY(_handTilesWidget->makeFixedChow1Pack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
@@ -290,7 +290,7 @@ void TilePickWidget::onChow1Button(cocos2d::Ref *sender) {
     }
 }
 
-void TilePickWidget::onChow2Button(cocos2d::Ref *sender) {
+void TilePickWidget::onChow2Button(cocos2d::Ref *) {
     if (LIKELY(_handTilesWidget->makeFixedChow2Pack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
@@ -298,7 +298,7 @@ void TilePickWidget::onChow2Button(cocos2d::Ref *sender) {
     }
 }
 
-void TilePickWidget::onChow3Button(cocos2d::Ref *sender) {
+void TilePickWidget::onChow3Button(cocos2d::Ref *) {
     if (LIKELY(_handTilesWidget->makeFixedChow3Pack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
@@ -306,7 +306,7 @@ void TilePickWidget::onChow3Button(cocos2d::Ref *sender) {
     }
 }
 
-void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
+void TilePickWidget::onPungButton(cocos2d::Ref *) {
     if (LIKELY(_handTilesWidget->makeFixedPungPack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
@@ -314,7 +314,7 @@ void TilePickWidget::onPungButton(cocos2d::Ref *sender) {
     }
 }
 
-void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
+void TilePickWidget::onMeldedKongButton(cocos2d::Ref *) {
     if (LIKELY(_handTilesWidget->makeFixedMeldedKongPack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
@@ -322,7 +322,7 @@ void TilePickWidget::onMeldedKongButton(cocos2d::Ref *sender) {
     }
 }
 
-void TilePickWidget::onConcealedKongButton(cocos2d::Ref *sender) {
+void TilePickWidget::onConcealedKongButton(cocos2d::Ref *) {
     if (LIKELY(_handTilesWidget->makeFixedConcealedKongPack())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();

@@ -345,11 +345,11 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     return true;
 }
 
-ssize_t RecordScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t RecordScene::numberOfCellsInTableView(cw::TableView *) {
     return 10;
 }
 
-float RecordScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float RecordScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
     size_t cnt = eachLevelCounts[idx];
     float height = computeRowsAlign4(cnt) * 25.0f;
     return (height + 15.0f);
@@ -561,7 +561,7 @@ void RecordScene::updateScoreLabel() {
     }
 }
 
-void RecordScene::onMinusButton(cocos2d::Ref *sender, int delta) {
+void RecordScene::onMinusButton(cocos2d::Ref *, int delta) {
     int winScore = atoi(_editBox->getText());
     int temp = winScore - delta;
     if (temp < 8) temp = 8;
@@ -573,7 +573,7 @@ void RecordScene::onMinusButton(cocos2d::Ref *sender, int delta) {
     }
 }
 
-void RecordScene::onPlusButton(cocos2d::Ref *sender, int delta) {
+void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {
     int winScore = atoi(_editBox->getText());
     winScore += delta;
     char buf[32];
@@ -582,7 +582,7 @@ void RecordScene::onPlusButton(cocos2d::Ref *sender, int delta) {
     updateScoreLabel();
 }
 
-void RecordScene::onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+void RecordScene::onDrawBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType event) {
     if (event == ui::CheckBox::EventType::SELECTED) {
         _winIndex = -1;
         // 禁用所有人的和、自摸/点炮，启用错和
@@ -608,7 +608,7 @@ void RecordScene::onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventTy
     updateScoreLabel();
 }
 
-void RecordScene::onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
+void RecordScene::onWinGroup(cocos2d::ui::RadioButton *, int index, cocos2d::ui::RadioButtonGroup::EventType) {
     _winIndex = index;
     for (int i = 0; i < 4; ++i) {
         if (i == index) {
@@ -627,12 +627,12 @@ void RecordScene::onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, c
     updateScoreLabel();
 }
 
-void RecordScene::onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
+void RecordScene::onClaimGroup(cocos2d::ui::RadioButton *, int, cocos2d::ui::RadioButtonGroup::EventType) {
     if (_winIndex == -1) return;
     updateScoreLabel();
 }
 
-void RecordScene::onFalseWinBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+void RecordScene::onFalseWinBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType) {
     updateScoreLabel();
 }
 
@@ -721,7 +721,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     updateScoreLabel();
 }
 
-void RecordScene::onSubmitButton(cocos2d::Ref *sender) {
+void RecordScene::onSubmitButton(cocos2d::Ref *) {
     if (_detail.fan_flag != 0) {  // 标记了番种
         if (_drawBox->isSelected()) {  // 荒庄
             AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", 12,

@@ -221,7 +221,7 @@ void ExtraInfoWidget::setSeatWind(mahjong::wind_t wind) {
     }
 }
 
-void ExtraInfoWidget::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event) {
+void ExtraInfoWidget::onWinTypeGroup(cocos2d::ui::RadioButton *, int index, cocos2d::ui::RadioButtonGroup::EventType) {
     if (index == 0) {  // 点和
         // 绝张：可为绝张 && 抢杠没选中
         // 杠开：禁用
@@ -245,7 +245,7 @@ void ExtraInfoWidget::onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int 
     }
 }
 
-void ExtraInfoWidget::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+void ExtraInfoWidget::onFourthTileBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType event) {
     // 绝张与抢杠互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
         // 抢杠：禁用
@@ -265,7 +265,7 @@ void ExtraInfoWidget::onFourthTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBo
     }
 }
 
-void ExtraInfoWidget::onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+void ExtraInfoWidget::onRobKongBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType event) {
     // 抢杠与绝张、海底互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
         // 绝张：禁用
@@ -281,7 +281,7 @@ void ExtraInfoWidget::onRobKongBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::
     }
 }
 
-void ExtraInfoWidget::onLastTileBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+void ExtraInfoWidget::onLastTileBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType event) {
     // 海底与抢杠互斥
     if (event == ui::CheckBox::EventType::SELECTED) {
         // 抢杠：禁用
@@ -345,7 +345,7 @@ void ExtraInfoWidget::refreshByWinTile(const RefreshByWinTile &rt) {
     refreshByKong(rt.isFixedPacksContainsKong());
 }
 
-void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *sender) {
+void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float maxWidth = visibleSize.width * 0.8f - 10;
     Label *label = Label::createWithSystemFont(

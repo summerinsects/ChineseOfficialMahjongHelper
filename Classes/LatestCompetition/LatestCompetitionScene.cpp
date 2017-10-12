@@ -60,6 +60,8 @@ void LatestCompetitionScene::requestCompetitions() {
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
+        CC_UNUSED_PARAM(client);
+
         network::HttpClient::destroyInstance();
 
         if (UNLIKELY(!thiz->isRunning())) {
@@ -161,11 +163,11 @@ bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
     return false;
 }
 
-ssize_t LatestCompetitionScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t LatestCompetitionScene::numberOfCellsInTableView(cw::TableView *) {
     return _competitions.size();
 }
 
-float LatestCompetitionScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float LatestCompetitionScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
     return 50.0f;
 }
 

@@ -108,7 +108,7 @@ bool MahjongTheoryScene::init() {
         checkBox->setContentSize(Size(20.0f, 20.0f));
         checkBox->setPosition(Vec2(xPos - 20.0f, yPos));
         checkBox->setSelected(true);
-        checkBox->addEventListener([this](Ref *sender, ui::CheckBox::EventType event) {
+        checkBox->addEventListener([this](Ref *, ui::CheckBox::EventType) {
             filterResultsByFlag(getFilterFlag());
             _tableView->reloadData();
         });
@@ -157,7 +157,7 @@ bool MahjongTheoryScene::init() {
     return true;
 }
 
-void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
+void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
     AlertView::showWithMessage("使用说明",
         "牌理功能未经严格测试，可能存在bug。\n\n"
         "1." INPUT_GUIDE_STRING_1 "\n"
@@ -536,7 +536,7 @@ void MahjongTheoryScene::recoverFromState(StateData &state) {
     _tableView->reloadData();
 }
 
-void MahjongTheoryScene::onUndoButton(cocos2d::Ref *sender) {
+void MahjongTheoryScene::onUndoButton(cocos2d::Ref *) {
     if (LIKELY(!_undoCache.empty())) {
         _redoCache.emplace_back();
         StateData &state = _redoCache.back();
@@ -551,7 +551,7 @@ void MahjongTheoryScene::onUndoButton(cocos2d::Ref *sender) {
     }
 }
 
-void MahjongTheoryScene::onRedoButton(cocos2d::Ref *sender) {
+void MahjongTheoryScene::onRedoButton(cocos2d::Ref *) {
     if (LIKELY(!_redoCache.empty())) {
         _undoCache.emplace_back();
         StateData &state = _undoCache.back();
@@ -693,11 +693,11 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
 #define SPACE 2
 #define TILE_WIDTH_SMALL 15
 
-ssize_t MahjongTheoryScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t MahjongTheoryScene::numberOfCellsInTableView(cw::TableView *) {
     return _orderedIndices.size();
 }
 
-float MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
     size_t realIdx = _orderedIndices[idx];
     const ResultEx *result = &_resultSources[realIdx];  // 当前cell的数据
 

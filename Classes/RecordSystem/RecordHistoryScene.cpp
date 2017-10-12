@@ -190,11 +190,11 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     return true;
 }
 
-ssize_t RecordHistoryScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t RecordHistoryScene::numberOfCellsInTableView(cw::TableView *) {
     return _recordTexts.size();
 }
 
-float RecordHistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float RecordHistoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
     return 70.0f;
 }
 

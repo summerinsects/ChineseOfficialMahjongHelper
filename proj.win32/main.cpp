@@ -9,8 +9,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance,
                        LPTSTR    lpCmdLine,
                        int       nCmdShow)
 {
+    UNREFERENCED_PARAMETER(hInstance);
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+    UNREFERENCED_PARAMETER(nCmdShow);
 
     // create the application instance
     AppDelegate app;
