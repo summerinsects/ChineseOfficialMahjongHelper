@@ -9,7 +9,7 @@
 
 #include "json/document.h"
 
-#define NAME_SIZE 64
+#define NAME_SIZE 32
 
 struct Record {
     char name[4][NAME_SIZE];// 选手姓名
