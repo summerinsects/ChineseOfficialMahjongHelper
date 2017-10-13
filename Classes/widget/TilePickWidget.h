@@ -7,8 +7,10 @@ class TilePickWidget : public cocos2d::Node {
 public:
     CREATE_FUNC(TilePickWidget);
 
-    void setFixedPacksChangedCallback(const std::function<void ()> &callback) { _fixedPacksChangedCallback = callback; }
-    void setWinTileChangedCallback(const std::function<void ()> &callback) { _winTileChangedCallback = callback; }
+    typedef std::function<void ()> TilePickCallback;
+
+    void setFixedPacksChangedCallback(const TilePickCallback &callback) { _fixedPacksChangedCallback = callback; }
+    void setWinTileChangedCallback(const TilePickCallback &callback) { _winTileChangedCallback = callback; }
     void setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile);
 
     virtual bool init() override;
@@ -27,8 +29,8 @@ private:
     cocos2d::ui::Button *_meldedKongButton = nullptr;
     cocos2d::ui::Button *_concealedKongButton = nullptr;
 
-    std::function<void ()> _fixedPacksChangedCallback;
-    std::function<void ()> _winTileChangedCallback;
+    TilePickCallback _fixedPacksChangedCallback;
+    TilePickCallback _winTileChangedCallback;
 
     void reset();
     void sort();
