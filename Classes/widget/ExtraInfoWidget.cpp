@@ -308,10 +308,9 @@ void ExtraInfoWidget::refreshByKong(bool hasKong) {
     }
 }
 
-void ExtraInfoWidget::refreshByWinTile(const RefreshByWinTile &rt) {
+void ExtraInfoWidget::refreshByWinTile(mahjong::tile_t winTile, bool maybeFourthTile, size_t winTileCountInFixedPacks, bool hasKong) {
     _maybeFourthTile = false;
     _winTileCountInFixedPacks = 0;
-    mahjong::tile_t winTile = rt.getWinTile();
     if (winTile == 0) {  // 没有和牌张
         _fourthTileBox->setEnabled(false);
         _robKongBox->setEnabled(false);
@@ -319,11 +318,10 @@ void ExtraInfoWidget::refreshByWinTile(const RefreshByWinTile &rt) {
         return;
     }
 
-    // 立牌中不包含和牌张，则可能为绝张
-    _maybeFourthTile = !rt.isStandingTilesContainsServingTile();
+    _maybeFourthTile = maybeFourthTile;
 
     // 一定为绝张
-    _winTileCountInFixedPacks = rt.countServingTileInFixedPacks();
+    _winTileCountInFixedPacks = winTileCountInFixedPacks;
     if (_maybeFourthTile && _winTileCountInFixedPacks == 3) {
         _fourthTileBox->setEnabled(true);
         _robKongBox->setEnabled(false);
@@ -342,7 +340,7 @@ void ExtraInfoWidget::refreshByWinTile(const RefreshByWinTile &rt) {
     _lastTileBox->setEnabled(!_robKongBox->isSelected());
 
     // 杠开
-    refreshByKong(rt.isFixedPacksContainsKong());
+    refreshByKong(hasKong);
 }
 
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
