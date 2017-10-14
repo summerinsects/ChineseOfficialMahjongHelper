@@ -283,35 +283,46 @@ void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {
     _viewCallback(&g_records[cell->getIdx()]);
 }
 
-static void __modifyRecord(const Record *record) {
-    auto it = std::find_if(g_records.begin(), g_records.end(), [record](const Record &r) {
-        return (r.start_time == record->start_time);  // 我们认为开始时间相同的为同一个记录
+static void __modifyRecord(std::vector<Record> &records, const Record *r) {
+    // 我们认为开始时间相同的为同一个记录
+    time_t start_time = r->start_time;
+    auto it = std::find_if(records.begin(), records.end(), [start_time](const Record &r) {
+        return (r.start_time == start_time);
     });
 
-    if (it == g_records.end()) {
-        g_records.push_back(*record);
+    // 未找到，则添加；找到，则覆盖
+    if (it == records.end()) {
+        records.push_back(*r);
+    }
+    else {
+        memcpy(&*it, r, sizeof(*r));
     }
 
-    std::sort(g_records.begin(), g_records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
+    // 按时间排序
+    std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
 }
 
 void RecordHistoryScene::modifyRecord(const Record *record) {
-    if (UNLIKELY(g_records.empty())) {
-        auto recordCopy = std::make_shared<Record>(*record);
-        std::thread([recordCopy]() {
-            auto temp = std::make_shared<std::vector<Record> >();
-            loadRecords(*temp);
-            __modifyRecord(recordCopy.get());
-            saveRecords(*temp);
+    if (UNLIKELY(g_records.empty())) {  // 如果当前没有加载过历史记录
+        auto r = std::make_shared<Record>(*record);  // 复制当前记录
+        // 子线程中加载、修改、保存
+        std::thread([r]() {
+            auto records = std::make_shared<std::vector<Record> >();
+            loadRecords(*records);
+            __modifyRecord(*records, r.get());
+            saveRecords(*records);
 
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([recordCopy, temp]() {
-                g_records.swap(*temp);
+            // 切换到主线程，覆盖整个历史记录
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([records]() {
+                g_records.swap(*records);
             });
         }).detach();
     }
-    else {
-        __modifyRecord(record);
+    else {  // 如果当前加载过历史记录
+        // 直接修改
+        __modifyRecord(g_records, record);
 
+        // 子线程中写文件
         auto temp = std::make_shared<std::vector<Record> >(g_records);
         std::thread([temp]() {
             saveRecords(*temp);
