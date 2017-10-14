@@ -60,7 +60,7 @@ namespace {
 }
 
 // 递归划分算法的最后一步，添加划分
-static void divide_tail_add_division(tile_t tile, intptr_t fixed_cnt, const division_t *work_division, division_result_t *result) {
+static void divide_tail_add_division(intptr_t fixed_cnt, const division_t *work_division, division_result_t *result) {
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
     // 这里不能直接在work_division.packs上排序，否则会破坏递归外层的数据
     division_t temp;
@@ -96,7 +96,7 @@ static bool divide_tail(tile_table_t &cnt_table, intptr_t fixed_cnt, division_t 
 
             // 这2张作为雀头
             work_division->packs[4] = make_pack(0, PACK_TYPE_PAIR, t);
-            divide_tail_add_division(t, fixed_cnt, work_division, result);  // 记录
+            divide_tail_add_division(fixed_cnt, work_division, result);  // 记录
             return true;
         }
         cnt_table[t] += 2;  // 还原
@@ -482,7 +482,7 @@ static int calculate_chows_pairwise(const tile_t (&mid_tiles)[_Size], fan_t (&se
 static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_table) {
     fan_t fan;
     // 存在4组顺子的番种时，不再检测其他的了
-    if ((fan = get_4_chows_fan(mid_tiles[0], mid_tiles[1], mid_tiles[2], mid_tiles[3]))) {
+    if ((fan = get_4_chows_fan(mid_tiles[0], mid_tiles[1], mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
         return;
     }

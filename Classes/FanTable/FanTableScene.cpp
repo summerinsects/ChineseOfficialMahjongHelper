@@ -40,11 +40,11 @@ bool FanTableScene::init() {
     return true;
 }
 
-ssize_t FanTableScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t FanTableScene::numberOfCellsInTableView(cw::TableView *) {
     return 13;
 }
 
-float FanTableScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float FanTableScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
     size_t cnt = eachLevelCounts[idx];
     float height = computeRowsAlign4(cnt) * 25.0f;
     return (height + 15.0f);

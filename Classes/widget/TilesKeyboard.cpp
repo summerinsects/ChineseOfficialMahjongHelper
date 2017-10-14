@@ -447,13 +447,13 @@ void TilesKeyboard::removeSpaceTile() {
 }
 
 void TilesKeyboard::onNumberedSuffix(int suit) {
-    if (_tilesText.empty() || !isdigit(_tilesText.back())) {
+    if (_tilesText.empty() || !Common::__isdigit(_tilesText.back())) {
         return;
     }
 
     std::string::size_type len = _tilesText.length();
     std::string::size_type lastSuffixPos
-        = std::find_if_not(_tilesText.rbegin(), _tilesText.rend(), isdigit).base() - _tilesText.begin();
+        = std::find_if_not(_tilesText.rbegin(), _tilesText.rend(), Common::__isdigit).base() - _tilesText.begin();
 
     static const char *suitFace = "msp";
     _tilesText.append(1, suitFace[suit]);
@@ -467,7 +467,7 @@ void TilesKeyboard::onNumberedSuffix(int suit) {
 }
 
 void TilesKeyboard::onHonor(int honor) {
-    if (!_tilesText.empty() && isdigit(_tilesText.back())) {
+    if (!_tilesText.empty() && Common::__isdigit(_tilesText.back())) {
         return;
     }
 
@@ -490,7 +490,7 @@ void TilesKeyboard::onBackspace() {
     switch (ch) {
     case 'm': case 's': case 'p': {
         _tilesText.pop_back();
-        if (!_tilesText.empty() && isdigit(_tilesText.back())) {
+        if (!_tilesText.empty() && Common::__isdigit(_tilesText.back())) {
             _tilesText.push_back(ch);
         }
         removeTiles(1);
@@ -518,7 +518,7 @@ void TilesKeyboard::onBackspace() {
 }
 
 void TilesKeyboard::onSpace() {
-    if (_tilesText.empty() || isdigit(_tilesText.back()) || _tilesText.back() == ' ') {
+    if (_tilesText.empty() || Common::__isdigit(_tilesText.back()) || _tilesText.back() == ' ') {
         return;
     }
 
@@ -533,7 +533,7 @@ void TilesKeyboard::onLeftBracket() {
         return;
     }
 
-    if (!_tilesText.empty() && isdigit(_tilesText.back())) {
+    if (!_tilesText.empty() && Common::__isdigit(_tilesText.back())) {
         return;
     }
 
@@ -549,7 +549,7 @@ void TilesKeyboard::onRightBracket() {
         return;
     }
 
-    if (!_tilesText.empty() && isdigit(_tilesText.back())) {
+    if (!_tilesText.empty() && Common::__isdigit(_tilesText.back())) {
         return;
     }
 

@@ -70,12 +70,8 @@ bool FanCalculatorScene::init() {
     });
 
     tilePicker->setWinTileChangedCallback([tilePicker, extraInfo]() {
-        ExtraInfoWidget::RefreshByWinTile rt;
-        rt.getWinTile = std::bind(&TilePickWidget::getServingTile, tilePicker);
-        rt.isStandingTilesContainsServingTile = std::bind(&TilePickWidget::isStandingTilesContainsServingTile, tilePicker);
-        rt.countServingTileInFixedPacks = std::bind(&TilePickWidget::countServingTileInFixedPacks, tilePicker);
-        rt.isFixedPacksContainsKong = std::bind(&TilePickWidget::isFixedPacksContainsKong, tilePicker);
-        extraInfo->refreshByWinTile(rt);
+        extraInfo->refreshByWinTile(tilePicker->getServingTile(), !tilePicker->isStandingTilesContainsServingTile(),
+            tilePicker->countServingTileInFixedPacks(), tilePicker->isFixedPacksContainsKong());
     });
 
     return true;

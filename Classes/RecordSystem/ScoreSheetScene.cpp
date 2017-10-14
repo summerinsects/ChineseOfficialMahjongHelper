@@ -463,7 +463,7 @@ void ScoreSheetScene::reset() {
     }
 }
 
-void ScoreSheetScene::onNameButton(cocos2d::Ref *sender, size_t idx) {
+void ScoreSheetScene::onNameButton(cocos2d::Ref *, size_t idx) {
     if (_lockButton->isVisible() && _lockButton->isEnabled()) {
         editName(idx);
     }
@@ -493,12 +493,21 @@ void ScoreSheetScene::editName(size_t idx) {
 
     static const char *wind[] = { "东", "南", "西", "北" };
     AlertView::showWithNode(Common::format("开局座位「%s」", wind[idx]), editBox, [this, editBox, idx]() {
-        char (&name)[NAME_SIZE] = _record->name[idx];
-        memset(name, 0, sizeof(name));
-
         const char *text = editBox->getText();
-        if (!Common::isCStringEmpty(text)) {
-            strncpy(name, text, NAME_SIZE - 1);
+        if (text != nullptr) {
+            std::string name = text;
+            Common::trim(name);
+
+            // 开始后不允许清空名字
+            if (_record->start_time != 0 && name.empty()) {
+                return;
+            }
+
+            if (name.length() > NAME_SIZE - 1) {
+                name.erase(NAME_SIZE - 1);
+            }
+
+            strncpy(_record->name[idx], name.c_str(), NAME_SIZE - 1);
             _nameLabel[idx]->setVisible(true);
             _nameLabel[idx]->setString(name);
             Common::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
@@ -519,7 +528,7 @@ void ScoreSheetScene::editName(size_t idx) {
     }, 0.0f, "open_keyboard");
 }
 
-void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
+void ScoreSheetScene::onLockButton(cocos2d::Ref *) {
     const char (&name)[4][NAME_SIZE] = _record->name;
     auto it = std::find_if(std::begin(name), std::end(name), &Common::isCStringEmpty);
     if (it != std::end(name)) {
@@ -553,7 +562,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *sender) {
     }
 }
 
-void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender, size_t handIdx) {
+void ScoreSheetScene::onRecordButton(cocos2d::Ref *, size_t handIdx) {
     editRecord(handIdx, false);
 }
 
@@ -642,7 +651,7 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
     return ret;
 }
 
-void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
+void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     const Record::Detail &detail = _record->detail[handIdx];
     if (detail.score == 0) {
         AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"),
@@ -658,7 +667,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender, size_t handIdx) {
         std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
 }
 
-void ScoreSheetScene::onTimeScheduler(float dt) {
+void ScoreSheetScene::onTimeScheduler(float) {
     time_t t = time(nullptr);
     struct tm ret = *localtime(&t);
     _timeLabel->setString(Common::format("当前时间：%d年%d月%d日%.2d:%.2d",
@@ -666,7 +675,7 @@ void ScoreSheetScene::onTimeScheduler(float dt) {
     _timeLabel->setScale(1);
 }
 
-void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
+void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
     AlertView::showWithMessage("使用说明",
         "1. 使用步骤：点击「选手姓名」一栏，输入四名选手姓名，点击「锁定」，开始「记分」。\n"
         "2. 计分时如果有标记番种，则「番种备注」一栏会选取一个最大的番种名予以显示。\n"
@@ -677,7 +686,7 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *sender) {
         10, nullptr, nullptr);
 }
 
-void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
+void ScoreSheetScene::onHistoryButton(cocos2d::Ref *) {
     Director::getInstance()->pushScene(RecordHistoryScene::create([this](Record *record) {
         if (UNLIKELY(g_currentRecord.start_time == record->start_time)) {  // 我们认为开始时间相同的为同一个记录
             Director::getInstance()->popScene();
@@ -691,7 +700,7 @@ void ScoreSheetScene::onHistoryButton(cocos2d::Ref *sender) {
     }));
 }
 
-void ScoreSheetScene::onResetButton(cocos2d::Ref *sender) {
+void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     const char (&name)[4][NAME_SIZE] = _record->name;
     if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
         reset();
@@ -911,7 +920,7 @@ namespace {
     };
 }
 
-void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
+void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     const char (&name)[4][NAME_SIZE] = _record->name;
     Node *rootNode = nullptr;
 
@@ -961,7 +970,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *sender) {
     }, nullptr);
 }
 
-void ScoreSheetScene::onScoreButton(cocos2d::Ref *sender, size_t idx) {
+void ScoreSheetScene::onScoreButton(cocos2d::Ref *, size_t idx) {
     const char (&name)[4][NAME_SIZE] = _record->name;
     if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)
         || _record->current_index == 16) {

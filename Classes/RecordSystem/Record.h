@@ -9,7 +9,7 @@
 
 #include "json/document.h"
 
-#define NAME_SIZE 64
+#define NAME_SIZE 32
 
 struct Record {
     char name[4][NAME_SIZE];// 选手姓名
@@ -24,10 +24,6 @@ struct Record {
     time_t start_time;      // 开始时间
     time_t end_time;        // 结束时间
 };
-
-static bool operator==(const Record &left, const Record &right) {
-    return memcmp(&left, &right, sizeof(Record)) == 0;
-}
 
 #define SET_WIN(wc_, n_) ((wc_) |= (1 << ((n_) + 4)))
 #define TEST_WIN(wc_, n_) !!((wc_) & (1 << ((n_) + 4)))

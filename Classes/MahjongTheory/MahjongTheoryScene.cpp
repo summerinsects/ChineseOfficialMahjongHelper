@@ -108,7 +108,7 @@ bool MahjongTheoryScene::init() {
         checkBox->setContentSize(Size(20.0f, 20.0f));
         checkBox->setPosition(Vec2(xPos - 20.0f, yPos));
         checkBox->setSelected(true);
-        checkBox->addEventListener([this](Ref *sender, ui::CheckBox::EventType event) {
+        checkBox->addEventListener([this](Ref *, ui::CheckBox::EventType) {
             filterResultsByFlag(getFilterFlag());
             _tableView->reloadData();
         });
@@ -157,7 +157,7 @@ bool MahjongTheoryScene::init() {
     return true;
 }
 
-void MahjongTheoryScene::onGuideButton(cocos2d::Ref *sender) {
+void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
     AlertView::showWithMessage("使用说明",
         "牌理功能未经严格测试，可能存在bug。\n\n"
         "1." INPUT_GUIDE_STRING_1 "\n"
@@ -536,7 +536,7 @@ void MahjongTheoryScene::recoverFromState(StateData &state) {
     _tableView->reloadData();
 }
 
-void MahjongTheoryScene::onUndoButton(cocos2d::Ref *sender) {
+void MahjongTheoryScene::onUndoButton(cocos2d::Ref *) {
     if (LIKELY(!_undoCache.empty())) {
         _redoCache.emplace_back();
         StateData &state = _redoCache.back();
@@ -551,7 +551,7 @@ void MahjongTheoryScene::onUndoButton(cocos2d::Ref *sender) {
     }
 }
 
-void MahjongTheoryScene::onRedoButton(cocos2d::Ref *sender) {
+void MahjongTheoryScene::onRedoButton(cocos2d::Ref *) {
     if (LIKELY(!_redoCache.empty())) {
         _undoCache.emplace_back();
         StateData &state = _undoCache.back();
@@ -644,10 +644,6 @@ static std::string getResultTypeString(uint8_t flag, int step) {
     return str;
 }
 
-static int forceinline __isdigit(int c) {
-    return (c >= -1 && c <= 255) ? isdigit(c) : 0;
-}
-
 // 分割string到两个label
 static void spiltStringToLabel(const std::string &str, float width, Label *label1, Label *label2) {
     label2->setVisible(false);
@@ -657,7 +653,8 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
         return;
     }
 
-    long utf8Len = StringUtils::getCharacterCountInUTF8String(str);
+    StringUtils::StringUTF8 utf8(str);
+    long utf8Len = utf8.length();
     long pos = static_cast<long>(width / size.width * utf8Len);  // 切这么多
 
     // 切没了，全部放在第2个label上
@@ -665,15 +662,16 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
         label1->setString("");
         label2->setVisible(true);
         label2->setString(str);
+        return;
     }
 
-    std::string str1 = ui::Helper::getSubStringOfUTF8String(str, 0, pos);
-    std::string str2 = ui::Helper::getSubStringOfUTF8String(str, pos, utf8Len);
+    std::string str1 = utf8.getAsCharSequence(0, pos);
+    std::string str2 = utf8.getAsCharSequence(pos, utf8Len - pos);
 
     // 保证不从数字中间切断
-    if (!str2.empty() && __isdigit(str2.front())) {  // 第2个字符串以数字开头
+    if (!str2.empty() && Common::__isdigit(str2.front())) {  // 第2个字符串以数字开头
         // 将第1个字符串尾部的数字都转移到第2个字符串头部
-        while (pos > 0 && !str1.empty() && __isdigit(str1.back())) {
+        while (pos > 0 && !str1.empty() && Common::__isdigit(str1.back())) {
             --pos;
             str2.insert(0, 1, str1.back());
             str1.pop_back();
@@ -695,11 +693,11 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
 #define SPACE 2
 #define TILE_WIDTH_SMALL 15
 
-ssize_t MahjongTheoryScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t MahjongTheoryScene::numberOfCellsInTableView(cw::TableView *) {
     return _orderedIndices.size();
 }
 
-float MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
     size_t realIdx = _orderedIndices[idx];
     const ResultEx *result = &_resultSources[realIdx];  // 当前cell的数据
 

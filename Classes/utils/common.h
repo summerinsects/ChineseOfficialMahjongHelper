@@ -83,7 +83,7 @@ void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width);
 
 void calculateColumnsCenterX(const float *colWidth, size_t col, float *xPos);
 
-static inline bool isCStringEmpty(const char *str) {
+static bool FORCE_INLINE isCStringEmpty(const char *str) {
     return *str == '\0';
 }
 
@@ -94,6 +94,20 @@ std::string format(_Printf_format_string_ const char *fmt, ...);
 #else
 std::string format(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
 #endif
+
+static int FORCE_INLINE __isdigit(int c) {
+    return (c >= -1 && c <= 255) ? isdigit(c) : 0;
+}
+
+static int FORCE_INLINE __isspace(int c) {
+    return (c >= -1 && c <= 255) ? isspace(c) : 0;
+}
+
+static inline std::string &trim(std::string &str) {
+    str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](char c) { return !__isspace(c); }));
+    str.erase(std::find_if(str.rbegin(), str.rend(), [](char c) { return !__isspace(c); }).base(), str.end());
+    return str;
+}
 
 }
 

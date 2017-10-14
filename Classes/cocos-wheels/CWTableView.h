@@ -82,7 +82,11 @@ namespace cw {
          * @return size of a cell at given index, height of a cell if the table view is VERTICAL or width if HORIZONTAL
 
          */
-        virtual float tableCellSizeForIndex(TableView *table, ssize_t idx) { return 0.0f; }
+        virtual float tableCellSizeForIndex(TableView *table, ssize_t idx) {
+            CC_UNUSED_PARAM(table);
+            CC_UNUSED_PARAM(idx);
+            return 0.0f;
+        }
 
         /**
          * a cell instance at a given index
@@ -102,7 +106,10 @@ namespace cw {
          * @js NA
          * @lua NA
          */
-        virtual void tableCellWillRecycle(TableView *table, TableViewCell *cell) { }
+        virtual void tableCellWillRecycle(TableView *table, TableViewCell *cell) {
+            CC_UNUSED_PARAM(table);
+            CC_UNUSED_PARAM(cell);
+        }
     };
 
     class TableView : public cocos2d::ui::ScrollView {

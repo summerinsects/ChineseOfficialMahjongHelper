@@ -131,14 +131,14 @@ bool AlertView::initWithTitle(const std::string &title, cocos2d::Node *node, flo
     return true;
 }
 
-void AlertView::onCancelButton(cocos2d::Ref *sender) {
+void AlertView::onCancelButton(cocos2d::Ref *) {
     if (_cancelCallback) {
         _cancelCallback();
     }
     this->removeFromParent();
 }
 
-void AlertView::onConfirmButton(cocos2d::Ref *sender) {
+void AlertView::onConfirmButton(cocos2d::Ref *) {
     if (_confirmCallback) {
         _confirmCallback();
     }
