@@ -43,6 +43,8 @@ struct Record {
 
 void JsonToRecord(const rapidjson::Value &json, Record &record);
 void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
+void ReadRecordFromFile(const char *file, Record &record);
+void WriteRecordToFile(const char *file, const Record &record);
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
 const char *GetShortFanText(const Record::Detail &detail);

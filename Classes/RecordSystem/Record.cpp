@@ -1,6 +1,12 @@
 ﻿#include "Record.h"
+#include "json/stringbuffer.h"
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
+#include "json/prettywriter.h"
+#else
+#include "json/writer.h"
+#endif
 #include "../mahjong-algorithm/fan_calculator.h"
-#include "../utils/compiler.h"
+#include "../utils/common.h"
 
 static const char *packedFanNames[] = {
     "门断平", "门清平和", "断幺平和", "连风刻", "番牌暗杠", "双同幺九", "门清双暗", "双暗暗杠"
@@ -91,6 +97,62 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
 
     json.AddMember("start_time", rapidjson::Value(static_cast<uint64_t>(record.start_time)), alloc);
     json.AddMember("end_time", rapidjson::Value(static_cast<uint64_t>(record.end_time)), alloc);
+}
+
+void ReadRecordFromFile(const char *file, Record &record) {
+    std::string str;
+    FILE *fp = fopen(file, "rb");
+    if (LIKELY(fp != nullptr)) {
+        fseek(fp, 0, SEEK_END);
+        long size = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+        try {
+            str.resize(size + 1);
+            fread(&str[0], sizeof(char), size, fp);
+        }
+        catch (...) {
+        }
+        fclose(fp);
+    }
+
+    try {
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError()) {
+            return;
+        }
+
+        JsonToRecord(doc, record);
+    }
+    catch (std::exception &e) {
+        MYLOG("%s %s", __FUNCTION__, e.what());
+    }
+}
+
+void WriteRecordToFile(const char *file, const Record &record) {
+    try {
+        rapidjson::Document doc(rapidjson::Type::kObjectType);
+        RecordToJson(record, doc, doc.GetAllocator());
+
+        rapidjson::StringBuffer buf;
+#ifdef COCOS2D_DEBUG
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+#else
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+#endif
+        doc.Accept(writer);
+
+        MYLOG("%.*s", static_cast<int>(buf.GetSize()), buf.GetString());
+
+        FILE *fp = fopen(file, "wb");
+        if (LIKELY(fp != nullptr)) {
+            fwrite(buf.GetString(), 1, buf.GetSize(), fp);
+            fclose(fp);
+        }
+    }
+    catch (std::exception &e) {
+        MYLOG("%s %s", __FUNCTION__, e.what());
+    }
 }
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
