@@ -123,7 +123,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setTitleText("追分策略");
     button->setPosition(Vec2(origin.x + 2.0f + buttonWidth * 0.5f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
-    Common::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
+    cw::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
 
     // 时间label
     Label *label = Label::createWithSystemFont("当前时间", "Arial", 12);
@@ -168,7 +168,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line1Y));
     node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4.0f);
+    cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     // 4个用于弹出输入框的AlertLayer及同位置的label
     // 这里不直接使用Button内部Label，因为内部Label在点击后会恢复scale
@@ -207,13 +207,13 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label->setColor(Color3B::BLACK);
         label->setPosition(Vec2(colPosX[i], line2Y));
         node->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4.0f);
+        cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         label = Label::createWithSystemFont(row1Text[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         label->setPosition(Vec2(colPosX[i], line3Y));
         node->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4.0f);
+        cw::scaleLabelToFitWidth(label, gap - 4.0f);
     }
 
     // 第4栏：累计
@@ -222,7 +222,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line4Y));
     node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4.0f);
+    cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("+0", "Arail", 12);
@@ -246,7 +246,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line5Y));
     node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4.0f);
+    cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("", "Arail", 12);
@@ -261,7 +261,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label->setColor(Color3B::BLACK);
     label->setPosition(Vec2(colPosX[5], line5Y));
     node->addChild(label);
-    Common::scaleLabelToFitWidth(label, gap - 4.0f);
+    cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     // 第6~21栏，东风东~北风北的计分
     for (int k = 0; k < 16; ++k) {
@@ -272,7 +272,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label->setColor(Color3B(0x60, 0x60, 0x60));
         label->setPosition(Vec2(colPosX[0], y));
         node->addChild(label);
-        Common::scaleLabelToFitWidth(label, gap - 4.0f);
+        cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 四位选手得分
         for (int i = 0; i < 4; ++i) {
@@ -351,12 +351,23 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     Label *label = _fanNameLabel[handIdx];
     label->setString(GetShortFanText(detail));
     label->setVisible(true);
-    Common::scaleLabelToFitWidth(label, _cellWidth - 4.0f);
+    cw::scaleLabelToFitWidth(label, _cellWidth - 4.0f);
+}
+
+void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]) {
+    memset(ranks, 0, sizeof(ranks));
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (i == j) continue;
+            if (scores[i] < scores[j]) ++ranks[i];
+            //if (scores[i] == scores[j] && i > j) ++ranks[i];  // 这一行的作用是取消并列
+        }
+    }
 }
 
 void ScoreSheetScene::refreshRank() {
     unsigned rank[4] = {0};
-    Common::calculateRankFromScore(_totalScores, rank);
+    CalculateRankFromScore(_totalScores, rank);
 
     static const char *text[] = { "一", "二", "三", "四" };
     for (int i = 0; i < 4; ++i) {
@@ -380,7 +391,7 @@ void ScoreSheetScene::refreshEndTime() {
         ret1.tm_year + 1900, ret1.tm_mon + 1, ret1.tm_mday, ret1.tm_hour, ret1.tm_min));
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    Common::scaleLabelToFitWidth(_timeLabel, visibleSize.width - 10.0f);
+    cw::scaleLabelToFitWidth(_timeLabel, visibleSize.width - 10.0f);
 }
 
 void ScoreSheetScene::recover() {
@@ -392,7 +403,7 @@ void ScoreSheetScene::recover() {
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setString(name[i]);
         _nameLabel[i]->setVisible(true);
-        Common::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);
+        cw::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);
     }
 
     // 有选手名字为空，则清空数据
@@ -510,7 +521,7 @@ void ScoreSheetScene::editName(size_t idx) {
             strncpy(_record->name[idx], name.c_str(), NAME_SIZE - 1);
             _nameLabel[idx]->setVisible(true);
             _nameLabel[idx]->setString(name);
-            Common::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
+            cw::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
 
             if (_record->current_index >= 16) {
                 RecordHistoryScene::modifyRecord(_record);
@@ -544,7 +555,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *) {
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setVisible(true);
         _nameLabel[i]->setString(_record->name[i]);
-        Common::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);
+        cw::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);
     }
 
     _recordButton[0]->setVisible(true);
@@ -719,7 +730,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     rootNode->addChild(label);
     label->setPosition(Vec2(100.0f, 60.0f));
     label->setColor(Color3B(0x60, 0x60, 0x60));
-    Common::scaleLabelToFitWidth(label, 200.0f);
+    cw::scaleLabelToFitWidth(label, 200.0f);
 
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
     rootNode->addChild(radioGroup);
@@ -735,7 +746,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     label = Label::createWithSystemFont("保存，将未打完盘数标记为荒庄", "Arial", 12);
     label->setColor(Color3B::BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    Common::scaleLabelToFitWidth(label, 175.0f);
+    cw::scaleLabelToFitWidth(label, 175.0f);
     radioButton->addChild(label);
     label->setPosition(Vec2(25.0f, 10.0f));
 
@@ -750,7 +761,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     label = Label::createWithSystemFont("丢弃，不保存当前一局记录", "Arial", 12);
     label->setColor(Color3B::BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    Common::scaleLabelToFitWidth(label, 175.0f);
+    cw::scaleLabelToFitWidth(label, 175.0f);
     radioButton->addChild(label);
     label->setPosition(Vec2(25.0f, 10.0f));
 
@@ -832,7 +843,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
     };
     // 中心位置
     float xPos[6];
-    Common::calculateColumnsCenterX(colWidth, 6, xPos);
+    cw::calculateColumnsCenterX(colWidth, 6, xPos);
 
     DrawNode *drawNode = DrawNode::create();
     drawNode->setContentSize(Size(width, height));
@@ -862,7 +873,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
         label->setColor(titleColor[i]);
         label->setPosition(Vec2(xPos[i], 190.0f));
         drawNode->addChild(label);
-        Common::scaleLabelToFitWidth(label, colWidth[i] - 4.0f);
+        cw::scaleLabelToFitWidth(label, colWidth[i] - 4.0f);
     }
 
     const float nameY[3] = { 150, 100, 30 };
@@ -874,7 +885,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
         label->setColor(titleColor[0]);
         label->setPosition(Vec2(xPos[0], nameY[n - 1]));
         drawNode->addChild(label);
-        Common::scaleLabelToFitWidth(label, colWidth[0] - 4.0f);
+        cw::scaleLabelToFitWidth(label, colWidth[0] - 4.0f);
 
         // 追k位。k=0表示1位，以此类推
         for (int k = 0; k < n; ++k) {
@@ -884,7 +895,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
             label->setColor(titleColor[1]);
             label->setPosition(Vec2(xPos[1], posY));
             drawNode->addChild(label);
-            Common::scaleLabelToFitWidth(label, colWidth[1] - 4.0f);
+            cw::scaleLabelToFitWidth(label, colWidth[1] - 4.0f);
 
             int delta = totalScores[indices[k]] - totalScores[indices[n]];
             int d = delta - 32;
@@ -899,7 +910,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
                 label->setColor(titleColor[i + 2]);
                 label->setPosition(Vec2(xPos[2 + i], posY));
                 drawNode->addChild(label);
-                Common::scaleLabelToFitWidth(label, colWidth[2 + i] - 4.0f);
+                cw::scaleLabelToFitWidth(label, colWidth[2 + i] - 4.0f);
             }
         }
     }
@@ -999,7 +1010,7 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *, size_t idx) {
         else {
             button->setTitleText(Common::format("与「%s」平分", name[dst]));
         }
-        Common::scaleLabelToFitWidth(button->getTitleLabel(), 148.0f);
+        cw::scaleLabelToFitWidth(button->getTitleLabel(), 148.0f);
         rootNode->addChild(button);
         button->setPosition(Vec2(75.0f, 60.0f - i * 25.0f));
         button->addClickEventListener([delta](Ref *) {

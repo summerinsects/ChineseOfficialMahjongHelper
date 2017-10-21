@@ -48,6 +48,9 @@
     <ClCompile Include="..\Classes\AppDelegate.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\cocos-wheels\CWCommon.cpp">
+      <Filter>src\cocos-wheels</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\cocos-wheels\CWTableView.cpp">
       <Filter>src\cocos-wheels</Filter>
     </ClCompile>
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\BaseScene.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\cocos-wheels\CWCommon.h">
+      <Filter>src\cocos-wheels</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\cocos-wheels\CWTableView.h">
       <Filter>src\cocos-wheels</Filter>

@@ -134,7 +134,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 70.0f));
-    Common::scaleLabelToFitWidth(label, visibleSize.width - 10.0f);
+    cw::scaleLabelToFitWidth(label, visibleSize.width - 10.0f);
 
     ui::RadioButtonGroup *winGroup = ui::RadioButtonGroup::create();
     winGroup->setAllowedNoSelection(true);
@@ -158,7 +158,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         label->setColor(Color3B::ORANGE);
         this->addChild(label);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 90.0f));
-        Common::scaleLabelToFitWidth(label, gap - 4.0f);
+        cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 得分
         label = Label::createWithSystemFont("+0", "Arial", 12);
@@ -422,7 +422,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             button->setTag(true);
         }
 
-        Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
+        cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
     }
 
     return cell;
