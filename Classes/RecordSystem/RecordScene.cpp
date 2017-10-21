@@ -9,7 +9,7 @@ static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
 static const size_t eachLevelBeginIndex[] = { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 static const size_t eachLevelCounts[] = { 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
 
-static inline size_t computeRowsAlign4(size_t cnt) {
+static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
 }
 
@@ -134,7 +134,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 70.0f));
-    Common::scaleLabelToFitWidth(label, visibleSize.width - 10.0f);
+    cw::scaleLabelToFitWidth(label, visibleSize.width - 10.0f);
 
     ui::RadioButtonGroup *winGroup = ui::RadioButtonGroup::create();
     winGroup->setAllowedNoSelection(true);
@@ -158,7 +158,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         label->setColor(Color3B::ORANGE);
         this->addChild(label);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 90.0f));
-        Common::scaleLabelToFitWidth(label, gap - 4.0f);
+        cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 得分
         label = Label::createWithSystemFont("+0", "Arial", 12);
@@ -422,7 +422,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             button->setTag(true);
         }
 
-        Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
+        cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
     }
 
     return cell;

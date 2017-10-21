@@ -11,7 +11,7 @@ static const int fanLevel[] = { 0, 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 }; 
 static const size_t eachLevelCounts[] = { 5, 13, 10, 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次番种的个数
 static const size_t eachLevelBeginIndex[] = { 0, 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 
-static inline size_t computeRowsAlign4(size_t cnt) {
+static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
 }
 
@@ -113,7 +113,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         size_t row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
-        Common::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
+        cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
     }
 
     for (size_t k = currentLevelCount; k < 13; ++k) {

@@ -74,6 +74,8 @@
 		1FE5D0491CAE046300A5C38B /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = 1FE5D0471CAE046300A5C38B /* tiles */; };
 		1FF6025B1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */; };
 		1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */; };
+		1FFE17A31F9BB17200714066 /* CWCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FFE17A11F9BB17200714066 /* CWCommon.cpp */; };
+		1FFE17A41F9BB17200714066 /* CWCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FFE17A11F9BB17200714066 /* CWCommon.cpp */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		294D0D641D0D56D500F7F5D4 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 294D0D631D0D56D500F7F5D4 /* CoreText.framework */; };
 		46880B8119C43A67006E1F66 /* xyg.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7A19C43A67006E1F66 /* xyg.png */; };
@@ -230,6 +232,8 @@
 		1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LatestCompetitionScene.cpp; sourceTree = "<group>"; };
 		1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LatestCompetitionScene.h; sourceTree = "<group>"; };
 		1FF8820B1F5E60BE009C3449 /* TilesImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilesImage.h; sourceTree = "<group>"; };
+		1FFE17A11F9BB17200714066 /* CWCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWCommon.cpp; sourceTree = "<group>"; };
+		1FFE17A21F9BB17200714066 /* CWCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWCommon.h; sourceTree = "<group>"; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		294D0D631D0D56D500F7F5D4 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
 		46880B7A19C43A67006E1F66 /* xyg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = xyg.png; sourceTree = "<group>"; };
@@ -403,6 +407,8 @@
 		1FDCF7BB1F738E1C00D9C608 /* cocos-wheels */ = {
 			isa = PBXGroup;
 			children = (
+				1FFE17A11F9BB17200714066 /* CWCommon.cpp */,
+				1FFE17A21F9BB17200714066 /* CWCommon.h */,
 				1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */,
 				1FDCF7BE1F738E1D00D9C608 /* CWTableView.h */,
 			);
@@ -779,6 +785,7 @@
 				1F2D25871E076FC20071ADE2 /* AlertView.cpp in Sources */,
 				1FE17A771EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
+				1FFE17A31F9BB17200714066 /* CWCommon.cpp in Sources */,
 				1FDD94451C8337140031BC38 /* shanten.cpp in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
@@ -812,6 +819,7 @@
 				1FDCF7C01F738E1D00D9C608 /* CWTableView.cpp in Sources */,
 				1FE2A3EE1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
 				1FE2A3EC1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
+				1FFE17A41F9BB17200714066 /* CWCommon.cpp in Sources */,
 				1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
 				1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */,
 				1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,

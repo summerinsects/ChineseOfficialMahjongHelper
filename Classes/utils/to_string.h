@@ -13,6 +13,8 @@
 // V6.00:0009
 
 #include <string>
+#include <ostream>
+#include <locale>
 #include <stdint.h>
 
 namespace std {

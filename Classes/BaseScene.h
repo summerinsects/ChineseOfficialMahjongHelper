@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "utils/common.h"
+#include "cocos-wheels/CWCommon.h"
 
 #define COLOR4B_BG          cocos2d::Color4B(245, 245, 245, 255)
 #define COLOR4B_NAVIGATION  cocos2d::Color4B(51, 204, 255, 255)
@@ -55,7 +56,7 @@ public:
         this->addChild(titleLabel);
         titleLabel->setPosition(cocos2d::Vec2(origin.x + visibleSize.width * 0.5f,
             origin.y + visibleSize.height - 15));
-        Common::trimLabelStringWithEllipsisToFitWidth(titleLabel, visibleSize.width - 64.0f);
+        cw::trimLabelStringWithEllipsisToFitWidth(titleLabel, visibleSize.width - 64.0f);
 
         // 返回按钮
         cocos2d::ui::Button *backBtn = cocos2d::ui::Button::create("source_material/btn_left_white.png");
