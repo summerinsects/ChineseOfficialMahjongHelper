@@ -18,6 +18,12 @@ std::string format(_Printf_format_string_ const char *fmt, ...);
 std::string format(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
 #endif
 
+#ifdef _MSC_VER
+void __log(_Printf_format_string_ const char *fmt, ...);
+#else
+void __log(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
+#endif
+
 static int FORCE_INLINE __isdigit(int c) {
     return (c >= -1 && c <= 255) ? isdigit(c) : 0;
 }
@@ -33,5 +39,11 @@ static inline std::string &trim(std::string &str) {
 }
 
 }
+
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
+#define MYLOG(fmt, ...)      Common::__log(fmt, ##__VA_ARGS__)
+#else
+#define MYLOG(fmt, ...)      (void)0
+#endif
 
 #endif
