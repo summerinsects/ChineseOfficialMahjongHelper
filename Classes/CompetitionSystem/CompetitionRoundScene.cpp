@@ -80,7 +80,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     _colWidth[6] = visibleSize.width * 0.16f;
 
     // 中心位置
-    Common::calculateColumnsCenterX(_colWidth, 7, _posX);
+    cw::calculateColumnsCenterX(_colWidth, 7, _posX);
 
     // 表头
     static const char *titleTexts[] = { "名次", "编号", "选手姓名", "本轮标准分", "本轮比赛分", "累计标准分", "累计比赛分" };
@@ -89,7 +89,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 70.0f));
-        Common::scaleLabelToFitWidth(label, _colWidth[i] - 4.0f);
+        cw::scaleLabelToFitWidth(label, _colWidth[i] - 4.0f);
     }
 
     const float tableHeight = visibleSize.height - 85.0f;
@@ -205,7 +205,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     labels[6]->setString(std::to_string(ret.second));
 
     for (int i = 0; i < 7; ++i) {
-        Common::scaleLabelToFitWidth(labels[i], _colWidth[i] - 4.0f);
+        cw::scaleLabelToFitWidth(labels[i], _colWidth[i] - 4.0f);
     }
 
     return cell;

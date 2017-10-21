@@ -7,6 +7,9 @@
 
 USING_NS_CC;
 
+// in ScoreSheetScene.cpp
+extern "C++" void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]);
+
 static const char *seatText[] = { "东", "南", "西", "北" };
 
 bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
@@ -33,7 +36,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     _colWidth[7] = visibleSize.width * 0.14f;
 
     // 中心位置
-    Common::calculateColumnsCenterX(_colWidth, 8, _posX);
+    cw::calculateColumnsCenterX(_colWidth, 8, _posX);
 
     // 表头
     static const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "顺位", "标准分", "比赛分" };
@@ -42,7 +45,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 45.0f));
-        Common::scaleLabelToFitWidth(label, _colWidth[i] - 4.0f);
+        cw::scaleLabelToFitWidth(label, _colWidth[i] - 4.0f);
     }
 
     const float tableHeight = visibleSize.height - 85.0f;
@@ -175,7 +178,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         button->setTitleText("输入");
         button->setPosition(Vec2(_posX[7], 55.0f));
         button->addClickEventListener(std::bind(&CompetitionTableScene::onRecordButton, this, std::placeholders::_1));
-        Common::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10.0f);
+        cw::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10.0f);
         buttons[0] = button;
 
         // 清空按钮
@@ -187,7 +190,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         button->setTitleText("清空");
         button->setPosition(Vec2(_posX[7], 25.0f));
         button->addClickEventListener(std::bind(&CompetitionTableScene::onClearButton, this, std::placeholders::_1));
-        Common::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10.0f);
+        cw::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[6] - 10.0f);
         buttons[1] = button;
 
         // 画线
@@ -238,7 +241,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
             labels[i][4]->setString(std::to_string(ret.second));
 
             for (int k = 0; k < 5; ++k) {
-                Common::scaleLabelToFitWidth(labels[i][k], _colWidth[2 + k] - 4.0f);
+                cw::scaleLabelToFitWidth(labels[i][k], _colWidth[2 + k] - 4.0f);
             }
         }
     }
@@ -315,7 +318,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
     // 中心位置
     float posX[6];
-    Common::calculateColumnsCenterX(colWidth, 6, posX);
+    cw::calculateColumnsCenterX(colWidth, 6, posX);
 
     // 根结点
     Node *rootNode = Node::create();
@@ -336,7 +339,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     label->setColor(Color3B(254, 87, 110));
     rootNode->addChild(label);
     label->setPosition(Vec2(width * 0.5f, 45.0f));
-    Common::scaleLabelToFitWidth(label, width - 4.0f);
+    cw::scaleLabelToFitWidth(label, width - 4.0f);
 
     std::function<void (const std::array<CompetitionResult, 4> &)> refreshCheckLabel = [label](const std::array<CompetitionResult, 4> &results) {
         float ss = 0.0f;
@@ -373,7 +376,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         label->setColor(Color3B::BLACK);
         drawNode->addChild(label);
         label->setPosition(Vec2(posX[i], 90.0f));
-        Common::scaleLabelToFitWidth(label, colWidth[i] - 4.0f);
+        cw::scaleLabelToFitWidth(label, colWidth[i] - 4.0f);
     }
 
     const std::vector<CompetitionPlayer> &players = _competitionData->players;
@@ -393,7 +396,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             label->setColor(textColors[k]);
             drawNode->addChild(label);
             label->setPosition(Vec2(posX[k], posY));
-            Common::scaleLabelToFitWidth(label, colWidth[k] - 4.0f);
+            cw::scaleLabelToFitWidth(label, colWidth[k] - 4.0f);
             labels[i][k] = label;
         }
 
@@ -411,7 +414,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             for (int k = 0; k < 3; ++k) {
                 Label *label = labels[i][k + RANK];
                 label->setString(text[k]);
-                Common::scaleLabelToFitWidth(label, colWidthArray[k + RANK] - 4.0f);
+                cw::scaleLabelToFitWidth(label, colWidthArray[k + RANK] - 4.0f);
             }
 
             if (refreshAll) {
@@ -447,7 +450,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
             results->at(3).competition_score
         };
         unsigned ranks[4];
-        Common::calculateRankFromScore(scores, ranks);
+        CalculateRankFromScore(scores, ranks);
 
         // 并列的数目
         unsigned rankCnt[4] = { 0 };
@@ -482,7 +485,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     label->setColor(Color3B(0x60, 0x60, 0x60));
     rootNode->addChild(label);
     label->setPosition(Vec2(width * 0.5f, 5.0f));
-    Common::scaleLabelToFitWidth(label, width);
+    cw::scaleLabelToFitWidth(label, width);
 
     std::string title = Common::format("第%" PRIzu "桌成绩", table + 1);
     AlertView::showWithNode(title, rootNode, [this, table, labels, title, sharedResults]() {
@@ -616,7 +619,7 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     label->setColor(Color3B(0x60, 0x60, 0x60));
     rootNode->addChild(label);
     label->setPosition(Vec2(135.0f * 0.5f, 5.0f));
-    Common::scaleLabelToFitWidth(label, visibleSize.width * 0.8f - 14.0f);
+    cw::scaleLabelToFitWidth(label, visibleSize.width * 0.8f - 14.0f);
 
     AlertView::showWithNode(title, rootNode, [this, radioGroup, editBoxes, title, result, callback, delegate]() {
         unsigned rank = 0;

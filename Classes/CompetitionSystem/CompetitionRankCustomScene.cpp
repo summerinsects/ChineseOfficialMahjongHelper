@@ -33,7 +33,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     _colWidth[7] = visibleSize.width * 0.2f;
 
     // 中心位置
-    Common::calculateColumnsCenterX(_colWidth, 8, _posX);
+    cw::calculateColumnsCenterX(_colWidth, 8, _posX);
 
     // 表头
     static const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "桌号", "座次", "编号", "选手姓名" };
@@ -42,7 +42,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
         label->setColor(Color3B::BLACK);
         this->addChild(label);
         label->setPosition(Vec2(origin.x + _posX[i], visibleSize.height - 45.0f));
-        Common::scaleLabelToFitWidth(label, _colWidth[i] - 4.0f);
+        cw::scaleLabelToFitWidth(label, _colWidth[i] - 4.0f);
     }
 
     const float tableHeight = visibleSize.height - 85.0f;
@@ -241,7 +241,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                 }
 
                 for (int k = 0; k < 2; ++k) {
-                    Common::scaleLabelToFitWidth(labels[n][i][k], _colWidth[2 + k] - 4.0f);
+                    cw::scaleLabelToFitWidth(labels[n][i][k], _colWidth[2 + k] - 4.0f);
                 }
 
                 touchedWidgets[n][i]->setUserData(reinterpret_cast<void *>(realIndex));
@@ -420,9 +420,9 @@ namespace {
                 ssize_t realIdx = (idx << 1) + i;
                 const CompetitionPlayer &player = _players->at(realIdx);
                 labels[i][0]->setString(std::to_string(player.serial + 1));
-                Common::scaleLabelToFitWidth(labels[i][0], 18.0f);
+                cw::scaleLabelToFitWidth(labels[i][0], 18.0f);
                 labels[i][1]->setString(player.name);
-                Common::scaleLabelToFitWidth(labels[i][1], cellWidth * 0.5f - 54.0f);
+                cw::scaleLabelToFitWidth(labels[i][1], cellWidth * 0.5f - 54.0f);
 
                 ui::CheckBox *checkBox = checkBoxes[i];
                 checkBox->setUserData(reinterpret_cast<void *>(realIdx));

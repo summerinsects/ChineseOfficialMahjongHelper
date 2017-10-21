@@ -161,7 +161,7 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
         labels[1]->setColor(Color3B::ORANGE);
         labels[1]->setString(name0);
     }
-    Common::scaleLabelToFitWidth(labels[1], visibleSize.width * 0.5f - 50.0f);
+    cw::scaleLabelToFitWidth(labels[1], visibleSize.width * 0.5f - 50.0f);
 
     if (name1.empty()) {
         labels[3]->setColor(Color3B::GRAY);
@@ -171,7 +171,7 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
         labels[3]->setColor(Color3B::ORANGE);
         labels[3]->setString(name1);
     }
-    Common::scaleLabelToFitWidth(labels[3], visibleSize.width * 0.5f - 50.0f);
+    cw::scaleLabelToFitWidth(labels[3], visibleSize.width * 0.5f - 50.0f);
 
     return cell;
 }
