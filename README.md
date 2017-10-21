@@ -49,28 +49,5 @@ Chinese Official Mahjong Helper 国标小助手
     self.uiWebView.dataDetectorTypes = UIDataDetectorTypeNone;
 ```
 
-#### 扩展cocos2d::StringUtils::StringUTF8（必须，否则编译错误）
-- 打开cocos2d/cocos/base/ccUTF8.h
-- 第199行`bool isAnsi() { return _char.size() == 1; }`改为`bool isAnsi() const { return _char.size() == 1; }`
-- 第210行`std::string getAsCharSequence() const;`改为`std::string getAsCharSequence(std::size_t pos = 0, std::size_t len = (std::size_t)-1) const;`
-- 第217行增加`const CharUTF8Store& getString() const { return _str; }`
-- 打开cocos2d/cocos/base/ccUTF8.cpp，找到函数`std::string StringUTF8::getAsCharSequence() const`（第381行）整个函数改为
-```c++
-std::string StringUTF8::getAsCharSequence(std::size_t pos/* = 0*/, std::size_t len/* = (std::size_t)-1*/) const
-{
-    std::string charSequence;
-    size_t maxLen = _str.size() - pos;
-    if (len == (size_t)-1 || len > maxLen)
-    {
-        len = maxLen;
-    }
- 
-    len += pos;
-    while (pos < len)
-    {
-        charSequence.append(_str[pos++]._char);
-    }
-
-    return charSequence;
-}
-```
+#### 扩展cocos2d::StringUtils::StringUTF8
+https://github.com/cocos2d/cocos2d-x/pull/18356
