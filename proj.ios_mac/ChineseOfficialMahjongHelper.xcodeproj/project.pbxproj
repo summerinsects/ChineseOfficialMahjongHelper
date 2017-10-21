@@ -25,7 +25,6 @@
 		1F154E421E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
 		1F2D25871E076FC20071ADE2 /* AlertView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertView.cpp */; };
 		1F2D25881E076FC20071ADE2 /* AlertView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertView.cpp */; };
-		1F4192751E10A10200CDC47D /* CWTableView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4192721E10A10200CDC47D /* CWTableView.cpp */; };
 		1F68AFC91F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */; };
 		1F68AFCA1F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */; };
 		1F68AFCB1F03366900B4BB97 /* CompetitionMainScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC71F03366800B4BB97 /* CompetitionMainScene.cpp */; };
