@@ -7,8 +7,6 @@
 #include <vector>
 #include <utility>
 
-#include "json/document.h"
-
 #define INVALID_INDEX ((ptrdiff_t)-1)
 
 // 成绩
@@ -18,9 +16,6 @@ struct CompetitionResult {
     int competition_score = 0;  // 比赛分
 
     static std::string standardScoreToString(float ss);  // 标准分转换为字符串
-
-    static void fromJson(const rapidjson::Value &json, CompetitionResult &result);
-    static void toJson(const CompetitionResult &result, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 };
 
 // 队员
@@ -33,9 +28,6 @@ public:
 
     std::pair<float, int> getTotalScoresByRound(size_t round) const;  // 获取指定一轮总成绩
     std::pair<float, int> getCurrentScoresByRound(size_t round) const;  // 获取指定一轮单轮成绩
-
-    static void fromJson(const rapidjson::Value &json, CompetitionPlayer &player);
-    static void toJson(const CompetitionPlayer &player, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 };
 
 // 队伍
@@ -44,9 +36,6 @@ public:
     size_t serial = 0;  // 编号
     std::string name;  // 队名
     std::vector<ptrdiff_t> player_indices;  // 队员
-
-    static void fromJson(const rapidjson::Value &json, CompetitionTeam &team);
-    static void toJson(const CompetitionTeam &team, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 };
 
 // 桌
@@ -60,18 +49,12 @@ struct CompetitionTable {
         player_indices[2] = INVALID_INDEX;
         player_indices[3] = INVALID_INDEX;
     }
-
-    static void fromJson(const rapidjson::Value &json, CompetitionTable &table);
-    static void toJson(const CompetitionTable &table, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 };
 
 // 轮
 class CompetitionRound {
 public:
     std::vector<CompetitionTable> tables;  // 桌
-
-    static void fromJson(const rapidjson::Value &json, CompetitionRound &round);
-    static void toJson(const CompetitionRound &round, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 
     // 高高碰排序
     static void sortPlayers(size_t round, const std::vector<CompetitionPlayer> &players, std::vector<const CompetitionPlayer *> &output);
@@ -86,9 +69,6 @@ public:
     size_t round_count = 0;  // 总轮数
     time_t start_time = 0;  // 开始时间
     time_t finish_time = 0;  // 结束时间
-
-    static void fromJson(const rapidjson::Value &json, CompetitionData &data);
-    static void toJson(const CompetitionData &data, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
 
     std::string associated_file;
     bool readFromFile();  // 从文件中读
@@ -108,5 +88,9 @@ public:
     void rankTablesByScores(size_t round);  // 高高碰排桌
     void rankTablesByScoresSnake(size_t round);  // 蛇形名次排桌
 };
+
+void LoadHistoryCompetitions(const char *file, std::vector<CompetitionData> &competitions);
+void SaveHistoryCompetitions(const char *file, const std::vector<CompetitionData> &competitions);
+void ModifyCompetitionInHistory(std::vector<CompetitionData> &competitions, const CompetitionData *data);
 
 #endif
