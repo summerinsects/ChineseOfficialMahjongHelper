@@ -1788,7 +1788,7 @@ static forceinline bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
 }
 
 // 全不靠/七星不靠算番
-bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], fan_table_t &fan_table) {
+static bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], fan_table_t &fan_table) {
     const tile_t *honor_begin = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
     ptrdiff_t numbered_cnt = honor_begin - standing_tiles;
     // 数牌张数大于9或者小于7必然不可能是全不靠
