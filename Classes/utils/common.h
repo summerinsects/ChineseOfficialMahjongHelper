@@ -38,6 +38,7 @@ static inline std::string &trim(std::string &str) {
     return str;
 }
 
+std::string getStringFromFile(const char *file);
 }
 
 #if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)

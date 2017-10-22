@@ -81,4 +81,22 @@ void __log(const char *fmt, ...) {
 #endif
 }
 
+std::string getStringFromFile(const char *file) {
+    std::string str;
+    FILE *fp = fopen(file, "rb");
+    if (LIKELY(fp != nullptr)) {
+        fseek(fp, 0, SEEK_END);
+        long size = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+        try {
+            str.resize(size + 1);
+            fread(&str[0], sizeof(char), size, fp);
+        }
+        catch (...) {
+        }
+        fclose(fp);
+    }
+    return str;
+}
+
 }

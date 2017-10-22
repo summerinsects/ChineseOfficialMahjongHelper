@@ -1,4 +1,7 @@
 ﻿#include "Record.h"
+#include <algorithm>
+#include <iterator>
+#include "json/document.h"
 #include "json/stringbuffer.h"
 #if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
 #include "json/prettywriter.h"
@@ -12,7 +15,7 @@ static const char *packedFanNames[] = {
     "门断平", "门清平和", "断幺平和", "连风刻", "番牌暗杠", "双同幺九", "门清双暗", "双暗暗杠"
 };
 
-void JsonToRecord(const rapidjson::Value &json, Record &record) {
+static void JsonToRecord(const rapidjson::Value &json, Record &record) {
     memset(&record, 0, sizeof(Record));
 
     rapidjson::Value::ConstMemberIterator it = json.FindMember("name");
@@ -72,7 +75,7 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
     }
 }
 
-void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
+static void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
     rapidjson::Value name(rapidjson::Type::kArrayType);
     name.Reserve(4, alloc);
     for (int i = 0; i < 4; ++i) {
@@ -100,20 +103,7 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
 }
 
 void ReadRecordFromFile(const char *file, Record &record) {
-    std::string str;
-    FILE *fp = fopen(file, "rb");
-    if (LIKELY(fp != nullptr)) {
-        fseek(fp, 0, SEEK_END);
-        long size = ftell(fp);
-        fseek(fp, 0, SEEK_SET);
-        try {
-            str.resize(size + 1);
-            fread(&str[0], sizeof(char), size, fp);
-        }
-        catch (...) {
-        }
-        fclose(fp);
-    }
+    std::string str = Common::getStringFromFile(file);
 
     try {
         rapidjson::Document doc;
@@ -153,6 +143,79 @@ void WriteRecordToFile(const char *file, const Record &record) {
     catch (std::exception &e) {
         MYLOG("%s %s", __FUNCTION__, e.what());
     }
+}
+
+void LoadHistoryRecords(const char *file, std::vector<Record> &records) {
+    std::string str = Common::getStringFromFile(file);
+
+    try {
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError() || !doc.IsArray()) {
+            return;
+        }
+
+        records.clear();
+        records.reserve(doc.Size());
+        std::transform(doc.Begin(), doc.End(), std::back_inserter(records), [](const rapidjson::Value &json) {
+            Record record;
+            JsonToRecord(json, record);
+            return record;
+        });
+
+        std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
+    }
+    catch (std::exception &e) {
+        MYLOG("%s %s", __FUNCTION__, e.what());
+    }
+}
+
+void SaveHistoryRecords(const char *file, const std::vector<Record> &records) {
+    FILE *fp = fopen(file, "wb");
+    if (LIKELY(fp != nullptr)) {
+        try {
+            rapidjson::Document doc(rapidjson::Type::kArrayType);
+            doc.Reserve(static_cast<rapidjson::SizeType>(records.size()), doc.GetAllocator());
+            std::for_each(records.begin(), records.end(), [&doc](const Record &record) {
+                rapidjson::Value json(rapidjson::Type::kObjectType);
+                RecordToJson(record, json, doc.GetAllocator());
+                doc.PushBack(std::move(json), doc.GetAllocator());
+            });
+
+            rapidjson::StringBuffer buf;
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+#else
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+#endif
+            doc.Accept(writer);
+
+            fwrite(buf.GetString(), 1, buf.GetSize(), fp);
+        }
+        catch (std::exception &e) {
+            MYLOG("%s %s", __FUNCTION__, e.what());
+        }
+        fclose(fp);
+    }
+}
+
+void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
+    // 我们认为开始时间相同的为同一个记录
+    time_t start_time = r->start_time;
+    auto it = std::find_if(records.begin(), records.end(), [start_time](const Record &r) {
+        return (r.start_time == start_time);
+    });
+
+    // 未找到，则添加；找到，则覆盖
+    if (it == records.end()) {
+        records.push_back(*r);
+    }
+    else {
+        memcpy(&*it, r, sizeof(*r));
+    }
+
+    // 按时间排序
+    std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
 }
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {

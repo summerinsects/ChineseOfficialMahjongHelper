@@ -1,13 +1,5 @@
 ﻿#include "RecordHistoryScene.h"
-#include <algorithm>
-#include <iterator>
 #include <array>
-#include "json/stringbuffer.h"
-#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
-#include "json/prettywriter.h"
-#else
-#include "json/writer.h"
-#endif
 #include "Record.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
@@ -22,61 +14,13 @@ static void loadRecords(std::vector<Record> &records) {
 
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
-    std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
-
-    try {
-        rapidjson::Document doc;
-        doc.Parse<0>(str.c_str());
-        if (doc.HasParseError() || !doc.IsArray()) {
-            return;
-        }
-
-        records.clear();
-        records.reserve(doc.Size());
-        std::transform(doc.Begin(), doc.End(), std::back_inserter(records), [](const rapidjson::Value &json) {
-            Record record;
-            JsonToRecord(json, record);
-            return record;
-        });
-
-        std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
-    }
-    catch (std::exception &e) {
-        CCLOG("%s %s", __FUNCTION__, e.what());
-    }
+    LoadHistoryRecords(fileName.c_str(), records);
 }
 
 static void saveRecords(const std::vector<Record> &records) {
-    std::lock_guard<std::mutex> lg(g_mutex);
-
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
-    FILE *file = fopen(fileName.c_str(), "wb");
-    if (LIKELY(file != nullptr)) {
-        try {
-            rapidjson::Document doc(rapidjson::Type::kArrayType);
-            doc.Reserve(static_cast<rapidjson::SizeType>(records.size()), doc.GetAllocator());
-            std::for_each(records.begin(), records.end(), [&doc](const Record &record) {
-                rapidjson::Value json(rapidjson::Type::kObjectType);
-                RecordToJson(record, json, doc.GetAllocator());
-                doc.PushBack(std::move(json), doc.GetAllocator());
-            });
-
-            rapidjson::StringBuffer buf;
-#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
-            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
-#else
-            rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
-#endif
-            doc.Accept(writer);
-
-            fwrite(buf.GetString(), 1, buf.GetSize(), file);
-        }
-        catch (std::exception &e) {
-            CCLOG("%s %s", __FUNCTION__, e.what());
-        }
-        fclose(file);
-    }
+    SaveHistoryRecords(fileName.c_str(), records);
 }
 
 #define BUF_SIZE 511
@@ -283,25 +227,6 @@ void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {
     _viewCallback(&g_records[cell->getIdx()]);
 }
 
-static void __modifyRecord(std::vector<Record> &records, const Record *r) {
-    // 我们认为开始时间相同的为同一个记录
-    time_t start_time = r->start_time;
-    auto it = std::find_if(records.begin(), records.end(), [start_time](const Record &r) {
-        return (r.start_time == start_time);
-    });
-
-    // 未找到，则添加；找到，则覆盖
-    if (it == records.end()) {
-        records.push_back(*r);
-    }
-    else {
-        memcpy(&*it, r, sizeof(*r));
-    }
-
-    // 按时间排序
-    std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
-}
-
 void RecordHistoryScene::modifyRecord(const Record *record) {
     if (UNLIKELY(g_records.empty())) {  // 如果当前没有加载过历史记录
         auto r = std::make_shared<Record>(*record);  // 复制当前记录
@@ -309,7 +234,7 @@ void RecordHistoryScene::modifyRecord(const Record *record) {
         std::thread([r]() {
             auto records = std::make_shared<std::vector<Record> >();
             loadRecords(*records);
-            __modifyRecord(*records, r.get());
+            ModifyRecordInHistory(*records, r.get());
             saveRecords(*records);
 
             // 切换到主线程，覆盖整个历史记录
@@ -320,7 +245,7 @@ void RecordHistoryScene::modifyRecord(const Record *record) {
     }
     else {  // 如果当前加载过历史记录
         // 直接修改
-        __modifyRecord(g_records, record);
+        ModifyRecordInHistory(g_records, record);
 
         // 子线程中写文件
         auto temp = std::make_shared<std::vector<Record> >(g_records);
