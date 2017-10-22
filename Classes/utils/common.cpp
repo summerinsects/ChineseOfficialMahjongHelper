@@ -70,7 +70,7 @@ void __log(const char *fmt, ...) {
     std::wstring wszBuf;
     int len = ::MultiByteToWideChar(CP_UTF8, 0, ret.c_str(), -1, nullptr, 0);
     if (len > 0) {
-        wszBuf.resize(len + 1);
+        wszBuf.resize(len);
         ::MultiByteToWideChar(CP_UTF8, 0, ret.c_str(), -1, &wszBuf[0], len);
         ::OutputDebugStringW(wszBuf.c_str());
     }
