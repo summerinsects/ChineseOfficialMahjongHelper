@@ -477,6 +477,10 @@ void ScoreSheetScene::editName(size_t idx) {
                 name.erase(NAME_SIZE - 1);
             }
 
+            if (strncmp(_record->name[idx], name.c_str(), NAME_SIZE - 1) == 0) {
+                return;
+            }
+
             strncpy(_record->name[idx], name.c_str(), NAME_SIZE - 1);
             _nameLabel[idx]->setVisible(true);
             _nameLabel[idx]->setString(name);

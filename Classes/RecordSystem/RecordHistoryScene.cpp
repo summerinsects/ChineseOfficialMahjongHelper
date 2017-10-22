@@ -247,7 +247,7 @@ void RecordHistoryScene::modifyRecord(const Record *record) {
         // 直接修改
         ModifyRecordInHistory(g_records, record);
 
-        // 子线程中写文件
+        // 子线程中保存
         auto temp = std::make_shared<std::vector<Record> >(g_records);
         std::thread([temp]() {
             saveRecords(*temp);
