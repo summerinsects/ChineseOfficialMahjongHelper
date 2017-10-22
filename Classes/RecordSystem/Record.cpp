@@ -15,7 +15,9 @@ static const char *packedFanNames[] = {
     "门断平", "门清平和", "断幺平和", "连风刻", "番牌暗杠", "双同幺九", "门清双暗", "双暗暗杠"
 };
 
-static void JsonToRecord(const rapidjson::Value &json, Record &record) {
+namespace {
+
+void JsonToRecord(const rapidjson::Value &json, Record &record) {
     memset(&record, 0, sizeof(Record));
 
     rapidjson::Value::ConstMemberIterator it = json.FindMember("name");
@@ -75,7 +77,7 @@ static void JsonToRecord(const rapidjson::Value &json, Record &record) {
     }
 }
 
-static void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
+void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
     rapidjson::Value name(rapidjson::Type::kArrayType);
     name.Reserve(4, alloc);
     for (int i = 0; i < 4; ++i) {
@@ -100,6 +102,22 @@ static void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson
 
     json.AddMember("start_time", rapidjson::Value(static_cast<uint64_t>(record.start_time)), alloc);
     json.AddMember("end_time", rapidjson::Value(static_cast<uint64_t>(record.end_time)), alloc);
+}
+
+void SortRecords(std::vector<Record> &records) {
+    // 用指针排序
+    std::vector<Record *> ptrs(records.size());
+    std::transform(records.begin(), records.end(), ptrs.begin(), [](Record &r) { return &r; });
+    std::sort(ptrs.begin(), ptrs.end(), [](const Record *r1, const Record *r2) { return r1->start_time > r2->start_time; });
+    std::vector<Record> temp;
+    temp.reserve(records.size());
+    std::for_each(ptrs.begin(), ptrs.end(), [&temp](Record *r) {
+        temp.emplace_back();
+        std::swap(temp.back(), *r);
+    });
+    records.swap(temp);
+}
+
 }
 
 void ReadRecordFromFile(const char *file, Record &record) {
@@ -163,7 +181,7 @@ void LoadHistoryRecords(const char *file, std::vector<Record> &records) {
             return record;
         });
 
-        std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
+        SortRecords(records);
     }
     catch (std::exception &e) {
         MYLOG("%s %s", __FUNCTION__, e.what());
@@ -214,8 +232,7 @@ void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
         memcpy(&*it, r, sizeof(*r));
     }
 
-    // 按时间排序
-    std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
+    SortRecords(records);
 }
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
