@@ -1,12 +1,6 @@
 ﻿#include "ScoreSheetScene.h"
 #include <algorithm>
 #include <iterator>
-#include "json/stringbuffer.h"
-#ifdef COCOS2D_DEBUG
-#include "json/prettywriter.h"
-#else
-#include "json/writer.h"
-#endif
 #include "../widget/AlertView.h"
 #include "../widget/HandTilesWidget.h"
 #include "Record.h"
@@ -17,55 +11,20 @@ USING_NS_CC;
 
 static Record g_currentRecord;
 
-static void readFromJson(Record &record) {
-    std::string fileName = FileUtils::getInstance()->getWritablePath();
-    fileName.append("record.json");
-    std::string str = FileUtils::getInstance()->getStringFromFile(fileName);
-    CCLOG("%s", str.c_str());
-    try {
-        rapidjson::Document doc;
-        doc.Parse<0>(str.c_str());
-        if (doc.HasParseError()) {
-            return;
-        }
-
-        JsonToRecord(doc, record);
-    }
-    catch (std::exception &e) {
-        CCLOG("%s %s", __FUNCTION__, e.what());
-    }
+static void readFromFile(Record &record) {
+    std::string path = FileUtils::getInstance()->getWritablePath();
+    path.append("record.json");
+    ReadRecordFromFile(path.c_str(), record);
 }
 
-static void writeToJson(const Record &record) {
-    try {
-        rapidjson::Document doc(rapidjson::Type::kObjectType);
-        RecordToJson(record, doc, doc.GetAllocator());
-
-        rapidjson::StringBuffer buf;
-#ifdef COCOS2D_DEBUG
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
-#else
-        rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
-#endif
-        doc.Accept(writer);
-
-        CCLOG("%.*s", static_cast<int>(buf.GetSize()), buf.GetString());
-
-        std::string path = FileUtils::getInstance()->getWritablePath();
-        path.append("record.json");
-        FILE *file = fopen(path.c_str(), "wb");
-        if (LIKELY(file != nullptr)) {
-            fwrite(buf.GetString(), 1, buf.GetSize(), file);
-            fclose(file);
-        }
-    }
-    catch (std::exception &e) {
-        CCLOG("%s %s", __FUNCTION__, e.what());
-    }
+static void writeToFile(const Record &record) {
+    std::string path = FileUtils::getInstance()->getWritablePath();
+    path.append("record.json");
+    WriteRecordToFile(path.c_str(), record);
 }
 
 bool ScoreSheetScene::init() {
-    readFromJson(g_currentRecord);
+    readFromFile(g_currentRecord);
     return ScoreSheetScene::initWithRecord(&g_currentRecord);
 }
 
@@ -454,7 +413,7 @@ void ScoreSheetScene::recover() {
 
 void ScoreSheetScene::reset() {
     memset(_record, 0, sizeof(*_record));
-    writeToJson(*_record);
+    writeToFile(*_record);
 
     memset(_totalScores, 0, sizeof(_totalScores));
 
@@ -528,7 +487,7 @@ void ScoreSheetScene::editName(size_t idx) {
             }
 
             if (_record == &g_currentRecord) {
-                writeToJson(*_record);
+                writeToFile(*_record);
             }
         }
     }, nullptr);
@@ -569,7 +528,7 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *) {
     refreshStartTime();
 
     if (_record == &g_currentRecord) {
-        writeToJson(*_record);
+        writeToFile(*_record);
     }
 }
 
@@ -625,7 +584,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
         }
 
         if (_record == &g_currentRecord) {
-            writeToJson(*_record);
+            writeToFile(*_record);
         }
     });
     Director::getInstance()->pushScene(scene);

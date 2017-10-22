@@ -6,8 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <string>
-
-#include "json/document.h"
+#include <vector>
 
 #define NAME_SIZE 32
 
@@ -41,8 +40,12 @@ struct Record {
 #define RESET_FAN(flag_, fan_) ((flag_) &= ~(1ULL << (mahjong::LAST_TILE - (fan_))))
 #define TEST_FAN(flag_, fan_) !!((flag_) & (1ULL << (mahjong::LAST_TILE - (fan_))))
 
-void JsonToRecord(const rapidjson::Value &json, Record &record);
-void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc);
+void ReadRecordFromFile(const char *file, Record &record);
+void WriteRecordToFile(const char *file, const Record &record);
+
+void LoadHistoryRecords(const char *file, std::vector<Record> &records);
+void SaveHistoryRecords(const char *file, const std::vector<Record> &records);
+void ModifyRecordInHistory(std::vector<Record> &records, const Record *r);
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
 const char *GetShortFanText(const Record::Detail &detail);
