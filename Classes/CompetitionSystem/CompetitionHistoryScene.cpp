@@ -5,7 +5,7 @@
 #include <mutex>
 #include <array>
 #include "json/stringbuffer.h"
-#ifdef COCOS2D_DEBUG
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
 #include "json/prettywriter.h"
 #else
 #include "json/writer.h"
@@ -65,7 +65,7 @@ static void saveCompetitions(const std::vector<CompetitionData> &competitions) {
             });
 
             rapidjson::StringBuffer buf;
-#ifdef COCOS2D_DEBUG
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
             rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
 #else
             rapidjson::Writer<rapidjson::StringBuffer> writer(buf);

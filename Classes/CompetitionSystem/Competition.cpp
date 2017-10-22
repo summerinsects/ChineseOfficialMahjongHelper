@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <iterator>
 #include "json/stringbuffer.h"
-#ifdef COCOS2D_DEBUG
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
 #include "json/prettywriter.h"
 #else
 #include "json/writer.h"
@@ -514,7 +514,7 @@ bool CompetitionData::readFromFile() {
     }
 
     try {
-        CCLOG("%s", str.c_str());
+        MYLOG("%s", str.c_str());
         rapidjson::Document doc;
         doc.Parse<0>(str.c_str());
         if (doc.HasParseError()) {
@@ -525,7 +525,7 @@ bool CompetitionData::readFromFile() {
         return true;
     }
     catch (std::exception &e) {
-        CCLOG("%s %s", __FUNCTION__, e.what());
+        MYLOG("%s %s", __FUNCTION__, e.what());
         return false;
     }
 }
@@ -537,14 +537,14 @@ bool CompetitionData::writeToFile() const {
         toJson(*this, doc, doc.GetAllocator());
 
         rapidjson::StringBuffer buf;
-#ifdef COCOS2D_DEBUG
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
 #else
         rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
 #endif
         doc.Accept(writer);
 
-        CCLOG("%.*s", static_cast<int>(buf.GetSize()), buf.GetString());
+        MYLOG("%.*s", static_cast<int>(buf.GetSize()), buf.GetString());
 
         FILE *fp = fopen(associated_file.c_str(), "wb");
         if (LIKELY(fp != nullptr)) {
@@ -556,7 +556,7 @@ bool CompetitionData::writeToFile() const {
         return false;
     }
     catch (std::exception &e) {
-        CCLOG("%s %s", __FUNCTION__, e.what());
+        MYLOG("%s %s", __FUNCTION__, e.what());
         return false;
     }
 }
