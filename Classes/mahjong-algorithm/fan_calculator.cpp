@@ -425,57 +425,41 @@ static fan_t get_1_chow_extra_fan(tile_t tile0, tile_t tile1, tile_t tile2, tile
     return FAN_NONE;
 }
 
-// 若干顺子两两算番
-template <size_t _Size>
-static int calculate_chows_pairwise(const tile_t (&mid_tiles)[_Size], fan_t (&selected_fan)[_Size - 1]) {
-    fan_t all_fan[_Size][_Size] = { { FAN_NONE } };
-
-    // 初始化矩阵
-    for (int i = 0; i < _Size; ++i) {
-        for (int j = 0; j < i - 1; ++j) {  // 这是对称矩阵
-            all_fan[i][j] = all_fan[j][i];
-        }
-        for (int j = i + 1; j < _Size; ++j) {  // 获取所有两两组合的番种
-            all_fan[i][j] = get_2_chows_fan(mid_tiles[i], mid_tiles[j]);
-        }
-    }
-
-    // 套算一次原则：
-    // 如果有尚未组合过的一副牌，只可同已组合过的相应的一副牌套算一次
-    //
-    // 不得相同原则：
-    // 凡已经合过某一番种的牌，不能再同其他一副牌组成相同的番种计分
-    //
-    // 根据套算一次原则，234567s234567p，只能计为“喜相逢*2 连六*1”或者“喜相逢*1 连六*2”，而不是“喜相逢*2 连六*2”
-    // 根据以上两点，234s223344567p，只能计为：“喜相逢、一般高、连六”，而不是“喜相逢*2、连六”
-
-    int cnt = 0;
-    unsigned used_flag[_Size] = { 0 };  // 标记每一组顺子被用过什么番
-    for (int i = 0; i < _Size; ++i) {
-        for (int j = 0; j < _Size; ++j) {
-            if (i == j) {
-                continue;
-            }
-
-            // 套算一次原则，两组都已经使用过，就不再组合
-            if (used_flag[i] && used_flag[j]) {
-                continue;
-            }
-            fan_t pt = all_fan[i][j];
-            if (pt != FAN_NONE) {
-                int idx = pt - PURE_DOUBLE_CHOW;  // bit分配：0一般高 1喜相逢 2连六 3老少副
-                unsigned flag = 1U << idx;
-                // 不得相同原则，如果i和j都没算过某一种番，则算这种番
-                if ((used_flag[i] & flag) == 0 && (used_flag[j] & flag) == 0) {
-                    used_flag[i] |= flag;
-                    used_flag[j] |= flag;
-                    selected_fan[cnt++] = pt;  // 写入这个番
-                }
-            }
+// 套算一次原则：
+// 如果有尚未组合过的一副牌，只可同已组合过的相应的一副牌套算一次
+//
+// 不得相同原则：
+// 凡已经合过某一番种的牌，不能再同其他一副牌组成相同的番种计分
+//
+// 根据套算一次原则，234567s234567p，只能计为“喜相逢*2 连六*1”或者“喜相逢*1 连六*2”，而不是“喜相逢*2 连六*2”
+// 根据以上两点，234s223344567p，只能计为：“喜相逢、一般高、连六”，而不是“喜相逢*2、连六”
+//
+// 直接按规则来写，差不多是图的算法，太过复杂
+// 这里简便处理：先统计有多少番，当超过时规则允许的数目时，从重复的开始削减
+static void exclusionary_rule(const fan_t *all_fans, long fan_cnt, long max_cnt, fan_table_t &fan_table) {
+    // 统计有多少番
+    uint16_t table[4] = { 0 };
+    long cnt = 0;
+    for (long i = 0; i < fan_cnt; ++i) {
+        if (all_fans[i] != FAN_NONE) {
+            ++cnt;
+            ++table[all_fans[i] - PURE_DOUBLE_CHOW];
         }
     }
 
-    return cnt;
+    // 当超过时，从重复的开始削减
+    for (int i = 4; cnt > max_cnt && i > 0; ) {
+        --i;
+        while (table[i] > 1 && cnt > max_cnt) {
+            --table[i];
+            --cnt;
+        }
+    }
+
+    fan_table[PURE_DOUBLE_CHOW] = table[0];
+    fan_table[MIXED_DOUBLE_CHOW] = table[1];
+    fan_table[SHORT_STRAIGHT] = table[2];
+    fan_table[TWO_TERMINAL_CHOWS] = table[3];
 }
 
 // 4组顺子算番
@@ -522,11 +506,15 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
     }
 
     // 不存在3组顺子的番种时，4组顺子最多3番
-    fan_t selected_fan[3];
-    int cnt = calculate_chows_pairwise(mid_tiles, selected_fan);
-    for (int i = 0; i < cnt; ++i) {
-        ++fan_table[selected_fan[i]];
-    }
+    fan_t all_fans[6] = {
+        get_2_chows_fan(mid_tiles[0], mid_tiles[1]),
+        get_2_chows_fan(mid_tiles[0], mid_tiles[2]),
+        get_2_chows_fan(mid_tiles[0], mid_tiles[3]),
+        get_2_chows_fan(mid_tiles[1], mid_tiles[2]),
+        get_2_chows_fan(mid_tiles[1], mid_tiles[3]),
+        get_2_chows_fan(mid_tiles[2], mid_tiles[3])
+    };
+    exclusionary_rule(all_fans, 6, 3, fan_table);
 }
 
 // 3组顺子算番
@@ -540,11 +528,12 @@ static void calculate_3_chows(const tile_t (&mid_tiles)[3], fan_table_t &fan_tab
     }
 
     // 不存在上述番种时，3组顺子最多2番
-    fan_t selected_fan[2];
-    int cnt = calculate_chows_pairwise(mid_tiles, selected_fan);
-    for (int i = 0; i < cnt; ++i) {
-        ++fan_table[selected_fan[i]];
-    }
+    fan_t all_fans[3] = {
+        get_2_chows_fan(mid_tiles[0], mid_tiles[1]),
+        get_2_chows_fan(mid_tiles[0], mid_tiles[2]),
+        get_2_chows_fan(mid_tiles[1], mid_tiles[2])
+    };
+    exclusionary_rule(all_fans, 3, 2, fan_table);
 }
 
 // 2组顺子算番
