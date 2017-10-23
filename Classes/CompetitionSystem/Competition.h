@@ -71,6 +71,7 @@ public:
     time_t finish_time = 0;  // 结束时间
 
     std::string associated_file;
+    void (*modify_callback)(const CompetitionData *) = nullptr;
     bool readFromFile();  // 从文件中读
     bool writeToFile() const;  // 写入到文件
 

@@ -563,6 +563,10 @@ bool CompetitionData::writeToFile() const {
 
         MYLOG("%.*s", static_cast<int>(buf.GetSize()), buf.GetString());
 
+        if (modify_callback) {
+            modify_callback(this);
+        }
+
         FILE *fp = fopen(associated_file.c_str(), "wb");
         if (LIKELY(fp != nullptr)) {
             fwrite(buf.GetString(), sizeof(char), buf.GetSize(), fp);

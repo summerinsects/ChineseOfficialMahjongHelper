@@ -71,6 +71,7 @@ bool CompetitionMainScene::init() {
 
     _competitionData = std::make_shared<CompetitionData>();
     _competitionData->associated_file = FileUtils::getInstance()->getWritablePath().append("competition.json");
+    _competitionData->modify_callback = CompetitionHistoryScene::modifyData;
     _competitionData->readFromFile();
 
     return true;
