@@ -30,7 +30,10 @@ std::string __format(const char *fmt, va_list ap) {
 
         do {
             ret.resize(len);
-            int size = vsnprintf(&ret[0], len, fmt, ap);
+            va_list temp;
+            va_copy(temp, ap);
+            int size = vsnprintf(&ret[0], len, fmt, temp);
+            va_end(temp);
             if (LIKELY(size >= 0)) {
                 if (LIKELY(size < len)) {  // Everything worked
                     ret.resize(size);
