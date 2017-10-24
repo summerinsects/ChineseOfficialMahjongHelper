@@ -140,7 +140,7 @@ bool HelloWorld::init() {
     button->setTitleText("捐赠");
     button->setPosition(Vec2(origin.x + visibleSize.width - 23.0f, origin.y + 15.0f));
     button->addClickEventListener([](Ref *) {
-        Application::getInstance()->openURL("https://git.oschina.net/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
+        Application::getInstance()->openURL("https://gitee.com/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
     });
 
     Label *label = Label::createWithSystemFont(
