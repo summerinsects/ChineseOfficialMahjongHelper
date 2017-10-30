@@ -477,8 +477,14 @@ void ScoreSheetScene::editName(size_t idx) {
                 name.erase(NAME_SIZE - 1);
             }
 
-            if (strncmp(_record->name[idx], name.c_str(), NAME_SIZE - 1) == 0) {
-                return;
+            for (size_t i = 0; i < 4; ++i) {
+                if (strncmp(_record->name[i], name.c_str(), NAME_SIZE - 1) == 0) {
+                    if (i != idx) {
+                        AlertView::showWithMessage("提示", "选手姓名不能相同", 12,
+                            std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
+                    }
+                    return;
+                }
             }
 
             strncpy(_record->name[idx], name.c_str(), NAME_SIZE - 1);
