@@ -365,8 +365,8 @@ void ScoreSheetScene::recover() {
         cw::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);
     }
 
-    // 有选手名字为空，则清空数据
-    if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
+    // 如果开始时间为0，说明未锁定
+    if (_record->start_time == 0) {
         memset(_record, 0, sizeof(*_record));
         memcpy(_record->name, name, sizeof(name)); // 恢复名字
         onTimeScheduler(0.0f);
