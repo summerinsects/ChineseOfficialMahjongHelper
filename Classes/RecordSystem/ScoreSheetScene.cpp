@@ -313,17 +313,6 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     cw::scaleLabelToFitWidth(label, _cellWidth - 4.0f);
 }
 
-void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]) {
-    memset(ranks, 0, sizeof(ranks));
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            if (i == j) continue;
-            if (scores[i] < scores[j]) ++ranks[i];
-            //if (scores[i] == scores[j] && i > j) ++ranks[i];  // 这一行的作用是取消并列
-        }
-    }
-}
-
 void ScoreSheetScene::refreshRank() {
     unsigned rank[4] = {0};
     CalculateRankFromScore(_totalScores, rank);

@@ -48,6 +48,10 @@ void SaveHistoryRecords(const char *file, const std::vector<Record> &records);
 void ModifyRecordInHistory(std::vector<Record> &records, const Record *r);
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
+void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]);
+void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]);
+void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]);
+
 const char *GetShortFanText(const Record::Detail &detail);
 std::string GetLongFanText(const Record::Detail &detail);
 const char *GetPackedFanText(uint8_t packedFan);

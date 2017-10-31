@@ -266,6 +266,45 @@ void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)
     }
 }
 
+void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]) {
+    memset(ranks, 0, sizeof(ranks));
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (i == j) continue;
+            if (scores[i] < scores[j]) ++ranks[i];
+            //if (scores[i] == scores[j] && i > j) ++ranks[i];  // 这一行的作用是取消并列
+        }
+    }
+}
+
+void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]) {
+    // 并列的数目
+    unsigned rankCnt[4] = { 0 };
+    for (int i = 0; i < 4; ++i) {
+        ++rankCnt[ranks[i]];
+    }
+
+    static const float standardScore[] = { 4, 2, 1, 0 };
+    for (int i = 0; i < 4; ++i) {
+        unsigned rank = ranks[i];
+        unsigned tieCnt = rankCnt[rank];  // 并列的人数
+
+        // 累加并列的标准分
+        float ss0 = standardScore[rank];
+        for (unsigned n = 1, cnt = tieCnt; n < cnt; ++n) {
+            ss0 += standardScore[rank + n];
+        }
+        ss0 /= tieCnt;
+        ss[i] = ss0;
+    }
+}
+
+void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]) {
+    unsigned ranks[4];
+    CalculateRankFromScore(cs, ranks);
+    RankToStandardScore(ranks, ss);
+}
+
 static const char *fan_name2[mahjong::LAST_TILE + 1][mahjong::LAST_TILE + 1] = {
     { nullptr },
 
