@@ -1090,8 +1090,7 @@ const char *GetShortFanText(const Record::Detail &detail) {
         return packedFanNames[packedFan - 1];
     }
 
-    // 将未标记番种的显示为其他凑番
-    return "其他凑番";
+    return "未标记番种";
 }
 
 const char *GetPackedFanText(uint8_t packedFan) {
