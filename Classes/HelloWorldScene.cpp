@@ -156,6 +156,36 @@ bool HelloWorld::init() {
     return true;
 }
 
+static void shareApplication() {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float width = visibleSize.width * 0.8f - 10.0f;
+
+    std::string str = Common::format("https://github.com/summerinsects/ChineseOfficialMahjongHelper/releases/download/v%d.%d.%d/ChineseOfficialMahjongHelper_v%d.%d.%d.apk",
+        (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF);
+
+    Node *rootNode = Node::create();
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    experimental::ui::WebView *webView = experimental::ui::WebView::create();
+    webView->setContentSize(Size(width, 60.0f));
+    webView->setBackgroundTransparent();
+    webView->setScalesPageToFit(true);
+    webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(str), ""));
+    rootNode->addChild(webView);
+    webView->setPosition(Vec2(width * 0.5f, 30.0f));
+    rootNode->setContentSize(Size(width, 60.0f));
+#else
+    Label *label = Label::createWithSystemFont(str, "Arail", 10);
+    label->setColor(Color3B::BLACK);
+    label->setDimensions(width, 0.0f);
+    rootNode->addChild(label);
+
+    const Size &labelSize = label->getContentSize();
+    rootNode->setContentSize(Size(width, labelSize.height));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f));
+#endif
+    AlertView::showWithNode("下载地址", rootNode, nullptr, nullptr);
+}
+
 void HelloWorld::onAboutButton(cocos2d::Ref *) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float width = visibleSize.width * 0.8f - 10.0f;
@@ -172,17 +202,28 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     rootNode->addChild(label);
 
     // 检测新版本
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(65.0, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("检测新版本");
-    button->addClickEventListener([this](Ref *) { requestVersion(true); });
-    rootNode->addChild(button);
+    ui::Button *button1 = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button1->setScale9Enabled(true);
+    button1->setContentSize(Size(65.0, 20.0f));
+    button1->setTitleFontSize(12);
+    button1->setTitleText("检测新版本");
+    button1->addClickEventListener([this](Ref *) { requestVersion(true); });
+    rootNode->addChild(button1);
+
+    ui::Button *button2 = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button2->setScale9Enabled(true);
+    button2->setContentSize(Size(65.0, 20.0f));
+    button2->setTitleFontSize(12);
+    button2->setTitleText("下载地址");
+    button2->addClickEventListener([](Ref *) {
+        shareApplication();
+    });
+    rootNode->addChild(button2);
 
     const Size &labelSize = label->getContentSize();
     rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
-    button->setPosition(Vec2(width * 0.5f, 10.0f));
+    button1->setPosition(Vec2(width * 0.25f, 10.0f));
+    button2->setPosition(Vec2(width * 0.75f, 10.0f));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
 
     AlertView::showWithNode("关于", rootNode, nullptr, nullptr);
