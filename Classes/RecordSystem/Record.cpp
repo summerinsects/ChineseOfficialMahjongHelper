@@ -305,6 +305,59 @@ void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]) {
     RankToStandardScore(ranks, ss);
 }
 
+void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector<Record> &records, RecordsStatistic *result) {
+    memset(result, 0, sizeof(*result));
+
+    for (size_t i = 0, cnt = std::min<size_t>(flags.size(), records.size()); i < cnt; ++i) {
+        const Record &record = records[i];
+        if (record.end_time == 0) {
+            continue;
+        }
+
+        int8_t idx = flags[i];
+        if (idx == -1) {
+            continue;
+        }
+
+        int totalScores[4] = { 0 };
+
+        for (int k = 0; k < 16; ++k) {
+            const Record::Detail &detail = record.detail[k];
+
+            int scoreTable[4];
+            TranslateDetailToScoreTable(detail, scoreTable);
+            for (int n = 0; n < 4; ++n) {
+                totalScores[n] += scoreTable[n];
+            }
+
+            uint8_t wc = detail.win_claim;
+            int winIndex = WIN_INDEX(wc);
+            int claimIndex = CLAIM_INDEX(wc);
+            if (winIndex == idx) {
+                ++result->win;
+                if (claimIndex == idx) {
+                    ++result->self_drawn;
+                }
+                result->win_fan += detail.score;
+                result->max_fan = std::max<uint16_t>(result->max_fan, detail.score);
+            }
+            else if (claimIndex == idx) {
+                ++result->claim;
+                result->claim_fan += detail.score;
+            }
+        }
+
+        unsigned ranks[4];
+        CalculateRankFromScore(totalScores, ranks);
+        ++result->rank[ranks[idx]];
+        result->competition_score += totalScores[idx];
+
+        float ss[4];
+        RankToStandardScore(ranks, ss);
+        result->standard_score += ss[idx];
+    }
+}
+
 static const char *fan_name2[mahjong::LAST_TILE + 1][mahjong::LAST_TILE + 1] = {
     { nullptr },
 
