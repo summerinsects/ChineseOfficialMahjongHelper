@@ -249,7 +249,7 @@ struct hand_tiles_t {
  * @param [in] tile 牌
  * @return bool
  */
-static bool forceinline is_green(tile_t tile) {
+static forceinline bool is_green(tile_t tile) {
     // 最基本的逐个判断，23468s及发财为绿一色构成牌
     //return (tile == TILE_2s || tile == TILE_3s || tile == TILE_4s || tile == TILE_6s || tile == TILE_8s || tile == TILE_F);
 
@@ -266,7 +266,7 @@ static bool forceinline is_green(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-static bool forceinline is_reversible(tile_t tile) {
+static forceinline bool is_reversible(tile_t tile) {
     // 最基本的逐个判断：245689s、1234589p及白板为推不倒构成牌
     //return (tile == TILE_2s || tile == TILE_4s || tile == TILE_5s || tile == TILE_6s || tile == TILE_8s || tile == TILE_9s ||
     //    tile == TILE_1p || tile == TILE_2p || tile == TILE_3p || tile == TILE_4p || tile == TILE_5p || tile == TILE_8p || tile == TILE_9p ||

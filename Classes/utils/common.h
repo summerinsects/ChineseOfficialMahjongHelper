@@ -8,7 +8,7 @@
 
 namespace Common {
 
-static bool FORCE_INLINE isCStringEmpty(const char *str) {
+static FORCE_INLINE bool isCStringEmpty(const char *str) {
     return *str == '\0';
 }
 
@@ -24,11 +24,11 @@ void __log(_Printf_format_string_ const char *fmt, ...);
 void __log(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
 #endif
 
-static int FORCE_INLINE __isdigit(int c) {
+static FORCE_INLINE int __isdigit(int c) {
     return (c >= -1 && c <= 255) ? isdigit(c) : 0;
 }
 
-static int FORCE_INLINE __isspace(int c) {
+static FORCE_INLINE int __isspace(int c) {
     return (c >= -1 && c <= 255) ? isspace(c) : 0;
 }
 
