@@ -38,8 +38,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    const float buttonWidth = 54.0f;
-    const float buttonGap = (visibleSize.width - 4.0f - buttonWidth) / 3.0f;
+    const float buttonGap = (visibleSize.width - 4.0f - 55.0f) / 3.0f;
 
     // 使用说明按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -48,7 +47,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("使用说明");
-    button->setPosition(Vec2(origin.x + 2.0f + buttonWidth * 0.5f + buttonGap * 3, origin.y + visibleSize.height - 45.0f));
+    button->setPosition(Vec2(origin.x + 2.0f + 55.0f * 0.5f + buttonGap * 3, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onInstructionButton, this, std::placeholders::_1));
 
     // 历史记录按钮
@@ -58,7 +57,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("历史记录");
-    button->setPosition(Vec2(origin.x + 2.0f + buttonWidth * 0.5f + buttonGap * 2, origin.y + visibleSize.height - 45.0f));
+    button->setPosition(Vec2(origin.x + 2.0f + 55.0f * 0.5f + buttonGap * 2, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onHistoryButton, this, std::placeholders::_1));
     button->setEnabled(record == &g_currentRecord);
 
@@ -69,7 +68,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("清空表格");
-    button->setPosition(Vec2(origin.x + 2.0f + buttonWidth * 0.5f + buttonGap, origin.y + visibleSize.height - 45.0f));
+    button->setPosition(Vec2(origin.x + 2.0f + 55.0f * 0.5f + buttonGap, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
     button->setEnabled(record == &g_currentRecord);
 
@@ -80,7 +79,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("追分策略");
-    button->setPosition(Vec2(origin.x + 2.0f + buttonWidth * 0.5f, origin.y + visibleSize.height - 45.0f));
+    button->setPosition(Vec2(origin.x + 2.0f + 55.0f * 0.5f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
     cw::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
 
