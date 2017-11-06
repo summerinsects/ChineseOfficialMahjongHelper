@@ -378,6 +378,7 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
         scrollView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
         scrollView->setScrollBarWidth(4.0f);
         scrollView->setScrollBarOpacity(0x99);
+        scrollView->setBounceEnabled(true);
         scrollView->setContentSize(Size(maxWidth, maxHeight));
         scrollView->setInnerContainerSize(labelSize);
         scrollView->addChild(label);
