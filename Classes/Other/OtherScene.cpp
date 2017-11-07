@@ -49,7 +49,7 @@ void OtherScene::createContentView() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    const float height = visibleSize.height - 35.0f;
+    const float height = visibleSize.height - 40.0f;
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
@@ -57,7 +57,7 @@ void OtherScene::createContentView() {
     webView->setBackgroundTransparent();
     webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(g_text), ""));
     this->addChild(webView);
-    webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f));
+    webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f + 0.5f));
 #else
     ui::RichText *richText = ui::RichText::createWithXML("<font face=\"Verdana\" size=\"12\" color=\"#000000\">" + g_text + "</font>");
     richText->setContentSize(Size(visibleSize.width - 10.0f, 0.0f));
@@ -71,7 +71,7 @@ void OtherScene::createContentView() {
     if (size.height <= height) {
         this->addChild(richText);
         richText->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        richText->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height - size.height * 0.5f));
+        richText->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height - size.height * 0.5f + 0.5f));
     }
     else {
         ui::ScrollView *scrollView = ui::ScrollView::create();
@@ -88,7 +88,7 @@ void OtherScene::createContentView() {
 
         this->addChild(scrollView);
         scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f));
+        scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f + 0.5f));
     }
 #endif
 }

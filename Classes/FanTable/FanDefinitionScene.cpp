@@ -123,7 +123,7 @@ void FanDefinitionScene::createContentView(size_t idx) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    const float height = visibleSize.height - 35.0f;
+    const float height = visibleSize.height - 40.0f;
 
     const std::string &text = idx < 100 ? g_definitions[idx] : g_principles[idx - 100];
 
@@ -133,7 +133,7 @@ void FanDefinitionScene::createContentView(size_t idx) {
     webView->setBackgroundTransparent();
     webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(text), ""));
     this->addChild(webView);
-    webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f));
+    webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f + 5.0f));
 #else
     ui::RichText *richText = ui::RichText::createWithXML("<font face=\"Verdana\" size=\"12\" color=\"#000000\">" + text + "</font>");
     richText->setContentSize(Size(visibleSize.width - 10.0f, 0.0f));
@@ -147,7 +147,7 @@ void FanDefinitionScene::createContentView(size_t idx) {
     if (size.height <= height) {
         this->addChild(richText);
         richText->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        richText->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height - size.height * 0.5f));
+        richText->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height - size.height * 0.5f + 5.0f));
     }
     else {
         ui::ScrollView *scrollView = ui::ScrollView::create();
@@ -164,7 +164,7 @@ void FanDefinitionScene::createContentView(size_t idx) {
 
         this->addChild(scrollView);
         scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f));
+        scrollView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f + 5.0f));
     }
 #endif
 }
