@@ -11,7 +11,7 @@
 #include "MahjongTheory/MahjongTheoryScene.h"
 #include "LatestCompetition/LatestCompetitionScene.h"
 
-#define VERSION 0x010204
+#define VERSION 0x010205
 
 USING_NS_CC;
 
