@@ -75,7 +75,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
             scale = maxWidth / TILE_WIDTH;
         }
 #else
-        float scale = 0.6f;
+        float scale = 0.5f;
 #endif
 
         auto thiz = makeRef(this);  // 保证线程回来之前不析构
