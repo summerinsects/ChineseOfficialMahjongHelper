@@ -235,11 +235,6 @@ void HandTilesWidget::replaceTile(mahjong::tile_t tile) {
 
     _standingTiles[_currentIdx] = tile;
     ++_standingTilesTable[tile];
-
-    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
-    if (_currentIdx < maxCnt) {
-        ++_currentIdx;
-    }
 }
 
 mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
@@ -255,11 +250,11 @@ mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
             --_usedTilesTable[prevTile];
             ++_usedTilesTable[tile];
         }
-        else {
-            size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
-            if (_currentIdx < maxCnt) {
-                ++_currentIdx;
-            }
+
+        // 根据需要增加下标
+        size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
+        if (_currentIdx < maxCnt) {
+            ++_currentIdx;
         }
     }
 
@@ -345,6 +340,7 @@ void HandTilesWidget::sortStandingTiles() {
         return;
     }
 
+    // 最后一张不参与排序
     const size_t offset = getServingTile() == 0 ? 0 : 1;
 
     std::sort(_standingTiles.begin(), _standingTiles.end() - offset);
