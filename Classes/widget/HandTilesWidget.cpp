@@ -183,8 +183,12 @@ size_t HandTilesWidget::countServingTileInFixedPacks() const {
 
 void HandTilesWidget::onTileButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    _currentIdx = reinterpret_cast<size_t>(button->getUserData());
-    refreshHighlightPos();
+    size_t idx = reinterpret_cast<size_t>(button->getUserData());
+    if (_currentIdx != idx) {
+        _currentIdx = idx;
+        refreshHighlightPos();
+    }
+
     if (_tileClickCallback) {
         _tileClickCallback();
     }
