@@ -351,7 +351,7 @@ void HandTilesWidget::sortStandingTiles() {
     refreshStandingTilesPos();
 }
 
-// 添加一组吃
+// 添加一组明顺
 void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
     const Size fixedSize = _fixedContainer->getContentSize();
     const float offsetX = _fixedPacks.size() > 1 ? GAP : 0.0f;
@@ -399,7 +399,7 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
     }
 }
 
-// 添加一组碰
+// 添加一组明刻
 void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
     const Size fixedSize = _fixedContainer->getContentSize();
     const float offsetX = _fixedPacks.size() > 1 ? GAP : 0.0f;
@@ -522,7 +522,7 @@ void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
     }
 }
 
-bool HandTilesWidget::canChow1() const {
+bool HandTilesWidget::canChow(int meldedIdx) const {
     if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
         return false;
     }
@@ -532,48 +532,14 @@ bool HandTilesWidget::canChow1() const {
         return false;
     }
 
-    // _XX 23吃1
+    // meldedIdx == 0: _XX 23吃1 tile, tile+1, tile+2
+    // meldedIdx == 1: X_X 13吃2 tile-1, tile, tile+1
+    // meldedIdx == 2: XX_ 12吃3 tile-2, tile-1, tile
     mahjong::tile_t tile = _standingTiles[_currentIdx];
     return (!mahjong::is_honor(tile)
-        && _standingTilesTable[tile] > 0
-        && _standingTilesTable[tile + 1] > 0
-        && _standingTilesTable[tile + 2] > 0);
-}
-
-bool HandTilesWidget::canChow2() const {
-    if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
-    if (_currentIdx == maxCnt) {  // 不允许对和牌张进行副露
-        return false;
-    }
-
-    // X_X 13吃2
-    mahjong::tile_t tile = _standingTiles[_currentIdx];
-    return (!mahjong::is_honor(tile)
-        && _standingTilesTable[tile - 1] > 0
-        && _standingTilesTable[tile] > 0
-        && _standingTilesTable[tile + 1] > 0);
-}
-
-bool HandTilesWidget::canChow3() const {
-    if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
-    if (_currentIdx == maxCnt) {  // 不允许对和牌张进行副露
-        return false;
-    }
-
-    // XX_ 12吃3
-    mahjong::tile_t tile = _standingTiles[_currentIdx];
-    return (!mahjong::is_honor(tile)
-        && _standingTilesTable[tile - 2] > 0
-        && _standingTilesTable[tile - 1] > 0
-        && _standingTilesTable[tile] > 0);
+        && _standingTilesTable[tile - meldedIdx] > 0
+        && _standingTilesTable[tile - meldedIdx + 1] > 0
+        && _standingTilesTable[tile - meldedIdx + 2] > 0);
 }
 
 bool HandTilesWidget::canPung() const {
@@ -604,83 +570,31 @@ bool HandTilesWidget::canKong() const {
     return (_standingTilesTable[tile] >= 4);
 }
 
-bool HandTilesWidget::makeFixedChow1Pack() {
-    if (UNLIKELY(!canChow1())) {
+bool HandTilesWidget::makeFixedChowPack(int meldedIdx) {
+    if (UNLIKELY(!canChow(meldedIdx))) {
         return false;
     }
 
-    // _XX 23吃1
+    // meldedIdx == 0: _XX 23吃1 tile+1
+    // meldedIdx == 1: X_X 13吃2 tile+0
+    // meldedIdx == 2: XX_ 12吃3 tile-1
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, tile + 1);
+    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, tile + 1 - meldedIdx);
     _fixedPacks.push_back(pack);
 
     // 这里迭代器不能连续使用，因为立牌不一定有序
     std::vector<mahjong::tile_t>::iterator it;
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - meldedIdx);
     _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile + 1);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - meldedIdx + 1);
     _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile + 2);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - meldedIdx + 2);
     _standingTiles.erase(it);
-    --_standingTilesTable[tile];
-    --_standingTilesTable[tile + 1];
-    --_standingTilesTable[tile + 2];
+    --_standingTilesTable[tile - meldedIdx];
+    --_standingTilesTable[tile - meldedIdx + 1];
+    --_standingTilesTable[tile - meldedIdx + 2];
 
-    addFixedChowPack(tile, 0);
-    refreshStandingTiles();
-    return true;
-}
-
-bool HandTilesWidget::makeFixedChow2Pack() {
-    if (UNLIKELY(!canChow2())) {
-        return false;
-    }
-
-    // X_X 13吃2
-    mahjong::tile_t tile = _standingTiles[_currentIdx];
-    mahjong::pack_t pack = mahjong::make_pack(2, PACK_TYPE_CHOW, tile);
-    _fixedPacks.push_back(pack);
-
-    // 这里迭代器不能连续使用，因为立牌不一定有序
-    std::vector<mahjong::tile_t>::iterator it;
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - 1);
-    _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
-    _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile + 1);
-    _standingTiles.erase(it);
-    --_standingTilesTable[tile - 1];
-    --_standingTilesTable[tile];
-    --_standingTilesTable[tile + 1];
-
-    addFixedChowPack(tile, 1);
-    refreshStandingTiles();
-    return true;
-}
-
-bool HandTilesWidget::makeFixedChow3Pack() {
-    if (UNLIKELY(!canChow3())) {
-        return false;
-    }
-
-    // XX_ 12吃3
-    mahjong::tile_t tile = _standingTiles[_currentIdx];
-    mahjong::pack_t pack = mahjong::make_pack(3, PACK_TYPE_CHOW, tile - 1);
-    _fixedPacks.push_back(pack);
-
-    // 这里迭代器不能连续使用，因为立牌不一定有序
-    std::vector<mahjong::tile_t>::iterator it;
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - 2);
-    _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - 1);
-    _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
-    _standingTiles.erase(it);
-    --_standingTilesTable[tile - 2];
-    --_standingTilesTable[tile - 1];
-    --_standingTilesTable[tile];
-
-    addFixedChowPack(tile, 2);
+    addFixedChowPack(tile, meldedIdx);
     refreshStandingTiles();
     return true;
 }
