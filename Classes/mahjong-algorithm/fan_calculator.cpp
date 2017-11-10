@@ -432,7 +432,7 @@ static fan_t get_1_chow_extra_fan(tile_t tile0, tile_t tile1, tile_t tile2, tile
 // 凡已经合过某一番种的牌，不能再同其他一副牌组成相同的番种计分
 //
 // 根据套算一次原则，234567s234567p，只能计为“喜相逢*2 连六*1”或者“喜相逢*1 连六*2”，而不是“喜相逢*2 连六*2”
-// 根据以上两点，234s223344567p，只能计为：“喜相逢、一般高、连六”，而不是“喜相逢*2、连六”
+// 根据以上两点，234s223344567p，只能计为：“一般高、喜相逢、连六”，而不是“喜相逢*2、连六”
 //
 // 直接按规则来写，差不多是图的算法，太过复杂
 // 这里简便处理：先统计有多少番，当超过时规则允许的数目时，从重复的开始削减
@@ -448,12 +448,17 @@ static void exclusionary_rule(const fan_t *all_fans, long fan_cnt, long max_cnt,
     }
 
     // 当超过时，从重复的开始削减
-    for (int i = 4; cnt > max_cnt && i > 0; ) {
-        --i;
-        while (table[i] > 1 && cnt > max_cnt) {
-            --table[i];
-            --cnt;
+    int limit_cnt = 1;
+    // 第一轮先削减剩下1，第二轮削减剩下0
+    while (cnt > max_cnt && limit_cnt >= 0) {
+        int idx = 4;  // 从老少副开始削减
+        while (cnt > max_cnt && idx-- > 0) {
+            while (static_cast<int>(table[idx]) > limit_cnt && cnt > max_cnt) {
+                --table[idx];
+                --cnt;
+            }
         }
+        --limit_cnt;
     }
 
     fan_table[PURE_DOUBLE_CHOW] = table[0];
@@ -514,7 +519,32 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
         get_2_chows_fan(mid_tiles[1], mid_tiles[3]),
         get_2_chows_fan(mid_tiles[2], mid_tiles[3])
     };
-    exclusionary_rule(all_fans, 6, 3, fan_table);
+
+    int max_cnt = 3;
+
+    // 0与其他3组顺子无任何关系
+    if (all_fans[0] == FAN_NONE && all_fans[1] == FAN_NONE && all_fans[2] == FAN_NONE) {
+        --max_cnt;
+    }
+
+    // 1与其他3组顺子无任何关系
+    if (all_fans[0] == FAN_NONE && all_fans[3] == FAN_NONE && all_fans[4] == FAN_NONE) {
+        --max_cnt;
+    }
+
+    // 2与其他3组顺子无任何关系
+    if (all_fans[1] == FAN_NONE && all_fans[3] == FAN_NONE && all_fans[5] == FAN_NONE) {
+        --max_cnt;
+    }
+
+    // 3与其他3组顺子无任何关系
+    if (all_fans[2] == FAN_NONE && all_fans[4] == FAN_NONE && all_fans[5] == FAN_NONE) {
+        --max_cnt;
+    }
+
+    if (max_cnt > 0) {
+        exclusionary_rule(all_fans, 6, max_cnt, fan_table);
+    }
 }
 
 // 3组顺子算番
