@@ -50,6 +50,7 @@ private:
     cocos2d::Node *_fixedContainer = nullptr;
     cocos2d::Node *_standingContainer = nullptr;
     std::vector<cocos2d::ui::Button *> _standingTileButtons;
+    cocos2d::ui::Widget *_emptyTileWidget = nullptr;
     cocos2d::DrawNode *_highlightBox = nullptr;
 
     mahjong::tile_table_t _usedTilesTable;
@@ -64,10 +65,12 @@ private:
 private:
     void addTile(mahjong::tile_t tile);
     void replaceTile(mahjong::tile_t tile);
+    void refreshEmptyWidgetPos();
     void refreshHighlightPos();
     void refreshStandingTiles();
     void refreshStandingTilesPos();
 
+    void onEmptyWidget(cocos2d::Ref *sender);
     void onTileButton(cocos2d::Ref *sender);
 
     int calcMeldedIdx(int maxIdx) const;

@@ -29,6 +29,14 @@ bool HandTilesWidget::init() {
     node->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height * 0.5f));
     _standingContainer = node;
 
+    ui::Widget *widget = ui::Widget::create();
+    widget->setTouchEnabled(true);
+    widget->setContentSize(Size(Size(TILE_WIDTH, TILE_HEIGHT)));
+    _standingContainer->addChild(widget);
+    widget->addClickEventListener(std::bind(&HandTilesWidget::onEmptyWidget, this, std::placeholders::_1));
+    _emptyTileWidget = widget;
+    widget->addChild(LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x20), TILE_WIDTH, TILE_HEIGHT));
+
     // 高亮方框
     DrawNode *drawNode = DrawNode::create();
     drawNode->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
@@ -70,6 +78,7 @@ void HandTilesWidget::reset() {
         _standingTileButtons.pop_back();
     }
     _standingContainer->setContentSize(Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT));
+    _emptyTileWidget->setPosition(Vec2(TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f));
     _highlightBox->setPosition(Vec2(TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f));
 
     // 清除之前残留的副露
@@ -133,6 +142,7 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
         ++_usedTilesTable[servingTile];
     }
 
+    refreshEmptyWidgetPos();
     refreshHighlightPos();
 }
 
@@ -181,6 +191,16 @@ size_t HandTilesWidget::countServingTileInFixedPacks() const {
 
     return mahjong::count_win_tile_in_fixed_packs(
         _fixedPacks.data(), _fixedPacks.size(), servingTile);
+}
+
+void HandTilesWidget::onEmptyWidget(cocos2d::Ref *) {
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
+    size_t cnt = _standingTiles.size();
+    size_t idx = std::min(cnt, maxCnt);
+    if (_currentIdx != idx) {
+        _currentIdx = idx;
+        refreshHighlightPos();
+    }
 }
 
 void HandTilesWidget::onTileButton(cocos2d::Ref *sender) {
@@ -242,6 +262,8 @@ mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
     if (_currentIdx >= _standingTiles.size()) {  // 新增牌
         addTile(tile);
         ++_usedTilesTable[tile];
+
+        refreshEmptyWidgetPos();
     }
     else {  // 修改牌
         prevTile = _standingTiles[_currentIdx];  // 此位置之前的牌
@@ -260,6 +282,20 @@ mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
 
     refreshHighlightPos();
     return prevTile;
+}
+
+// 刷新空白Widget位置
+void HandTilesWidget::refreshEmptyWidgetPos() {
+    const float posY = TILE_HEIGHT * 0.5f;
+
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
+    size_t cnt = _standingTileButtons.size();
+    if (LIKELY(cnt < maxCnt)) {
+        _emptyTileWidget->setPosition(Vec2(TILE_WIDTH * (cnt + 0.5f), posY));
+    }
+    else {
+        _emptyTileWidget->setPosition(Vec2(TILE_WIDTH * (maxCnt + 0.5f) + GAP, posY));
+    }
 }
 
 // 刷新高亮位置
@@ -310,6 +346,8 @@ void HandTilesWidget::refreshStandingTiles() {
     if (_currentIdx > maxCnt) {
         _currentIdx = maxCnt;
     }
+
+    refreshEmptyWidgetPos();
     refreshHighlightPos();
 }
 
