@@ -20,9 +20,11 @@ static std::vector<std::string> g_principles;
 static std::vector<std::string> g_definitions;
 
 static void replaceTilesToImage(std::string &text, float scale) {
+    const int width = static_cast<int>(TILE_WIDTH * scale);
+    const int height = static_cast<int>(TILE_HEIGHT * scale);
+
     char tilesStr[128];
     mahjong::tile_t tiles[14];
-    intptr_t tilesCnt;
     char imgStr[1024];
 
     std::string::size_type pos = text.find('[');
@@ -30,15 +32,30 @@ static void replaceTilesToImage(std::string &text, float scale) {
         const char *str = text.c_str();
         int readLen;
         if (sscanf(str + pos + 1, "%[^]]%n", tilesStr, &readLen) != EOF
-            && str[pos + readLen + 1] == ']'
-            && (tilesCnt = mahjong::parse_tiles(tilesStr, tiles, 14)) >= 0) {
+            && str[pos + readLen + 1] == ']') {
+
             size_t totalWriteLen = 0;
+            const char *p = tilesStr;
+            if (*p == '_') {
+                int writeLen = snprintf(imgStr, sizeof(imgStr),
+                    "<img src=\"tiles/bg.png\" width=\"%d\" height=\"%d\"/>", width, height);
+                totalWriteLen += writeLen;
+                ++p;
+            }
+
+            intptr_t tilesCnt = mahjong::parse_tiles(p, tiles, 14);
             for (intptr_t i = 0; i < tilesCnt; ++i) {
                 int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
-                    "<img src=\"%s\" width=\"%d\" height=\"%d\"/>",
-                    tilesImageName[tiles[i]], static_cast<int>(TILE_WIDTH * scale), static_cast<int>(TILE_HEIGHT * scale));
+                    "<img src=\"%s\" width=\"%d\" height=\"%d\"/>", tilesImageName[tiles[i]], width, height);
                 totalWriteLen += writeLen;
             }
+
+            if (tilesStr[readLen - 1] == '_') {
+                int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
+                    "<img src=\"tiles/bg.png\" width=\"%d\" height=\"%d\"/>", width, height);
+                totalWriteLen += writeLen;
+            }
+
             text.replace(pos, readLen + 2, imgStr);
             pos = text.find('[', pos + totalWriteLen);
         }
