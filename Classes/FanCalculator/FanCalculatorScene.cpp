@@ -84,8 +84,8 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
 
     // 排列
     Node *node = Node::create();
-    const int lineHeight = fontSize + 2;
-    ptrdiff_t resultAreaHeight = lineHeight * rows;  // 每行间隔2像素
+    const int lineHeight = fontSize + 2;  // 每行间隔2像素
+    ptrdiff_t resultAreaHeight = lineHeight * rows;
     resultAreaHeight += (5 + lineHeight) + 20;  // 总计+提示
     node->setContentSize(Size(resultAreaWidth, static_cast<float>(resultAreaHeight)));
 
@@ -97,7 +97,7 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         uint16_t n = fan_table[j];
         fan += f * n;
         std::string str = (n == 1) ? Common::format("%s %hu番\n", mahjong::fan_name[j], f)
-            : Common::format("%s %hu番x%hu\n", mahjong::fan_name[j], f, fan_table[j]);
+            : Common::format("%s %hu番x%hu\n", mahjong::fan_name[j], f, n);
 
         // 创建label，每行排2个
         Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
