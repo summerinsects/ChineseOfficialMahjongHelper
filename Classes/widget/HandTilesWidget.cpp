@@ -19,27 +19,30 @@ bool HandTilesWidget::init() {
 
     // 14张牌宽度：TILE_WIDTH * 14
     Size standingSize = Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT);
-    _standingContainer = Node::create();
-    _standingContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _standingContainer->setIgnoreAnchorPointForPosition(false);
-    _standingContainer->setContentSize(standingSize);
-    this->addChild(_standingContainer);
-    _standingContainer->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height * 0.5f));
+    Node *node = Node::create();
+    node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    node->setIgnoreAnchorPointForPosition(false);
+    node->setContentSize(standingSize);
+    this->addChild(node);
+    node->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height * 0.5f));
+    _standingContainer = node;
 
     // 高亮方框
-    _highlightBox = DrawNode::create();
-    _highlightBox->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
-    _highlightBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _highlightBox->drawRect(Vec2(0.0f, 0.0f), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
-    _standingContainer->addChild(_highlightBox, 2);
+    DrawNode *drawNode = DrawNode::create();
+    drawNode->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
+    drawNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    drawNode->drawRect(Vec2(0.0f, 0.0f), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
+    _standingContainer->addChild(drawNode, 2);
+    _highlightBox = drawNode;
 
     const float fixedHeight = TILE_HEIGHT;  // NOTE: 如果将来支持加杠，则应为std::max(TILE_HEIGHT, TILE_WIDTH * 2)
-    _fixedContainer = Node::create();
-    _fixedContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _fixedContainer->setIgnoreAnchorPointForPosition(false);
-    _fixedContainer->setContentSize(Size(0, fixedHeight));
-    this->addChild(_fixedContainer);
-    _fixedContainer->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height + fixedHeight * 0.5f + GAP));
+    node = Node::create();
+    node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    node->setIgnoreAnchorPointForPosition(false);
+    node->setContentSize(Size(0, fixedHeight));
+    this->addChild(node);
+    node->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height + fixedHeight * 0.5f + GAP));
+    _fixedContainer = node;
 
     this->setContentSize(Size(standingSize.width, standingSize.height + fixedHeight + GAP));
 
