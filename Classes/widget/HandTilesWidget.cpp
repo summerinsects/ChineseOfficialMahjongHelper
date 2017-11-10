@@ -207,14 +207,15 @@ void HandTilesWidget::addTile(mahjong::tile_t tile) {
     button->setTag(tile);
     button->addClickEventListener(std::bind(&HandTilesWidget::onTileButton, this, std::placeholders::_1));
 
-    Vec2 pos = Vec2(TILE_WIDTH * (tilesCnt + 0.5f), TILE_HEIGHT * 0.5f);
+    const float posY = TILE_HEIGHT * 0.5f;
+
     size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     if (LIKELY(tilesCnt < maxCnt)) {
-        button->setPosition(pos);
+        button->setPosition(Vec2(TILE_WIDTH * (tilesCnt + 0.5f), posY));
         _currentIdx = tilesCnt + 1;
     }
     else {
-        button->setPosition(Vec2(pos.x + GAP, pos.y));  // 和牌张与立牌间隔4像素
+        button->setPosition(Vec2(TILE_WIDTH * (maxCnt + 0.5f) + GAP, posY));
     }
     ++_standingTilesTable[tile];
 
@@ -268,13 +269,14 @@ mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
 
 // 刷新高亮位置
 void HandTilesWidget::refreshHighlightPos() {
+    const float posY = TILE_HEIGHT * 0.5f;
+
     size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
-    Vec2 pos = Vec2(TILE_WIDTH * (_currentIdx + 0.5f), TILE_HEIGHT * 0.5f);
     if (LIKELY(_currentIdx < maxCnt)) {
-        _highlightBox->setPosition(pos);
+        _highlightBox->setPosition(Vec2(TILE_WIDTH * (_currentIdx + 0.5f), posY));
     }
     else {
-        _highlightBox->setPosition(Vec2(pos.x + GAP, pos.y));
+        _highlightBox->setPosition(Vec2(TILE_WIDTH * (maxCnt + 0.5f) + GAP, posY));
     }
 
     if (_currentIdxChangedCallback) {
@@ -321,17 +323,18 @@ void HandTilesWidget::refreshStandingTilesPos() {
     size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     _standingContainer->setContentSize(Size(static_cast<float>(TILE_WIDTH * (maxCnt + 1) + GAP), TILE_HEIGHT));
 
+    const float posY = TILE_HEIGHT * 0.5f;
+
     // 重新设置UserData及位置
     for (size_t i = 0, cnt = _standingTileButtons.size(); i < cnt; ++i) {
         ui::Button *button = _standingTileButtons[i];
         button->setUserData(reinterpret_cast<void *>(i));
 
-        Vec2 pos = Vec2(TILE_WIDTH * (i + 0.5f), TILE_HEIGHT * 0.5f);
         if (LIKELY(i < maxCnt)) {
-            button->setPosition(pos);
+            button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), posY));
         }
         else {
-            button->setPosition(Vec2(pos.x + GAP, pos.y));
+            button->setPosition(Vec2(TILE_WIDTH * (maxCnt + 0.5f) + GAP, posY));
         }
     }
 }
