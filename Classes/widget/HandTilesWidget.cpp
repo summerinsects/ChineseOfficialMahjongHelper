@@ -597,24 +597,12 @@ bool HandTilesWidget::canKong() const {
 }
 
 bool HandTilesWidget::makeFixedChow1Pack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+    if (UNLIKELY(!canChow1())) {
         return false;
     }
 
     // _XX 23吃1
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(mahjong::is_honor(tile)
-        || _standingTilesTable[tile] == 0
-        || _standingTilesTable[tile + 1] == 0
-        || _standingTilesTable[tile + 2] == 0)) {
-        return false;
-    }
-
     mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, tile + 1);
     _fixedPacks.push_back(pack);
 
@@ -636,24 +624,12 @@ bool HandTilesWidget::makeFixedChow1Pack() {
 }
 
 bool HandTilesWidget::makeFixedChow2Pack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+    if (UNLIKELY(!canChow2())) {
         return false;
     }
 
     // X_X 13吃2
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(mahjong::is_honor(tile)
-        || _standingTilesTable[tile - 1] == 0
-        || _standingTilesTable[tile] == 0
-        || _standingTilesTable[tile + 1] == 0)) {
-        return false;
-    }
-
     mahjong::pack_t pack = mahjong::make_pack(2, PACK_TYPE_CHOW, tile);
     _fixedPacks.push_back(pack);
 
@@ -675,24 +651,12 @@ bool HandTilesWidget::makeFixedChow2Pack() {
 }
 
 bool HandTilesWidget::makeFixedChow3Pack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+    if (UNLIKELY(!canChow3())) {
         return false;
     }
 
     // XX_ 12吃3
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(mahjong::is_honor(tile)
-        || _standingTilesTable[tile - 2] == 0
-        || _standingTilesTable[tile - 1] == 0
-        || _standingTilesTable[tile] == 0)) {
-        return false;
-    }
-
     mahjong::pack_t pack = mahjong::make_pack(3, PACK_TYPE_CHOW, tile - 1);
     _fixedPacks.push_back(pack);
 
@@ -730,20 +694,11 @@ int HandTilesWidget::calcMeldedIdx(int maxIdx) const {
 }
 
 bool HandTilesWidget::makeFixedPungPack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+    if (UNLIKELY(!canPung())) {  // 当前位置没有牌
         return false;
     }
 
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(_standingTilesTable[tile] < 3)) {
-        return false;
-    }
-
     int meldedIdx = calcMeldedIdx(2);
     mahjong::pack_t pack = mahjong::make_pack(meldedIdx + 1, PACK_TYPE_PUNG, tile);
     _fixedPacks.push_back(pack);
@@ -762,20 +717,11 @@ bool HandTilesWidget::makeFixedPungPack() {
 }
 
 bool HandTilesWidget::makeFixedMeldedKongPack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+    if (UNLIKELY(!canKong())) {
         return false;
     }
 
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(_standingTilesTable[tile] < 4)) {
-        return false;
-    }
-
     int meldedIdx = calcMeldedIdx(3);
     mahjong::pack_t pack = mahjong::make_pack(std::min(meldedIdx + 1, 3), PACK_TYPE_KONG, tile);
     _fixedPacks.push_back(pack);
@@ -794,20 +740,11 @@ bool HandTilesWidget::makeFixedMeldedKongPack() {
 }
 
 bool HandTilesWidget::makeFixedConcealedKongPack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+    if (UNLIKELY(!canKong())) {
         return false;
     }
 
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(_standingTilesTable[tile] < 4)) {
-        return false;
-    }
-
     mahjong::pack_t pack = mahjong::make_pack(0, PACK_TYPE_KONG, tile);
     _fixedPacks.push_back(pack);
 
