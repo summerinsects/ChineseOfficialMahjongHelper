@@ -387,6 +387,10 @@ void HandTilesWidget::sortStandingTiles() {
     });
 
     refreshStandingTilesPos();
+
+    if (_currentIdxChangedCallback) {
+        _currentIdxChangedCallback();
+    }
 }
 
 // 添加一组明顺
