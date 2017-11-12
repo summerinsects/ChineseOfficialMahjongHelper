@@ -41,7 +41,9 @@ bool HandTilesWidget::init() {
     DrawNode *drawNode = DrawNode::create();
     drawNode->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
     drawNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    drawNode->setLineWidth(3.0f);
     drawNode->drawRect(Vec2(0.0f, 0.0f), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
+    drawNode->drawSolidRect(Vec2(0.0f, 0.0f), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F(0.05f, 0.05f, 0.05f, 0.1f));
     _standingContainer->addChild(drawNode, 2);
     _highlightBox = drawNode;
 
