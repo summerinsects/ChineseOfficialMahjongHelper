@@ -160,19 +160,19 @@ static void shareApplication() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     const float width = visibleSize.width * 0.8f - 10.0f;
 
-    std::string str = Common::format("https://github.com/summerinsects/ChineseOfficialMahjongHelper/releases/download/v%d.%d.%d/ChineseOfficialMahjongHelper_v%d.%d.%d.apk",
+    std::string str = Common::format("<div style=\"word-break:break-all\">https://github.com/summerinsects/ChineseOfficialMahjongHelper/releases/download/v%d.%d.%d/ChineseOfficialMahjongHelper_v%d.%d.%d.apk</div>",
         (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF);
 
     Node *rootNode = Node::create();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
-    webView->setContentSize(Size(width, 60.0f));
+    webView->setContentSize(Size(width, 80.0f));
     webView->setBackgroundTransparent();
     webView->setScalesPageToFit(true);
     webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(str), ""));
     rootNode->addChild(webView);
-    webView->setPosition(Vec2(width * 0.5f, 30.0f));
-    rootNode->setContentSize(Size(width, 60.0f));
+    webView->setPosition(Vec2(width * 0.5f, 40.0f));
+    rootNode->setContentSize(Size(width, 80.0f));
 #else
     Label *label = Label::createWithSystemFont(str, "Arail", 10);
     label->setColor(Color3B::BLACK);
@@ -193,9 +193,10 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     Node *rootNode = Node::create();
 
     Label *label = Label::createWithSystemFont(
-        "1. 本软件开源，高端玩家可下载源代码自行编译。\n"
-        "2. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
-        "3. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
+        "1. 如果觉得本软件好用，可点击「下载地址」获取下载链接，分享给他人。\n"
+        "2. 本软件开源，高端玩家可下载源代码自行编译。\n"
+        "3. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
+        "4. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
         "Arail", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0.0f);
