@@ -1,6 +1,7 @@
 ﻿#include "ExtraInfoWidget.h"
-#include "../utils/compiler.h"
+#include "../utils/common.h"
 #include "AlertView.h"
+#include "../mahjong-algorithm/stringify.h"
 
 USING_NS_CC;
 
@@ -117,8 +118,18 @@ bool ExtraInfoWidget::init() {
         _windGroups[k] = radioGroup;
     }
 
-    // 使用说明
+    // 直接输入
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("直接输入");
+    this->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 40.0f, 100.0f));
+    button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
+
+    // 使用说明
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -128,17 +139,20 @@ bool ExtraInfoWidget::init() {
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
-    label = Label::createWithSystemFont("花x", "Arial", 12);
-    label->setColor(Color3B::BLACK);
+    label = Label::createWithSystemFont("\xF0\x9F\x8C\xB8", "Arial", 12);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+    label->setColor(Color3B(224, 45, 45));
+#endif
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(visibleSize.width - 80.0f, 40.0f));
+    label->setPosition(Vec2(visibleSize.width - 85.0f, 40.0f));
 
-    label = Label::createWithSystemFont("0", "Arial", 12);
+    label = Label::createWithSystemFont("x0", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(visibleSize.width - 80.0f, 40.0f));
+    label->setPosition(Vec2(visibleSize.width - 85.0f, 40.0f));
+    label->setTag(0);
     _flowerLabel = label;
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -149,9 +163,10 @@ bool ExtraInfoWidget::init() {
     this->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 55.0f, 40.0f));
     button->addClickEventListener([label](Ref *) {
-        int n = atoi(label->getString().c_str());
+        int n = label->getTag();
         if (n > 0) {
-            label->setString(std::to_string(n - 1));
+            label->setTag(--n);
+            label->setString(Common::format("x%d", n));
         }
     });
 
@@ -163,9 +178,10 @@ bool ExtraInfoWidget::init() {
     this->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 25.0f, 40.0f));
     button->addClickEventListener([label](Ref *) {
-        int n = atoi(label->getString().c_str());
+        int n = label->getTag();
         if (n < 8) {
-            label->setString(std::to_string(n + 1));
+            label->setTag(++n);
+            label->setString(Common::format("x%d", n));
         }
     });
 
@@ -173,11 +189,14 @@ bool ExtraInfoWidget::init() {
 }
 
 int ExtraInfoWidget::getFlowerCount() const {
-    return atoi(_flowerLabel->getString().c_str());
+    return _flowerLabel->getTag();
 }
 
 void ExtraInfoWidget::setFlowerCount(int cnt) {
-    _flowerLabel->setString(std::to_string(cnt));
+    if (cnt > 8) cnt = 8;
+    if (cnt < 0) cnt = 0;
+    _flowerLabel->setTag(cnt);
+    _flowerLabel->setString(Common::format("x%d", cnt));
 }
 
 mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
@@ -191,8 +210,24 @@ mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
 }
 
 void ExtraInfoWidget::setWinFlag(mahjong::win_flag_t flag) {
-    if (flag & WIN_FLAG_SELF_DRAWN) _winTypeGroup->setSelectedButton(1);
-    if (flag & WIN_FLAG_WALL_LAST) _lastTileBox->setSelected(true);
+    if (flag & WIN_FLAG_SELF_DRAWN) {
+        _winTypeGroup->setSelectedButton(1);
+    }
+
+    if (flag & WIN_FLAG_WALL_LAST) {
+        _lastTileBox->setSelected(true);
+        onLastTileBox(_lastTileBox, ui::CheckBox::EventType::SELECTED);
+    }
+
+    if (flag & WIN_FLAG_ABOUT_KONG) {
+        if (flag & WIN_FLAG_SELF_DRAWN) {
+            _replacementBox->setSelected(_hasKong);
+        }
+        else {
+            _robKongBox->setSelected(_maybeFourthTile);
+            onRobKongBox(_robKongBox, _maybeFourthTile ? ui::CheckBox::EventType::SELECTED : ui::CheckBox::EventType::UNSELECTED);
+        }
+    }
 }
 
 mahjong::wind_t ExtraInfoWidget::getPrevalentWind() const {
@@ -388,4 +423,90 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
     }
 
     AlertView::showWithNode("使用说明", node, nullptr, nullptr);
+}
+
+void ExtraInfoWidget::showInputAlert(const char *prevInput) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float width = visibleSize.width * 0.8f - 10.0f;
+
+    Node *rootNode = Node::create();
+
+    Label *label = Label::createWithSystemFont("使用说明：\n"
+        "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n"
+        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n"
+        "3.每组吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源，无逗号或者数字为0的杠为暗杠。\n"
+        "输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
+        "输入范例2：1112345678999s9s\n"
+        "输入范例3：[WWWW,1][444s]45m678pFF6m\n", "Arial", 10);
+    label->setColor(Color3B::BLACK);
+    label->setDimensions(width, 0.0f);
+    rootNode->addChild(label);
+
+    // 输入手牌
+    ui::EditBox *editBox = ui::EditBox::create(Size(width - 10.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontSize(12);
+    editBox->setPlaceholderFontColor(Color4B::GRAY);
+    editBox->setPlaceHolder("输入手牌");
+    editBox->setMaxLength(50);
+    if (prevInput != nullptr) {
+        editBox->setText(prevInput);
+    }
+
+    rootNode->addChild(editBox);
+
+    const Size &labelSize = label->getContentSize();
+    rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
+    editBox->setPosition(Vec2(width * 0.5f, 10.0f));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
+
+    AlertView::showWithNode("直接输入", rootNode, [this, editBox]() {
+        const char *input = editBox->getText();
+        const char *errorStr = parseInput(input);
+        if (errorStr != nullptr) {
+            const std::string str = input;
+            AlertView::showWithMessage("直接输入牌", errorStr, 12, [this, str]() {
+                showInputAlert(str.c_str());
+            }, nullptr);
+        }
+    }, nullptr);
+}
+
+const char *ExtraInfoWidget::parseInput(const char *input) {
+    if (*input == '\0') {
+        return nullptr;
+    }
+
+    mahjong::hand_tiles_t hand_tiles;
+    mahjong::tile_t win_tile;
+    intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &win_tile);
+    if (ret != PARSE_NO_ERROR) {
+        switch (ret) {
+            case PARSE_ERROR_ILLEGAL_CHARACTER: return "无法解析的字符";
+            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: return "数字后面需有后缀";
+            case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: return "一组副露包含了错误的牌数目";
+            case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: return "无法正确解析副露";
+            default: break;
+        }
+        return nullptr;
+    }
+    if (win_tile == 0) {
+        return "缺少和牌张";
+    }
+
+    ret = mahjong::check_calculator_input(&hand_tiles, win_tile);
+    if (ret != 0) {
+        switch (ret) {
+            case ERROR_WRONG_TILES_COUNT: return "牌张数错误";
+            case ERROR_TILE_COUNT_GREATER_THAN_4: return "同一种牌最多只能使用4枚";
+            default: break;
+        }
+        return nullptr;
+    }
+
+    _inputCallback(hand_tiles, win_tile);
+    return nullptr;
 }
