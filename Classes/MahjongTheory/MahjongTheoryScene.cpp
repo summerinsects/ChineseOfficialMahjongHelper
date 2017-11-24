@@ -161,9 +161,9 @@ bool MahjongTheoryScene::init() {
 void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
     AlertView::showWithMessage("使用说明",
         "牌理功能未经严格测试，可能存在bug。\n\n"
-        "1." INPUT_GUIDE_STRING_1 "\n"
-        "2." INPUT_GUIDE_STRING_2 "\n"
-        "3." INPUT_GUIDE_STRING_3 "\n"
+        "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n"
+        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n"
+        "3.每组吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源，无逗号或者数字为0的杠为暗杠。\n"
         "4.输入牌的总数不能超过14张。\n"
         "5.当输入牌的数量为(n*3+2)时，最后一张牌作为摸上来的牌。\n"
         "6.当输入牌的数量为(n*3+1)时，系统会随机补一张摸上来的牌。\n"
@@ -172,7 +172,7 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
         "9.点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n"
         "10.点击手牌可切出对应牌，随机上牌。\n"
         "输入范例1：[EEEE]288s349pSCFF2p\n"
-        "输入范例2：123p 345s 999s 6m6pEW1m\n"
+        "输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n"
         "输入范例3：356m18s1579pWNFF9p",
         10, nullptr, nullptr);
 }
