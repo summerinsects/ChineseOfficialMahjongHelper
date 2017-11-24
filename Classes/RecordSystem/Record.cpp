@@ -63,6 +63,27 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
             if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
                 detail_data.fan_flag = it->value.GetUint64();
             }
+
+            it = detail_json.FindMember("win_hand");
+            if (it != detail_json.MemberEnd() && it->value.IsObject()) {
+                Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
+
+                const rapidjson::Value::ConstObject &win_hand_json = it->value.GetObject();
+                it = win_hand_json.FindMember("tiles");
+                if (it != win_hand_json.MemberEnd() && it->value.IsString()) {
+                    strncpy(win_hand_data.tiles, it->value.GetString(), sizeof(win_hand_data.tiles) - 1);
+                }
+
+                it = win_hand_json.FindMember("win_flag");
+                if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
+                    win_hand_data.win_flag = it->value.GetUint();
+                }
+
+                it = win_hand_json.FindMember("flower_count");
+                if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
+                    win_hand_data.flower_count = it->value.GetUint();
+                }
+            }
         }
     }
 
@@ -95,6 +116,14 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
         detail_json.AddMember("packed_fan", rapidjson::Value(detail_data.packed_fan), alloc);
         detail_json.AddMember("score", rapidjson::Value(detail_data.score), alloc);
         detail_json.AddMember("fan_flag", rapidjson::Value(detail_data.fan_flag), alloc);
+
+        const Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
+        rapidjson::Value win_hand_json(rapidjson::Type::kObjectType);
+        win_hand_json.AddMember("tiles", rapidjson::StringRef(win_hand_data.tiles), alloc);
+        win_hand_json.AddMember("win_flag", rapidjson::Value(win_hand_data.win_flag), alloc);
+        win_hand_json.AddMember("flower_count", rapidjson::Value(win_hand_data.flower_count), alloc);
+
+        detail_json.AddMember("win_hand", std::move(win_hand_json), alloc);
 
         detail.PushBack(std::move(detail_json), alloc);
     }
@@ -1091,13 +1120,6 @@ const char *GetShortFanText(const Record::Detail &detail) {
     }
 
     return "未标记番种";
-}
-
-const char *GetPackedFanText(uint8_t packedFan) {
-    if (packedFan > 0 && packedFan <= 8) {
-        return packedFanNames[packedFan - 1];
-    }
-    return "";
 }
 
 std::string GetLongFanText(const Record::Detail &detail) {

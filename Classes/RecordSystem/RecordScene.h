@@ -6,10 +6,17 @@
 #include "Record.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 
+class TilePickWidget;
+class ExtraInfoWidget;
+
 static const char *handNameText[] = {
     "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
     "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北"
 };
+
+#define EMOJI_FLOWER "\xF0\x9F\x8C\xB8"
+
+#define EMOJI_FLOWER_8 EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER EMOJI_FLOWER
 
 class RecordScene : public BaseScene, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
 public:
@@ -37,6 +44,7 @@ private:
     cw::TableView *_tableView = nullptr;
     cocos2d::ui::Button *_submitButton = nullptr;
 
+    size_t _handIdx = 0;
     int _winIndex = -1;
     Record::Detail _detail;
     SubmitCallback _submitCallback;
@@ -53,6 +61,7 @@ private:
 
     void onMinusButton(cocos2d::Ref *sender, int delta);
     void onPlusButton(cocos2d::Ref *sender, int delta);
+    void onRecordTilesButton(cocos2d::Ref *sender);
     void onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
     void onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
@@ -60,6 +69,9 @@ private:
 
     void onPointsNameButton(cocos2d::Ref *sender);
     void onSubmitButton(cocos2d::Ref *sender);
+
+    void showCalculator(const mahjong::calculate_param_t &param);
+    void calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const mahjong::calculate_param_t &param);
 };
 
 #endif

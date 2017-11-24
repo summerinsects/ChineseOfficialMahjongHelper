@@ -18,6 +18,12 @@ struct Record {
         uint8_t packed_fan; // 小番组合
         uint32_t score;     // 番数
         uint64_t fan_flag;  // 标记番种
+
+        struct WinHand {
+            char tiles[64];         // 牌
+            uint8_t win_flag;       // 和牌标记
+            uint8_t flower_count;   // 花牌数
+        } win_hand;         // 和牌
     } detail[16];           // 每一盘的详情
     size_t current_index;   // 当前打到第几盘
     time_t start_time;      // 开始时间
@@ -54,7 +60,6 @@ void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]);
 
 const char *GetShortFanText(const Record::Detail &detail);
 std::string GetLongFanText(const Record::Detail &detail);
-const char *GetPackedFanText(uint8_t packedFan);
 
 struct RecordsStatistic {
     size_t rank[4];
