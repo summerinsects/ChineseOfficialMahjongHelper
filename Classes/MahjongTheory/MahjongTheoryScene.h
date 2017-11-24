@@ -43,6 +43,7 @@ private:
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
     void setRandomInput();
     void onGuideButton(cocos2d::Ref *sender);
+    void showInputAlert();
     bool parseInput(const char *input);
     void calculate();
     void filterResultsByFlag(uint8_t flag);
