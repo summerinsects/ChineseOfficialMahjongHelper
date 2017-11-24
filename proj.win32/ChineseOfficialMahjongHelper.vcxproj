@@ -169,7 +169,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp" />
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp" />
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp" />
-    <ClCompile Include="..\Classes\widget\TilesKeyboard.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -201,7 +200,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\widget\HandTilesWidget.h" />
     <ClInclude Include="..\Classes\widget\LoadingView.h" />
     <ClInclude Include="..\Classes\widget\TilePickWidget.h" />
-    <ClInclude Include="..\Classes\widget\TilesKeyboard.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
