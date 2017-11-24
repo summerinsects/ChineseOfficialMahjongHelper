@@ -2,8 +2,7 @@
 #define __SCORE_SHEET_SCENE_H__
 
 #include "../BaseScene.h"
-
-struct Record;
+#include "Record.h"
 
 class ScoreSheetScene : public BaseScene {
 public:
@@ -24,7 +23,8 @@ private:
     cocos2d::Label *_rankLabels[4];
     cocos2d::Label *_timeLabel = nullptr;
 
-    Record *_record;
+    Record _record;
+    bool _isGlobal = false;
     bool initWithRecord(Record *record);
 
     void fillRow(size_t handIdx);
