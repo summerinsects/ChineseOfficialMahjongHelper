@@ -1,6 +1,6 @@
 Chinese Official Mahjong Helper 国标小助手
 =========
-- 这是与国标麻将相关的应用，包含算番器、计分器、番种详细说明、牌理等内容
+- 这是与国标麻将相关的应用，包含算番器、线下实麻计分器、番种详细说明、牌理等内容
 - 本程序以cocos2dx引擎为UI写成
 - 算番、判断听牌、听牌计算、上听数计算、有效牌计算等相关算法在mahjong-algorithm文件夹下，可提取出来单独使用
 - 由于cocos2dx引擎自身的源码较为庞大，这里就不上传了，请按如下步骤配置
@@ -51,3 +51,9 @@ Chinese Official Mahjong Helper 国标小助手
 
 #### 扩展cocos2d::StringUtils::StringUTF8
 https://github.com/cocos2d/cocos2d-x/pull/18356
+
+
+#### 特别鸣谢
+1. 牌画来源：[日语维基——中国麻雀](https://ja.wikipedia.org/wiki/%E4%B8%AD%E5%9B%BD%E9%BA%BB%E9%9B%80)
+2. 其他图片来源：CrossApp
+3. Android自带素材
