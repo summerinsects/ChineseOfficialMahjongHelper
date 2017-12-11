@@ -195,20 +195,43 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
     return divide_recursively(cnt_table, fixed_cnt, 0, &work_division, result);
 }
 
-#define IS_FOUR_SHIFTED_1(r0_, r1_, r2_, r3_) ((r0_) + 1 == (r1_) && (r1_) + 1 == (r2_) && (r2_) + 1 == (r3_))
-#define IS_FOUR_SHIFTED_2(r0_, r1_, r2_, r3_) ((r0_) + 2 == (r1_) && (r1_) + 2 == (r2_) && (r2_) + 2 == (r3_))
-#define IS_SHIFTED_1(r0_, r1_, r2_) ((r0_) + 1 == (r1_) && (r1_) + 1 == (r2_))
-#define IS_SHIFTED_2(r0_, r1_, r2_) ((r0_) + 2 == (r1_) && (r1_) + 2 == (r2_))
+// 4组递增1
+static forceinline bool is_four_shifted_1(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
+    return (r0 + 1 == r1 && r1 + 1 == r2 && r2 + 1 == r3);
+}
 
-#define IS_MIXED(s0_, s1_, s2_) ((s0_) != (s1_) && (s0_) != (s2_) && (s1_) != (s2_))
+// 4组递增2
+static forceinline bool is_four_shifted_2(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
+    return (r0 + 2 == r1 && r1 + 2 == r2 && r2 + 2 == r3);
+}
+
+// 3组递增1
+static forceinline bool is_shifted_1(rank_t r0, rank_t r1, rank_t r2) {
+    return (r0 + 1 == r1 && r1 + 1 == r2);
+}
+
+// 3组递增2
+static forceinline bool is_shifted_2(rank_t r0, rank_t r1, rank_t r2) {
+    return (r0 + 2 == r1 && r1 + 2 == r2);
+}
+
+// 三色
+static forceinline bool is_mixed(suit_t s0, suit_t s1, suit_t s2) {
+    return (s0 != s1 && s0 != s2 && s1 != s2);
+}
+
+// 3组递增1无序
+static forceinline bool is_shifted_1_unordered(rank_t r0, rank_t r1, rank_t r2) {
+    return is_shifted_1(r1, r0, r2) || is_shifted_1(r2, r0, r1) || is_shifted_1(r0, r1, r2)
+        || is_shifted_1(r2, r1, r0) || is_shifted_1(r0, r2, r1) || is_shifted_1(r1, r2, r0);
+}
 
 // 4组顺子的番
 static fan_t get_4_chows_fan(tile_t t0, tile_t t1, tile_t t2, tile_t t3) {
     // 按出现频率顺序
 
     // 一色四步高
-    if (IS_FOUR_SHIFTED_2(t0, t1, t2, t3)
-        || IS_FOUR_SHIFTED_1(t0, t1, t2, t3)) {
+    if (is_four_shifted_2(t0, t1, t2, t3) || is_four_shifted_1(t0, t1, t2, t3)) {
         return FOUR_PURE_SHIFTED_CHOWS;
     }
     // 一色四同顺
@@ -231,14 +254,9 @@ static fan_t get_3_chows_fan(tile_t t0, tile_t t1, tile_t t2) {
 
     // 按出现频率顺序
 
-    if (IS_MIXED(s0, s1, s2)) {  // 三色
+    if (is_mixed(s0, s1, s2)) {  // 三色
         // 三色三步高
-        if (IS_SHIFTED_1(r1, r0, r2)
-            || IS_SHIFTED_1(r2, r0, r1)
-            || IS_SHIFTED_1(r0, r1, r2)
-            || IS_SHIFTED_1(r2, r1, r0)
-            || IS_SHIFTED_1(r0, r2, r1)
-            || IS_SHIFTED_1(r1, r2, r0)) {
+        if (is_shifted_1_unordered(r1, r0, r2)) {
             return MIXED_SHIFTED_CHOWS;
         }
         // 三色三同顺
@@ -246,12 +264,9 @@ static fan_t get_3_chows_fan(tile_t t0, tile_t t1, tile_t t2) {
             return MIXED_TRIPLE_CHOW;
         }
         // 花龙
-        if ((r0 == 2 && r1 == 5 && r2 == 8)
-            || (r0 == 2 && r1 == 8 && r2 == 5)
-            || (r0 == 5 && r1 == 2 && r2 == 8)
-            || (r0 == 5 && r1 == 8 && r2 == 2)
-            || (r0 == 8 && r1 == 2 && r2 == 5)
-            || (r0 == 8 && r1 == 5 && r2 == 2)) {
+        if ((r0 == 2 && r1 == 5 && r2 == 8) || (r0 == 2 && r1 == 8 && r2 == 5)
+            || (r0 == 5 && r1 == 2 && r2 == 8) || (r0 == 5 && r1 == 8 && r2 == 2)
+            || (r0 == 8 && r1 == 2 && r2 == 5) || (r0 == 8 && r1 == 5 && r2 == 2)) {
             return MIXED_STRAIGHT;
         }
     }
@@ -261,7 +276,7 @@ static fan_t get_3_chows_fan(tile_t t0, tile_t t1, tile_t t2) {
             return PURE_STRAIGHT;
         }
         // 一色三步高
-        if (IS_SHIFTED_2(t0, t1, t2) || IS_SHIFTED_1(t0, t1, t2)) {
+        if (is_shifted_2(t0, t1, t2) || is_shifted_1(t0, t1, t2)) {
             return PURE_SHIFTED_CHOWS;
         }
         // 一色三同顺
@@ -330,14 +345,9 @@ static fan_t get_3_pungs_fan(tile_t t0, tile_t t1, tile_t t2) {
         rank_t r1 = tile_get_rank(t1);
         rank_t r2 = tile_get_rank(t2);
 
-        if (IS_MIXED(s0, s1, s2)) {  // 三色
+        if (is_mixed(s0, s1, s2)) {  // 三色
             // 三色三节高
-            if (IS_SHIFTED_1(r1, r0, r2)
-                || IS_SHIFTED_1(r2, r0, r1)
-                || IS_SHIFTED_1(r0, r1, r2)
-                || IS_SHIFTED_1(r2, r1, r0)
-                || IS_SHIFTED_1(r0, r2, r1)
-                || IS_SHIFTED_1(r1, r2, r0)) {
+            if (is_shifted_1_unordered(r1, r0, r2)) {
                 return MIXED_SHIFTED_PUNGS;
             }
             // 三同刻
@@ -369,13 +379,6 @@ static fan_t get_3_pungs_fan(tile_t t0, tile_t t1, tile_t t2) {
     // 以上都没有
     return FAN_NONE;
 }
-
-#undef IS_FOUR_SHIFTED_1
-#undef IS_FOUR_SHIFTED_2
-#undef IS_SHIFTED_1
-#undef IS_SHIFTED_2
-
-#undef IS_MIXED
 
 // 2组刻子的番
 static fan_t get_2_pungs_fan(tile_t t0, tile_t t1) {
@@ -416,15 +419,24 @@ static fan_t get_1_chow_extra_fan(tile_t tile0, tile_t tile1, tile_t tile2, tile
     fan_t fan1 = get_2_chows_fan(tile1, tile_extra);
     fan_t fan2 = get_2_chows_fan(tile2, tile_extra);
 
-#define TEST_RETURN_FAN(fan_) \
-    if (fan0 == fan_ || fan1 == fan_ || fan2 == fan_) return fan_
+    // 按以下顺序返回
+    // 一般高
+    if (fan0 == PURE_DOUBLE_CHOW || fan1 == PURE_DOUBLE_CHOW || fan2 == PURE_DOUBLE_CHOW) {
+        return PURE_DOUBLE_CHOW;
+    }
+    // 喜相逢
+    if (fan0 == MIXED_DOUBLE_CHOW || fan1 == MIXED_DOUBLE_CHOW || fan2 == MIXED_DOUBLE_CHOW) {
+        return MIXED_DOUBLE_CHOW;
+    }
+    // 连六
+    if (fan0 == SHORT_STRAIGHT || fan1 == SHORT_STRAIGHT || fan2 == SHORT_STRAIGHT) {
+        return SHORT_STRAIGHT;
+    }
+    // 老少副
+    if (fan0 == TWO_TERMINAL_CHOWS || fan1 == TWO_TERMINAL_CHOWS || fan2 == TWO_TERMINAL_CHOWS) {
+        return TWO_TERMINAL_CHOWS;
+    }
 
-    TEST_RETURN_FAN(PURE_DOUBLE_CHOW);  // 一般高
-    TEST_RETURN_FAN(MIXED_DOUBLE_CHOW);  // 喜相逢
-    TEST_RETURN_FAN(SHORT_STRAIGHT);  // 连六
-    TEST_RETURN_FAN(TWO_TERMINAL_CHOWS);  // 老少副
-
-#undef TEST_RETURN_FAN
     return FAN_NONE;
 }
 
@@ -850,11 +862,9 @@ static bool is_nine_gates(const tile_t *tiles) {
     map_tiles(tiles, 13, cnt_table);
 
     // 1、9各三枚，2~8各一枚
-#define IS_NINE_GATES(s_) \
-    (cnt_table[0x ## s_ ## 1] == 3 && cnt_table[0x ## s_ ## 9] == 3 \
-    && std::all_of(cnt_table + 0x ## s_ ## 2, cnt_table + 0x ## s_ ## 9, [](int n) { return n == 1; }))
-    return IS_NINE_GATES(1) || IS_NINE_GATES(2) || IS_NINE_GATES(3);
-#undef IS_NINE_GATES
+    return (cnt_table[0x11] == 3 && cnt_table[0x19] == 3 && std::all_of(cnt_table + 0x12, cnt_table + 0x19, [](int n) { return n == 1; }))
+        || (cnt_table[0x21] == 3 && cnt_table[0x29] == 3 && std::all_of(cnt_table + 0x22, cnt_table + 0x29, [](int n) { return n == 1; }))
+        || (cnt_table[0x31] == 3 && cnt_table[0x39] == 3 && std::all_of(cnt_table + 0x32, cnt_table + 0x39, [](int n) { return n == 1; }));
 }
 
 // 一色双龙会
