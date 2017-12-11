@@ -52,7 +52,7 @@ namespace {
         pack_t packs[5];  // 牌组。4面子1雀头，共5组
     };
 
-    // 划分结果类型
+    // 划分结果
     struct division_result_t {
         division_t divisions[MAX_DIVISION_CNT];  // 每一种划分
         intptr_t count;  // 划分方式总数
@@ -62,7 +62,7 @@ namespace {
 // 递归划分算法的最后一步，添加划分
 static void divide_tail_add_division(intptr_t fixed_cnt, const division_t *work_division, division_result_t *result) {
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
-    // 这里不能直接在work_division.packs上排序，否则会破坏递归外层的数据
+    // 这里不能直接在work_division->packs上排序，否则会破坏递归外层的数据
     division_t temp;
     memcpy(&temp, work_division, sizeof(temp));
     std::sort(temp.packs + fixed_cnt, temp.packs + 4);
@@ -90,7 +90,7 @@ static bool divide_tail(tile_table_t &cnt_table, intptr_t fixed_cnt, division_t 
         }
 
         cnt_table[t] -= 2;  // 削减
-        // 全部使用完毕
+        // 所有牌全部使用完毕
         if (std::all_of(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n == 0; })) {
             cnt_table[t] += 2;  // 还原
 
@@ -113,6 +113,7 @@ static bool is_division_branch_exist(intptr_t fixed_cnt, intptr_t step, const di
     }
 
     // std::includes要求有序
+    // 这里不能直接在work_division->packs上排序，否则会破坏递归外层的数据
     division_t temp;
     memcpy(&temp.packs[fixed_cnt], &work_division->packs[fixed_cnt], step * sizeof(pack_t));
     std::sort(&temp.packs[fixed_cnt], &temp.packs[fixed_cnt + step]);
@@ -132,6 +133,8 @@ static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intp
     }
 
     bool ret = false;
+
+    // 按牌表张遍历牌
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] < 1) {
@@ -480,6 +483,7 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
     // 012构成3组顺子的番种
     if ((fan = get_3_chows_fan(mid_tiles[0], mid_tiles[1], mid_tiles[2])) != FAN_NONE) {
         fan_table[fan] = 1;
+        // 计算与第4组顺子构成的番
         if ((fan = get_1_chow_extra_fan(mid_tiles[0], mid_tiles[1], mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
             fan_table[fan] = 1;
         }
@@ -488,6 +492,7 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
     // 013构成3组顺子的番种
     else if ((fan = get_3_chows_fan(mid_tiles[0], mid_tiles[1], mid_tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
+        // 计算与第4组顺子构成的番
         if ((fan = get_1_chow_extra_fan(mid_tiles[0], mid_tiles[1], mid_tiles[3], mid_tiles[2])) != FAN_NONE) {
             fan_table[fan] = 1;
         }
@@ -496,6 +501,7 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
     // 023构成3组顺子的番种
     else if ((fan = get_3_chows_fan(mid_tiles[0], mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
+        // 计算与第4组顺子构成的番
         if ((fan = get_1_chow_extra_fan(mid_tiles[0], mid_tiles[2], mid_tiles[3], mid_tiles[1])) != FAN_NONE) {
             fan_table[fan] = 1;
         }
@@ -504,6 +510,7 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
     // 123构成3组顺子的番种
     else if ((fan = get_3_chows_fan(mid_tiles[1], mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
+        // 计算与第4组顺子构成的番
         if ((fan = get_1_chow_extra_fan(mid_tiles[1], mid_tiles[2], mid_tiles[3], mid_tiles[0])) != FAN_NONE) {
             fan_table[fan] = 1;
         }
@@ -1790,6 +1797,7 @@ static bool calculate_knitted_straight_fan(const hand_tiles_t *hand_tiles, tile_
             adjust_by_waiting_form(packs + 3, 2, standing_tiles, standing_cnt, win_tile, fan_table);
         }
         else {
+            // 非门清状态如果听牌不在组合龙范围内，必然是单钓将
             fan_table[SINGLE_WAIT] = 1;
         }
     }
