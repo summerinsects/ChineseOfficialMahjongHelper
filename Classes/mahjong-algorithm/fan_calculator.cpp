@@ -289,7 +289,7 @@ static fan_t get_3_chows_fan(tile_t t0, tile_t t1, tile_t t2) {
 }
 
 // 2组顺子的番
-static fan_t get_2_chows_fan(tile_t t0, tile_t t1) {
+static fan_t get_2_chows_fan_unordered(tile_t t0, tile_t t1) {
     // 按出现频率顺序
 
     if (!is_suit_equal_quick(t0, t1)) {  // 两色
@@ -381,7 +381,7 @@ static fan_t get_3_pungs_fan(tile_t t0, tile_t t1, tile_t t2) {
 }
 
 // 2组刻子的番
-static fan_t get_2_pungs_fan(tile_t t0, tile_t t1) {
+static fan_t get_2_pungs_fan_unordered(tile_t t0, tile_t t1) {
     // 按出现频率顺序
     if (is_numbered_suit_quick(t0) && is_numbered_suit_quick(t1)) {  // 数牌
         // 双同刻
@@ -415,9 +415,9 @@ static fan_t get_1_pung_fan(tile_t mid_tile) {
 
 // 存在3组顺子的番种时，余下的第4组顺子最多算1番
 static fan_t get_1_chow_extra_fan(tile_t tile0, tile_t tile1, tile_t tile2, tile_t tile_extra) {
-    fan_t fan0 = get_2_chows_fan(tile0, tile_extra);
-    fan_t fan1 = get_2_chows_fan(tile1, tile_extra);
-    fan_t fan2 = get_2_chows_fan(tile2, tile_extra);
+    fan_t fan0 = get_2_chows_fan_unordered(tile0, tile_extra);
+    fan_t fan1 = get_2_chows_fan_unordered(tile1, tile_extra);
+    fan_t fan2 = get_2_chows_fan_unordered(tile2, tile_extra);
 
     // 按以下顺序返回
     // 一般高
@@ -531,12 +531,12 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
 
     // 不存在3组顺子的番种时，4组顺子最多3番
     fan_t all_fans[6] = {
-        get_2_chows_fan(mid_tiles[0], mid_tiles[1]),
-        get_2_chows_fan(mid_tiles[0], mid_tiles[2]),
-        get_2_chows_fan(mid_tiles[0], mid_tiles[3]),
-        get_2_chows_fan(mid_tiles[1], mid_tiles[2]),
-        get_2_chows_fan(mid_tiles[1], mid_tiles[3]),
-        get_2_chows_fan(mid_tiles[2], mid_tiles[3])
+        get_2_chows_fan_unordered(mid_tiles[0], mid_tiles[1]),
+        get_2_chows_fan_unordered(mid_tiles[0], mid_tiles[2]),
+        get_2_chows_fan_unordered(mid_tiles[0], mid_tiles[3]),
+        get_2_chows_fan_unordered(mid_tiles[1], mid_tiles[2]),
+        get_2_chows_fan_unordered(mid_tiles[1], mid_tiles[3]),
+        get_2_chows_fan_unordered(mid_tiles[2], mid_tiles[3])
     };
 
     int max_cnt = 3;
@@ -578,17 +578,17 @@ static void calculate_3_chows(const tile_t (&mid_tiles)[3], fan_table_t &fan_tab
 
     // 不存在上述番种时，3组顺子最多2番
     fan_t all_fans[3] = {
-        get_2_chows_fan(mid_tiles[0], mid_tiles[1]),
-        get_2_chows_fan(mid_tiles[0], mid_tiles[2]),
-        get_2_chows_fan(mid_tiles[1], mid_tiles[2])
+        get_2_chows_fan_unordered(mid_tiles[0], mid_tiles[1]),
+        get_2_chows_fan_unordered(mid_tiles[0], mid_tiles[2]),
+        get_2_chows_fan_unordered(mid_tiles[1], mid_tiles[2])
     };
     exclusionary_rule(all_fans, 3, 2, fan_table);
 }
 
 // 2组顺子算番
-static void calculate_2_chows(const tile_t (&mid_tiles)[2], fan_table_t &fan_table) {
+static void calculate_2_chows_unordered(const tile_t (&mid_tiles)[2], fan_table_t &fan_table) {
     fan_t fan;
-    if ((fan = get_2_chows_fan(mid_tiles[0], mid_tiles[1])) != FAN_NONE) {
+    if ((fan = get_2_chows_fan_unordered(mid_tiles[0], mid_tiles[1])) != FAN_NONE) {
         ++fan_table[fan];
     }
 }
@@ -796,7 +796,7 @@ static void calculate_4_pungs(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
                 continue;
             }
             // 依次与未使用的这组刻子测试番种
-            if ((fan = get_2_pungs_fan(mid_tiles[i], mid_tiles[free_pack_idx])) != FAN_NONE) {
+            if ((fan = get_2_pungs_fan_unordered(mid_tiles[i], mid_tiles[free_pack_idx])) != FAN_NONE) {
                 ++fan_table[fan];
                 break;
             }
@@ -805,22 +805,22 @@ static void calculate_4_pungs(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
     }
 
     // 不存在3组刻子的番种时，两两计算番种
-    if ((fan = get_2_pungs_fan(mid_tiles[0], mid_tiles[1])) != FAN_NONE) {
+    if ((fan = get_2_pungs_fan_unordered(mid_tiles[0], mid_tiles[1])) != FAN_NONE) {
         ++fan_table[fan];
     }
-    if ((fan = get_2_pungs_fan(mid_tiles[0], mid_tiles[2])) != FAN_NONE) {
+    if ((fan = get_2_pungs_fan_unordered(mid_tiles[0], mid_tiles[2])) != FAN_NONE) {
         ++fan_table[fan];
     }
-    if ((fan = get_2_pungs_fan(mid_tiles[0], mid_tiles[3])) != FAN_NONE) {
+    if ((fan = get_2_pungs_fan_unordered(mid_tiles[0], mid_tiles[3])) != FAN_NONE) {
         ++fan_table[fan];
     }
-    if ((fan = get_2_pungs_fan(mid_tiles[1], mid_tiles[2])) != FAN_NONE) {
+    if ((fan = get_2_pungs_fan_unordered(mid_tiles[1], mid_tiles[2])) != FAN_NONE) {
         ++fan_table[fan];
     }
-    if ((fan = get_2_pungs_fan(mid_tiles[1], mid_tiles[3])) != FAN_NONE) {
+    if ((fan = get_2_pungs_fan_unordered(mid_tiles[1], mid_tiles[3])) != FAN_NONE) {
         ++fan_table[fan];
     }
-    if ((fan = get_2_pungs_fan(mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
+    if ((fan = get_2_pungs_fan_unordered(mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
         ++fan_table[fan];
     }
 }
@@ -836,20 +836,20 @@ static void calculate_3_pungs(const tile_t (&mid_tiles)[3], fan_table_t &fan_tab
     }
 
     // 不存在3组刻子的番种时，两两计算番种
-    if ((fan = get_2_pungs_fan(mid_tiles[0], mid_tiles[1])) != FAN_NONE) {
+    if ((fan = get_2_pungs_fan_unordered(mid_tiles[0], mid_tiles[1])) != FAN_NONE) {
         ++fan_table[fan];
     }
-    if ((fan = get_2_pungs_fan(mid_tiles[0], mid_tiles[2])) != FAN_NONE) {
+    if ((fan = get_2_pungs_fan_unordered(mid_tiles[0], mid_tiles[2])) != FAN_NONE) {
         ++fan_table[fan];
     }
-    if ((fan = get_2_pungs_fan(mid_tiles[1], mid_tiles[2])) != FAN_NONE) {
+    if ((fan = get_2_pungs_fan_unordered(mid_tiles[1], mid_tiles[2])) != FAN_NONE) {
         ++fan_table[fan];
     }
 }
 
 // 2组刻子算番
-static void calculate_2_pungs(const tile_t (&mid_tiles)[2], fan_table_t &fan_table) {
-    fan_t fan = get_2_pungs_fan(mid_tiles[0], mid_tiles[1]);
+static void calculate_2_pungs_unordered(const tile_t (&mid_tiles)[2], fan_table_t &fan_table) {
+    fan_t fan = get_2_pungs_fan_unordered(mid_tiles[0], mid_tiles[1]);
     if (fan != FAN_NONE) {
         ++fan_table[fan];
     }
@@ -1637,8 +1637,8 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
         mid_tiles_pung[0] = pack_get_tile(pung_packs[0]);
         mid_tiles_pung[1] = pack_get_tile(pung_packs[1]);
 
-        calculate_2_chows(mid_tiles_chow, fan_table);
-        calculate_2_pungs(mid_tiles_pung, fan_table);
+        calculate_2_chows_unordered(mid_tiles_chow, fan_table);
+        calculate_2_pungs_unordered(mid_tiles_pung, fan_table);
         break;
     }
     case 1: {  // 1组顺子+3组刻子
