@@ -236,9 +236,7 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
 }
 
 static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-
-    const float width = visibleSize.width * 0.8f - 20;
+    const float width = AlertView::maxWidth();
     const float height = 8 * 20;
 
     DrawNode *drawNode = DrawNode::create();
@@ -357,7 +355,7 @@ namespace {
         });
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = visibleSize.width * 0.8f - 10.0f;
+        const float width = AlertView::maxWidth();
         const float height = visibleSize.height * 0.8f - 80.0f;
 
         this->setContentSize(Size(width, height));
@@ -401,8 +399,7 @@ namespace {
         typedef cw::TableViewCellEx<Label *, ui::RadioButtonGroup *, std::array<ui::RadioButton *, 4>, std::array<Label *, 4>, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-        Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float cellWidth = visibleSize.width * 0.8f - 10;
+        const float cellWidth = AlertView::maxWidth();
 
         if (cell == nullptr) {
             cell = CustomCell::create();

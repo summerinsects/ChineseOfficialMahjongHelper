@@ -645,8 +645,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     mahjong::tile_t win_tile;
     mahjong::string_to_tiles(detail.win_hand.tiles, &hand_tiles, &win_tile);
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width * 0.8f - 10;
+    const float maxWidth = AlertView::maxWidth();
 
     // 花（使用emoji代码）
     Label *flowerLabel = nullptr;
@@ -852,9 +851,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
         return totalScores[a] > totalScores[b];
     });
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-
-    const float width = visibleSize.width * 0.8f - 20;
+    const float width = AlertView::maxWidth();
     const float height = 10 * 20;
 
     // 列宽

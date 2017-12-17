@@ -379,8 +379,7 @@ void ExtraInfoWidget::refreshByWinTile(mahjong::tile_t winTile, bool maybeFourth
 }
 
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width * 0.8f - 10;
+    const float maxWidth = AlertView::maxWidth();
     Label *label = Label::createWithSystemFont(
         "1. 本程序不对和牌张位置的牌进行吃、碰、杠检测，如果要对某张牌进行吃、碰、杠操作，请将这张牌放在手牌范围内。点击算番结果处的番种名，可跳转到相应番种的定义。\n"
         "2. 本程序遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式，请以您所参加的比赛细则中之规定为准。\n"
@@ -426,8 +425,7 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
 }
 
 void ExtraInfoWidget::showInputAlert(const char *prevInput) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10.0f;
+    const float width = AlertView::maxWidth();
 
     Node *rootNode = Node::create();
 

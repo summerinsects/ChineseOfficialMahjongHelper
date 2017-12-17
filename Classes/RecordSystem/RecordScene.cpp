@@ -890,8 +890,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
         return;
     }
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width * 0.8f - 10;
+    const float maxWidth = AlertView::maxWidth();
 
     Node *innerNode = createFanResultNode(fan_table, 12, maxWidth);
     const Size &fanResultSize = innerNode->getContentSize();

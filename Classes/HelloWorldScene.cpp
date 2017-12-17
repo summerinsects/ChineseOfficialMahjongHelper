@@ -157,8 +157,7 @@ bool HelloWorld::init() {
 }
 
 static void shareApplication() {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10.0f;
+    const float width = AlertView::maxWidth();
 
     std::string str = Common::format("<div style=\"word-break:break-all\">https://github.com/summerinsects/ChineseOfficialMahjongHelper/releases/download/v%d.%d.%d/ChineseOfficialMahjongHelper_v%d.%d.%d.apk</div>",
         (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF);
@@ -187,8 +186,7 @@ static void shareApplication() {
 }
 
 void HelloWorld::onAboutButton(cocos2d::Ref *) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10.0f;
+    const float width = AlertView::maxWidth();
 
     Node *rootNode = Node::create();
 

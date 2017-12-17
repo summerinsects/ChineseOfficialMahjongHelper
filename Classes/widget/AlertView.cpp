@@ -15,8 +15,7 @@ void AlertView::showWithNode(const std::string &title, cocos2d::Node *node, floa
 }
 
 void AlertView::showWithMessage(const std::string &title, const std::string &message, float fontSize, const std::function<void ()> &confirmCallback, const std::function<void ()> &cancelCallback) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width * 0.8f - 10.0f;
+    const float maxWidth = AlertView::maxWidth();
     Label *label = Label::createWithSystemFont(message, "Arail", fontSize);
     label->setColor(Color3B::BLACK);
     if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
