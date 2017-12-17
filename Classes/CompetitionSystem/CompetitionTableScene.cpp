@@ -301,8 +301,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
 }
 
 void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResult (&prevResult)[4]) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10.0f;
+    const float width = AlertView::maxWidth();
     const float height = 100;
 
     // 列宽
@@ -612,14 +611,12 @@ void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &t
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-
     // 说明文本
     label = Label::createWithSystemFont("此处可仅输入比赛分，再使用「自动计算」", "Arail", 10);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     rootNode->addChild(label);
     label->setPosition(Vec2(135.0f * 0.5f, 5.0f));
-    cw::scaleLabelToFitWidth(label, visibleSize.width * 0.8f - 14.0f);
+    cw::scaleLabelToFitWidth(label, AlertView::maxWidth() - 4.0f);
 
     AlertView::showWithNode(title, rootNode, [this, radioGroup, editBoxes, title, result, callback, delegate]() {
         unsigned rank = 0;

@@ -321,9 +321,8 @@ namespace {
 
             _currentFlags.resize(playerFlags->size());
 
-            Size visibleSize = Director::getInstance()->getVisibleSize();
-            const float width = visibleSize.width * 0.8f - 10.0f;
-            const float height = visibleSize.height * 0.8f - 80.0f;
+            const float width = AlertView::maxWidth();
+            const float height = Director::getInstance()->getVisibleSize().height * 0.8f - 80.0f;
 
             this->setContentSize(Size(width, height));
 
@@ -365,8 +364,7 @@ namespace {
             typedef cw::TableViewCellEx<std::array<ui::CheckBox *, 2>, std::array<std::array<Label *, 2>, 2>, std::array<LayerColor *, 2> > CustomCell;
             CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-            Size visibleSize = Director::getInstance()->getVisibleSize();
-            const float cellWidth = visibleSize.width * 0.8f - 10;
+            const float cellWidth = AlertView::maxWidth();
 
             if (cell == nullptr) {
                 cell = CustomCell::create();
