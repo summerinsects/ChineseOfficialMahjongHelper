@@ -7,6 +7,12 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_RED = Color3B(254, 87, 110);
+static const Color3B C3B_BLUE = Color3B(44, 121, 178);
+static const Color3B C3B_GREEN = Color3B(49, 155, 28);
+static const Color3B C3B_GRAY = Color3B(0x60, 0x60, 0x60);
+static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
+
 static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
 static const size_t eachLevelBeginIndex[] = { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 static const size_t eachLevelCounts[] = { 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
@@ -147,7 +153,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
     // 说明文本
     label = Label::createWithSystemFont("番数支持直接输入。标记主番可快速增加番数，取消标记不减少。", "Arial", 10);
-    label->setColor(Color3B(0x60, 0x60, 0x60));
+    label->setColor(C3B_GRAY);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
     label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 65.0f));
@@ -167,7 +173,6 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     this->addChild(radioNode);
 
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
-    const Color3B grayColor(0x60, 0x60, 0x60);
     for (int i = 0; i < 4; ++i) {
         const float x = origin.x + gap * (i + 0.5f);
 
@@ -180,7 +185,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 得分
         label = Label::createWithSystemFont("+0", "Arial", 12);
-        label->setColor(grayColor);
+        label->setColor(C3B_GRAY);
         this->addChild(label);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 120.0f));
         _scoreLabel[i] = label;
@@ -234,7 +239,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 200.0f));
 
         label = Label::createWithSystemFont("+0", "Arial", 12);
-        label->setColor(grayColor);
+        label->setColor(C3B_GRAY);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 200.0f));
@@ -474,6 +479,14 @@ void RecordScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
     updateScoreLabel();
 }
 
+static inline void updatePenaltyLabel(Label *label, int16_t ps) {
+    label->setString(Common::format("%+hd", ps));
+
+    if (ps < 0) label->setColor(C3B_GREEN);
+    else if (ps > 0) label->setColor(C3B_RED);
+    else label->setColor(C3B_GRAY);
+}
+
 void RecordScene::refresh() {
     int wc = _detail.win_claim;
     if (_detail.fan >= 8) {
@@ -484,7 +497,7 @@ void RecordScene::refresh() {
 
     // 罚分
     for (int i = 0; i < 4; ++i) {
-        _penaltyLabel[i]->setString(Common::format("%+d", _detail.penalty_scores[PLAYER_TO_UI(i)]));
+        updatePenaltyLabel(_penaltyLabel[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
     }
 
     _winIndex = WIN_INDEX(wc);
@@ -511,22 +524,22 @@ void RecordScene::SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&sco
     for (int i = 0; i < 4; ++i) {
         if (scoreTable[i] != 0) {
             if (TEST_WIN(win_claim, i)) {  // 和牌：红色
-                scoreLabel[i]->setColor(Color3B(254, 87, 110));
+                scoreLabel[i]->setColor(C3B_RED);
             }
             else {
                 if (UNLIKELY(penalty_scores[i] < 0)) {  // 罚分：紫色
-                    scoreLabel[i]->setColor(Color3B(89, 16, 89));
+                    scoreLabel[i]->setColor(C3B_PURPLE);
                 }
                 else if (UNLIKELY(TEST_CLAIM(win_claim, i))) {  // 点炮：蓝色
-                    scoreLabel[i]->setColor(Color3B(44, 121, 178));
+                    scoreLabel[i]->setColor(C3B_BLUE);
                 }
                 else {  // 其他：绿色
-                    scoreLabel[i]->setColor(Color3B(49, 155, 28));
+                    scoreLabel[i]->setColor(C3B_GREEN);
                 }
             }
         }
         else {
-            scoreLabel[i]->setColor(Color3B(0x60, 0x60, 0x60));
+            scoreLabel[i]->setColor(C3B_GRAY);
         }
     }
 }
@@ -661,7 +674,6 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     rootNode->setContentSize(Size(maxWidth, 145.0f));
 
     const float gap = (maxWidth - 4.0f) * 0.25f;
-    const Color3B grayColor(0x60, 0x60, 0x60);
 
     const int16_t value[4] = { -10, -5, +5, +10 };
     const char *text[4] = { "-10", "-5", "+5", "+10" };
@@ -685,11 +697,11 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
         sprite->setContentSize(Size(30.0f, 20.0f));
         sprite->setPosition(Vec2(x, 60.0f));
 
-        // 得分
-        label = Label::createWithSystemFont(Common::format("%+hd", _detail.penalty_scores[PLAYER_TO_UI(i)]), "Arial", 12);
-        label->setColor(grayColor);
+        // 罚分
+        label = Label::createWithSystemFont("", "Arial", 12);
         rootNode->addChild(label);
         label->setPosition(Vec2(x, 60.0f));
+        updatePenaltyLabel(label, penaltyScores->at(PLAYER_TO_UI(i)));
 
         for (int n = 0; n < 4; ++n) {
             ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -701,9 +713,9 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
             button->setPosition(Vec2(x, buttonY[n]));
             int v = value[n];
             button->addClickEventListener([this, penaltyScores, label, i, v](Ref *) {
-                int16_t &score = penaltyScores->at(PLAYER_TO_UI(i));
-                score += v;
-                label->setString(Common::format("%+hd", score));
+                int16_t &ps = penaltyScores->at(PLAYER_TO_UI(i));
+                ps += v;
+                updatePenaltyLabel(label, ps);
             });
         }
     }
@@ -711,7 +723,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     AlertView::showWithNode("罚分调整", rootNode, [this, penaltyScores]() {
         memcpy(&_detail.penalty_scores, penaltyScores->data(), sizeof(_detail.penalty_scores));
         for (int i = 0; i < 4; ++i) {
-            _penaltyLabel[i]->setString(Common::format("%+d", penaltyScores->at(PLAYER_TO_UI(i))));
+            updatePenaltyLabel(_penaltyLabel[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
         }
         updateScoreLabel();
     }, nullptr);
