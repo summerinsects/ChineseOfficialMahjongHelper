@@ -44,9 +44,19 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 detail_data.win_claim = it->value.GetUint();
             }
 
+            // 兼容旧的key
             it = detail_json.FindMember("false_win");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.false_win = it->value.GetUint();
+                uint32_t false_win = it->value.GetUint();
+                for (int i = 0; i < 4; ++i) {
+                    if (false_win & (1 << i)) {
+                        detail_data.penalty_scores[i] -= 30;
+                        for (int j = 0; j < 4; ++j) {
+                            if (j == i) continue;
+                            detail_data.penalty_scores[j] += 10;
+                        }
+                    }
+                }
             }
 
             it = detail_json.FindMember("packed_fan");
@@ -68,6 +78,16 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
             it = detail_json.FindMember("fan_flag");
             if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
                 detail_data.fan_flag = it->value.GetUint64();
+            }
+
+            it = detail_json.FindMember("penalty_scores");
+            if (it != detail_json.MemberEnd() && it->value.IsArray()) {
+                rapidjson::Value::ConstArray penalty_scores = it->value.GetArray();
+                if (penalty_scores.Size() == 4) {
+                    for (int n = 0; n < 4; ++n) {
+                        detail_data.penalty_scores[n] = penalty_scores[n].GetInt();
+                    }
+                }
             }
 
             it = detail_json.FindMember("win_hand");
@@ -118,10 +138,16 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
         const Record::Detail &detail_data = record.detail[i];
         rapidjson::Value detail_json(rapidjson::Type::kObjectType);
         detail_json.AddMember("win_claim", rapidjson::Value(detail_data.win_claim), alloc);
-        detail_json.AddMember("false_win", rapidjson::Value(detail_data.false_win), alloc);
         detail_json.AddMember("packed_fan", rapidjson::Value(detail_data.packed_fan), alloc);
         detail_json.AddMember("fan", rapidjson::Value(detail_data.fan), alloc);
         detail_json.AddMember("fan_flag", rapidjson::Value(detail_data.fan_flag), alloc);
+
+        rapidjson::Value penalty_scores(rapidjson::Type::kArrayType);
+        penalty_scores.Reserve(4, alloc);
+        for (int n = 0; n < 4; ++n) {
+            penalty_scores.PushBack(rapidjson::Value(detail_data.penalty_scores[n]), alloc);
+        }
+        detail_json.AddMember("penalty_scores", std::move(penalty_scores), alloc);
 
         const Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
         rapidjson::Value win_hand_json(rapidjson::Type::kObjectType);
@@ -289,15 +315,9 @@ void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)
         }
     }
 
-    // 检查错和
+    // 加上处罚
     for (int i = 0; i < 4; ++i) {
-        if (TEST_FALSE_WIN(detail.false_win, i)) {
-            scoreTable[i] -= 30;
-            for (int j = 0; j < 4; ++j) {
-                if (j == i) continue;
-                scoreTable[j] += 10;
-            }
-        }
+        scoreTable[i] += detail.penalty_scores[i];
     }
 }
 

@@ -300,7 +300,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     }
 
     // 使用不同颜色
-    RecordScene::SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_claim, detail.false_win);
+    RecordScene::SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_claim, detail.penalty_scores);
 
     // 禁用并隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
@@ -538,7 +538,7 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *, size_t handIdx) {
 }
 
 void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
-    const char *name[] = { _record.name[0], _record.name[1], _record.name[2], _record.name[3] };
+    const std::array<const char *, 4> name = { _record.name[0], _record.name[1], _record.name[2], _record.name[3] };
     auto scene = RecordScene::create(handIdx, name, modify ? &_record.detail[handIdx] : nullptr,
         [this, handIdx](const Record::Detail &detail) {
         bool isModify = (handIdx != _record.current_index);
@@ -606,17 +606,6 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
     }
     else {
         ret.append(Common::format("「%s」和%s%d番，「%s」点炮。\n", record->name[winIndex], fanText.c_str(), detail.fan, record->name[claimIndex]));
-    }
-
-    if (detail.false_win != 0) {
-        for (int i = 0; i < 4; ++i) {
-            if (TEST_FALSE_WIN(detail.false_win, i)) {
-                ret.append("「");
-                ret.append(record->name[i]);
-                ret.append("」");
-            }
-        }
-        ret.append("错和。\n");
     }
 
     return ret;
