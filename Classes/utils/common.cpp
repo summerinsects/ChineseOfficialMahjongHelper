@@ -30,7 +30,10 @@ std::string __format(const char *fmt, va_list ap) {
 
         do {
             ret.resize(len);
-            int size = vsnprintf(&ret[0], len, fmt, ap);
+            va_list temp;
+            va_copy(temp, ap);
+            int size = vsnprintf(&ret[0], len, fmt, temp);
+            va_end(temp);
             if (LIKELY(size >= 0)) {
                 if (LIKELY(size < len)) {  // Everything worked
                     ret.resize(size);
@@ -70,7 +73,7 @@ void __log(const char *fmt, ...) {
     std::wstring wszBuf;
     int len = ::MultiByteToWideChar(CP_UTF8, 0, ret.c_str(), -1, nullptr, 0);
     if (len > 0) {
-        wszBuf.resize(len + 1);
+        wszBuf.resize(len);
         ::MultiByteToWideChar(CP_UTF8, 0, ret.c_str(), -1, &wszBuf[0], len);
         ::OutputDebugStringW(wszBuf.c_str());
     }

@@ -15,7 +15,9 @@ static const char *packedFanNames[] = {
     "门断平", "门清平和", "断幺平和", "连风刻", "番牌暗杠", "双同幺九", "门清双暗", "双暗暗杠"
 };
 
-static void JsonToRecord(const rapidjson::Value &json, Record &record) {
+namespace {
+
+void JsonToRecord(const rapidjson::Value &json, Record &record) {
     memset(&record, 0, sizeof(Record));
 
     rapidjson::Value::ConstMemberIterator it = json.FindMember("name");
@@ -42,9 +44,19 @@ static void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 detail_data.win_claim = it->value.GetUint();
             }
 
+            // 兼容旧的key
             it = detail_json.FindMember("false_win");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.false_win = it->value.GetUint();
+                uint32_t false_win = it->value.GetUint();
+                for (int i = 0; i < 4; ++i) {
+                    if (false_win & (1 << i)) {
+                        detail_data.penalty_scores[i] -= 30;
+                        for (int j = 0; j < 4; ++j) {
+                            if (j == i) continue;
+                            detail_data.penalty_scores[j] += 10;
+                        }
+                    }
+                }
             }
 
             it = detail_json.FindMember("packed_fan");
@@ -52,14 +64,51 @@ static void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 detail_data.packed_fan = it->value.GetUint();
             }
 
+            it = detail_json.FindMember("fan");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                detail_data.fan = it->value.GetUint();
+            }
+
+            // 兼容旧的key
             it = detail_json.FindMember("score");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.score = it->value.GetUint();
+                detail_data.fan = it->value.GetUint();
             }
 
             it = detail_json.FindMember("fan_flag");
             if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
                 detail_data.fan_flag = it->value.GetUint64();
+            }
+
+            it = detail_json.FindMember("penalty_scores");
+            if (it != detail_json.MemberEnd() && it->value.IsArray()) {
+                rapidjson::Value::ConstArray penalty_scores = it->value.GetArray();
+                if (penalty_scores.Size() == 4) {
+                    for (int n = 0; n < 4; ++n) {
+                        detail_data.penalty_scores[n] = penalty_scores[n].GetInt();
+                    }
+                }
+            }
+
+            it = detail_json.FindMember("win_hand");
+            if (it != detail_json.MemberEnd() && it->value.IsObject()) {
+                Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
+
+                const rapidjson::Value::ConstObject &win_hand_json = it->value.GetObject();
+                it = win_hand_json.FindMember("tiles");
+                if (it != win_hand_json.MemberEnd() && it->value.IsString()) {
+                    strncpy(win_hand_data.tiles, it->value.GetString(), sizeof(win_hand_data.tiles) - 1);
+                }
+
+                it = win_hand_json.FindMember("win_flag");
+                if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
+                    win_hand_data.win_flag = it->value.GetUint();
+                }
+
+                it = win_hand_json.FindMember("flower_count");
+                if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
+                    win_hand_data.flower_count = it->value.GetUint();
+                }
             }
         }
     }
@@ -75,7 +124,7 @@ static void JsonToRecord(const rapidjson::Value &json, Record &record) {
     }
 }
 
-static void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
+void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
     rapidjson::Value name(rapidjson::Type::kArrayType);
     name.Reserve(4, alloc);
     for (int i = 0; i < 4; ++i) {
@@ -89,10 +138,24 @@ static void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson
         const Record::Detail &detail_data = record.detail[i];
         rapidjson::Value detail_json(rapidjson::Type::kObjectType);
         detail_json.AddMember("win_claim", rapidjson::Value(detail_data.win_claim), alloc);
-        detail_json.AddMember("false_win", rapidjson::Value(detail_data.false_win), alloc);
         detail_json.AddMember("packed_fan", rapidjson::Value(detail_data.packed_fan), alloc);
-        detail_json.AddMember("score", rapidjson::Value(detail_data.score), alloc);
+        detail_json.AddMember("fan", rapidjson::Value(detail_data.fan), alloc);
         detail_json.AddMember("fan_flag", rapidjson::Value(detail_data.fan_flag), alloc);
+
+        rapidjson::Value penalty_scores(rapidjson::Type::kArrayType);
+        penalty_scores.Reserve(4, alloc);
+        for (int n = 0; n < 4; ++n) {
+            penalty_scores.PushBack(rapidjson::Value(detail_data.penalty_scores[n]), alloc);
+        }
+        detail_json.AddMember("penalty_scores", std::move(penalty_scores), alloc);
+
+        const Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
+        rapidjson::Value win_hand_json(rapidjson::Type::kObjectType);
+        win_hand_json.AddMember("tiles", rapidjson::StringRef(win_hand_data.tiles), alloc);
+        win_hand_json.AddMember("win_flag", rapidjson::Value(win_hand_data.win_flag), alloc);
+        win_hand_json.AddMember("flower_count", rapidjson::Value(win_hand_data.flower_count), alloc);
+
+        detail_json.AddMember("win_hand", std::move(win_hand_json), alloc);
 
         detail.PushBack(std::move(detail_json), alloc);
     }
@@ -100,6 +163,22 @@ static void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson
 
     json.AddMember("start_time", rapidjson::Value(static_cast<uint64_t>(record.start_time)), alloc);
     json.AddMember("end_time", rapidjson::Value(static_cast<uint64_t>(record.end_time)), alloc);
+}
+
+void SortRecords(std::vector<Record> &records) {
+    // 用指针排序
+    std::vector<Record *> ptrs(records.size());
+    std::transform(records.begin(), records.end(), ptrs.begin(), [](Record &r) { return &r; });
+    std::sort(ptrs.begin(), ptrs.end(), [](const Record *r1, const Record *r2) { return r1->start_time > r2->start_time; });
+    std::vector<Record> temp;
+    temp.reserve(records.size());
+    std::for_each(ptrs.begin(), ptrs.end(), [&temp](Record *r) {
+        temp.emplace_back();
+        std::swap(temp.back(), *r);
+    });
+    records.swap(temp);
+}
+
 }
 
 void ReadRecordFromFile(const char *file, Record &record) {
@@ -163,7 +242,7 @@ void LoadHistoryRecords(const char *file, std::vector<Record> &records) {
             return record;
         });
 
-        std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
+        SortRecords(records);
     }
     catch (std::exception &e) {
         MYLOG("%s %s", __FUNCTION__, e.what());
@@ -214,38 +293,123 @@ void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
         memcpy(&*it, r, sizeof(*r));
     }
 
-    // 按时间排序
-    std::sort(records.begin(), records.end(), [](const Record &r1, const Record &r2) { return r1.start_time > r2.start_time; });
+    SortRecords(records);
 }
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
     memset(scoreTable, 0, sizeof(scoreTable));
-    int winScore = detail.score;
-    if (winScore >= 8 && !!(detail.win_claim & 0xF0)) {
+    int fan = detail.fan;
+    if (fan >= 8 && !!(detail.win_claim & 0xF0)) {
         uint8_t wc = detail.win_claim;
         int winIndex = WIN_INDEX(wc);
         int claimIndex = CLAIM_INDEX(wc);
         if (winIndex == claimIndex) {  // 自摸
             for (int i = 0; i < 4; ++i) {
-                scoreTable[i] = (i == winIndex) ? (winScore + 8) * 3 : (-8 - winScore);
+                scoreTable[i] = (i == winIndex) ? (fan + 8) * 3 : (-8 - fan);
             }
         }
         else {  // 点炮
             for (int i = 0; i < 4; ++i) {
-                scoreTable[i] = (i == winIndex) ? (winScore + 24) : (i == claimIndex ? (-8 - winScore) : -8);
+                scoreTable[i] = (i == winIndex) ? (fan + 24) : (i == claimIndex ? (-8 - fan) : -8);
             }
         }
     }
 
-    // 检查错和
+    // 加上处罚
     for (int i = 0; i < 4; ++i) {
-        if (TEST_FALSE_WIN(detail.false_win, i)) {
-            scoreTable[i] -= 30;
-            for (int j = 0; j < 4; ++j) {
-                if (j == i) continue;
-                scoreTable[j] += 10;
+        scoreTable[i] += detail.penalty_scores[i];
+    }
+}
+
+void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]) {
+    memset(ranks, 0, sizeof(ranks));
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (i == j) continue;
+            if (scores[i] < scores[j]) ++ranks[i];
+            //if (scores[i] == scores[j] && i > j) ++ranks[i];  // 这一行的作用是取消并列
+        }
+    }
+}
+
+void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]) {
+    // 并列的数目
+    unsigned rankCnt[4] = { 0 };
+    for (int i = 0; i < 4; ++i) {
+        ++rankCnt[ranks[i]];
+    }
+
+    static const float standardScore[] = { 4, 2, 1, 0 };
+    for (int i = 0; i < 4; ++i) {
+        unsigned rank = ranks[i];
+        unsigned tieCnt = rankCnt[rank];  // 并列的人数
+
+        // 累加并列的标准分
+        float ss0 = standardScore[rank];
+        for (unsigned n = 1, cnt = tieCnt; n < cnt; ++n) {
+            ss0 += standardScore[rank + n];
+        }
+        ss0 /= tieCnt;
+        ss[i] = ss0;
+    }
+}
+
+void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]) {
+    unsigned ranks[4];
+    CalculateRankFromScore(cs, ranks);
+    RankToStandardScore(ranks, ss);
+}
+
+void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector<Record> &records, RecordsStatistic *result) {
+    memset(result, 0, sizeof(*result));
+
+    for (size_t i = 0, cnt = std::min<size_t>(flags.size(), records.size()); i < cnt; ++i) {
+        const Record &record = records[i];
+        if (record.end_time == 0) {
+            continue;
+        }
+
+        int8_t idx = flags[i];
+        if (idx == -1) {
+            continue;
+        }
+
+        int totalScores[4] = { 0 };
+
+        for (int k = 0; k < 16; ++k) {
+            const Record::Detail &detail = record.detail[k];
+
+            int scoreTable[4];
+            TranslateDetailToScoreTable(detail, scoreTable);
+            for (int n = 0; n < 4; ++n) {
+                totalScores[n] += scoreTable[n];
+            }
+
+            uint8_t wc = detail.win_claim;
+            int winIndex = WIN_INDEX(wc);
+            int claimIndex = CLAIM_INDEX(wc);
+            if (winIndex == idx) {
+                ++result->win;
+                if (claimIndex == idx) {
+                    ++result->self_drawn;
+                }
+                result->win_fan += detail.fan;
+                result->max_fan = std::max<uint16_t>(result->max_fan, detail.fan);
+            }
+            else if (claimIndex == idx) {
+                ++result->claim;
+                result->claim_fan += detail.fan;
             }
         }
+
+        unsigned ranks[4];
+        CalculateRankFromScore(totalScores, ranks);
+        ++result->rank[ranks[idx]];
+        result->competition_score += totalScores[idx];
+
+        float ss[4];
+        RankToStandardScore(ranks, ss);
+        result->standard_score += ss[idx];
     }
 }
 
@@ -949,7 +1113,7 @@ static const char *fan_name2[mahjong::LAST_TILE + 1][mahjong::LAST_TILE + 1] = {
 };
 
 const char *GetShortFanText(const Record::Detail &detail) {
-    if (detail.score == 0) {
+    if (detail.fan == 0) {
         return "荒庄";
     }
 
@@ -981,15 +1145,7 @@ const char *GetShortFanText(const Record::Detail &detail) {
         return packedFanNames[packedFan - 1];
     }
 
-    // 将未标记番种的显示为其他凑番
-    return "其他凑番";
-}
-
-const char *GetPackedFanText(uint8_t packedFan) {
-    if (packedFan > 0 && packedFan <= 8) {
-        return packedFanNames[packedFan - 1];
-    }
-    return "";
+    return "未标记番种";
 }
 
 std::string GetLongFanText(const Record::Detail &detail) {

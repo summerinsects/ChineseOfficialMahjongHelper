@@ -1,13 +1,19 @@
 ﻿#include "RecordScene.h"
-#include <array>
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../widget/AlertView.h"
+#include "../widget/TilePickWidget.h"
+#include "../widget/ExtraInfoWidget.h"
+#include "../mahjong-algorithm/stringify.h"
 
 USING_NS_CC;
 
 static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
 static const size_t eachLevelBeginIndex[] = { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 static const size_t eachLevelCounts[] = { 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
+
+static const char *packedFanNames[] = {
+    "门断平", "门清平和", "断幺平和", "连风刻", "番牌暗杠", "双同幺九", "门清双暗", "双暗暗杠"
+};
 
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
@@ -18,11 +24,12 @@ static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
 #define PLAYER_TO_UI(p_) ORDER(_seatFlag, (p_))
 #define UI_TO_PLAYER(u_) ORDER(_playerFlag, (u_))
 
-bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const Record::Detail *detail, const SubmitCallback &callback) {
+bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const Record::Detail *detail, const SubmitCallback &callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
     }
 
+    _handIdx = handIdx;
     _submitCallback = callback;
 
     switch (handIdx >> 2) {
@@ -128,13 +135,23 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 50.0f));
 
+    // 罚分调整
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("罚分调整");
+    button->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 75.0f));
+    button->addClickEventListener(std::bind(&RecordScene::onPenaltyButton, this, std::placeholders::_1, names));
+
     // 说明文本
     label = Label::createWithSystemFont("番数支持直接输入。标记主番可快速增加番数，取消标记不减少。", "Arial", 10);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 70.0f));
-    cw::scaleLabelToFitWidth(label, visibleSize.width - 10.0f);
+    label->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 65.0f));
+    label->setDimensions(visibleSize.width - 70.0f, 0.0f);
 
     ui::RadioButtonGroup *winGroup = ui::RadioButtonGroup::create();
     winGroup->setAllowedNoSelection(true);
@@ -150,21 +167,22 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     this->addChild(radioNode);
 
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
+    const Color3B grayColor(0x60, 0x60, 0x60);
     for (int i = 0; i < 4; ++i) {
         const float x = origin.x + gap * (i + 0.5f);
 
         // 名字
-        label = Label::createWithSystemFont(playerNames[PLAYER_TO_UI(i)], "Arial", 12.0f);
+        label = Label::createWithSystemFont(names[PLAYER_TO_UI(i)], "Arial", 12.0f);
         label->setColor(Color3B::ORANGE);
         this->addChild(label);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 90.0f));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 100.0f));
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 得分
         label = Label::createWithSystemFont("+0", "Arial", 12);
-        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setColor(grayColor);
         this->addChild(label);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 110.0f));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 120.0f));
         _scoreLabel[i] = label;
 
         // 和牌
@@ -174,14 +192,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 135.0f));
+        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 145.0f));
         winGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("和牌", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 135.0f));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 145.0f));
 
         // 点炮或自摸
         button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
@@ -190,40 +208,37 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 165.0f));
+        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 175.0f));
         claimGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 165.0f));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 175.0f));
         _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 165.0f));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 175.0f));
         label->setVisible(false);
         _selfDrawnLabel[i] = label;
 
-        // 错和
-        ui::CheckBox *checkBox= ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
-            "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
-        radioNode->addChild(checkBox);
-        checkBox->setZoomScale(0.0f);
-        checkBox->ignoreContentAdaptWithSize(false);
-        checkBox->setContentSize(Size(20.0f, 20.0f));
-        checkBox->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 195.0f));
-        checkBox->addEventListener(std::bind(&RecordScene::onFalseWinBox, this, std::placeholders::_1, std::placeholders::_2));
-        _falseWinBox[i] = checkBox;
-
-        label = Label::createWithSystemFont("错和", "Arial", 12);
+        // 罚分
+        label = Label::createWithSystemFont("调整 ", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 200.0f));
+
+        label = Label::createWithSystemFont("+0", "Arial", 12);
+        label->setColor(grayColor);
+        radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 195.0f));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 200.0f));
+        _penaltyLabel[i] = label;
     }
     _winGroup = winGroup;
     _claimGroup = claimGroup;
@@ -242,7 +257,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     rootLayout->addChild(topNode);
 
     // 说明
-    label = Label::createWithSystemFont("标记主番（4番以上，未做排斥检测）", "Arial", 12);
+    label = Label::createWithSystemFont("标记主番（4番以上）", "Arial", 12);
     label->setColor(Color3B::BLACK);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -255,6 +270,15 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     layoutButton->setTitleFontSize(12);
     topNode->addChild(layoutButton);
     layoutButton->setPosition(Vec2(visibleSize.width - 35.0f, 35.0f));
+
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("记录和牌");
+    button->addClickEventListener([this](Ref *) { onRecordTilesButton(nullptr); });
+    topNode->addChild(button);
+    button->setPosition(Vec2(visibleSize.width - 100.0f, 35.0f));
 
     // 常用凑番
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -271,6 +295,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
+    tableView->setBounceEnabled(true);
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
@@ -286,7 +311,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const char **playerNames, const 
         Size layoutSize;
         layoutSize.width = visibleSize.width;
         if (layoutButton->getUserData()) {
-            layoutSize.height = visibleSize.height - 140.0f;
+            layoutSize.height = visibleSize.height - 150.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
             layoutButton->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
             radioNode->setVisible(false);
@@ -451,17 +476,15 @@ void RecordScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
 
 void RecordScene::refresh() {
     int wc = _detail.win_claim;
-    if (_detail.score >= 8) {
+    if (_detail.fan >= 8) {
         char str[32];
-        snprintf(str, sizeof(str), "%d", _detail.score);
+        snprintf(str, sizeof(str), "%d", _detail.fan);
         _editBox->setText(str);
     }
 
-    // 错和
-    if (_detail.false_win != 0) {
-        for (int i = 0; i < 4; ++i) {
-            _falseWinBox[i]->setSelected(TEST_FALSE_WIN(_detail.false_win, UI_TO_PLAYER(i)));
-        }
+    // 罚分
+    for (int i = 0; i < 4; ++i) {
+        _penaltyLabel[i]->setString(Common::format("%+d", _detail.penalty_scores[PLAYER_TO_UI(i)]));
     }
 
     _winIndex = WIN_INDEX(wc);
@@ -473,7 +496,7 @@ void RecordScene::refresh() {
         }
     }
 
-    if (_detail.score == 0) {
+    if (_detail.fan == 0) {
         _drawBox->setSelected(true);
         onDrawBox(_drawBox, ui::CheckBox::EventType::SELECTED);
     }
@@ -484,14 +507,14 @@ void RecordScene::refresh() {
     _tableView->reloadDataInplacement();
 }
 
-void RecordScene::SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, uint8_t false_win) {
+void RecordScene::SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, const int16_t (&penalty_scores)[4]) {
     for (int i = 0; i < 4; ++i) {
         if (scoreTable[i] != 0) {
             if (TEST_WIN(win_claim, i)) {  // 和牌：红色
                 scoreLabel[i]->setColor(Color3B(254, 87, 110));
             }
             else {
-                if (UNLIKELY(TEST_FALSE_WIN(false_win, i))) {  // 错和：紫色
+                if (UNLIKELY(penalty_scores[i] < 0)) {  // 罚分：紫色
                     scoreLabel[i]->setColor(Color3B(89, 16, 89));
                 }
                 else if (UNLIKELY(TEST_CLAIM(win_claim, i))) {  // 点炮：蓝色
@@ -512,8 +535,8 @@ void RecordScene::updateScoreLabel() {
     _detail.win_claim = 0;
     int claimIndex = -1;
     if (_winIndex != -1) {  // 有人和牌
-        int winScore = atoi(_editBox->getText());  // 获取输入框里所填番数
-        _detail.score = std::max(8, winScore);
+        int fan = atoi(_editBox->getText());  // 获取输入框里所填番数
+        _detail.fan = std::max(8, fan);
         claimIndex = _claimGroup->getSelectedButtonIndex();
 
         // 记录和牌和点炮
@@ -524,15 +547,7 @@ void RecordScene::updateScoreLabel() {
         }
     }
     else {  // 荒庄
-        _detail.score = 0;
-    }
-
-    // 检查是否有错和
-    _detail.false_win = 0;
-    for (int i = 0; i < 4; ++i) {
-        if (_falseWinBox[i]->isEnabled() && _falseWinBox[i]->isSelected()) {
-            SET_FALSE_WIN(_detail.false_win, PLAYER_TO_UI(i));
-        }
+        _detail.fan = 0;
     }
 
     int scoreTable[4];
@@ -544,20 +559,16 @@ void RecordScene::updateScoreLabel() {
 
     // 使用不同颜色
     Label *tempLabel[4] = { _scoreLabel[UI_TO_PLAYER(0)], _scoreLabel[UI_TO_PLAYER(1)], _scoreLabel[UI_TO_PLAYER(2)], _scoreLabel[UI_TO_PLAYER(3)] };
-    SetScoreLabelColor(tempLabel, scoreTable, _detail.win_claim, _detail.false_win);
+    SetScoreLabelColor(tempLabel, scoreTable, _detail.win_claim, _detail.penalty_scores);
 
-    // 四位选手的总分加起来和为0
-    if (scoreTable[0] + scoreTable[1] + scoreTable[2] + scoreTable[3] == 0) {
-        if (_drawBox->isSelected()) {  // 荒庄
-            _submitButton->setEnabled(true);
-        }
-        else {
-            _submitButton->setEnabled(_winGroup->getSelectedButtonIndex() != -1);
-        }
+    // 未选择和牌
+    if (_winIndex == -1) {
+        // 荒庄时允许确定
+        _submitButton->setEnabled(_drawBox->isSelected());
     }
     else {
-        // 四位选手的总分加起来和不为0，则说明还没有选择是自摸还是点炮
-        _submitButton->setEnabled(false);
+        // 未选择是点炮还是自摸时，不允许确定
+        _submitButton->setEnabled(claimIndex != -1);
     }
 }
 
@@ -582,27 +593,40 @@ void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {
     updateScoreLabel();
 }
 
+void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
+    if (_drawBox->isSelected()) {
+        AlertView::showWithMessage("记录和牌", "荒庄时不能记录和牌", 12, nullptr, nullptr);
+        return;
+    }
+
+    mahjong::calculate_param_t param;
+
+    mahjong::string_to_tiles(_detail.win_hand.tiles, &param.hand_tiles, &param.win_tile);
+    param.win_flag = _detail.win_hand.win_flag;
+    param.flower_count = _detail.win_hand.flower_count;
+
+    showCalculator(param);
+}
+
 void RecordScene::onDrawBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType event) {
     if (event == ui::CheckBox::EventType::SELECTED) {
         _winIndex = -1;
-        // 禁用所有人的和、自摸/点炮，启用错和
+        // 禁用所有人的和、自摸/点炮
         for (int i = 0; i < 4; ++i) {
             ui::RadioButton *button = _winGroup->getRadioButtonByIndex(i);
             button->setEnabled(false);
             button = _claimGroup->getRadioButtonByIndex(i);
             button->setEnabled(false);
-            _falseWinBox[i]->setEnabled(true);
         }
     }
     else {
         _winIndex = _winGroup->getSelectedButtonIndex();
-        // 启用所有人的和、自摸/点炮、错和
+        // 启用所有人的和、自摸/点炮
         for (int i = 0; i < 4; ++i) {
             ui::RadioButton *button = _winGroup->getRadioButtonByIndex(i);
             button->setEnabled(true);
             button = _claimGroup->getRadioButtonByIndex(i);
             button->setEnabled(true);
-            _falseWinBox[i]->setEnabled(i != _winIndex);
         }
     }
     updateScoreLabel();
@@ -612,16 +636,14 @@ void RecordScene::onWinGroup(cocos2d::ui::RadioButton *, int index, cocos2d::ui:
     _winIndex = index;
     for (int i = 0; i < 4; ++i) {
         if (i == index) {
-            // 和的选手，显示自摸，禁用错和
+            // 和的选手，显示自摸
             _byDiscardLabel[i]->setVisible(false);
             _selfDrawnLabel[i]->setVisible(true);
-            _falseWinBox[i]->setEnabled(false);
         }
         else {
-            // 未和的选手，显示点炮，启用错和
+            // 未和的选手，显示点炮
             _byDiscardLabel[i]->setVisible(true);
             _selfDrawnLabel[i]->setVisible(false);
-            _falseWinBox[i]->setEnabled(true);
         }
     }
     updateScoreLabel();
@@ -632,8 +654,67 @@ void RecordScene::onClaimGroup(cocos2d::ui::RadioButton *, int, cocos2d::ui::Rad
     updateScoreLabel();
 }
 
-void RecordScene::onFalseWinBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType) {
-    updateScoreLabel();
+void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
+    float maxWidth = AlertView::maxWidth();
+
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(maxWidth, 145.0f));
+
+    const float gap = (maxWidth - 4.0f) * 0.25f;
+    const Color3B grayColor(0x60, 0x60, 0x60);
+
+    const int16_t value[4] = { -10, -5, +5, +10 };
+    const char *text[4] = { "-10", "-5", "+5", "+10" };
+    const float buttonY[4] = { 110, 85, 35, 10 };
+
+    std::shared_ptr<std::array<int16_t, 4> > penaltyScores = std::make_shared<std::array<int16_t, 4> >();
+    memcpy(penaltyScores->data(), &_detail.penalty_scores, sizeof(_detail.penalty_scores));
+
+    for (int i = 0; i < 4; ++i) {
+        const float x = gap * (i + 0.5f);
+
+        // 名字
+        Label *label = Label::createWithSystemFont(names[PLAYER_TO_UI(i)], "Arial", 12.0f);
+        label->setColor(Color3B::ORANGE);
+        rootNode->addChild(label);
+        label->setPosition(Vec2(x, 135.0f));
+        cw::scaleLabelToFitWidth(label, gap - 2.0f);
+
+        ui::Scale9Sprite *sprite = ui::Scale9Sprite::create("source_material/btn_square_normal.png");
+        rootNode->addChild(sprite);
+        sprite->setContentSize(Size(30.0f, 20.0f));
+        sprite->setPosition(Vec2(x, 60.0f));
+
+        // 得分
+        label = Label::createWithSystemFont(Common::format("%+hd", _detail.penalty_scores[PLAYER_TO_UI(i)]), "Arial", 12);
+        label->setColor(grayColor);
+        rootNode->addChild(label);
+        label->setPosition(Vec2(x, 60.0f));
+
+        for (int n = 0; n < 4; ++n) {
+            ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+            button->setScale9Enabled(true);
+            button->setContentSize(Size(30.0f, 20.0f));
+            button->setTitleFontSize(12);
+            button->setTitleText(text[n]);
+            rootNode->addChild(button);
+            button->setPosition(Vec2(x, buttonY[n]));
+            int v = value[n];
+            button->addClickEventListener([this, penaltyScores, label, i, v](Ref *) {
+                int16_t &score = penaltyScores->at(PLAYER_TO_UI(i));
+                score += v;
+                label->setString(Common::format("%+hd", score));
+            });
+        }
+    }
+
+    AlertView::showWithNode("罚分调整", rootNode, [this, penaltyScores]() {
+        memcpy(&_detail.penalty_scores, penaltyScores->data(), sizeof(_detail.penalty_scores));
+        for (int i = 0; i < 4; ++i) {
+            _penaltyLabel[i]->setString(Common::format("%+d", penaltyScores->at(PLAYER_TO_UI(i))));
+        }
+        updateScoreLabel();
+    }, nullptr);
 }
 
 void RecordScene::showPackedFanAlert(const std::function<void ()> &callback) {
@@ -654,7 +735,7 @@ void RecordScene::showPackedFanAlert(const std::function<void ()> &callback) {
         rootNode->addChild(radioButton);
         radioGroup->addRadioButton(radioButton);
 
-        Label *label = Label::createWithSystemFont(GetPackedFanText(i + 1), "Arial", 12);
+        Label *label = Label::createWithSystemFont(packedFanNames[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         radioButton->addChild(label);
@@ -728,6 +809,7 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
                 [this]() {
                 _detail.fan_flag = 0;
                 _detail.packed_fan = 0;
+                memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
                 _submitCallback(_detail);
                 Director::getInstance()->popScene();
             }, nullptr);
@@ -738,7 +820,7 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
         }
     }
     else {  // 未标记番种
-        if (_winIndex != -1) {  // 有人和牌
+        if (_winIndex != -1 && Common::isCStringEmpty(_detail.win_hand.tiles)) {  // 有人和牌
             showPackedFanAlert([this]() {
                 _submitCallback(_detail);
                 Director::getInstance()->popScene();
@@ -749,4 +831,215 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
             Director::getInstance()->popScene();
         }
     }
+}
+
+void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float maxWidth = visibleSize.width - 20;
+
+    // 选牌面板和其他信息的相关控件
+    TilePickWidget *tilePicker = TilePickWidget::create();
+    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
+
+    extraInfo->setFlowerCount(param.flower_count);
+    extraInfo->setPrevalentWind(static_cast<mahjong::wind_t>(_handIdx / 4));
+    extraInfo->setSeatWind(param.seat_wind);
+
+    // 缩放
+    Size pickerSize = tilePicker->getContentSize();
+    const float pickerScale = maxWidth / pickerSize.width;
+    tilePicker->setScale(pickerScale);
+    pickerSize = Size(maxWidth, pickerSize.height * pickerScale);
+
+    Size extraInfoSize = extraInfo->getContentSize();
+    const float extraInfoScale = maxWidth / extraInfoSize.width;
+    extraInfo->setScale(extraInfoScale);
+    extraInfoSize = Size(maxWidth, extraInfoSize.height * extraInfoScale);
+
+    // 布局在rootNode上
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(maxWidth, pickerSize.height + extraInfoSize.height + 5));
+    rootNode->addChild(tilePicker);
+    tilePicker->setPosition(Vec2(maxWidth * 0.5f, pickerSize.height * 0.5f + extraInfoSize.height + 5));
+    rootNode->addChild(extraInfo);
+    extraInfo->setPosition(Vec2(maxWidth * 0.5f, extraInfoSize.height * 0.5f));
+
+    tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {
+        extraInfo->refreshByKong(tilePicker->isFixedPacksContainsKong());
+    });
+
+    tilePicker->setWinTileChangedCallback([tilePicker, extraInfo]() {
+        extraInfo->refreshByWinTile(tilePicker->getServingTile(), !tilePicker->isStandingTilesContainsServingTile(),
+            tilePicker->countServingTileInFixedPacks(), tilePicker->isFixedPacksContainsKong());
+    });
+
+    if (param.hand_tiles.tile_count != 0 && param.win_tile != 0) {
+        tilePicker->setData(param.hand_tiles, param.win_tile);
+        extraInfo->setWinFlag(param.win_flag);
+    }
+
+    // 通过AlertView显示出来
+    AlertView::showWithNode("记录和牌", rootNode, maxWidth, [this, tilePicker, extraInfo, param]() {
+        calculate(tilePicker, extraInfo, param);
+    }, nullptr);
+}
+
+// in FanCalculatorScene.cpp
+cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth);
+
+void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const mahjong::calculate_param_t &param) {
+    mahjong::calculate_param_t temp = { 0 };
+    tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
+    if (temp.win_tile == 0 && temp.hand_tiles.tile_count == 0 && temp.hand_tiles.pack_count == 0) {
+        AlertView::showWithMessage("记录和牌", "确定不记录和牌吗？", 12, [this]() {
+                memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
+                _detail.fan_flag = 0;
+                refresh();
+            },
+            std::bind(&RecordScene::showCalculator, this, param));
+        return;
+    }
+
+    temp.flower_count = extraInfo->getFlowerCount();
+    if (temp.flower_count > 8) {
+        AlertView::showWithMessage("记录和牌", "花牌数的范围为0~8", 12, std::bind(&RecordScene::showCalculator, this, param), nullptr);
+        return;
+    }
+
+    if (temp.win_tile == 0) {
+        AlertView::showWithMessage("记录和牌", "牌张数错误", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        return;
+    }
+
+    std::sort(temp.hand_tiles.standing_tiles, temp.hand_tiles.standing_tiles + temp.hand_tiles.tile_count);
+
+    mahjong::fan_table_t fan_table = { 0 };
+
+    // 获取绝张、杠开、抢杠、海底信息
+    temp.win_flag = extraInfo->getWinFlag();
+
+    // 获取圈风门风
+    temp.prevalent_wind = extraInfo->getPrevalentWind();
+    temp.seat_wind = extraInfo->getSeatWind();
+
+    // 算番
+    int fan = mahjong::calculate_fan(&temp, fan_table);
+
+    if (fan == ERROR_NOT_WIN) {
+        AlertView::showWithMessage("记录和牌", "诈和", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        return;
+    }
+    if (fan == ERROR_WRONG_TILES_COUNT) {
+        AlertView::showWithMessage("记录和牌", "牌张数错误", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        return;
+    }
+    if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
+        AlertView::showWithMessage("记录和牌", "同一种牌最多只能使用4枚", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);
+        return;
+    }
+
+    const float maxWidth = AlertView::maxWidth();
+
+    Node *innerNode = createFanResultNode(fan_table, 12, maxWidth);
+    const Size &fanResultSize = innerNode->getContentSize();
+
+    // 花（使用emoji代码）
+    Label *flowerLabel = nullptr;
+    if (temp.flower_count > 0) {
+        flowerLabel = Label::createWithSystemFont(std::string(EMOJI_FLOWER_8, temp.flower_count * (sizeof(EMOJI_FLOWER) - 1)), "Arial", 12);
+        flowerLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+        flowerLabel->setColor(Color3B(224, 45, 45));
+#endif
+    }
+
+    // 手牌
+    Node *tilesNode = HandTilesWidget::createStaticNode(temp.hand_tiles, temp.win_tile);
+    Size tilesNodeSize = tilesNode->getContentSize();
+    if (tilesNodeSize.width > maxWidth) {
+        const float scale = maxWidth / tilesNodeSize.width;
+        tilesNode->setScale(scale);
+        tilesNodeSize.width = maxWidth;
+        tilesNodeSize.height *= scale;
+    }
+    innerNode->addChild(tilesNode);
+    tilesNode->setPosition(Vec2(maxWidth * 0.5f, fanResultSize.height + 5 + tilesNodeSize.height * 0.5f));
+
+    if (temp.flower_count > 0) {
+        innerNode->addChild(flowerLabel);
+        const Size &flowerSize = flowerLabel->getContentSize();
+        flowerLabel->setPosition(Vec2(0, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
+
+        innerNode->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height));
+    }
+    else {
+        innerNode->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height));
+    }
+
+    uint64_t fanFlag = 0;
+    for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
+        if (fan_table[n]) {
+            SET_FAN(fanFlag, n);
+        }
+    }
+
+    uint8_t packedFan = 0;
+    if (fanFlag == 0) {
+        if (fan_table[mahjong::ALL_CHOWS]) {
+            if (fan_table[mahjong::CONCEALED_HAND]) {
+                packedFan = !!fan_table[mahjong::ALL_SIMPLES] ? 1 : 2;
+            }
+            else if (fan_table[mahjong::ALL_SIMPLES]) {
+                packedFan = 3;
+            }
+        }
+        else {
+            if (fan_table[mahjong::CONCEALED_KONG]) {
+                if (fan_table[mahjong::PREVALENT_WIND] || fan_table[mahjong::SEAT_WIND] || fan_table[mahjong::DRAGON_PUNG]) {
+                    packedFan = 4;
+                }
+                else if (fan_table[mahjong::TWO_CONCEALED_PUNGS]) {
+                    packedFan = 8;
+                }
+            }
+            else if (fan_table[mahjong::TWO_CONCEALED_PUNGS] && fan_table[mahjong::CONCEALED_HAND]) {
+                packedFan = 7;
+            }
+            else if (fan_table[mahjong::DOUBLE_PUNG] && fan_table[mahjong::PUNG_OF_TERMINALS_OR_HONORS] >= 2) {
+                packedFan = 6;
+            }
+            else if (fan_table[mahjong::PREVALENT_WIND] && fan_table[mahjong::SEAT_WIND]) {
+                packedFan = 4;
+            }
+        }
+    }
+
+    AlertView::showWithNode("记录和牌", innerNode, [this, temp, fan, fanFlag, packedFan]() {
+        _detail.fan = std::max(fan, 8);
+        _detail.fan_flag = fanFlag;
+        _detail.packed_fan = packedFan;
+
+        Record::Detail::WinHand &winHand = _detail.win_hand;
+        memset(&winHand, 0, sizeof(winHand));
+        intptr_t n = mahjong::hand_tiles_to_string(&temp.hand_tiles, winHand.tiles, 64);
+        mahjong::tiles_to_string(&temp.win_tile, 1, &winHand.tiles[n], sizeof(winHand.tiles) - n);
+
+        winHand.win_flag = temp.win_flag;
+        winHand.flower_count = temp.flower_count;
+
+        // 更改输入框中的番数
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%d", fan);
+        _editBox->setText(buf);
+
+        // 根据记录和牌的门风确定和牌的是哪一家
+        int winIndex = static_cast<int>(temp.seat_wind);
+        _winGroup->setSelectedButton(winIndex);
+
+        if (temp.win_flag & WIN_FLAG_SELF_DRAWN) {  // 自摸
+            _claimGroup->setSelectedButton(winIndex);
+        }
+
+        refresh();
+    }, std::bind(&RecordScene::showCalculator, this, temp));
 }

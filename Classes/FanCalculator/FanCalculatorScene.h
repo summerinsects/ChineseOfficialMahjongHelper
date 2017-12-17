@@ -13,7 +13,6 @@ public:
     CREATE_FUNC(FanCalculatorScene);
 
 private:
-    void showInputAlert(const char *prevInput);
     void calculate();
 
     TilePickWidget *_tilePicker = nullptr;

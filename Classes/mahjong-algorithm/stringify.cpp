@@ -117,33 +117,36 @@ intptr_t parse_tiles(const char *str, tile_t *tiles, intptr_t max_cnt) {
 }
 
 // 生成副露
-static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *pack) {
+static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *pack, int8_t offer) {
     if (tile_cnt > 0) {
         if (tile_cnt != 3 && tile_cnt != 4) {
             return PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK;
         }
         if (tile_cnt == 3) {
+            if (offer == 0) {
+                offer = 1;
+            }
             if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
-                *pack = make_pack(1, PACK_TYPE_PUNG, tiles[0]);  // TODO: 增加供牌信息
+                *pack = make_pack(offer, PACK_TYPE_PUNG, tiles[0]);
             }
             else {
                 if (tiles[0] + 1 == tiles[1] && tiles[1] + 1 == tiles[2]) {
-                    *pack = make_pack(1, PACK_TYPE_CHOW, tiles[1]);
+                    *pack = make_pack(offer, PACK_TYPE_CHOW, tiles[1]);
                 }
                 else if (tiles[0] + 1 == tiles[2] && tiles[2] + 1 == tiles[1]) {
-                    *pack = make_pack(1, PACK_TYPE_CHOW, tiles[2]);
+                    *pack = make_pack(offer, PACK_TYPE_CHOW, tiles[2]);
                 }
                 else if (tiles[1] + 1 == tiles[0] && tiles[0] + 1 == tiles[2]) {
-                    *pack = make_pack(2, PACK_TYPE_CHOW, tiles[0]);
+                    *pack = make_pack(offer, PACK_TYPE_CHOW, tiles[0]);
                 }
                 else if (tiles[1] + 1 == tiles[2] && tiles[2] + 1 == tiles[0]) {
-                    *pack = make_pack(3, PACK_TYPE_CHOW, tiles[2]);
+                    *pack = make_pack(offer, PACK_TYPE_CHOW, tiles[2]);
                 }
                 else if (tiles[2] + 1 == tiles[0] && tiles[0] + 1 == tiles[1]) {
-                    *pack = make_pack(2, PACK_TYPE_CHOW, tiles[0]);
+                    *pack = make_pack(offer, PACK_TYPE_CHOW, tiles[0]);
                 }
                 else if (tiles[2] + 1 == tiles[1] && tiles[1] + 1 == tiles[0]) {
-                    *pack = make_pack(3, PACK_TYPE_CHOW, tiles[1]);
+                    *pack = make_pack(offer, PACK_TYPE_CHOW, tiles[1]);
                 }
                 else {
                     return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
@@ -154,7 +157,7 @@ static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *
             if (tiles[0] != tiles[1] || tiles[1] != tiles[2] || tiles[2] != tiles[3]) {
                 return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
             }
-            *pack = make_pack(1, PACK_TYPE_KONG, tiles[0]);  // TODO: 增加供牌信息
+            *pack = make_pack(offer, PACK_TYPE_KONG, tiles[0]);
         }
         return 1;
     }
@@ -164,70 +167,63 @@ static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *
 // 字符串转换为手牌结构和上牌
 intptr_t string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile) {
     size_t len = strlen(str);
-    if (strspn(str, "0123456789mpszESWNCFP []") != len) {
+    if (strspn(str, "0123456789mpszESWNCFP,[]") != len) {
         return PARSE_ERROR_ILLEGAL_CHARACTER;
     }
 
     pack_t packs[4];
     intptr_t pack_cnt = 0;
-    bool is_concealed_kong = false;
+    bool in_brackets = false;
     tile_t tiles[14];
     intptr_t tile_cnt = 0;
+    uint8_t offer = 0;
 
     const char *p = str;
     while (char c = *p) {
         const char *q;
         switch (c) {
-        case ' ': {
-            if (pack_cnt > 4) {
-                return PARSE_ERROR_TOO_MANY_FIXED_PACKS;
+        case ',': {
+            if (!in_brackets) {
+                return PARSE_ERROR_ILLEGAL_CHARACTER;
             }
-            intptr_t ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt]);
-            if (ret < 0) {
-                return ret;
-            }
-            pack_cnt += ret;
+            offer = static_cast<uint8_t>(*++p - '0');
             q = ++p;
-            tile_cnt = 0;
             break;
         }
         case '[': {
             if (pack_cnt > 4) {
                 return PARSE_ERROR_TOO_MANY_FIXED_PACKS;
             }
-            intptr_t ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt]);
+            q = ++p;
+            in_brackets = true;
+            offer = 0;
+            break;
+        }
+        case ']': {
+            if (!in_brackets) {
+                return PARSE_ERROR_ILLEGAL_CHARACTER;
+            }
+            q = ++p;
+            intptr_t ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt], offer);
             if (ret < 0) {
                 return ret;
             }
-            pack_cnt += ret;
-            q = ++p;
-            is_concealed_kong = true;
-            break;
-        }
-        case ']':
-            if (!is_concealed_kong) {
-                return PARSE_ERROR_ILLEGAL_CHARACTER;
-            }
-            if (tile_cnt != 4) {
-                return PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK;
-            }
-            q = ++p;
-            packs[pack_cnt] = make_pack(0, PACK_TYPE_KONG, tiles[0]);
-            is_concealed_kong = false;
+            in_brackets = false;
             ++pack_cnt;
             tile_cnt = 0;
             break;
+        }
         default: {
-                intptr_t ret = parse_tiles_impl(p, tiles, 14, &tile_cnt);
-                if (ret < 0) {
-                    return ret;
-                }
-                if (ret == 0) {
-                    return PARSE_ERROR_ILLEGAL_CHARACTER;
-                }
-                q = p + ret;
+            intptr_t ret = parse_tiles_impl(p, tiles, 14, &tile_cnt);
+            if (ret < 0) {
+                return ret;
             }
+            if (ret == 0) {
+                return PARSE_ERROR_ILLEGAL_CHARACTER;
+            }
+            q = p + ret;
             break;
+        }
         }
         p = q;
     }
@@ -315,30 +311,51 @@ intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intp
     tile_t temp[4];
     for (intptr_t i = 0; i < pack_cnt && p < end; ++i) {
         pack_t pack = packs[i];
+        uint8_t o = pack_get_offer(pack);
         tile_t t = pack_get_tile(pack);
         uint8_t pt = pack_get_type(pack);
         switch (pt) {
         case PACK_TYPE_CHOW:
+            if (p >= end) break;
+            *p++ = '[';
             temp[0] = t - 1; temp[1] = t; temp[2] = t + 1;
             p += tiles_to_string(temp, 3, p, end - p);
-            if (p < end) *p++ = ' ';
+            if (p >= end) break;
+            *p++ = ',';
+            if (p >= end) break;
+            *p++ = '0' + o;
+            if (p >= end) break;
+            *p++ = ']';
             break;
         case PACK_TYPE_PUNG:
+            if (p >= end) break;
+            *p++ = '[';
             temp[0] = t; temp[1] = t; temp[2] = t;
             p += tiles_to_string(temp, 3, p, end - p);
-            if (p < end) *p++ = ' ';
+            if (p >= end) break;
+            *p++ = ',';
+            if (p >= end) break;
+            *p++ = '0' + o;
+            if (p >= end) break;
+            *p++ = ']';
             break;
         case PACK_TYPE_KONG:
-            if (!is_pack_melded(pack) && p < end) *p++ = '[';
+            if (p >= end) break;
+            *p++ = '[';
             temp[0] = t; temp[1] = t; temp[2] = t; temp[3] = t;
             p += tiles_to_string(temp, 4, p, end - p);
-            if (!is_pack_melded(pack) && p < end) *p++ = ']';
-            if (p < end) *p++ = ' ';
+            if (p >= end) break;
+            *p++ = ',';
+            if (p >= end) break;
+            *p++ = '0' + o;
+            if (p >= end) break;
+            *p++ = ']';
+
+            //if (!is_pack_melded(pack))
             break;
         case PACK_TYPE_PAIR:
             temp[0] = t; temp[1] = t;
             p += tiles_to_string(temp, 2, p, end - p);
-            if (p < end) *p++ = ' ';
             break;
         default: break;
         }

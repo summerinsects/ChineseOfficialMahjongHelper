@@ -9,6 +9,8 @@ USING_NS_CC;
 
 #define GAP 4
 
+#define MAX_STANDING_TILES_COUNT(fixedPackSize_) (13 - (fixedPackSize_) * 3)
+
 bool HandTilesWidget::init() {
     if (UNLIKELY(!Node::init())) {
         return false;
@@ -19,27 +21,40 @@ bool HandTilesWidget::init() {
 
     // 14张牌宽度：TILE_WIDTH * 14
     Size standingSize = Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT);
-    _standingContainer = Node::create();
-    _standingContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _standingContainer->setIgnoreAnchorPointForPosition(false);
-    _standingContainer->setContentSize(standingSize);
-    this->addChild(_standingContainer);
-    _standingContainer->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height * 0.5f));
+    Node *node = Node::create();
+    node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    node->setIgnoreAnchorPointForPosition(false);
+    node->setContentSize(standingSize);
+    this->addChild(node);
+    node->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height * 0.5f));
+    _standingContainer = node;
+
+    ui::Widget *widget = ui::Widget::create();
+    widget->setTouchEnabled(true);
+    widget->setContentSize(Size(Size(TILE_WIDTH, TILE_HEIGHT)));
+    _standingContainer->addChild(widget);
+    widget->addClickEventListener(std::bind(&HandTilesWidget::onEmptyWidget, this, std::placeholders::_1));
+    _emptyTileWidget = widget;
+    widget->addChild(LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x20), TILE_WIDTH, TILE_HEIGHT));
 
     // 高亮方框
-    _highlightBox = DrawNode::create();
-    _highlightBox->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
-    _highlightBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _highlightBox->drawRect(Vec2(0.0f, 0.0f), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
-    _standingContainer->addChild(_highlightBox, 2);
+    DrawNode *drawNode = DrawNode::create();
+    drawNode->setContentSize(Size(TILE_WIDTH, TILE_HEIGHT));
+    drawNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    drawNode->setLineWidth(3.0f);
+    drawNode->drawRect(Vec2(0.0f, 0.0f), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F::RED);
+    drawNode->drawSolidRect(Vec2(0.0f, 0.0f), Vec2(TILE_WIDTH, TILE_HEIGHT), Color4F(0.05f, 0.05f, 0.05f, 0.1f));
+    _standingContainer->addChild(drawNode, 2);
+    _highlightBox = drawNode;
 
     const float fixedHeight = TILE_HEIGHT;  // NOTE: 如果将来支持加杠，则应为std::max(TILE_HEIGHT, TILE_WIDTH * 2)
-    _fixedContainer = Node::create();
-    _fixedContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _fixedContainer->setIgnoreAnchorPointForPosition(false);
-    _fixedContainer->setContentSize(Size(0, fixedHeight));
-    this->addChild(_fixedContainer);
-    _fixedContainer->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height + fixedHeight * 0.5f + GAP));
+    node = Node::create();
+    node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    node->setIgnoreAnchorPointForPosition(false);
+    node->setContentSize(Size(0, fixedHeight));
+    this->addChild(node);
+    node->setPosition(Vec2(standingSize.width * 0.5f, standingSize.height + fixedHeight * 0.5f + GAP));
+    _fixedContainer = node;
 
     this->setContentSize(Size(standingSize.width, standingSize.height + fixedHeight + GAP));
 
@@ -65,6 +80,7 @@ void HandTilesWidget::reset() {
         _standingTileButtons.pop_back();
     }
     _standingContainer->setContentSize(Size(TILE_WIDTH * 14 + GAP, TILE_HEIGHT));
+    _emptyTileWidget->setPosition(Vec2(TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f));
     _highlightBox->setPosition(Vec2(TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f));
 
     // 清除之前残留的副露
@@ -128,6 +144,7 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
         ++_usedTilesTable[servingTile];
     }
 
+    refreshEmptyWidgetPos();
     refreshHighlightPos();
 }
 
@@ -140,7 +157,7 @@ void HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t 
     handTiles->pack_count = std::copy(_fixedPacks.begin(), _fixedPacks.end(), std::begin(handTiles->fixed_packs))
         - std::begin(handTiles->fixed_packs);
 
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     // 获取立牌
     size_t cnt = std::copy(_standingTiles.begin(), _standingTiles.end() - (st == 0 ? 0 : 1), std::begin(handTiles->standing_tiles))
             - std::begin(handTiles->standing_tiles);
@@ -148,7 +165,7 @@ void HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t 
 }
 
 mahjong::tile_t HandTilesWidget::getServingTile() const {
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     if (_standingTiles.size() < maxCnt + 1) {
         return 0;
     }
@@ -178,10 +195,24 @@ size_t HandTilesWidget::countServingTileInFixedPacks() const {
         _fixedPacks.data(), _fixedPacks.size(), servingTile);
 }
 
+void HandTilesWidget::onEmptyWidget(cocos2d::Ref *) {
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
+    size_t cnt = _standingTiles.size();
+    size_t idx = std::min(cnt, maxCnt);
+    if (_currentIdx != idx) {
+        _currentIdx = idx;
+        refreshHighlightPos();
+    }
+}
+
 void HandTilesWidget::onTileButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    _currentIdx = reinterpret_cast<size_t>(button->getUserData());
-    refreshHighlightPos();
+    size_t idx = reinterpret_cast<size_t>(button->getUserData());
+    if (_currentIdx != idx) {
+        _currentIdx = idx;
+        refreshHighlightPos();
+    }
+
     if (_tileClickCallback) {
         _tileClickCallback();
     }
@@ -198,14 +229,15 @@ void HandTilesWidget::addTile(mahjong::tile_t tile) {
     button->setTag(tile);
     button->addClickEventListener(std::bind(&HandTilesWidget::onTileButton, this, std::placeholders::_1));
 
-    Vec2 pos = Vec2(TILE_WIDTH * (tilesCnt + 0.5f), TILE_HEIGHT * 0.5f);
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    const float posY = TILE_HEIGHT * 0.5f;
+
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     if (LIKELY(tilesCnt < maxCnt)) {
-        button->setPosition(pos);
+        button->setPosition(Vec2(TILE_WIDTH * (tilesCnt + 0.5f), posY));
         _currentIdx = tilesCnt + 1;
     }
     else {
-        button->setPosition(Vec2(pos.x + GAP, pos.y));  // 和牌张与立牌间隔4像素
+        button->setPosition(Vec2(TILE_WIDTH * (maxCnt + 0.5f) + GAP, posY));
     }
     ++_standingTilesTable[tile];
 
@@ -225,11 +257,6 @@ void HandTilesWidget::replaceTile(mahjong::tile_t tile) {
 
     _standingTiles[_currentIdx] = tile;
     ++_standingTilesTable[tile];
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (_currentIdx < maxCnt) {
-        ++_currentIdx;
-    }
 }
 
 mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
@@ -237,6 +264,8 @@ mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
     if (_currentIdx >= _standingTiles.size()) {  // 新增牌
         addTile(tile);
         ++_usedTilesTable[tile];
+
+        refreshEmptyWidgetPos();
     }
     else {  // 修改牌
         prevTile = _standingTiles[_currentIdx];  // 此位置之前的牌
@@ -245,27 +274,43 @@ mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
             --_usedTilesTable[prevTile];
             ++_usedTilesTable[tile];
         }
-        else {
-            size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-            if (_currentIdx < maxCnt) {
-                ++_currentIdx;
-            }
-        }
+
+        // 以下代码，如果修改牌时需要增加下标，请启用
+        //// 根据需要增加下标
+        //size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
+        //if (_currentIdx < maxCnt) {
+        //    ++_currentIdx;
+        //}
     }
 
     refreshHighlightPos();
     return prevTile;
 }
 
-// 刷新高亮位置
-void HandTilesWidget::refreshHighlightPos() {
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    Vec2 pos = Vec2(TILE_WIDTH * (_currentIdx + 0.5f), TILE_HEIGHT * 0.5f);
-    if (LIKELY(_currentIdx < maxCnt)) {
-        _highlightBox->setPosition(pos);
+// 刷新空白Widget位置
+void HandTilesWidget::refreshEmptyWidgetPos() {
+    const float posY = TILE_HEIGHT * 0.5f;
+
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
+    size_t cnt = _standingTileButtons.size();
+    if (LIKELY(cnt < maxCnt)) {
+        _emptyTileWidget->setPosition(Vec2(TILE_WIDTH * (cnt + 0.5f), posY));
     }
     else {
-        _highlightBox->setPosition(Vec2(pos.x + GAP, pos.y));
+        _emptyTileWidget->setPosition(Vec2(TILE_WIDTH * (maxCnt + 0.5f) + GAP, posY));
+    }
+}
+
+// 刷新高亮位置
+void HandTilesWidget::refreshHighlightPos() {
+    const float posY = TILE_HEIGHT * 0.5f;
+
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
+    if (LIKELY(_currentIdx < maxCnt)) {
+        _highlightBox->setPosition(Vec2(TILE_WIDTH * (_currentIdx + 0.5f), posY));
+    }
+    else {
+        _highlightBox->setPosition(Vec2(TILE_WIDTH * (maxCnt + 0.5f) + GAP, posY));
     }
 
     if (_currentIdxChangedCallback) {
@@ -300,29 +345,32 @@ void HandTilesWidget::refreshStandingTiles() {
         _currentIdx = prevIndex;
     }
 
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     if (_currentIdx > maxCnt) {
         _currentIdx = maxCnt;
     }
+
+    refreshEmptyWidgetPos();
     refreshHighlightPos();
 }
 
 // 刷新立牌位置
 void HandTilesWidget::refreshStandingTilesPos() {
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     _standingContainer->setContentSize(Size(static_cast<float>(TILE_WIDTH * (maxCnt + 1) + GAP), TILE_HEIGHT));
+
+    const float posY = TILE_HEIGHT * 0.5f;
 
     // 重新设置UserData及位置
     for (size_t i = 0, cnt = _standingTileButtons.size(); i < cnt; ++i) {
         ui::Button *button = _standingTileButtons[i];
         button->setUserData(reinterpret_cast<void *>(i));
 
-        Vec2 pos = Vec2(TILE_WIDTH * (i + 0.5f), TILE_HEIGHT * 0.5f);
         if (LIKELY(i < maxCnt)) {
-            button->setPosition(pos);
+            button->setPosition(Vec2(TILE_WIDTH * (i + 0.5f), posY));
         }
         else {
-            button->setPosition(Vec2(pos.x + GAP, pos.y));
+            button->setPosition(Vec2(TILE_WIDTH * (maxCnt + 0.5f) + GAP, posY));
         }
     }
 }
@@ -333,6 +381,7 @@ void HandTilesWidget::sortStandingTiles() {
         return;
     }
 
+    // 最后一张不参与排序
     const size_t offset = getServingTile() == 0 ? 0 : 1;
 
     std::sort(_standingTiles.begin(), _standingTiles.end() - offset);
@@ -341,9 +390,13 @@ void HandTilesWidget::sortStandingTiles() {
     });
 
     refreshStandingTilesPos();
+
+    if (_currentIdxChangedCallback) {
+        _currentIdxChangedCallback();
+    }
 }
 
-// 添加一组吃
+// 添加一组明顺
 void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
     const Size fixedSize = _fixedContainer->getContentSize();
     const float offsetX = _fixedPacks.size() > 1 ? GAP : 0.0f;
@@ -391,7 +444,7 @@ void HandTilesWidget::addFixedChowPack(mahjong::tile_t tile, int meldedIdx) {
     }
 }
 
-// 添加一组碰
+// 添加一组明刻
 void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
     const Size fixedSize = _fixedContainer->getContentSize();
     const float offsetX = _fixedPacks.size() > 1 ? GAP : 0.0f;
@@ -514,58 +567,24 @@ void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
     }
 }
 
-bool HandTilesWidget::canChow1() const {
+bool HandTilesWidget::canChow(int meldedIdx) const {
     if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
         return false;
     }
 
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     if (_currentIdx == maxCnt) {  // 不允许对和牌张进行副露
         return false;
     }
 
-    // _XX 23吃1
+    // meldedIdx == 0: _XX 23吃1 tile, tile+1, tile+2
+    // meldedIdx == 1: X_X 13吃2 tile-1, tile, tile+1
+    // meldedIdx == 2: XX_ 12吃3 tile-2, tile-1, tile
     mahjong::tile_t tile = _standingTiles[_currentIdx];
     return (!mahjong::is_honor(tile)
-        && _standingTilesTable[tile] > 0
-        && _standingTilesTable[tile + 1] > 0
-        && _standingTilesTable[tile + 2] > 0);
-}
-
-bool HandTilesWidget::canChow2() const {
-    if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (_currentIdx == maxCnt) {  // 不允许对和牌张进行副露
-        return false;
-    }
-
-    // X_X 13吃2
-    mahjong::tile_t tile = _standingTiles[_currentIdx];
-    return (!mahjong::is_honor(tile)
-        && _standingTilesTable[tile - 1] > 0
-        && _standingTilesTable[tile] > 0
-        && _standingTilesTable[tile + 1] > 0);
-}
-
-bool HandTilesWidget::canChow3() const {
-    if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (_currentIdx == maxCnt) {  // 不允许对和牌张进行副露
-        return false;
-    }
-
-    // XX_ 12吃3
-    mahjong::tile_t tile = _standingTiles[_currentIdx];
-    return (!mahjong::is_honor(tile)
-        && _standingTilesTable[tile - 2] > 0
-        && _standingTilesTable[tile - 1] > 0
-        && _standingTilesTable[tile] > 0);
+        && _standingTilesTable[tile - meldedIdx] > 0
+        && _standingTilesTable[tile - meldedIdx + 1] > 0
+        && _standingTilesTable[tile - meldedIdx + 2] > 0);
 }
 
 bool HandTilesWidget::canPung() const {
@@ -573,7 +592,7 @@ bool HandTilesWidget::canPung() const {
         return false;
     }
 
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     if (_currentIdx == maxCnt) {  // 不允许对和牌张进行副露
         return false;
     }
@@ -587,7 +606,7 @@ bool HandTilesWidget::canKong() const {
         return false;
     }
 
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     if (_currentIdx == maxCnt) {  // 不允许对和牌张进行副露
         return false;
     }
@@ -596,119 +615,31 @@ bool HandTilesWidget::canKong() const {
     return (_standingTilesTable[tile] >= 4);
 }
 
-bool HandTilesWidget::makeFixedChow1Pack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
+bool HandTilesWidget::makeFixedChowPack(int meldedIdx) {
+    if (UNLIKELY(!canChow(meldedIdx))) {
         return false;
     }
 
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
-        return false;
-    }
-
-    // _XX 23吃1
+    // meldedIdx == 0: _XX 23吃1 tile+1
+    // meldedIdx == 1: X_X 13吃2 tile+0
+    // meldedIdx == 2: XX_ 12吃3 tile-1
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(mahjong::is_honor(tile)
-        || _standingTilesTable[tile] == 0
-        || _standingTilesTable[tile + 1] == 0
-        || _standingTilesTable[tile + 2] == 0)) {
-        return false;
-    }
-
-    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, tile + 1);
+    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, tile + 1 - meldedIdx);
     _fixedPacks.push_back(pack);
 
     // 这里迭代器不能连续使用，因为立牌不一定有序
     std::vector<mahjong::tile_t>::iterator it;
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - meldedIdx);
     _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile + 1);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - meldedIdx + 1);
     _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile + 2);
+    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - meldedIdx + 2);
     _standingTiles.erase(it);
-    --_standingTilesTable[tile];
-    --_standingTilesTable[tile + 1];
-    --_standingTilesTable[tile + 2];
+    --_standingTilesTable[tile - meldedIdx];
+    --_standingTilesTable[tile - meldedIdx + 1];
+    --_standingTilesTable[tile - meldedIdx + 2];
 
-    addFixedChowPack(tile, 0);
-    refreshStandingTiles();
-    return true;
-}
-
-bool HandTilesWidget::makeFixedChow2Pack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
-        return false;
-    }
-
-    // X_X 13吃2
-    mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(mahjong::is_honor(tile)
-        || _standingTilesTable[tile - 1] == 0
-        || _standingTilesTable[tile] == 0
-        || _standingTilesTable[tile + 1] == 0)) {
-        return false;
-    }
-
-    mahjong::pack_t pack = mahjong::make_pack(2, PACK_TYPE_CHOW, tile);
-    _fixedPacks.push_back(pack);
-
-    // 这里迭代器不能连续使用，因为立牌不一定有序
-    std::vector<mahjong::tile_t>::iterator it;
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - 1);
-    _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
-    _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile + 1);
-    _standingTiles.erase(it);
-    --_standingTilesTable[tile - 1];
-    --_standingTilesTable[tile];
-    --_standingTilesTable[tile + 1];
-
-    addFixedChowPack(tile, 1);
-    refreshStandingTiles();
-    return true;
-}
-
-bool HandTilesWidget::makeFixedChow3Pack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
-        return false;
-    }
-
-    // XX_ 12吃3
-    mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(mahjong::is_honor(tile)
-        || _standingTilesTable[tile - 2] == 0
-        || _standingTilesTable[tile - 1] == 0
-        || _standingTilesTable[tile] == 0)) {
-        return false;
-    }
-
-    mahjong::pack_t pack = mahjong::make_pack(3, PACK_TYPE_CHOW, tile - 1);
-    _fixedPacks.push_back(pack);
-
-    // 这里迭代器不能连续使用，因为立牌不一定有序
-    std::vector<mahjong::tile_t>::iterator it;
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - 2);
-    _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile - 1);
-    _standingTiles.erase(it);
-    it = std::find(_standingTiles.begin(), _standingTiles.end(), tile);
-    _standingTiles.erase(it);
-    --_standingTilesTable[tile - 2];
-    --_standingTilesTable[tile - 1];
-    --_standingTilesTable[tile];
-
-    addFixedChowPack(tile, 2);
+    addFixedChowPack(tile, meldedIdx);
     refreshStandingTiles();
     return true;
 }
@@ -717,7 +648,7 @@ int HandTilesWidget::calcMeldedIdx(int maxIdx) const {
     mahjong::tile_t tile = _standingTiles[_currentIdx];
 
     size_t offset = 0;
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
         offset = 1;
     }
@@ -730,20 +661,11 @@ int HandTilesWidget::calcMeldedIdx(int maxIdx) const {
 }
 
 bool HandTilesWidget::makeFixedPungPack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+    if (UNLIKELY(!canPung())) {  // 当前位置没有牌
         return false;
     }
 
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(_standingTilesTable[tile] < 3)) {
-        return false;
-    }
-
     int meldedIdx = calcMeldedIdx(2);
     mahjong::pack_t pack = mahjong::make_pack(meldedIdx + 1, PACK_TYPE_PUNG, tile);
     _fixedPacks.push_back(pack);
@@ -762,20 +684,11 @@ bool HandTilesWidget::makeFixedPungPack() {
 }
 
 bool HandTilesWidget::makeFixedMeldedKongPack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+    if (UNLIKELY(!canKong())) {
         return false;
     }
 
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(_standingTilesTable[tile] < 4)) {
-        return false;
-    }
-
     int meldedIdx = calcMeldedIdx(3);
     mahjong::pack_t pack = mahjong::make_pack(std::min(meldedIdx + 1, 3), PACK_TYPE_KONG, tile);
     _fixedPacks.push_back(pack);
@@ -794,20 +707,11 @@ bool HandTilesWidget::makeFixedMeldedKongPack() {
 }
 
 bool HandTilesWidget::makeFixedConcealedKongPack() {
-    if (UNLIKELY(_currentIdx >= _standingTiles.size())) {  // 当前位置没有牌
-        return false;
-    }
-
-    size_t maxCnt = 13 - _fixedPacks.size() * 3;  // 立牌数最大值（不包括和牌）
-    if (UNLIKELY(_currentIdx == maxCnt)) {  // 不允许对和牌张进行副露
+    if (UNLIKELY(!canKong())) {
         return false;
     }
 
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    if (UNLIKELY(_standingTilesTable[tile] < 4)) {
-        return false;
-    }
-
     mahjong::pack_t pack = mahjong::make_pack(0, PACK_TYPE_KONG, tile);
     _fixedPacks.push_back(pack);
 

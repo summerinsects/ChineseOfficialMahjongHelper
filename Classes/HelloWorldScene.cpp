@@ -12,7 +12,7 @@
 #include "LatestCompetition/LatestCompetitionScene.h"
 #include "CompetitionSystem/CompetitionMainScene.h"
 
-#define VERSION 0x010201
+#define VERSION 0x010208
 
 USING_NS_CC;
 
@@ -157,33 +157,73 @@ bool HelloWorld::init() {
     return true;
 }
 
+static void shareApplication() {
+    const float width = AlertView::maxWidth();
+
+    std::string str = Common::format("<div style=\"word-break:break-all\">https://github.com/summerinsects/ChineseOfficialMahjongHelper/releases/download/v%d.%d.%d/ChineseOfficialMahjongHelper_v%d.%d.%d.apk</div>",
+        (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF);
+
+    Node *rootNode = Node::create();
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    experimental::ui::WebView *webView = experimental::ui::WebView::create();
+    webView->setContentSize(Size(width, 80.0f));
+    webView->setBackgroundTransparent();
+    webView->setScalesPageToFit(true);
+    webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(str), ""));
+    rootNode->addChild(webView);
+    webView->setPosition(Vec2(width * 0.5f, 40.0f));
+    rootNode->setContentSize(Size(width, 80.0f));
+#else
+    Label *label = Label::createWithSystemFont(str, "Arail", 10);
+    label->setColor(Color3B::BLACK);
+    label->setDimensions(width, 0.0f);
+    rootNode->addChild(label);
+
+    const Size &labelSize = label->getContentSize();
+    rootNode->setContentSize(Size(width, labelSize.height));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f));
+#endif
+    AlertView::showWithNode("下载地址", rootNode, nullptr, nullptr);
+}
+
 void HelloWorld::onAboutButton(cocos2d::Ref *) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10.0f;
+    const float width = AlertView::maxWidth();
 
     Node *rootNode = Node::create();
 
     Label *label = Label::createWithSystemFont(
-        "1. 本软件开源，高端玩家可下载源代码自行编译。\n"
-        "2. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
-        "3. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
+        "1. 如果觉得本软件好用，可点击「下载地址」获取下载链接，分享给他人。\n"
+        "2. 本软件开源，高端玩家可下载源代码自行编译。\n"
+        "3. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
+        "4. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
         "Arail", 10);
     label->setColor(Color3B::BLACK);
     label->setDimensions(width, 0.0f);
     rootNode->addChild(label);
 
     // 检测新版本
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(65.0, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("检测新版本");
-    button->addClickEventListener([this](Ref *) { requestVersion(true); });
-    rootNode->addChild(button);
+    ui::Button *button1 = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button1->setScale9Enabled(true);
+    button1->setContentSize(Size(65.0, 20.0f));
+    button1->setTitleFontSize(12);
+    button1->setTitleText("检测新版本");
+    button1->addClickEventListener([this](Ref *) { requestVersion(true); });
+    rootNode->addChild(button1);
+
+    ui::Button *button2 = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button2->setScale9Enabled(true);
+    button2->setContentSize(Size(65.0, 20.0f));
+    button2->setTitleFontSize(12);
+    button2->setTitleText("下载地址");
+    button2->addClickEventListener([](Ref *) {
+        shareApplication();
+    });
+    rootNode->addChild(button2);
 
     const Size &labelSize = label->getContentSize();
     rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
-    button->setPosition(Vec2(width * 0.5f, 10.0f));
+    button1->setPosition(Vec2(width * 0.25f, 10.0f));
+    button2->setPosition(Vec2(width * 0.75f, 10.0f));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
 
     AlertView::showWithNode("关于", rootNode, nullptr, nullptr);

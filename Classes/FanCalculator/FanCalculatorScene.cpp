@@ -6,7 +6,6 @@
 #include "../widget/TilePickWidget.h"
 #include "../widget/ExtraInfoWidget.h"
 #include "../widget/AlertView.h"
-#include "../widget/TilesKeyboard.h"
 #include "../FanTable/FanDefinitionScene.h"
 
 USING_NS_CC;
@@ -35,18 +34,10 @@ bool FanCalculatorScene::init() {
         origin.y + visibleSize.height - 35.0f - widgetSize.height - 5.0f - extraSize.height * 0.5f));
     _extraInfo = extraInfo;
 
-    // 直接输入
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("直接输入");
-    extraInfo->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40.0f, 100.0f));
-    button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
+    extraInfo->setInputCallback(std::bind(&TilePickWidget::setData, _tilePicker, std::placeholders::_1, std::placeholders::_2));
 
     // 番算按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -77,15 +68,15 @@ bool FanCalculatorScene::init() {
     return true;
 }
 
-static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth) {
+cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth) {
     // 有n个番种，每行排2个
     ptrdiff_t n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
     ptrdiff_t rows = (n >> 1) + (n & 1);  // 需要这么多行
 
     // 排列
     Node *node = Node::create();
-    const int lineHeight = fontSize + 2;
-    ptrdiff_t resultAreaHeight = lineHeight * rows;  // 每行间隔2像素
+    const int lineHeight = fontSize + 2;  // 每行间隔2像素
+    ptrdiff_t resultAreaHeight = lineHeight * rows;
     resultAreaHeight += (5 + lineHeight) + 20;  // 总计+提示
     node->setContentSize(Size(resultAreaWidth, static_cast<float>(resultAreaHeight)));
 
@@ -97,7 +88,7 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         uint16_t n = fan_table[j];
         fan += f * n;
         std::string str = (n == 1) ? Common::format("%s %hu番\n", mahjong::fan_name[j], f)
-            : Common::format("%s %hu番x%hu\n", mahjong::fan_name[j], f, fan_table[j]);
+            : Common::format("%s %hu番x%hu\n", mahjong::fan_name[j], f, n);
 
         // 创建label，每行排2个
         Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
@@ -132,57 +123,6 @@ static cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
     label->setPosition(Vec2(0.0f, 5.0f));
 
     return node;
-}
-
-void FanCalculatorScene::showInputAlert(const char *prevInput) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float width = visibleSize.width * 0.8f - 10.0f;
-
-    Node *rootNode = Node::create();
-
-    Label *label = Label::createWithSystemFont("使用说明：\n"
-        "1." INPUT_GUIDE_STRING_1 "\n"
-        "2." INPUT_GUIDE_STRING_2 "\n"
-        "3." INPUT_GUIDE_STRING_3 "\n"
-        "输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
-        "输入范例2：1112345678999s9s\n"
-        "输入范例3：WWWW 444s 45m678pFF6m\n", "Arial", 10);
-    label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0.0f);
-    rootNode->addChild(label);
-
-    // 输入手牌
-    ui::EditBox *editBox = ui::EditBox::create(Size(width - 10.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setPlaceholderFontColor(Color4B::GRAY);
-    editBox->setPlaceHolder("输入手牌");
-    editBox->setMaxLength(50);
-    if (prevInput != nullptr) {
-        editBox->setText(prevInput);
-    }
-    TilesKeyboard::hookEditBox(editBox);
-    rootNode->addChild(editBox);
-
-    const Size &labelSize = label->getContentSize();
-    rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
-    editBox->setPosition(Vec2(width * 0.5f, 10.0f));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
-
-    AlertView::showWithNode("直接输入", rootNode, [this, editBox]() {
-        const char *input = editBox->getText();
-        const char *errorStr = TilesKeyboard::parseInput(input,
-            std::bind(&TilePickWidget::setData, _tilePicker, std::placeholders::_1, std::placeholders::_2));
-        if (errorStr != nullptr) {
-            const std::string str = input;
-            AlertView::showWithMessage("直接输入牌", errorStr, 12, [this, str]() {
-                showInputAlert(str.c_str());
-            }, nullptr);
-        }
-    }, nullptr);
 }
 
 void FanCalculatorScene::calculate() {
@@ -252,6 +192,7 @@ void FanCalculatorScene::calculate() {
         scrollView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
         scrollView->setScrollBarWidth(4.0f);
         scrollView->setScrollBarOpacity(0x99);
+        scrollView->setBounceEnabled(true);
         scrollView->setContentSize(Size(fanAreaSize.width - 10.0f, fanAreaSize.height));
         scrollView->setInnerContainerSize(innerNode->getContentSize());
         scrollView->addChild(innerNode);

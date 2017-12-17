@@ -193,10 +193,10 @@ int main(int argc, const char *argv[]) {
     test_points("445566m445566s5p5p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
 
     test_points("[EEEE]22233344m44s4m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
-    test_points("1111p 23477m23457p6p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("[1111p,1]23477m23457p6p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
 
-    test_points("222p 123m 456s78pFF9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("222p 123m 456s78pFF6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[222p][123m]456s78pFF9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[222p][123m]456s78pFF6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     test_points("1112345678999p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_points("1122335578899s7s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
@@ -228,28 +228,28 @@ int main(int argc, const char *argv[]) {
 
     // 以下测试用例来自于规则书上
     puts("==== test big four winds ====");
-    test_points("EEE WWW SSSNNCCN", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("EEE WWW 99mSSSNNN", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("EEE WWW 33sSSSNNN", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[EEE][WWW]SSSNNCCN", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[EEE][WWW]99mSSSNNN", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[EEE][WWW]33sSSSNNN", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test big three dragons ====");
-    test_points("CCC PPP 11m99pFFF1m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("CCC PPP EEWWFFFE", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("CCC PPP 5556sFFF4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC][PPP]11m99pFFF1m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC][PPP]EEWWFFFE", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC][PPP]5556sFFF4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test all green ====");
-    test_points("234s 23466888sFF6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("234s 22334666sFF4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("222s 444s 3366688s3s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[234s]23466888sFF6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[234s]22334666sFF4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[222s][444s]3366688s3s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_points("223344668888sFF", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test nine gates ====");
     test_points("1112345678999m9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test four kongs ====");
-    test_points("2222s 5555m 7777p EEEE CC", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
-    test_points("1111m 2222s 3333p 1111s 4m4m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
-    test_points("7777p NNNN CCCC 3333p 5p5p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("[2222s,1][5555m,2][7777p,3][EEEE]CC", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("[1111m,1][2222s,2][3333p,3][1111s,1]4m4m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("[7777p,1][NNNN,2][CCCC,3][3333p,1]5p5p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
 
     puts("==== test seven shifted pairs ====");
     test_points("1122334455667m7m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
@@ -259,19 +259,19 @@ int main(int argc, const char *argv[]) {
     test_points("19m19s19pESWNCFPN", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test all terminals ====");
-    test_points("111m 111s 999m 99s1p1p9s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[111m][111s][999m]99s1p1p9s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test little four winds ====");
-    test_points("EEE WWW NNN 23sSS1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("WWW SSS NNN EEPPP", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[EEE][WWW][NNN]23sSS1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[WWW][SSS][NNN]EEPPP", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test little three dragons ====");
-    test_points("CCC FFF 11199pPP9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("CCC FFF 23s111pPP1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("CCC FFF EEENNPPN", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC][FFF]11199pPP9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC][FFF]23s111pPP1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC][FFF]EEENNPPN", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test all honors ====");
-    test_points("CCC PPP EEESSNNS", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC][PPP]EEESSNNS", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test four concealed pungs ====");
     test_points("3444m222s222333p3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
@@ -280,20 +280,20 @@ int main(int argc, const char *argv[]) {
     test_points("1223355778899s1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test quadruple chow ====");
-    test_points("123m 123m 1122334m4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m][123m]1122334m4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test four pure shifted pungs ====");
-    test_points("111p 222p 333p 22s44p4p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[111p][222p][333p]22s44p4p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test four pure shifted chows ====");
-    test_points("123m 234m 345m 1145m6m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("123s 345s 567s 78s55p9s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m][234m][345m]1145m6m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123s][345s][567s]78s55p9s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test three kongs ====");
-    test_points("2222m 3333m 4444m 2233s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[2222m,1][3333m,2][4444m,3]2233s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test all terminals and honors ====");
-    test_points("EEE 111m 999s 99pCC9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[EEE][111m][999s]99pCC9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test seven pairs ====");
     test_points("33m22s77pEENCCPPN", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
@@ -305,55 +305,55 @@ int main(int argc, const char *argv[]) {
     test_points("17m36s25pESWNCFP9s", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
 
     puts("==== test all even pungs ====");
-    test_points("222m 444s 666p 4488p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("222m 222s 222p 44m44s4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("666m 666s 666p 88m22s8m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[222m][444s][666p]4488p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[222m][222s][222p]44m44s4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[666m][666s][666p]88m22s8m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test full flush ====");
-    test_points("111m 2223334449m9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("123s 1112223334s4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("789p 1234567899p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[111m]2223334449m9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123s]1112223334s4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[789p]1234567899p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test pure triple chow ====");
-    test_points("456m 456m 456m 4556p5p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[456m][456m][456m]4556p5p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test pure shifted pungs ====");
-    test_points("222s 333s 444s 2233p3p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[222s][333s][444s]2233p3p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test upper tiles ====");
-    test_points("789m 789s 789p 7899p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("777s 888m 777p 99m88s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("789m 789s 888s 88m88p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[789m][789s][789p]7899p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[777s][888m][777p]99m88s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[789m][789s][888s]88m88p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test middle tiles ====");
-    test_points("456s 444s 555s 66s66p6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[456s][444s][555s]66s66p6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test lower tiles ====");
-    test_points("123p 123m 123s 2333s1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123p][123m][123s]2333s1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test pure straight ====");
-    test_points("123m 456m 789m 2377m1m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("123s 456s 789s 6688p6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m][456m][789m]2377m1m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123s][456s][789s]6688p6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test three suited terminal chows ====");
-    test_points("123p 789p 12378m55s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123p][789p]12378m55s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test pure shifted chows ====");
-    test_points("123p 234p 345p 2234s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("123s 345s 567s 2345s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("123m 345567m77s88p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123p][234p][345p]2234s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123s][345s][567s]2345s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m]345567m77s88p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test all five ====");
-    test_points("456p 456s 456m 4555m6m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("345m 456m 555p 55m55s5s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[456p][456s][456m]4555m6m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[345m][456m][555p]55m55s5s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test triple pung ====");
-    test_points("333p 333m 44m23333s4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("111m 111p 111s 99s99p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[333p][333m]44m23333s4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[111m][111p][111s]99s99p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test three concealed pungs ====");
     test_points("999m11s99pEEECCC1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("123s 4445777888s5s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123s]4445777888s5s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test lesser honors and knitted tiles ====");
     test_points("258m147s36pESWFPC", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
@@ -366,43 +366,43 @@ int main(int argc, const char *argv[]) {
     test_points("369m258s147pEEPPE", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test upper four ====");
-    test_points("789s 678p 777p 78m99s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("789m 789s 789p 77s78p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("666s 666p 666m 7788p7p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[789s][678p][777p]78m99s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[789m][789s][789p]77s78p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[666s][666p][666m]7788p7p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test lower four ====");
-    test_points("123s 123m 123p 2333m1m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("111s 222s 22m33344s4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123s][123m][123p]2333m1m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[111s][222s]22m33344s4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test big three winds ====");
-    test_points("EEE SSS WWW 99m99s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("SSS WWW NNN 2345m5m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("SSS WWW NNNCCFFC", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[EEE][SSS][WWW]99m99s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[SSS][WWW][NNN]2345m5m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[SSS][WWW]NNNCCFFC", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test mixed straight ====");
-    test_points("123s 456p 789m23s88p1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("123m 456s 789p 77m45p6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123s][456p]789m23s88p1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m][456s][789p]77m45p6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test reversible tiles ====");
-    test_points("123p 234p 345p 8899p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("234p 234p 234p 1123p4p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("345p 345p 456s 4555s6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("234p 456s 888p 88sPP8s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("111p 222p 333p 4455p4p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("222s 456s 4555888s6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("888p 999p 999s 88sPPP", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123p][234p][345p]8899p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[234p][234p][234p]1123p4p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[345p][345p][456s]4555s6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[234p][456s][888p]88sPP8s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[111p][222p][333p]4455p4p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[222s][456s]4555888s6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[888p][999p][999s]88sPPP", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_points("1122334455889p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test mixed triple chow ====");
-    test_points("345s 345p 345m 4456m4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("678m 678s 678p 99s67p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[345s][345p][345m]4456m4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[678m][678s][678p]99s67p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test mixed shifted pungs ====");
-    test_points("222p 333s 444m 22m33p3p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("777m 888s 999p 99m78p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[222p][333s][444m]22m33p3p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[777m][888s][999p]99m78p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test chicken hand ====");
-    test_points("123p 444s 789m 34pCC2p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123p][444s][789m]34pCC2p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test last tile draw ====");
     puts("==== test last tile claim ====");
@@ -410,37 +410,37 @@ int main(int argc, const char *argv[]) {
     puts("==== test robbing the kong ====");
 
     puts("==== test two concealed kongs ====");
-    test_points("[1111s]EEEE SSS 789m 8m8m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("[1111s][EEEE,1][SSS][789m]8m8m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
 
     puts("==== test all pungs ====");
-    test_points("888m 888p 888sEEPPP", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[888m][888p]888sEEPPP", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test half flush ====");
-    test_points("123m 234m 34578mCC9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m][234m]34578mCC9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test mixed shifted chows ====");
-    test_points("123s 234m 345p 55m45s6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123s][234m][345p]55m45s6s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test all types ====");
-    test_points("123m 456p 789sNNFFF", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m][456p]789sNNFFF", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test melded hand ====");
-    test_points("2222m 456p 678p 888s 6m6m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[2222m,1][456p][678p][888s]6m6m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test two dragons pungs ====");
-    test_points("CCC FFF 12378m88s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC][FFF]12378m88s9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test outside hand ====");
-    test_points("123m 123m 111p 11s11m1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("789p 789m 7788999s9s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("123m 123m 789m 78mCC9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("123m 123p 999m78pEE9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m][123m][111p]11s11m1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[789p][789m]7788999s9s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m][123m][789m]78mCC9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[123m][123p]999m78pEE9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test fully concealed hand ====");
     test_points("234m4468s345678p7s", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
 
     puts("==== test two melded kongs ====");
-    test_points("4444p 4444m CCC 1133m1m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[4444p,1][4444m,1][CCC]1133m1m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test last tile ====");
     puts("==== test dragon pung ====");
@@ -453,10 +453,10 @@ int main(int argc, const char *argv[]) {
     test_points("234m456789s3477p5p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test tile hog ====");
-    test_points("789p 789s 789m 77m33p7m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[789p][789s][789m]77m33p7m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test double pung ====");
-    test_points("222m 555m 555s 4488p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[222m][555m][555s]4488p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     puts("==== test two concealed pungs ====");
     test_points("[9999p]1255789m999s3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
@@ -477,7 +477,7 @@ int main(int argc, const char *argv[]) {
     puts("==== test closed wait ====");
     puts("==== test single wait ====");
     puts("==== test self drawn ====");
-    test_points("1111p 456s 2789s456p2s", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("[1111p,1][456s]2789s456p2s", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
 
     return 0;
 }

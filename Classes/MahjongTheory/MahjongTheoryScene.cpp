@@ -3,10 +3,9 @@
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../TilesImage.h"
-#include "../widget/HandTilesWidget.h"
+#include "../widget/TilePickWidget.h"
 #include "../widget/AlertView.h"
 #include "../widget/LoadingView.h"
-#include "../widget/TilesKeyboard.h"
 
 USING_NS_CC;
 
@@ -20,6 +19,7 @@ bool MahjongTheoryScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    // 输入框
     ui::EditBox *editBox= ui::EditBox::create(Size(visibleSize.width - 95.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     this->addChild(editBox);
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
@@ -32,9 +32,18 @@ bool MahjongTheoryScene::init() {
     editBox->setMaxLength(50);
     editBox->setDelegate(this);
     editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40.0f, origin.y + visibleSize.height - 50.0f));
-    TilesKeyboard::hookEditBox(editBox);
     _editBox = editBox;
 
+    // 与输入框同位置的空白button
+    const Size &editSize = editBox->getContentSize();
+    ui::Widget *widget = ui::Widget::create();
+    widget->setTouchEnabled(true);
+    widget->setContentSize(editSize);
+    widget->addClickEventListener([this](Ref *) { showInputAlert(); });
+    editBox->addChild(widget);
+    widget->setPosition(Vec2(editSize.width * 0.5f, editSize.height * 0.5f));
+
+    // 随机按钮
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
@@ -44,6 +53,7 @@ bool MahjongTheoryScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width - 65.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener([this](Ref *) { setRandomInput(); });
 
+    // 说明按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
@@ -53,6 +63,7 @@ bool MahjongTheoryScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width - 25.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
 
+    // 手牌
     HandTilesWidget *handTilesWidget = HandTilesWidget::create();
     handTilesWidget->setTileClickCallback(std::bind(&MahjongTheoryScene::onStandingTileEvent, this));
     this->addChild(handTilesWidget);
@@ -68,6 +79,7 @@ bool MahjongTheoryScene::init() {
     handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 65.0f - widgetSize.height * 0.5f));
     _handTilesWidget = handTilesWidget;
 
+    // 撤销与重做按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
@@ -90,6 +102,7 @@ bool MahjongTheoryScene::init() {
     button->setEnabled(false);
     _redoButton = button;
 
+    // 特殊和型选项
     Label *label = Label::createWithSystemFont("考虑特殊和型", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
@@ -125,7 +138,7 @@ bool MahjongTheoryScene::init() {
     _cellWidth = visibleSize.width - 5;
     Label *tempLabel = Label::createWithSystemFont("打「", "Arial", 12);
     _discardLabelWidth = tempLabel->getContentSize().width;
-    tempLabel->setString("」摸「"); 
+    tempLabel->setString("」摸「");
     _servingLabelWidth1 = tempLabel->getContentSize().width;
     tempLabel->setString("摸「");
     _servingLabelWidth2 = tempLabel->getContentSize().width;
@@ -141,6 +154,7 @@ bool MahjongTheoryScene::init() {
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
+    tableView->setBounceEnabled(true);
     tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 130.0f - widgetSize.height));
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
@@ -152,6 +166,7 @@ bool MahjongTheoryScene::init() {
 
     srand(static_cast<unsigned>(time(nullptr)));
 
+    // 下一帧设置随机输入
     this->scheduleOnce([this](float) { setRandomInput(); }, 0.0f, "set_random_input");
 
     return true;
@@ -160,9 +175,12 @@ bool MahjongTheoryScene::init() {
 void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
     AlertView::showWithMessage("使用说明",
         "牌理功能未经严格测试，可能存在bug。\n\n"
-        "1." INPUT_GUIDE_STRING_1 "\n"
-        "2." INPUT_GUIDE_STRING_2 "\n"
-        "3." INPUT_GUIDE_STRING_3 "\n"
+        "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n"
+        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n"
+        "3.吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n"
+        "  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n"
+        "  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n"
+        "  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n"
         "4.输入牌的总数不能超过14张。\n"
         "5.当输入牌的数量为(n*3+2)时，最后一张牌作为摸上来的牌。\n"
         "6.当输入牌的数量为(n*3+1)时，系统会随机补一张摸上来的牌。\n"
@@ -171,9 +189,55 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
         "9.点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n"
         "10.点击手牌可切出对应牌，随机上牌。\n"
         "输入范例1：[EEEE]288s349pSCFF2p\n"
-        "输入范例2：123p 345s 999s 6m6pEW1m\n"
+        "输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n"
         "输入范例3：356m18s1579pWNFF9p",
         10, nullptr, nullptr);
+}
+
+void MahjongTheoryScene::showInputAlert() {
+    mahjong::hand_tiles_t handTiles;
+    mahjong::tile_t servingTile;
+    mahjong::string_to_tiles(_editBox->getText(), &handTiles, &servingTile);
+    if (0 != mahjong::check_calculator_input(&handTiles, servingTile)) {
+        _editBox->touchDownAction(_editBox, ui::Widget::TouchEventType::ENDED);
+        return;
+    }
+
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float maxWidth = visibleSize.width - 20;
+
+    // 选牌面板和其他信息的相关控件
+    TilePickWidget *tilePicker = TilePickWidget::create();
+
+    // 缩放
+    Size pickerSize = tilePicker->getContentSize();
+    const float pickerScale = maxWidth / pickerSize.width;
+    tilePicker->setScale(pickerScale);
+    pickerSize = Size(maxWidth, pickerSize.height * pickerScale);
+
+    // 布局在rootNode上
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(maxWidth, pickerSize.height));
+    rootNode->addChild(tilePicker);
+    tilePicker->setPosition(Vec2(maxWidth * 0.5f, pickerSize.height * 0.5f));
+
+    if (handTiles.tile_count != 0 && servingTile != 0) {
+        tilePicker->setData(handTiles, servingTile);
+    }
+
+    // 通过AlertView显示出来
+    AlertView::showWithNode("输入手牌", rootNode, maxWidth, [this, tilePicker]() {
+        mahjong::hand_tiles_t handTiles;
+        mahjong::tile_t servingTile;
+        tilePicker->getData(&handTiles, &servingTile);
+        char str[64];
+        intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, str, 64);
+        if (ret > 0) {
+            mahjong::tiles_to_string(&servingTile, 1, &str[ret], 64 - ret);
+            _editBox->setText(str);
+            editBoxReturn(_editBox);
+        }
+    }, std::bind(&ui::EditBox::touchDownAction, _editBox, _editBox, ui::Widget::TouchEventType::ENDED));
 }
 
 void MahjongTheoryScene::setRandomInput() {
@@ -208,6 +272,7 @@ void MahjongTheoryScene::setRandomInput() {
     // 设置UI
     _handTilesWidget->setData(handTiles, servingTile);
 
+    // 转化为字符串，显示在输入框内
     char str[64];
     intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
     mahjong::tiles_to_string(&servingTile, 1, str + ret, sizeof(str) - ret);
@@ -293,6 +358,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             _editBox->setText(str.c_str());
         }
 
+        // 检查输入的合法性
         ret = mahjong::check_calculator_input(&hand_tiles, serving_tile);
         if (ret != 0) {
             switch (ret) {
@@ -303,14 +369,13 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             break;
         }
 
+        // 设置UI
         _handTilesWidget->setData(hand_tiles, serving_tile);
         return true;
     } while (0);
 
     if (errorStr != nullptr) {
-        AlertView::showWithMessage("提示", errorStr, 12, [this]() {
-            TilesKeyboard::showByEditBox(_editBox);
-        }, nullptr);
+        AlertView::showWithMessage("提示", errorStr, 12, std::bind(&MahjongTheoryScene::showInputAlert, this), nullptr);
     }
     return false;
 }
@@ -477,6 +542,7 @@ void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {
     mahjong::tile_t discardTile = _resultSources[realIdx].discard_tile;
     mahjong::tile_t servingTile;
 
+    // 打一张牌，上随机牌或指定牌
     int tag = button->getTag();
     if (tag != INVALID_TAG) {
         servingTile = mahjong::all_tiles[tag];
@@ -502,6 +568,7 @@ void MahjongTheoryScene::onStandingTileEvent() {
         return;
     }
 
+    // 打一张牌，上随机牌
     mahjong::tile_t servingTile = serveRandomTile(_handTilesTable, discardTile);
 
     _undoCache.emplace_back();
@@ -701,7 +768,8 @@ float MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
     size_t realIdx = _orderedIndices[idx];
     const ResultEx *result = &_resultSources[realIdx];  // 当前cell的数据
 
-    const uint16_t key = ((!!result->discard_tile) << 9) | ((!!result->shanten) << 8) | result->count_in_tiles;
+    // 用有效牌种数作为key，缓存曾经计算过的高度
+    const uint16_t key = static_cast<uint16_t>(result->count_in_tiles);
     std::unordered_map<uint16_t, int>::iterator it = _cellHeightMap.find(key);
     if (it != _cellHeightMap.end()) {
         return static_cast<float>(it->second);
@@ -709,14 +777,8 @@ float MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
 
     const float cellWidth = _cellWidth - SPACE * 2;  // 前后各留2像素
     float remainWidth;  // 第一行除了前面一些label之后剩下宽度
-    if (result->discard_tile != 0) {
-        remainWidth = cellWidth - _discardLabelWidth - TILE_WIDTH_SMALL -
-            (result->shanten > 0 ? _servingLabelWidth1 : _waitingLabelWidth1);
-    }
-    else {
-        remainWidth = cellWidth -
-            (result->shanten > 0 ? _servingLabelWidth2 : _waitingLabelWidth2);
-    }
+    remainWidth = cellWidth - _discardLabelWidth - TILE_WIDTH_SMALL -
+        (result->shanten > 0 ? _servingLabelWidth1 : _waitingLabelWidth1);
 
     int lineCnt = 1;
     int remainCnt = result->count_in_tiles;
@@ -738,7 +800,7 @@ float MahjongTheoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
 }
 
 cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<std::array<LayerColor *, 2>, Label *, Label *, ui::Button *, Label *, std::array<ui::Button *, 34>, Label *, Label *> CustomCell;
+    typedef cw::TableViewCellEx<std::array<LayerColor *, 2>, Label *, Label *, ui::Button *, std::array<Label *, 2>, std::array<ui::Button *, 34>, std::array<Label *, 2> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
     if (cell == nullptr) {
         cell = CustomCell::create();
@@ -748,41 +810,57 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         Label *&typeLabel = std::get<1>(ext);
         Label *&discardLabel = std::get<2>(ext);
         ui::Button *&discardButton = std::get<3>(ext);
-        Label *&usefulLabel = std::get<4>(ext);
+        std::array<Label *, 2> &usefulLabel = std::get<4>(ext);
         std::array<ui::Button *, 34> &usefulButtons = std::get<5>(ext);
-        Label *&cntLabel1 = std::get<6>(ext);
-        Label *&cntLabel2 = std::get<7>(ext);
+        std::array<Label *, 2> &cntLabel = std::get<6>(ext);
 
+        // 背景色
         layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), _cellWidth, 0.0f);
         cell->addChild(layerColors[0]);
 
         layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), _cellWidth, 0.0f);
         cell->addChild(layerColors[1]);
 
-        typeLabel = Label::createWithSystemFont("", "Arial", 12);
-        typeLabel->setColor(Color3B(0x60, 0x60, 0x60));
-        typeLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        cell->addChild(typeLabel);
+        // 和牌型label
+        Label *label = Label::createWithSystemFont("", "Arial", 12);
+        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cell->addChild(label);
+        typeLabel = label;
 
-        discardLabel = Label::createWithSystemFont("", "Arial", 12);
-        discardLabel->setColor(Color3B(0x60, 0x60, 0x60));
-        discardLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        cell->addChild(discardLabel);
+        // 打label
+        label = Label::createWithSystemFont("打「", "Arial", 12);
+        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cell->addChild(label);
+        discardLabel = label;
 
+        // 打的那张牌button
         const float tileScale = CC_CONTENT_SCALE_FACTOR() / TILE_WIDTH * TILE_WIDTH_SMALL;
-        discardButton = ui::Button::create("tiles/bg.png");
-        discardButton->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        discardButton->setScale(tileScale);
-        cell->addChild(discardButton);
-        discardButton->addClickEventListener(std::bind(&MahjongTheoryScene::onTileButton, this, std::placeholders::_1));
+        ui::Button *button = ui::Button::create("tiles/bg.png");
+        button->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        button->setScale(tileScale);
+        cell->addChild(button);
+        button->addClickEventListener(std::bind(&MahjongTheoryScene::onTileButton, this, std::placeholders::_1));
+        discardButton = button;
 
-        usefulLabel = Label::createWithSystemFont("", "Arial", 12);
-        usefulLabel->setColor(Color3B(0x60, 0x60, 0x60));
-        usefulLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        cell->addChild(usefulLabel);
+        // 摸label
+        label = Label::createWithSystemFont("」摸「", "Arial", 12);
+        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cell->addChild(label);
+        usefulLabel[0] = label;
 
+        // 听label
+        label = Label::createWithSystemFont("」听「", "Arial", 12);
+        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cell->addChild(label);
+        usefulLabel[1] = label;
+
+        // 34张牌button
         for (int i = 0; i < 34; ++i) {
-            ui::Button *button = ui::Button::create(tilesImageName[mahjong::all_tiles[i]]);
+            button = ui::Button::create(tilesImageName[mahjong::all_tiles[i]]);
             button->setScale(tileScale);
             button->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
             cell->addChild(button);
@@ -791,16 +869,19 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
             usefulButtons[i] = button;
         }
 
-        cntLabel1 = Label::createWithSystemFont("", "Arial", 12);
-        cntLabel1->setColor(Color3B(0x60, 0x60, 0x60));
-        cntLabel1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        cell->addChild(cntLabel1);
+        // 共几种几枚分在两个label上
+        label = Label::createWithSystemFont("", "Arial", 12);
+        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cell->addChild(label);
+        cntLabel[0] = label;
 
-        cntLabel2 = Label::createWithSystemFont("", "Arial", 12);
-        cntLabel2->setColor(Color3B(0x60, 0x60, 0x60));
-        cntLabel2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        cell->addChild(cntLabel2);
-        cntLabel2->setPosition(Vec2(SPACE, TILE_WIDTH_SMALL));
+        label = Label::createWithSystemFont("", "Arial", 12);
+        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cell->addChild(label);
+        label->setPosition(Vec2(SPACE, TILE_WIDTH_SMALL));
+        cntLabel[1] = label;
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -808,15 +889,15 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     Label *typeLabel = std::get<1>(ext);
     Label *discardLabel = std::get<2>(ext);
     ui::Button *discardButton = std::get<3>(ext);
-    Label *usefulLabel = std::get<4>(ext);
+    const std::array<Label *, 2> &usefulLabel = std::get<4>(ext);
     const std::array<ui::Button *, 34> &usefulButtons = std::get<5>(ext);
-    Label *cntLabel1 = std::get<6>(ext);
-    Label *cntLabel2 = std::get<7>(ext);
+    const std::array<Label *, 2> &cntLabel = std::get<6>(ext);
 
     const float cellHeight = tableCellSizeForIndex(table, idx);
     size_t realIdx = _orderedIndices[idx];
     const ResultEx *result = &_resultSources[realIdx];
 
+    // 背景色
     if (idx & 1) {
         layerColors[0]->setVisible(false);
         layerColors[1]->setVisible(true);
@@ -828,6 +909,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         layerColors[0]->setContentSize(Size(_cellWidth, cellHeight));
     }
 
+    // 和牌型label
     typeLabel->setString(getResultTypeString(result->form_flag, result->shanten));
     typeLabel->setPosition(Vec2(SPACE, cellHeight - 10.0f));
     typeLabel->setColor(result->shanten != -1 ? Color3B(0x60, 0x60, 0x60) : Color3B::ORANGE);
@@ -835,44 +917,31 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     float xPos = SPACE;
     float yPos = cellHeight - 35.0f;
 
-    if (result->discard_tile != 0) {
-        discardLabel->setVisible(true);
-        discardButton->setVisible(true);
+    // 打label
+    discardLabel->setPosition(Vec2(xPos, yPos));
+    xPos += discardLabel->getContentSize().width;
 
-        discardLabel->setString("打「");
-        discardLabel->setPosition(Vec2(xPos, yPos));
-        xPos += discardLabel->getContentSize().width;
+    // 打的那张牌button
+    discardButton->loadTextureNormal(tilesImageName[result->discard_tile]);
+    discardButton->setUserData(reinterpret_cast<void *>(realIdx));
+    discardButton->setPosition(Vec2(xPos, yPos));
+    xPos += TILE_WIDTH_SMALL;
 
-        discardButton->loadTextureNormal(tilesImageName[result->discard_tile]);
-        discardButton->setUserData(reinterpret_cast<void *>(realIdx));
-        discardButton->setPosition(Vec2(xPos, yPos));
-        xPos += TILE_WIDTH_SMALL;
-
-        if (result->shanten > 0) {
-            usefulLabel->setString("」摸「");
-        }
-        else {
-            usefulLabel->setString("」听「");
-        }
-
-        usefulLabel->setPosition(Vec2(xPos, yPos));
-        xPos += usefulLabel->getContentSize().width;
+    // 摸或者听label
+    if (result->shanten > 0) {
+        usefulLabel[0]->setVisible(true);
+        usefulLabel[1]->setVisible(false);
+        usefulLabel[0]->setPosition(Vec2(xPos, yPos));
+        xPos += usefulLabel[0]->getContentSize().width;
     }
     else {
-        discardLabel->setVisible(false);
-        discardButton->setVisible(false);
-
-        if (result->shanten != 0) {
-            usefulLabel->setString("摸「");
-        }
-        else {
-            usefulLabel->setString("听「");
-        }
-        usefulLabel->setPosition(Vec2(xPos, yPos));
-
-        xPos += usefulLabel->getContentSize().width;
+        usefulLabel[0]->setVisible(false);
+        usefulLabel[1]->setVisible(true);
+        usefulLabel[1]->setPosition(Vec2(xPos, yPos));
+        xPos += usefulLabel[1]->getContentSize().width;
     }
 
+    // 34张牌button
     for (int i = 0; i < 34; ++i) {
         if (!result->useful_table[mahjong::all_tiles[i]]) {
             usefulButtons[i]->setVisible(false);
@@ -890,15 +959,16 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         xPos += TILE_WIDTH_SMALL;
     }
 
+    // 共几种几枚分在两个label上
     std::string str = Common::format("」共%d种，%d枚", result->count_in_tiles, result->count_total);
     if (yPos > 15) {
-        spiltStringToLabel(str, _cellWidth - SPACE * 2 - xPos, cntLabel1, cntLabel2);
+        spiltStringToLabel(str, _cellWidth - SPACE * 2 - xPos, cntLabel[0], cntLabel[1]);
     }
     else {
-        cntLabel1->setString(str);
-        cntLabel2->setVisible(false);
+        cntLabel[0]->setString(str);
+        cntLabel[1]->setVisible(false);
     }
-    cntLabel1->setPosition(Vec2(xPos, yPos));
+    cntLabel[0]->setPosition(Vec2(xPos, yPos));
 
     return cell;
 }

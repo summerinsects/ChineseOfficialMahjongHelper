@@ -8,7 +8,7 @@
 
 namespace Common {
 
-static bool FORCE_INLINE isCStringEmpty(const char *str) {
+static FORCE_INLINE bool isCStringEmpty(const char *str) {
     return *str == '\0';
 }
 
@@ -24,21 +24,30 @@ void __log(_Printf_format_string_ const char *fmt, ...);
 void __log(const char *fmt, ...) FORMAT_CHECK_PRINTF(1, 2);
 #endif
 
-static int FORCE_INLINE __isdigit(int c) {
+static FORCE_INLINE int __isdigit(int c) {
     return (c >= -1 && c <= 255) ? isdigit(c) : 0;
 }
 
-static int FORCE_INLINE __isspace(int c) {
+static FORCE_INLINE int __isspace(int c) {
     return (c >= -1 && c <= 255) ? isspace(c) : 0;
 }
 
-static inline std::string &trim(std::string &str) {
+static inline std::string &ltrim(std::string &str) {
     str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](char c) { return !__isspace(c); }));
+    return str;
+}
+
+static inline std::string &rtrim(std::string &str) {
     str.erase(std::find_if(str.rbegin(), str.rend(), [](char c) { return !__isspace(c); }).base(), str.end());
     return str;
 }
 
+static inline std::string &trim(std::string &str) {
+    return rtrim(ltrim(str));
+}
+
 std::string getStringFromFile(const char *file);
+
 }
 
 #if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)

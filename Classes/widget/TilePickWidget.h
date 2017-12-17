@@ -22,9 +22,7 @@ private:
     cocos2d::ui::Button *_bambooButtons[9];
     cocos2d::ui::Button *_dotsButtons[9];
     cocos2d::ui::Button *_honorButtons[7];
-    cocos2d::ui::Button *_chow1Button = nullptr;
-    cocos2d::ui::Button *_chow2Button = nullptr;
-    cocos2d::ui::Button *_chow3Button = nullptr;
+    cocos2d::ui::Button *_chowButton[3];
     cocos2d::ui::Button *_pungButton = nullptr;
     cocos2d::ui::Button *_meldedKongButton = nullptr;
     cocos2d::ui::Button *_concealedKongButton = nullptr;
@@ -38,9 +36,7 @@ private:
     void refreshAllTilesTableButton();
     void refreshActionButtons();
     void onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t tile);
-    void onChow1Button(cocos2d::Ref *sender);
-    void onChow2Button(cocos2d::Ref *sender);
-    void onChow3Button(cocos2d::Ref *sender);
+    void onChowButton(cocos2d::Ref *sender);
     void onPungButton(cocos2d::Ref *sender);
     void onMeldedKongButton(cocos2d::Ref *sender);
     void onConcealedKongButton(cocos2d::Ref *sender);

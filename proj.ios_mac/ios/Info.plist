@@ -41,9 +41,6 @@
 		<string>Icon-100</string>
 		<string>Icon-114</string>
 		<string>Icon-120</string>
-		<string>Icon-144</string>
-		<string>Icon-152</string>
-		<string>Icon-180</string>
 	</array>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
@@ -52,11 +49,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2.1</string>
+	<string>1.2.8</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.2.1</string>
+	<string>1.2.8</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIAppFonts</key>

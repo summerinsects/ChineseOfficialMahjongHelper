@@ -51,8 +51,6 @@
 		1FE04AE11C94682A008401EA /* RecordScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADA1C94682A008401EA /* RecordScene.cpp */; };
 		1FE04AE21C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
 		1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
-		1FE0DAAE1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */; };
-		1FE0DAAF1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */; };
 		1FE1019A1F74964E001C3FA8 /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDCF7C51F738EE400D9C608 /* common.cpp */; };
 		1FE1019E1F74964E001C3FA8 /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDCF7C51F738EE400D9C608 /* common.cpp */; };
 		1FE17A751EE0FF9300B47FE3 /* Competition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */; };
@@ -210,8 +208,6 @@
 		1FE04ADB1C94682A008401EA /* RecordScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordScene.h; sourceTree = "<group>"; };
 		1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScoreSheetScene.cpp; sourceTree = "<group>"; };
 		1FE04ADD1C94682A008401EA /* ScoreSheetScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreSheetScene.h; sourceTree = "<group>"; };
-		1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilesKeyboard.cpp; sourceTree = "<group>"; };
-		1FE0DAAD1E8A0C94008BCC2F /* TilesKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilesKeyboard.h; sourceTree = "<group>"; };
 		1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Competition.cpp; path = CompetitionSystem/Competition.cpp; sourceTree = "<group>"; };
 		1FE17A6E1EE0FF9300B47FE3 /* Competition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Competition.h; path = CompetitionSystem/Competition.h; sourceTree = "<group>"; };
 		1FE17A6F1EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionRankCustomScene.cpp; path = CompetitionSystem/CompetitionRankCustomScene.cpp; sourceTree = "<group>"; };
@@ -486,8 +482,6 @@
 				1F16A6311F5F8CFB00974F88 /* LoadingView.h */,
 				1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */,
 				1FE5CFDC1CAE029200A5C38B /* TilePickWidget.h */,
-				1FE0DAAC1E8A0C94008BCC2F /* TilesKeyboard.cpp */,
-				1FE0DAAD1E8A0C94008BCC2F /* TilesKeyboard.h */,
 			);
 			path = widget;
 			sourceTree = "<group>";
@@ -774,7 +768,6 @@
 				1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
 				1FDCF7BF1F738E1D00D9C608 /* CWTableView.cpp in Sources */,
-				1FE0DAAE1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */,
 				1F68AFC91F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */,
 				1FE2A3ED1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
 				1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
@@ -808,7 +801,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F0B2C221F7F8779004E8EA6 /* CompetitionHistoryScene.cpp in Sources */,
-				1FE0DAAF1E8A0C94008BCC2F /* TilesKeyboard.cpp in Sources */,
 				1FDD94441C8337140031BC38 /* fan_calculator.cpp in Sources */,
 				1FE17A7A1EE0FF9300B47FE3 /* CompetitionRoundScene.cpp in Sources */,
 				1FE17A781EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp in Sources */,
