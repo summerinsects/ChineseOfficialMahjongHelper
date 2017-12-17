@@ -16,7 +16,7 @@ struct Record {
         uint8_t win_claim;  // 和牌标记（4567bit）/点炮标记（0123bit）
         uint8_t false_win;  // 错和标记
         uint8_t packed_fan; // 小番组合
-        uint32_t score;     // 番数
+        uint32_t fan;       // 番数
         uint64_t fan_flag;  // 标记番种
 
         struct WinHand {

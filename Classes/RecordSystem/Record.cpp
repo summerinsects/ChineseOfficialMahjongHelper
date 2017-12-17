@@ -54,9 +54,15 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 detail_data.packed_fan = it->value.GetUint();
             }
 
+            it = detail_json.FindMember("fan");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                detail_data.fan = it->value.GetUint();
+            }
+
+            // 兼容旧的key
             it = detail_json.FindMember("score");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.score = it->value.GetUint();
+                detail_data.fan = it->value.GetUint();
             }
 
             it = detail_json.FindMember("fan_flag");
@@ -114,7 +120,7 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
         detail_json.AddMember("win_claim", rapidjson::Value(detail_data.win_claim), alloc);
         detail_json.AddMember("false_win", rapidjson::Value(detail_data.false_win), alloc);
         detail_json.AddMember("packed_fan", rapidjson::Value(detail_data.packed_fan), alloc);
-        detail_json.AddMember("score", rapidjson::Value(detail_data.score), alloc);
+        detail_json.AddMember("fan", rapidjson::Value(detail_data.fan), alloc);
         detail_json.AddMember("fan_flag", rapidjson::Value(detail_data.fan_flag), alloc);
 
         const Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
@@ -266,19 +272,19 @@ void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
     memset(scoreTable, 0, sizeof(scoreTable));
-    int winScore = detail.score;
-    if (winScore >= 8 && !!(detail.win_claim & 0xF0)) {
+    int fan = detail.fan;
+    if (fan >= 8 && !!(detail.win_claim & 0xF0)) {
         uint8_t wc = detail.win_claim;
         int winIndex = WIN_INDEX(wc);
         int claimIndex = CLAIM_INDEX(wc);
         if (winIndex == claimIndex) {  // 自摸
             for (int i = 0; i < 4; ++i) {
-                scoreTable[i] = (i == winIndex) ? (winScore + 8) * 3 : (-8 - winScore);
+                scoreTable[i] = (i == winIndex) ? (fan + 8) * 3 : (-8 - fan);
             }
         }
         else {  // 点炮
             for (int i = 0; i < 4; ++i) {
-                scoreTable[i] = (i == winIndex) ? (winScore + 24) : (i == claimIndex ? (-8 - winScore) : -8);
+                scoreTable[i] = (i == winIndex) ? (fan + 24) : (i == claimIndex ? (-8 - fan) : -8);
             }
         }
     }
@@ -367,12 +373,12 @@ void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector<Record
                 if (claimIndex == idx) {
                     ++result->self_drawn;
                 }
-                result->win_fan += detail.score;
-                result->max_fan = std::max<uint16_t>(result->max_fan, detail.score);
+                result->win_fan += detail.fan;
+                result->max_fan = std::max<uint16_t>(result->max_fan, detail.fan);
             }
             else if (claimIndex == idx) {
                 ++result->claim;
-                result->claim_fan += detail.score;
+                result->claim_fan += detail.fan;
             }
         }
 
@@ -1087,7 +1093,7 @@ static const char *fan_name2[mahjong::LAST_TILE + 1][mahjong::LAST_TILE + 1] = {
 };
 
 const char *GetShortFanText(const Record::Detail &detail) {
-    if (detail.score == 0) {
+    if (detail.fan == 0) {
         return "荒庄";
     }
 

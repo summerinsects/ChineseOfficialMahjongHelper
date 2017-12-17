@@ -602,10 +602,10 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
     int winIndex = WIN_INDEX(wc);
     int claimIndex = CLAIM_INDEX(wc);
     if (winIndex == claimIndex) {
-        ret.append(Common::format("「%s」自摸%s%d番。\n", record->name[winIndex], fanText.c_str(), detail.score));
+        ret.append(Common::format("「%s」自摸%s%d番。\n", record->name[winIndex], fanText.c_str(), detail.fan));
     }
     else {
-        ret.append(Common::format("「%s」和%s%d番，「%s」点炮。\n", record->name[winIndex], fanText.c_str(), detail.score, record->name[claimIndex]));
+        ret.append(Common::format("「%s」和%s%d番，「%s」点炮。\n", record->name[winIndex], fanText.c_str(), detail.fan, record->name[claimIndex]));
     }
 
     if (detail.false_win != 0) {
@@ -624,7 +624,7 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
 
 void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     const Record::Detail &detail = _record.detail[handIdx];
-    if (detail.score == 0) {
+    if (detail.fan == 0) {
         AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"),
             "荒庄。\n\n是否需要修改这盘的记录？", 12,
             std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
