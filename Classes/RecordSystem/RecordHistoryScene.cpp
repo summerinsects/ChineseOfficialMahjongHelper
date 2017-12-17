@@ -387,11 +387,11 @@ namespace {
         return true;
     }
 
-    ssize_t AlertInnerNode::numberOfCellsInTableView(cw::TableView *table) {
+    ssize_t AlertInnerNode::numberOfCellsInTableView(cw::TableView *) {
         return g_records.size();
     }
 
-    float AlertInnerNode::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+    float AlertInnerNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
         return 40.0f;
     }
 
@@ -501,7 +501,7 @@ namespace {
         return cell;
     }
 
-    void AlertInnerNode::onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType event) {
+    void AlertInnerNode::onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType) {
         if (radioButton == nullptr) {
             return;
         }
