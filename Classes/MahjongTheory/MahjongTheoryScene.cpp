@@ -138,7 +138,7 @@ bool MahjongTheoryScene::init() {
     _cellWidth = visibleSize.width - 5;
     Label *tempLabel = Label::createWithSystemFont("打「", "Arial", 12);
     _discardLabelWidth = tempLabel->getContentSize().width;
-    tempLabel->setString("」摸「"); 
+    tempLabel->setString("」摸「");
     _servingLabelWidth1 = tempLabel->getContentSize().width;
     tempLabel->setString("摸「");
     _servingLabelWidth2 = tempLabel->getContentSize().width;

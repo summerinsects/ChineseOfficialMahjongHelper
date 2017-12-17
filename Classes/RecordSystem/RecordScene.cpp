@@ -1028,11 +1028,11 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
         char buf[32];
         snprintf(buf, sizeof(buf), "%d", fan);
         _editBox->setText(buf);
-        
+
         // 根据记录和牌的门风确定和牌的是哪一家
         int winIndex = static_cast<int>(temp.seat_wind);
         _winGroup->setSelectedButton(winIndex);
-        
+
         if (temp.win_flag & WIN_FLAG_SELF_DRAWN) {  // 自摸
             _claimGroup->setSelectedButton(winIndex);
         }

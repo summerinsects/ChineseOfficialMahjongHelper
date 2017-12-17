@@ -329,7 +329,7 @@ void ExtraInfoWidget::onLastTileBox(cocos2d::Ref *, cocos2d::ui::CheckBox::Event
             && !_fourthTileBox->isSelected());
     }
 }
-    
+
 void ExtraInfoWidget::refreshByKong(bool hasKong) {
     // 当副露不包含杠的时候，杠开是禁用状态
     _hasKong = hasKong;
