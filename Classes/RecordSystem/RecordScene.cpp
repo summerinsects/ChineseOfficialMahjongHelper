@@ -484,7 +484,7 @@ void RecordScene::refresh() {
 
     // 罚分
     for (int i = 0; i < 4; ++i) {
-        _penaltyLabel[i]->setString(Common::format("%+d", _detail.penalty_scores[UI_TO_PLAYER(i)]));
+        _penaltyLabel[i]->setString(Common::format("%+d", _detail.penalty_scores[PLAYER_TO_UI(i)]));
     }
 
     _winIndex = WIN_INDEX(wc);
@@ -686,7 +686,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
         sprite->setPosition(Vec2(x, 60.0f));
 
         // 得分
-        label = Label::createWithSystemFont(Common::format("%+hd", _detail.penalty_scores[UI_TO_PLAYER(i)]), "Arial", 12);
+        label = Label::createWithSystemFont(Common::format("%+hd", _detail.penalty_scores[PLAYER_TO_UI(i)]), "Arial", 12);
         label->setColor(grayColor);
         rootNode->addChild(label);
         label->setPosition(Vec2(x, 60.0f));
@@ -701,7 +701,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
             button->setPosition(Vec2(x, buttonY[n]));
             int v = value[n];
             button->addClickEventListener([this, penaltyScores, label, i, v](Ref *) {
-                int16_t &score = penaltyScores->at(UI_TO_PLAYER(i));
+                int16_t &score = penaltyScores->at(PLAYER_TO_UI(i));
                 score += v;
                 label->setString(Common::format("%+hd", score));
             });
@@ -710,6 +710,9 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
 
     AlertView::showWithNode("罚分调整", rootNode, [this, penaltyScores]() {
         memcpy(&_detail.penalty_scores, penaltyScores->data(), sizeof(_detail.penalty_scores));
+        for (int i = 0; i < 4; ++i) {
+            _penaltyLabel[i]->setString(Common::format("%+d", penaltyScores->at(PLAYER_TO_UI(i))));
+        }
         updateScoreLabel();
     }, nullptr);
 }
