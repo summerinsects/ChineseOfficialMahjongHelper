@@ -68,6 +68,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    float yPos = origin.y + visibleSize.height - 45.0f;
     // 番数输入框
     ui::EditBox *editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     this->addChild(editBox);
@@ -78,7 +79,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     editBox->setFontSize(12);
     editBox->setText("8");
     editBox->setMaxLength(3);  // 理论最高番332番，所以最大为3位
-    editBox->setPosition(Vec2(origin.x + 84.0f, origin.y + visibleSize.height - 45.0f));
+    editBox->setPosition(Vec2(origin.x + 84.0f, yPos));
     editBox->setDelegate(this);
     _editBox = editBox;
 
@@ -86,7 +87,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 104.0f, origin.y + visibleSize.height - 45.0f));
+    label->setPosition(Vec2(origin.x + 104.0f, yPos));
 
     // +-按钮
     static const float xPos[4] = { 18.0f, 48.0f, 133.0f, 163.0f };
@@ -99,7 +100,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         button->setContentSize(Size(25.0f, 20.0f));
         button->setTitleFontSize(12);
         button->setTitleText(titleText[i]);
-        button->setPosition(Vec2(origin.x + xPos[i], origin.y + visibleSize.height - 45.0f));
+        button->setPosition(Vec2(origin.x + xPos[i], yPos));
         button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1, delta[i]));
     }
 
@@ -109,7 +110,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     drawBox->setZoomScale(0.0f);
     drawBox->ignoreContentAdaptWithSize(false);
     drawBox->setContentSize(Size(20.0f, 20.0f));
-    drawBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, origin.y + visibleSize.height - 45.0f));
+    drawBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, yPos));
     drawBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
     _drawBox = drawBox;
 
@@ -117,7 +118,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 45.0f));
+    label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, yPos));
 
     // 罚分调整
     ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -169,58 +170,61 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         _scoreLabel[i] = label;
 
         // 和牌
+        float y = origin.y + visibleSize.height - 140.0f;
         ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
             "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
         radioNode->addChild(button);
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 140.0f));
+        button->setPosition(Vec2(x - 15.0f, y));
         winGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("和牌", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 140.0f));
+        label->setPosition(Vec2(x, y));
 
         // 点炮或自摸
+        y = origin.y + visibleSize.height - 170.0f;
         button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
             "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
         radioNode->addChild(button);
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 170.0f));
+        button->setPosition(Vec2(x - 15.0f, y));
         claimGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 170.0f));
+        label->setPosition(Vec2(x, y));
         _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 170.0f));
+        label->setPosition(Vec2(x, y));
         label->setVisible(false);
         _selfDrawnLabel[i] = label;
 
         // 罚分
+        y = origin.y + visibleSize.height - 195.0f;
         label = Label::createWithSystemFont("调整 ", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 195.0f));
+        label->setPosition(Vec2(x, y));
 
         label = Label::createWithSystemFont("+0", "Arial", 12);
         label->setColor(C3B_GRAY);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 195.0f));
+        label->setPosition(Vec2(x, y));
         _penaltyLabel[i] = label;
     }
     _winGroup = winGroup;
