@@ -7,6 +7,12 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_RED = Color3B(254, 87, 110);
+static const Color3B C3B_BLUE = Color3B(44, 121, 178);
+static const Color3B C3B_GREEN = Color3B(49, 155, 28);
+static const Color3B C3B_GRAY = Color3B(0x60, 0x60, 0x60);
+static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
+
 static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
 static const size_t eachLevelBeginIndex[] = { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 static const size_t eachLevelCounts[] = { 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
@@ -62,6 +68,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    float yPos = origin.y + visibleSize.height - 45.0f;
     // 番数输入框
     ui::EditBox *editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     this->addChild(editBox);
@@ -72,52 +79,30 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     editBox->setFontSize(12);
     editBox->setText("8");
     editBox->setMaxLength(3);  // 理论最高番332番，所以最大为3位
-    editBox->setPosition(Vec2(origin.x + 86.0f, origin.y + visibleSize.height - 50.0f));
+    editBox->setPosition(Vec2(origin.x + 84.0f, yPos));
     editBox->setDelegate(this);
     _editBox = editBox;
-
-    // +-按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(25.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("-5");
-    button->setPosition(Vec2(origin.x + 20.0f, origin.y + visibleSize.height - 50.0f));
-    button->addClickEventListener(std::bind(&RecordScene::onMinusButton, this, std::placeholders::_1, 5));
-
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(25.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("-1");
-    button->setPosition(Vec2(origin.x + 50.0f, origin.y + visibleSize.height - 50.0f));
-    button->addClickEventListener(std::bind(&RecordScene::onMinusButton, this, std::placeholders::_1, 1));
-
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(25.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("+1");
-    button->setPosition(Vec2(origin.x + 135.0f, origin.y + visibleSize.height - 50.0f));
-    button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1, 1));
-
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(25.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("+5");
-    button->setPosition(Vec2(origin.x + 165.0f, origin.y + visibleSize.height - 50.0f));
-    button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1, 5));
 
     Label *label = Label::createWithSystemFont("番", "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 106.0f, origin.y + visibleSize.height - 50.0f));
+    label->setPosition(Vec2(origin.x + 104.0f, yPos));
+
+    // +-按钮
+    static const float xPos[4] = { 18.0f, 48.0f, 133.0f, 163.0f };
+    static const char *titleText[4] = { "-5", "-1", "+1", "+5" };
+    static const int delta[4] = { -5, -1, 1, 5 };
+    for (int i = 0; i < 4; ++i) {
+        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        this->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(25.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText(titleText[i]);
+        button->setPosition(Vec2(origin.x + xPos[i], yPos));
+        button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1, delta[i]));
+    }
 
     // 荒庄
     ui::CheckBox *drawBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
@@ -125,7 +110,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     drawBox->setZoomScale(0.0f);
     drawBox->ignoreContentAdaptWithSize(false);
     drawBox->setContentSize(Size(20.0f, 20.0f));
-    drawBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, origin.y + visibleSize.height - 50.0f));
+    drawBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, yPos));
     drawBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
     _drawBox = drawBox;
 
@@ -133,25 +118,25 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 50.0f));
+    label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, yPos));
 
     // 罚分调整
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("罚分调整");
-    button->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 75.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 70.0f));
     button->addClickEventListener(std::bind(&RecordScene::onPenaltyButton, this, std::placeholders::_1, names));
 
     // 说明文本
     label = Label::createWithSystemFont("番数支持直接输入。标记主番可快速增加番数，取消标记不减少。", "Arial", 10);
-    label->setColor(Color3B(0x60, 0x60, 0x60));
+    label->setColor(C3B_GRAY);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 65.0f));
-    label->setDimensions(visibleSize.width - 70.0f, 0.0f);
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 60.0f));
+    label->setDimensions(visibleSize.width - 75.0f, 0.0f);
 
     ui::RadioButtonGroup *winGroup = ui::RadioButtonGroup::create();
     winGroup->setAllowedNoSelection(true);
@@ -167,7 +152,6 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     this->addChild(radioNode);
 
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
-    const Color3B grayColor(0x60, 0x60, 0x60);
     for (int i = 0; i < 4; ++i) {
         const float x = origin.x + gap * (i + 0.5f);
 
@@ -175,69 +159,72 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         label = Label::createWithSystemFont(names[PLAYER_TO_UI(i)], "Arial", 12.0f);
         label->setColor(Color3B::ORANGE);
         this->addChild(label);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 100.0f));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 95.0f));
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 得分
         label = Label::createWithSystemFont("+0", "Arial", 12);
-        label->setColor(grayColor);
+        label->setColor(C3B_GRAY);
         this->addChild(label);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 120.0f));
+        label->setPosition(Vec2(x, origin.y + visibleSize.height - 115.0f));
         _scoreLabel[i] = label;
 
         // 和牌
+        float y = origin.y + visibleSize.height - 140.0f;
         ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
             "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
         radioNode->addChild(button);
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 145.0f));
+        button->setPosition(Vec2(x - 15.0f, y));
         winGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("和牌", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 145.0f));
+        label->setPosition(Vec2(x, y));
 
         // 点炮或自摸
+        y = origin.y + visibleSize.height - 170.0f;
         button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
             "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
         radioNode->addChild(button);
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
         button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, origin.y + visibleSize.height - 175.0f));
+        button->setPosition(Vec2(x - 15.0f, y));
         claimGroup->addRadioButton(button);
 
         label = Label::createWithSystemFont("点炮", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 175.0f));
+        label->setPosition(Vec2(x, y));
         _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont("自摸", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 175.0f));
+        label->setPosition(Vec2(x, y));
         label->setVisible(false);
         _selfDrawnLabel[i] = label;
 
         // 罚分
+        y = origin.y + visibleSize.height - 195.0f;
         label = Label::createWithSystemFont("调整 ", "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 200.0f));
+        label->setPosition(Vec2(x, y));
 
         label = Label::createWithSystemFont("+0", "Arial", 12);
-        label->setColor(grayColor);
+        label->setColor(C3B_GRAY);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, origin.y + visibleSize.height - 200.0f));
+        label->setPosition(Vec2(x, y));
         _penaltyLabel[i] = label;
     }
     _winGroup = winGroup;
@@ -250,11 +237,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     rootLayout->setTouchEnabled(true);
 
     // 上方所有东西
-    Node *topNode = Node::create();
-    topNode->setContentSize(Size(visibleSize.width, 45.0f));
+    DrawNode *topNode = DrawNode::create();
+    topNode->setContentSize(Size(visibleSize.width, 50.0f));
     topNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     topNode->setIgnoreAnchorPointForPosition(false);
     rootLayout->addChild(topNode);
+    topNode->drawLine(Vec2(0.0f, 50.0f), Vec2(visibleSize.width, 50.0f), Color4F::BLACK);
 
     // 说明
     label = Label::createWithSystemFont("标记主番（4番以上）", "Arial", 12);
@@ -295,7 +283,6 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
-    tableView->setBounceEnabled(true);
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
@@ -311,13 +298,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         Size layoutSize;
         layoutSize.width = visibleSize.width;
         if (layoutButton->getUserData()) {
-            layoutSize.height = visibleSize.height - 150.0f;
+            layoutSize.height = visibleSize.height - 145.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
             layoutButton->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
             radioNode->setVisible(false);
         }
         else {
-            layoutSize.height = visibleSize.height - 230.0f;
+            layoutSize.height = visibleSize.height - 225.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(true));
             layoutButton->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E展开");
             radioNode->setVisible(true);
@@ -474,6 +461,14 @@ void RecordScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
     updateScoreLabel();
 }
 
+static inline void updatePenaltyLabel(Label *label, int16_t ps) {
+    label->setString(Common::format("%+hd", ps));
+
+    if (ps < 0) label->setColor(C3B_GREEN);
+    else if (ps > 0) label->setColor(C3B_RED);
+    else label->setColor(C3B_GRAY);
+}
+
 void RecordScene::refresh() {
     int wc = _detail.win_claim;
     if (_detail.fan >= 8) {
@@ -484,7 +479,7 @@ void RecordScene::refresh() {
 
     // 罚分
     for (int i = 0; i < 4; ++i) {
-        _penaltyLabel[i]->setString(Common::format("%+d", _detail.penalty_scores[PLAYER_TO_UI(i)]));
+        updatePenaltyLabel(_penaltyLabel[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
     }
 
     _winIndex = WIN_INDEX(wc);
@@ -511,22 +506,22 @@ void RecordScene::SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&sco
     for (int i = 0; i < 4; ++i) {
         if (scoreTable[i] != 0) {
             if (TEST_WIN(win_claim, i)) {  // 和牌：红色
-                scoreLabel[i]->setColor(Color3B(254, 87, 110));
+                scoreLabel[i]->setColor(C3B_RED);
             }
             else {
                 if (UNLIKELY(penalty_scores[i] < 0)) {  // 罚分：紫色
-                    scoreLabel[i]->setColor(Color3B(89, 16, 89));
+                    scoreLabel[i]->setColor(C3B_PURPLE);
                 }
                 else if (UNLIKELY(TEST_CLAIM(win_claim, i))) {  // 点炮：蓝色
-                    scoreLabel[i]->setColor(Color3B(44, 121, 178));
+                    scoreLabel[i]->setColor(C3B_BLUE);
                 }
                 else {  // 其他：绿色
-                    scoreLabel[i]->setColor(Color3B(49, 155, 28));
+                    scoreLabel[i]->setColor(C3B_GREEN);
                 }
             }
         }
         else {
-            scoreLabel[i]->setColor(Color3B(0x60, 0x60, 0x60));
+            scoreLabel[i]->setColor(C3B_GRAY);
         }
     }
 }
@@ -572,9 +567,9 @@ void RecordScene::updateScoreLabel() {
     }
 }
 
-void RecordScene::onMinusButton(cocos2d::Ref *, int delta) {
+void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {
     int winScore = atoi(_editBox->getText());
-    int temp = winScore - delta;
+    int temp = winScore + delta;
     if (temp < 8) temp = 8;
     if (winScore != temp) {
         char buf[32];
@@ -582,15 +577,6 @@ void RecordScene::onMinusButton(cocos2d::Ref *, int delta) {
         _editBox->setText(buf);
         updateScoreLabel();
     }
-}
-
-void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {
-    int winScore = atoi(_editBox->getText());
-    winScore += delta;
-    char buf[32];
-    snprintf(buf, sizeof(buf), "%d", winScore);
-    _editBox->setText(buf);
-    updateScoreLabel();
 }
 
 void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
@@ -661,11 +647,10 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     rootNode->setContentSize(Size(maxWidth, 145.0f));
 
     const float gap = (maxWidth - 4.0f) * 0.25f;
-    const Color3B grayColor(0x60, 0x60, 0x60);
 
-    const int16_t value[4] = { -10, -5, +5, +10 };
-    const char *text[4] = { "-10", "-5", "+5", "+10" };
-    const float buttonY[4] = { 110, 85, 35, 10 };
+    static const int16_t value[4] = { -10, -5, +5, +10 };
+    static const char *text[4] = { "-10", "-5", "+5", "+10" };
+    static const float buttonY[4] = { 110.0f, 85.0f, 35.0f, 10.0f };
 
     std::shared_ptr<std::array<int16_t, 4> > penaltyScores = std::make_shared<std::array<int16_t, 4> >();
     memcpy(penaltyScores->data(), &_detail.penalty_scores, sizeof(_detail.penalty_scores));
@@ -685,11 +670,11 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
         sprite->setContentSize(Size(30.0f, 20.0f));
         sprite->setPosition(Vec2(x, 60.0f));
 
-        // 得分
-        label = Label::createWithSystemFont(Common::format("%+hd", _detail.penalty_scores[PLAYER_TO_UI(i)]), "Arial", 12);
-        label->setColor(grayColor);
+        // 罚分
+        label = Label::createWithSystemFont("", "Arial", 12);
         rootNode->addChild(label);
         label->setPosition(Vec2(x, 60.0f));
+        updatePenaltyLabel(label, penaltyScores->at(PLAYER_TO_UI(i)));
 
         for (int n = 0; n < 4; ++n) {
             ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -701,9 +686,9 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
             button->setPosition(Vec2(x, buttonY[n]));
             int v = value[n];
             button->addClickEventListener([this, penaltyScores, label, i, v](Ref *) {
-                int16_t &score = penaltyScores->at(PLAYER_TO_UI(i));
-                score += v;
-                label->setString(Common::format("%+hd", score));
+                int16_t &ps = penaltyScores->at(PLAYER_TO_UI(i));
+                ps += v;
+                updatePenaltyLabel(label, ps);
             });
         }
     }
@@ -711,7 +696,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     AlertView::showWithNode("罚分调整", rootNode, [this, penaltyScores]() {
         memcpy(&_detail.penalty_scores, penaltyScores->data(), sizeof(_detail.penalty_scores));
         for (int i = 0; i < 4; ++i) {
-            _penaltyLabel[i]->setString(Common::format("%+d", penaltyScores->at(PLAYER_TO_UI(i))));
+            updatePenaltyLabel(_penaltyLabel[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
         }
         updateScoreLabel();
     }, nullptr);

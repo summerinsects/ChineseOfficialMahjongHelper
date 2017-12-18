@@ -62,7 +62,6 @@ private:
     void updateScoreLabel();
     void showPackedFanAlert(const std::function<void ()> &callback);
 
-    void onMinusButton(cocos2d::Ref *sender, int delta);
     void onPlusButton(cocos2d::Ref *sender, int delta);
     void onRecordTilesButton(cocos2d::Ref *sender);
     void onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);

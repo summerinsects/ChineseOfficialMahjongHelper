@@ -38,52 +38,34 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    // 上方4个按钮
     const float buttonGap = (visibleSize.width - 4.0f - 55.0f) / 3.0f;
 
-    // 使用说明按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("使用说明");
-    button->setPosition(Vec2(origin.x + 2.0f + 55.0f * 0.5f + buttonGap * 3, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onInstructionButton, this, std::placeholders::_1));
+    float xPos = origin.x + 2.0f + 55.0f * 0.5f;
+    float yPos = origin.y + visibleSize.height - 45.0f;
+    static const char *titleText[4] = { "追分策略", "清空表格", "历史记录", "使用说明" };
+    static void (ScoreSheetScene::*callbacks[4])(Ref *) = {
+        &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onInstructionButton
+    };
 
-    // 历史记录按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("历史记录");
-    button->setPosition(Vec2(origin.x + 2.0f + 55.0f * 0.5f + buttonGap * 2, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onHistoryButton, this, std::placeholders::_1));
-    button->setEnabled(record == &g_currentRecord);
+    ui::Button *topButtons[4];
+    for (int i = 0; i < 4; ++i) {
+        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        this->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(55.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText(titleText[i]);
+        button->setPosition(Vec2(xPos + buttonGap * i, yPos));
+        button->addClickEventListener(std::bind(callbacks[i], this, std::placeholders::_1));
+        cw::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
 
-    // 清空表格按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("清空表格");
-    button->setPosition(Vec2(origin.x + 2.0f + 55.0f * 0.5f + buttonGap, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onResetButton, this, std::placeholders::_1));
-    button->setEnabled(record == &g_currentRecord);
+        topButtons[i] = button;
+    }
+    topButtons[1]->setEnabled(record == &g_currentRecord);
+    topButtons[2]->setEnabled(record == &g_currentRecord);
 
-    // 追分策略按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("追分策略");
-    button->setPosition(Vec2(origin.x + 2.0f + 55.0f * 0.5f, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onPursuitButton, this, std::placeholders::_1));
-    cw::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
-
-    // 时间label
+    // 底部时间label
     Label *label = Label::createWithSystemFont("当前时间", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -145,7 +127,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         _nameLabel[i] = label;
     }
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     node->addChild(button, -1);
     button->setScale9Enabled(true);
     button->setContentSize(Size(gap, cellHeight));
@@ -240,7 +222,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         }
 
         // 计分按钮
-        button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
         node->addChild(button, -1);
         button->setScale9Enabled(true);
         button->setContentSize(Size(gap, cellHeight));
