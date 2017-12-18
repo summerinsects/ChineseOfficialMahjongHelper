@@ -14,22 +14,28 @@ void scaleLabelToFitWidth(cocos2d::Label *label, float width) {
 }
 
 void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width) {
+    // 保存原始尺寸
     const cocos2d::Size orginSize = label->getContentSize();
     if (orginSize.width <= width) {
         return;
     }
 
+    // 保存原始文本
     const std::string orginText = label->getString();
 
+    // 设置成三个点，并获取尺寸
     label->setString("...");
     const cocos2d::Size dotSize = label->getContentSize();
 
+    // 切割比例
     const float cutWidth = orginSize.width + dotSize.width - width;
-    const float cutRate = cutWidth / orginSize.width * 0.5f;
+    const float cutRate = cutWidth / orginSize.width;
 
+    // UTF8字符串
     const cocos2d::StringUtils::StringUTF8 utf8(orginText);
     const cocos2d::StringUtils::StringUTF8::CharUTF8Store &utf8String = utf8.getString();
 
+    // 计算按比例切割后，每部分的UTF8字符数
     const size_t totalLength = utf8String.size();
     const size_t cutLength = static_cast<size_t>(ceilf(totalLength * cutRate));
     size_t leftLength = (totalLength - cutLength) / 2;
@@ -39,23 +45,30 @@ void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width) {
         return;
     }
 
+    // 初始切割
     std::string newString = utf8.getAsCharSequence(0, leftLength);
     size_t partLength = newString.length();
 
     std::string temp = utf8.getAsCharSequence(totalLength - leftLength);
     newString.append("...").append(temp);
 
+    // 微调
     do {
         label->setString(newString);
         if (label->getContentSize().width <= width) {
             return;
         }
 
-        size_t l1 = utf8String[leftLength]._char.size();
-        size_t l2 = utf8String[totalLength - leftLength]._char.size();
-        newString.erase(partLength - l1, l1);
-        partLength -= l1;
-        newString.erase(partLength + 3, l2);
+        // 前半部分最后一个UTF8字符长度、后半部分第一个UTF8字符长度
+        size_t charLength1 = utf8String[leftLength - 1]._char.size();
+        size_t charLength2 = utf8String[totalLength - leftLength - 1]._char.size();
+
+        // 删除前半部分的最后一个UTF8字符
+        partLength -= charLength1;
+        newString.erase(partLength - 1, charLength1);
+
+        // 删除后半部分的第一个UTF8字符，三个点长度为3
+        newString.erase(partLength + 3, charLength2);
     } while (--leftLength > 0);
 
     label->setString(orginText);
