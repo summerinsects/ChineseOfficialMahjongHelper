@@ -79,7 +79,6 @@ void OtherScene::createContentView() {
         scrollView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
         scrollView->setScrollBarWidth(4.0f);
         scrollView->setScrollBarOpacity(0x99);
-        scrollView->setBounceEnabled(true);
         scrollView->setContentSize(Size(size.width, height));
         scrollView->setInnerContainerSize(size);
         scrollView->addChild(richText);
