@@ -26,8 +26,8 @@ private:
     void showCompetitionResultInputAlert(const std::string &title, const CompetitionResult &result, const RefreshRecordAlertCallback &callback);
     void showRankAlert();
 
-    float _colWidth[8];
-    float _posX[8];
+    float _colWidth[7];
+    float _posX[7];
 
     cw::TableView *_tableView = nullptr;
     cocos2d::ui::Button *_submitButton = nullptr;
