@@ -7,7 +7,7 @@ Chinese Official Mahjong Helper 国标小助手
 
 ## 配置步骤
 
-- 下载cocos2dx v3.16
+- 下载[cocos2dx v3.16](http://www.cocos2d-x.org/download)
 - clone本项目
 - 随便创建一个c++工程，工程名可以随便取（命令行：cocos new -l cpp --portrait 工程名）
 - 将在上一步创建的工程目录下的cocos2d目录拷贝到本项目Classes的同一级目录下
@@ -22,6 +22,9 @@ Chinese Official Mahjong Helper 国标小助手
 #### Android版(使用Eclipse ADT)
 - shift+右键“在此处打开命令行窗口”
 - cocos compile -p android（如果要编译release版本，请加参数-m release）
+
+#### Android版(Android Studio)
+- 用Android Studio导入proj.android-studio
 
 ---
 
