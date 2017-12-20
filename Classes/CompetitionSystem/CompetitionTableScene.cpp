@@ -299,201 +299,234 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     showRecordAlert(table, result);
 }
 
-void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResult (&prevResult)[4]) {
-    const float width = AlertView::maxWidth();
-    const float height = 100;
+namespace {
+    class AlertInnerNode : public Node, ui::EditBoxDelegate {
+    private:
+        CompetitionResult _results[4];
 
-    // 列宽
-    const float colWidth[5] = {
-        width * 0.15f,
-        width * 0.15f,
-        width * 0.3f,
-        width * 0.2f,
-        width * 0.2f
-    };
-    std::array<float, 5> colWidthArray = { colWidth[0], colWidth[1], colWidth[2], colWidth[3], colWidth[4] };
+        float _colWidth[5];
+        float _posX[5];
 
-    // 中心位置
-    float posX[5];
-    cw::calculateColumnsCenterX(colWidth, 5, posX);
+        Label *_checkLabel = nullptr;
+        ui::EditBox *_editBoxes[4][2];
 
-    // 根结点
-    Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(width, height + 55.0f));
+    public:
+        const CompetitionResult (&getResults())[4] { return _results; }
 
-    // 表格画在DrawNode上
-    DrawNode *drawNode = DrawNode::create();
-    rootNode->addChild(drawNode);
-    drawNode->setPosition(Vec2(0.0f, 55.0f));
+        typedef CompetitionResult CompetitionResultArray[4];
+        CREATE_FUNC_WITH_PARAM_3(AlertInnerNode, initWithPrevResult, const CompetitionResultArray &, prevResults,
+            const std::vector<CompetitionPlayer> &, players, const CompetitionTable &, currentTable);
 
-    // shared_ptr随着AlertView析构，其他lambda捕获裸指针，
-    // 在次级弹出界面修改数据提交后，lambda刷新之这里的数据及其相关UI
-    auto sharedResults = std::make_shared<std::array<CompetitionResult, 4> >(std::array<CompetitionResult, 4>({ prevResult[0], prevResult[1], prevResult[2], prevResult[3] }));
-    std::array<CompetitionResult, 4> *results = sharedResults.get();
+        bool initWithPrevResult(const CompetitionResult (&prevResults)[4], const std::vector<CompetitionPlayer> &players, const CompetitionTable &currentTable) {
+            if (UNLIKELY(!Node::init())) {
+                return false;
+            }
 
-    // 检查
-    Label *label = Label::createWithSystemFont("检查：标准分总和7，比赛分总和0", "Arail", 10);
-    label->setColor(Color3B(254, 87, 110));
-    rootNode->addChild(label);
-    label->setPosition(Vec2(width * 0.5f, 45.0f));
-    cw::scaleLabelToFitWidth(label, width - 4.0f);
+            memcpy(_results, prevResults, sizeof(_results));
 
-    std::function<void (const std::array<CompetitionResult, 4> &)> refreshCheckLabel = [label](const std::array<CompetitionResult, 4> &results) {
-        float ss = 0.0f;
-        int cs = 0;
-        for (int i = 0; i < 4; ++i) {
-            ss += results[i].standard_score;
-            cs += results[i].competition_score;
+            const float width = AlertView::maxWidth();
+            const float height = 100;
+
+            // 列宽
+            _colWidth[0] = width * 0.15f;
+            _colWidth[1] = width * 0.15f;
+            _colWidth[2] = width * 0.3f;
+            _colWidth[3] = width * 0.2f;
+            _colWidth[4] = width * 0.2f;
+
+            // 中心位置
+            cw::calculateColumnsCenterX(_colWidth, 5, _posX);
+
+            this->setContentSize(Size(width, height + 55.0f));
+
+            // 表格画在DrawNode上
+            DrawNode *drawNode = DrawNode::create();
+            this->addChild(drawNode);
+            drawNode->setPosition(Vec2(0.0f, 55.0f));
+
+            // 横线
+            for (int i = 0; i < 6; ++i) {
+                const float y = static_cast<float>(i * 20);
+                drawNode->drawLine(Vec2(0.0f, y), Vec2(width, y), Color4F::BLACK);
+            }
+
+            // 竖线
+            drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(0.0f, 100.0f), Color4F::BLACK);
+            for (int i = 0; i < 5; ++i) {
+                const float x = _posX[i] + _colWidth[i] * 0.5f;
+                drawNode->drawLine(Vec2(x, 0.0f), Vec2(x, 100.0f), Color4F::BLACK);
+            }
+
+            // 检查
+            Label *label = Label::createWithSystemFont("检查：标准分总和7，比赛分总和0", "Arail", 10);
+            label->setColor(Color3B(254, 87, 110));
+            this->addChild(label);
+            label->setPosition(Vec2(width * 0.5f, 45.0f));
+            cw::scaleLabelToFitWidth(label, width - 4.0f);
+            _checkLabel = label;
+
+            static const char *titleTexts[] = { "座次", "编号", "选手姓名", "标准分", "比赛分" };
+            for (int i = 0; i < 5; ++i) {
+                Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
+                label->setColor(Color3B::BLACK);
+                drawNode->addChild(label);
+                label->setPosition(Vec2(_posX[i], 90.0f));
+                cw::scaleLabelToFitWidth(label, _colWidth[i] - 4.0f);
+            }
+
+            Color3B textColors[] = { Color3B::BLACK, Color3B(0x60, 0x60, 0x60), Color3B::ORANGE,
+                Color3B(254, 87, 110), Color3B(44, 121, 178) };
+            for (int i = 0; i < 4; ++i) {
+                const CompetitionPlayer *player = &players[currentTable.player_indices[i]];
+
+                const float posY = 70.0f - 20.0f * i;
+                std::string text[3] = { seatText[i], std::to_string(player->serial + 1), player->name };
+
+                for (int k = 0; k < 3; ++k) {
+                    Label *label = Label::createWithSystemFont(text[k], "Arail", 12);
+                    label->setColor(textColors[k]);
+                    drawNode->addChild(label);
+                    label->setPosition(Vec2(_posX[k], posY));
+                    cw::scaleLabelToFitWidth(label, _colWidth[k] - 4.0f);
+                }
+
+                for (int k = 0; k < 2; ++k) {
+                    ui::EditBox *editBox = ui::EditBox::create(Size(_colWidth[k + 3], 20.0f), ui::Scale9Sprite::create());
+                    drawNode->addChild(editBox);
+                    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+                    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+                    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+                    editBox->setFontColor(textColors[k + 3]);
+                    editBox->setFontSize(12);
+                    editBox->setTextHorizontalAlignment(TextHAlignment::CENTER);
+                    editBox->setMaxLength(6);
+                    editBox->setPosition(Vec2(_posX[k + 3], posY));
+                    editBox->setTag(i << 4 | k);
+                    editBox->setDelegate(this);
+                    _editBoxes[i][k] = editBox;
+                }
+
+                float ss = _results[i].standard_score;
+                _editBoxes[i][0]->setText(CompetitionResult::standardScoreToString(ss).c_str());
+
+                int cs = _results[i].competition_score;
+                _editBoxes[i][1]->setText(std::to_string(cs).c_str());
+            }
+
+            // 自动计算按钮
+            ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+            this->addChild(button);
+            button->setScale9Enabled(true);
+            button->setContentSize(Size(55.0f, 20.0f));
+            button->setTitleFontSize(12);
+            button->setTitleText("自动计算");
+            button->setPosition(Vec2(width * 0.5f, 25.0f));
+            button->addClickEventListener([this](Ref *) {
+                calculateRanks();
+                calculateStandardScores();
+            });
+
+            // 说明文本
+            label = Label::createWithSystemFont("点击格子输入成绩，自动计算的标准分按4210计", "Arail", 10);
+            label->setColor(Color3B(0x60, 0x60, 0x60));
+            this->addChild(label);
+            label->setPosition(Vec2(width * 0.5f, 5.0f));
+            cw::scaleLabelToFitWidth(label, width);
+
+            refreshCheckLabel();
+
+            return true;
         }
-        label->setString(Common::format("检查：标准分总和%s，比赛分总和%d", CompetitionResult::standardScoreToString(ss).c_str(), cs));
-    };
-    refreshCheckLabel(*results);
 
-    // 横线
-    for (int i = 0; i < 6; ++i) {
-        const float y = static_cast<float>(i * 20);
-        drawNode->drawLine(Vec2(0.0f, y), Vec2(width, y), Color4F::BLACK);
-    }
-
-    // 竖线
-    drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(0.0f, 100.0f), Color4F::BLACK);
-    for (int i = 0; i < 6; ++i) {
-        const float x = posX[i] + colWidth[i] * 0.5f;
-        drawNode->drawLine(Vec2(x, 0.0f), Vec2(x, 100.0f), Color4F::BLACK);
-    }
-
-    std::array<std::array<Label *, 6>, 4> labels;
-    enum {
-        SEAT, SERIAL, NAME, RANK, STANDARD_SCORE, COMPETITION_SCORE
-    };
-
-    static const char *titleTexts[] = { "座次", "编号", "选手姓名", "标准分", "比赛分" };
-    for (int i = 0; i < 5; ++i) {
-        Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
-        label->setColor(Color3B::BLACK);
-        drawNode->addChild(label);
-        label->setPosition(Vec2(posX[i], 90.0f));
-        cw::scaleLabelToFitWidth(label, colWidth[i] - 4.0f);
-    }
-
-    const std::vector<CompetitionPlayer> &players = _competitionData->players;
-    const CompetitionTable &currentTable = _competitionTables->at(table);
-
-    Color3B textColors[] = { Color3B::BLACK, Color3B(0x60, 0x60, 0x60), Color3B::ORANGE,
-        Color3B(254, 87, 110), Color3B(44, 121, 178) };
-    for (int i = 0; i < 4; ++i) {
-        const CompetitionPlayer *player = &players[currentTable.player_indices[i]];
-
-        const float posY = 70.0f - 20.0f * i;
-
-        std::string text[5] = { seatText[i], std::to_string(player->serial + 1), player->name, "", "" };
-
-        for (int k = 0; k < 5; ++k) {
-            Label *label = Label::createWithSystemFont(text[k], "Arail", 12);
-            label->setColor(textColors[k]);
-            drawNode->addChild(label);
-            label->setPosition(Vec2(posX[k], posY));
-            cw::scaleLabelToFitWidth(label, colWidth[k] - 4.0f);
-            labels[i][k] = label;
-        }
-
-        const CompetitionResult *result = &results->at(i);
-
-        // 刷新三个label的回调函数
-        auto callback = [labels, i, colWidthArray, results, refreshCheckLabel](const CompetitionResult &result, bool refreshAll) {
-            results->at(i) = result;
-
-            std::string text[2] = {
-                 CompetitionResult::standardScoreToString(result.standard_score),
-                std::to_string(result.competition_score)
+        void calculateRanks() {
+            int scores[4] = {
+                _results[0].competition_score,
+                _results[1].competition_score,
+                _results[2].competition_score,
+                _results[3].competition_score
             };
-            for (int k = 0; k < 2; ++k) {
-                Label *label = labels[i][k + RANK];
-                label->setString(text[k]);
-                cw::scaleLabelToFitWidth(label, colWidthArray[k + RANK] - 4.0f);
+            unsigned ranks[4];
+            CalculateRankFromScore(scores, ranks);
+
+            for (int i = 0; i < 4; ++i) {
+                _results[i].rank = ranks[i] + 1;
             }
-
-            if (refreshAll) {
-                refreshCheckLabel(*results);
-            }
-        };
-        callback(*result, false);
-
-        ui::Widget *widget = ui::Widget::create();
-        widget->setTouchEnabled(true);
-        widget->setPosition(Vec2(posX[4], posY));
-        widget->setContentSize(Size(colWidth[4] * 3, 20.0f));
-        drawNode->addChild(widget);
-        widget->addClickEventListener([this, i, player, result, callback](Ref *) {
-            std::string title = Common::format("「%s」：%" PRIzu " 「%s」录入成绩", seatText[i], player->serial + 1, player->name.c_str());
-            showCompetitionResultInputAlert(title, *result, callback);
-        });
-    }
-
-    // 自动计算按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
-    rootNode->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("自动计算");
-    button->setPosition(Vec2(width * 0.5f, 25.0f));
-    button->addClickEventListener([this, labels, results, refreshCheckLabel](Ref *) {
-        int scores[4] = {
-            results->at(0).competition_score,
-            results->at(1).competition_score,
-            results->at(2).competition_score,
-            results->at(3).competition_score
-        };
-        unsigned ranks[4];
-        CalculateRankFromScore(scores, ranks);
-
-        // 并列的数目
-        unsigned rankCnt[4] = { 0 };
-        for (int i = 0; i < 4; ++i) {
-            ++rankCnt[ranks[i]];
         }
 
-        static const float standardScore[] = { 4, 2, 1, 0 };
-        for (int i = 0; i < 4; ++i) {
-            CompetitionResult &result = results->at(i);
-            unsigned rank = ranks[i];
-            unsigned tieCnt = rankCnt[rank];  // 并列的人数
-
-            // 累加并列的标准分
-            float ss = standardScore[rank];
-            for (unsigned n = 1, cnt = tieCnt; n < cnt; ++n) {
-                ss += standardScore[rank + n];
+    private:
+        virtual void editBoxReturn(ui::EditBox *editBox) override {
+            if (Common::isCStringEmpty(editBox->getText())) {
+                editBox->setText("0");
             }
-            ss /= tieCnt;
 
-            result.rank = rank + 1;
-            result.standard_score = ss;
-            labels[i][RANK]->setString(std::to_string(rank + 1));
-            labels[i][STANDARD_SCORE]->setString(CompetitionResult::standardScoreToString(ss));
+            int tag = editBox->getTag();
+            int i = tag >> 4, k = tag & 0xF;
+
+            switch (k) {
+            case 0: _results[i].standard_score = atof(editBox->getText()); break;
+            case 1: _results[i].competition_score = atoi(editBox->getText()); break;
+            default: break;
+            }
+            refreshCheckLabel();
         }
 
-        refreshCheckLabel(*results);
-    });
+        void refreshCheckLabel() {
+            float ss = 0.0f;
+            int cs = 0;
+            for (int i = 0; i < 4; ++i) {
+                ss += _results[i].standard_score;
+                cs += _results[i].competition_score;
+            }
+            _checkLabel->setString(Common::format("检查：标准分总和%s，比赛分总和%d", CompetitionResult::standardScoreToString(ss).c_str(), cs));
+        }
 
-    // 说明文本
-    label = Label::createWithSystemFont("点击格子输入成绩，自动计算的标准分按4210计", "Arail", 10);
-    label->setColor(Color3B(0x60, 0x60, 0x60));
-    rootNode->addChild(label);
-    label->setPosition(Vec2(width * 0.5f, 5.0f));
-    cw::scaleLabelToFitWidth(label, width);
+
+        void calculateStandardScores() {
+            unsigned ranks[4] = { _results[0].rank - 1, _results[1].rank - 1, _results[2].rank - 1, _results[3].rank - 1 };
+
+            // 并列的数目
+            unsigned rankCnt[4] = { 0 };
+            for (int i = 0; i < 4; ++i) {
+                ++rankCnt[ranks[i]];
+            }
+
+            static const float standardScore[] = { 4, 2, 1, 0 };
+            for (int i = 0; i < 4; ++i) {
+                CompetitionResult &result = _results[i];
+                unsigned rank = ranks[i];
+                unsigned tieCnt = rankCnt[rank];  // 并列的人数
+
+                // 累加并列的标准分
+                float ss = standardScore[rank];
+                for (unsigned n = 1, cnt = tieCnt; n < cnt; ++n) {
+                    ss += standardScore[rank + n];
+                }
+                ss /= tieCnt;
+
+                result.rank = rank + 1;
+                result.standard_score = ss;
+                _editBoxes[i][0]->setText(CompetitionResult::standardScoreToString(ss).c_str());
+            }
+
+            refreshCheckLabel();
+        }
+    };
+}
+
+void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResult (&prevResult)[4]) {
+    AlertInnerNode *rootNode = AlertInnerNode::create(prevResult,
+        _competitionData->players, _competitionTables->at(table));
 
     std::string title = Common::format("第%" PRIzu "桌成绩", table + 1);
-    AlertView::showWithNode(title, rootNode, [this, table, labels, title, sharedResults]() {
-        std::array<CompetitionResult, 4> *results = sharedResults.get();
+    AlertView::showWithNode(title, rootNode, [this, table, title, rootNode]() {
+        rootNode->calculateRanks();
+        const CompetitionResult (*results)[4] = &rootNode->getResults();
 
         // 如果有顺位为0，则提示重新输入
         if (std::any_of(std::begin(*results), std::end(*results),
             [](const CompetitionResult &result) { return result.rank == 0; })) {
-            AlertView::showWithMessage(title, "请选择顺位或使用自动计算", 12, [this, table, sharedResults]() {
-                std::array<CompetitionResult, 4> *results = sharedResults.get();
-                CompetitionResult temp[4] = { results->at(0), results->at(1), results->at(2), results->at(3) };
-                showRecordAlert(table, temp);
+            AlertView::showWithMessage(title, "请选择顺位或使用自动计算", 12, [this, table, results]() {
+                showRecordAlert(table, *results);
             }, nullptr);
             return;
         }
@@ -502,141 +535,13 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         std::vector<CompetitionPlayer> &players = _competitionData->players;
         CompetitionTable &currentTable = _competitionTables->at(table);
         for (int i = 0; i < 4; ++i) {
-            players[currentTable.player_indices[i]].competition_results[_currentRound] = results->at(i);
+            players[currentTable.player_indices[i]].competition_results[_currentRound] = (*results)[i];
         }
 
         // 刷新外面的UI
         _submitButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
         _tableView->updateCellAtIndex(table);
         _competitionData->writeToFile();
-    }, nullptr);
-}
-
-void CompetitionTableScene::showCompetitionResultInputAlert(const std::string &title, const CompetitionResult &result, const RefreshRecordAlertCallback &callback) {
-    Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(135.0f, 105.0f));
-
-    Label *label = Label::createWithSystemFont("顺位", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 90.0f));
-
-    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
-    radioGroup->setAllowedNoSelection(true);
-    rootNode->addChild(radioGroup);
-    for (int i = 0; i < 4; ++i) {
-        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        radioButton->setZoomScale(0.0f);
-        radioButton->ignoreContentAdaptWithSize(false);
-        radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(45.0f + i * 25, 90.0f));
-        rootNode->addChild(radioButton);
-
-        label = Label::createWithSystemFont(std::to_string(i + 1), "Arial", 12);
-        label->setColor(Color3B::BLACK);
-        radioButton->addChild(label);
-        label->setPosition(Vec2(10.0f, 10.0f));
-
-        radioGroup->addRadioButton(radioButton);
-    }
-    if (result.rank != 0) {
-        radioGroup->setSelectedButton(static_cast<int>(result.rank - 1));
-    }
-
-    std::array<ui::EditBox *, 2> editBoxes;
-
-    label = Label::createWithSystemFont("标准分", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 60.0f));
-
-    ui::EditBox *editBox = ui::EditBox::create(Size(80.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-#else
-    editBox->setInputMode(ui::EditBox::InputMode::DECIMAL);
-#endif
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setText(CompetitionResult::standardScoreToString(result.standard_score).c_str());
-    editBox->setMaxLength(10);
-    rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(90.0f, 60.0f));
-    editBoxes[0] = editBox;
-
-    radioGroup->addEventListener([editBox](ui::RadioButton *, int index, ui::RadioButtonGroup::EventType) {
-        switch (index) {
-        case 0: editBox->setText("4"); break;
-        case 1: editBox->setText("2"); break;
-        case 2: editBox->setText("1"); break;
-        case 3: editBox->setText("0"); break;
-        default: break;
-        }
-    });
-
-    label = Label::createWithSystemFont("比赛分", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 30.0f));
-
-    char buf[32];
-    snprintf(buf, sizeof(buf), "%d", result.competition_score);
-
-    editBox = ui::EditBox::create(Size(80.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
-#else
-    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-#endif
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setText(buf);
-    editBox->setMaxLength(10);
-    rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(90.0f, 30.0f));
-    editBoxes[1] = editBox;
-
-    // EditBox的代理
-    auto delegate = std::make_shared<EditBoxDelegateWrapper>(std::vector<ui::EditBox *>(editBoxes.begin(), editBoxes.end()));
-    editBoxes[0]->setDelegate(delegate.get());
-    editBoxes[1]->setDelegate(delegate.get());
-
-    // 说明文本
-    label = Label::createWithSystemFont("此处可仅输入比赛分，再使用「自动计算」", "Arail", 10);
-    label->setColor(Color3B(0x60, 0x60, 0x60));
-    rootNode->addChild(label);
-    label->setPosition(Vec2(135.0f * 0.5f, 5.0f));
-    cw::scaleLabelToFitWidth(label, AlertView::maxWidth() - 4.0f);
-
-    AlertView::showWithNode(title, rootNode, [this, radioGroup, editBoxes, title, result, callback, delegate]() {
-        unsigned rank = 0;
-        float standardScore = 0;
-        int competitionScore = 0;
-
-        rank = radioGroup->getSelectedButtonIndex() + 1;
-
-        const char *text = editBoxes[0]->getText();
-        if (*text != '\0') {
-            standardScore = static_cast<float>(atof(text));
-        }
-
-        text = editBoxes[1]->getText();
-        if (*text != '\0') {
-            competitionScore = atoi(text);
-        }
-
-        CompetitionResult temp;
-        temp.rank = rank;
-        temp.standard_score = standardScore;
-        temp.competition_score = competitionScore;
-        callback(temp, true);
     }, nullptr);
 }
 
