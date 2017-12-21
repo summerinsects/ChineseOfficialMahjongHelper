@@ -227,7 +227,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
     for (int i = 0; i < 4; ++i) {
         ptrdiff_t playerIndex = currentTable.player_indices[i];
         if (playerIndex == INVALID_INDEX) {
-            for (int k = 0; k < 5; ++k) {
+            for (int k = 0; k < 4; ++k) {
                 labels[i][k]->setString("");
             }
         }
