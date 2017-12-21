@@ -427,7 +427,7 @@ namespace {
             });
 
             // 说明文本
-            label = Label::createWithSystemFont("点击格子输入成绩，自动计算的标准分按4210计", "Arail", 10);
+            label = Label::createWithSystemFont("如采用4210标准分赛制，可使用「自动计算」", "Arail", 10);
             label->setColor(Color3B(0x60, 0x60, 0x60));
             this->addChild(label);
             label->setPosition(Vec2(width * 0.5f, 5.0f));
@@ -525,7 +525,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         // 如果有顺位为0，则提示重新输入
         if (std::any_of(std::begin(*results), std::end(*results),
             [](const CompetitionResult &result) { return result.rank == 0; })) {
-            AlertView::showWithMessage(title, "请选择顺位或使用自动计算", 12, [this, table, results]() {
+            AlertView::showWithMessage(title, "数据错误，请重新输入", 12, [this, table, results]() {
                 showRecordAlert(table, *results);
             }, nullptr);
             return;
