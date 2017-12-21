@@ -15,6 +15,13 @@ LOCAL_SRC_FILES := $(LOCAL_PATH)/hellocpp/main.cpp \
                    $(LOCAL_PATH)/../../../Classes/AppDelegate.cpp \
                    $(LOCAL_PATH)/../../../Classes/cocos-wheels/CWCommon.cpp \
                    $(LOCAL_PATH)/../../../Classes/cocos-wheels/CWTableView.cpp \
+                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/Competition.cpp \
+                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionEnrollScene.cpp \
+                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionHistoryScene.cpp \
+                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionMainScene.cpp \
+                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionRankCustomScene.cpp \
+                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionRoundScene.cpp \
+                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionTableScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/FanCalculator/FanCalculatorScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/FanTable/FanDefinitionScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/FanTable/FanTableScene.cpp \
