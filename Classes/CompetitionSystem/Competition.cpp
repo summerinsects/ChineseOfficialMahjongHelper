@@ -48,6 +48,8 @@ namespace {
         const CompetitionPlayer *player = nullptr;
         float standard_score = 0.0f;
         int competition_score = 0;
+        unsigned rank_cnt[4];
+        int max_score;
     };
 }
 
@@ -58,10 +60,19 @@ void CompetitionRound::sortPlayers(size_t round, const std::vector<CompetitionPl
     temp.reserve(players.size());
     std::transform(players.begin(), players.end(), std::back_inserter(temp), [round](const CompetitionPlayer &player) {
         ScoresSortInfo ret;
+        memset(&ret, 0, sizeof(ret));
         ret.player = &player;
-        auto s = player.getTotalScoresByRound(round);
-        ret.standard_score = s.first;
-        ret.competition_score = s.second;
+        for (size_t i = 0; i <= round; ++i) {
+            float ss = player.competition_results[i].standard_score;
+            int cs = player.competition_results[i].competition_score;
+            unsigned rank = player.competition_results[i].rank;
+
+            ret.standard_score += ss;
+            ret.competition_score += cs;
+            ++ret.rank_cnt[rank - 1];
+            ret.max_score = std::max(ret.max_score, cs);
+        }
+
         return ret;
     });
 
@@ -72,10 +83,29 @@ void CompetitionRound::sortPlayers(size_t round, const std::vector<CompetitionPl
 
     // 3. 排序指针数组
     std::sort(ptemp.begin(), ptemp.end(), [](const ScoresSortInfo *a, const ScoresSortInfo *b) {
-        if (a->standard_score > b->standard_score) return true;
-        if (a->standard_score == b->standard_score) {
-            if (a->competition_score > b->competition_score) return true;
-            if (a->competition_score == b->competition_score) return a->player->serial < b->player->serial;
+        const float ss1 = a->standard_score, ss2 = b->standard_score;
+        if (ss1 > ss2) return true;  // 标准分
+        if (ss1 == ss2) {
+            const int cs1 = a->competition_score, cs2 = b->competition_score;
+            if (cs1 > cs2) return true;  // 比赛分
+            if (cs1 == cs2) {
+                if (a->rank_cnt[0] > b->rank_cnt[0]) return true;  // 1位数
+                if (a->rank_cnt[0] == b->rank_cnt[0]) {
+                    if (a->rank_cnt[1] > b->rank_cnt[1]) return true;  // 2位数
+                    if (a->rank_cnt[1] == b->rank_cnt[1]) {
+                        if (a->rank_cnt[2] > b->rank_cnt[2]) return true;  // 3位数
+                        if (a->rank_cnt[2] == b->rank_cnt[2]) {
+                            if (a->rank_cnt[3] > b->rank_cnt[3]) return true;  // 4位数
+                            if (a->rank_cnt[3] == b->rank_cnt[3]) {
+                                if (a->max_score > b->max_score) return true;  // 单局最高分
+                                if (a->max_score == b->max_score) {
+                                    return a->player->serial < b->player->serial;  // 编号
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         return false;
     });

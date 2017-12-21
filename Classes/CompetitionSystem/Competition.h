@@ -11,7 +11,7 @@
 
 // 成绩
 struct CompetitionResult {
-    unsigned rank = 0;  // 顺位
+    unsigned rank = 0;  // 顺位，合法值为1 2 3 4
     float standard_score = 0;  // 标准分
     int competition_score = 0;  // 比赛分
 
