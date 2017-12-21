@@ -191,27 +191,6 @@ void CompetitionData::rankTablesBySerial(size_t round) {
     }
 }
 
-// 按编号蛇形排桌
-void CompetitionData::rankTablesBySerialSnake(size_t round) {
-    const size_t cnt = players.size();
-    std::vector<CompetitionTable> &tables = rounds[round].tables;
-    tables.resize(cnt / 4);
-
-    size_t east = 0;
-    size_t south = cnt / 2 - 1;
-    size_t west = south + 1;
-    size_t north = cnt - 1;
-    for (size_t i = 0; i < cnt; i += 4) {
-        size_t serial = i / 4;
-        CompetitionTable &table = tables[serial];
-        table.serial = serial;
-        table.player_indices[0] = east++;
-        table.player_indices[1] = south--;
-        table.player_indices[2] = west++;
-        table.player_indices[3] = north--;
-    }
-}
-
 // 随机排桌
 void CompetitionData::rankTablesByRandom(size_t round) {
     srand(static_cast<unsigned>(time(nullptr)));
@@ -256,8 +235,8 @@ void CompetitionData::rankTablesByScores(size_t round) {
     }
 }
 
-// 蛇形名次排桌
-void CompetitionData::rankTablesByScoresSnake(size_t round) {
+// 蛇形排桌
+void CompetitionData::rankTablesBySnake(size_t round) {
     const size_t cnt = players.size();
     std::vector<CompetitionTable> &tables = rounds[round].tables;
     tables.resize(cnt / 4);

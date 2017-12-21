@@ -552,36 +552,37 @@ void CompetitionTableScene::showRankAlert() {
     }
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(80.0f, 120.0f));
+    rootNode->setContentSize(Size(80.0f, 95.0f));
 
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
     rootNode->addChild(radioGroup);
 
-    static const char *titles[] = { "随机", "编号蛇形", "排名蛇形", "高高碰", "自定义" };
+    static const char *titles[] = { "随机", "蛇形", "高高碰", "自定义" };
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 4; ++i) {
+        const float yPos = 85.0f - i * 25.0f;
+
         ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
         rootNode->addChild(radioButton);
         radioButton->setZoomScale(0.0f);
         radioButton->ignoreContentAdaptWithSize(false);
         radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(10.0f, 110.0f - i * 25.0f));
+        radioButton->setPosition(Vec2(10.0f, yPos));
         radioGroup->addRadioButton(radioButton);
 
         Label *label = Label::createWithSystemFont(titles[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(25.0f, 110.0f - i * 25.0f));
+        label->setPosition(Vec2(25.0f, yPos));
     }
 
     AlertView::showWithNode("排列座位", rootNode, [this, radioGroup]() {
         switch (radioGroup->getSelectedButtonIndex()) {
         case 0: _competitionData->rankTablesByRandom(_currentRound); break;
-        case 1: _competitionData->rankTablesBySerialSnake(_currentRound); break;
-        case 2: _competitionData->rankTablesByScoresSnake(_currentRound); break;
-        case 3: _competitionData->rankTablesByScores(_currentRound); break;
-        case 4: Director::getInstance()->pushScene(CompetitionRankCustomScene::create(_competitionData, _currentRound)); return;
+        case 1: _competitionData->rankTablesBySnake(_currentRound); break;
+        case 2: _competitionData->rankTablesByScores(_currentRound); break;
+        case 3: Director::getInstance()->pushScene(CompetitionRankCustomScene::create(_competitionData, _currentRound)); return;
         default: return;
         }
         _tableView->reloadData();

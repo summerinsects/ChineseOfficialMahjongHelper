@@ -84,10 +84,9 @@ public:
     bool isRoundFinished(size_t round) const;  // 一轮是否已经结束
 
     void rankTablesBySerial(size_t round);  // 按编号排桌
-    void rankTablesBySerialSnake(size_t round);  // 按编号蛇形排桌
     void rankTablesByRandom(size_t round);  // 随机排桌
     void rankTablesByScores(size_t round);  // 高高碰排桌
-    void rankTablesByScoresSnake(size_t round);  // 蛇形名次排桌
+    void rankTablesBySnake(size_t round);  // 蛇形名次排桌
 };
 
 void LoadHistoryCompetitions(const char *file, std::vector<CompetitionData> &competitions);
