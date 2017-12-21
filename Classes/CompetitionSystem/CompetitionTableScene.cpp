@@ -91,7 +91,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setTitleFontSize(12);
     button->setTitleText("排列座位");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f, origin.y + 15.0f));
-    button->addClickEventListener([this](Ref *) { showRankAlert(); });
+    button->addClickEventListener([this](Ref *) { showArrangeAlert(); });
 
     // 提交按钮
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
@@ -101,9 +101,16 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setTitleFontSize(12);
     button->setTitleText("提交");
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.75f, origin.y + 15.0f));
-    button->addClickEventListener([](Ref *) { cocos2d::Director::getInstance()->popScene(); });
+    button->addClickEventListener([](Ref *) { Director::getInstance()->popScene(); });
     button->setEnabled(_competitionData->isRoundFinished(_currentRound));
     _submitButton = button;
+
+    // 有空位
+    if (std::any_of(_competitionTables->begin(), _competitionTables->end(), [](const CompetitionTable &table) {
+        return std::any_of(std::begin(table.player_indices), std::end(table.player_indices), [](ptrdiff_t idx) { return idx == INVALID_INDEX; });
+    })) {
+        this->scheduleOnce([this](float) { showArrangeAlert(); }, 0.0f, "show_rank_alert");
+    }
 
     return true;
 }
@@ -286,7 +293,7 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     // 有空位
     if (std::any_of(std::begin(currentTable.player_indices), std::end(currentTable.player_indices),
         [](ptrdiff_t idx) { return idx == INVALID_INDEX; })) {
-        AlertView::showWithMessage("登记成绩", "请先排座位", 12, std::bind(&CompetitionTableScene::showRankAlert, this), nullptr);
+        AlertView::showWithMessage("登记成绩", "请先排座位", 12, std::bind(&CompetitionTableScene::showArrangeAlert, this), nullptr);
         return;
     }
 
@@ -545,7 +552,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     }, nullptr);
 }
 
-void CompetitionTableScene::showRankAlert() {
+void CompetitionTableScene::showArrangeAlert() {
     if (_competitionData->isRoundStarted(_currentRound)) {
         AlertView::showWithMessage("排列座位", "开始记录成绩后不允许重新排座位", 12, nullptr, nullptr);
         return;

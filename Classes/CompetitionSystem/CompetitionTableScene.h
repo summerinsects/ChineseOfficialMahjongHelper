@@ -23,7 +23,7 @@ private:
     void onClearButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender);
     void showRecordAlert(size_t table, const CompetitionResult (&prevResult)[4]);
-    void showRankAlert();
+    void showArrangeAlert();
 
     float _colWidth[7];
     float _posX[7];
