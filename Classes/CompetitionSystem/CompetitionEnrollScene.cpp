@@ -66,11 +66,11 @@ bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData>
     return true;
 }
 
-ssize_t CompetitionEnrollScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t CompetitionEnrollScene::numberOfCellsInTableView(cw::TableView *) {
     return _competitionData->players.size() >> 1;
 }
 
-float CompetitionEnrollScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float CompetitionEnrollScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
     return 30.0f;
 }
 
@@ -176,7 +176,7 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
     return cell;
 }
 
-void CompetitionEnrollScene::onSubmitButton(cocos2d::Ref *sender) {
+void CompetitionEnrollScene::onSubmitButton(cocos2d::Ref *) {
 #if 1  // 测试代码
     for (size_t i = 0, cnt = _competitionData->players.size(); i < cnt; ++i) {
         std::string &name = _competitionData->players.at(i).name;

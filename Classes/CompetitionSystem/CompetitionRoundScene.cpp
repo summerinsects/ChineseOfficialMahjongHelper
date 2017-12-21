@@ -130,11 +130,11 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     return true;
 }
 
-ssize_t CompetitionRoundScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t CompetitionRoundScene::numberOfCellsInTableView(cw::TableView *) {
     return _players.size();
 }
 
-float CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float CompetitionRoundScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
     return 20.0f;
 }
 
@@ -211,7 +211,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     return cell;
 }
 
-void CompetitionRoundScene::onReportButton(cocos2d::Ref *sender) {
+void CompetitionRoundScene::onReportButton(cocos2d::Ref *) {
     CompetitionTableScene *scene = CompetitionTableScene::create(_competitionData, _currentRound);
     scene->setOnExitCallback([this]() {
         CompetitionRound::sortPlayers(_currentRound, _competitionData->players, _players);

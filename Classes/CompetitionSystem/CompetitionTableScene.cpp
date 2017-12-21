@@ -108,11 +108,11 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     return true;
 }
 
-ssize_t CompetitionTableScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t CompetitionTableScene::numberOfCellsInTableView(cw::TableView *) {
     return _competitionTables->size();
 }
 
-float CompetitionTableScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float CompetitionTableScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
     return 80.0f;
 }
 

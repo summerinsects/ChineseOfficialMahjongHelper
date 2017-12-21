@@ -124,11 +124,11 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
     return true;
 }
 
-ssize_t CompetitionHistoryScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t CompetitionHistoryScene::numberOfCellsInTableView(cw::TableView *) {
     return _dataTexts.size();
 }
 
-float CompetitionHistoryScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float CompetitionHistoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
     return 40.0f;
 }
 

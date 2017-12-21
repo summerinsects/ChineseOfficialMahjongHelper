@@ -105,11 +105,11 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     return true;
 }
 
-ssize_t CompetitionRankCustomScene::numberOfCellsInTableView(cw::TableView *table) {
+ssize_t CompetitionRankCustomScene::numberOfCellsInTableView(cw::TableView *) {
     return ((_tableCount >> 1) + (_tableCount & 1));
 }
 
-float CompetitionRankCustomScene::tableCellSizeForIndex(cw::TableView *table, ssize_t idx) {
+float CompetitionRankCustomScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
     return 80.0f;
 }
 
@@ -252,7 +252,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
     return cell;
 }
 
-void CompetitionRankCustomScene::onResetButton(cocos2d::Ref *sender) {
+void CompetitionRankCustomScene::onResetButton(cocos2d::Ref *) {
     AlertView::showWithMessage("清空", "确定清空？", 12, [this]() {
         _playerFlags.assign(_playerFlags.size(), false);
         _playerIndices.assign(_playerFlags.size(), INVALID_INDEX);
@@ -261,7 +261,7 @@ void CompetitionRankCustomScene::onResetButton(cocos2d::Ref *sender) {
     }, nullptr);
 }
 
-void CompetitionRankCustomScene::onSubmitButton(cocos2d::Ref *sender) {
+void CompetitionRankCustomScene::onSubmitButton(cocos2d::Ref *) {
     std::vector<CompetitionTable> &tables = _competitionData->rounds[_currentRound].tables;
     tables.resize(_tableCount);
     for (ssize_t i = 0; i < _tableCount; ++i) {
@@ -309,8 +309,8 @@ namespace {
     public:
         const std::vector<uint8_t> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_4(AlertInnerNode, initWithPlayers, const std::vector<CompetitionPlayer> *, players, const std::vector<uint8_t> *, playerFlags, const std::vector<ptrdiff_t> *, playerIndices, ssize_t, realIndex);
-        bool initWithPlayers(const std::vector<CompetitionPlayer> *players, const std::vector<uint8_t> *playerFlags, const std::vector<ptrdiff_t> *playerIndices, ssize_t realIndex) {
+        CREATE_FUNC_WITH_PARAM_3(AlertInnerNode, initWithPlayers, const std::vector<CompetitionPlayer> *, players, const std::vector<uint8_t> *, playerFlags, const std::vector<ptrdiff_t> *, playerIndices);
+        bool initWithPlayers(const std::vector<CompetitionPlayer> *players, const std::vector<uint8_t> *playerFlags, const std::vector<ptrdiff_t> *playerIndices) {
             if (UNLIKELY(!Node::init())) {
                 return false;
             }
@@ -352,11 +352,11 @@ namespace {
             return true;
         }
 
-        virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override {
+        virtual ssize_t numberOfCellsInTableView(cw::TableView *) override {
             return _playerFlags->size() >> 1;
         }
 
-        virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override {
+        virtual float tableCellSizeForIndex(cw::TableView *, ssize_t) override {
             return 30.0f;
         }
 
@@ -440,7 +440,7 @@ namespace {
 }
 
 void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
-    AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &_playerFlags, &_playerIndices, realIndex);
+    AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &_playerFlags, &_playerIndices);
     std::string title = Common::format("选择选手：%" PRIzd "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
     AlertView::showWithNode(title, innerNode, [this, innerNode, realIndex]() {
         const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
