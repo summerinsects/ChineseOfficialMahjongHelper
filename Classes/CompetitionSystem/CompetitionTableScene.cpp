@@ -387,7 +387,9 @@ namespace {
                 const CompetitionPlayer *player = &players[currentTable.player_indices[i]];
 
                 const float posY = 70.0f - 20.0f * i;
-                std::string text[3] = { seatText[i], std::to_string(player->serial + 1), player->name };
+                std::string text[5] = { seatText[i], std::to_string(player->serial + 1), player->name,
+                    CompetitionResult::standardScoreToString(_results[i].standard_score), std::to_string(_results[i].competition_score)
+                };
 
                 for (int k = 0; k < 3; ++k) {
                     Label *label = Label::createWithSystemFont(text[k], "Arail", 12);
@@ -406,18 +408,13 @@ namespace {
                     editBox->setFontColor(textColors[k + 3]);
                     editBox->setFontSize(12);
                     editBox->setTextHorizontalAlignment(TextHAlignment::CENTER);
+                    editBox->setText(text[k + 3].c_str());
                     editBox->setMaxLength(6);
                     editBox->setPosition(Vec2(_posX[k + 3], posY));
                     editBox->setTag(i << 4 | k);
                     editBox->setDelegate(this);
                     _editBoxes[i][k] = editBox;
                 }
-
-                float ss = _results[i].standard_score;
-                _editBoxes[i][0]->setText(CompetitionResult::standardScoreToString(ss).c_str());
-
-                int cs = _results[i].competition_score;
-                _editBoxes[i][1]->setText(std::to_string(cs).c_str());
             }
 
             // 自动计算按钮
