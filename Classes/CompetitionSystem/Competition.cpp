@@ -457,7 +457,7 @@ void CompetitionDataFromJson(const rapidjson::Value &json, CompetitionData &data
 
     it = json.FindMember("round_count");
     if (it != json.MemberEnd() && it->value.IsUint64()) {
-        data.round_count = it->value.GetUint64();
+        data.round_count = static_cast<size_t>(it->value.GetUint64());
     }
 
     it = json.FindMember("start_time");
@@ -532,7 +532,7 @@ bool CompetitionData::readFromFile() {
         fseek(fp, 0, SEEK_SET);
         try {
             str.resize(size + 1);
-            fread(&str[0], sizeof(char), size, fp);
+            fread(&str[0], sizeof(char), static_cast<size_t>(size), fp);
         }
         catch (...) {
         }

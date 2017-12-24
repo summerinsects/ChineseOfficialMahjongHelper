@@ -41,14 +41,14 @@ void CompetitionHistoryScene::updateDataTexts() {
         int len = snprintf(str, BUF_SIZE, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (data.finish_time != 0) {
             ret = *localtime(&data.finish_time);
-            len += snprintf(str + len, BUF_SIZE - len, "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         }
         else {
-            len += snprintf(str + len, BUF_SIZE - len, "%s", "——(未结束)");
+            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "%s", "——(未结束)");
         }
 
-        len += snprintf(str + len, BUF_SIZE - len, "\n%s", data.name.c_str());
-        len += snprintf(str + len, BUF_SIZE - len, "\n%" PRIzd "人，%" PRIzd "轮", data.players.size(), data.round_count);
+        len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "\n%s", data.name.c_str());
+        snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "\n%" PRIzd "人，%" PRIzd "轮", data.players.size(), data.round_count);
 
         return str;
     });

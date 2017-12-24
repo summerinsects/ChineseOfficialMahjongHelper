@@ -467,7 +467,7 @@ namespace {
             int i = tag >> 4, k = tag & 0xF;
 
             switch (k) {
-            case 0: _results[i].standard_score = atof(editBox->getText()); break;
+            case 0: _results[i].standard_score = static_cast<float>(atof(editBox->getText())); break;
             case 1: _results[i].competition_score = atoi(editBox->getText()); break;
             default: break;
             }

@@ -152,12 +152,12 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
 
         text = editBoxes[1]->getText();
         if (*text != '\0') {
-            player = atoll(text);
+            player = static_cast<size_t>(atoll(text));
         }
 
         text = editBoxes[2]->getText();
         if (*text != '\0') {
-            round = atoll(text);
+            round = static_cast<size_t>(atoll(text));
         }
 
         if (name.empty()) {
