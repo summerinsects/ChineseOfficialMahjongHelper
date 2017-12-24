@@ -193,7 +193,7 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile);
 struct calculate_param_t {
     hand_tiles_t hand_tiles;    ///< 手牌
     tile_t win_tile;            ///< 和牌张
-    int flower_count;           ///< 花牌数
+    uint8_t flower_count;       ///< 花牌数
     win_flag_t win_flag;        ///< 和牌标记
     wind_t prevalent_wind;      ///< 圈风
     wind_t seat_wind;           ///< 门风

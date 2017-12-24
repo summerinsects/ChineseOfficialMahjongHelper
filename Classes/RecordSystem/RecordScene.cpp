@@ -884,7 +884,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
         return;
     }
 
-    temp.flower_count = extraInfo->getFlowerCount();
+    temp.flower_count = static_cast<uint8_t>(extraInfo->getFlowerCount());
     if (temp.flower_count > 8) {
         AlertView::showWithMessage("记录和牌", "花牌数的范围为0~8", 12, std::bind(&RecordScene::showCalculator, this, param), nullptr);
         return;
