@@ -401,7 +401,7 @@ void ScoreSheetScene::reset() {
     onTimeScheduler(0.0f);
     this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
 
-    for (int i = 0; i < 16; ++i) {
+    for (size_t i = 0; i < 16; ++i) {
         cleanRow(i);
     }
 }
@@ -584,10 +584,10 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
     int winIndex = WIN_INDEX(wc);
     int claimIndex = CLAIM_INDEX(wc);
     if (winIndex == claimIndex) {
-        ret.append(Common::format("「%s」自摸%s%d番。\n", record->name[winIndex], fanText.c_str(), detail.fan));
+        ret.append(Common::format("「%s」自摸%s%hu番。\n", record->name[winIndex], fanText.c_str(), detail.fan));
     }
     else {
-        ret.append(Common::format("「%s」和%s%d番，「%s」点炮。\n", record->name[winIndex], fanText.c_str(), detail.fan, record->name[claimIndex]));
+        ret.append(Common::format("「%s」和%s%hu番，「%s」点炮。\n", record->name[winIndex], fanText.c_str(), detail.fan, record->name[claimIndex]));
     }
 
     return ret;

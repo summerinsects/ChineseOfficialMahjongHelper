@@ -157,7 +157,7 @@ static const tile_t all_tiles[] = {
  * - 一种是用牌表，各索引表示各种牌拥有的枚数，这种存储方式的优点是在递归计算时削减面子只需要修改表中相应下标的值，缺点是一手牌的总数不方便确定
  * - 另一种是直接用牌的数组，这种存储方式的优点是很容易确定一手牌的总数，缺点是在递归计算时削减面子不方便，需要进行数组删除元素操作
  */
-typedef int tile_table_t[TILE_TABLE_SIZE];
+typedef uint16_t tile_table_t[TILE_TABLE_SIZE];
 
 #define PACK_TYPE_NONE 0  ///< 无效
 #define PACK_TYPE_CHOW 1  ///< 顺子

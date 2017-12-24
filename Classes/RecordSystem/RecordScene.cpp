@@ -470,10 +470,10 @@ static inline void updatePenaltyLabel(Label *label, int16_t ps) {
 }
 
 void RecordScene::refresh() {
-    int wc = _detail.win_claim;
+    uint8_t wc = _detail.win_claim;
     if (_detail.fan >= 8) {
         char str[32];
-        snprintf(str, sizeof(str), "%d", _detail.fan);
+        snprintf(str, sizeof(str), "%hu", _detail.fan);
         _editBox->setText(str);
     }
 
@@ -531,7 +531,7 @@ void RecordScene::updateScoreLabel() {
     int claimIndex = -1;
     if (_winIndex != -1) {  // 有人和牌
         int fan = atoi(_editBox->getText());  // 获取输入框里所填番数
-        _detail.fan = std::max(8, fan);
+        _detail.fan = std::max<uint16_t>(8, fan);
         claimIndex = _claimGroup->getSelectedButtonIndex();
 
         // 记录和牌和点炮
@@ -772,8 +772,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     int currentWinScore = 0;
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
         if (TEST_FAN(_detail.fan_flag, n)) {
-            unsigned idx = n;
-            currentWinScore += mahjong::fan_value_table[idx];
+            currentWinScore += mahjong::fan_value_table[n];
         }
     }
     currentWinScore = std::max(8, currentWinScore);
@@ -885,7 +884,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
         return;
     }
 
-    temp.flower_count = extraInfo->getFlowerCount();
+    temp.flower_count = static_cast<uint8_t>(extraInfo->getFlowerCount());
     if (temp.flower_count > 8) {
         AlertView::showWithMessage("记录和牌", "花牌数的范围为0~8", 12, std::bind(&RecordScene::showCalculator, this, param), nullptr);
         return;
@@ -1000,7 +999,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     }
 
     AlertView::showWithNode("记录和牌", innerNode, [this, temp, fan, fanFlag, packedFan]() {
-        _detail.fan = std::max(fan, 8);
+        _detail.fan = std::max<uint16_t>(fan, 8);
         _detail.fan_flag = fanFlag;
         _detail.packed_fan = packedFan;
 

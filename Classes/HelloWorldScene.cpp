@@ -12,7 +12,7 @@
 #include "LatestCompetition/LatestCompetitionScene.h"
 #include "CompetitionSystem/CompetitionMainScene.h"
 
-#define VERSION 0x010208
+#define VERSION 0x010209
 
 USING_NS_CC;
 

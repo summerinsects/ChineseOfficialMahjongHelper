@@ -140,12 +140,8 @@ bool MahjongTheoryScene::init() {
     _discardLabelWidth = tempLabel->getContentSize().width;
     tempLabel->setString("」摸「");
     _servingLabelWidth1 = tempLabel->getContentSize().width;
-    tempLabel->setString("摸「");
-    _servingLabelWidth2 = tempLabel->getContentSize().width;
     tempLabel->setString("」听「");
     _waitingLabelWidth1 = tempLabel->getContentSize().width;
-    tempLabel->setString("听「");
-    _waitingLabelWidth2 = tempLabel->getContentSize().width;
     tempLabel->setString("」共0种，00枚");
     _totalLabelWidth = tempLabel->getContentSize().width;
 

@@ -1813,11 +1813,11 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
         if (fixed_cnt == 0) {  // 门清的牌有可能存在边张、嵌张、单钓将
             // 将除去组合龙的部分恢复成牌
             --cnt_table[win_tile];
-            tile_t standing_tiles[4];
-            intptr_t standing_cnt = packs_to_tiles(&packs[3], 2, standing_tiles, 4);
+            tile_t tiles[4];
+            intptr_t cnt = packs_to_tiles(&packs[3], 2, tiles, 4);
 
             // 听牌方式校正，确定边张、嵌张、单钓将
-            adjust_by_waiting_form(packs + 3, 2, standing_tiles, standing_cnt, win_tile, fan_table);
+            adjust_by_waiting_form(packs + 3, 2, tiles, cnt, win_tile, fan_table);
         }
         else {
             // 非门清状态如果听牌不在组合龙范围内，必然是单钓将
@@ -1838,7 +1838,7 @@ static forceinline bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
 }
 
 // 全不靠/七星不靠算番
-static bool caculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], fan_table_t &fan_table) {
+static bool calculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], fan_table_t &fan_table) {
     const tile_t *honor_begin = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
     ptrdiff_t numbered_cnt = honor_begin - standing_tiles;
     // 数牌张数大于9或者小于7必然不可能是全不靠
@@ -1912,7 +1912,7 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
         fan_table[THIRTEEN_ORPHANS] = 1;
     }
     // 全不靠/七星不靠
-    else if (caculate_honors_and_knitted_tiles(standing_tiles, fan_table)) {
+    else if (calculate_honors_and_knitted_tiles(standing_tiles, fan_table)) {
     }
     else {
         return false;

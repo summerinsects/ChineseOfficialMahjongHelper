@@ -85,7 +85,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     const size_t currentLevelCount = eachLevelCounts[idx];
     size_t totalRows = computeRowsAlign4(currentLevelCount);
 
-    const CustomCell::ExtDataType ext = cell->getExtData();
+    const CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
     const std::array<ui::Button *, 13> &buttons = std::get<1>(ext);
 

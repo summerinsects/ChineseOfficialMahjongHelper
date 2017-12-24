@@ -15,24 +15,24 @@ void scaleLabelToFitWidth(cocos2d::Label *label, float width) {
 
 void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width) {
     // 保存原始尺寸
-    const cocos2d::Size orginSize = label->getContentSize();
-    if (orginSize.width <= width) {
+    const cocos2d::Size originSize = label->getContentSize();
+    if (originSize.width <= width) {
         return;
     }
 
     // 保存原始文本
-    const std::string orginText = label->getString();
+    const std::string originText = label->getString();
 
     // 设置成三个点，并获取尺寸
     label->setString("...");
     const cocos2d::Size dotSize = label->getContentSize();
 
     // 切割比例
-    const float cutWidth = orginSize.width + dotSize.width - width;
-    const float cutRate = cutWidth / orginSize.width;
+    const float cutWidth = originSize.width + dotSize.width - width;
+    const float cutRate = cutWidth / originSize.width;
 
     // UTF8字符串
-    const cocos2d::StringUtils::StringUTF8 utf8(orginText);
+    const cocos2d::StringUtils::StringUTF8 utf8(originText);
     const cocos2d::StringUtils::StringUTF8::CharUTF8Store &utf8String = utf8.getString();
 
     // 计算按比例切割后，每部分的UTF8字符数
@@ -41,7 +41,7 @@ void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width) {
     size_t leftLength = (totalLength - cutLength) / 2;
 
     if (leftLength == 0) {
-        label->setString(orginText);
+        label->setString(originText);
         return;
     }
 
@@ -71,7 +71,7 @@ void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width) {
         newString.erase(partLength + 3, charLength2);
     } while (--leftLength > 0);
 
-    label->setString(orginText);
+    label->setString(originText);
 }
 
 void calculateColumnsCenterX(const float *colWidth, size_t col, float *xPos) {

@@ -104,7 +104,7 @@ parse_finish:
     if (out_tile_cnt != nullptr) {
         *out_tile_cnt = tile_cnt;
     }
-    return (p - str);
+    return static_cast<intptr_t>(p - str);
 }
 
 // 解析牌
@@ -117,7 +117,7 @@ intptr_t parse_tiles(const char *str, tile_t *tiles, intptr_t max_cnt) {
 }
 
 // 生成副露
-static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *pack, int8_t offer) {
+static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *pack, uint8_t offer) {
     if (tile_cnt > 0) {
         if (tile_cnt != 3 && tile_cnt != 4) {
             return PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK;
@@ -302,7 +302,7 @@ intptr_t tiles_to_string(const tile_t *tiles, intptr_t tile_cnt, char *str, intp
     if (p < end) {
         *p = '\0';
     }
-    return p - str;
+    return static_cast<intptr_t>(p - str);
 }
 
 // 牌组转换为字符串
@@ -364,7 +364,7 @@ intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intp
     if (p < end) {
         *p = '\0';
     }
-    return p - str;
+    return static_cast<intptr_t>(p - str);
 }
 
 // 手牌结构转换为字符串
@@ -372,7 +372,7 @@ intptr_t hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, intptr_
     char *p = str, *end = str + max_size;
     p += packs_to_string(hand_tiles->fixed_packs, hand_tiles->pack_count, str, max_size);
     if (p < end) p += tiles_to_string(hand_tiles->standing_tiles, hand_tiles->tile_count, p, end - p);
-    return p - str;
+    return static_cast<intptr_t>(p - str);
 }
 
 }

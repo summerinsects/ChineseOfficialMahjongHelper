@@ -66,13 +66,13 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
 
             it = detail_json.FindMember("fan");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.fan = it->value.GetUint();
+                detail_data.fan = static_cast<uint16_t>(it->value.GetUint());
             }
 
             // 兼容旧的key
             it = detail_json.FindMember("score");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.fan = it->value.GetUint();
+                detail_data.fan = static_cast<uint16_t>(it->value.GetUint());
             }
 
             it = detail_json.FindMember("fan_flag");
@@ -102,12 +102,12 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
 
                 it = win_hand_json.FindMember("win_flag");
                 if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
-                    win_hand_data.win_flag = it->value.GetUint();
+                    win_hand_data.win_flag = static_cast<uint8_t>(it->value.GetUint());
                 }
 
                 it = win_hand_json.FindMember("flower_count");
                 if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
-                    win_hand_data.flower_count = it->value.GetUint();
+                    win_hand_data.flower_count = static_cast<uint8_t>(it->value.GetUint());
                 }
             }
         }
@@ -115,12 +115,12 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
 
     it = json.FindMember("start_time");
     if (it != json.MemberEnd() && it->value.IsUint64()) {
-        record.start_time = it->value.GetUint64();
+        record.start_time = static_cast<time_t>(it->value.GetUint64());
     }
 
     it = json.FindMember("end_time");
     if (it != json.MemberEnd() && it->value.IsUint64()) {
-        record.end_time = it->value.GetUint64();
+        record.end_time = static_cast<time_t>(it->value.GetUint64());
     }
 }
 
@@ -298,7 +298,7 @@ void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
     memset(scoreTable, 0, sizeof(scoreTable));
-    int fan = detail.fan;
+    int fan = static_cast<int>(detail.fan);
     if (fan >= 8 && !!(detail.win_claim & 0xF0)) {
         uint8_t wc = detail.win_claim;
         int winIndex = WIN_INDEX(wc);

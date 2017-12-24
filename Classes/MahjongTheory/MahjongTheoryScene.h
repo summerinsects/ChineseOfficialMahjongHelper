@@ -58,9 +58,7 @@ private:
     float _cellWidth = 0.0f;
     float _discardLabelWidth = 0.0f;
     float _servingLabelWidth1 = 0.0f;
-    float _servingLabelWidth2 = 0.0f;
     float _waitingLabelWidth1 = 0.0f;
-    float _waitingLabelWidth2 = 0.0f;
     float _totalLabelWidth = 0.0f;
     std::unordered_map<uint16_t, int> _cellHeightMap;
 

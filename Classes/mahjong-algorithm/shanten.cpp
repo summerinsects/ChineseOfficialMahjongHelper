@@ -144,7 +144,7 @@ namespace {
 #define UNIT_TYPE_CHOW_CLOSED 6         // 嵌张搭子
 #define UNIT_TYPE_INCOMPLETE_PUNG 7     // 刻子搭子
 
-#define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
+#define MAKE_UNIT(type_, tile_) static_cast<path_unit_t>(((type_) << 8) | (tile_))
 #define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
 #define UNIT_TILE(unit_) ((unit_) & 0xFF)
 
@@ -861,14 +861,14 @@ static int basic_form_shanten_specified(const tile_table_t &cnt_table, const til
 
     tile_table_t temp_table;
     memcpy(temp_table, cnt_table, sizeof(temp_table));
-    int exsit_cnt = 0;
+    int exist_cnt = 0;
 
     // 统计主番的牌
     for (int i = 0; i < main_cnt; ++i) {
         tile_t t = main_tiles[i];
         int n = cnt_table[t];
         if (n > 0) {  // 有，削减之
-            ++exsit_cnt;
+            ++exist_cnt;
             --temp_table[t];
         }
         else if (useful_table != nullptr) {  // 没有，记录有效牌
@@ -880,7 +880,7 @@ static int basic_form_shanten_specified(const tile_table_t &cnt_table, const til
     int result = basic_form_shanten_from_table(temp_table, fixed_cnt + main_cnt / 3, useful_table);
 
     // 上听数=主番缺少的张数+余下牌的上听数
-    return (main_cnt - exsit_cnt) + result;
+    return (main_cnt - exist_cnt) + result;
 }
 
 // 组合龙上听数
