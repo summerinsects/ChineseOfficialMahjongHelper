@@ -135,7 +135,7 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
         widgets[1] = widget;
     }
 
-    const CustomCell::ExtDataType ext = cell->getExtData();
+    const CustomCell::ExtDataType &ext = cell->getExtData();
     const std::array<Label *, 4> &labels = std::get<0>(ext);
     const std::array<ui::Widget *, 2> &widgets = std::get<1>(ext);
     const std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);

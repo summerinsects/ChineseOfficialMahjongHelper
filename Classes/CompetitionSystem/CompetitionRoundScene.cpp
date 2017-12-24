@@ -180,7 +180,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
         }
     }
 
-    const CustomCell::ExtDataType ext = cell->getExtData();
+    const CustomCell::ExtDataType &ext = cell->getExtData();
     const std::array<Label *, 7> &labels = std::get<0>(ext);
     const std::array<LayerColor *, 2> &layerColors = std::get<1>(ext);
 

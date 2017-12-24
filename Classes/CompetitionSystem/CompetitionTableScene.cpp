@@ -216,7 +216,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         }
     }
 
-    const CustomCell::ExtDataType ext = cell->getExtData();
+    const CustomCell::ExtDataType &ext = cell->getExtData();
     Label *tableLabel = std::get<0>(ext);
     const std::array<std::array<Label *, 4>, 4> &labels = std::get<1>(ext);
     const std::array<ui::Button *, 2> &buttons = std::get<2>(ext);

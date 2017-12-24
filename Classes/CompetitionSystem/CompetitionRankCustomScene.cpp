@@ -203,7 +203,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
         drawNodes[0]->drawLine(Vec2(halfWidth, 0.0f), Vec2(halfWidth, 80.0f), Color4F::BLACK);
     }
 
-    const CustomCell::ExtDataType ext = cell->getExtData();
+    const CustomCell::ExtDataType &ext = cell->getExtData();
     const std::array<ui::Widget *, 2> &rootWidgets = std::get<0>(ext);
     const std::array<Label *, 2> &tableLabels = std::get<1>(ext);
     const std::array<std::array<std::array<Label *, 2>, 4>, 2> &labels = std::get<2>(ext);
