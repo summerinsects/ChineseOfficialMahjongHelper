@@ -155,7 +155,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
             for (int i = 0; i < 4; ++i) {
                 const float posY = static_cast<float>(70 - i * 20);
 
-                Label *label = Label::createWithSystemFont(seatText[i], "Arail", 12);
+                label = Label::createWithSystemFont(seatText[i], "Arail", 12);
                 label->setColor(Color3B::BLACK);
                 rootWidget->addChild(label);
                 label->setPosition(Vec2(_posX[1], posY));
@@ -167,7 +167,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                 const float posY = static_cast<float>(70 - i * 20);
 
                 for (int k = 0; k < 2; ++k) {
-                    Label *label = Label::createWithSystemFont("", "Arail", 12);
+                    label = Label::createWithSystemFont("", "Arail", 12);
                     label->setColor(textColor[k]);
                     rootWidget->addChild(label);
                     label->setPosition(Vec2(_posX[2 + k], posY));

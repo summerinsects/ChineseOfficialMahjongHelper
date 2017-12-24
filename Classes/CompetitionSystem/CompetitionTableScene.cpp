@@ -374,7 +374,7 @@ namespace {
 
             static const char *titleTexts[] = { "座次", "编号", "选手姓名", "标准分", "比赛分" };
             for (int i = 0; i < 5; ++i) {
-                Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
+                label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
                 label->setColor(Color3B::BLACK);
                 drawNode->addChild(label);
                 label->setPosition(Vec2(_posX[i], 90.0f));
@@ -392,7 +392,7 @@ namespace {
                 };
 
                 for (int k = 0; k < 3; ++k) {
-                    Label *label = Label::createWithSystemFont(text[k], "Arail", 12);
+                    label = Label::createWithSystemFont(text[k], "Arail", 12);
                     label->setColor(textColors[k]);
                     drawNode->addChild(label);
                     label->setPosition(Vec2(_posX[k], posY));
