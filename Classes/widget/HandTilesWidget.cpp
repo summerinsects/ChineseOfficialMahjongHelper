@@ -653,11 +653,11 @@ int HandTilesWidget::calcMeldedIdx(int maxIdx) const {
         offset = 1;
     }
 
-    bool leftExsits = std::any_of(_standingTiles.begin(), _standingTiles.begin() + _currentIdx,
+    bool leftExists = std::any_of(_standingTiles.begin(), _standingTiles.begin() + _currentIdx,
         [tile](mahjong::tile_t t) { return tile == t; });
-    bool rightExsits = std::any_of(_standingTiles.begin() + _currentIdx + 1, _standingTiles.end() - offset,
+    bool rightExists = std::any_of(_standingTiles.begin() + _currentIdx + 1, _standingTiles.end() - offset,
         [tile](mahjong::tile_t t) { return tile == t; });
-    return leftExsits ? (rightExsits ? 1 : maxIdx) : 0;
+    return leftExists ? (rightExists ? 1 : maxIdx) : 0;
 }
 
 bool HandTilesWidget::makeFixedPungPack() {
