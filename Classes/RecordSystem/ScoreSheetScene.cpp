@@ -401,7 +401,7 @@ void ScoreSheetScene::reset() {
     onTimeScheduler(0.0f);
     this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
 
-    for (int i = 0; i < 16; ++i) {
+    for (size_t i = 0; i < 16; ++i) {
         cleanRow(i);
     }
 }

@@ -470,7 +470,7 @@ static inline void updatePenaltyLabel(Label *label, int16_t ps) {
 }
 
 void RecordScene::refresh() {
-    int wc = _detail.win_claim;
+    uint8_t wc = _detail.win_claim;
     if (_detail.fan >= 8) {
         char str[32];
         snprintf(str, sizeof(str), "%d", _detail.fan);
@@ -772,8 +772,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
     int currentWinScore = 0;
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
         if (TEST_FAN(_detail.fan_flag, n)) {
-            unsigned idx = n;
-            currentWinScore += mahjong::fan_value_table[idx];
+            currentWinScore += mahjong::fan_value_table[n];
         }
     }
     currentWinScore = std::max(8, currentWinScore);
