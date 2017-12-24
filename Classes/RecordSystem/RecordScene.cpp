@@ -473,7 +473,7 @@ void RecordScene::refresh() {
     uint8_t wc = _detail.win_claim;
     if (_detail.fan >= 8) {
         char str[32];
-        snprintf(str, sizeof(str), "%d", _detail.fan);
+        snprintf(str, sizeof(str), "%hu", _detail.fan);
         _editBox->setText(str);
     }
 
@@ -531,7 +531,7 @@ void RecordScene::updateScoreLabel() {
     int claimIndex = -1;
     if (_winIndex != -1) {  // 有人和牌
         int fan = atoi(_editBox->getText());  // 获取输入框里所填番数
-        _detail.fan = std::max(8, fan);
+        _detail.fan = std::max<uint16_t>(8, fan);
         claimIndex = _claimGroup->getSelectedButtonIndex();
 
         // 记录和牌和点炮
@@ -999,7 +999,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     }
 
     AlertView::showWithNode("记录和牌", innerNode, [this, temp, fan, fanFlag, packedFan]() {
-        _detail.fan = std::max(fan, 8);
+        _detail.fan = std::max<uint16_t>(fan, 8);
         _detail.fan_flag = fanFlag;
         _detail.packed_fan = packedFan;
 

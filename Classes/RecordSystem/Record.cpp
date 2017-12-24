@@ -66,13 +66,13 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
 
             it = detail_json.FindMember("fan");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.fan = it->value.GetUint();
+                detail_data.fan = static_cast<uint16_t>(it->value.GetUint());
             }
 
             // 兼容旧的key
             it = detail_json.FindMember("score");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.fan = it->value.GetUint();
+                detail_data.fan = static_cast<uint16_t>(it->value.GetUint());
             }
 
             it = detail_json.FindMember("fan_flag");
@@ -298,7 +298,7 @@ void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
     memset(scoreTable, 0, sizeof(scoreTable));
-    int fan = detail.fan;
+    int fan = static_cast<int>(detail.fan);
     if (fan >= 8 && !!(detail.win_claim & 0xF0)) {
         uint8_t wc = detail.win_claim;
         int winIndex = WIN_INDEX(wc);
