@@ -123,12 +123,12 @@ bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
 
                 it = json.FindMember("start_time");
                 if (it != json.MemberEnd() && it->value.IsInt64()) {
-                    info.startTime = it->value.GetInt64();
+                    info.startTime = static_cast<time_t>(it->value.GetInt64());
                 }
 
                 it = json.FindMember("end_time");
                 if (it != json.MemberEnd() && it->value.IsInt64()) {
-                    info.endTime = it->value.GetInt64();
+                    info.endTime = static_cast<time_t>(it->value.GetInt64());
                 }
 
                 it = json.FindMember("url");

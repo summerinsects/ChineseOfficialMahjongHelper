@@ -102,12 +102,12 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
 
                 it = win_hand_json.FindMember("win_flag");
                 if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
-                    win_hand_data.win_flag = it->value.GetUint();
+                    win_hand_data.win_flag = static_cast<uint8_t>(it->value.GetUint());
                 }
 
                 it = win_hand_json.FindMember("flower_count");
                 if (it != win_hand_json.MemberEnd() && it->value.IsUint()) {
-                    win_hand_data.flower_count = it->value.GetUint();
+                    win_hand_data.flower_count = static_cast<uint8_t>(it->value.GetUint());
                 }
             }
         }
@@ -115,12 +115,12 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
 
     it = json.FindMember("start_time");
     if (it != json.MemberEnd() && it->value.IsUint64()) {
-        record.start_time = it->value.GetUint64();
+        record.start_time = static_cast<time_t>(it->value.GetUint64());
     }
 
     it = json.FindMember("end_time");
     if (it != json.MemberEnd() && it->value.IsUint64()) {
-        record.end_time = it->value.GetUint64();
+        record.end_time = static_cast<time_t>(it->value.GetUint64());
     }
 }
 

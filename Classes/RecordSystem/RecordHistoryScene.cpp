@@ -39,10 +39,10 @@ void RecordHistoryScene::updateRecordTexts() {
         int len = snprintf(str, BUF_SIZE, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (record.end_time != 0) {
             ret = *localtime(&record.end_time);
-            len += snprintf(str + len, BUF_SIZE - len, "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         }
         else {
-            len += snprintf(str + len, BUF_SIZE - len, "——(未结束)");
+            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——(未结束)");
         }
 
         typedef std::pair<int, int> SeatScore;
@@ -66,7 +66,7 @@ void RecordHistoryScene::updateRecordTexts() {
         });
 
         static const char *seatText[] = { "东", "南", "西", "北" };
-        len += snprintf(str + len, BUF_SIZE - len, "\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)",
+        len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)",
             seatText[seatscore[0].first], record.name[seatscore[0].first], seatscore[0].second,
             seatText[seatscore[1].first], record.name[seatscore[1].first], seatscore[1].second,
             seatText[seatscore[2].first], record.name[seatscore[2].first], seatscore[2].second,
@@ -345,10 +345,10 @@ namespace {
             int len = snprintf(str, BUF_SIZE, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
             if (record.end_time != 0) {
                 ret = *localtime(&record.end_time);
-                len += snprintf(str + len, BUF_SIZE - len, "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+                len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
             }
             else {
-                len += snprintf(str + len, BUF_SIZE - len, "——(未结束)");
+                len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——(未结束)");
             }
             return str;
         });
@@ -489,7 +489,7 @@ namespace {
             radioButtons[i]->setEnabled(finished);
             radioButtons[i]->setUserData(reinterpret_cast<void *>(idx));
             labels[i]->setString(record.name[i]);
-            cw::scaleLabelToFitWidth(labels[i], cellWidth * 0.25 - 20.0f - 2.0f);
+            cw::scaleLabelToFitWidth(labels[i], cellWidth * 0.25f - 20.0f - 2.0f);
         }
 
         // 设置选中

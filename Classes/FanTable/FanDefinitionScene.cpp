@@ -56,7 +56,7 @@ static void replaceTilesToImage(std::string &text, float scale) {
                 totalWriteLen += writeLen;
             }
 
-            text.replace(pos, readLen + 2, imgStr);
+            text.replace(pos, static_cast<std::string::size_type>(readLen + 2), imgStr);
             pos = text.find('[', pos + totalWriteLen);
         }
         else {

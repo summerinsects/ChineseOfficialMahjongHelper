@@ -154,8 +154,8 @@ void HandTilesWidget::getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t 
     *servingTile = st;
 
     // 获取副露
-    handTiles->pack_count = std::copy(_fixedPacks.begin(), _fixedPacks.end(), std::begin(handTiles->fixed_packs))
-        - std::begin(handTiles->fixed_packs);
+    handTiles->pack_count = static_cast<intptr_t>(std::copy(_fixedPacks.begin(), _fixedPacks.end(), std::begin(handTiles->fixed_packs))
+        - std::begin(handTiles->fixed_packs));
 
     size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
     // 获取立牌

@@ -144,7 +144,7 @@ namespace {
 #define UNIT_TYPE_CHOW_CLOSED 6         // 嵌张搭子
 #define UNIT_TYPE_INCOMPLETE_PUNG 7     // 刻子搭子
 
-#define MAKE_UNIT(type_, tile_) (((type_) << 8) | (tile_))
+#define MAKE_UNIT(type_, tile_) static_cast<path_unit_t>(((type_) << 8) | (tile_))
 #define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
 #define UNIT_TILE(unit_) ((unit_) & 0xFF)
 
