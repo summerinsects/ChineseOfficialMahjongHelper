@@ -422,6 +422,8 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *, size_t idx) {
     }
 }
 
+static const char *s_wind[] = { "东", "南", "西", "北" };
+
 void ScoreSheetScene::editName(size_t idx) {
     ui::EditBox *editBox = ui::EditBox::create(Size(120.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -434,15 +436,16 @@ void ScoreSheetScene::editName(size_t idx) {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
-    static const char *wind[] = { "东", "南", "西", "北" };
-    AlertView::showWithNode(Common::format("开局座位「%s」", wind[idx]), editBox, [this, editBox, idx]() {
+    AlertView::showWithNode(Common::format("开局座位「%s」", s_wind[idx]), editBox, [this, editBox, idx]() {
         const char *text = editBox->getText();
         if (text != nullptr) {
             std::string name = text;
             Common::trim(name);
 
             // 开始后不允许清空名字
-            if (_record.start_time != 0 && name.empty()) {
+            if (name.empty()) {
+                AlertView::showWithMessage("提示", "对局开始后不允许清空名字", 12,
+                    std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
                 return;
             }
 
