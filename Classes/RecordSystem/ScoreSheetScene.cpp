@@ -408,7 +408,7 @@ void ScoreSheetScene::reset() {
 
 void ScoreSheetScene::onNameButton(cocos2d::Ref *, size_t idx) {
     if (_record.start_time == 0) {
-        editName(idx);
+        editNameAllAtOnce(idx);
     }
     else {
         if (_record.current_index < 16) {
@@ -484,12 +484,159 @@ void ScoreSheetScene::editName(size_t idx) {
     }, 0.0f, "open_keyboard");
 }
 
+namespace {
+    class ContinuousEditBoxDelegate : public cocos2d::ui::EditBoxDelegate {
+        const std::vector<cocos2d::ui::EditBox *> _editBoxes;
+
+    public:
+        ContinuousEditBoxDelegate(const std::vector<cocos2d::ui::EditBox *> &editBoxes) : _editBoxes(editBoxes) { }
+
+        virtual ~ContinuousEditBoxDelegate() { CCLOG("%s", __FUNCTION__); }
+
+        virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override { }
+
+        virtual void editBoxEditingDidEndWithAction(cocos2d::ui::EditBox *editBox, EditBoxEndAction action) override {
+            // 使得能连续输入
+            if (action == EditBoxEndAction::TAB_TO_NEXT) {
+                auto it = std::find(_editBoxes.begin(), _editBoxes.end(), editBox);
+                if (it != _editBoxes.end() && ++it != _editBoxes.end()) {
+                    editBox = *it;
+                    editBox->scheduleOnce([editBox](float) {
+                        editBox->touchDownAction(editBox, cocos2d::ui::Widget::TouchEventType::ENDED);
+                    }, 0.0f, "open_keyboard");
+                }
+            }
+        }
+    };
+}
+
+void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(150.0f, 120.0f));
+
+    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    rootNode->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("重新抽风");
+    button->setPosition(Vec2(75.0f, 10.0f));
+    cw::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
+
+    std::array<ui::EditBox *, 4> editBoxes;
+
+    for (int i = 0; i < 4; ++i) {
+        const float yPos = 110.0f - i * 25.0f;
+        Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        rootNode->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(5.0f, yPos));
+
+        ui::EditBox *editBox = ui::EditBox::create(Size(120.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+        editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+        editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+        editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
+        editBox->setFontColor(Color3B::BLACK);
+        editBox->setFontSize(12);
+        editBox->setText(_record.name[i]);
+        editBox->setMaxLength(NAME_SIZE - 1);
+        rootNode->addChild(editBox);
+        editBox->setPosition(Vec2(85.0f, yPos));
+
+        editBoxes[i] = editBox;
+    }
+
+    // EditBox的代理，使得能连续输入
+    auto delegate = std::make_shared<ContinuousEditBoxDelegate>(std::vector<ui::EditBox *>(editBoxes.begin(), editBoxes.end()));
+    editBoxes[0]->setDelegate(delegate.get());
+    editBoxes[1]->setDelegate(delegate.get());
+    editBoxes[2]->setDelegate(delegate.get());
+
+    AlertView::showWithNode("输入选手姓名", rootNode, [this, editBoxes, delegate]() {
+        // 获取四个输入框内容
+        std::string names[4];
+        for (int i = 0; i < 4; ++i) {
+            const char *text = editBoxes[i]->getText();
+            if (text != nullptr) {
+                std::string &name = names[i];
+                name = text;
+                Common::trim(name);
+
+                if (name.length() > NAME_SIZE - 1) {
+                    name.erase(NAME_SIZE - 1);
+                }
+            }
+        }
+
+        // 检查重名
+        for (size_t i = 0; i < 4; ++i) {
+            for (size_t k = i + 1; k < 4; ++k) {
+                if (!names[k].empty() && names[k].compare(names[i]) == 0) {
+                    AlertView::showWithMessage("提示", "选手姓名不能相同", 12,
+                        std::bind(&ScoreSheetScene::editName, this, k), nullptr);
+                    return;
+                }
+            }
+        }
+
+        // 提交
+        for (int i = 0; i < 4; ++i) {
+            strncpy(_record.name[i], names[i].c_str(), NAME_SIZE - 1);
+            _nameLabel[i]->setVisible(true);
+            _nameLabel[i]->setString(names[i]);
+            cw::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);
+        }
+
+        if (_record.current_index >= 16) {
+            RecordHistoryScene::modifyRecord(&_record);
+        }
+
+        if (_isGlobal) {
+            writeToFile(_record);
+        }
+    }, nullptr);
+
+    // 自动打开指定下标的editBox
+    ui::EditBox *editBox = editBoxes[idx];
+    editBox->scheduleOnce([editBox](float) {
+        editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
+    }, 0.0f, "open_keyboard");
+
+    button->addClickEventListener([editBoxes](Ref *) {
+        // 获取四个输入框内容
+        std::string names[4];
+        for (int i = 0; i < 4; ++i) {
+            const char *text = editBoxes[i]->getText();
+            if (text != nullptr) {
+                std::string &name = names[i];
+                name = text;
+                Common::trim(name);
+
+                if (name.length() > NAME_SIZE - 1) {
+                    name.erase(NAME_SIZE - 1);
+                }
+            }
+            if (names[i].empty()) {
+                AlertView::showWithMessage("重新抽风", "请先输入四位参赛选手姓名", 12, nullptr, nullptr);
+                return;
+            }
+        }
+
+        srand(static_cast<unsigned>(time(nullptr)));
+        std::random_shuffle(std::begin(names), std::end(names));
+        for (int i = 0; i < 4; ++i) {
+            editBoxes[i]->setText(names[i].c_str());
+        }
+    });
+}
+
 void ScoreSheetScene::onLockButton(cocos2d::Ref *) {
     const char (&name)[4][NAME_SIZE] = _record.name;
     auto it = std::find_if(std::begin(name), std::end(name), &Common::isCStringEmpty);
     if (it != std::end(name)) {
         size_t idx = it - std::begin(name);
-        AlertView::showWithMessage("锁定", "请先录入四位参赛选手姓名", 12, [this, idx]() {
+        AlertView::showWithMessage("锁定", "请先输入四位参赛选手姓名", 12, [this, idx]() {
             editName(idx);
         }, nullptr);
         return;

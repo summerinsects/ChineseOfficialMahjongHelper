@@ -36,6 +36,7 @@ private:
     void reset();
     void onNameButton(cocos2d::Ref *sender, size_t idx);
     void editName(size_t idx);
+    void editNameAllAtOnce(size_t idx);
     void onLockButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender, size_t handIdx);
     void onDetailButton(cocos2d::Ref *sender, size_t handIdx);
