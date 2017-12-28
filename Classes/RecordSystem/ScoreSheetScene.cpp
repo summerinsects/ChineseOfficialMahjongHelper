@@ -907,7 +907,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
 }
 
 namespace {
-    class EditBoxDelegateWrapper : public cocos2d::ui::EditBoxDelegate {
+    class PursuitEditBoxDelegate : public cocos2d::ui::EditBoxDelegate {
     public:
         virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override {
             const char *text = editBox->getText();
@@ -956,7 +956,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     }
 
     // EditBox的代理
-    auto delegate = std::make_shared<EditBoxDelegateWrapper>();
+    auto delegate = std::make_shared<PursuitEditBoxDelegate>();
     editBox->setDelegate(delegate.get());
 
     // 使这个代理随AlertView一起析构
