@@ -407,7 +407,7 @@ void ScoreSheetScene::reset() {
 }
 
 void ScoreSheetScene::onNameButton(cocos2d::Ref *, size_t idx) {
-    if (_lockButton->isVisible() && _lockButton->isEnabled()) {
+    if (_record.start_time == 0) {
         editName(idx);
     }
     else {
