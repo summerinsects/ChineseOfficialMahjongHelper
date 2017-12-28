@@ -705,13 +705,8 @@ void ScoreSheetScene::onHistoryButton(cocos2d::Ref *) {
 }
 
 void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
-    const char (&name)[4][NAME_SIZE] = _record.name;
-    if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
-        reset();
-        return;
-    }
-
-    if (_record.current_index == 16) {
+    // 未开始或已结束时，随便清空
+    if (_record.start_time == 0 || _record.current_index == 16) {
         reset();
         return;
     }
