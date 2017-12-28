@@ -383,6 +383,13 @@ void ScoreSheetScene::recover() {
 }
 
 void ScoreSheetScene::reset() {
+    // 如果选手姓名不为空，则保存上次对局的姓名
+    if (std::all_of(std::begin(_record.name), std::end(_record.name), [](const char (&s)[NAME_SIZE]) { return s[0] != '\0'; })) {
+        for (int i = 0; i < 4; ++i) {
+            _prevName[i] = _record.name[i];
+        }
+    }
+
     memset(&_record, 0, sizeof(_record));
     if (_isGlobal) {
         writeToFile(_record);
@@ -545,6 +552,13 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         editBox->setPosition(Vec2(85.0f, yPos));
 
         editBoxes[i] = editBox;
+    }
+
+    // 如果选手姓名皆为空，则填入上次对局的姓名
+    if (std::all_of(std::begin(_record.name), std::end(_record.name), [](const char (&s)[NAME_SIZE]) { return s[0] == '\0'; })) {
+        for (size_t i = 0; i < 4; ++i) {
+            editBoxes[i]->setText(_prevName[i].c_str());
+        }
     }
 
     // EditBox的代理，使得能连续输入

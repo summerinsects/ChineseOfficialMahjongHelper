@@ -25,6 +25,8 @@ private:
 
     Record _record;
     bool _isGlobal = false;
+    std::string _prevName[4];
+
     bool initWithRecord(Record *record);
 
     void fillRow(size_t handIdx);
