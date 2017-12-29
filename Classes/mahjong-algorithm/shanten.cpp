@@ -696,12 +696,13 @@ int seven_pairs_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, use
 // 七对是否听牌
 bool is_seven_pairs_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *waiting_table) {
     // 直接计算其上听数，上听数为0即为听牌
+    if (waiting_table == nullptr) {
+        return (0 == seven_pairs_shanten(standing_tiles, standing_cnt, nullptr));
+    }
+
     useful_table_t useful_table;
-    if (0 == seven_pairs_shanten(standing_tiles, standing_cnt,
-        waiting_table != nullptr ? &useful_table : nullptr)) {
-        if (waiting_table != nullptr) {
-            memcpy(*waiting_table, useful_table, sizeof(*waiting_table));
-        }
+    if (0 == seven_pairs_shanten(standing_tiles, standing_cnt, &useful_table)) {
+        memcpy(*waiting_table, useful_table, sizeof(*waiting_table));
         return true;
     }
     return false;
@@ -738,6 +739,10 @@ int thirteen_orphans_shanten(const tile_t *standing_tiles, intptr_t standing_cnt
         }
     }
 
+    // 当有对子时，上听数为：12-幺九牌的种类
+    // 当没有对子时，上听数为：13-幺九牌的种类
+    int ret = has_pair ? 12 - cnt : 13 - cnt;
+
     if (useful_table != nullptr) {
         // 先标记所有的幺九牌为有效牌
         memset(*useful_table, 0, sizeof(*useful_table));
@@ -745,11 +750,9 @@ int thirteen_orphans_shanten(const tile_t *standing_tiles, intptr_t standing_cnt
             [useful_table](tile_t t) {
             (*useful_table)[t] = true;
         });
-    }
 
-    if (has_pair) {  // 当有对子时，上听数为：12-幺九牌的种类
-        if (useful_table != nullptr) {
-            // 当有对子时，已有的幺九牌都不需要了
+        // 当有对子时，已有的幺九牌都不需要了
+        if (has_pair) {
             for (int i = 0; i < 13; ++i) {
                 tile_t t = standard_thirteen_orphans[i];
                 int n = cnt_table[t];
@@ -758,22 +761,21 @@ int thirteen_orphans_shanten(const tile_t *standing_tiles, intptr_t standing_cnt
                 }
             }
         }
-        return 12 - cnt;
     }
-    else {  // 当没有对子时，上听数为：13-幺九牌的种类
-        return 13 - cnt;
-    }
+
+    return ret;
 }
 
 // 十三幺是否听牌
 bool is_thirteen_orphans_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *waiting_table) {
     // 直接计算其上听数，上听数为0即为听牌
+    if (waiting_table == nullptr) {
+        return (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt, nullptr));
+    }
+
     useful_table_t useful_table;
-    if (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt,
-        waiting_table != nullptr ? &useful_table : nullptr)) {
-        if (waiting_table != nullptr) {
-            memcpy(*waiting_table, useful_table, sizeof(*waiting_table));
-        }
+    if (0 == thirteen_orphans_shanten(standing_tiles, standing_cnt, &useful_table)) {
+        memcpy(*waiting_table, useful_table, sizeof(*waiting_table));
         return true;
     }
     return false;
@@ -855,9 +857,6 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
 // 基本和型包含主番的上听数，可用于计算三步高 三同顺 龙等三组面子的番种整个立牌的上听数
 static int basic_form_shanten_specified(const tile_table_t &cnt_table, const tile_t *main_tiles, int main_cnt,
     intptr_t fixed_cnt, useful_table_t *useful_table) {
-    if (useful_table != nullptr) {
-        memset(*useful_table, 0, sizeof(*useful_table));
-    }
 
     tile_table_t temp_table;
     memcpy(&temp_table, &cnt_table, sizeof(temp_table));
@@ -871,8 +870,19 @@ static int basic_form_shanten_specified(const tile_table_t &cnt_table, const til
             ++exist_cnt;
             --temp_table[t];
         }
-        else if (useful_table != nullptr) {  // 没有，记录有效牌
-            (*useful_table)[t] = true;
+    }
+
+    // 记录有效牌
+    if (useful_table != nullptr) {
+        memset(*useful_table, 0, sizeof(*useful_table));
+
+        // 统计主番缺失的牌
+        for (int i = 0; i < main_cnt; ++i) {
+            tile_t t = main_tiles[i];
+            int n = cnt_table[t];
+            if (n <= 0) {
+                (*useful_table)[t] = true;
+            }
         }
     }
 
@@ -894,26 +904,35 @@ int knitted_straight_shanten(const tile_t *standing_tiles, intptr_t standing_cnt
     map_tiles(standing_tiles, standing_cnt, &cnt_table);
 
     int ret = std::numeric_limits<int>::max();
-    useful_table_t temp_table;
 
+    // 需要获取有效牌时，计算上听数的同时就获取有效牌了
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
-    }
 
-    // 6种组合龙分别计算
-    for (int i = 0; i < 6; ++i) {
-        int fixed_cnt = (13 - static_cast<int>(standing_cnt)) / 3;
-        int st = basic_form_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt,
-            useful_table != nullptr ? &temp_table : nullptr);
-        if (st < ret) {  // 上听数小的，直接覆盖数据
-            ret = st;
-            if (useful_table != nullptr) {  // 直接覆盖原来的有效牌数据
-                memcpy(*useful_table, temp_table, sizeof(*useful_table));
+        useful_table_t temp_table;
+
+        // 6种组合龙分别计算
+        for (int i = 0; i < 6; ++i) {
+            int fixed_cnt = (13 - static_cast<int>(standing_cnt)) / 3;
+            int st = basic_form_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt, &temp_table);
+            if (st < ret) {  // 上听数小的，直接覆盖数据
+                ret = st;
+                memcpy(*useful_table, temp_table, sizeof(*useful_table));  // 直接覆盖原来的有效牌数据
+            }
+            else if (st == ret) {  // 两种不同组合龙上听数如果相等的话，直接合并有效牌
+                std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table),
+                    std::begin(*useful_table), [](bool u, bool t) { return u || t; });
             }
         }
-        else if (st == ret && useful_table != nullptr) {  // 两种不同组合龙上听数如果相等的话，直接合并有效牌
-            std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table),
-                std::begin(*useful_table), [](bool u, bool t) { return u || t; });
+    }
+    else {
+        // 6种组合龙分别计算
+        for (int i = 0; i < 6; ++i) {
+            int fixed_cnt = (13 - static_cast<int>(standing_cnt)) / 3;
+            int st = basic_form_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt, nullptr);
+            if (st < ret) {
+                ret = st;
+            }
         }
     }
 
@@ -948,10 +967,6 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, intp
         return std::numeric_limits<int>::max();
     }
 
-    if (useful_table != nullptr) {
-        memset(*useful_table, 0, sizeof(*useful_table));
-    }
-
     // 对牌的种类进行打表
     tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, &cnt_table);
@@ -965,9 +980,6 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, intp
         if (n > 0) {  // 有，增加计数
             ++cnt;
         }
-        else if (useful_table != nullptr) {  // 没有，记录有效牌
-            (*useful_table)[t] = true;
-        }
     }
 
     // 统计字牌
@@ -977,8 +989,28 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, intp
         if (n > 0) {  // 有，增加计数
             ++cnt;
         }
-        else if (useful_table != nullptr) {  // 没有，记录有效牌
-            (*useful_table)[t] = true;
+    }
+
+    // 记录有效牌
+    if (useful_table != nullptr) {
+        memset(*useful_table, 0, sizeof(*useful_table));
+
+        // 统计组合龙部分缺失的数牌
+        for (int i = 0; i < 9; ++i) {
+            tile_t t = standard_knitted_straight[which_seq][i];
+            int n = cnt_table[t];
+            if (n <= 0) {
+                (*useful_table)[t] = true;
+            }
+        }
+
+        // 统计缺失的字牌
+        for (int i = 6; i < 13; ++i) {
+            tile_t t = standard_thirteen_orphans[i];
+            int n = cnt_table[t];
+            if (n <= 0) {
+                (*useful_table)[t] = true;
+            }
         }
     }
 
@@ -989,24 +1021,33 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, intp
 // 全不靠上听数
 int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
     int ret = std::numeric_limits<int>::max();
-    useful_table_t temp_table;
 
+    // 需要获取有效牌时，计算上听数的同时就获取有效牌了
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
-    }
 
-    // 6种组合龙分别计算
-    for (int i = 0; i < 6; ++i) {
-        int st = honors_and_knitted_tiles_shanten_1(standing_tiles, standing_cnt, i, useful_table != nullptr ? &temp_table : nullptr);
-        if (st < ret) {  // 上听数小的，直接覆盖数据
-            ret = st;
-            if (useful_table != nullptr) {  // 直接覆盖原来的有效牌数据
-                memcpy(*useful_table, temp_table, sizeof(*useful_table));
+        useful_table_t temp_table;
+
+        // 6种组合龙分别计算
+        for (int i = 0; i < 6; ++i) {
+            int st = honors_and_knitted_tiles_shanten_1(standing_tiles, standing_cnt, i, &temp_table);
+            if (st < ret) {  // 上听数小的，直接覆盖数据
+                ret = st;
+                memcpy(*useful_table, temp_table, sizeof(*useful_table));  // 直接覆盖原来的有效牌数据
+            }
+            else if (st == ret) {  // 两种不同组合龙上听数如果相等的话，直接合并有效牌
+                std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table),
+                    std::begin(*useful_table), [](bool u, bool t) { return u || t; });
             }
         }
-        else if (st == ret && useful_table != nullptr) {  // 两种不同组合龙上听数如果相等的话，直接合并有效牌
-            std::transform(std::begin(*useful_table), std::end(*useful_table), std::begin(temp_table),
-                std::begin(*useful_table), [](bool u, bool t) { return u || t; });
+    }
+    else {
+        // 6种组合龙分别计算
+        for (int i = 0; i < 6; ++i) {
+            int st = honors_and_knitted_tiles_shanten_1(standing_tiles, standing_cnt, i, nullptr);
+            if (st < ret) {
+                ret = st;
+            }
         }
     }
     return ret;
@@ -1015,12 +1056,13 @@ int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, intptr_t stan
 // 全不靠是否听牌
 bool is_honors_and_knitted_tiles_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *waiting_table) {
     // 直接计算其上听数，上听数为0即为听牌
+    if (waiting_table == nullptr) {
+        return (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt, nullptr));
+    }
+
     useful_table_t useful_table;
-    if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt,
-        waiting_table != nullptr ? &useful_table : nullptr)) {
-        if (waiting_table != nullptr) {
-            memcpy(*waiting_table, useful_table, sizeof(*waiting_table));
-        }
+    if (0 == honors_and_knitted_tiles_shanten(standing_tiles, standing_cnt, &useful_table)) {
+        memcpy(*waiting_table, useful_table, sizeof(*waiting_table));
         return true;
     }
     return false;
