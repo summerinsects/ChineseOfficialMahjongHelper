@@ -907,7 +907,7 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
     temp.seat_wind = extraInfo->getSeatWind();
 
     // 算番
-    int fan = mahjong::calculate_fan(&temp, fan_table);
+    int fan = mahjong::calculate_fan(&temp, &fan_table);
 
     if (fan == ERROR_NOT_WIN) {
         AlertView::showWithMessage("记录和牌", "诈和", 12, std::bind(&RecordScene::showCalculator, this, temp), nullptr);

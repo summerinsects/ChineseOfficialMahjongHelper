@@ -45,7 +45,7 @@ intptr_t packs_to_tiles(const pack_t *packs, intptr_t pack_cnt, tile_t *tiles, i
  * @param [in] cnt 牌的数量
  * @param [out] cnt_table 牌的数量表
  */
-void map_tiles(const tile_t *tiles, intptr_t cnt, tile_table_t &cnt_table);
+void map_tiles(const tile_t *tiles, intptr_t cnt, tile_table_t *cnt_table);
 
 /**
  * @brief 将手牌打表
@@ -54,7 +54,7 @@ void map_tiles(const tile_t *tiles, intptr_t cnt, tile_table_t &cnt_table);
  * @param [out] cnt_table 牌的数量表
  * @return bool 手牌结构是否正确。即是否符合：副露组数*3+立牌数=13
  */
-bool map_hand_tiles(const hand_tiles_t *hand_tiles, tile_table_t &cnt_table);
+bool map_hand_tiles(const hand_tiles_t *hand_tiles, tile_table_t *cnt_table);
 
 /**
  * @brief 将表转换成牌

@@ -185,7 +185,7 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
 
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    map_tiles(standing_tiles, standing_cnt, &cnt_table);
 
     result->count = 0;
 
@@ -859,7 +859,7 @@ static void calculate_2_pungs_unordered(const tile_t (&mid_tiles)[2], fan_table_
 static bool is_nine_gates(const tile_t *tiles) {
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
-    map_tiles(tiles, 13, cnt_table);
+    map_tiles(tiles, 13, &cnt_table);
 
     // 1、9各三枚，2~8各一枚
     return (cnt_table[0x11] == 3 && cnt_table[0x19] == 3 && std::all_of(cnt_table + 0x12, cnt_table + 0x19, [](int n) { return n == 1; }))
@@ -1144,7 +1144,7 @@ static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_t
 static void adjust_by_tiles_hog(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
     intptr_t kong_cnt = tile_cnt - 14;  // 标准和牌14张，多出几张就说明有几个杠
     tile_table_t cnt_table;
-    map_tiles(tiles, tile_cnt, cnt_table);
+    map_tiles(tiles, tile_cnt, &cnt_table);
     // 有多少种已经用去4张的牌减去杠的数量，即为四归一的数量
     intptr_t _4_cnt = std::count(std::begin(cnt_table), std::end(cnt_table), 4);
     fan_table[TILE_HOG] = static_cast<uint8_t>(_4_cnt - kong_cnt);
@@ -1735,7 +1735,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
 
     // 对立牌和和牌的种类进行打表
     tile_table_t cnt_table;
-    map_tiles(hand_tiles->standing_tiles, standing_cnt, cnt_table);
+    map_tiles(hand_tiles->standing_tiles, standing_cnt, &cnt_table);
     ++cnt_table[win_tile];
 
     // 匹配组合龙
@@ -1977,7 +1977,7 @@ bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, intptr_t fixed_cnt)
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     // 打表
     tile_table_t cnt_table;
-    if (!map_hand_tiles(hand_tiles, cnt_table)) {
+    if (!map_hand_tiles(hand_tiles, &cnt_table)) {
         return ERROR_WRONG_TILES_COUNT;
     }
     if (win_tile != 0) {
@@ -1993,7 +1993,7 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
 }
 
 // 算番
-int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_table) {
+int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table) {
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
     tile_t win_tile = calculate_param->win_tile;
     win_flag_t win_flag = calculate_param->win_flag;
@@ -2098,11 +2098,13 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_tab
         return ERROR_NOT_WIN;
     }
 
-    memcpy(fan_table, *selected_fan_table, sizeof(fan_table));
-
     // 加花牌
     max_fan += calculate_param->flower_count;
-    fan_table[FLOWER_TILES] = calculate_param->flower_count;
+
+    if (fan_table != nullptr) {
+        memcpy(*fan_table, *selected_fan_table, sizeof(*fan_table));
+        (*fan_table)[FLOWER_TILES] = calculate_param->flower_count;
+    }
 
     return max_fan;
 }

@@ -160,7 +160,7 @@ void FanCalculatorScene::calculate() {
     param.win_flag = win_flag;
     param.prevalent_wind = prevalent_wind;
     param.seat_wind = seat_wind;
-    int fan = calculate_fan(&param, fan_table);
+    int fan = calculate_fan(&param, &fan_table);
 
     if (fan == ERROR_NOT_WIN) {
         Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", 14);

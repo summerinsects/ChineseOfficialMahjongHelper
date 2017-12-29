@@ -214,7 +214,7 @@ typedef uint16_t fan_table_t[FAN_TABLE_SIZE];
  * @retval ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
  * @retval ERROR_NOT_WIN 没和牌
  */
-int calculate_fan(const calculate_param_t *calculate_param, fan_table_t &fan_table);
+int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table);
 
 #if 0
 

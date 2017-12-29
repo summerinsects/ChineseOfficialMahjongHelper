@@ -68,15 +68,15 @@ intptr_t packs_to_tiles(const pack_t *packs, intptr_t pack_cnt, tile_t *tiles, i
 }
 
 // 将牌打表
-void map_tiles(const tile_t *tiles, intptr_t cnt, tile_table_t &cnt_table) {
-    memset(cnt_table, 0, sizeof(cnt_table));
+void map_tiles(const tile_t *tiles, intptr_t cnt, tile_table_t *cnt_table) {
+    memset(*cnt_table, 0, sizeof(*cnt_table));
     for (intptr_t i = 0; i < cnt; ++i) {
-        ++cnt_table[tiles[i]];
+        ++(*cnt_table)[tiles[i]];
     }
 }
 
 // 将手牌打表
-bool map_hand_tiles(const hand_tiles_t *hand_tiles, tile_table_t &cnt_table) {
+bool map_hand_tiles(const hand_tiles_t *hand_tiles, tile_table_t *cnt_table) {
     // 将每一组副露当作3张牌来算，那么总张数=13
     if (hand_tiles->tile_count <= 0 || hand_tiles->pack_count < 0 || hand_tiles->pack_count > 4
         || hand_tiles->pack_count * 3 + hand_tiles->tile_count != 13) {
@@ -418,7 +418,7 @@ int basic_form_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, usef
 
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    map_tiles(standing_tiles, standing_cnt, &cnt_table);
 
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
@@ -584,7 +584,7 @@ static bool is_basic_form_wait_recursively(tile_table_t &cnt_table, intptr_t lef
 bool is_basic_form_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *waiting_table) {
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    map_tiles(standing_tiles, standing_cnt, &cnt_table);
 
     if (waiting_table != nullptr) {
         memset(*waiting_table, 0, sizeof(*waiting_table));
@@ -661,7 +661,7 @@ static bool is_basic_form_win_recursively(tile_table_t &cnt_table, intptr_t left
 bool is_basic_form_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile_t test_tile) {
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    map_tiles(standing_tiles, standing_cnt, &cnt_table);
     ++cnt_table[test_tile];  // 添加测试的牌
     return is_basic_form_win_recursively(cnt_table, standing_cnt + 1);
 }
@@ -724,7 +724,7 @@ int thirteen_orphans_shanten(const tile_t *standing_tiles, intptr_t standing_cnt
 
     // 对牌的种类进行打表
     tile_table_t cnt_table;
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    map_tiles(standing_tiles, standing_cnt, &cnt_table);
 
     bool has_pair = false;
     int cnt = 0;
@@ -814,7 +814,7 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
 
     // 剔除组合龙
     tile_table_t temp_table;
-    memcpy(temp_table, cnt_table, sizeof(temp_table));
+    memcpy(&temp_table, &cnt_table, sizeof(temp_table));
     for (int i = 0; i < 9; ++i) {
         tile_t t = (*matched_seq)[i];
         if (temp_table[t]) {
@@ -860,7 +860,7 @@ static int basic_form_shanten_specified(const tile_table_t &cnt_table, const til
     }
 
     tile_table_t temp_table;
-    memcpy(temp_table, cnt_table, sizeof(temp_table));
+    memcpy(&temp_table, &cnt_table, sizeof(temp_table));
     int exist_cnt = 0;
 
     // 统计主番的牌
@@ -891,7 +891,7 @@ int knitted_straight_shanten(const tile_t *standing_tiles, intptr_t standing_cnt
 
     // 打表
     tile_table_t cnt_table;
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    map_tiles(standing_tiles, standing_cnt, &cnt_table);
 
     int ret = std::numeric_limits<int>::max();
     useful_table_t temp_table;
@@ -928,7 +928,7 @@ bool is_knitted_straight_wait(const tile_t *standing_tiles, intptr_t standing_cn
 
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    map_tiles(standing_tiles, standing_cnt, &cnt_table);
 
     return is_knitted_straight_wait_from_table(cnt_table, standing_cnt, waiting_table);
 }
@@ -954,7 +954,7 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, intp
 
     // 对牌的种类进行打表
     tile_table_t cnt_table;
-    map_tiles(standing_tiles, standing_cnt, cnt_table);
+    map_tiles(standing_tiles, standing_cnt, &cnt_table);
 
     int cnt = 0;
 
@@ -1116,7 +1116,7 @@ void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint
 
     // 将立牌打表
     tile_table_t cnt_table;
-    map_tiles(hand_tiles->standing_tiles, hand_tiles->tile_count, cnt_table);
+    map_tiles(hand_tiles->standing_tiles, hand_tiles->tile_count, &cnt_table);
 
     // 复制一份手牌
     hand_tiles_t temp;

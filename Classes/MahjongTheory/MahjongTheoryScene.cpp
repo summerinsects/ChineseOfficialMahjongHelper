@@ -344,7 +344,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
         // 随机上牌
         if (serving_tile == 0) {
             mahjong::tile_table_t cnt_table;
-            mahjong::map_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count, cnt_table);
+            mahjong::map_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count, &cnt_table);
             serving_tile = serveRandomTile(cnt_table, 0);
 
             char temp[64];
@@ -477,7 +477,7 @@ void MahjongTheoryScene::calculate() {
     }
 
     // 打表
-    mahjong::map_hand_tiles(&hand_tiles, _handTilesTable);
+    mahjong::map_hand_tiles(&hand_tiles, &_handTilesTable);
     if (serving_tile != 0) {
         ++_handTilesTable[serving_tile];
     }
@@ -587,7 +587,7 @@ void MahjongTheoryScene::recoverFromState(StateData &state) {
     _editBox->setText(str);
 
     // 打表
-    mahjong::map_hand_tiles(&state.handTiles, _handTilesTable);
+    mahjong::map_hand_tiles(&state.handTiles, &_handTilesTable);
     if (state.servingTile != 0) {
         ++_handTilesTable[state.servingTile];
     }
@@ -641,7 +641,7 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t ser
 
     // 对立牌打表
     mahjong::tile_table_t cntTable;
-    mahjong::map_tiles(handTiles.standing_tiles, handTiles.tile_count, cntTable);
+    mahjong::map_tiles(handTiles.standing_tiles, handTiles.tile_count, &cntTable);
     ++cntTable[st];  // 当前上牌
 
     // 打出牌
