@@ -282,7 +282,7 @@ void ScoreSheetScene::fillRow(size_t handIdx) {
     }
 
     // 使用不同颜色
-    RecordScene::SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_claim, detail.penalty_scores);
+    RecordScene::SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_flag, detail.claim_flag, detail.penalty_scores);
 
     // 禁用并隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
@@ -742,9 +742,10 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
 
     std::string ret;
 
-    int wc = detail.win_claim;
-    int winIndex = WIN_INDEX(wc);
-    int claimIndex = CLAIM_INDEX(wc);
+    int8_t wf = detail.win_flag;
+    int8_t cf = detail.claim_flag;
+    int winIndex = WIN_CLAIM_INDEX(wf);
+    int claimIndex = WIN_CLAIM_INDEX(cf);
     if (winIndex == claimIndex) {
         ret.append(Common::format("「%s」自摸%s%hu番。\n", record->name[winIndex], fanText.c_str(), detail.fan));
     }

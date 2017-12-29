@@ -39,9 +39,22 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
             Record::Detail &detail_data = record.detail[i];
             const rapidjson::Value &detail_json = detail[static_cast<rapidjson::SizeType>(i)];
 
+            // 兼容旧的key
             it = detail_json.FindMember("win_claim");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.win_claim = it->value.GetUint();
+                uint32_t wc = it->value.GetUint();
+                detail_data.win_flag = (wc >> 4) & 0xF;
+                detail_data.claim_flag = wc & 0xF;
+            }
+
+            it = detail_json.FindMember("win_flag");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                detail_data.win_flag = static_cast<uint8_t>(it->value.GetUint());
+            }
+
+            it = detail_json.FindMember("claim_flag");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                detail_data.claim_flag = static_cast<uint8_t>(it->value.GetUint());
             }
 
             // 兼容旧的key
@@ -137,7 +150,8 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
     for (size_t i = 0; i < record.current_index; ++i) {
         const Record::Detail &detail_data = record.detail[i];
         rapidjson::Value detail_json(rapidjson::Type::kObjectType);
-        detail_json.AddMember("win_claim", rapidjson::Value(detail_data.win_claim), alloc);
+        detail_json.AddMember("win_flag", rapidjson::Value(detail_data.win_flag), alloc);
+        detail_json.AddMember("claim_flag", rapidjson::Value(detail_data.claim_flag), alloc);
         detail_json.AddMember("packed_fan", rapidjson::Value(detail_data.packed_fan), alloc);
         detail_json.AddMember("fan", rapidjson::Value(detail_data.fan), alloc);
         detail_json.AddMember("fan_flag", rapidjson::Value(detail_data.fan_flag), alloc);
@@ -299,10 +313,11 @@ void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
     memset(scoreTable, 0, sizeof(scoreTable));
     int fan = static_cast<int>(detail.fan);
-    if (fan >= 8 && !!(detail.win_claim & 0xF0)) {
-        uint8_t wc = detail.win_claim;
-        int winIndex = WIN_INDEX(wc);
-        int claimIndex = CLAIM_INDEX(wc);
+    if (fan >= 8 && detail.win_flag != 0) {
+        uint8_t wf = detail.win_flag;
+        uint8_t cf = detail.claim_flag;
+        int winIndex = WIN_CLAIM_INDEX(wf);
+        int claimIndex = WIN_CLAIM_INDEX(cf);
         if (winIndex == claimIndex) {  // 自摸
             for (int i = 0; i < 4; ++i) {
                 scoreTable[i] = (i == winIndex) ? (fan + 8) * 3 : (-8 - fan);
@@ -385,9 +400,10 @@ void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector<Record
                 totalScores[n] += scoreTable[n];
             }
 
-            uint8_t wc = detail.win_claim;
-            int winIndex = WIN_INDEX(wc);
-            int claimIndex = CLAIM_INDEX(wc);
+            uint8_t wf = detail.win_flag;
+            uint8_t cf = detail.claim_flag;
+            int winIndex = WIN_CLAIM_INDEX(wf);
+            int claimIndex = WIN_CLAIM_INDEX(cf);
             if (winIndex == idx) {
                 ++result->win;
                 if (claimIndex == idx) {

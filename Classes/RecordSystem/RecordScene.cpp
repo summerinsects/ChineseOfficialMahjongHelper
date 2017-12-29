@@ -470,7 +470,8 @@ static inline void updatePenaltyLabel(Label *label, int16_t ps) {
 }
 
 void RecordScene::refresh() {
-    uint8_t wc = _detail.win_claim;
+    uint8_t wf = _detail.win_flag;
+    uint8_t cf = _detail.claim_flag;
     if (_detail.fan >= 8) {
         char str[32];
         snprintf(str, sizeof(str), "%hu", _detail.fan);
@@ -482,9 +483,9 @@ void RecordScene::refresh() {
         updatePenaltyLabel(_penaltyLabel[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
     }
 
-    _winIndex = WIN_INDEX(wc);
+    _winIndex = WIN_CLAIM_INDEX(wf);
     if (_winIndex != -1) {  // 有人和牌
-        int claimIndex = CLAIM_INDEX(wc);  // 点炮者
+        int claimIndex = WIN_CLAIM_INDEX(cf);  // 点炮者
         _winGroup->setSelectedButton(UI_TO_PLAYER(_winIndex));
         if (claimIndex != -1) {
             _claimGroup->setSelectedButton(UI_TO_PLAYER(claimIndex));
@@ -502,17 +503,17 @@ void RecordScene::refresh() {
     _tableView->reloadDataInplacement();
 }
 
-void RecordScene::SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_claim, const int16_t (&penalty_scores)[4]) {
+void RecordScene::SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_flag, uint8_t claim_flag, const int16_t (&penalty_scores)[4]) {
     for (int i = 0; i < 4; ++i) {
         if (scoreTable[i] != 0) {
-            if (TEST_WIN(win_claim, i)) {  // 和牌：红色
+            if (TEST_WIN_CLAIM(win_flag, i)) {  // 和牌：红色
                 scoreLabel[i]->setColor(C3B_RED);
             }
             else {
                 if (UNLIKELY(penalty_scores[i] < 0)) {  // 罚分：紫色
                     scoreLabel[i]->setColor(C3B_PURPLE);
                 }
-                else if (UNLIKELY(TEST_CLAIM(win_claim, i))) {  // 点炮：蓝色
+                else if (UNLIKELY(TEST_WIN_CLAIM(claim_flag, i))) {  // 点炮：蓝色
                     scoreLabel[i]->setColor(C3B_BLUE);
                 }
                 else {  // 其他：绿色
@@ -527,7 +528,8 @@ void RecordScene::SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&sco
 }
 
 void RecordScene::updateScoreLabel() {
-    _detail.win_claim = 0;
+    _detail.win_flag = 0;
+    _detail.claim_flag = 0;
     int claimIndex = -1;
     if (_winIndex != -1) {  // 有人和牌
         int fan = atoi(_editBox->getText());  // 获取输入框里所填番数
@@ -535,10 +537,9 @@ void RecordScene::updateScoreLabel() {
         claimIndex = _claimGroup->getSelectedButtonIndex();
 
         // 记录和牌和点炮
-        _detail.win_claim = 0;
-        SET_WIN(_detail.win_claim, PLAYER_TO_UI(_winIndex));
+        SET_WIN_CLAIM(_detail.win_flag, PLAYER_TO_UI(_winIndex));
         if (claimIndex != -1) {
-            SET_CLAIM(_detail.win_claim, PLAYER_TO_UI(claimIndex));
+            SET_WIN_CLAIM(_detail.claim_flag, PLAYER_TO_UI(claimIndex));
         }
     }
     else {  // 荒庄
@@ -554,7 +555,7 @@ void RecordScene::updateScoreLabel() {
 
     // 使用不同颜色
     Label *tempLabel[4] = { _scoreLabel[UI_TO_PLAYER(0)], _scoreLabel[UI_TO_PLAYER(1)], _scoreLabel[UI_TO_PLAYER(2)], _scoreLabel[UI_TO_PLAYER(3)] };
-    SetScoreLabelColor(tempLabel, scoreTable, _detail.win_claim, _detail.penalty_scores);
+    SetScoreLabelColor(tempLabel, scoreTable, _detail.win_flag, _detail.claim_flag, _detail.penalty_scores);
 
     // 未选择和牌
     if (_winIndex == -1) {
