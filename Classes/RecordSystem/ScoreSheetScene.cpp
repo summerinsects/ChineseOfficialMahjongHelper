@@ -498,7 +498,7 @@ namespace {
 
         virtual ~ContinuousEditBoxDelegate() { CCLOG("%s", __FUNCTION__); }
 
-        virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override { }
+        virtual void editBoxReturn(cocos2d::ui::EditBox *) override { }
 
         virtual void editBoxEditingDidEndWithAction(cocos2d::ui::EditBox *editBox, EditBoxEndAction action) override {
             // 使得能连续输入
