@@ -274,7 +274,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("常用凑番");
-    button->addClickEventListener([this](Ref *) { showPackedFanAlert(nullptr); });
+    button->addClickEventListener([this](Ref *) { showPackedFanAlert(false); });
     topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35.0f, 10.0f));
 
@@ -703,7 +703,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     }, nullptr);
 }
 
-void RecordScene::showPackedFanAlert(const std::function<void ()> &callback) {
+void RecordScene::showPackedFanAlert(bool callFromSubmiting) {
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(200.0f, 100.0f));
 
@@ -742,11 +742,12 @@ void RecordScene::showPackedFanAlert(const std::function<void ()> &callback) {
         radioGroup->setSelectedButtonWithoutEvent(packedFan - 1);
     }
 
-    AlertView::showWithNode("选择常用凑番", rootNode, [this, radioGroup, callback]() {
+    AlertView::showWithNode("选择常用凑番", rootNode, [this, radioGroup, callFromSubmiting]() {
         int highlight = radioGroup->getSelectedButtonIndex();
         _detail.packed_fan = static_cast<uint8_t>(highlight + 1);
-        if (callback) {
-            callback();
+        if (callFromSubmiting) {
+            _submitCallback(_detail);
+            Director::getInstance()->popScene();
         }
     }, nullptr);
 }
@@ -805,11 +806,8 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
         }
     }
     else {  // 未标记番种
-        if (_winIndex != -1 && Common::isCStringEmpty(_detail.win_hand.tiles)) {  // 有人和牌
-            showPackedFanAlert([this]() {
-                _submitCallback(_detail);
-                Director::getInstance()->popScene();
-            });
+        if (_winIndex != -1 && Common::isCStringEmpty(_detail.win_hand.tiles)) {
+            showPackedFanAlert(true);
         }
         else {
             _submitCallback(_detail);
