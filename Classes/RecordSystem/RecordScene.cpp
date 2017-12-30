@@ -701,8 +701,10 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
 }
 
 void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
+    const float maxWidth = AlertView::maxWidth();
+
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(240.0f, 255.0f));
+    rootNode->setContentSize(Size(maxWidth, 255.0f));
 
     uint16_t uniqueFan = _detail.unique_fan;
     uint64_t multipleFan = _detail.multiple_fan;
@@ -711,16 +713,17 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
     std::array<Label *, 9> labels;
 
     // 只存在一个的番用CheckBox，每行3个，共5行
+    const float width3 = maxWidth / 3.0f;
     for (int i = 0, totalRows = 5; i < 14; ++i) {
         div_t ret = div(i, 3);
-        const float xPos = 10.0f + 80.0f * ret.rem;
+        const float xPos = width3 * ret.rem;
         const float yPos = 130.0f + (totalRows - ret.quot - 0.5f) * 25.0f;
 
         ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
         checkBox->setContentSize(Size(20.0f, 20.0f));
-        checkBox->setPosition(Vec2(xPos + 5.0f, yPos));
+        checkBox->setPosition(Vec2(xPos + 12.0f, yPos));
         rootNode->addChild(checkBox);
         checkBox->setSelected(TEST_UNIQUE_FAN(uniqueFan, i));
         checkBoxes[i] = checkBox;
@@ -729,22 +732,24 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         label->setColor(Color3B::BLACK);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         rootNode->addChild(label);
-        label->setPosition(Vec2(xPos + 20.0f, yPos));
+        label->setPosition(Vec2(xPos + 27.0f, yPos));
+        cw::scaleLabelToFitWidth(label, width3 - 29.0f);
     }
 
     // 复计的上限
     static const int limitCounts[] = { 3, 2, 2, 2, 2, 2, 4, 3, 8 };
 
     // 可复计的番有+-按钮，每行2个，共5行
+    const float width2 = maxWidth * 0.5f;
     for (int i = 0, totalRows = 5; i < 9; ++i) {
-        const float xPos = 10.0f + 120.0f * (i & 1);
+        const float xPos = width2 * (i & 1);
         const float yPos = (totalRows - (i >> 1) - 0.5f) * 25.0f;
 
         // 方框背景
         ui::Scale9Sprite *sprite = ui::Scale9Sprite::create("source_material/btn_square_normal.png");
         rootNode->addChild(sprite);
         sprite->setContentSize(Size(20.0f, 20.0f));
-        sprite->setPosition(Vec2(xPos + 30.0f, yPos));
+        sprite->setPosition(Vec2(xPos + 35.0f, yPos));
 
         int cnt = static_cast<int>(MULTIPLE_FAN_COUNT(multipleFan, i));
 
@@ -752,7 +757,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         Label *label = Label::createWithSystemFont(std::to_string(cnt), "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
-        label->setPosition(Vec2(xPos + 30.0f, yPos));
+        label->setPosition(Vec2(xPos + 35.0f, yPos));
         label->setTag(cnt);
         labels[i] = label;
 
@@ -763,7 +768,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         button->setTitleFontSize(12);
         button->setTitleText("-1");
         rootNode->addChild(button);
-        button->setPosition(Vec2(xPos + 5.0f, yPos));
+        button->setPosition(Vec2(xPos + 12.0f, yPos));
         button->addClickEventListener([label](Ref *) {
             int n = label->getTag();
             if (n > 0) {
@@ -780,7 +785,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         button->setTitleFontSize(12);
         button->setTitleText("+1");
         rootNode->addChild(button);
-        button->setPosition(Vec2(xPos + 55.0f, yPos));
+        button->setPosition(Vec2(xPos + 58.0f, yPos));
         button->addClickEventListener([label, limitCount](Ref *) {
             int n = label->getTag();
             if (n < limitCount) {
@@ -795,6 +800,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(xPos + 70.0f, yPos));
+        cw::scaleLabelToFitWidth(label, width2 - 72.0f);
     }
 
     // 花牌特殊处理，不在littleFan标记内
