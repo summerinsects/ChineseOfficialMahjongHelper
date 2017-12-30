@@ -803,11 +803,6 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         cw::scaleLabelToFitWidth(label, width2 - 72.0f);
     }
 
-    // 花牌特殊处理，不在littleFan标记内
-    int cnt = static_cast<int>(_detail.win_hand.flower_count);
-    labels[8]->setTag(cnt);
-    labels[8]->setString(std::to_string(cnt));
-
     AlertView::showWithNode("标记小番", rootNode, [this, checkBoxes, labels, callFromSubmiting]() {
         uint16_t uniqueFan = 0;
         uint64_t multipleFan = 0;
@@ -817,7 +812,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
             }
         }
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < 9; ++i) {
             int cnt = labels[i]->getTag();
             if (cnt > 0) {
                 SET_MULTIPLE_FAN(multipleFan, i, cnt);
