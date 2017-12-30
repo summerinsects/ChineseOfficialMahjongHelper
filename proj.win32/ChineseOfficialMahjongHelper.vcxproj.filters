@@ -164,6 +164,9 @@
     <ClInclude Include="..\Classes\Other\OtherScene.h">
       <Filter>src\Other</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\RecordSystem\LittleFan.h">
+      <Filter>src\RecordSystem</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\RecordSystem\Record.h">
       <Filter>src\RecordSystem</Filter>
     </ClInclude>

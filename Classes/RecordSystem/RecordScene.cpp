@@ -4,6 +4,7 @@
 #include "../widget/TilePickWidget.h"
 #include "../widget/ExtraInfoWidget.h"
 #include "../mahjong-algorithm/stringify.h"
+#include "LittleFan.h"
 
 USING_NS_CC;
 
@@ -16,10 +17,6 @@ static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
 static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
 static const size_t eachLevelBeginIndex[] = { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
 static const size_t eachLevelCounts[] = { 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
-
-static const char *packedFanNames[] = {
-    "门断平", "门清平和", "断幺平和", "连风刻", "番牌暗杠", "双同幺九", "门清双暗", "双暗暗杠"
-};
 
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
@@ -268,13 +265,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 100.0f, 35.0f));
 
-    // 常用凑番
+    // 小番
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("常用凑番");
-    button->addClickEventListener([this](Ref *) { showPackedFanAlert(false); });
+    button->setTitleText("小番");
+    button->addClickEventListener([this](Ref *) { showLittleFanAlert(false); });
     topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35.0f, 10.0f));
 
@@ -703,48 +700,126 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     }, nullptr);
 }
 
-void RecordScene::showPackedFanAlert(bool callFromSubmiting) {
+void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(200.0f, 100.0f));
+    rootNode->setContentSize(Size(240.0f, 255.0f));
 
-    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
-    radioGroup->setAllowedNoSelection(true);
-    rootNode->addChild(radioGroup);
+    uint16_t uniqueFan = _detail.unique_fan;
+    uint64_t multipleFan = _detail.multiple_fan;
 
-    const int totalRows = 4;  // 每行2个，共4行
-    for (int i = 0; i < 8; ++i) {
-        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-        radioButton->setZoomScale(0.0f);
-        radioButton->ignoreContentAdaptWithSize(false);
-        radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(10.0f + 100.0f * (i & 1), (totalRows - (i >> 1) - 0.5f) * 25.0f));
-        rootNode->addChild(radioButton);
-        radioGroup->addRadioButton(radioButton);
+    std::array<ui::CheckBox *, 14> checkBoxes;
+    std::array<Label *, 9> labels;
 
-        Label *label = Label::createWithSystemFont(packedFanNames[i], "Arial", 12);
+    // 只存在一个的番用CheckBox，每行3个，共5行
+    for (int i = 0, totalRows = 5; i < 14; ++i) {
+        div_t ret = div(i, 3);
+        const float xPos = 10.0f + 80.0f * ret.rem;
+        const float yPos = 130.0f + (totalRows - ret.quot - 0.5f) * 25.0f;
+
+        ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        checkBox->setZoomScale(0.0f);
+        checkBox->ignoreContentAdaptWithSize(false);
+        checkBox->setContentSize(Size(20.0f, 20.0f));
+        checkBox->setPosition(Vec2(xPos + 5.0f, yPos));
+        rootNode->addChild(checkBox);
+        checkBox->setSelected(TEST_UNIQUE_FAN(uniqueFan, i));
+        checkBoxes[i] = checkBox;
+
+        Label *label = Label::createWithSystemFont(mahjong::fan_name[uniqueFanTable[i]], "Arial", 12);
         label->setColor(Color3B::BLACK);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        radioButton->addChild(label);
-        label->setPosition(Vec2(25.0f, 10.0f));
+        rootNode->addChild(label);
+        label->setPosition(Vec2(xPos + 20.0f, yPos));
+    }
 
-        // 这一段是实现RadioButton可以取消选中的
-        radioButton->addClickEventListener([radioGroup](Ref *sender) {
-            ui::RadioButton *radioButton = (ui::RadioButton *)sender;
-            if (radioButton->isSelected()) {
-                // 需要在下一帧调用
-                radioGroup->scheduleOnce([radioGroup](float) { radioGroup->setSelectedButton(nullptr); }, 0.0f, "deselect");
+    // 复计的上限
+    static const int limitCounts[] = { 3, 2, 2, 2, 2, 2, 4, 3, 8 };
+
+    // 可复计的番有+-按钮，每行2个，共5行
+    for (int i = 0, totalRows = 5; i < 9; ++i) {
+        const float xPos = 10.0f + 120.0f * (i & 1);
+        const float yPos = (totalRows - (i >> 1) - 0.5f) * 25.0f;
+
+        // 方框背景
+        ui::Scale9Sprite *sprite = ui::Scale9Sprite::create("source_material/btn_square_normal.png");
+        rootNode->addChild(sprite);
+        sprite->setContentSize(Size(20.0f, 20.0f));
+        sprite->setPosition(Vec2(xPos + 30.0f, yPos));
+
+        int cnt = static_cast<int>(MULTIPLE_FAN_COUNT(multipleFan, i));
+
+        // 显示数量的Label
+        Label *label = Label::createWithSystemFont(std::to_string(cnt), "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        rootNode->addChild(label);
+        label->setPosition(Vec2(xPos + 30.0f, yPos));
+        label->setTag(cnt);
+        labels[i] = label;
+
+        // -按钮
+        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText("-1");
+        rootNode->addChild(button);
+        button->setPosition(Vec2(xPos + 5.0f, yPos));
+        button->addClickEventListener([label](Ref *) {
+            int n = label->getTag();
+            if (n > 0) {
+                label->setTag(--n);
+                label->setString(std::to_string(n));
             }
         });
+
+        // +按钮
+        int limitCount = limitCounts[i];
+        button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText("+1");
+        rootNode->addChild(button);
+        button->setPosition(Vec2(xPos + 55.0f, yPos));
+        button->addClickEventListener([label, limitCount](Ref *) {
+            int n = label->getTag();
+            if (n < limitCount) {
+                label->setTag(++n);
+                label->setString(std::to_string(n));
+            }
+        });
+
+        // 番名Label
+        label = Label::createWithSystemFont(mahjong::fan_name[multipleFanTable[i]], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        rootNode->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(xPos + 70.0f, yPos));
     }
 
-    uint8_t packedFan = _detail.packed_fan;
-    if (packedFan > 0 && packedFan <= 8) {
-        radioGroup->setSelectedButtonWithoutEvent(packedFan - 1);
-    }
+    // 花牌特殊处理，不在littleFan标记内
+    int cnt = static_cast<int>(_detail.win_hand.flower_count);
+    labels[8]->setTag(cnt);
+    labels[8]->setString(std::to_string(cnt));
 
-    AlertView::showWithNode("选择常用凑番", rootNode, [this, radioGroup, callFromSubmiting]() {
-        int highlight = radioGroup->getSelectedButtonIndex();
-        _detail.packed_fan = static_cast<uint8_t>(highlight + 1);
+    AlertView::showWithNode("标记小番", rootNode, [this, checkBoxes, labels, callFromSubmiting]() {
+        uint16_t uniqueFan = 0;
+        uint64_t multipleFan = 0;
+        for (int i = 0; i < 14; ++i) {
+            if (checkBoxes[i]->isSelected()) {
+                SET_UNIQUE_FAN(uniqueFan, i);
+            }
+        }
+
+        for (int i = 0; i < 8; ++i) {
+            int cnt = labels[i]->getTag();
+            if (cnt > 0) {
+                SET_MULTIPLE_FAN(multipleFan, i, cnt);
+            }
+        }
+
+        _detail.unique_fan = uniqueFan;
+        _detail.multiple_fan = multipleFan;
         if (callFromSubmiting) {
             _submitCallback(_detail);
             Director::getInstance()->popScene();
@@ -794,7 +869,8 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
             AlertView::showWithMessage("记分", "你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？", 12,
                 [this]() {
                 _detail.fan_flag = 0;
-                _detail.packed_fan = 0;
+                _detail.unique_fan = 0;
+                _detail.multiple_fan = 0;
                 memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
                 _submitCallback(_detail);
                 Director::getInstance()->popScene();
@@ -806,8 +882,8 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
         }
     }
     else {  // 未标记番种
-        if (_winIndex != -1 && Common::isCStringEmpty(_detail.win_hand.tiles)) {
-            showPackedFanAlert(true);
+        if (_winIndex != -1 && Common::isCStringEmpty(_detail.win_hand.tiles) && _detail.unique_fan == 0 && _detail.multiple_fan == 0) {
+            showLittleFanAlert(true);
         }
         else {
             _submitCallback(_detail);
@@ -966,41 +1042,25 @@ void RecordScene::calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraIn
         }
     }
 
-    uint8_t packedFan = 0;
-    if (fanFlag == 0) {
-        if (fan_table[mahjong::ALL_CHOWS]) {
-            if (fan_table[mahjong::CONCEALED_HAND]) {
-                packedFan = !!fan_table[mahjong::ALL_SIMPLES] ? 1 : 2;
-            }
-            else if (fan_table[mahjong::ALL_SIMPLES]) {
-                packedFan = 3;
-            }
+    uint16_t uniqueFan = 0;
+    uint64_t multipleFan = 0;
+    for (unsigned n = 0; n < 14; ++n) {
+        if (fan_table[uniqueFanTable[n]] > 0) {
+            SET_UNIQUE_FAN(uniqueFan, n);
         }
-        else {
-            if (fan_table[mahjong::CONCEALED_KONG]) {
-                if (fan_table[mahjong::PREVALENT_WIND] || fan_table[mahjong::SEAT_WIND] || fan_table[mahjong::DRAGON_PUNG]) {
-                    packedFan = 4;
-                }
-                else if (fan_table[mahjong::TWO_CONCEALED_PUNGS]) {
-                    packedFan = 8;
-                }
-            }
-            else if (fan_table[mahjong::TWO_CONCEALED_PUNGS] && fan_table[mahjong::CONCEALED_HAND]) {
-                packedFan = 7;
-            }
-            else if (fan_table[mahjong::DOUBLE_PUNG] && fan_table[mahjong::PUNG_OF_TERMINALS_OR_HONORS] >= 2) {
-                packedFan = 6;
-            }
-            else if (fan_table[mahjong::PREVALENT_WIND] && fan_table[mahjong::SEAT_WIND]) {
-                packedFan = 4;
-            }
+    }
+    for (unsigned n = 0; n < 9; ++n) {
+        uint16_t cnt = fan_table[multipleFanTable[n]];
+        if (cnt > 0) {
+            SET_MULTIPLE_FAN(multipleFan, n, cnt);
         }
     }
 
-    AlertView::showWithNode("记录和牌", innerNode, [this, temp, fan, fanFlag, packedFan]() {
+    AlertView::showWithNode("记录和牌", innerNode, [this, temp, fan, fanFlag, uniqueFan, multipleFan]() {
         _detail.fan = std::max<uint16_t>(fan, 8);
         _detail.fan_flag = fanFlag;
-        _detail.packed_fan = packedFan;
+        _detail.unique_fan = uniqueFan;
+        _detail.multiple_fan = multipleFan;
 
         Record::Detail::WinHand &winHand = _detail.win_hand;
         memset(&winHand, 0, sizeof(winHand));
