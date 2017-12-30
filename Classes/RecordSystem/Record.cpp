@@ -40,8 +40,8 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
             it = detail_json.FindMember("win_claim");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
                 uint32_t wc = it->value.GetUint();
-                detail_data.win_flag = (wc >> 4) & 0xF;
-                detail_data.claim_flag = wc & 0xF;
+                detail_data.win_flag = static_cast<uint8_t>((wc >> 4) & 0xF);
+                detail_data.claim_flag = static_cast<uint8_t>(wc & 0xF);
             }
 
             it = detail_json.FindMember("win_flag");
@@ -146,7 +146,7 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 rapidjson::Value::ConstArray penalty_scores = it->value.GetArray();
                 if (penalty_scores.Size() == 4) {
                     for (int n = 0; n < 4; ++n) {
-                        detail_data.penalty_scores[n] = penalty_scores[n].GetInt();
+                        detail_data.penalty_scores[n] = static_cast<int16_t>(penalty_scores[n].GetInt());
                     }
                 }
             }
