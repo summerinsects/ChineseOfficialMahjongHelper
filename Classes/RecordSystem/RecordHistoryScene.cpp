@@ -23,8 +23,6 @@ static void saveRecords(const std::vector<Record> &records) {
     SaveHistoryRecords(fileName.c_str(), records);
 }
 
-static void showSummaryInput();
-
 #define BUF_SIZE 511
 
 void RecordHistoryScene::updateRecordTexts() {
@@ -92,8 +90,18 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("个人汇总");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener([](Ref *) { showSummaryInput(); });
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f, origin.y + visibleSize.height - 45.0f));
+    button->addClickEventListener(std::bind(&RecordHistoryScene::onSummaryButton, this, std::placeholders::_1));
+
+    // 批量删除按钮
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText("批量删除");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.75f, origin.y + visibleSize.height - 45.0f));
+    button->addClickEventListener(std::bind(&RecordHistoryScene::onBatchDeleteButton, this, std::placeholders::_1));
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
@@ -234,6 +242,74 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     }, nullptr);
 }
 
+namespace {
+    struct RecordsStatistic {
+        size_t rank[4];
+        float standard_score;
+        int competition_score;
+        uint16_t max_fan;
+        size_t win;
+        size_t self_drawn;
+        size_t claim;
+        size_t win_fan;
+        size_t claim_fan;
+    };
+}
+
+static void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector<Record> &records, RecordsStatistic *result) {
+    memset(result, 0, sizeof(*result));
+
+    for (size_t i = 0, cnt = std::min<size_t>(flags.size(), records.size()); i < cnt; ++i) {
+        const Record &record = records[i];
+        if (record.end_time == 0) {
+            continue;
+        }
+
+        int8_t idx = flags[i];
+        if (idx == -1) {
+            continue;
+        }
+
+        int totalScores[4] = { 0 };
+
+        for (int k = 0; k < 16; ++k) {
+            const Record::Detail &detail = record.detail[k];
+
+            int scoreTable[4];
+            TranslateDetailToScoreTable(detail, scoreTable);
+            for (int n = 0; n < 4; ++n) {
+                totalScores[n] += scoreTable[n];
+            }
+
+            uint8_t wf = detail.win_flag;
+            uint8_t cf = detail.claim_flag;
+            int winIndex = WIN_CLAIM_INDEX(wf);
+            int claimIndex = WIN_CLAIM_INDEX(cf);
+            if (winIndex == idx) {
+                ++result->win;
+                if (claimIndex == idx) {
+                    ++result->self_drawn;
+                }
+                result->win_fan += detail.fan;
+                result->max_fan = std::max<uint16_t>(result->max_fan, detail.fan);
+            }
+            else if (claimIndex == idx) {
+                ++result->claim;
+                result->claim_fan += detail.fan;
+            }
+        }
+
+        unsigned ranks[4];
+        CalculateRankFromScore(totalScores, ranks);
+        ++result->rank[ranks[idx]];
+        result->competition_score += totalScores[idx];
+
+        float ss[4];
+        RankToStandardScore(ranks, ss);
+        result->standard_score += ss[idx];
+    }
+}
+
 static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
     const float width = AlertView::maxWidth();
     const float height = 8 * 20;
@@ -310,7 +386,7 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
 
 namespace {
 
-    class AlertInnerNode : public Node, cw::TableViewDelegate {
+    class SummaryTableNode : public Node, cw::TableViewDelegate {
     private:
         std::vector<std::string> _titles;
         std::vector<int8_t> _currentFlags;
@@ -318,7 +394,7 @@ namespace {
     public:
         const std::vector<int8_t> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC(AlertInnerNode);
+        CREATE_FUNC(SummaryTableNode);
 
         virtual bool init() override;
 
@@ -329,7 +405,7 @@ namespace {
         void onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType event);
     };
 
-    bool AlertInnerNode::init() {
+    bool SummaryTableNode::init() {
         if (UNLIKELY(!Node::init())) {
             return false;
         }
@@ -385,15 +461,15 @@ namespace {
         return true;
     }
 
-    ssize_t AlertInnerNode::numberOfCellsInTableView(cw::TableView *) {
+    ssize_t SummaryTableNode::numberOfCellsInTableView(cw::TableView *) {
         return g_records.size();
     }
 
-    float AlertInnerNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
+    float SummaryTableNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
         return 40.0f;
     }
 
-    cw::TableViewCell *AlertInnerNode::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
+    cw::TableViewCell *SummaryTableNode::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
         typedef cw::TableViewCellEx<Label *, ui::RadioButtonGroup *, std::array<ui::RadioButton *, 4>, std::array<Label *, 4>, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
@@ -446,7 +522,7 @@ namespace {
                 label->setPosition(Vec2(cellWidth * 0.25f * i + 20.0f, 10.0f));
                 labels[i] = label;
             }
-            radioGroup->addEventListener(std::bind(&AlertInnerNode::onRadioButtonGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            radioGroup->addEventListener(std::bind(&SummaryTableNode::onRadioButtonGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
             // 清除按钮
             ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -499,7 +575,7 @@ namespace {
         return cell;
     }
 
-    void AlertInnerNode::onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType) {
+    void SummaryTableNode::onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType) {
         if (radioButton == nullptr) {
             return;
         }
@@ -509,8 +585,8 @@ namespace {
     }
 }
 
-static void showSummaryInput() {
-    AlertInnerNode *rootNode = AlertInnerNode::create();
+void RecordHistoryScene::onSummaryButton(cocos2d::Ref *) {
+    SummaryTableNode *rootNode = SummaryTableNode::create();
     AlertView::showWithNode("选择要汇总的对局", rootNode, [rootNode]() {
         auto& currentFlags = rootNode->getCurrentFlags();
 
@@ -519,6 +595,162 @@ static void showSummaryInput() {
 
         Node *node = createStatisticNode(rs);
         AlertView::showWithNode("汇总", node, nullptr, nullptr);
+    }, nullptr);
+}
+
+namespace {
+
+    class BatchDeleteTableNode : public Node, cw::TableViewDelegate {
+    private:
+        std::vector<std::string> _texts;
+        std::vector<bool> _currentFlags;
+
+    public:
+        const std::vector<bool> &getCurrentFlags() { return _currentFlags; }
+
+        CREATE_FUNC_WITH_PARAM_1(BatchDeleteTableNode, initWithText, const std::vector<std::string> &, texts);
+
+        bool initWithText(const std::vector<std::string> &texts);
+
+        virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
+        virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
+        virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
+    };
+
+    bool BatchDeleteTableNode::initWithText(const std::vector<std::string> &texts) {
+        if (UNLIKELY(!Node::init())) {
+            return false;
+        }
+
+        _currentFlags.assign(g_records.size(), 0);
+
+        _texts.reserve(texts.size());
+        std::copy(texts.begin(), texts.end(), std::back_inserter(_texts));
+
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        const float width = AlertView::maxWidth();
+        const float height = visibleSize.height * 0.8f - 80.0f;
+
+        this->setContentSize(Size(width, height));
+
+        // 表格
+        cw::TableView *tableView = cw::TableView::create();
+        tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
+        tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+        tableView->setScrollBarWidth(4.0f);
+        tableView->setScrollBarOpacity(0x99);
+        tableView->setContentSize(Size(width, height));
+        tableView->setDelegate(this);
+        tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
+
+        tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+        tableView->setPosition(Vec2(width * 0.5f, height * 0.5f));
+        tableView->reloadData();
+        this->addChild(tableView);
+
+        return true;
+    }
+
+    ssize_t BatchDeleteTableNode::numberOfCellsInTableView(cw::TableView *) {
+        return g_records.size();
+    }
+
+    float BatchDeleteTableNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
+        return 70.0f;
+    }
+
+    cw::TableViewCell *BatchDeleteTableNode::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
+        typedef cw::TableViewCellEx<Label *, ui::CheckBox *, std::array<LayerColor *, 2> > CustomCell;
+        CustomCell *cell = (CustomCell *)table->dequeueCell();
+
+        const float cellWidth = AlertView::maxWidth();
+
+        if (cell == nullptr) {
+            cell = CustomCell::create();
+
+            CustomCell::ExtDataType &ext = cell->getExtData();
+            Label *&label = std::get<0>(ext);
+            ui::CheckBox *&checkBox = std::get<1>(ext);
+            std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+
+            // 背景色
+            layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 70.0f);
+            cell->addChild(layerColors[0]);
+
+            layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 70.0f);
+            cell->addChild(layerColors[1]);
+
+            label = Label::createWithSystemFont("", "Arail", 10);
+            label->setColor(Color3B::BLACK);
+            cell->addChild(label);
+            label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+            label->setPosition(Vec2(2.0f, 35.0f));
+
+            checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            cell->addChild(checkBox);
+            checkBox->setZoomScale(0.0f);
+            checkBox->ignoreContentAdaptWithSize(false);
+            checkBox->setContentSize(Size(15.0f, 15.0f));
+            checkBox->setPosition(Vec2(cellWidth - 20.0f, 30.0f));
+            checkBox->addEventListener([this](Ref *sender, ui::CheckBox::EventType) {
+                ui::CheckBox *checkBox = (ui::CheckBox *)sender;
+                ssize_t idx = reinterpret_cast<ssize_t>(checkBox->getUserData());
+                _currentFlags[idx] = checkBox->isSelected();
+            });
+        }
+
+        const CustomCell::ExtDataType &ext = cell->getExtData();
+        Label *label = std::get<0>(ext);
+        ui::CheckBox *checkBox = std::get<1>(ext);
+        const std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+
+        layerColors[0]->setVisible(!(idx & 1));
+        layerColors[1]->setVisible(!!(idx & 1));
+
+        const Record &record = g_records[idx];
+        bool finished = record.end_time != 0;
+
+        label->setString(_texts[idx]);
+        cw::scaleLabelToFitWidth(label, cellWidth - 4.0f);
+
+        // 设置选中
+        checkBox->setUserData(reinterpret_cast<void *>(idx));
+        checkBox->setSelected(_currentFlags[idx]);
+
+        return cell;
+    }
+}
+
+void RecordHistoryScene::onBatchDeleteButton(cocos2d::Ref *) {
+    BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(_recordTexts);
+    AlertView::showWithNode("选择要删除的对局", rootNode, [this, rootNode]() {
+        auto currentFlags = std::make_shared<std::vector<bool> >(rootNode->getCurrentFlags());
+        AlertView::showWithMessage("删除记录", "删除后无法找回，确认删除？", 12, [this, currentFlags]() {
+            LoadingView *loadingView = LoadingView::create();
+            this->addChild(loadingView);
+            loadingView->setPosition(Director::getInstance()->getVisibleSize());
+
+            for (size_t i = currentFlags->size(); i-- > 0; ) {
+                if (currentFlags->at(i)) {
+                    g_records.erase(g_records.begin() + i);
+                }
+            }
+
+            auto thiz = makeRef(this);  // 保证线程回来之前不析构
+            auto temp = std::make_shared<std::vector<Record> >(g_records);
+            std::thread([thiz, temp, loadingView](){
+                saveRecords(*temp);
+
+                // 切换到cocos线程
+                Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
+                    if (LIKELY(thiz->isRunning())) {
+                        thiz->updateRecordTexts();
+                        loadingView->removeFromParent();
+                        thiz->_tableView->reloadDataInplacement();
+                    }
+                });
+            }).detach();
+        }, nullptr);
     }, nullptr);
 }
 

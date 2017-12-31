@@ -174,6 +174,7 @@
 		1F154E401E440A160083F8B3 /* stringify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringify.h; sourceTree = "<group>"; };
 		1F16A62F1F5F8CD500974F88 /* standard_tiles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = standard_tiles.h; sourceTree = "<group>"; };
 		1F16A6311F5F8CFB00974F88 /* LoadingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingView.h; sourceTree = "<group>"; };
+		1F2487531FF7662D00FE12F2 /* LittleFan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LittleFan.h; sourceTree = "<group>"; };
 		1F2D25851E076FC20071ADE2 /* AlertView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertView.cpp; sourceTree = "<group>"; };
 		1F2D25861E076FC20071ADE2 /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
 		1F4192721E10A10200CDC47D /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
@@ -447,6 +448,7 @@
 		1FE04AD91C94682A008401EA /* RecordSystem */ = {
 			isa = PBXGroup;
 			children = (
+				1F2487531FF7662D00FE12F2 /* LittleFan.h */,
 				1F0828A41ED26F8C00F4C424 /* Record.cpp */,
 				1FCC3C011CC47200001C9555 /* Record.h */,
 				1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */,

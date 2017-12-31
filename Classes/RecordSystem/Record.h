@@ -11,13 +11,15 @@
 #define NAME_SIZE 32
 
 struct Record {
-    char name[4][NAME_SIZE];// 选手姓名
+    char name[4][NAME_SIZE];        // 选手姓名
     struct Detail {
-        uint8_t win_claim;  // 和牌标记（4567bit）/点炮标记（0123bit）
-        uint8_t packed_fan; // 小番组合
-        uint16_t fan;       // 番数
+        uint8_t win_flag;           // 和牌选手（0123bit）
+        uint8_t claim_flag;         // 点炮选手（0123bit），当点炮选手=和牌选手时，为自摸
+        uint16_t fan;               // 番数
         int16_t penalty_scores[4];  // 处罚分
-        uint64_t fan_flag;  // 标记番种
+        uint64_t fan_flag;          // 标记番种
+        uint16_t unique_fan;        // 只存在一个的番14个：箭刻、圈风刻、门风刻、门前清、平和、双暗刻、暗杠、断幺、明杠、无字、边张、嵌张、单钓将、自摸
+        uint64_t multiple_fan;      // 可复计的番9个(每个番占用4bit)：四归一(3)、双同刻(2)、一般高(2)、喜相逢(2)、连六(2)、老少副(2)、幺九刻(4)、缺一门(3)、花牌(8)
 
         struct WinHand {
             char tiles[64];         // 牌
@@ -30,18 +32,45 @@ struct Record {
     time_t end_time;        // 结束时间
 };
 
-#define SET_WIN(wc_, n_) ((wc_) |= (1 << ((n_) + 4)))
-#define TEST_WIN(wc_, n_) !!((wc_) & (1 << ((n_) + 4)))
+#define SET_WIN_CLAIM(wc_, n_) ((wc_) |= (1 << (n_)))
+#define TEST_WIN_CLAIM(wc_, n_) !!((wc_) & (1 << (n_)))
 
-#define SET_CLAIM(wc_, n_) ((wc_) |= (1 << (n_)))
-#define TEST_CLAIM(wc_, n_) !!((wc_) & (1 << (n_)))
-
-#define WIN_INDEX(wc_) (((wc_) & 0x80) ? 3 : ((wc_) & 0x40) ? 2 : ((wc_) & 0x20) ? 1 : ((wc_) & 0x10) ? 0 : -1)
-#define CLAIM_INDEX(wc_) (((wc_) & 0x8) ? 3 : ((wc_) & 0x4) ? 2 : ((wc_) & 0x2) ? 1 : ((wc_) & 0x1) ? 0 : -1)
+#define WIN_CLAIM_INDEX(wc_) (((wc_) & 0x8) ? 3 : ((wc_) & 0x4) ? 2 : ((wc_) & 0x2) ? 1 : ((wc_) & 0x1) ? 0 : -1)
 
 #define SET_FAN(flag_, fan_) ((flag_) |= (1ULL << (mahjong::LAST_TILE - (fan_))))
 #define RESET_FAN(flag_, fan_) ((flag_) &= ~(1ULL << (mahjong::LAST_TILE - (fan_))))
 #define TEST_FAN(flag_, fan_) !!((flag_) & (1ULL << (mahjong::LAST_TILE - (fan_))))
+
+#define UNIQUE_FAN_DRAGON_PUNG          0
+#define UNIQUE_FAN_PREVALENT_WIND       1
+#define UNIQUE_FAN_SEAT_WIND            2
+#define UNIQUE_FAN_CONCEALED_HAND       3
+#define UNIQUE_FAN_ALL_CHOWS            4
+#define UNIQUE_FAN_TWO_CONCEALED_PUNGS  5
+#define UNIQUE_FAN_CONCEALED_KONG       6
+#define UNIQUE_FAN_ALL_SIMPLES          7
+#define UNIQUE_FAN_MELDED_KONG          8
+#define UNIQUE_FAN_NO_HONORS            9
+#define UNIQUE_FAN_EDGE_WAIT            10
+#define UNIQUE_FAN_CLOSED_WAIT          11
+#define UNIQUE_FAN_SINGLE_WAIT          12
+#define UNIQUE_FAN_SELF_DRAWN           13
+
+#define SET_UNIQUE_FAN(unique_, idx_) ((unique_) |= (1U << (idx_)))
+#define TEST_UNIQUE_FAN(unique_, idx_) !!((unique_) & (1U << (idx_)))
+
+#define MULTIPLE_FAN_TILE_HOG           0
+#define MULTIPLE_FAN_DOUBLE_PUNG        1
+#define MULTIPLE_FAN_PURE_DOUBLE_CHOW   2
+#define MULTIPLE_FAN_MIXED_DOUBLE_CHOW  3
+#define MULTIPLE_FAN_SHORT_STRAIGHT     4
+#define MULTIPLE_FAN_TWO_TERMINAL_CHOWS 5
+#define MULTIPLE_FAN_PUNG_OF_TERMINALS_OR_HONORS    6
+#define MULTIPLE_FAN_ONE_VOIDED_SUIT    7
+#define MULTIPLE_FAN_FLOWER_TILES       8
+
+#define SET_MULTIPLE_FAN(multiple_, idx_, cnt_) ((multiple_) |= (static_cast<uint64_t>(cnt_) << ((idx_) * 4)))
+#define MULTIPLE_FAN_COUNT(multiple_, idx_)  static_cast<uint8_t>(((multiple_) >> ((idx_) * 4)) & 0xF)
 
 void ReadRecordFromFile(const char *file, Record &record);
 void WriteRecordToFile(const char *file, const Record &record);
@@ -53,23 +82,5 @@ void ModifyRecordInHistory(std::vector<Record> &records, const Record *r);
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
 void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]);
 void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]);
-void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]);
-
-const char *GetShortFanText(const Record::Detail &detail);
-std::string GetLongFanText(const Record::Detail &detail);
-
-struct RecordsStatistic {
-    size_t rank[4];
-    float standard_score;
-    int competition_score;
-    uint16_t max_fan;
-    size_t win;
-    size_t self_drawn;
-    size_t claim;
-    size_t win_fan;
-    size_t claim_fan;
-};
-
-void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector<Record> &records, RecordsStatistic *result);
 
 #endif

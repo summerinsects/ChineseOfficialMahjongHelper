@@ -146,7 +146,7 @@ void FanCalculatorScene::calculate() {
 
     std::sort(param.hand_tiles.standing_tiles, param.hand_tiles.standing_tiles + param.hand_tiles.tile_count);
 
-    param.flower_count = static_cast<uint16_t>(flowerCnt);
+    param.flower_count = static_cast<uint8_t>(flowerCnt);
     mahjong::fan_table_t fan_table = { 0 };
 
     // 获取绝张、杠开、抢杠、海底信息
@@ -160,7 +160,7 @@ void FanCalculatorScene::calculate() {
     param.win_flag = win_flag;
     param.prevalent_wind = prevalent_wind;
     param.seat_wind = seat_wind;
-    int fan = calculate_fan(&param, fan_table);
+    int fan = calculate_fan(&param, &fan_table);
 
     if (fan == ERROR_NOT_WIN) {
         Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", 14);

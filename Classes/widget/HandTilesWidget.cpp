@@ -276,11 +276,13 @@ mahjong::tile_t HandTilesWidget::putTile(mahjong::tile_t tile) {
         }
 
         // 以下代码，如果修改牌时需要增加下标，请启用
-        //// 根据需要增加下标
-        //size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
-        //if (_currentIdx < maxCnt) {
-        //    ++_currentIdx;
-        //}
+#if 1
+        // 根据需要增加下标
+        size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
+        if (_currentIdx < maxCnt) {
+            ++_currentIdx;
+        }
+#endif
     }
 
     refreshHighlightPos();
