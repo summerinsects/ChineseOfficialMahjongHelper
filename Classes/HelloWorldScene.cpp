@@ -11,8 +11,6 @@
 #include "MahjongTheory/MahjongTheoryScene.h"
 #include "CompetitionSystem/CompetitionMainScene.h"
 
-#define VERSION 0x01020A
-
 USING_NS_CC;
 
 static bool checkVersion(const std::vector<char> *buffer, bool manual);
@@ -143,9 +141,9 @@ bool HelloWorld::init() {
         Application::getInstance()->openURL("https://gitee.com/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
     });
 
+    std::string version = Application::getInstance()->getVersion();
     Label *label = Label::createWithSystemFont(
-        Common::format("v%d.%d.%d\n%s", (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, "Built  " __DATE__ "  " __TIME__),
-        "Arial", 10);
+        Common::format("v%s\n%s", version.c_str(), "Built  " __DATE__ "  " __TIME__), "Arial", 10);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAlignment(TextHAlignment::CENTER);
@@ -159,8 +157,9 @@ bool HelloWorld::init() {
 static void shareApplication() {
     const float width = AlertView::maxWidth();
 
-    std::string str = Common::format("<div style=\"word-break:break-all\">https://github.com/summerinsects/ChineseOfficialMahjongHelper/releases/download/v%d.%d.%d/ChineseOfficialMahjongHelper_v%d.%d.%d.apk</div>",
-        (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF, (VERSION >> 16) & 0xFF, (VERSION >> 8) & 0xFF, VERSION & 0xFF);
+    std::string version = Application::getInstance()->getVersion();
+    std::string str = Common::format("<div style=\"word-break:break-all\">https://github.com/summerinsects/ChineseOfficialMahjongHelper/releases/download/v%s/ChineseOfficialMahjongHelper_v%s.apk</div>",
+        version.c_str(), version.c_str());
 
     Node *rootNode = Node::create();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
@@ -338,12 +337,33 @@ bool checkVersion(const std::vector<char> *buffer, bool manual) {
                 size = it->value.GetUint();
             }
 
-            int a, b, c;
-            if (sscanf(tag.c_str(), "v%d.%d.%d", &a, &b, &c) != 3) {
+            int major1, minor1, point1;
+            if (sscanf(tag.c_str(), "v%d.%d.%d", &major1, &minor1, &point1) != 3) {
                 break;
             }
 
-            if (((a << 16) | (b << 8) | c) <= VERSION) {
+            std::string version = Application::getInstance()->getVersion();
+            int a, b, c;
+            if (sscanf(version.c_str(), "%d.%d.%d", &a, &b, &c) != 3) {
+                break;
+            }
+
+            bool hasNewVersion = false;
+            if (major1 > a) {
+                hasNewVersion = true;
+            }
+            else if (major1 == a) {
+                if (minor1 > b) {
+                    hasNewVersion = true;
+                }
+                else if (minor1 == b) {
+                    if (point1 > c) {
+                        hasNewVersion = true;
+                    }
+                }
+            }
+
+            if (!hasNewVersion) {
                 if (manual) {
                     AlertView::showWithMessage("提示", "已经是最新版本", 12, nullptr, nullptr);
                 }
@@ -358,7 +378,7 @@ bool checkVersion(const std::vector<char> *buffer, bool manual) {
 
             AlertView::showWithMessage(
                 "检测到新版本",
-                Common::format("%s，大小%.2fM，是否下载？\n%s", tag.c_str(), size / 1048576.0f, body.c_str()), 12, [url]() {
+                Common::format("%s，大小%.2fM，是否下载？\n\n%s", tag.c_str(), size / 1048576.0f, body.c_str()), 12, [url]() {
                 Application::getInstance()->openURL(url);
             }, nullptr);
 
