@@ -716,6 +716,7 @@ namespace {
         // 设置选中
         checkBox->setUserData(reinterpret_cast<void *>(idx));
         checkBox->setSelected(_currentFlags[idx]);
+        checkBox->setEnabled(finished);
 
         return cell;
     }
