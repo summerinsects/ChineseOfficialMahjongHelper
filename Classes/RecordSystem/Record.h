@@ -84,7 +84,4 @@ void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]);
 void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]);
 void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]);
 
-std::string GetShortFanText(const Record::Detail &detail);
-std::string GetLongFanText(const Record::Detail &detail);
-
 #endif
