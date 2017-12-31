@@ -17,6 +17,8 @@
 		1F0828A91ED2756500F4C424 /* drawable in Resources */ = {isa = PBXBuildFile; fileRef = 1F0828A71ED2756500F4C424 /* drawable */; };
 		1F0828AB1ED276D200F4C424 /* text in Resources */ = {isa = PBXBuildFile; fileRef = 1F0828AA1ED276D200F4C424 /* text */; };
 		1F0828AC1ED276D200F4C424 /* text in Resources */ = {isa = PBXBuildFile; fileRef = 1F0828AA1ED276D200F4C424 /* text */; };
+		1F11543C1FF8F586000EF358 /* CompetitionMainScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F11543A1FF8F586000EF358 /* CompetitionMainScene.cpp */; };
+		1F11543D1FF8F586000EF358 /* CompetitionMainScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F11543A1FF8F586000EF358 /* CompetitionMainScene.cpp */; };
 		1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */; };
 		1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */; };
 		1F154E411E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
@@ -152,6 +154,8 @@
 		1F0828A41ED26F8C00F4C424 /* Record.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Record.cpp; sourceTree = "<group>"; };
 		1F0828A71ED2756500F4C424 /* drawable */ = {isa = PBXFileReference; lastKnownFileType = folder; path = drawable; sourceTree = "<group>"; };
 		1F0828AA1ED276D200F4C424 /* text */ = {isa = PBXFileReference; lastKnownFileType = folder; path = text; sourceTree = "<group>"; };
+		1F11543A1FF8F586000EF358 /* CompetitionMainScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompetitionMainScene.cpp; sourceTree = "<group>"; };
+		1F11543B1FF8F586000EF358 /* CompetitionMainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompetitionMainScene.h; sourceTree = "<group>"; };
 		1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MahjongTheoryScene.cpp; sourceTree = "<group>"; };
 		1F154E3B1E4409420083F8B3 /* MahjongTheoryScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MahjongTheoryScene.h; sourceTree = "<group>"; };
 		1F154E3F1E440A160083F8B3 /* stringify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stringify.cpp; sourceTree = "<group>"; };
@@ -439,6 +443,8 @@
 		1FF602581F00D792006BF5E3 /* CompetitionSystem */ = {
 			isa = PBXGroup;
 			children = (
+				1F11543A1FF8F586000EF358 /* CompetitionMainScene.cpp */,
+				1F11543B1FF8F586000EF358 /* CompetitionMainScene.h */,
 				1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */,
 				1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */,
 			);
@@ -725,6 +731,7 @@
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				1FFE17A31F9BB17200714066 /* CWCommon.cpp in Sources */,
 				1FDD94451C8337140031BC38 /* shanten.cpp in Sources */,
+				1F11543C1FF8F586000EF358 /* CompetitionMainScene.cpp in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				1FF6025B1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
@@ -757,6 +764,7 @@
 				1F0828A61ED26F8C00F4C424 /* Record.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,
+				1F11543D1FF8F586000EF358 /* CompetitionMainScene.cpp in Sources */,
 				1FE04ADF1C94682A008401EA /* FanCalculatorScene.cpp in Sources */,
 				1F154E421E440A160083F8B3 /* stringify.cpp in Sources */,
 				1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,

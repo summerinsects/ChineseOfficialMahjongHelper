@@ -15,6 +15,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
                    ../../Classes/cocos-wheels/CWCommon.cpp \
                    ../../Classes/cocos-wheels/CWTableView.cpp \
+                   ../../Classes/CompetitionSystem/CompetitionMainScene.cpp \
                    ../../Classes/CompetitionSystem/LatestCompetitionScene.cpp \
                    ../../Classes/FanCalculator/FanCalculatorScene.cpp \
                    ../../Classes/FanTable/FanDefinitionScene.cpp \

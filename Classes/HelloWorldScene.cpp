@@ -9,7 +9,7 @@
 #include "FanTable/FanTableScene.h"
 #include "Other/OtherScene.h"
 #include "MahjongTheory/MahjongTheoryScene.h"
-#include "CompetitionSystem/LatestCompetitionScene.h"
+#include "CompetitionSystem/CompetitionMainScene.h"
 
 #define VERSION 0x010209
 
@@ -106,10 +106,10 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
-    button->setTitleText("近期赛事");
+    button->setTitleText("比赛");
     button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8.0f, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8.0f));
     button->addClickEventListener([](Ref *) {
-        Director::getInstance()->pushScene(LatestCompetitionScene::create());
+        Director::getInstance()->pushScene(CompetitionMainScene::create());
     });
 
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
