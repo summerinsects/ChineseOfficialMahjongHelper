@@ -9,7 +9,7 @@
 #include "FanTable/FanTableScene.h"
 #include "Other/OtherScene.h"
 #include "MahjongTheory/MahjongTheoryScene.h"
-#include "LatestCompetition/LatestCompetitionScene.h"
+#include "CompetitionSystem/LatestCompetitionScene.h"
 
 #define VERSION 0x010209
 

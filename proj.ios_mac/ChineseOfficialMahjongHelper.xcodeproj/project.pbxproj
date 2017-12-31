@@ -436,13 +436,13 @@
 			path = widget;
 			sourceTree = "<group>";
 		};
-		1FF602581F00D792006BF5E3 /* LatestCompetition */ = {
+		1FF602581F00D792006BF5E3 /* CompetitionSystem */ = {
 			isa = PBXGroup;
 			children = (
 				1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */,
 				1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */,
 			);
-			path = LatestCompetition;
+			path = CompetitionSystem;
 			sourceTree = "<group>";
 		};
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
@@ -511,7 +511,7 @@
 				1FE2A3E61CBB30D1008C45C5 /* FanTable */,
 				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
 				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
-				1FF602581F00D792006BF5E3 /* LatestCompetition */,
+				1FF602581F00D792006BF5E3 /* CompetitionSystem */,
 				1FDD943B1C8337140031BC38 /* mahjong-algorithm */,
 				1F154E391E4409420083F8B3 /* MahjongTheory */,
 				1F764BE81CC5DB1F00844DAF /* Other */,
