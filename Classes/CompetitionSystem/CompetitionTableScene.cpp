@@ -7,8 +7,9 @@
 
 USING_NS_CC;
 
-// in ScoreSheetScene.cpp
+// in Record.cpp
 extern "C++" void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]);
+extern "C++" void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]);
 
 static const char *seatText[] = { "东", "南", "西", "北" };
 
@@ -484,32 +485,15 @@ namespace {
             _checkLabel->setString(Common::format("检查：标准分总和%s，比赛分总和%d", CompetitionResult::standardScoreToString(ss).c_str(), cs));
         }
 
-
         void calculateStandardScores() {
             unsigned ranks[4] = { _results[0].rank - 1, _results[1].rank - 1, _results[2].rank - 1, _results[3].rank - 1 };
+            float ss[4];
+            RankToStandardScore(ranks, ss);
 
-            // 并列的数目
-            unsigned rankCnt[4] = { 0 };
-            for (int i = 0; i < 4; ++i) {
-                ++rankCnt[ranks[i]];
-            }
-
-            static const float standardScore[] = { 4, 2, 1, 0 };
             for (int i = 0; i < 4; ++i) {
                 CompetitionResult &result = _results[i];
-                unsigned rank = ranks[i];
-                unsigned tieCnt = rankCnt[rank];  // 并列的人数
-
-                // 累加并列的标准分
-                float ss = standardScore[rank];
-                for (unsigned n = 1, cnt = tieCnt; n < cnt; ++n) {
-                    ss += standardScore[rank + n];
-                }
-                ss /= tieCnt;
-
-                result.rank = rank + 1;
-                result.standard_score = ss;
-                _editBoxes[i][0]->setText(CompetitionResult::standardScoreToString(ss).c_str());
+                result.standard_score = ss[i];
+                _editBoxes[i][0]->setText(CompetitionResult::standardScoreToString(ss[i]).c_str());
             }
 
             refreshCheckLabel();
