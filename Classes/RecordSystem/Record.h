@@ -87,18 +87,4 @@ void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]);
 std::string GetShortFanText(const Record::Detail &detail);
 std::string GetLongFanText(const Record::Detail &detail);
 
-struct RecordsStatistic {
-    size_t rank[4];
-    float standard_score;
-    int competition_score;
-    uint16_t max_fan;
-    size_t win;
-    size_t self_drawn;
-    size_t claim;
-    size_t win_fan;
-    size_t claim_fan;
-};
-
-void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector<Record> &records, RecordsStatistic *result);
-
 #endif
