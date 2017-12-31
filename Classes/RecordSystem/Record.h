@@ -82,6 +82,5 @@ void ModifyRecordInHistory(std::vector<Record> &records, const Record *r);
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
 void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]);
 void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]);
-void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]);
 
 #endif

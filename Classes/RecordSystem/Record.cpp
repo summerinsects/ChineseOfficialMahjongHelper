@@ -416,9 +416,3 @@ void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]) {
         ss[i] = ss0;
     }
 }
-
-void CompetitionScoreToStandardScore(const int (&cs)[4], float (&ss)[4]) {
-    unsigned ranks[4];
-    CalculateRankFromScore(cs, ranks);
-    RankToStandardScore(ranks, ss);
-}
