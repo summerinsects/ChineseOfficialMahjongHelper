@@ -150,6 +150,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\cocos-wheels\CWCommon.cpp" />
     <ClCompile Include="..\Classes\cocos-wheels\CWTableView.cpp" />
+    <ClCompile Include="..\Classes\CompetitionSystem\CompetitionMainScene.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\LatestCompetitionScene.cpp" />
     <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp" />
     <ClCompile Include="..\Classes\FanTable\FanDefinitionScene.cpp" />
@@ -176,6 +177,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\BaseScene.h" />
     <ClInclude Include="..\Classes\cocos-wheels\CWCommon.h" />
     <ClInclude Include="..\Classes\cocos-wheels\CWTableView.h" />
+    <ClInclude Include="..\Classes\CompetitionSystem\CompetitionMainScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\LatestCompetitionScene.h" />
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h" />
