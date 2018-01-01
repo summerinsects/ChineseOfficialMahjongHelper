@@ -225,8 +225,8 @@
 		1FE5CFDC1CAE029200A5C38B /* TilePickWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilePickWidget.h; sourceTree = "<group>"; };
 		1FE5D0471CAE046300A5C38B /* tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tiles; sourceTree = "<group>"; };
 		1FF089FA1F829B03008F2629 /* EditBoxDelegateWrapper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = EditBoxDelegateWrapper.hpp; path = CompetitionSystem/EditBoxDelegateWrapper.hpp; sourceTree = "<group>"; };
-		1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LatestCompetitionScene.cpp; sourceTree = "<group>"; };
-		1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LatestCompetitionScene.h; sourceTree = "<group>"; };
+		1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompetitionSystem/LatestCompetitionScene.cpp; sourceTree = "<group>"; };
+		1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompetitionSystem/LatestCompetitionScene.h; sourceTree = "<group>"; };
 		1FF8820B1F5E60BE009C3449 /* TilesImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TilesImage.h; sourceTree = "<group>"; };
 		1FFE17A11F9BB17200714066 /* CWCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWCommon.cpp; sourceTree = "<group>"; };
 		1FFE17A21F9BB17200714066 /* CWCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWCommon.h; sourceTree = "<group>"; };
@@ -369,7 +369,7 @@
 			path = MahjongTheory;
 			sourceTree = "<group>";
 		};
-		1F31F1E71EDEA6A800EBEE2C /* CompetitionSystem */ = {
+		1FF602581F00D792006BF5E3 /* CompetitionSystem */ = {
 			isa = PBXGroup;
 			children = (
 				1FE17A6D1EE0FF9300B47FE3 /* Competition.cpp */,
@@ -387,6 +387,8 @@
 				1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */,
 				1FE17A741EE0FF9300B47FE3 /* CompetitionTableScene.h */,
 				1FF089FA1F829B03008F2629 /* EditBoxDelegateWrapper.hpp */,
+				1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */,
+				1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */,
 			);
 			name = CompetitionSystem;
 			sourceTree = "<group>";
@@ -488,15 +490,6 @@
 			path = widget;
 			sourceTree = "<group>";
 		};
-		1FF602581F00D792006BF5E3 /* LatestCompetition */ = {
-			isa = PBXGroup;
-			children = (
-				1FF602591F00D792006BF5E3 /* LatestCompetitionScene.cpp */,
-				1FF6025A1F00D792006BF5E3 /* LatestCompetitionScene.h */,
-			);
-			path = LatestCompetition;
-			sourceTree = "<group>";
-		};
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
@@ -560,11 +553,11 @@
 				1F6A373D1CBDD3C9001617E6 /* BaseScene.h */,
 				1F31F1E71EDEA6A800EBEE2C /* CompetitionSystem */,
 				1FDCF7BB1F738E1C00D9C608 /* cocos-wheels */,
+				1FF602581F00D792006BF5E3 /* CompetitionSystem */,
 				1FE04AD61C94682A008401EA /* FanCalculator */,
 				1FE2A3E61CBB30D1008C45C5 /* FanTable */,
 				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
 				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
-				1FF602581F00D792006BF5E3 /* LatestCompetition */,
 				1FDD943B1C8337140031BC38 /* mahjong-algorithm */,
 				1F154E391E4409420083F8B3 /* MahjongTheory */,
 				1F764BE81CC5DB1F00844DAF /* Other */,

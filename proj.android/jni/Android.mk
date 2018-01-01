@@ -22,11 +22,11 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/CompetitionSystem/CompetitionRankCustomScene.cpp \
                    ../../Classes/CompetitionSystem/CompetitionRoundScene.cpp \
                    ../../Classes/CompetitionSystem/CompetitionTableScene.cpp \
+                   ../../Classes/CompetitionSystem/LatestCompetitionScene.cpp \
                    ../../Classes/FanCalculator/FanCalculatorScene.cpp \
                    ../../Classes/FanTable/FanDefinitionScene.cpp \
                    ../../Classes/FanTable/FanTableScene.cpp \
                    ../../Classes/HelloWorldScene.cpp \
-                   ../../Classes/LatestCompetition/LatestCompetitionScene.cpp \
                    ../../Classes/mahjong-algorithm/fan_calculator.cpp \
                    ../../Classes/mahjong-algorithm/stringify.cpp \
                    ../../Classes/mahjong-algorithm/shanten.cpp \

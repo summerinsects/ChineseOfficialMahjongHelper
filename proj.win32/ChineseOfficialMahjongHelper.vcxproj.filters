@@ -14,7 +14,7 @@
       <UniqueIdentifier>{069be9d5-bc9f-45f0-9357-fbd661ca6f96}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\CompetitionSystem">
-      <UniqueIdentifier>{ec2ebec7-c428-4bb6-8308-3e4f802a6fe0}</UniqueIdentifier>
+      <UniqueIdentifier>{0c098f96-90e5-4fd6-87d0-c74d284ea39a}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\FanCalculator">
       <UniqueIdentifier>{ee88c5ab-d66e-486f-9367-a564efe30b78}</UniqueIdentifier>
@@ -22,17 +22,11 @@
     <Filter Include="src\FanTable">
       <UniqueIdentifier>{c45dcad3-107b-4c78-a709-2ca8c957501f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\LatestCompetition">
-      <UniqueIdentifier>{0c098f96-90e5-4fd6-87d0-c74d284ea39a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\mahjong-algorithm">
       <UniqueIdentifier>{b30a3da7-0281-44fa-b97c-3fef043608b1}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\MahjongTheory">
       <UniqueIdentifier>{0d3ab171-ddea-44a5-bacd-63f9043728ea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\LatestCompetition">
-      <UniqueIdentifier>{0c098f96-90e5-4fd6-87d0-c74d284ea39a}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Other">
       <UniqueIdentifier>{70992fc8-7be4-4c25-907b-0ae6ce812762}</UniqueIdentifier>
@@ -81,6 +75,9 @@
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionTableScene.cpp">
       <Filter>src\CompetitionSystem</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\CompetitionSystem\LatestCompetitionScene.cpp">
+      <Filter>src\CompetitionSystem</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp">
       <Filter>src\FanCalculator</Filter>
     </ClCompile>
@@ -92,9 +89,6 @@
     </ClCompile>
     <ClCompile Include="..\Classes\HelloWorldScene.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp">
-      <Filter>src\LatestCompetition</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp">
       <Filter>src\mahjong-algorithm</Filter>
@@ -179,6 +173,9 @@
     <ClInclude Include="..\Classes\CompetitionSystem\EditBoxDelegateWrapper.hpp">
       <Filter>src\CompetitionSystem</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\CompetitionSystem\LatestCompetitionScene.h">
+      <Filter>src\CompetitionSystem</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h">
       <Filter>src\FanTable</Filter>
     </ClInclude>
@@ -190,9 +187,6 @@
     </ClInclude>
     <ClInclude Include="..\Classes\HelloWorldScene.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h">
-      <Filter>src\LatestCompetition</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h">
       <Filter>src\mahjong-algorithm</Filter>

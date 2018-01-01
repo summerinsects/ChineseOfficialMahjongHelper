@@ -22,11 +22,11 @@ LOCAL_SRC_FILES := $(LOCAL_PATH)/hellocpp/main.cpp \
                    $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionRankCustomScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionRoundScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionTableScene.cpp \
+                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/LatestCompetitionScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/FanCalculator/FanCalculatorScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/FanTable/FanDefinitionScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/FanTable/FanTableScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/HelloWorldScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/LatestCompetition/LatestCompetitionScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/mahjong-algorithm/fan_calculator.cpp \
                    $(LOCAL_PATH)/../../../Classes/mahjong-algorithm/stringify.cpp \
                    $(LOCAL_PATH)/../../../Classes/mahjong-algorithm/shanten.cpp \

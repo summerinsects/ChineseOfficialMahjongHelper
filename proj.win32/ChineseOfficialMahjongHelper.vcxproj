@@ -157,11 +157,11 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionRankCustomScene.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionRoundScene.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionTableScene.cpp" />
+    <ClCompile Include="..\Classes\CompetitionSystem\LatestCompetitionScene.cpp" />
     <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp" />
     <ClCompile Include="..\Classes\FanTable\FanDefinitionScene.cpp" />
     <ClCompile Include="..\Classes\FanTable\FanTableScene.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
-    <ClCompile Include="..\Classes\LatestCompetition\LatestCompetitionScene.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp" />
@@ -191,11 +191,11 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionRoundScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionTableScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\EditBoxDelegateWrapper.hpp" />
+    <ClInclude Include="..\Classes\CompetitionSystem\LatestCompetitionScene.h" />
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanTableScene.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
-    <ClInclude Include="..\Classes\LatestCompetition\LatestCompetitionScene.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\shanten.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\standard_tiles.h" />

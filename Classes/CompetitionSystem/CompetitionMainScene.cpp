@@ -6,6 +6,7 @@
 #include "CompetitionRoundScene.h"
 #include "CompetitionHistoryScene.h"
 #include "EditBoxDelegateWrapper.hpp"
+#include "LatestCompetitionScene.h"
 
 USING_NS_CC;
 
@@ -23,7 +24,7 @@ bool CompetitionMainScene::init() {
     button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleText("新建比赛");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 50.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 75.0f));
     button->addClickEventListener([this](Ref *) {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
             AlertView::showWithMessage("新建比赛", "当前有未完成的比赛，新建比赛将会覆盖旧的比赛，是否继续？", 12,
@@ -40,7 +41,7 @@ bool CompetitionMainScene::init() {
     button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleText("继续比赛");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 25.0f));
     button->addClickEventListener([this](Ref *) {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
             Scene *scene = nullptr;
@@ -64,9 +65,20 @@ bool CompetitionMainScene::init() {
     button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
     button->setTitleText("历史记录");
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 50.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 25.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(CompetitionHistoryScene::create([](CompetitionData *){ }));
+    });
+
+    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    this->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(90.0f, 32.0f));
+    button->setTitleFontSize(20);
+    button->setTitleText("近期赛事");
+    button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 75.0f));
+    button->addClickEventListener([this](Ref *) {
+        Director::getInstance()->pushScene(LatestCompetitionScene::create());
     });
 
     _competitionData = std::make_shared<CompetitionData>();
