@@ -34,7 +34,8 @@ LOCAL_SRC_FILES := $(LOCAL_PATH)/hellocpp/main.cpp \
                    $(LOCAL_PATH)/../../../Classes/widget/AlertView.cpp \
                    $(LOCAL_PATH)/../../../Classes/widget/ExtraInfoWidget.cpp \
                    $(LOCAL_PATH)/../../../Classes/widget/HandTilesWidget.cpp \
-                   $(LOCAL_PATH)/../../../Classes/widget/TilePickWidget.cpp
+                   $(LOCAL_PATH)/../../../Classes/widget/TilePickWidget.cpp \
+                   $(LOCAL_PATH)/../../../Classes/widget/Toast.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../Classes
 

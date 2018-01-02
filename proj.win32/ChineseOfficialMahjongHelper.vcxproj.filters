@@ -114,6 +114,9 @@
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\widget\Toast.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -207,6 +210,9 @@
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\TilePickWidget.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\Toast.h">
       <Filter>src\widget</Filter>
     </ClInclude>
   </ItemGroup>
