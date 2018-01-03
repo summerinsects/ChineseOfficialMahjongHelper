@@ -23,8 +23,8 @@
 		1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3A1E4409420083F8B3 /* MahjongTheoryScene.cpp */; };
 		1F154E411E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
 		1F154E421E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
-		1F2D25871E076FC20071ADE2 /* AlertView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertView.cpp */; };
-		1F2D25881E076FC20071ADE2 /* AlertView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertView.cpp */; };
+		1F2D25871E076FC20071ADE2 /* AlertDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */; };
+		1F2D25881E076FC20071ADE2 /* AlertDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */; };
 		1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1FA6933A1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
@@ -165,8 +165,8 @@
 		1F16A62F1F5F8CD500974F88 /* standard_tiles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = standard_tiles.h; sourceTree = "<group>"; };
 		1F16A6311F5F8CFB00974F88 /* LoadingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingView.h; sourceTree = "<group>"; };
 		1F2487531FF7662D00FE12F2 /* LittleFan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LittleFan.h; sourceTree = "<group>"; };
-		1F2D25851E076FC20071ADE2 /* AlertView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertView.cpp; sourceTree = "<group>"; };
-		1F2D25861E076FC20071ADE2 /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
+		1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertDialog.cpp; sourceTree = "<group>"; };
+		1F2D25861E076FC20071ADE2 /* AlertDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialog.h; sourceTree = "<group>"; };
 		1F6A373D1CBDD3C9001617E6 /* BaseScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseScene.h; sourceTree = "<group>"; };
 		1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OtherScene.cpp; sourceTree = "<group>"; };
 		1F764BEA1CC5DB1F00844DAF /* OtherScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OtherScene.h; sourceTree = "<group>"; };
@@ -431,8 +431,8 @@
 		1FE5CFDA1CAE029200A5C38B /* widget */ = {
 			isa = PBXGroup;
 			children = (
-				1F2D25851E076FC20071ADE2 /* AlertView.cpp */,
-				1F2D25861E076FC20071ADE2 /* AlertView.h */,
+				1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */,
+				1F2D25861E076FC20071ADE2 /* AlertDialog.h */,
 				1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */,
 				1FA693391E83552300E839CC /* ExtraInfoWidget.h */,
 				1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */,
@@ -733,7 +733,7 @@
 				1FE1019A1F74964E001C3FA8 /* common.cpp in Sources */,
 				1F154E411E440A160083F8B3 /* stringify.cpp in Sources */,
 				1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
-				1F2D25871E076FC20071ADE2 /* AlertView.cpp in Sources */,
+				1F2D25871E076FC20071ADE2 /* AlertDialog.cpp in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				1FFE17A31F9BB17200714066 /* CWCommon.cpp in Sources */,
 				1FDD94451C8337140031BC38 /* shanten.cpp in Sources */,
@@ -767,7 +767,7 @@
 				1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
 				1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */,
 				1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
-				1F2D25881E076FC20071ADE2 /* AlertView.cpp in Sources */,
+				1F2D25881E076FC20071ADE2 /* AlertDialog.cpp in Sources */,
 				1F0828A61ED26F8C00F4C424 /* Record.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,

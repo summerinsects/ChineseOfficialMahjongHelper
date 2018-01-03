@@ -166,7 +166,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\RecordSystem\RecordScene.cpp" />
     <ClCompile Include="..\Classes\RecordSystem\ScoreSheetScene.cpp" />
     <ClCompile Include="..\Classes\utils\common.cpp" />
-    <ClCompile Include="..\Classes\widget\AlertView.cpp" />
+    <ClCompile Include="..\Classes\widget\AlertDialog.cpp" />
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp" />
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp" />
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp" />
@@ -199,7 +199,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\TilesImage.h" />
     <ClInclude Include="..\Classes\utils\common.h" />
     <ClInclude Include="..\Classes\utils\compiler.h" />
-    <ClInclude Include="..\Classes\widget\AlertView.h" />
+    <ClInclude Include="..\Classes\widget\AlertDialog.h" />
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h" />
     <ClInclude Include="..\Classes\widget\HandTilesWidget.h" />
     <ClInclude Include="..\Classes\widget\LoadingView.h" />

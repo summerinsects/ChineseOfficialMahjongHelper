@@ -6,7 +6,7 @@
 #include "json/document.h"
 #include "json/stringbuffer.h"
 #include "../widget/LoadingView.h"
-#include "../widget/AlertView.h"
+#include "../widget/AlertDialog.h"
 
 USING_NS_CC;
 
@@ -72,9 +72,14 @@ void LatestCompetitionScene::requestCompetitions() {
 
         LatestCompetitionScene *pthis = thiz.get();
         if (response == nullptr) {
-            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, [pthis]() {
+            AlertDialog::Builder(pthis)
+                .setTitle("提示")
+                .setMessage("获取近期赛事失败")
+                .setNegativeButton("取消", nullptr)
+                .setPositiveButton("重试", [pthis](AlertDialog *, int) {
                 pthis->requestCompetitions();
-            }, nullptr);
+                return true;
+            }).create()->show();
             return;
         }
 
@@ -83,9 +88,14 @@ void LatestCompetitionScene::requestCompetitions() {
         if (!response->isSucceed()) {
             log("response failed");
             log("error buffer: %s", response->getErrorBuffer());
-            AlertView::showWithMessage("提示", "获取近期赛事失败", 12, [pthis]() {
+            AlertDialog::Builder(pthis)
+                .setTitle("提示")
+                .setMessage("获取近期赛事失败")
+                .setNegativeButton("取消", nullptr)
+                .setPositiveButton("重试", [pthis](AlertDialog *, int) {
                 pthis->requestCompetitions();
-            }, nullptr);
+                return true;
+            }).create()->show();
             return;
         }
 

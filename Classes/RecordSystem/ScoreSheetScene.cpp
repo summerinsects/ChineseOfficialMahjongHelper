@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <iterator>
 #include "../mahjong-algorithm/stringify.h"
-#include "../widget/AlertView.h"
+#include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "../widget/HandTilesWidget.h"
 #include "RecordScene.h"
@@ -573,14 +573,13 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *, size_t idx) {
         editNameAllAtOnce(idx);
     }
     else {
-        if (_record.current_index < 16) {
-            AlertView::showWithMessage("提示", "对局已经开始，是否要修改选手姓名？", 12,
-                std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
-        }
-        else {
-            AlertView::showWithMessage("提示", "对局已经结束，是否要修改选手姓名？", 12,
-                std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
-        }
+        const char *message = (_record.current_index < 16) ? "对局已经开始，是否要修改选手姓名？" : "对局已经结束，是否要修改选手姓名？";
+        AlertDialog::Builder(this)
+            .setTitle("提示")
+            .setMessage(message)
+            .setNegativeButton("否", nullptr)
+            .setPositiveButton("是", [this, idx](AlertDialog *, int) { editName(idx); return true; })
+            .create()->show();
     }
 }
 
@@ -598,7 +597,11 @@ void ScoreSheetScene::editName(size_t idx) {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
-    AlertView::showWithNode(Common::format("开局座位「%s」", s_wind[idx]), editBox, [this, editBox, idx]() {
+    AlertDialog::Builder(this)
+        .setTitle(Common::format("开局座位「%s」", s_wind[idx]))
+        .setContentNode(editBox)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, editBox, idx](AlertDialog *, int) {
         const char *text = editBox->getText();
         if (text != nullptr) {
             std::string name = text;
@@ -606,9 +609,8 @@ void ScoreSheetScene::editName(size_t idx) {
 
             // 开始后不允许清空名字
             if (name.empty()) {
-                AlertView::showWithMessage("提示", "对局开始后不允许清空名字", 12,
-                    std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
-                return;
+                Toast::makeText(this, "对局开始后不允许清空名字", Toast::LENGTH_LONG)->show();
+                return false;
             }
 
             if (name.length() > NAME_SIZE - 1) {
@@ -617,9 +619,8 @@ void ScoreSheetScene::editName(size_t idx) {
 
             for (size_t i = 0; i < 4; ++i) {
                 if (i != idx && name.compare(_record.name[i]) == 0) {
-                    AlertView::showWithMessage("提示", "选手姓名不能相同", 12,
-                        std::bind(&ScoreSheetScene::editName, this, idx), nullptr);
-                    return;
+                    Toast::makeText(this, "选手姓名不能相同", Toast::LENGTH_LONG)->show();
+                    return false;
                 }
             }
 
@@ -635,8 +636,10 @@ void ScoreSheetScene::editName(size_t idx) {
             if (_isGlobal) {
                 writeToFile(_record);
             }
+            return true;
         }
-    }, nullptr);
+        return false;
+    }).create()->show();
 
     // 自动打开editBox
     editBox->scheduleOnce([editBox](float) {
@@ -720,7 +723,11 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     editBoxes[1]->setDelegate(delegate.get());
     editBoxes[2]->setDelegate(delegate.get());
 
-    AlertView::showWithNode("输入选手姓名", rootNode, [this, editBoxes, delegate]() {
+    AlertDialog::Builder(this)
+        .setTitle("输入选手姓名")
+        .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, editBoxes, delegate](AlertDialog *, int) {
         // 获取四个输入框内容
         std::string names[4];
         for (int i = 0; i < 4; ++i) {
@@ -740,9 +747,8 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         for (size_t i = 0; i < 4; ++i) {
             for (size_t k = i + 1; k < 4; ++k) {
                 if (!names[k].empty() && names[k].compare(names[i]) == 0) {
-                    AlertView::showWithMessage("提示", "选手姓名不能相同", 12,
-                        std::bind(&ScoreSheetScene::editName, this, k), nullptr);
-                    return;
+                    Toast::makeText(this, "选手姓名不能相同", Toast::LENGTH_LONG)->show();
+                    return false;
                 }
             }
         }
@@ -762,7 +768,8 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         if (_isGlobal) {
             writeToFile(_record);
         }
-    }, nullptr);
+        return true;
+    }).create()->show();
 
     // 自动打开指定下标的editBox
     ui::EditBox *editBox = editBoxes[idx];
@@ -800,12 +807,8 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
 
 void ScoreSheetScene::onLockButton(cocos2d::Ref *) {
     const char (&name)[4][NAME_SIZE] = _record.name;
-    auto it = std::find_if(std::begin(name), std::end(name), &Common::isCStringEmpty);
-    if (it != std::end(name)) {
-        size_t idx = it - std::begin(name);
-        AlertView::showWithMessage("锁定", "请先输入四位参赛选手姓名", 12, [this, idx]() {
-            editName(idx);
-        }, nullptr);
+    if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
+        Toast::makeText(this, "请先输入四位参赛选手姓名", Toast::LENGTH_LONG)->show();
         return;
     }
 
@@ -958,9 +961,12 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
 void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     const Record::Detail &detail = _record.detail[handIdx];
     if (detail.fan == 0) {
-        AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"),
-            "荒庄。\n\n是否需要修改这盘的记录？", 12,
-            std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
+        AlertDialog::Builder(this)
+            .setTitle(std::string(handNameText[handIdx]).append("详情"))
+            .setMessage("荒庄。\n\n是否需要修改这盘的记录？")
+            .setNegativeButton("取消", nullptr)
+            .setPositiveButton("确定", [this, handIdx](AlertDialog *, int) {editRecord(handIdx, true); return true; })
+            .create()->show();
         return;
     }
 
@@ -968,8 +974,12 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     message.append("\n是否需要修改这盘的记录？");
 
     if (Common::isCStringEmpty(detail.win_hand.tiles)) {
-        AlertView::showWithMessage(std::string(handNameText[handIdx]).append("详情"), message, 12,
-            std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
+        AlertDialog::Builder(this)
+            .setTitle(std::string(handNameText[handIdx]).append("详情"))
+            .setMessage(message)
+            .setNegativeButton("取消", nullptr)
+            .setPositiveButton("确定", [this, handIdx](AlertDialog *, int) {editRecord(handIdx, true); return true; })
+            .create()->show();
         return;
     }
 
@@ -978,7 +988,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     mahjong::tile_t win_tile;
     mahjong::string_to_tiles(detail.win_hand.tiles, &hand_tiles, &win_tile);
 
-    const float maxWidth = AlertView::maxWidth();
+    const float maxWidth = AlertDialog::maxWidth();
 
     // 花（使用emoji代码）
     Label *flowerLabel = nullptr;
@@ -1026,8 +1036,12 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     container->addChild(label);
     label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f));
 
-    AlertView::showWithNode(std::string(handNameText[handIdx]).append("详情"), container,
-        std::bind(&ScoreSheetScene::editRecord, this, handIdx, true), nullptr);
+    AlertDialog::Builder(this)
+        .setTitle(std::string(handNameText[handIdx]).append("详情"))
+        .setContentNode(container)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, handIdx](AlertDialog *, int) {editRecord(handIdx, true); return true; })
+        .create()->show();
 }
 
 void ScoreSheetScene::onTimeScheduler(float) {
@@ -1039,14 +1053,21 @@ void ScoreSheetScene::onTimeScheduler(float) {
 }
 
 void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
-    AlertView::showWithMessage("使用说明",
+    Label *label = Label::createWithSystemFont(
         "1. 使用步骤：点击「选手姓名」一栏，输入四名选手姓名，点击「锁定」，开始「记分」。\n"
         "2. 计分时如果有标记番种，则「番种备注」一栏会选取一个最大的番种名予以显示。\n"
         "3. 对于已经记分的，点击「番种备注」一栏可修改记录。\n"
         "4. 对局未完成时，点击「累计」一栏处，可显示分差并有快捷计算追分选项。\n"
         "5. 「北风北」记分完成后，会自动添加入「历史记录」。\n"
         "6. 「历史记录」里的内容只要不卸载程序就会一直保存。",
-        10, nullptr, nullptr);
+        "Arial", 10, Size(AlertDialog::maxWidth(), 0.0f));
+    label->setColor(Color3B::BLACK);
+
+    AlertDialog::Builder(this)
+        .setTitle("使用说明")
+        .setContentNode(label)
+        .setPositiveButton("确定", nullptr)
+        .create()->show();
 }
 
 void ScoreSheetScene::onHistoryButton(cocos2d::Ref *) {
@@ -1112,19 +1133,28 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     radioButton->addChild(label);
     label->setPosition(Vec2(25.0f, 10.0f));
 
-    AlertView::showWithNode("清空表格", rootNode, [this, radioGroup]() {
+    AlertDialog::Builder(this)
+        .setTitle("清空表格")
+        .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, radioGroup](AlertDialog *, int) {
         if (radioGroup->getSelectedButtonIndex() == 0) {
             _record.current_index = 16;
             _record.end_time = time(nullptr);
             RecordHistoryScene::modifyRecord(&_record);
         }
         reset();
-    }, nullptr);
+        return true;
+    }).create()->show();
 }
 
 static void showPursuit(int delta) {
     if (delta == 0) {
-        AlertView::showWithMessage("追分与保位", "平分", 12, nullptr, nullptr);
+        AlertDialog::Builder(Director::getInstance()->getRunningScene())
+            .setTitle("追分与保位")
+            .setMessage("平分")
+            .setPositiveButton("确定", nullptr)
+            .create()->show();
         return;
     }
 
@@ -1168,7 +1198,11 @@ static void showPursuit(int delta) {
         }
     }
 
-    AlertView::showWithMessage("追分与保位", msg, 12, nullptr, nullptr);
+    AlertDialog::Builder(Director::getInstance()->getRunningScene())
+        .setTitle("追分与保位")
+        .setMessage(msg)
+        .setPositiveButton("确定", nullptr)
+        .create()->show();
 }
 
 static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int (&totalScores)[4]) {
@@ -1179,7 +1213,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
         return totalScores[a] > totalScores[b];
     });
 
-    const float width = AlertView::maxWidth();
+    const float width = AlertDialog::maxWidth();
     const float height = 10 * 20;
 
     // 列宽
@@ -1316,14 +1350,19 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     auto delegate = std::make_shared<PursuitEditBoxDelegate>();
     editBox->setDelegate(delegate.get());
 
-    // 使这个代理随AlertView一起析构
-    AlertView::showWithNode("追分策略", rootNode, [editBox, delegate]() {
+    // 使这个代理随AlertDialog一起析构
+    AlertDialog::Builder(this)
+        .setTitle("追分策略")
+        .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [editBox, delegate](AlertDialog *, int) {
         const char *text = editBox->getText();
         if (!Common::isCStringEmpty(text)) {
             int delta = atoi(text);
             showPursuit(delta);
         }
-    }, nullptr);
+        return true;
+    }).create()->show();
 }
 
 void ScoreSheetScene::onScoreButton(cocos2d::Ref *, size_t idx) {
@@ -1363,5 +1402,9 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *, size_t idx) {
         });
     }
 
-    AlertView::showWithNode(name[idx], rootNode, nullptr, nullptr);
+    AlertDialog::Builder(this)
+        .setTitle(name[idx])
+        .setContentNode(rootNode)
+        .setPositiveButton("确定", nullptr)
+        .create()->show();
 }

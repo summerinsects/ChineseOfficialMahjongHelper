@@ -31,7 +31,7 @@ LOCAL_SRC_FILES := $(LOCAL_PATH)/hellocpp/main.cpp \
                    $(LOCAL_PATH)/../../../Classes/RecordSystem/RecordScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/RecordSystem/ScoreSheetScene.cpp \
                    $(LOCAL_PATH)/../../../Classes/utils/common.cpp \
-                   $(LOCAL_PATH)/../../../Classes/widget/AlertView.cpp \
+                   $(LOCAL_PATH)/../../../Classes/widget/AlertDialog.cpp \
                    $(LOCAL_PATH)/../../../Classes/widget/ExtraInfoWidget.cpp \
                    $(LOCAL_PATH)/../../../Classes/widget/HandTilesWidget.cpp \
                    $(LOCAL_PATH)/../../../Classes/widget/TilePickWidget.cpp \

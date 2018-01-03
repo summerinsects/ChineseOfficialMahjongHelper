@@ -102,7 +102,7 @@
     <ClCompile Include="..\Classes\utils\common.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\widget\AlertView.cpp">
+    <ClCompile Include="..\Classes\widget\AlertDialog.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp">
@@ -197,7 +197,7 @@
     <ClInclude Include="..\Classes\utils\compiler.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\widget\AlertView.h">
+    <ClInclude Include="..\Classes\widget\AlertDialog.h">
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h">
