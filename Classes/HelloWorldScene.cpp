@@ -4,6 +4,7 @@
 #include "json/stringbuffer.h"
 #include "utils/common.h"
 #include "widget/AlertView.h"
+#include "widget/Toast.h"
 #include "FanCalculator/FanCalculatorScene.h"
 #include "RecordSystem/ScoreSheetScene.h"
 #include "FanTable/FanTableScene.h"
@@ -12,8 +13,6 @@
 #include "CompetitionSystem/CompetitionMainScene.h"
 
 USING_NS_CC;
-
-static bool checkVersion(const std::vector<char> *buffer, bool manual);
 
 bool HelloWorld::init() {
     if (UNLIKELY(!Scene::init())) {
@@ -240,7 +239,7 @@ void HelloWorld::requestVersion(bool manual) {
     request->setRequestType(network::HttpRequest::Type::GET);
     request->setUrl("https://api.github.com/repos/summerinsects/ChineseOfficialMahjongHelper/releases/latest");
 
-    request->setResponseCallback([manual](network::HttpClient *client, network::HttpResponse *response) {
+    request->setResponseCallback([this, manual](network::HttpClient *client, network::HttpResponse *response) {
         network::HttpClient::destroyInstance();
 
         checking = false;
@@ -255,7 +254,7 @@ void HelloWorld::requestVersion(bool manual) {
             log("response failed");
             log("error buffer: %s", response->getErrorBuffer());
             if (manual) {
-                AlertView::showWithMessage("提示", "获取最新版本失败", 12, nullptr, nullptr);
+                Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_LONG)->show();
             }
             return;
         }
@@ -263,7 +262,7 @@ void HelloWorld::requestVersion(bool manual) {
         std::vector<char> *buffer = response->getResponseData();
         if (!checkVersion(buffer, manual)) {
             if (manual) {
-                AlertView::showWithMessage("提示", "获取最新版本失败", 12, nullptr, nullptr);
+                Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_LONG)->show();
             }
         }
     });
@@ -272,7 +271,7 @@ void HelloWorld::requestVersion(bool manual) {
     request->release();
 #else
     if (manual) {
-        AlertView::showWithMessage("提示", "获取最新版本失败", 12, nullptr, nullptr);
+        Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_LONG)->show();
     }
 #endif
 }
@@ -283,7 +282,7 @@ static inline bool string_has_suffix(const char *str, const char *suffix) {
     return (str_len >= suffix_len) && (strcmp(suffix, str + (str_len - suffix_len)) == 0);
 }
 
-bool checkVersion(const std::vector<char> *buffer, bool manual) {
+bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
     if (buffer == nullptr) {
         return false;
     }
@@ -365,7 +364,7 @@ bool checkVersion(const std::vector<char> *buffer, bool manual) {
 
             if (!hasNewVersion) {
                 if (manual) {
-                    AlertView::showWithMessage("提示", "已经是最新版本", 12, nullptr, nullptr);
+                    Toast::makeText(this, "已经是最新版本", Toast::LENGTH_LONG)->show();
                 }
                 return true;
             }

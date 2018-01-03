@@ -1,6 +1,7 @@
 ﻿#include "RecordScene.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../widget/AlertView.h"
+#include "../widget/Toast.h"
 #include "../widget/TilePickWidget.h"
 #include "../widget/ExtraInfoWidget.h"
 #include "../mahjong-algorithm/stringify.h"
@@ -579,7 +580,7 @@ void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {
 
 void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
     if (_drawBox->isSelected()) {
-        AlertView::showWithMessage("记录和牌", "荒庄时不能记录和牌", 12, nullptr, nullptr);
+        Toast::makeText(this, "荒庄时不能记录和牌", Toast::LENGTH_LONG)->show();
         return;
     }
 

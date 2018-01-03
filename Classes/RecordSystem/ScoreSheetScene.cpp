@@ -3,6 +3,7 @@
 #include <iterator>
 #include "../mahjong-algorithm/stringify.h"
 #include "../widget/AlertView.h"
+#include "../widget/Toast.h"
 #include "../widget/HandTilesWidget.h"
 #include "RecordScene.h"
 #include "RecordHistoryScene.h"
@@ -769,7 +770,7 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
     }, 0.0f, "open_keyboard");
 
-    button->addClickEventListener([editBoxes](Ref *) {
+    button->addClickEventListener([this, editBoxes](Ref *) {
         // 获取四个输入框内容
         std::string names[4];
         for (int i = 0; i < 4; ++i) {
@@ -784,7 +785,7 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
                 }
             }
             if (names[i].empty()) {
-                AlertView::showWithMessage("重新抽风", "请先输入四位参赛选手姓名", 12, nullptr, nullptr);
+                Toast::makeText(this, "请先输入四位参赛选手姓名", Toast::LENGTH_LONG)->show();
                 return;
             }
         }

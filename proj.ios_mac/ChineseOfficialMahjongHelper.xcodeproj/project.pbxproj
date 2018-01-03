@@ -33,6 +33,8 @@
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1FA6933A1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
 		1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
+		1FC616271FFB39C3005FC2F7 /* Toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC616251FFB39C3005FC2F7 /* Toast.cpp */; };
+		1FC616281FFB39C3005FC2F7 /* Toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC616251FFB39C3005FC2F7 /* Toast.cpp */; };
 		1FCC3C021CC47200001C9555 /* RecordHistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */; };
 		1FCC3C031CC47200001C9555 /* RecordHistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */; };
 		1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */; };
@@ -177,7 +179,6 @@
 		1F2487531FF7662D00FE12F2 /* LittleFan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LittleFan.h; sourceTree = "<group>"; };
 		1F2D25851E076FC20071ADE2 /* AlertView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertView.cpp; sourceTree = "<group>"; };
 		1F2D25861E076FC20071ADE2 /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
-		1F4192721E10A10200CDC47D /* CWTableView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CWTableView.cpp; sourceTree = "<group>"; };
 		1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionEnrollScene.cpp; path = CompetitionSystem/CompetitionEnrollScene.cpp; sourceTree = "<group>"; };
 		1F68AFC61F03366800B4BB97 /* CompetitionEnrollScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompetitionEnrollScene.h; path = CompetitionSystem/CompetitionEnrollScene.h; sourceTree = "<group>"; };
 		1F68AFC71F03366800B4BB97 /* CompetitionMainScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompetitionMainScene.cpp; path = CompetitionSystem/CompetitionMainScene.cpp; sourceTree = "<group>"; };
@@ -187,6 +188,8 @@
 		1F764BEA1CC5DB1F00844DAF /* OtherScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OtherScene.h; sourceTree = "<group>"; };
 		1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtraInfoWidget.cpp; sourceTree = "<group>"; };
 		1FA693391E83552300E839CC /* ExtraInfoWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtraInfoWidget.h; sourceTree = "<group>"; };
+		1FC616251FFB39C3005FC2F7 /* Toast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Toast.cpp; sourceTree = "<group>"; };
+		1FC616261FFB39C3005FC2F7 /* Toast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Toast.h; sourceTree = "<group>"; };
 		1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecordHistoryScene.cpp; sourceTree = "<group>"; };
 		1FCC3C001CC47200001C9555 /* RecordHistoryScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordHistoryScene.h; sourceTree = "<group>"; };
 		1FCC3C011CC47200001C9555 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Record.h; sourceTree = "<group>"; };
@@ -486,6 +489,8 @@
 				1F16A6311F5F8CFB00974F88 /* LoadingView.h */,
 				1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */,
 				1FE5CFDC1CAE029200A5C38B /* TilePickWidget.h */,
+				1FC616251FFB39C3005FC2F7 /* Toast.cpp */,
+				1FC616261FFB39C3005FC2F7 /* Toast.h */,
 			);
 			path = widget;
 			sourceTree = "<group>";
@@ -551,7 +556,6 @@
 				46880B8419C43A87006E1F66 /* AppDelegate.cpp */,
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
 				1F6A373D1CBDD3C9001617E6 /* BaseScene.h */,
-				1F31F1E71EDEA6A800EBEE2C /* CompetitionSystem */,
 				1FDCF7BB1F738E1C00D9C608 /* cocos-wheels */,
 				1FF602581F00D792006BF5E3 /* CompetitionSystem */,
 				1FE04AD61C94682A008401EA /* FanCalculator */,
@@ -783,6 +787,7 @@
 				1FE17A7B1EE0FF9300B47FE3 /* CompetitionTableScene.cpp in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
 				1FE17A751EE0FF9300B47FE3 /* Competition.cpp in Sources */,
+				1FC616271FFB39C3005FC2F7 /* Toast.cpp in Sources */,
 				1FCC3C021CC47200001C9555 /* RecordHistoryScene.cpp in Sources */,
 				1FE04AE01C94682A008401EA /* RecordScene.cpp in Sources */,
 				1FE2A3EB1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
@@ -810,7 +815,6 @@
 				1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */,
 				1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
 				1F2D25881E076FC20071ADE2 /* AlertView.cpp in Sources */,
-				1F4192751E10A10200CDC47D /* CWTableView.cpp in Sources */,
 				1F68AFCA1F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */,
 				1F0828A61ED26F8C00F4C424 /* Record.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
@@ -821,6 +825,7 @@
 				1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				46880B8B19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				1FDD94461C8337140031BC38 /* shanten.cpp in Sources */,
+				1FC616281FFB39C3005FC2F7 /* Toast.cpp in Sources */,
 				1FE04AE11C94682A008401EA /* RecordScene.cpp in Sources */,
 				1FE17A761EE0FF9300B47FE3 /* Competition.cpp in Sources */,
 				1FE5CFDE1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,

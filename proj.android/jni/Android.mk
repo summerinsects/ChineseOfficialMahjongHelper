@@ -40,7 +40,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/widget/AlertView.cpp \
                    ../../Classes/widget/ExtraInfoWidget.cpp \
                    ../../Classes/widget/HandTilesWidget.cpp \
-                   ../../Classes/widget/TilePickWidget.cpp
+                   ../../Classes/widget/TilePickWidget.cpp \
+                   ../../Classes/widget/Toast.cpp
 
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

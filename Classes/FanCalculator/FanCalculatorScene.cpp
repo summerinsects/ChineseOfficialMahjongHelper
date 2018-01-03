@@ -5,7 +5,7 @@
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../widget/TilePickWidget.h"
 #include "../widget/ExtraInfoWidget.h"
-#include "../widget/AlertView.h"
+#include "../widget/Toast.h"
 #include "../FanTable/FanDefinitionScene.h"
 
 USING_NS_CC;
@@ -133,14 +133,14 @@ void FanCalculatorScene::calculate() {
 
     int flowerCnt = _extraInfo->getFlowerCount();
     if (flowerCnt > 8) {
-        AlertView::showWithMessage("算番", "花牌数的范围为0~8", 12, nullptr, nullptr);
+        Toast::makeText(this, "花牌数的范围为0~8", Toast::LENGTH_LONG)->show();
         return;
     }
 
     mahjong::calculate_param_t param;
     _tilePicker->getData(&param.hand_tiles, &param.win_tile);
     if (param.win_tile == 0) {
-        AlertView::showWithMessage("算番", "牌张数错误", 12, nullptr, nullptr);
+        Toast::makeText(this, "牌张数错误", Toast::LENGTH_LONG)->show();
         return;
     }
 
@@ -163,18 +163,15 @@ void FanCalculatorScene::calculate() {
     int fan = calculate_fan(&param, &fan_table);
 
     if (fan == ERROR_NOT_WIN) {
-        Label *errorLabel = Label::createWithSystemFont("诈和", "Arial", 14);
-        errorLabel->setColor(Color3B::BLACK);
-        _fanAreaNode->addChild(errorLabel);
-        errorLabel->setPosition(pos);
+        Toast::makeText(this, "诈和", Toast::LENGTH_LONG)->show();
         return;
     }
     if (fan == ERROR_WRONG_TILES_COUNT) {
-        AlertView::showWithMessage("算番", "牌张数错误", 12, nullptr, nullptr);
+        Toast::makeText(this, "牌张数错误", Toast::LENGTH_LONG)->show();
         return;
     }
     if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
-        AlertView::showWithMessage("算番", "同一种牌最多只能使用4枚", 12, nullptr, nullptr);
+        Toast::makeText(this, "同一种牌最多只能使用4枚", Toast::LENGTH_LONG)->show();
         return;
     }
 

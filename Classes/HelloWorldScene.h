@@ -12,6 +12,7 @@ public:
 private:
     void onAboutButton(cocos2d::Ref *sender);
     void requestVersion(bool manual);
+    bool checkVersion(const std::vector<char> *buffer, bool manual);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
