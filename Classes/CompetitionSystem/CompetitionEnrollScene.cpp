@@ -1,6 +1,6 @@
 ﻿#include "CompetitionEnrollScene.h"
 #include <array>
-#include "../widget/AlertView.h"
+#include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "Competition.h"
 #include "CompetitionRoundScene.h"
@@ -210,11 +210,16 @@ void CompetitionEnrollScene::onNameWidget(cocos2d::Ref *sender) {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
-    AlertView::showWithNode(Common::format("序号「%" PRIzu "」", idx + 1), editBox, [this, editBox, idx]() {
+    AlertDialog::Builder(this)
+        .setTitle(Common::format("序号「%" PRIzu "」", idx + 1))
+        .setContentNode(editBox)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, editBox, idx](AlertDialog *, int) {
         _competitionData->players[idx].name = editBox->getText();
         _competitionData->writeToFile();
         _tableView->updateCellAtIndex(idx >> 1);
-    }, nullptr);
+        return true;
+    }).create()->show();
 
     auto editBoxStrong = makeRef(editBox);
     Director::getInstance()->getScheduler()->schedule([editBoxStrong](float) {

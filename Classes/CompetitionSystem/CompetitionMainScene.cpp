@@ -1,6 +1,7 @@
 ﻿#include "CompetitionMainScene.h"
 #include <array>
-#include "../widget/AlertView.h"
+#include "../widget/AlertDialog.h"
+#include "../widget/Toast.h"
 #include "Competition.h"
 #include "CompetitionEnrollScene.h"
 #include "CompetitionRoundScene.h"
@@ -27,8 +28,12 @@ bool CompetitionMainScene::init() {
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 75.0f));
     button->addClickEventListener([this](Ref *) {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
-            AlertView::showWithMessage("新建比赛", "当前有未完成的比赛，新建比赛将会覆盖旧的比赛，是否继续？", 12,
-                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, "", 8, 5), nullptr);
+            AlertDialog::Builder(this)
+                .setTitle("新建比赛")
+                .setMessage("当前有未完成的比赛，新建比赛将会覆盖旧的比赛，是否继续？")
+                .setNegativeButton("取消", nullptr)
+                .setPositiveButton("继续", [this](AlertDialog *, int) { showNewCompetitionAlert("", 8, 5); return true; })
+                .create()->show();
         }
         else {
             this->showNewCompetitionAlert("", 8, 5);
@@ -153,7 +158,11 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     label->setPosition(Vec2(110.0f, 15.0f));
     label->setDimensions(220.0f, 0.0f);
 
-    AlertView::showWithNode("新建比赛", rootNode, [this, editBoxes, delegate]() {
+    AlertDialog::Builder(this)
+        .setTitle("新建比赛")
+        .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, editBoxes, delegate](AlertDialog *dlg, int) {
         std::string name;
         size_t player = 8, round = 5;
 
@@ -173,31 +182,35 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
         }
 
         if (name.empty()) {
-            AlertView::showWithMessage("新建比赛", "请输入赛事名称", 12,
-                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, name, player, round), nullptr);
-            return;
+            Toast::makeText(this, "请输入赛事名称", Toast::LENGTH_LONG)->show();
+            return false;
         }
 
         if ((player & 0x3) || player == 0) {
-            AlertView::showWithMessage("新建比赛", "参赛人数必须为4的倍数，且大于0", 12,
-                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, name, player, round), nullptr);
-            return;
+            Toast::makeText(this, "参赛人数必须为4的倍数，且大于0", Toast::LENGTH_LONG)->show();
+            return false;
         }
 
         if (round == 0) {
-            AlertView::showWithMessage("新建比赛", "比赛轮数必须大于0", 12,
-                std::bind(&CompetitionMainScene::showNewCompetitionAlert, this, name, player, round), nullptr);
-            return;
+            Toast::makeText(this, "比赛轮数必须大于0", Toast::LENGTH_LONG)->show();
+            return false;
         }
 
         Label *label = Label::createWithSystemFont(Common::format("「%s」\n%" PRIzu "人\n%" PRIzu "轮", name.c_str(), player, round), "Arial", 12);
         label->setColor(Color3B::BLACK);
         label->setHorizontalAlignment(TextHAlignment::CENTER);
 
-        AlertView::showWithNode("新建比赛", label, [this, name, player, round]() {
+        AlertDialog::Builder(this)
+            .setTitle("新建比赛")
+            .setContentNode(label)
+            .setNegativeButton("取消", nullptr)
+            .setPositiveButton("确定", [this, name, player, round, dlg](AlertDialog *, int) {
             _competitionData->prepare(name, player, round);
             _competitionData->writeToFile();
             Director::getInstance()->pushScene(CompetitionEnrollScene::create(_competitionData));
-        }, nullptr);
-    }, nullptr);
+            dlg->dismiss();
+            return true;
+        }).create()->show();
+        return false;
+    }).create()->show();
 }

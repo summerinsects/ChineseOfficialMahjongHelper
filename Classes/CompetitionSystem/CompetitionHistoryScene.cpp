@@ -3,7 +3,7 @@
 #include <mutex>
 #include <array>
 #include "Competition.h"
-#include "../widget/AlertView.h"
+#include "../widget/AlertDialog.h"
 #include "../widget/LoadingView.h"
 
 USING_NS_CC;
@@ -188,7 +188,12 @@ cw::TableViewCell *CompetitionHistoryScene::tableCellAtIndex(cw::TableView *tabl
 void CompetitionHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
-    AlertView::showWithMessage("删除记录", "删除后无法找回，确认删除？", 12, [this, idx]() {
+
+    AlertDialog::Builder(this)
+        .setTitle("删除记录")
+        .setMessage("删除后无法找回，确认删除？")
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, idx](AlertDialog *, int) {
         LoadingView *loadingView = LoadingView::create();
         this->addChild(loadingView);
         loadingView->setPosition(Director::getInstance()->getVisibleSize());
@@ -209,7 +214,8 @@ void CompetitionHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
                 }
             });
         }).detach();
-    }, nullptr);
+        return true;
+    }).create()->show();
 }
 
 void CompetitionHistoryScene::onCellClicked(cocos2d::Ref *sender) {

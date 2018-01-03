@@ -1,6 +1,6 @@
 ﻿#include "CompetitionRankCustomScene.h"
 #include <array>
-#include "../widget/AlertView.h"
+#include "../widget/AlertDialog.h"
 #include "Competition.h"
 
 USING_NS_CC;
@@ -253,12 +253,17 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
 }
 
 void CompetitionRankCustomScene::onResetButton(cocos2d::Ref *) {
-    AlertView::showWithMessage("清空", "确定清空？", 12, [this]() {
+    AlertDialog::Builder(this)
+        .setTitle("清空")
+        .setMessage("确定清空？")
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("清空", [this](AlertDialog *, int) {
         _playerFlags.assign(_playerFlags.size(), false);
         _playerIndices.assign(_playerFlags.size(), INVALID_INDEX);
         _tableView->reloadData();
         _submitButton->setEnabled(false);
-    }, nullptr);
+        return true;
+    }).create()->show();
 }
 
 void CompetitionRankCustomScene::onSubmitButton(cocos2d::Ref *) {
@@ -285,15 +290,19 @@ void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
         showSelectPlayerAlert(realIndex);
     }
     else {
-        std::string title = Common::format("%" PRIzd "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
-        AlertView::showWithMessage(title, "该座位已经有人了，是否清除并重新选择", 12, [this, playerIndex, realIndex]() {
+        AlertDialog::Builder(this)
+            .setTitle(Common::format("%" PRIzd "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]))
+            .setMessage("该座位已经有人了，是否清除并重新选择")
+            .setNegativeButton("取消", nullptr)
+            .setPositiveButton("清除", [this, playerIndex, realIndex](AlertDialog *, int) {
             _playerIndices[realIndex] = INVALID_INDEX;
             _playerFlags[playerIndex] = false;
             _tableView->updateCellAtIndex(realIndex >> 3);
             _submitButton->setEnabled(false);
 
             showSelectPlayerAlert(realIndex);
-        }, nullptr);
+            return true;
+        }).create()->show();
     }
 }
 
@@ -321,7 +330,7 @@ namespace {
 
             _currentFlags.resize(playerFlags->size());
 
-            const float width = AlertView::maxWidth();
+            const float width = AlertDialog::maxWidth();
             const float height = Director::getInstance()->getVisibleSize().height * 0.8f - 80.0f;
 
             this->setContentSize(Size(width, height));
@@ -364,7 +373,7 @@ namespace {
             typedef cw::TableViewCellEx<std::array<ui::CheckBox *, 2>, std::array<std::array<Label *, 2>, 2>, std::array<LayerColor *, 2> > CustomCell;
             CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-            const float cellWidth = AlertView::maxWidth();
+            const float cellWidth = AlertDialog::maxWidth();
 
             if (cell == nullptr) {
                 cell = CustomCell::create();
@@ -441,8 +450,11 @@ namespace {
 
 void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
     AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &_playerFlags, &_playerIndices);
-    std::string title = Common::format("选择选手：%" PRIzd "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]);
-    AlertView::showWithNode(title, innerNode, [this, innerNode, realIndex]() {
+    AlertDialog::Builder(this)
+        .setTitle(Common::format("选择选手：%" PRIzd "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]))
+        .setContentNode(innerNode)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, innerNode, realIndex](AlertDialog *, int) {
         const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
         std::vector<size_t> selected;
         selected.reserve(8);
@@ -462,5 +474,6 @@ void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
 
         _submitButton->setEnabled(std::none_of(_playerIndices.begin(), _playerIndices.end(),
             [](ptrdiff_t idx) { return idx == INVALID_INDEX; }));
-    }, nullptr);
+        return true;
+    }).create()->show();
 }

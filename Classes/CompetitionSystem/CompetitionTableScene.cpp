@@ -1,6 +1,6 @@
 ﻿#include "CompetitionTableScene.h"
 #include <array>
-#include "../widget/AlertView.h"
+#include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "Competition.h"
 #include "CompetitionRankCustomScene.h"
@@ -295,7 +295,12 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     // 有空位
     if (std::any_of(std::begin(currentTable.player_indices), std::end(currentTable.player_indices),
         [](ptrdiff_t idx) { return idx == INVALID_INDEX; })) {
-        AlertView::showWithMessage("登记成绩", "请先排座位", 12, std::bind(&CompetitionTableScene::showArrangeAlert, this), nullptr);
+        AlertDialog::Builder(this)
+            .setTitle("登记成绩")
+            .setMessage("请先排座位")
+            .setNegativeButton("取消", nullptr)
+            .setPositiveButton("确定", [this](AlertDialog *, int) { showArrangeAlert(); return true; })
+            .create()->show();
         return;
     }
 
@@ -333,7 +338,7 @@ namespace {
 
             memcpy(_results, prevResults, sizeof(_results));
 
-            const float width = AlertView::maxWidth();
+            const float width = AlertDialog::maxWidth();
             const float height = 100;
 
             // 列宽
@@ -506,18 +511,19 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
     AlertInnerNode *rootNode = AlertInnerNode::create(prevResult,
         _competitionData->players, _competitionTables->at(table));
 
-    std::string title = Common::format("第%" PRIzu "桌成绩", table + 1);
-    AlertView::showWithNode(title, rootNode, [this, table, title, rootNode]() {
+    AlertDialog::Builder(this)
+        .setTitle(Common::format("第%" PRIzu "桌成绩", table + 1))
+        .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, table, rootNode](AlertDialog *, int) {
         rootNode->calculateRanks();
         const CompetitionResult (*results)[4] = &rootNode->getResults();
 
         // 如果有顺位为0，则提示重新输入
         if (std::any_of(std::begin(*results), std::end(*results),
             [](const CompetitionResult &result) { return result.rank == 0; })) {
-            AlertView::showWithMessage(title, "数据错误，请重新输入", 12, [this, table, results]() {
-                showRecordAlert(table, *results);
-            }, nullptr);
-            return;
+            Toast::makeText(this, "数据错误，请重新输入", Toast::LENGTH_LONG)->show();
+            return false;
         }
 
         // 更新数据
@@ -531,7 +537,8 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         _submitButton->setEnabled(_competitionData->isRoundFinished(_currentRound));
         _tableView->updateCellAtIndex(table);
         _competitionData->writeToFile();
-    }, nullptr);
+        return true;
+    }).create()->show();
 }
 
 void CompetitionTableScene::showArrangeAlert() {
@@ -566,15 +573,20 @@ void CompetitionTableScene::showArrangeAlert() {
         label->setPosition(Vec2(25.0f, yPos));
     }
 
-    AlertView::showWithNode("排列座位", rootNode, [this, radioGroup]() {
+    AlertDialog::Builder(this)
+        .setTitle("排列座位")
+        .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, radioGroup](AlertDialog *, int) {
         switch (radioGroup->getSelectedButtonIndex()) {
         case 0: _competitionData->rankTablesByRandom(_currentRound); break;
         case 1: _competitionData->rankTablesBySnake(_currentRound); break;
         case 2: _competitionData->rankTablesByScores(_currentRound); break;
-        case 3: Director::getInstance()->pushScene(CompetitionRankCustomScene::create(_competitionData, _currentRound)); return;
-        default: return;
+        case 3: Director::getInstance()->pushScene(CompetitionRankCustomScene::create(_competitionData, _currentRound)); return true;
+        default: return false;
         }
         _tableView->reloadData();
         _competitionData->writeToFile();
-    }, nullptr);
+        return true;
+    }).create()->show();
 }
