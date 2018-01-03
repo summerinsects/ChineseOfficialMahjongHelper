@@ -133,14 +133,14 @@ void FanCalculatorScene::calculate() {
 
     int flowerCnt = _extraInfo->getFlowerCount();
     if (flowerCnt > 8) {
-        Toast::makeText(this, "花牌数的范围为0~8", Toast::LENGTH_SHORT)->show();
+        Toast::makeText(this, "花牌数的范围为0~8", Toast::LENGTH_LONG)->show();
         return;
     }
 
     mahjong::calculate_param_t param;
     _tilePicker->getData(&param.hand_tiles, &param.win_tile);
     if (param.win_tile == 0) {
-        Toast::makeText(this, "牌张数错误", Toast::LENGTH_SHORT)->show();
+        Toast::makeText(this, "牌张数错误", Toast::LENGTH_LONG)->show();
         return;
     }
 
@@ -163,15 +163,15 @@ void FanCalculatorScene::calculate() {
     int fan = calculate_fan(&param, &fan_table);
 
     if (fan == ERROR_NOT_WIN) {
-        Toast::makeText(this, "诈和", Toast::LENGTH_SHORT)->show();
+        Toast::makeText(this, "诈和", Toast::LENGTH_LONG)->show();
         return;
     }
     if (fan == ERROR_WRONG_TILES_COUNT) {
-        Toast::makeText(this, "牌张数错误", Toast::LENGTH_SHORT)->show();
+        Toast::makeText(this, "牌张数错误", Toast::LENGTH_LONG)->show();
         return;
     }
     if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
-        Toast::makeText(this, "同一种牌最多只能使用4枚", Toast::LENGTH_SHORT)->show();
+        Toast::makeText(this, "同一种牌最多只能使用4枚", Toast::LENGTH_LONG)->show();
         return;
     }
 

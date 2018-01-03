@@ -785,7 +785,7 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
                 }
             }
             if (names[i].empty()) {
-                Toast::makeText(this, "请先输入四位参赛选手姓名", Toast::LENGTH_SHORT)->show();
+                Toast::makeText(this, "请先输入四位参赛选手姓名", Toast::LENGTH_LONG)->show();
                 return;
             }
         }

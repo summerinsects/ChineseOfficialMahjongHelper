@@ -580,7 +580,7 @@ void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {
 
 void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
     if (_drawBox->isSelected()) {
-        Toast::makeText(this, "荒庄时不能记录和牌", Toast::LENGTH_SHORT)->show();
+        Toast::makeText(this, "荒庄时不能记录和牌", Toast::LENGTH_LONG)->show();
         return;
     }
 

@@ -254,7 +254,7 @@ void HelloWorld::requestVersion(bool manual) {
             log("response failed");
             log("error buffer: %s", response->getErrorBuffer());
             if (manual) {
-                Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_SHORT)->show();
+                Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_LONG)->show();
             }
             return;
         }
@@ -262,7 +262,7 @@ void HelloWorld::requestVersion(bool manual) {
         std::vector<char> *buffer = response->getResponseData();
         if (!checkVersion(buffer, manual)) {
             if (manual) {
-                Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_SHORT)->show();
+                Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_LONG)->show();
             }
         }
     });
@@ -271,7 +271,7 @@ void HelloWorld::requestVersion(bool manual) {
     request->release();
 #else
     if (manual) {
-        Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_SHORT)->show();
+        Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_LONG)->show();
     }
 #endif
 }
@@ -364,7 +364,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 
             if (!hasNewVersion) {
                 if (manual) {
-                    Toast::makeText(this, "已经是最新版本", Toast::LENGTH_SHORT);
+                    Toast::makeText(this, "已经是最新版本", Toast::LENGTH_LONG)->show();
                 }
                 return true;
             }
