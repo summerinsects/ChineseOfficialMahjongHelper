@@ -1,7 +1,7 @@
 ﻿#include "RecordHistoryScene.h"
 #include <array>
 #include "Record.h"
-#include "../widget/AlertView.h"
+#include "../widget/AlertDialog.h"
 #include "../widget/LoadingView.h"
 
 USING_NS_CC;
@@ -218,7 +218,12 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
 void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
-    AlertView::showWithMessage("删除记录", "删除后无法找回，确认删除？", 12, [this, idx]() {
+
+    AlertDialog::Builder(this)
+        .setTitle("删除记录")
+        .setMessage("删除后无法找回，确认删除？")
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, idx](AlertDialog *, int) {
         LoadingView *loadingView = LoadingView::create();
         this->addChild(loadingView);
         loadingView->setPosition(Director::getInstance()->getVisibleSize());
@@ -239,7 +244,8 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
                 }
             });
         }).detach();
-    }, nullptr);
+        return true;
+    }).create()->show();
 }
 
 namespace {
@@ -311,7 +317,7 @@ static void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector
 }
 
 static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
-    const float width = AlertView::maxWidth();
+    const float width = AlertDialog::maxWidth();
     const float height = 8 * 20;
 
     DrawNode *drawNode = DrawNode::create();
@@ -430,7 +436,7 @@ namespace {
         });
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = AlertView::maxWidth();
+        const float width = AlertDialog::maxWidth();
         const float height = visibleSize.height * 0.8f - 80.0f;
 
         this->setContentSize(Size(width, height));
@@ -473,7 +479,7 @@ namespace {
         typedef cw::TableViewCellEx<Label *, ui::RadioButtonGroup *, std::array<ui::RadioButton *, 4>, std::array<Label *, 4>, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-        const float cellWidth = AlertView::maxWidth();
+        const float cellWidth = AlertDialog::maxWidth();
 
         if (cell == nullptr) {
             cell = CustomCell::create();
@@ -587,15 +593,24 @@ namespace {
 
 void RecordHistoryScene::onSummaryButton(cocos2d::Ref *) {
     SummaryTableNode *rootNode = SummaryTableNode::create();
-    AlertView::showWithNode("选择要汇总的对局", rootNode, [rootNode]() {
+    AlertDialog::Builder(this)
+        .setTitle("选择要汇总的对局")
+        .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, rootNode](AlertDialog *, int) {
         auto& currentFlags = rootNode->getCurrentFlags();
 
         RecordsStatistic rs;
         SummarizeRecords(currentFlags, g_records, &rs);
 
         Node *node = createStatisticNode(rs);
-        AlertView::showWithNode("汇总", node, nullptr, nullptr);
-    }, nullptr);
+        AlertDialog::Builder(this)
+            .setTitle("汇总")
+            .setContentNode(node)
+            .setPositiveButton("确定", nullptr)
+            .create()->show();
+        return true;
+    }).create()->show();
 }
 
 namespace {
@@ -628,7 +643,7 @@ namespace {
         std::copy(texts.begin(), texts.end(), std::back_inserter(_texts));
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = AlertView::maxWidth();
+        const float width = AlertDialog::maxWidth();
         const float height = visibleSize.height * 0.8f - 80.0f;
 
         this->setContentSize(Size(width, height));
@@ -663,7 +678,7 @@ namespace {
         typedef cw::TableViewCellEx<Label *, ui::CheckBox *, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-        const float cellWidth = AlertView::maxWidth();
+        const float cellWidth = AlertDialog::maxWidth();
 
         if (cell == nullptr) {
             cell = CustomCell::create();
@@ -724,9 +739,18 @@ namespace {
 
 void RecordHistoryScene::onBatchDeleteButton(cocos2d::Ref *) {
     BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(_recordTexts);
-    AlertView::showWithNode("选择要删除的对局", rootNode, [this, rootNode]() {
+    AlertDialog::Builder(this)
+        .setTitle("选择要删除的对局")
+        .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
+        .setPositiveButton("确定", [this, rootNode](AlertDialog *dlg, int) {
         auto currentFlags = std::make_shared<std::vector<bool> >(rootNode->getCurrentFlags());
-        AlertView::showWithMessage("删除记录", "删除后无法找回，确认删除？", 12, [this, currentFlags]() {
+
+        AlertDialog::Builder(this)
+            .setTitle("删除记录")
+            .setMessage("删除后无法找回，确认删除？")
+            .setNegativeButton("取消", nullptr)
+            .setPositiveButton("确定", [this, currentFlags, dlg](AlertDialog *, int) {
             LoadingView *loadingView = LoadingView::create();
             this->addChild(loadingView);
             loadingView->setPosition(Director::getInstance()->getVisibleSize());
@@ -751,8 +775,11 @@ void RecordHistoryScene::onBatchDeleteButton(cocos2d::Ref *) {
                     }
                 });
             }).detach();
-        }, nullptr);
-    }, nullptr);
+            dlg->dismiss();
+            return true;
+        }).create()->show();
+        return false;
+    }).create()->show();
 }
 
 void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {

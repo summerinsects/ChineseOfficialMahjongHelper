@@ -73,7 +73,6 @@ private:
     void onSubmitButton(cocos2d::Ref *sender);
 
     void showCalculator(const mahjong::calculate_param_t &param);
-    void calculate(TilePickWidget *tilePicker, ExtraInfoWidget *extraInfo, const mahjong::calculate_param_t &param);
 };
 
 #endif

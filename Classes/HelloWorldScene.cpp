@@ -3,7 +3,7 @@
 #include "json/document.h"
 #include "json/stringbuffer.h"
 #include "utils/common.h"
-#include "widget/AlertView.h"
+#include "widget/AlertDialog.h"
 #include "widget/Toast.h"
 #include "FanCalculator/FanCalculatorScene.h"
 #include "RecordSystem/ScoreSheetScene.h"
@@ -25,15 +25,20 @@ bool HelloWorld::init() {
     this->addChild(background, -100);
 
     auto listener = EventListenerKeyboard::create();
-    listener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
+    listener->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event *unusedEvent) {
         CC_UNUSED_PARAM(keyCode);
         CC_UNUSED_PARAM(unusedEvent);
-        AlertView::showWithMessage("提示", "是否确定退出国标小助手？", 12, []() {
+        AlertDialog::Builder(this)
+            .setTitle("提示")
+            .setMessage("是否确定退出国标小助手？")
+            .setNegativeButton("取消", nullptr)
+            .setPositiveButton("确定", [](AlertDialog *, int) {
             Director::getInstance()->end();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
             exit(0);
 #endif
-        }, nullptr);
+            return true;
+        }).create()->show();
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
@@ -154,7 +159,7 @@ bool HelloWorld::init() {
 }
 
 static void shareApplication() {
-    const float width = AlertView::maxWidth();
+    const float width = AlertDialog::maxWidth();
 
     std::string version = Application::getInstance()->getVersion();
     std::string str = Common::format("<div style=\"word-break:break-all\">https://github.com/summerinsects/ChineseOfficialMahjongHelper/releases/download/v%s/ChineseOfficialMahjongHelper_v%s.apk</div>",
@@ -180,11 +185,15 @@ static void shareApplication() {
     rootNode->setContentSize(Size(width, labelSize.height));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f));
 #endif
-    AlertView::showWithNode("下载地址", rootNode, nullptr, nullptr);
+    AlertDialog::Builder(Director::getInstance()->getRunningScene())
+        .setTitle("下载地址")
+        .setContentNode(rootNode)
+        .setPositiveButton("确定", nullptr)
+        .create()->show();
 }
 
 void HelloWorld::onAboutButton(cocos2d::Ref *) {
-    const float width = AlertView::maxWidth();
+    const float width = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
 
@@ -223,7 +232,12 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     button2->setPosition(Vec2(width * 0.75f, 10.0f));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
 
-    AlertView::showWithNode("关于", rootNode, nullptr, nullptr);
+    AlertDialog::Builder(this)
+        .setTitle("关于")
+        .setContentNode(rootNode)
+        .setPositiveButton("确定", nullptr)
+        .setNegativeButton("取消", nullptr)
+        .create()->show();
 }
 
 void HelloWorld::requestVersion(bool manual) {
@@ -375,12 +389,12 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
                 body = it->value.GetString();
             }
 
-            AlertView::showWithMessage(
-                "检测到新版本",
-                Common::format("%s，大小%.2fM，是否下载？\n\n%s", tag.c_str(), size / 1048576.0f, body.c_str()), 12, [url]() {
-                Application::getInstance()->openURL(url);
-            }, nullptr);
-
+            AlertDialog::Builder(this)
+                .setTitle("检测到新版本")
+                .setMessage(Common::format("%s，大小%.2fM，是否下载？\n\n%s", tag.c_str(), size / 1048576.0f, body.c_str()))
+                .setNegativeButton("取消", nullptr)
+                .setPositiveButton("确定", [url](AlertDialog *, int) { Application::getInstance()->openURL(url); return true; })
+                .create()->show();
             return true;
         } while (0);
     }

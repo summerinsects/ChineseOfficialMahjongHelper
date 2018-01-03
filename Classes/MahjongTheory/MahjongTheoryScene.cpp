@@ -4,7 +4,8 @@
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../TilesImage.h"
 #include "../widget/TilePickWidget.h"
-#include "../widget/AlertView.h"
+#include "../widget/AlertDialog.h"
+#include "../widget/Toast.h"
 #include "../widget/LoadingView.h"
 
 USING_NS_CC;
@@ -168,7 +169,7 @@ bool MahjongTheoryScene::init() {
 }
 
 void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
-    AlertView::showWithMessage("使用说明",
+    Label *label = Label::createWithSystemFont(
         "牌理功能未经严格测试，可能存在bug。\n\n"
         "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n"
         "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n"
@@ -186,7 +187,14 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
         "输入范例1：[EEEE]288s349pSCFF2p\n"
         "输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n"
         "输入范例3：356m18s1579pWNFF9p",
-        10, nullptr, nullptr);
+        "Arial", 10, Size(AlertDialog::maxWidth(), 0.0f));
+    label->setColor(Color3B::BLACK);
+
+    AlertDialog::Builder(this)
+        .setTitle("使用说明")
+        .setContentNode(label)
+        .setPositiveButton("确定", nullptr)
+        .create()->show();
 }
 
 void MahjongTheoryScene::showInputAlert() {
@@ -220,8 +228,11 @@ void MahjongTheoryScene::showInputAlert() {
         tilePicker->setData(handTiles, servingTile);
     }
 
-    // 通过AlertView显示出来
-    AlertView::showWithNode("输入手牌", rootNode, maxWidth, [this, tilePicker]() {
+    // 通过AlertDialog显示出来
+    AlertDialog::Builder(this)
+        .setTitle("输入手牌")
+        .setContentNode(rootNode)
+        .setPositiveButton("确定", [this, tilePicker](AlertDialog *, int) {
         mahjong::hand_tiles_t handTiles;
         mahjong::tile_t servingTile;
         tilePicker->getData(&handTiles, &servingTile);
@@ -232,7 +243,11 @@ void MahjongTheoryScene::showInputAlert() {
             _editBox->setText(str);
             editBoxReturn(_editBox);
         }
-    }, std::bind(&ui::EditBox::touchDownAction, _editBox, _editBox, ui::Widget::TouchEventType::ENDED));
+        return true;
+    }).setNegativeButton("取消", [this](AlertDialog *, int) {
+        _editBox->touchDownAction(_editBox, ui::Widget::TouchEventType::ENDED);
+        return true;
+    }).create()->show();
 }
 
 void MahjongTheoryScene::setRandomInput() {
@@ -370,7 +385,7 @@ bool MahjongTheoryScene::parseInput(const char *input) {
     } while (0);
 
     if (errorStr != nullptr) {
-        AlertView::showWithMessage("提示", errorStr, 12, std::bind(&MahjongTheoryScene::showInputAlert, this), nullptr);
+        Toast::makeText(this, errorStr, Toast::LENGTH_LONG)->show();
     }
     return false;
 }

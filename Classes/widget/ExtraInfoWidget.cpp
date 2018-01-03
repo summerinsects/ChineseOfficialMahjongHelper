@@ -1,6 +1,7 @@
 ﻿#include "ExtraInfoWidget.h"
 #include "../utils/common.h"
-#include "AlertView.h"
+#include "AlertDialog.h"
+#include "Toast.h"
 #include "../mahjong-algorithm/stringify.h"
 
 USING_NS_CC;
@@ -379,7 +380,7 @@ void ExtraInfoWidget::refreshByWinTile(mahjong::tile_t winTile, bool maybeFourth
 }
 
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
-    const float maxWidth = AlertView::maxWidth();
+    const float maxWidth = AlertDialog::maxWidth();
     Label *label = Label::createWithSystemFont(
         "1. 本程序不对和牌张位置的牌进行吃、碰、杠检测，如果要对某张牌进行吃、碰、杠操作，请将这张牌放在手牌范围内。点击算番结果处的番种名，可跳转到相应番种的定义。\n"
         "2. 本程序遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式，请以您所参加的比赛细则中之规定为准。\n"
@@ -420,11 +421,15 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
         node = scrollView;
     }
 
-    AlertView::showWithNode("使用说明", node, nullptr, nullptr);
+    AlertDialog::Builder(Director::getInstance()->getRunningScene())
+        .setTitle("使用说明")
+        .setContentNode(node)
+        .setPositiveButton("确定", nullptr)
+        .create()->show();
 }
 
 void ExtraInfoWidget::showInputAlert(const char *prevInput) {
-    const float width = AlertView::maxWidth();
+    const float width = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
 
@@ -463,16 +468,18 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     editBox->setPosition(Vec2(width * 0.5f, 10.0f));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
 
-    AlertView::showWithNode("直接输入", rootNode, [this, editBox]() {
+    AlertDialog::Builder(Director::getInstance()->getRunningScene())
+        .setTitle("直接输入")
+        .setContentNode(rootNode)
+        .setPositiveButton("确定", [this, editBox](AlertDialog *, int) {
         const char *input = editBox->getText();
         const char *errorStr = parseInput(input);
         if (errorStr != nullptr) {
-            const std::string str = input;
-            AlertView::showWithMessage("直接输入牌", errorStr, 12, [this, str]() {
-                showInputAlert(str.c_str());
-            }, nullptr);
+            Toast::makeText(Director::getInstance()->getRunningScene(), errorStr, Toast::LENGTH_LONG)->show();
+            return false;
         }
-    }, nullptr);
+        return true;
+    }).create()->show();
 }
 
 const char *ExtraInfoWidget::parseInput(const char *input) {
