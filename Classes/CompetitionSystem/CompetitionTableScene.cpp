@@ -1,6 +1,7 @@
 ﻿#include "CompetitionTableScene.h"
 #include <array>
 #include "../widget/AlertView.h"
+#include "../widget/Toast.h"
 #include "Competition.h"
 #include "CompetitionRankCustomScene.h"
 #include "EditBoxDelegateWrapper.hpp"
@@ -535,7 +536,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
 void CompetitionTableScene::showArrangeAlert() {
     if (_competitionData->isRoundStarted(_currentRound)) {
-        AlertView::showWithMessage("排列座位", "开始记录成绩后不允许重新排座位", 12, nullptr, nullptr);
+        Toast::makeText(this, "开始记录成绩后不允许重新排座位", Toast::LENGTH_LONG)->show();
         return;
     }
 

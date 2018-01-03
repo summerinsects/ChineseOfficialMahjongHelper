@@ -1,6 +1,6 @@
 ﻿#include "CompetitionRoundScene.h"
 #include <array>
-#include "../widget/AlertView.h"
+#include "../widget/Toast.h"
 #include "Competition.h"
 #include "CompetitionTableScene.h"
 
@@ -64,7 +64,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
                 Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, nextRound));
             }
             else {
-                AlertView::showWithMessage("下一轮", "当前一轮尚未结束，请先将所有桌的成绩登记完毕。", 12, nullptr, nullptr);
+                Toast::makeText(this, "当前一轮尚未结束，请先将所有桌的成绩登记完毕。", Toast::LENGTH_LONG)->show();
             }
         }
     });

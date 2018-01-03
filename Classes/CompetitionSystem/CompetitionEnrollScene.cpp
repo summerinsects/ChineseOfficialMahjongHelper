@@ -1,6 +1,7 @@
 ﻿#include "CompetitionEnrollScene.h"
 #include <array>
 #include "../widget/AlertView.h"
+#include "../widget/Toast.h"
 #include "Competition.h"
 #include "CompetitionRoundScene.h"
 
@@ -185,7 +186,7 @@ void CompetitionEnrollScene::onSubmitButton(cocos2d::Ref *) {
 #endif
 
     if (!_competitionData->isEnrollmentOver()) {
-        AlertView::showWithMessage("提示", "请录入所有选手姓名", 12, nullptr, nullptr);
+        Toast::makeText(this, "请录入所有选手姓名", Toast::LENGTH_LONG)->show();
         return;
     }
 
