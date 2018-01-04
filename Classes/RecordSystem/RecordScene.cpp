@@ -129,12 +129,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->addClickEventListener(std::bind(&RecordScene::onPenaltyButton, this, std::placeholders::_1, names));
 
     // 说明文本
-    label = Label::createWithSystemFont("番数支持直接输入。标记主番可快速增加番数，取消标记不减少。", "Arial", 10);
+    label = Label::createWithSystemFont("番数支持直接输入。标记主番可快速增加番数，取消标记不减少。",
+        "Arial", 10, Size(visibleSize.width - 75.0f, 0.0f));
     label->setColor(C3B_GRAY);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
     label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 60.0f));
-    label->setDimensions(visibleSize.width - 75.0f, 0.0f);
 
     ui::RadioButtonGroup *winGroup = ui::RadioButtonGroup::create();
     winGroup->setAllowedNoSelection(true);

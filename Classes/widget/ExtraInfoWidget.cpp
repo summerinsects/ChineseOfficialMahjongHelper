@@ -395,9 +395,8 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
         "11. 九莲宝灯和258时计1个幺九刻，和其他牌不计幺九刻。\n"
         "12. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n"
         "13. 双暗杠6番，一明杠一暗杠5番，双明杠4番。暗杠的加计遵循国际麻将联盟（MIL）的规则，即杠系列和暗刻系列最多各计一个。",
-        "Arail", 10);
+        "Arail", 10, Size(maxWidth, 0.0f));
     label->setColor(Color3B::BLACK);
-    label->setDimensions(maxWidth, 0.0f);
 
     Node *node = nullptr;
 
@@ -442,9 +441,8 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
         "  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n"
         "输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
         "输入范例2：1112345678999s9s\n"
-        "输入范例3：[WWWW,1][444s]45m678pFF6m\n", "Arial", 10);
+        "输入范例3：[WWWW,1][444s]45m678pFF6m\n", "Arial", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0.0f);
     rootNode->addChild(label);
 
     // 输入手牌

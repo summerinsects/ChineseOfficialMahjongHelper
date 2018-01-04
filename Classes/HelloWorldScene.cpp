@@ -176,9 +176,8 @@ static void shareApplication() {
     webView->setPosition(Vec2(width * 0.5f, 40.0f));
     rootNode->setContentSize(Size(width, 80.0f));
 #else
-    Label *label = Label::createWithSystemFont(str, "Arail", 10);
+    Label *label = Label::createWithSystemFont(str, "Arail", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0.0f);
     rootNode->addChild(label);
 
     const Size &labelSize = label->getContentSize();
@@ -202,9 +201,8 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
         "2. 本软件开源，高端玩家可下载源代码自行编译。\n"
         "3. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
         "4. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
-        "Arail", 10);
+        "Arail", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0.0f);
     rootNode->addChild(label);
 
     // 检测新版本

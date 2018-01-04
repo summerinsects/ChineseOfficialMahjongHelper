@@ -1014,7 +1014,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     Label *label = Label::createWithSystemFont(message, "Arial", 12);
     label->setColor(Color3B::BLACK);
     if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
-        label->setDimensions(maxWidth, 0);
+        label->setDimensions(maxWidth, 0.0f);
     }
     const Size &labelSize = label->getContentSize();
 
