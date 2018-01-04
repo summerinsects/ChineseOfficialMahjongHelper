@@ -462,9 +462,9 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     rootNode->addChild(editBox);
 
     const Size &labelSize = label->getContentSize();
-    rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
+    rootNode->setContentSize(Size(width, labelSize.height + 25.0f));
     editBox->setPosition(Vec2(width * 0.5f, 10.0f));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 25.0f));
 
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
         .setTitle("直接输入")
