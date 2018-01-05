@@ -265,6 +265,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->addClickEventListener([this](Ref *) { onRecordTilesButton(nullptr); });
     topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 100.0f, 35.0f));
+    _recordTilesButton = button;
 
     // 小番
     button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
@@ -275,6 +276,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->addClickEventListener([this](Ref *) { showLittleFanAlert(false); });
     topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35.0f, 10.0f));
+    _littleFanButton = button;
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
@@ -595,6 +597,8 @@ void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
 
 void RecordScene::onDrawBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType event) {
     if (event == ui::CheckBox::EventType::SELECTED) {
+        _recordTilesButton->setEnabled(false);
+        _littleFanButton->setEnabled(false);
         _winIndex = -1;
         // 禁用所有人的和、自摸/点炮
         for (int i = 0; i < 4; ++i) {
@@ -605,6 +609,8 @@ void RecordScene::onDrawBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType eve
         }
     }
     else {
+        _recordTilesButton->setEnabled(true);
+        _littleFanButton->setEnabled(true);
         _winIndex = _winGroup->getSelectedButtonIndex();
         // 启用所有人的和、自摸/点炮
         for (int i = 0; i < 4; ++i) {
@@ -876,7 +882,7 @@ void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
 }
 
 void RecordScene::onSubmitButton(cocos2d::Ref *) {
-    if (_detail.fan_flag != 0) {  // 标记了番种
+    if (_detail.fan_flag != 0 || _detail.unique_fan != 0 || _detail.multiple_fan != 0) {  // 标记了番种
         if (_drawBox->isSelected()) {  // 荒庄
             AlertDialog::Builder(this)
                 .setTitle("记分")

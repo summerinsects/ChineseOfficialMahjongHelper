@@ -44,6 +44,8 @@ private:
     cocos2d::Label *_scoreLabel[4];
     cocos2d::Label *_penaltyLabel[4];
 
+    cocos2d::ui::Button *_recordTilesButton = nullptr;
+    cocos2d::ui::Button *_littleFanButton = nullptr;
     cw::TableView *_tableView = nullptr;
     cocos2d::ui::Button *_submitButton = nullptr;
 
