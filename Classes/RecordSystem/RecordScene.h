@@ -74,6 +74,8 @@ private:
     void onFanNameButton(cocos2d::Ref *sender);
     void onSubmitButton(cocos2d::Ref *sender);
 
+    void finish();
+
     void showCalculator(const mahjong::calculate_param_t &param);
 };
 

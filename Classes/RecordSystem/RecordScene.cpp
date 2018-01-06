@@ -838,8 +838,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         _detail.unique_fan = uniqueFan;
         _detail.multiple_fan = multipleFan;
         if (callFromSubmiting) {
-            _submitCallback(_detail);
-            Director::getInstance()->popScene();
+            finish();
         }
         return true;
     }).create()->show();
@@ -893,14 +892,12 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
                 _detail.unique_fan = 0;
                 _detail.multiple_fan = 0;
                 memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
-                _submitCallback(_detail);
-                Director::getInstance()->popScene();
+                finish();
                 return true;
             }).create()->show();
         }
         else {
-            _submitCallback(_detail);
-            Director::getInstance()->popScene();
+            finish();
         }
     }
     else {  // 未标记番种
@@ -908,11 +905,16 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
             showLittleFanAlert(true);
         }
         else {
-            _submitCallback(_detail);
-            Director::getInstance()->popScene();
+            finish();
         }
     }
 }
+
+void RecordScene::finish() {
+    _submitCallback(_detail);
+    Director::getInstance()->popScene();
+}
+
 // in FanCalculatorScene.cpp
 cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth);
 
