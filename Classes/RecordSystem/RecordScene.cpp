@@ -37,22 +37,10 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     _submitCallback = callback;
 
     switch (handIdx >> 2) {
-    default:
-        _seatFlag = 0xE4;  //3210
-        _playerFlag = 0xE4;  // 3210
-        break;
-    case 1:
-        _seatFlag = 0xB1;  // 2301
-        _playerFlag = 0xB1;  // 2301
-        break;
-    case 2:
-        _seatFlag = 0x1E;  // 0132
-        _playerFlag = 0x4B;  // 1023
-        break;
-    case 3:
-        _seatFlag = 0x4B;  // 1023
-        _playerFlag = 0x1E;  // 0132
-        break;
+    default: _seatFlag = 0xE4; _playerFlag = 0xE4; break;  // 3210 3210
+    case 1: _seatFlag = 0xB1; _playerFlag = 0xB1; break;  // 2301 2301
+    case 2: _seatFlag = 0x1E; _playerFlag = 0x4B; break;  // 0132 1023
+    case 3: _seatFlag = 0x4B; _playerFlag = 0x1E; break;  // 1023 0132
     }
 
     _winIndex = -1;
