@@ -11,6 +11,11 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_RED = Color3B(254, 87, 110);
+static const Color3B C3B_BLUE = Color3B(44, 121, 178);
+static const Color3B C3B_GREEN = Color3B(49, 155, 28);
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
+
 static Record g_currentRecord;
 
 static void readFromFile(Record &record) {
@@ -211,7 +216,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
         // 东风东~北风北名字
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
-        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setColor(C3B_GRAY);
         label->setPosition(Vec2(colPosX[0], y));
         node->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
@@ -238,7 +243,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
         // 备注的番种label
         label = Label::createWithSystemFont("", "Arail", 12);
-        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setColor(C3B_GRAY);
         label->setPosition(Vec2(colPosX[5], y));
         node->addChild(label);
         label->setVisible(false);
@@ -1097,7 +1102,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     Label *label = Label::createWithSystemFont("在清空表格之前，请选择「保存」或「丢弃」", "Arail", 12);
     rootNode->addChild(label);
     label->setPosition(Vec2(100.0f, 60.0f));
-    label->setColor(Color3B(0x60, 0x60, 0x60));
+    label->setColor(C3B_GRAY);
     cw::scaleLabelToFitWidth(label, 200.0f);
 
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
@@ -1245,7 +1250,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
     drawNode->drawLine(Vec2(width, 0.0f), Vec2(width, 200.0f), Color4F::BLACK);
 
     static const char *titleText[] = { "追者", "被追", "分差", "自摸", "对点", "旁点" };
-    const Color3B titleColor[] = { Color3B::ORANGE, Color3B::ORANGE, Color3B(0x60, 0x60, 0x60), Color3B(254, 87, 110), Color3B(44, 121, 178), Color3B(49, 155, 28) };
+    static const Color3B titleColor[] = { Color3B::ORANGE, Color3B::ORANGE, C3B_GRAY, C3B_RED, C3B_BLUE, C3B_GREEN };
 
     for (int i = 0; i < 6; ++i) {
         Label *label = Label::createWithSystemFont(titleText[i], "Arail", 12);

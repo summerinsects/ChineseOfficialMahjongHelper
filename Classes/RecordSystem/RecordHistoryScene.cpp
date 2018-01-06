@@ -6,6 +6,8 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
+
 static std::vector<Record> g_records;
 static std::mutex g_mutex;
 
@@ -380,7 +382,7 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
             cw::scaleLabelToFitWidth(label, colWidth - 4.0f);
 
             label = Label::createWithSystemFont(contentText[n][i], "Arail", 12);
-            label->setColor(Color3B(0x60, 0x60, 0x60));
+            label->setColor(C3B_GRAY);
             label->setPosition(Vec2(posX, posY - 20.0f));
             drawNode->addChild(label);
             cw::scaleLabelToFitWidth(label, colWidth - 4.0f);

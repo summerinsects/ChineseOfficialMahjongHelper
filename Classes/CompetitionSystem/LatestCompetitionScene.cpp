@@ -10,6 +10,8 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
+
 bool LatestCompetitionScene::init() {
     if (UNLIKELY(!BaseScene::initWithTitle("近期赛事"))) {
         return false;
@@ -209,7 +211,7 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         label[0]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
         label[1] = Label::createWithSystemFont("", "Arail", 10);
-        label[1]->setColor(Color3B(0x60, 0x60, 0x60));
+        label[1]->setColor(C3B_GRAY);
         cell->addChild(label[1]);
         label[1]->setPosition(Vec2(5.0f, 15.0f));
         label[1]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);

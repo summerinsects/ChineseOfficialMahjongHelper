@@ -10,6 +10,9 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
+static const Color3B C3B_BLUE_THEME = Color3B(51, 204, 255);
+
 bool FanCalculatorScene::init() {
     if (UNLIKELY(!BaseScene::initWithTitle("国标麻将算番器"))) {
         return false;
@@ -92,7 +95,7 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
 
         // 创建label，每行排2个
         Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
-        label->setColor(Color3B(0x60, 0x60, 0x60));
+        label->setColor(C3B_GRAY);
         node->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         div_t ret = div(i, 2);
@@ -117,7 +120,7 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
     label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20.0f));
 
     label = Label::createWithSystemFont("点击番种名可查看番种介绍。", "Arial", 10);
-    label->setColor(Color3B(51, 204, 255));
+    label->setColor(C3B_BLUE_THEME);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(0.0f, 5.0f));

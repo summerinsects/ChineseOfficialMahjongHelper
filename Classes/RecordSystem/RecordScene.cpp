@@ -12,7 +12,7 @@ USING_NS_CC;
 static const Color3B C3B_RED = Color3B(254, 87, 110);
 static const Color3B C3B_BLUE = Color3B(44, 121, 178);
 static const Color3B C3B_GREEN = Color3B(49, 155, 28);
-static const Color3B C3B_GRAY = Color3B(0x60, 0x60, 0x60);
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
 
 static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };

@@ -3,6 +3,8 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_BLUE_THEME = Color3B(51, 204, 255);
+
 AlertDialog *AlertDialog::Builder::create() const {
     return AlertDialog::createWithBuilder(*this);
 }
@@ -165,7 +167,7 @@ bool AlertDialog::initWithBuilder(const Builder &builder) {
 
         // 标题
         Label *label = Label::createWithSystemFont(builder._title, "Arail", 14);
-        label->setColor(Color3B(51, 204, 255));
+        label->setColor(C3B_BLUE_THEME);
         background->addChild(label);
         label->setPosition(Vec2(totalWidth * 0.5f, totalHeight + 15.0f));
         cw::trimLabelStringWithEllipsisToFitWidth(label, totalWidth - 4.0f);
