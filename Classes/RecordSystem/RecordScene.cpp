@@ -103,14 +103,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     }
 
     // 荒庄
-    ui::CheckBox *drawBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-    this->addChild(drawBox);
-    drawBox->setZoomScale(0.0f);
-    drawBox->ignoreContentAdaptWithSize(false);
-    drawBox->setContentSize(Size(20.0f, 20.0f));
-    drawBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, yPos));
-    drawBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
-    _drawBox = drawBox;
+    ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    this->addChild(checkBox);
+    checkBox->setZoomScale(0.0f);
+    checkBox->ignoreContentAdaptWithSize(false);
+    checkBox->setContentSize(Size(20.0f, 20.0f));
+    checkBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, yPos));
+    checkBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
+    _drawBox = checkBox;
 
     label = Label::createWithSystemFont("荒庄", "Arial", 12);
     label->setColor(Color3B::BLACK);
