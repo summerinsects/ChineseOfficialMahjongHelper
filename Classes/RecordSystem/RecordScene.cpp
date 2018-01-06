@@ -15,9 +15,112 @@ static const Color3B C3B_GREEN = Color3B(49, 155, 28);
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
 
-static const int fanLevel[] = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };
-static const size_t eachLevelBeginIndex[] = { 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
-static const size_t eachLevelCounts[] = { 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次的番种的个数
+// 8个常用番作为初始的「最近使用」
+static mahjong::fan_t recentFans[8] = {
+    mahjong::MIXED_SHIFTED_CHOWS,
+    mahjong::MIXED_TRIPLE_CHOW,
+    mahjong::MIXED_STRAIGHT,
+    mahjong::ALL_TYPES,
+    mahjong::PURE_STRAIGHT,
+    mahjong::HALF_FLUSH,
+    mahjong::ALL_PUNGS,
+    mahjong::PURE_SHIFTED_CHOWS
+};
+
+static const mahjong::fan_t standardFans[mahjong::FAN_TABLE_SIZE] = {
+    mahjong::FAN_NONE,
+
+    mahjong::BIG_FOUR_WINDS,
+    mahjong::BIG_THREE_DRAGONS,
+    mahjong::ALL_GREEN,
+    mahjong::NINE_GATES,
+    mahjong::FOUR_KONGS,
+    mahjong::SEVEN_SHIFTED_PAIRS,
+    mahjong::THIRTEEN_ORPHANS,
+
+    mahjong::ALL_TERMINALS,
+    mahjong::LITTLE_FOUR_WINDS,
+    mahjong::LITTLE_THREE_DRAGONS,
+    mahjong::ALL_HONORS,
+    mahjong::FOUR_CONCEALED_PUNGS,
+    mahjong::PURE_TERMINAL_CHOWS,
+
+    mahjong::QUADRUPLE_CHOW,
+    mahjong::FOUR_PURE_SHIFTED_PUNGS,
+
+    mahjong::FOUR_PURE_SHIFTED_CHOWS,
+    mahjong::THREE_KONGS,
+    mahjong::ALL_TERMINALS_AND_HONORS,
+
+    mahjong::SEVEN_PAIRS,
+    mahjong::GREATER_HONORS_AND_KNITTED_TILES,
+    mahjong::ALL_EVEN_PUNGS,
+    mahjong::FULL_FLUSH,
+    mahjong::PURE_TRIPLE_CHOW,
+    mahjong::PURE_SHIFTED_PUNGS,
+    mahjong::UPPER_TILES,
+    mahjong::MIDDLE_TILES,
+    mahjong::LOWER_TILES,
+
+    mahjong::PURE_STRAIGHT,
+    mahjong::THREE_SUITED_TERMINAL_CHOWS,
+    mahjong::PURE_SHIFTED_CHOWS,
+    mahjong::ALL_FIVE,
+    mahjong::TRIPLE_PUNG,
+    mahjong::THREE_CONCEALED_PUNGS,
+
+    mahjong::LESSER_HONORS_AND_KNITTED_TILES,
+    mahjong::KNITTED_STRAIGHT,
+    mahjong::UPPER_FOUR,
+    mahjong::LOWER_FOUR,
+    mahjong::BIG_THREE_WINDS,
+
+    mahjong::MIXED_STRAIGHT,
+    mahjong::REVERSIBLE_TILES,
+    mahjong::MIXED_TRIPLE_CHOW,
+    mahjong::MIXED_SHIFTED_PUNGS,
+    mahjong::CHICKEN_HAND,
+    mahjong::LAST_TILE_DRAW,
+    mahjong::LAST_TILE_CLAIM,
+    mahjong::OUT_WITH_REPLACEMENT_TILE,
+    mahjong::ROBBING_THE_KONG,
+
+    mahjong::ALL_PUNGS,
+    mahjong::HALF_FLUSH,
+    mahjong::MIXED_SHIFTED_CHOWS,
+    mahjong::ALL_TYPES,
+    mahjong::MELDED_HAND,
+    mahjong::TWO_CONCEALED_KONGS,
+    mahjong::TWO_DRAGONS_PUNGS,
+
+    mahjong::OUTSIDE_HAND,
+    mahjong::FULLY_CONCEALED_HAND,
+    mahjong::TWO_MELDED_KONGS,
+    mahjong::LAST_TILE
+};
+
+namespace {
+    typedef struct {
+        const char *const title;
+        const mahjong::fan_t *fans;
+        size_t count;
+        const mahjong::fan_t first_fan;
+    } CellDetail;
+}
+
+static CellDetail cellDetails[11] = {
+    { "最近使用", recentFans, 8, mahjong::FAN_NONE },
+    { "4番", &standardFans[mahjong::OUTSIDE_HAND], 4, mahjong::OUTSIDE_HAND },
+    { "6番", &standardFans[mahjong::ALL_PUNGS], 7, mahjong::ALL_PUNGS },
+    { "8番", &standardFans[mahjong::MIXED_STRAIGHT], 9, mahjong::MIXED_STRAIGHT },
+    { "12番", &standardFans[mahjong::LESSER_HONORS_AND_KNITTED_TILES], 5, mahjong::LESSER_HONORS_AND_KNITTED_TILES },
+    { "16番", &standardFans[mahjong::PURE_STRAIGHT], 6, mahjong::PURE_STRAIGHT },
+    { "24番", &standardFans[mahjong::SEVEN_PAIRS], 9, mahjong::SEVEN_PAIRS },
+    { "32番", &standardFans[mahjong::FOUR_PURE_SHIFTED_CHOWS], 3, mahjong::FOUR_PURE_SHIFTED_CHOWS },
+    { "48番", &standardFans[mahjong::QUADRUPLE_CHOW], 2, mahjong::QUADRUPLE_CHOW },
+    { "64番", &standardFans[mahjong::ALL_TERMINALS], 6, mahjong::ALL_TERMINALS },
+    { "88番", &standardFans[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
+};
 
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
@@ -322,7 +425,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         button->setContentSize(Size(30.0f, 20.0f));
         button->setTitleFontSize(12);
         button->setTitleText(text[i]);
-        button->addClickEventListener([tableView, i](Ref *) { tableView->jumpToCell(i + 1); });
+        button->addClickEventListener([tableView, i](Ref *) { tableView->jumpToCell(i + 2); });
         topNode->addChild(button);
         button->setPosition(Vec2(labelPosX + 35.0f * (0.5f + i), 10.0f));
     }
@@ -346,17 +449,43 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 }
 
 ssize_t RecordScene::numberOfCellsInTableView(cw::TableView *) {
-    return 10;
+    return 11;
 }
 
 float RecordScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
-    size_t cnt = eachLevelCounts[idx];
+    size_t cnt = cellDetails[idx].count;
     float height = computeRowsAlign4(cnt) * 25.0f;
     return (height + 15.0f);
 }
 
+namespace {
+    struct FakeCheckBox {
+        ui::Widget *root_widget = nullptr;
+        ui::Scale9Sprite *normal_sprite = nullptr;
+        ui::Scale9Sprite *selected_sprite = nullptr;
+        Label *title_label = nullptr;
+        bool is_selected = false;
+        ssize_t cell_idx = 0;
+        mahjong::fan_t fan = mahjong::FAN_NONE;
+
+        inline void setSelectd(bool selected) {
+            if (selected) {
+                is_selected = true;
+                normal_sprite->setVisible(false);
+                selected_sprite->setVisible(true);
+            }
+            else {
+                is_selected = false;
+                normal_sprite->setVisible(true);
+                selected_sprite->setVisible(false);
+            }
+        }
+    };
+
+    typedef cw::TableViewCellEx<Label *, std::array<FakeCheckBox, 9> > CustomCell;
+}
+
 cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<Label *, std::array<ui::Button *, 9> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -367,7 +496,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&label = std::get<0>(ext);
-        std::array<ui::Button *, 9> &buttons = std::get<1>(ext);
+        std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(ext);
 
         label = Label::createWithSystemFont("1番", "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -375,54 +504,75 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         label->setColor(Color3B::BLACK);
 
         for (size_t k = 0; k < 9; ++k) {
-            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
-            button->setScale9Enabled(true);
-            button->setContentSize(Size(gap - 4.0f, 20.0f));
-            button->setTitleColor(C3B_GRAY);
-            button->setTitleFontSize(12);
-            button->addClickEventListener(std::bind(&RecordScene::onFanNameButton, this, std::placeholders::_1));
+            Size size(gap - 4.0f, 20.0f);
+            Vec2 pos(size.width * 0.5f, size.height * 0.5f);
 
-            cell->addChild(button);
-            buttons[k] = button;
+            ui::Widget *rootWidget = ui::Widget::create();
+            rootWidget->setTouchEnabled(true);
+            rootWidget->setContentSize(size);
+            rootWidget->addClickEventListener(std::bind(&RecordScene::onFanNameButton, this, std::placeholders::_1));
+
+            ui::Scale9Sprite *normalSprite = ui::Scale9Sprite::create("source_material/btn_square_normal.png");
+            rootWidget->addChild(normalSprite);
+            normalSprite->setContentSize(size);
+            normalSprite->setPosition(pos);
+
+            ui::Scale9Sprite *selectedSprite = ui::Scale9Sprite::create("source_material/btn_square_highlighted.png");
+            rootWidget->addChild(selectedSprite);
+            selectedSprite->setContentSize(size);
+            selectedSprite->setPosition(pos);
+
+            Label *titleLabel = Label::createWithSystemFont("", "Arail", 12);
+            titleLabel->setColor(C3B_GRAY);
+            rootWidget->addChild(titleLabel);
+            titleLabel->setPosition(pos);
+
+            cell->addChild(rootWidget);
+
+            FakeCheckBox &checkBox = checkBoxes[k];
+            checkBox.root_widget = rootWidget;
+            checkBox.normal_sprite = normalSprite;
+            checkBox.selected_sprite = selectedSprite;
+            checkBox.title_label = titleLabel;
+            checkBox.is_selected = false;
+            rootWidget->setUserData(&checkBox);
         }
     }
 
-    const size_t currentLevelCount = eachLevelCounts[idx];
+    const CellDetail &detail = cellDetails[idx];
+    const size_t currentLevelCount = detail.count;
     size_t totalRows = computeRowsAlign4(currentLevelCount);
 
-    const CustomCell::ExtDataType &ext = cell->getExtData();
+    CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
-    const std::array<ui::Button *, 9> &buttons = std::get<1>(ext);
+    std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(ext);
 
-    for (size_t k = 0; k < 9; ++k) {
-        ui::Button *button = buttons[k];
-        button->setVisible(false);
-        button->setEnabled(false);
-        button->setHighlighted(false);
-        button->setTag(false);
-    }
-
-    label->setString(std::to_string(fanLevel[idx]).append("番"));
+    label->setString(detail.title);
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
+    const mahjong::fan_t *fans = detail.fans;
     for (size_t k = 0; k < currentLevelCount; ++k) {
-        ui::Button *button = buttons[k];
-        size_t idx0 = eachLevelBeginIndex[idx] + k;
-        button->setTitleText(mahjong::fan_name[idx0]);
-        button->setUserData(reinterpret_cast<void *>(idx0));
-        button->setVisible(true);
-        button->setEnabled(true);
+        mahjong::fan_t fan = fans[k];
+
+        FakeCheckBox &checkBox = checkBoxes[k];
+        checkBox.cell_idx = idx;
+        checkBox.fan = fan;
+
+        checkBox.root_widget->setVisible(true);
+        checkBox.title_label->setString(mahjong::fan_name[fan]);
+        cw::scaleLabelToFitWidth(checkBox.title_label, gap - 8.0f);
 
         size_t col = k & 0x3;
         size_t row = k >> 2;
-        button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
+        checkBox.root_widget->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
-        if (TEST_FAN(_detail.fan_flag, idx0)) {
-            button->setHighlighted(true);
-            button->setTag(true);
-        }
+        checkBox.setSelectd(TEST_FAN(_detail.fan_flag, fan));
+    }
 
-        cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
+    for (size_t k = currentLevelCount; k < 9; ++k) {
+        FakeCheckBox &checkBox = checkBoxes[k];
+        checkBox.root_widget->setVisible(false);
+        checkBox.is_selected = false;
     }
 
     return cell;
@@ -832,21 +982,33 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
     }).create()->show();
 }
 
+static const ssize_t standardFanToCellIdx[mahjong::FAN_TABLE_SIZE] {
+    0,
+    10, 10, 10, 10, 10, 10, 10,
+    9, 9, 9, 9, 9, 9,
+    8, 8,
+    7, 7, 7,
+    6, 6, 6, 6, 6, 6, 6, 6, 6,
+    5, 5, 5, 5, 5, 5,
+    4, 4, 4, 4, 4,
+    3, 3, 3, 3, 3, 3, 3, 3, 3,
+    2, 2, 2, 2, 2, 2, 2,
+    1, 1, 1, 1,
+};
+
 void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    size_t index = reinterpret_cast<size_t>(button->getUserData());
+    FakeCheckBox &checkBox = *(FakeCheckBox *)button->getUserData();
+    const mahjong::fan_t fan = checkBox.fan;
 
     // 标记/取消标记番种
-    bool selected = !!button->getTag();
-    if (selected) {
-        button->setHighlighted(false);
-        button->setTag(false);
-        RESET_FAN(_detail.fan_flag, index);
+    if (checkBox.is_selected) {
+        checkBox.setSelectd(false);
+        RESET_FAN(_detail.fan_flag, fan);
     }
     else {
-        button->setHighlighted(true);
-        button->setTag(true);
-        SET_FAN(_detail.fan_flag, index);
+        checkBox.setSelectd(true);
+        SET_FAN(_detail.fan_flag, fan);
     }
 
     // 计算番数
@@ -866,6 +1028,85 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
         _editBox->setText(str);
     }
     updateScoreLabel();
+
+    if (checkBox.cell_idx != 0) {
+        // 如果在「最近使用」里，则更新
+        const auto it = std::find(std::begin(recentFans), std::end(recentFans), fan);
+        if (it != std::end(recentFans)) {
+            CustomCell *cell = (CustomCell *)_tableView->cellAtIndex(0);
+            if (cell != nullptr) {
+                // 相应CheckBox的下标
+                const ptrdiff_t idx = it - std::begin(recentFans);
+
+                // 刷新CheckBox
+                std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(cell->getExtData());
+                if (fan == cellDetails[0].fans[idx]) {
+                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
+                }
+                else {
+                    assert(0);
+                }
+            }
+        }
+    }
+    else {
+        // 点击「最近使用」，更新对应格子的番
+        ssize_t cellIdx = standardFanToCellIdx[fan];
+        if (cellIdx != 0) {
+            CustomCell *cell = (CustomCell *)_tableView->cellAtIndex(cellIdx);
+            if (cell != nullptr) {
+                // 相应CheckBox的下标
+                const CellDetail &detail = cellDetails[cellIdx];
+                const ssize_t idx = static_cast<ssize_t>(fan) - static_cast<ssize_t>(detail.first_fan);
+
+                // 刷新CheckBox
+                std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(cell->getExtData());
+                if (fan == detail.fans[idx]) {
+                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
+                }
+                else {
+                    assert(0);
+                }
+            }
+        }
+    }
+}
+
+void RecordScene::adjustRecentFans() {
+    uint64_t fanFlag = _detail.fan_flag;
+    if (fanFlag == 0) {
+        return;
+    }
+
+    mahjong::fan_t temp[8];
+    uint8_t cnt = 0;
+
+    // 1. 将所有标记的番写到temp
+    for (int fan = mahjong::BIG_FOUR_WINDS; fan < mahjong::DRAGON_PUNG; ++fan) {
+        if (TEST_FAN(fanFlag, fan)) {
+            temp[cnt++] = static_cast<mahjong::fan_t>(fan);
+            if (cnt >= 8) {
+                break;
+            }
+        }
+    }
+
+    // 2. 对于不满8个的，补充原来recentFans的数据，注意去重
+    if (cnt < 8) {
+        for (int i = 0; i < 8; ++i) {
+            mahjong::fan_t fan = recentFans[i];
+            if (TEST_FAN(fanFlag, fan)) {
+                continue;
+            }
+            temp[cnt++] = fan;
+            if (cnt >= 8) {
+                break;
+            }
+        }
+    }
+
+    cellDetails[0].count = cnt;
+    std::copy(std::begin(temp), std::begin(temp) + cnt, std::begin(recentFans));
 }
 
 void RecordScene::onSubmitButton(cocos2d::Ref *) {
@@ -900,6 +1141,7 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
 
 void RecordScene::finish() {
     _submitCallback(_detail);
+    adjustRecentFans();
     Director::getInstance()->popScene();
 }
 
