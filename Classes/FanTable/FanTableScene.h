@@ -15,7 +15,7 @@ private:
     virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
-    void onPointsNameButton(cocos2d::Ref *sender);
+    void onFanNameButton(cocos2d::Ref *sender);
 };
 
 #endif

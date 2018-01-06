@@ -71,7 +71,7 @@ private:
     void onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
     void onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
 
-    void onPointsNameButton(cocos2d::Ref *sender);
+    void onFanNameButton(cocos2d::Ref *sender);
     void onSubmitButton(cocos2d::Ref *sender);
 
     void showCalculator(const mahjong::calculate_param_t &param);

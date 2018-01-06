@@ -75,7 +75,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
             button->setContentSize(Size(gap - 4.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
-            button->addClickEventListener(std::bind(&FanTableScene::onPointsNameButton, this, std::placeholders::_1));
+            button->addClickEventListener(std::bind(&FanTableScene::onFanNameButton, this, std::placeholders::_1));
 
             cell->addChild(button);
             buttons[k] = button;
@@ -124,7 +124,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     return cell;
 }
 
-void FanTableScene::onPointsNameButton(cocos2d::Ref *sender) {
+void FanTableScene::onFanNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
     Director::getInstance()->pushScene(FanDefinitionScene::create(idx));

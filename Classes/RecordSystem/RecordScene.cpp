@@ -392,7 +392,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             button->setContentSize(Size(gap - 4.0f, 20.0f));
             button->setTitleColor(Color3B::BLACK);
             button->setTitleFontSize(12);
-            button->addClickEventListener(std::bind(&RecordScene::onPointsNameButton, this, std::placeholders::_1));
+            button->addClickEventListener(std::bind(&RecordScene::onFanNameButton, this, std::placeholders::_1));
 
             cell->addChild(button);
             buttons[k] = button;
@@ -845,7 +845,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
     }).create()->show();
 }
 
-void RecordScene::onPointsNameButton(cocos2d::Ref *sender) {
+void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t index = reinterpret_cast<size_t>(button->getUserData());
 
