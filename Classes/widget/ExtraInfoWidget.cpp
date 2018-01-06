@@ -6,6 +6,8 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
+
 bool ExtraInfoWidget::init() {
     if (UNLIKELY(!Node::init())) {
         return false;
@@ -110,7 +112,7 @@ bool ExtraInfoWidget::init() {
             this->addChild(radioButton);
 
             label = Label::createWithSystemFont(windName[i], "Arial", 12);
-            label->setColor(Color3B::BLACK);
+            label->setColor(C3B_GRAY);
             radioButton->addChild(label);
             label->setPosition(Vec2(10.0f, 10.0f));
 
