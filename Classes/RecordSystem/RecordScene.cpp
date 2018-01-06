@@ -378,7 +378,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
             button->setContentSize(Size(gap - 4.0f, 20.0f));
-            button->setTitleColor(Color3B::BLACK);
+            button->setTitleColor(C3B_GRAY);
             button->setTitleFontSize(12);
             button->addClickEventListener(std::bind(&RecordScene::onFanNameButton, this, std::placeholders::_1));
 

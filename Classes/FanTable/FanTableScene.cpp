@@ -5,6 +5,8 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
+
 static const char *principle_title[] = { "不重复原则", "不拆移原则", "不得相同原则", "就高不就低", "套算一次原则" };
 
 static const int fanLevel[] = { 0, 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };  // 番种
@@ -73,7 +75,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
             button->setContentSize(Size(gap - 4.0f, 20.0f));
-            button->setTitleColor(Color3B::BLACK);
+            button->setTitleColor(C3B_GRAY);
             button->setTitleFontSize(12);
             button->addClickEventListener(std::bind(&FanTableScene::onFanNameButton, this, std::placeholders::_1));
 
