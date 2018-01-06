@@ -220,7 +220,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->addClickEventListener(std::bind(&RecordScene::onPenaltyButton, this, std::placeholders::_1, names));
 
     // 说明文本
-    label = Label::createWithSystemFont("番数支持直接输入。标记主番可快速增加番数，取消标记不减少。",
+    label = Label::createWithSystemFont("番数支持直接输入，强烈建议先「标记主番」直接增加番数，再用+-按钮调整。",
         "Arial", 10, Size(visibleSize.width - 75.0f, 0.0f));
     label->setColor(C3B_GRAY);
     this->addChild(label);
