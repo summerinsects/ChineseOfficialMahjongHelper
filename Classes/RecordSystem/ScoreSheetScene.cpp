@@ -1361,7 +1361,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
             int delta = atoi(text);
             showPursuit(delta);
         }
-        return true;
+        return false;
     }).create()->show();
 }
 
