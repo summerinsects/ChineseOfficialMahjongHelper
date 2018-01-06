@@ -6,6 +6,8 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
+
 bool ExtraInfoWidget::init() {
     if (UNLIKELY(!Node::init())) {
         return false;
@@ -110,7 +112,7 @@ bool ExtraInfoWidget::init() {
             this->addChild(radioButton);
 
             label = Label::createWithSystemFont(windName[i], "Arial", 12);
-            label->setColor(Color3B::BLACK);
+            label->setColor(C3B_GRAY);
             radioButton->addChild(label);
             label->setPosition(Vec2(10.0f, 10.0f));
 
@@ -382,7 +384,7 @@ void ExtraInfoWidget::refreshByWinTile(mahjong::tile_t winTile, bool maybeFourth
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
     const float maxWidth = AlertDialog::maxWidth();
     Label *label = Label::createWithSystemFont(
-        "1. 本程序不对和牌张位置的牌进行吃、碰、杠检测，如果要对某张牌进行吃、碰、杠操作，请将这张牌放在手牌范围内。点击算番结果处的番种名，可跳转到相应番种的定义。\n"
+        "1. 本程序不对和牌张位置的牌进行吃、碰、杠检测，如果要对某张牌进行吃、碰、杠操作，请将这张牌放在手牌范围内。\n"
         "2. 本程序遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式，请以您所参加的比赛细则中之规定为准。\n"
         "3. 手牌在形式上听多种牌（包括听第5张不存在的牌）时，不计边张、嵌张、单钓将。边张、嵌张、单钓将最多计其中一个。\n"
         "4. 组合龙普通型和牌中，可加计平和。对于可解释为组合龙龙身部分的听牌，一律不计边张、嵌张、单钓将。\n"
@@ -395,9 +397,8 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
         "11. 九莲宝灯和258时计1个幺九刻，和其他牌不计幺九刻。\n"
         "12. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n"
         "13. 双暗杠6番，一明杠一暗杠5番，双明杠4番。暗杠的加计遵循国际麻将联盟（MIL）的规则，即杠系列和暗刻系列最多各计一个。",
-        "Arail", 10);
+        "Arail", 10, Size(maxWidth, 0.0f));
     label->setColor(Color3B::BLACK);
-    label->setDimensions(maxWidth, 0.0f);
 
     Node *node = nullptr;
 
@@ -442,9 +443,8 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
         "  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n"
         "输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
         "输入范例2：1112345678999s9s\n"
-        "输入范例3：[WWWW,1][444s]45m678pFF6m\n", "Arial", 10);
+        "输入范例3：[WWWW,1][444s]45m678pFF6m\n", "Arial", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
-    label->setDimensions(width, 0.0f);
     rootNode->addChild(label);
 
     // 输入手牌
@@ -464,13 +464,14 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     rootNode->addChild(editBox);
 
     const Size &labelSize = label->getContentSize();
-    rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
+    rootNode->setContentSize(Size(width, labelSize.height + 25.0f));
     editBox->setPosition(Vec2(width * 0.5f, 10.0f));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 25.0f));
 
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
         .setTitle("直接输入")
         .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, editBox](AlertDialog *, int) {
         const char *input = editBox->getText();
         const char *errorStr = parseInput(input);

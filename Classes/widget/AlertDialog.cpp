@@ -3,6 +3,8 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_BLUE_THEME = Color3B(51, 204, 255);
+
 AlertDialog *AlertDialog::Builder::create() const {
     return AlertDialog::createWithBuilder(*this);
 }
@@ -81,25 +83,35 @@ bool AlertDialog::initWithBuilder(const Builder &builder) {
             totalHeight += 30.0f;
         }
         else if (!positiveTitle.empty()) {
+            // 分隔线
+            LayerColor *line = LayerColor::create(Color4B(227, 227, 227, 255), totalWidth, 2.0f);
+            background->addChild(line);
+            line->setPosition(Vec2(0.0f, totalHeight + 28.0f));
+
             ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
             background->addChild(button);
             button->setScale9Enabled(true);
             button->setContentSize(Size(55.0f, 20.0f));
             button->setTitleFontSize(12);
             button->setTitleText(positiveTitle);
-            button->setPosition(Vec2(totalWidth * 0.5f, 15.0f));
+            button->setPosition(Vec2(totalWidth * 0.5f, 14.0f));
             button->addClickEventListener(std::bind(&AlertDialog::onPositiveButton, this, std::placeholders::_1));
 
             totalHeight += 30.0f;
         }
         else if (!negativeTitle.empty()) {
+            // 分隔线
+            LayerColor *line = LayerColor::create(Color4B(227, 227, 227, 255), totalWidth, 2.0f);
+            background->addChild(line);
+            line->setPosition(Vec2(0.0f, totalHeight + 28.0f));
+
             ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
             background->addChild(button);
             button->setScale9Enabled(true);
             button->setContentSize(Size(55.0f, 20.0f));
             button->setTitleFontSize(12);
             button->setTitleText(negativeTitle);
-            button->setPosition(Vec2(totalWidth * 0.5f, 15.0f));
+            button->setPosition(Vec2(totalWidth * 0.5f, 14.0f));
             button->addClickEventListener(std::bind(&AlertDialog::onNegativeButton, this, std::placeholders::_1));
 
             totalHeight += 30.0f;
@@ -155,7 +167,7 @@ bool AlertDialog::initWithBuilder(const Builder &builder) {
 
         // 标题
         Label *label = Label::createWithSystemFont(builder._title, "Arail", 14);
-        label->setColor(Color3B(51, 204, 255));
+        label->setColor(C3B_BLUE_THEME);
         background->addChild(label);
         label->setPosition(Vec2(totalWidth * 0.5f, totalHeight + 15.0f));
         cw::trimLabelStringWithEllipsisToFitWidth(label, totalWidth - 4.0f);

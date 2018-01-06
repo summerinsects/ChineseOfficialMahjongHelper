@@ -25,20 +25,20 @@ bool Toast::initWithText(cocos2d::Scene *scene, const std::string &text, Duratio
 
     Label *label = Label::createWithSystemFont(text, "Arail", 12);
     Size size = label->getContentSize();
-    if (size.width > width - 8.0f) {
+    if (size.width > width - 15.0f) {
         label->setHorizontalAlignment(TextHAlignment::CENTER);
-        label->setDimensions(width - 8.0f, 0.0f);
+        label->setDimensions(width - 15.0f, 0.0f);
         size = label->getContentSize();
     }
 
-    size.width += 8.0f;
-    size.height += 8.0f;
+    size.width += 15.0f;
+    size.height += 15.0f;
     this->setContentSize(Size(size.width, size.height));
 
     this->addChild(label);
     label->setPosition(Vec2(size.width * 0.5f, size.height * 0.5f));
 
-    this->addChild(LayerColor::create(Color4B(0x60, 0x60, 0x60, 0xFF), size.width, size.height), -1);
+    this->addChild(LayerColor::create(Color4B(0x20, 0x20, 0x20, 0xF0), size.width, size.height), -1);
 
     this->setIgnoreAnchorPointForPosition(false);
     this->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
@@ -46,8 +46,11 @@ bool Toast::initWithText(cocos2d::Scene *scene, const std::string &text, Duratio
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    this->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
-        origin.y + std::min(visibleSize.height * 0.2f, size.height * 0.5f + 40.0f)));
+    float yPos = visibleSize.height * 0.15f;
+    if (yPos + size.height * 0.5f > visibleSize.height) {
+        yPos = visibleSize.height * 0.5f;
+    }
+    this->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + yPos));
 
     return true;
 }
@@ -57,5 +60,8 @@ void Toast::show() {
     _scene = nullptr;
 
     float dt = _duration == LENGTH_LONG ? 3.5f : 2.0f;
-    this->runAction(Sequence::create(DelayTime::create(dt), FadeOut::create(0.2f), RemoveSelf::create(), NULL));
+    auto thiz = makeRef(this);
+    // FIXME: 当scene不在前台时，schedule的暂停机制引起Toast延迟remove
+    Director::getInstance()->getScheduler()->schedule([thiz](float) { thiz->removeFromParent(); },
+        this, 0.0f, 0U, dt, false, "Toast::show");
 }

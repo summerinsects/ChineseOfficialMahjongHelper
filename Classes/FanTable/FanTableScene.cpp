@@ -5,11 +5,34 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
+
 static const char *principle_title[] = { "不重复原则", "不拆移原则", "不得相同原则", "就高不就低", "套算一次原则" };
 
-static const int fanLevel[] = { 0, 1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 88 };  // 番种
-static const size_t eachLevelCounts[] = { 5, 13, 10, 4, 7, 9, 5, 6, 9, 3, 2, 6, 7 };  // 各档次番种的个数
-static const size_t eachLevelBeginIndex[] = { 0, 69, 59, 55, 48, 39, 34, 28, 19, 16, 14, 8, 1 };
+namespace {
+    typedef struct {
+        const char *const title;
+        const char **fan_names;
+        const size_t count;
+        const size_t begin_index;
+    } CellDetail;
+}
+
+static const CellDetail cellDetails[13] = {
+    { "基本计分原则", principle_title, 5, 100 },
+    { "1番", &mahjong::fan_name[mahjong::PURE_DOUBLE_CHOW], 13, mahjong::PURE_DOUBLE_CHOW },
+    { "2番", &mahjong::fan_name[mahjong::DRAGON_PUNG], 10, mahjong::DRAGON_PUNG },
+    { "4番", &mahjong::fan_name[mahjong::OUTSIDE_HAND], 4, mahjong::OUTSIDE_HAND },
+    { "6番", &mahjong::fan_name[mahjong::ALL_PUNGS], 7, mahjong::ALL_PUNGS },
+    { "8番", &mahjong::fan_name[mahjong::MIXED_STRAIGHT], 9, mahjong::MIXED_STRAIGHT },
+    { "12番", &mahjong::fan_name[mahjong::LESSER_HONORS_AND_KNITTED_TILES], 5, mahjong::LESSER_HONORS_AND_KNITTED_TILES },
+    { "16番", &mahjong::fan_name[mahjong::PURE_STRAIGHT], 6, mahjong::PURE_STRAIGHT },
+    { "24番", &mahjong::fan_name[mahjong::SEVEN_PAIRS], 9, mahjong::SEVEN_PAIRS },
+    { "32番", &mahjong::fan_name[mahjong::FOUR_PURE_SHIFTED_CHOWS], 3, mahjong::FOUR_PURE_SHIFTED_CHOWS },
+    { "48番", &mahjong::fan_name[mahjong::QUADRUPLE_CHOW], 2, mahjong::QUADRUPLE_CHOW },
+    { "64番", &mahjong::fan_name[mahjong::ALL_TERMINALS], 6, mahjong::ALL_TERMINALS },
+    { "88番", &mahjong::fan_name[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
+};
 
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
@@ -45,7 +68,7 @@ ssize_t FanTableScene::numberOfCellsInTableView(cw::TableView *) {
 }
 
 float FanTableScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
-    size_t cnt = eachLevelCounts[idx];
+    size_t cnt = cellDetails[idx].count;
     float height = computeRowsAlign4(cnt) * 25.0f;
     return (height + 15.0f);
 }
@@ -73,35 +96,28 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
             button->setScale9Enabled(true);
             button->setContentSize(Size(gap - 4.0f, 20.0f));
-            button->setTitleColor(Color3B::BLACK);
+            button->setTitleColor(C3B_GRAY);
             button->setTitleFontSize(12);
-            button->addClickEventListener(std::bind(&FanTableScene::onPointsNameButton, this, std::placeholders::_1));
+            button->addClickEventListener(std::bind(&FanTableScene::onFanNameButton, this, std::placeholders::_1));
 
             cell->addChild(button);
             buttons[k] = button;
         }
     }
 
-    const size_t currentLevelCount = eachLevelCounts[idx];
+    const CellDetail &detail = cellDetails[idx];
+    const size_t currentLevelCount = detail.count;
     size_t totalRows = computeRowsAlign4(currentLevelCount);
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
     const std::array<ui::Button *, 13> &buttons = std::get<1>(ext);
 
-    size_t idx0;
-    const char **titleTexts;
-    if (fanLevel[idx] == 0) {
-        label->setString("基本计分原则");
-        idx0 = 100;
-        titleTexts = &principle_title[0];
-    }
-    else {
-        label->setString(std::to_string(fanLevel[idx]).append("番"));
-        idx0 = eachLevelBeginIndex[idx];
-        titleTexts = &mahjong::fan_name[idx0];
-    }
+    label->setString(detail.title);
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
+
+    size_t idx0 = detail.begin_index;
+    const char **titleTexts = detail.fan_names;
 
     for (size_t k = 0; k < currentLevelCount; ++k) {
         ui::Button *button = buttons[k];
@@ -124,7 +140,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     return cell;
 }
 
-void FanTableScene::onPointsNameButton(cocos2d::Ref *sender) {
+void FanTableScene::onFanNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
     Director::getInstance()->pushScene(FanDefinitionScene::create(idx));

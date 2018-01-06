@@ -44,6 +44,8 @@ private:
     cocos2d::Label *_scoreLabel[4];
     cocos2d::Label *_penaltyLabel[4];
 
+    cocos2d::ui::Button *_recordTilesButton = nullptr;
+    cocos2d::ui::Button *_littleFanButton = nullptr;
     cw::TableView *_tableView = nullptr;
     cocos2d::ui::Button *_submitButton = nullptr;
 
@@ -69,8 +71,11 @@ private:
     void onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
     void onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
 
-    void onPointsNameButton(cocos2d::Ref *sender);
+    void onFanNameButton(cocos2d::Ref *sender);
     void onSubmitButton(cocos2d::Ref *sender);
+
+    void adjustRecentFans();
+    void finish();
 
     void showCalculator(const mahjong::calculate_param_t &param);
 };

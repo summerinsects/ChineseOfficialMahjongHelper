@@ -4,6 +4,8 @@
 
 USING_NS_CC;
 
+static const Color3B C3B_GRAY = Color3B(96, 96, 96);
+
 bool TilePickWidget::init() {
     if (UNLIKELY(!Node::init())) {
         return false;
@@ -125,7 +127,7 @@ bool TilePickWidget::init() {
         button->setScale9Enabled(true);
         button->setContentSize(Size(BUTTON_WIDHT, BUTTON_HEIGHT));
         button->setTitleFontSize(FONT_SIZE);
-        button->setTitleColor(Color3B::BLACK);
+        button->setTitleColor(C3B_GRAY);
         button->setTitleText(titleText[i]);
         buttonsContainer->addChild(button);
         button->setPosition(Vec2(BUTTON_WIDHT * (col + 0.5f) + col * GAP, static_cast<float>((3 - row) * (BUTTON_HEIGHT + GAP_H) + BUTTON_HEIGHT / 2)));
