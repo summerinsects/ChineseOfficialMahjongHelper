@@ -469,6 +469,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
         .setTitle("直接输入")
         .setContentNode(rootNode)
+        .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, editBox](AlertDialog *, int) {
         const char *input = editBox->getText();
         const char *errorStr = parseInput(input);

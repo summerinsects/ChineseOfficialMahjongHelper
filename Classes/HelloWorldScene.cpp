@@ -234,7 +234,6 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
         .setTitle("关于")
         .setContentNode(rootNode)
         .setPositiveButton("确定", nullptr)
-        .setNegativeButton("取消", nullptr)
         .create()->show();
 }
 
