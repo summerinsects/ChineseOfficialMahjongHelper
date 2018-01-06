@@ -60,5 +60,8 @@ void Toast::show() {
     _scene = nullptr;
 
     float dt = _duration == LENGTH_LONG ? 3.5f : 2.0f;
-    this->runAction(Sequence::create(DelayTime::create(dt), FadeOut::create(0.2f), RemoveSelf::create(), NULL));
+    auto thiz = makeRef(this);
+    // FIXME: 当scene不在前台时，schedule的暂停机制引起Toast延迟remove
+    Director::getInstance()->getScheduler()->schedule([thiz](float) { thiz->removeFromParent(); },
+        this, 0.0f, 0U, dt, false, "Toast::show");
 }
