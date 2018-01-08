@@ -1,5 +1,6 @@
 ﻿#include "CompetitionMainScene.h"
 #include <array>
+#include "../UICommon.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "Competition.h"
@@ -19,7 +20,7 @@ bool CompetitionMainScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0f, 32.0f));

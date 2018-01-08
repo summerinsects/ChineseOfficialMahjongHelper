@@ -3,6 +3,7 @@
 #include "AlertDialog.h"
 #include "Toast.h"
 #include "../mahjong-algorithm/stringify.h"
+#include "../UICommon.h"
 
 USING_NS_CC;
 
@@ -29,7 +30,7 @@ bool ExtraInfoWidget::init() {
 
     static const char *winTypeTexts[] = { "点和", "自摸" };
     for (int i = 0; i < 2; ++i) {
-        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
         this->addChild(radioButton);
         radioButton->setZoomScale(0.0f);
         radioButton->ignoreContentAdaptWithSize(false);
@@ -46,7 +47,7 @@ bool ExtraInfoWidget::init() {
     _winTypeGroup = radioGroup;
 
     // 绝张
-    ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+    ui::CheckBox *checkBox = UICommon::createCheckBox();
     this->addChild(checkBox);
     checkBox->setZoomScale(0.0f);
     checkBox->ignoreContentAdaptWithSize(false);
@@ -65,7 +66,7 @@ bool ExtraInfoWidget::init() {
     static const char *extTexts[] = { "杠开", "抢杠", "海底" };
     ui::CheckBox *checkBoxes[3];
     for (int i = 0; i < 3; ++i) {
-        ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        ui::CheckBox *checkBox = UICommon::createCheckBox();
         this->addChild(checkBox);
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
@@ -122,7 +123,7 @@ bool ExtraInfoWidget::init() {
     }
 
     // 直接输入
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -132,7 +133,7 @@ bool ExtraInfoWidget::init() {
     button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
 
     // 使用说明
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -158,7 +159,7 @@ bool ExtraInfoWidget::init() {
     label->setTag(0);
     _flowerLabel = label;
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -173,7 +174,7 @@ bool ExtraInfoWidget::init() {
         }
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -448,7 +449,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     rootNode->addChild(label);
 
     // 输入手牌
-    ui::EditBox *editBox = ui::EditBox::create(Size(width - 10.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox = UICommon::createEditBox(Size(width - 10.0f, 20.0f));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);

@@ -1,5 +1,6 @@
 ﻿#include "TilePickWidget.h"
 #include "../utils/compiler.h"
+#include "../UICommon.h"
 #include "../TilesImage.h"
 
 USING_NS_CC;
@@ -123,7 +124,7 @@ bool TilePickWidget::init() {
         int col = i >> 2;
         int row = i & 3;
 
-        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+        ui::Button *button = UICommon::createButton();
         button->setScale9Enabled(true);
         button->setContentSize(Size(BUTTON_WIDHT, BUTTON_HEIGHT));
         button->setTitleFontSize(FONT_SIZE);

@@ -1,6 +1,7 @@
 ﻿#include "RecordHistoryScene.h"
 #include <array>
 #include "Record.h"
+#include "../UICommon.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/LoadingView.h"
 
@@ -86,7 +87,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 个人汇总按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -96,7 +97,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     button->addClickEventListener(std::bind(&RecordHistoryScene::onSummaryButton, this, std::placeholders::_1));
 
     // 批量删除按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -513,7 +514,7 @@ namespace {
             cell->addChild(radioGroup);
             radioGroup->setAllowedNoSelection(true);
             for (int i = 0; i < 4; ++i) {
-                ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+                ui::RadioButton *radioButton = UICommon::createRadioButton();
                 radioButton->setZoomScale(0.0f);
                 radioButton->ignoreContentAdaptWithSize(false);
                 radioButton->setContentSize(Size(15.0f, 15.0f));
@@ -533,7 +534,7 @@ namespace {
             radioGroup->addEventListener(std::bind(&SummaryTableNode::onRadioButtonGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
             // 清除按钮
-            ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+            ui::Button *button = UICommon::createButton();
             cell->addChild(button);
             button->setScale9Enabled(true);
             button->setContentSize(Size(30.0f, 15.0f));
@@ -703,7 +704,7 @@ namespace {
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
             label->setPosition(Vec2(2.0f, 35.0f));
 
-            checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            checkBox = UICommon::createCheckBox();
             cell->addChild(checkBox);
             checkBox->setZoomScale(0.0f);
             checkBox->ignoreContentAdaptWithSize(false);

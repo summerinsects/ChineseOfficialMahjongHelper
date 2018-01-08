@@ -2,6 +2,7 @@
 #include <array>
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
+#include "../UICommon.h"
 #include "../TilesImage.h"
 #include "../widget/TilePickWidget.h"
 #include "../widget/AlertDialog.h"
@@ -23,7 +24,7 @@ bool MahjongTheoryScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 输入框
-    ui::EditBox *editBox= ui::EditBox::create(Size(visibleSize.width - 95.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox = UICommon::createEditBox(Size(visibleSize.width - 95.0f, 20.0f));
     this->addChild(editBox);
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -47,7 +48,7 @@ bool MahjongTheoryScene::init() {
     widget->setPosition(Vec2(editSize.width * 0.5f, editSize.height * 0.5f));
 
     // 随机按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -57,7 +58,7 @@ bool MahjongTheoryScene::init() {
     button->addClickEventListener([this](Ref *) { setRandomInput(); });
 
     // 说明按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -83,7 +84,7 @@ bool MahjongTheoryScene::init() {
     _handTilesWidget = handTilesWidget;
 
     // 撤销与重做按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -94,7 +95,7 @@ bool MahjongTheoryScene::init() {
     button->setEnabled(false);
     _undoButton = button;
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -117,7 +118,7 @@ bool MahjongTheoryScene::init() {
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float xPos = origin.x + gap * (i + 0.5f);
-        ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        ui::CheckBox *checkBox = UICommon::createCheckBox();
         this->addChild(checkBox);
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
