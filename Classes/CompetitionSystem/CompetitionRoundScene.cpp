@@ -1,5 +1,6 @@
 ﻿#include "CompetitionRoundScene.h"
 #include <array>
+#include "../UICommon.h"
 #include "../widget/Toast.h"
 #include "Competition.h"
 #include "CompetitionTableScene.h"
@@ -21,7 +22,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 上一轮按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -36,7 +37,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setEnabled(_currentRound > 0);
 
     // 登记成绩按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -46,7 +47,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->addClickEventListener(std::bind(&CompetitionRoundScene::onReportButton, this, std::placeholders::_1));
 
     // 下一轮按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));

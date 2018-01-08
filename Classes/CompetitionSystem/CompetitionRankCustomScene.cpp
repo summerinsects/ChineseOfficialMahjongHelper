@@ -1,5 +1,6 @@
 ﻿#include "CompetitionRankCustomScene.h"
 #include <array>
+#include "../UICommon.h"
 #include "../widget/AlertDialog.h"
 #include "Competition.h"
 
@@ -81,7 +82,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     }
 
     // 清空按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -91,7 +92,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     button->addClickEventListener(std::bind(&CompetitionRankCustomScene::onResetButton, this, std::placeholders::_1));
 
     // 提交按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(50.0f, 20.0f));
@@ -393,7 +394,7 @@ namespace {
                 const float startX[] = { 0.0f, cellWidth *0.5f };
                 for (int i = 0; i < 2; ++i) {
                     // 选择框
-                    ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png", "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+                    ui::CheckBox *checkBox = UICommon::createCheckBox();
                     cell->addChild(checkBox);
                     checkBox->setZoomScale(0.0f);
                     checkBox->ignoreContentAdaptWithSize(false);

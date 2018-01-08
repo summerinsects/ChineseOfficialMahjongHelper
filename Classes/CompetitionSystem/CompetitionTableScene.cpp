@@ -1,5 +1,6 @@
 ﻿#include "CompetitionTableScene.h"
 #include <array>
+#include "../UICommon.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "Competition.h"
@@ -86,7 +87,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     tableView->setOnEnterCallback(std::bind(&cw::TableView::reloadDataInplacement, tableView));
 
     // 排列座位按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -96,7 +97,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->addClickEventListener([this](Ref *) { showArrangeAlert(); });
 
     // 提交按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(50.0f, 20.0f));
@@ -179,7 +180,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
 
         // 输入按钮
         const float buttonWidth = std::min(_colWidth[6] - 8.0f, 35.0f);
-        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        ui::Button *button = UICommon::createButton();
         cell->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(buttonWidth, 20.0f));
@@ -191,7 +192,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         buttons[0] = button;
 
         // 清空按钮
-        button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        button = UICommon::createButton();
         cell->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(buttonWidth, 20.0f));
@@ -425,7 +426,7 @@ namespace {
             }
 
             // 自动计算按钮
-            ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+            ui::Button *button = UICommon::createButton();
             this->addChild(button);
             button->setScale9Enabled(true);
             button->setContentSize(Size(55.0f, 20.0f));
@@ -558,7 +559,7 @@ void CompetitionTableScene::showArrangeAlert() {
     for (int i = 0; i < 4; ++i) {
         const float yPos = 85.0f - i * 25.0f;
 
-        ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
         rootNode->addChild(radioButton);
         radioButton->setZoomScale(0.0f);
         radioButton->ignoreContentAdaptWithSize(false);

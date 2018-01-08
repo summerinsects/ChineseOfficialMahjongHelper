@@ -1,5 +1,6 @@
 ﻿#include "CompetitionEnrollScene.h"
 #include <array>
+#include "../UICommon.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "Competition.h"
@@ -55,7 +56,7 @@ bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData>
     _tableView = tableView;
 
     // 提交按钮
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -199,7 +200,7 @@ void CompetitionEnrollScene::onNameWidget(cocos2d::Ref *sender) {
     ui::Widget *widget = (ui::Widget *)sender;
     size_t idx = reinterpret_cast<size_t>(widget->getUserData());
 
-    ui::EditBox *editBox = ui::EditBox::create(Size(120.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox = UICommon::createEditBox(Size(120.0f, 20.0f));
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);

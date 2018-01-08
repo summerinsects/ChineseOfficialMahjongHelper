@@ -41,7 +41,7 @@ bool CompetitionMainScene::init() {
         }
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0f, 32.0f));
@@ -65,7 +65,7 @@ bool CompetitionMainScene::init() {
         button->setEnabled(_competitionData->start_time != 0 && _competitionData->finish_time == 0);
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0f, 32.0f));
@@ -76,7 +76,7 @@ bool CompetitionMainScene::init() {
         Director::getInstance()->pushScene(CompetitionHistoryScene::create([](CompetitionData *){ }));
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0f, 32.0f));
@@ -107,7 +107,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
 
     std::array<ui::EditBox *, 3> editBoxes;
 
-    ui::EditBox *editBox = ui::EditBox::create(Size(160.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox = UICommon::createEditBox(Size(160.0f, 20.0f));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
@@ -135,7 +135,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
         char buf[32];
         snprintf(buf, sizeof(buf), "%" PRIzu, value[i]);
 
-        editBox = ui::EditBox::create(Size(50.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+        editBox = UICommon::createEditBox(Size(50.0f, 20.0f));
         editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
         editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
         editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
