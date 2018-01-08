@@ -1,4 +1,5 @@
 ﻿#include "AlertDialog.h"
+#include "../UICommon.h"
 #include "../cocos-wheels/CWCommon.h"
 
 USING_NS_CC;
@@ -73,7 +74,7 @@ bool AlertDialog::initWithBuilder(const Builder &builder) {
             button->setPosition(Vec2(totalWidth * 0.25f, 15.0f));
             button->addClickEventListener(std::bind(&AlertDialog::onNegativeButton, this, std::placeholders::_1));
 
-            button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+            button = UICommon::createButton();
             background->addChild(button);
             button->setScale9Enabled(true);
             button->setContentSize(Size(totalWidth * 0.5f, 30.0f));
@@ -90,7 +91,7 @@ bool AlertDialog::initWithBuilder(const Builder &builder) {
             background->addChild(line);
             line->setPosition(Vec2(0.0f, totalHeight + 28.0f));
 
-            ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+            ui::Button *button = UICommon::createButton();
             background->addChild(button);
             button->setScale9Enabled(true);
             button->setContentSize(Size(55.0f, 20.0f));
@@ -107,7 +108,7 @@ bool AlertDialog::initWithBuilder(const Builder &builder) {
             background->addChild(line);
             line->setPosition(Vec2(0.0f, totalHeight + 28.0f));
 
-            ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+            ui::Button *button = UICommon::createButton();
             background->addChild(button);
             button->setScale9Enabled(true);
             button->setContentSize(Size(55.0f, 20.0f));

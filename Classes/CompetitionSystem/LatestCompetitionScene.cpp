@@ -5,6 +5,7 @@
 #include "network/HttpClient.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
+#include "../UICommon.h"
 #include "../widget/LoadingView.h"
 #include "../widget/AlertDialog.h"
 
@@ -216,7 +217,7 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         label[1]->setPosition(Vec2(5.0f, 15.0f));
         label[1]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
-        detailBtn = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        detailBtn = UICommon::createButton();
         detailBtn->setScale9Enabled(true);
         detailBtn->setContentSize(Size(40.0f, 20.0f));
         detailBtn->setTitleFontSize(12);

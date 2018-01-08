@@ -2,6 +2,7 @@
 #include "network/HttpClient.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
+#include "UICommon.h"
 #include "utils/common.h"
 #include "widget/AlertDialog.h"
 #include "widget/Toast.h"
@@ -59,7 +60,7 @@ bool HelloWorld::init() {
     const float buttonWidth = (visibleSize.width - 16) / 3;
     const float buttonHeight = buttonWidth * 0.8f;
 
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
@@ -70,7 +71,7 @@ bool HelloWorld::init() {
         Director::getInstance()->pushScene(FanCalculatorScene::create());
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
@@ -81,7 +82,7 @@ bool HelloWorld::init() {
         Director::getInstance()->pushScene(ScoreSheetScene::create());
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
@@ -92,7 +93,7 @@ bool HelloWorld::init() {
         Director::getInstance()->pushScene(FanTableScene::create());
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
@@ -103,7 +104,7 @@ bool HelloWorld::init() {
         Director::getInstance()->pushScene(MahjongTheoryScene::create());
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
@@ -114,7 +115,7 @@ bool HelloWorld::init() {
         Director::getInstance()->pushScene(CompetitionMainScene::create());
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
@@ -125,7 +126,7 @@ bool HelloWorld::init() {
         Director::getInstance()->pushScene(OtherScene::create());
     });
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(40.0, 25.0f));
@@ -134,7 +135,7 @@ bool HelloWorld::init() {
     button->setPosition(Vec2(origin.x + 23.0f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(40.0, 25.0f));
@@ -206,7 +207,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     rootNode->addChild(label);
 
     // 检测新版本
-    ui::Button *button1 = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button1 = UICommon::createButton();
     button1->setScale9Enabled(true);
     button1->setContentSize(Size(65.0, 20.0f));
     button1->setTitleFontSize(12);
@@ -214,7 +215,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     button1->addClickEventListener([this](Ref *) { requestVersion(true); });
     rootNode->addChild(button1);
 
-    ui::Button *button2 = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button2 = UICommon::createButton();
     button2->setScale9Enabled(true);
     button2->setContentSize(Size(65.0, 20.0f));
     button2->setTitleFontSize(12);

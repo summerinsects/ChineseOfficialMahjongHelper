@@ -1,5 +1,6 @@
 ﻿#include "RecordScene.h"
 #include "../mahjong-algorithm/fan_calculator.h"
+#include "../UICommon.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "../widget/TilePickWidget.h"
@@ -159,7 +160,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
     float yPos = origin.y + visibleSize.height - 45.0f;
     // 番数输入框
-    ui::EditBox *editBox = ui::EditBox::create(Size(35.0f, 20.0f), ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+    ui::EditBox *editBox = UICommon::createEditBox(Size(35.0f, 20.0f));
     this->addChild(editBox);
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
@@ -183,7 +184,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     static const char *titleText[4] = { "-5", "-1", "+1", "+5" };
     static const int delta[4] = { -5, -1, 1, 5 };
     for (int i = 0; i < 4; ++i) {
-        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        ui::Button *button = UICommon::createButton();
         this->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(25.0f, 20.0f));
@@ -194,7 +195,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     }
 
     // 荒庄
-    ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+    ui::CheckBox *checkBox = UICommon::createCheckBox();
     this->addChild(checkBox);
     checkBox->setZoomScale(0.0f);
     checkBox->ignoreContentAdaptWithSize(false);
@@ -210,7 +211,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, yPos));
 
     // 罚分调整
-    ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -260,8 +261,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 和牌
         float y = origin.y + visibleSize.height - 140.0f;
-        ui::RadioButton *button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
-            "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        ui::RadioButton *button = UICommon::createRadioButton();
         radioNode->addChild(button);
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
@@ -277,8 +277,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 点炮或自摸
         y = origin.y + visibleSize.height - 170.0f;
-        button = ui::RadioButton::create("source_material/btn_square_normal.png", "", "source_material/btn_square_highlighted.png",
-            "source_material/btn_square_disabled.png", "source_material/btn_square_disabled.png");
+        button = UICommon::createRadioButton();
         radioNode->addChild(button);
         button->setZoomScale(0.0f);
         button->ignoreContentAdaptWithSize(false);
@@ -341,14 +340,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     label->setPosition(Vec2(5.0f, 35.0f));
 
     // 展开/收起
-    ui::Button *layoutButton = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    ui::Button *layoutButton = UICommon::createButton();
     layoutButton->setScale9Enabled(true);
     layoutButton->setContentSize(Size(55.0f, 20.0f));
     layoutButton->setTitleFontSize(12);
     topNode->addChild(layoutButton);
     layoutButton->setPosition(Vec2(visibleSize.width - 35.0f, 35.0f));
 
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -359,7 +358,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     _recordTilesButton = button;
 
     // 小番
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+    button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
@@ -420,7 +419,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     const float labelPosX = label->getContentSize().width + 5.0f + 2.0f;
     static const char *text[] = { "6番", "8番", "12番", "16番", "24番" };
     for (size_t i = 0; i < 5; ++i) {
-        button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        button = UICommon::createButton();
         button->setScale9Enabled(true);
         button->setContentSize(Size(30.0f, 20.0f));
         button->setTitleFontSize(12);
@@ -431,7 +430,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     }
 
     // 提交按钮
-    button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(50.0f, 20.0f));
@@ -820,7 +819,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
         updatePenaltyLabel(label, penaltyScores->at(PLAYER_TO_UI(i)));
 
         for (int n = 0; n < 4; ++n) {
-            ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+            ui::Button *button = UICommon::createButton();
             button->setScale9Enabled(true);
             button->setContentSize(Size(30.0f, 20.0f));
             button->setTitleFontSize(12);
@@ -869,7 +868,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         const float xPos = width3 * ret.rem;
         const float yPos = 130.0f + (totalRows - ret.quot - 0.5f) * 25.0f;
 
-        ui::CheckBox *checkBox = ui::CheckBox::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        ui::CheckBox *checkBox = UICommon::createCheckBox();
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
         checkBox->setContentSize(Size(20.0f, 20.0f));
@@ -912,7 +911,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         labels[i] = label;
 
         // -按钮
-        ui::Button *button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        ui::Button *button = UICommon::createButton();
         button->setScale9Enabled(true);
         button->setContentSize(Size(20.0f, 20.0f));
         button->setTitleFontSize(12);
@@ -929,7 +928,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
 
         // +按钮
         int limitCount = limitCounts[i];
-        button = ui::Button::create("source_material/btn_square_highlighted.png", "source_material/btn_square_selected.png");
+        button = UICommon::createButton();
         button->setScale9Enabled(true);
         button->setContentSize(Size(20.0f, 20.0f));
         button->setTitleFontSize(12);
