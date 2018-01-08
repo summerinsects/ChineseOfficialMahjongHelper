@@ -53,7 +53,7 @@ bool AlertDialog::initWithBuilder(const Builder &builder) {
     const float totalWidth = maxWidth1 + 10.0f;
 
     // 背景
-    LayerColor *background = LayerColor::create(Color4B::WHITE);
+    LayerColor *background = LayerColor::create(Color4B(255, 255, 255, 245));
     this->addChild(background);
     background->setIgnoreAnchorPointForPosition(false);
     background->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
