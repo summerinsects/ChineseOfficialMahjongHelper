@@ -20,9 +20,9 @@ public:
         this->setAnchorPoint(cocos2d::Vec2::ANCHOR_BOTTOM_LEFT);
 
         // 转圈的sprite
-        cocos2d::Sprite *sprite = cocos2d::Sprite::create("source_material/loading_black.png");
+        cocos2d::Sprite *sprite = cocos2d::Sprite::create("drawable/spinner_white_48.png");
         this->addChild(sprite);
-        sprite->setScale(40 / sprite->getContentSize().width);
+        sprite->setScale(CC_CONTENT_SCALE_FACTOR() * 0.5f);
         sprite->setPosition(cocos2d::Vec2(visibleSize.width * 0.5f, height * 0.5f));
         sprite->runAction(cocos2d::RepeatForever::create(cocos2d::RotateBy::create(0.5f, 180.0f)));
 
