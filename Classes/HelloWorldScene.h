@@ -11,8 +11,12 @@ public:
 
 private:
     void onAboutButton(cocos2d::Ref *sender);
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
     void requestVersion(bool manual);
     bool checkVersion(const std::vector<char> *buffer, bool manual);
+#endif
+
 };
 
 #endif // __HELLOWORLD_SCENE_H__

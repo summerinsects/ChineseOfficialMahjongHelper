@@ -154,7 +154,9 @@ bool HelloWorld::init() {
     label->setAlignment(TextHAlignment::CENTER);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
     requestVersion(false);
+#endif
 
     return true;
 }
@@ -206,7 +208,9 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
 
-    // 检测新版本
+    const Size &labelSize = label->getContentSize();
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
     ui::Button *button1 = UICommon::createButton();
     button1->setScale9Enabled(true);
     button1->setContentSize(Size(65.0, 20.0f));
@@ -225,11 +229,14 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     });
     rootNode->addChild(button2);
 
-    const Size &labelSize = label->getContentSize();
     rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
     button1->setPosition(Vec2(width * 0.25f, 10.0f));
     button2->setPosition(Vec2(width * 0.75f, 10.0f));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
+#else
+    rootNode->setContentSize(Size(width, labelSize.height));
+    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f));
+#endif
 
     AlertDialog::Builder(this)
         .setTitle("关于")
@@ -238,8 +245,8 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
         .create()->show();
 }
 
-void HelloWorld::requestVersion(bool manual) {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+void HelloWorld::requestVersion(bool manual) {
     static bool checking = false;
     if (checking) {
         return;
@@ -281,12 +288,8 @@ void HelloWorld::requestVersion(bool manual) {
 
     network::HttpClient::getInstance()->sendImmediate(request);
     request->release();
-#else
-    if (manual) {
-        Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_LONG)->show();
-    }
-#endif
 }
+#endif
 
 static inline bool string_has_suffix(const char *str, const char *suffix) {
     size_t suffix_len = strlen(suffix);
@@ -294,6 +297,7 @@ static inline bool string_has_suffix(const char *str, const char *suffix) {
     return (str_len >= suffix_len) && (strcmp(suffix, str + (str_len - suffix_len)) == 0);
 }
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
     if (buffer == nullptr) {
         return false;
@@ -402,3 +406,4 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 
     return false;
 }
+#endif
