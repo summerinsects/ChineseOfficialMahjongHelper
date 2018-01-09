@@ -12,36 +12,6 @@
 	<string>Icon-57.png</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.cocos2dx.ChineseOfficialMahjongHelper</string>
-	<key>CFBundleIconFiles</key>
-	<array>
-		<string>Icon-29</string>
-		<string>Icon-40</string>
-		<string>Icon-50</string>
-		<string>Icon-57</string>
-		<string>Icon-58</string>
-		<string>Icon-72</string>
-		<string>Icon-76</string>
-		<string>Icon-80</string>
-		<string>Icon-87</string>
-		<string>Icon-100</string>
-		<string>Icon-114</string>
-		<string>Icon-120</string>
-	</array>
-	<key>CFBundleIconFiles~ipad</key>
-	<array>
-		<string>Icon-29</string>
-		<string>Icon-40</string>
-		<string>Icon-50</string>
-		<string>Icon-57</string>
-		<string>Icon-58</string>
-		<string>Icon-72</string>
-		<string>Icon-76</string>
-		<string>Icon-80</string>
-		<string>Icon-87</string>
-		<string>Icon-100</string>
-		<string>Icon-114</string>
-		<string>Icon-120</string>
-	</array>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -58,6 +28,8 @@
 	<true/>
 	<key>UIAppFonts</key>
 	<array/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
 	<key>UIPrerenderedIcon</key>
 	<true/>
 	<key>UISupportedInterfaceOrientations</key>
