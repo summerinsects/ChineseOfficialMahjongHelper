@@ -599,6 +599,7 @@ void RecordHistoryScene::onSummaryButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
         .setTitle("选择要汇总的对局")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, rootNode](AlertDialog *, int) {
         auto& currentFlags = rootNode->getCurrentFlags();
@@ -745,6 +746,7 @@ void RecordHistoryScene::onBatchDeleteButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
         .setTitle("选择要删除的对局")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, rootNode](AlertDialog *dlg, int) {
         auto currentFlags = std::make_shared<std::vector<bool> >(rootNode->getCurrentFlags());

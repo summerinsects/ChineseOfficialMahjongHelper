@@ -190,6 +190,7 @@ static void shareApplication() {
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
         .setTitle("下载地址")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setPositiveButton("确定", nullptr)
         .create()->show();
 }
@@ -242,6 +243,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
         .setTitle("关于")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setPositiveButton("确定", nullptr)
         .create()->show();
 }
@@ -395,6 +397,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
             AlertDialog::Builder(this)
                 .setTitle("检测到新版本")
                 .setMessage(Common::format("%s，大小%.2fM，是否下载？\n\n%s", tag.c_str(), size / 1048576.0f, body.c_str()))
+                .setCloseOnTouchOutside(false)
                 .setNegativeButton("取消", nullptr)
                 .setPositiveButton("确定", [url](AlertDialog *, int) { Application::getInstance()->openURL(url); return true; })
                 .create()->show();

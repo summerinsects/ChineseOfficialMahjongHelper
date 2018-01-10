@@ -606,6 +606,7 @@ void ScoreSheetScene::editName(size_t idx) {
     AlertDialog::Builder(this)
         .setTitle(Common::format("开局座位「%s」", s_wind[idx]))
         .setContentNode(editBox)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, editBox, idx](AlertDialog *, int) {
         const char *text = editBox->getText();
@@ -732,6 +733,7 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     AlertDialog::Builder(this)
         .setTitle("输入选手姓名")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, editBoxes, delegate](AlertDialog *, int) {
         // 获取四个输入框内容
@@ -1142,6 +1144,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
         .setTitle("清空表格")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, radioGroup](AlertDialog *, int) {
         if (radioGroup->getSelectedButtonIndex() == 0) {
@@ -1360,6 +1363,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
         .setTitle("追分策略")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [editBox, delegate](AlertDialog *, int) {
         const char *text = editBox->getText();

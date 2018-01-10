@@ -258,6 +258,7 @@ void MahjongTheoryScene::showInputAlert() {
     AlertDialog::Builder(this)
         .setTitle("输入手牌")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setPositiveButton("确定", [this, tilePicker](AlertDialog *, int) {
         mahjong::hand_tiles_t handTiles;
         mahjong::tile_t servingTile;

@@ -838,6 +838,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     AlertDialog::Builder(this)
         .setTitle("罚分调整")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, penaltyScores](AlertDialog *, int) {
         memcpy(&_detail.penalty_scores, penaltyScores->data(), sizeof(_detail.penalty_scores));
@@ -955,6 +956,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
     AlertDialog::Builder(this)
         .setTitle("标记小番")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, checkBoxes, labels, callFromSubmiting](AlertDialog *, int) {
         uint16_t uniqueFan = 0;
@@ -1196,6 +1198,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
     AlertDialog::Builder(this)
         .setTitle("记录和牌")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, tilePicker, extraInfo, param](AlertDialog *dlg, int) {
         mahjong::calculate_param_t temp = { 0 };
@@ -1310,6 +1313,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
         AlertDialog::Builder(this)
             .setTitle("记录和牌")
             .setContentNode(innerNode)
+            .setCloseOnTouchOutside(false)
             .setPositiveButton("确定", [this, temp, fan, fanFlag, uniqueFan, multipleFan, dlg](AlertDialog *, int) {
             _detail.fan = std::max<uint16_t>(fan, 8);
             _detail.fan_flag = fanFlag;
