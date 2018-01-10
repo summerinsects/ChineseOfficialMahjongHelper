@@ -611,39 +611,7 @@ void ScoreSheetScene::editName(size_t idx) {
         .setPositiveButton("确定", [this, editBox, idx](AlertDialog *, int) {
         const char *text = editBox->getText();
         if (text != nullptr) {
-            std::string name = text;
-            Common::trim(name);
-
-            // 开始后不允许清空名字
-            if (name.empty()) {
-                Toast::makeText(this, "对局开始后不允许清空名字", Toast::LENGTH_LONG)->show();
-                return false;
-            }
-
-            if (name.length() > NAME_SIZE - 1) {
-                name.erase(NAME_SIZE - 1);
-            }
-
-            for (size_t i = 0; i < 4; ++i) {
-                if (i != idx && name.compare(_record.name[i]) == 0) {
-                    Toast::makeText(this, "选手姓名不能相同", Toast::LENGTH_LONG)->show();
-                    return false;
-                }
-            }
-
-            strncpy(_record.name[idx], name.c_str(), NAME_SIZE - 1);
-            _nameLabel[idx]->setVisible(true);
-            _nameLabel[idx]->setString(name);
-            cw::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
-
-            if (_record.current_index >= 16) {
-                RecordHistoryScene::modifyRecord(&_record);
-            }
-
-            if (_isGlobal) {
-                writeToFile(_record);
-            }
-            return true;
+            return submitName(text, idx);
         }
         return false;
     }).create()->show();
@@ -652,6 +620,42 @@ void ScoreSheetScene::editName(size_t idx) {
     editBox->scheduleOnce([editBox](float) {
         editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
     }, 0.0f, "open_keyboard");
+}
+
+bool ScoreSheetScene::submitName(const char *text, size_t idx) {
+    std::string name = text;
+    Common::trim(name);
+
+    // 开始后不允许清空名字
+    if (name.empty()) {
+        Toast::makeText(this, "对局开始后不允许清空名字", Toast::LENGTH_LONG)->show();
+        return false;
+    }
+
+    if (name.length() > NAME_SIZE - 1) {
+        name.erase(NAME_SIZE - 1);
+    }
+
+    for (size_t i = 0; i < 4; ++i) {
+        if (i != idx && name.compare(_record.name[i]) == 0) {
+            Toast::makeText(this, "选手姓名不能相同", Toast::LENGTH_LONG)->show();
+            return false;
+        }
+    }
+
+    strncpy(_record.name[idx], name.c_str(), NAME_SIZE - 1);
+    _nameLabel[idx]->setVisible(true);
+    _nameLabel[idx]->setString(name);
+    cw::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
+
+    if (_record.current_index >= 16) {
+        RecordHistoryScene::modifyRecord(&_record);
+    }
+
+    if (_isGlobal) {
+        writeToFile(_record);
+    }
+    return true;
 }
 
 namespace {
