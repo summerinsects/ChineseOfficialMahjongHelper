@@ -200,11 +200,12 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     Node *rootNode = Node::create();
 
     Label *label = Label::createWithSystemFont(
-        "1. 如果觉得本软件好用，可点击「下载地址」获取下载链接，分享给他人。\n"
-        "2. 本软件开源，高端玩家可下载源代码自行编译。\n"
-        "3. 由于作者无力承担苹果上架相关费用，没有推出iOS版本，您可以使用源代码自己打包出iOS版本。\n"
-        "4. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper",
-        "Arail", 10, Size(width, 0.0f));
+        "1. 本软件开源，高端玩家可下载源代码自行编译。\n"
+        "2. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper\n"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+        "3. 如果觉得本软件好用，可点击「下载地址」获取下载链接，分享给他人。"
+#endif
+        , "Arail", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
 
