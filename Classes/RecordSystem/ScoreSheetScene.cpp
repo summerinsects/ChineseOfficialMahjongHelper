@@ -591,6 +591,24 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *, size_t idx) {
 
 static const char *s_wind[] = { "东", "南", "西", "北" };
 
+namespace {
+    class NameEditBoxDelegate : public cocos2d::ui::EditBoxDelegate {
+        typedef std::function<void (cocos2d::ui::EditBox *, cocos2d::ui::EditBoxDelegate::EditBoxEndAction)> ccEditBoxEditingDidEndWithAction;
+        ccEditBoxEditingDidEndWithAction _callback;
+
+    public:
+        NameEditBoxDelegate(ccEditBoxEditingDidEndWithAction &&callback) : _callback(callback) { }
+
+        virtual ~NameEditBoxDelegate() { CCLOG("%s", __FUNCTION__); }
+
+        virtual void editBoxReturn(cocos2d::ui::EditBox *) override { }
+
+        virtual void editBoxEditingDidEndWithAction(cocos2d::ui::EditBox *editBox, EditBoxEndAction action) override {
+            _callback(editBox, action);
+        }
+    };
+}
+
 void ScoreSheetScene::editName(size_t idx) {
     ui::EditBox *editBox = UICommon::createEditBox(Size(120.0f, 20.0f));
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -603,18 +621,33 @@ void ScoreSheetScene::editName(size_t idx) {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
-    AlertDialog::Builder(this)
+    auto delegate = std::make_shared<NameEditBoxDelegate>([this, idx](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
+        if (action == ui::EditBoxDelegate::EditBoxEndAction::RETURN) {
+            AlertDialog *dialog = (AlertDialog *)editBox->getUserData();
+            if (submitName(editBox->getText(), idx)) {
+                dialog->scheduleOnce([dialog](float) {
+                    dialog->dismiss();
+                }, 0.0f, "dismiss_dialog");
+            }
+        }
+    });
+    editBox->setDelegate(delegate.get());
+
+    AlertDialog *dialog = AlertDialog::Builder(this)
         .setTitle(Common::format("开局座位「%s」", s_wind[idx]))
         .setContentNode(editBox)
         .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, editBox, idx](AlertDialog *, int) {
+        .setPositiveButton("确定", [this, editBox, idx, delegate](AlertDialog *, int) {
         const char *text = editBox->getText();
         if (text != nullptr) {
             return submitName(text, idx);
         }
         return false;
-    }).create()->show();
+    }).create();
+    dialog->show();
+
+    editBox->setUserData(dialog);
 
     // 自动打开editBox
     editBox->scheduleOnce([editBox](float) {
@@ -656,32 +689,6 @@ bool ScoreSheetScene::submitName(const char *text, size_t idx) {
         writeToFile(_record);
     }
     return true;
-}
-
-namespace {
-    class ContinuousEditBoxDelegate : public cocos2d::ui::EditBoxDelegate {
-        const std::vector<cocos2d::ui::EditBox *> _editBoxes;
-
-    public:
-        ContinuousEditBoxDelegate(const std::vector<cocos2d::ui::EditBox *> &editBoxes) : _editBoxes(editBoxes) { }
-
-        virtual ~ContinuousEditBoxDelegate() { CCLOG("%s", __FUNCTION__); }
-
-        virtual void editBoxReturn(cocos2d::ui::EditBox *) override { }
-
-        virtual void editBoxEditingDidEndWithAction(cocos2d::ui::EditBox *editBox, EditBoxEndAction action) override {
-            // 使得能连续输入
-            if (action == EditBoxEndAction::TAB_TO_NEXT) {
-                auto it = std::find(_editBoxes.begin(), _editBoxes.end(), editBox);
-                if (it != _editBoxes.end() && ++it != _editBoxes.end()) {
-                    editBox = *it;
-                    editBox->scheduleOnce([editBox](float) {
-                        editBox->touchDownAction(editBox, cocos2d::ui::Widget::TouchEventType::ENDED);
-                    }, 0.0f, "open_keyboard");
-                }
-            }
-        }
-    };
 }
 
 void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
@@ -729,7 +736,18 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     }
 
     // EditBox的代理，使得能连续输入
-    auto delegate = std::make_shared<ContinuousEditBoxDelegate>(std::vector<ui::EditBox *>(editBoxes.begin(), editBoxes.end()));
+    auto delegate = std::make_shared<NameEditBoxDelegate>([editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
+        if (action == ui::EditBoxDelegate::EditBoxEndAction::TAB_TO_NEXT) {
+            auto it = std::find(editBoxes.begin(), editBoxes.end(), editBox);
+            if (it != editBoxes.end() && ++it != editBoxes.end()) {
+                editBox = *it;
+                editBox->scheduleOnce([editBox](float) {
+                    editBox->touchDownAction(editBox, cocos2d::ui::Widget::TouchEventType::ENDED);
+                }, 0.0f, "open_keyboard");
+            }
+        }
+    });
+
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
     editBoxes[2]->setDelegate(delegate.get());
