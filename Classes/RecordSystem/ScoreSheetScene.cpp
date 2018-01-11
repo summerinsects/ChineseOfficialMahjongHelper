@@ -699,21 +699,30 @@ bool ScoreSheetScene::submitName(const char *text, size_t idx) {
 
 void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(150.0f, 120.0f));
+    rootNode->setContentSize(Size(150.0f, 125.0f));
 
-    ui::Button *button = UICommon::createButton();
-    rootNode->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("重新抽风");
-    button->setPosition(Vec2(75.0f, 10.0f));
-    cw::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
+    ui::Button *button1 = UICommon::createButton();
+    rootNode->addChild(button1);
+    button1->setScale9Enabled(true);
+    button1->setContentSize(Size(55.0f, 20.0f));
+    button1->setTitleFontSize(12);
+    button1->setTitleText("清空全部");
+    button1->setPosition(Vec2(40.0f, 115.0f));
+    cw::scaleLabelToFitWidth(button1->getTitleLabel(), 50.0f);
+
+    ui::Button *button2 = UICommon::createButton();
+    rootNode->addChild(button2);
+    button2->setScale9Enabled(true);
+    button2->setContentSize(Size(55.0f, 20.0f));
+    button2->setTitleFontSize(12);
+    button2->setTitleText("重新定庄");
+    button2->setPosition(Vec2(110.0f, 115.0f));
+    cw::scaleLabelToFitWidth(button2->getTitleLabel(), 50.0f);
 
     std::array<ui::EditBox *, 4> editBoxes;
 
     for (int i = 0; i < 4; ++i) {
-        const float yPos = 110.0f - i * 25.0f;
+        const float yPos = 85.0f - i * 25.0f;
         Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
@@ -813,7 +822,15 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
     }, 0.0f, "open_keyboard");
 
-    button->addClickEventListener([this, editBoxes](Ref *) {
+    // 清空全部
+    button1->addClickEventListener([editBoxes](Ref *) {
+        for (ui::EditBox *editBox : editBoxes) {
+            editBox->setText("");
+        }
+    });
+
+    // 重新定庄
+    button2->addClickEventListener([this, editBoxes](Ref *) {
         // 获取四个输入框内容
         std::string names[4];
         for (int i = 0; i < 4; ++i) {
