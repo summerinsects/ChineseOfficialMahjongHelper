@@ -729,6 +729,11 @@ void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
     param.win_flag = _detail.win_hand.win_flag;
     param.flower_count = _detail.win_hand.flower_count;
 
+    int idx = _winGroup->getSelectedButtonIndex();
+    if (idx >= 0 && idx < 4) {
+        param.seat_wind = static_cast<mahjong::wind_t>(idx);
+    }
+
     showCalculator(param);
 }
 
