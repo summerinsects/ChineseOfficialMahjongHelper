@@ -290,7 +290,7 @@ static const char *fan_short_name[] = {
     "花龙", "推不倒", "三色三同顺", "三色三节", "无番和", "妙手", "海底", "杠开", "抢杠",
     "碰碰和", "混一色", "三色三步", "五门", "全求人", "双暗杠", "双箭",
     "全带幺", "不求人", "双明杠", "绝张",
-    "箭刻", "圈风", "门风", "门清", "平和", "四归一", "双同", "双暗", "暗杠", "断幺",
+    "箭刻", "圈风", "门风", "门清", "平和", "四归一", "双同刻", "双暗", "暗杠", "断幺",
     "一般高", "喜相逢", "连六", "老少", "幺九", "明杠", "缺门", "无字", "边张", "嵌张", "单钓", "自摸",
     "花牌"
 };
@@ -400,7 +400,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
 
         std::string fanText;
         int fans = 0;
-        for (unsigned n = 0; n < 14; ++n) {
+        for (unsigned n = 0; n < 8; ++n) {
             if (TEST_UNIQUE_FAN(uniqueFan, n)) {
                 fanText.append(fan_short_name[uniqueFanTable[n]]);
                 if (++fans > 1) {
@@ -417,6 +417,12 @@ static std::string GetShortFanText(const Record::Detail &detail) {
                         break;
                     }
                 }
+            }
+        }
+
+        if (fanText.empty()) {
+            if (MULTIPLE_FAN_COUNT(multipleFan, 6) == 2) {
+                fanText.append("双幺九");
             }
         }
 
@@ -943,7 +949,7 @@ static std::string GetLongFanText(const Record::Detail &detail) {
         }
     }
     else if (uniqueFan != 0 || multipleFan != 0) {
-        for (unsigned n = 0; n < 14; ++n) {
+        for (unsigned n = 0; n < 8; ++n) {
             if (TEST_UNIQUE_FAN(uniqueFan, n)) {
                 fanText.append("「");
                 fanText.append(mahjong::fan_name[uniqueFanTable[n]]);
@@ -955,6 +961,14 @@ static std::string GetLongFanText(const Record::Detail &detail) {
             if (MULTIPLE_FAN_COUNT(multipleFan, n) > 0) {
                 fanText.append("「");
                 fanText.append(mahjong::fan_name[multipleFanTable[n]]);
+                fanText.append("」");
+            }
+        }
+
+        for (unsigned n = 8; n < 14; ++n) {
+            if (TEST_UNIQUE_FAN(uniqueFan, n)) {
+                fanText.append("「");
+                fanText.append(mahjong::fan_name[uniqueFanTable[n]]);
                 fanText.append("」");
             }
         }
