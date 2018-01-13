@@ -1155,27 +1155,18 @@ void RecordScene::finish() {
 cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth);
 
 void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width - 20;
+    const float maxWidth = AlertDialog::maxWidth();
 
     // 选牌面板和其他信息的相关控件
-    TilePickWidget *tilePicker = TilePickWidget::create();
-    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
+    TilePickWidget *tilePicker = TilePickWidget::create(maxWidth);
+    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create(maxWidth, nullptr);
 
     extraInfo->setFlowerCount(param.flower_count);
     extraInfo->setPrevalentWind(static_cast<mahjong::wind_t>(_handIdx / 4));
     extraInfo->setSeatWind(param.seat_wind);
 
-    // 缩放
-    Size pickerSize = tilePicker->getContentSize();
-    const float pickerScale = maxWidth / pickerSize.width;
-    tilePicker->setScale(pickerScale);
-    pickerSize = Size(maxWidth, pickerSize.height * pickerScale);
-
-    Size extraInfoSize = extraInfo->getContentSize();
-    const float extraInfoScale = maxWidth / extraInfoSize.width;
-    extraInfo->setScale(extraInfoScale);
-    extraInfoSize = Size(maxWidth, extraInfoSize.height * extraInfoScale);
+    const Size &pickerSize = tilePicker->getContentSize();
+    const Size &extraInfoSize = extraInfo->getContentSize();
 
     // 布局在rootNode上
     Node *rootNode = Node::create();

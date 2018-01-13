@@ -7,7 +7,7 @@ USING_NS_CC;
 
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
-bool TilePickWidget::init() {
+bool TilePickWidget::initWithWidth(float maxWidth) {
     if (UNLIKELY(!Node::init())) {
         return false;
     }
@@ -16,9 +16,6 @@ bool TilePickWidget::init() {
     this->setIgnoreAnchorPointForPosition(false);
 
 #define GAP 5
-
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width - GAP * 2;
 
     // 下方的手牌
     _handTilesWidget = HandTilesWidget::create();
@@ -53,11 +50,33 @@ bool TilePickWidget::init() {
     buttonsContainer->setContentSize(rightSize);
     this->addChild(buttonsContainer);
 
-    if (tableSize.width > maxWidth - rightSize.width - 5) {  // 缩放左边的选牌面板
+    // 适配
+    if (tableSize.width + rightSize.width + 5 > maxWidth) {
+        const Size tempSize = tableSize;
+
+        // 缩放左边的选牌面板
         const float scale = (maxWidth - rightSize.width - 5) / tableSize.width;
         tilesContainer->setScale(scale);
         tableSize.width *= scale;
         tableSize.height *= scale;
+
+        // 左边缩放后小于右边高度，按右边的高度重新适配
+        if (tableSize.height < rightSize.height) {
+            tableSize = tempSize;
+
+            const float scale1 = rightSize.height / tableSize.height;
+            tableSize.width *= scale1;
+            tableSize.height *= scale1;
+
+            const float scale2 = (maxWidth - 5) / (tableSize.width + rightSize.width);
+            buttonsContainer->setScale(scale2);
+            rightSize.width *= scale2;
+            rightSize.height *= scale2;
+
+            tilesContainer->setScale(scale1 * scale2);
+            tableSize.width *= scale2;
+            tableSize.height *= scale2;
+        }
     }
 
     const float maxHeight = std::max(rightSize.height, tableSize.height);
