@@ -71,11 +71,21 @@ bool AppDelegate::applicationDidFinishLaunching() {
     director->setAnimationInterval(1.0f / 10);
 
     // Set the design resolution
-    glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
-    auto frameSize = glview->getFrameSize();
+    Size frameSize = glview->getFrameSize();
+    const float aspectRatio = frameSize.width / frameSize.height;
+    if (aspectRatio > 0.67f) {
+        glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::FIXED_HEIGHT);
+    }
+    else if (aspectRatio < 0.57f) {
+        glview->setDesignResolutionSize(designResolutionSize.width * 0.86f, designResolutionSize.height * 0.86f, ResolutionPolicy::FIXED_WIDTH);
+    }
+    else {
+        glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
+    }
+
     // if the frame's height is larger than the height of medium size.
     if (frameSize.height > mediumResolutionSize.height) {
-        director->setContentScaleFactor(std::min(largeResolutionSize.height/designResolutionSize.height, largeResolutionSize.width/designResolutionSize.width));
+        director->setContentScaleFactor(std::min(largeResolutionSize.height / designResolutionSize.height, largeResolutionSize.width / designResolutionSize.width));
     }
     // if the frame's height is larger than the height of small size.
     else if (frameSize.height > smallResolutionSize.height) {
