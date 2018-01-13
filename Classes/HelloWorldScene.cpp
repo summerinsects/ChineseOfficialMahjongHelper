@@ -154,6 +154,14 @@ bool HelloWorld::init() {
     label->setAlignment(TextHAlignment::CENTER);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
 
+#if 0
+    label = Label::createWithSystemFont(Common::format("{{%.2f, %.2f}, {%.2f, %.2f}}", origin.x, origin.y, visibleSize.width, visibleSize.height),
+        "Arial", 10);
+    label->setColor(Color3B::BLACK);
+    this->addChild(label);
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 35.0f));
+#endif
+
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
     requestVersion(false);
 #endif
