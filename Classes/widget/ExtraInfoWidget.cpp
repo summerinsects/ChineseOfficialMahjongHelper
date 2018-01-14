@@ -9,7 +9,7 @@ USING_NS_CC;
 
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
-bool ExtraInfoWidget::init() {
+bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback) {
     if (UNLIKELY(!Node::init())) {
         return false;
     }
@@ -17,21 +17,34 @@ bool ExtraInfoWidget::init() {
     this->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     this->setIgnoreAnchorPointForPosition(false);
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Node *rootNode = nullptr;
+    Size contentSize(maxWidth, 110.0f);
+    if (maxWidth >= 270.0f) {
+        this->setContentSize(contentSize);
+        rootNode = this;
+    }
+    else {
+        contentSize.width = 270.0f;
+        const float scale = maxWidth / 270.0f;
+        this->setContentSize(Size(maxWidth, contentSize.height * scale));
 
-    this->setContentSize(Size(visibleSize.width, 110.0f));
+        rootNode = Node::create();
+        rootNode->setContentSize(Size(maxWidth * 0.5f, contentSize.height * scale * 0.5f));
+        rootNode->setScale(scale);
+        this->addChild(rootNode);
+    }
 
     const float gapX = 65.0f;
 
     // 点和与自摸互斥
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
-    this->addChild(radioGroup);
+    rootNode->addChild(radioGroup);
     radioGroup->addEventListener(std::bind(&ExtraInfoWidget::onWinTypeGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     static const char *winTypeTexts[] = { "点和", "自摸" };
     for (int i = 0; i < 2; ++i) {
         ui::RadioButton *radioButton = UICommon::createRadioButton();
-        this->addChild(radioButton);
+        rootNode->addChild(radioButton);
         radioButton->setZoomScale(0.0f);
         radioButton->ignoreContentAdaptWithSize(false);
         radioButton->setContentSize(Size(20.0f, 20.0f));
@@ -40,7 +53,7 @@ bool ExtraInfoWidget::init() {
 
         Label *label = Label::createWithSystemFont(winTypeTexts[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
-        this->addChild(label);
+        rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(35.0f + gapX * i, 100.0f));
     }
@@ -48,7 +61,7 @@ bool ExtraInfoWidget::init() {
 
     // 绝张
     ui::CheckBox *checkBox = UICommon::createCheckBox();
-    this->addChild(checkBox);
+    rootNode->addChild(checkBox);
     checkBox->setZoomScale(0.0f);
     checkBox->ignoreContentAdaptWithSize(false);
     checkBox->setContentSize(Size(20.0f, 20.0f));
@@ -59,7 +72,7 @@ bool ExtraInfoWidget::init() {
 
     Label *label = Label::createWithSystemFont("绝张", "Arial", 12);
     label->setColor(Color3B::BLACK);
-    this->addChild(label);
+    rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f + gapX * 2, 100.0f));
 
@@ -67,7 +80,7 @@ bool ExtraInfoWidget::init() {
     ui::CheckBox *checkBoxes[3];
     for (int i = 0; i < 3; ++i) {
         ui::CheckBox *checkBox = UICommon::createCheckBox();
-        this->addChild(checkBox);
+        rootNode->addChild(checkBox);
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
         checkBox->setContentSize(Size(20.0f, 20.0f));
@@ -76,7 +89,7 @@ bool ExtraInfoWidget::init() {
 
         label = Label::createWithSystemFont(extTexts[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
-        this->addChild(label);
+        rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(35.0f + gapX * i, 70.0f));
     }
@@ -99,7 +112,7 @@ bool ExtraInfoWidget::init() {
 
         label = Label::createWithSystemFont(windType[k], "Arial", 12);
         label->setColor(Color3B::BLACK);
-        this->addChild(label);
+        rootNode->addChild(label);
         label->setPosition(Vec2(20.0f, posY));
 
         radioGroup = ui::RadioButtonGroup::create();
@@ -110,7 +123,7 @@ bool ExtraInfoWidget::init() {
             radioButton->ignoreContentAdaptWithSize(false);
             radioButton->setContentSize(Size(20.0f, 20.0f));
             radioButton->setPosition(Vec2(50.0f + i * 30, posY));
-            this->addChild(radioButton);
+            rootNode->addChild(radioButton);
 
             label = Label::createWithSystemFont(windName[i], "Arial", 12);
             label->setColor(C3B_GRAY);
@@ -128,8 +141,8 @@ bool ExtraInfoWidget::init() {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("直接输入");
-    this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40.0f, 100.0f));
+    rootNode->addChild(button);
+    button->setPosition(Vec2(contentSize.width - 40.0f, 100.0f));
     button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
 
     // 使用说明
@@ -138,8 +151,8 @@ bool ExtraInfoWidget::init() {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("使用说明");
-    this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40.0f, 70.0f));
+    rootNode->addChild(button);
+    button->setPosition(Vec2(contentSize.width - 40.0f, 70.0f));
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
@@ -147,15 +160,15 @@ bool ExtraInfoWidget::init() {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
     label->setColor(Color3B(224, 45, 45));
 #endif
-    this->addChild(label);
+    rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(visibleSize.width - 85.0f, 40.0f));
+    label->setPosition(Vec2(contentSize.width - 85.0f, 40.0f));
 
     label = Label::createWithSystemFont("x0", "Arial", 12);
     label->setColor(Color3B::BLACK);
-    this->addChild(label);
+    rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(visibleSize.width - 85.0f, 40.0f));
+    label->setPosition(Vec2(contentSize.width - 85.0f, 40.0f));
     label->setTag(0);
     _flowerLabel = label;
 
@@ -164,8 +177,8 @@ bool ExtraInfoWidget::init() {
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("-1");
-    this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 55.0f, 40.0f));
+    rootNode->addChild(button);
+    button->setPosition(Vec2(contentSize.width - 55.0f, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = label->getTag();
         if (n > 0) {
@@ -179,8 +192,8 @@ bool ExtraInfoWidget::init() {
     button->setContentSize(Size(25.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText("+1");
-    this->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 25.0f, 40.0f));
+    rootNode->addChild(button);
+    button->setPosition(Vec2(contentSize.width - 25.0f, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = label->getTag();
         if (n < 8) {
@@ -188,6 +201,18 @@ bool ExtraInfoWidget::init() {
             label->setString(Common::format("x%d", n));
         }
     });
+
+    if (callback != nullptr) {
+        // 番算按钮
+        ui::Button *button = UICommon::createButton();
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(55.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText("算  番");
+        rootNode->addChild(button);
+        button->setPosition(Vec2(contentSize.width - 40.0f, 10.0f));
+        button->addClickEventListener(callback);
+    }
 
     return true;
 }
@@ -472,6 +497,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
         .setTitle("直接输入")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, editBox](AlertDialog *, int) {
         const char *input = editBox->getText();

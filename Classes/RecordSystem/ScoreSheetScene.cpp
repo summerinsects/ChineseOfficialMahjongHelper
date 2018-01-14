@@ -290,7 +290,7 @@ static const char *fan_short_name[] = {
     "花龙", "推不倒", "三色三同顺", "三色三节", "无番和", "妙手", "海底", "杠开", "抢杠",
     "碰碰和", "混一色", "三色三步", "五门", "全求人", "双暗杠", "双箭",
     "全带幺", "不求人", "双明杠", "绝张",
-    "箭刻", "圈风", "门风", "门清", "平和", "四归一", "双同", "双暗", "暗杠", "断幺",
+    "箭刻", "圈风", "门风", "门清", "平和", "四归一", "双同刻", "双暗", "暗杠", "断幺",
     "一般高", "喜相逢", "连六", "老少", "幺九", "明杠", "缺门", "无字", "边张", "嵌张", "单钓", "自摸",
     "花牌"
 };
@@ -328,6 +328,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
             }
 
             // 「一色XXX」与「混一色」、「清一色」、「绿一色」合并「一色」二字
+            // 1.「一色XXX」出现在fan0
             if (fan0 == mahjong::PURE_SHIFTED_CHOWS
                 || fan0 == mahjong::FOUR_PURE_SHIFTED_CHOWS
                 || fan0 == mahjong::PURE_SHIFTED_PUNGS
@@ -345,6 +346,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
                 }
             }
 
+            // 2.「一色XXX」出现在fan0
             if (fan1 == mahjong::PURE_SHIFTED_CHOWS
                 || fan1 == mahjong::FOUR_PURE_SHIFTED_CHOWS
                 || fan1 == mahjong::PURE_SHIFTED_PUNGS
@@ -356,9 +358,14 @@ static std::string GetShortFanText(const Record::Detail &detail) {
                     std::string fanName1 = fan_short_name[fan1];
                     return fanName0.append(fanName1.erase(0, strlen("一色")));
                 }
+                else {
+                    // 太长的直接用最大番
+                    return mahjong::fan_name[fan0];
+                }
             }
 
-            // 「五门齐」与「三色XXX」可以省略「三色」二字
+            // 「三色XXX」
+            // 1.「五门齐」与「三色XXX」可以省略「三色」二字，观察番种表，「五门齐」出现在「三色XXX」之后，故而只有一个判断
             if (fan0 == mahjong::MIXED_SHIFTED_CHOWS
                 || fan0 == mahjong::MIXED_TRIPLE_CHOW
                 || fan0 == mahjong::MIXED_SHIFTED_PUNGS) {
@@ -367,9 +374,20 @@ static std::string GetShortFanText(const Record::Detail &detail) {
                     std::string fanName1 = fan_short_name[fan1];
                     return fanName1.append(fanName0.erase(0, strlen("三色")));
                 }
+                else {
+                    // 太长的直接用最大番
+                    return mahjong::fan_name[fan0];
+                }
             }
 
-            // 太长的直接用最大番
+            // 2.「三色XXX」与更大的番复合，只显示最大的番
+            if (fan1 == mahjong::MIXED_SHIFTED_CHOWS
+                || fan1 == mahjong::MIXED_TRIPLE_CHOW
+                || fan1 == mahjong::MIXED_SHIFTED_PUNGS) {
+                return mahjong::fan_name[fan0];
+            }
+
+            // 「双龙会」系列不复合
             if (fan0 == mahjong::PURE_TERMINAL_CHOWS
                 || fan0 == mahjong::THREE_SUITED_TERMINAL_CHOWS) {
                 return mahjong::fan_name[fan0];
@@ -400,7 +418,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
 
         std::string fanText;
         int fans = 0;
-        for (unsigned n = 0; n < 14; ++n) {
+        for (unsigned n = 0; n < 8; ++n) {
             if (TEST_UNIQUE_FAN(uniqueFan, n)) {
                 fanText.append(fan_short_name[uniqueFanTable[n]]);
                 if (++fans > 1) {
@@ -417,6 +435,12 @@ static std::string GetShortFanText(const Record::Detail &detail) {
                         break;
                     }
                 }
+            }
+        }
+
+        if (fanText.empty()) {
+            if (MULTIPLE_FAN_COUNT(multipleFan, 6) == 2) {
+                fanText.append("双幺九");
             }
         }
 
@@ -591,6 +615,24 @@ void ScoreSheetScene::onNameButton(cocos2d::Ref *, size_t idx) {
 
 static const char *s_wind[] = { "东", "南", "西", "北" };
 
+namespace {
+    class NameEditBoxDelegate : public cocos2d::ui::EditBoxDelegate {
+        typedef std::function<void (cocos2d::ui::EditBox *, cocos2d::ui::EditBoxDelegate::EditBoxEndAction)> ccEditBoxEditingDidEndWithAction;
+        ccEditBoxEditingDidEndWithAction _callback;
+
+    public:
+        NameEditBoxDelegate(ccEditBoxEditingDidEndWithAction &&callback) : _callback(callback) { }
+
+        virtual ~NameEditBoxDelegate() { CCLOG("%s", __FUNCTION__); }
+
+        virtual void editBoxReturn(cocos2d::ui::EditBox *) override { }
+
+        virtual void editBoxEditingDidEndWithAction(cocos2d::ui::EditBox *editBox, EditBoxEndAction action) override {
+            _callback(editBox, action);
+        }
+    };
+}
+
 void ScoreSheetScene::editName(size_t idx) {
     ui::EditBox *editBox = UICommon::createEditBox(Size(120.0f, 20.0f));
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -603,49 +645,33 @@ void ScoreSheetScene::editName(size_t idx) {
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder("输入选手姓名");
 
-    AlertDialog::Builder(this)
+    auto delegate = std::make_shared<NameEditBoxDelegate>([this, idx](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
+        if (action == ui::EditBoxDelegate::EditBoxEndAction::RETURN) {
+            AlertDialog *dialog = (AlertDialog *)editBox->getUserData();
+            if (submitName(editBox->getText(), idx)) {
+                dialog->scheduleOnce([dialog](float) {
+                    dialog->dismiss();
+                }, 0.0f, "dismiss_dialog");
+            }
+        }
+    });
+    editBox->setDelegate(delegate.get());
+
+    AlertDialog *dialog = AlertDialog::Builder(this)
         .setTitle(Common::format("开局座位「%s」", s_wind[idx]))
         .setContentNode(editBox)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, editBox, idx](AlertDialog *, int) {
+        .setPositiveButton("确定", [this, editBox, idx, delegate](AlertDialog *, int) {
         const char *text = editBox->getText();
         if (text != nullptr) {
-            std::string name = text;
-            Common::trim(name);
-
-            // 开始后不允许清空名字
-            if (name.empty()) {
-                Toast::makeText(this, "对局开始后不允许清空名字", Toast::LENGTH_LONG)->show();
-                return false;
-            }
-
-            if (name.length() > NAME_SIZE - 1) {
-                name.erase(NAME_SIZE - 1);
-            }
-
-            for (size_t i = 0; i < 4; ++i) {
-                if (i != idx && name.compare(_record.name[i]) == 0) {
-                    Toast::makeText(this, "选手姓名不能相同", Toast::LENGTH_LONG)->show();
-                    return false;
-                }
-            }
-
-            strncpy(_record.name[idx], name.c_str(), NAME_SIZE - 1);
-            _nameLabel[idx]->setVisible(true);
-            _nameLabel[idx]->setString(name);
-            cw::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
-
-            if (_record.current_index >= 16) {
-                RecordHistoryScene::modifyRecord(&_record);
-            }
-
-            if (_isGlobal) {
-                writeToFile(_record);
-            }
-            return true;
+            return submitName(text, idx);
         }
         return false;
-    }).create()->show();
+    }).create();
+    dialog->show();
+
+    editBox->setUserData(dialog);
 
     // 自动打开editBox
     editBox->scheduleOnce([editBox](float) {
@@ -653,49 +679,68 @@ void ScoreSheetScene::editName(size_t idx) {
     }, 0.0f, "open_keyboard");
 }
 
-namespace {
-    class ContinuousEditBoxDelegate : public cocos2d::ui::EditBoxDelegate {
-        const std::vector<cocos2d::ui::EditBox *> _editBoxes;
+bool ScoreSheetScene::submitName(const char *text, size_t idx) {
+    std::string name = text;
+    Common::trim(name);
 
-    public:
-        ContinuousEditBoxDelegate(const std::vector<cocos2d::ui::EditBox *> &editBoxes) : _editBoxes(editBoxes) { }
+    // 开始后不允许清空名字
+    if (name.empty()) {
+        Toast::makeText(this, "对局开始后不允许清空名字", Toast::LENGTH_LONG)->show();
+        return false;
+    }
 
-        virtual ~ContinuousEditBoxDelegate() { CCLOG("%s", __FUNCTION__); }
+    if (name.length() > NAME_SIZE - 1) {
+        name.erase(NAME_SIZE - 1);
+    }
 
-        virtual void editBoxReturn(cocos2d::ui::EditBox *) override { }
-
-        virtual void editBoxEditingDidEndWithAction(cocos2d::ui::EditBox *editBox, EditBoxEndAction action) override {
-            // 使得能连续输入
-            if (action == EditBoxEndAction::TAB_TO_NEXT) {
-                auto it = std::find(_editBoxes.begin(), _editBoxes.end(), editBox);
-                if (it != _editBoxes.end() && ++it != _editBoxes.end()) {
-                    editBox = *it;
-                    editBox->scheduleOnce([editBox](float) {
-                        editBox->touchDownAction(editBox, cocos2d::ui::Widget::TouchEventType::ENDED);
-                    }, 0.0f, "open_keyboard");
-                }
-            }
+    for (size_t i = 0; i < 4; ++i) {
+        if (i != idx && name.compare(_record.name[i]) == 0) {
+            Toast::makeText(this, "选手姓名不能相同", Toast::LENGTH_LONG)->show();
+            return false;
         }
-    };
+    }
+
+    strncpy(_record.name[idx], name.c_str(), NAME_SIZE - 1);
+    _nameLabel[idx]->setVisible(true);
+    _nameLabel[idx]->setString(name);
+    cw::scaleLabelToFitWidth(_nameLabel[idx], _cellWidth - 4.0f);
+
+    if (_record.current_index >= 16) {
+        RecordHistoryScene::modifyRecord(&_record);
+    }
+
+    if (_isGlobal) {
+        writeToFile(_record);
+    }
+    return true;
 }
 
 void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(150.0f, 120.0f));
+    rootNode->setContentSize(Size(150.0f, 125.0f));
 
-    ui::Button *button = UICommon::createButton();
-    rootNode->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("重新抽风");
-    button->setPosition(Vec2(75.0f, 10.0f));
-    cw::scaleLabelToFitWidth(button->getTitleLabel(), 50.0f);
+    ui::Button *button1 = UICommon::createButton();
+    rootNode->addChild(button1);
+    button1->setScale9Enabled(true);
+    button1->setContentSize(Size(55.0f, 20.0f));
+    button1->setTitleFontSize(12);
+    button1->setTitleText("清空全部");
+    button1->setPosition(Vec2(40.0f, 115.0f));
+    cw::scaleLabelToFitWidth(button1->getTitleLabel(), 50.0f);
+
+    ui::Button *button2 = UICommon::createButton();
+    rootNode->addChild(button2);
+    button2->setScale9Enabled(true);
+    button2->setContentSize(Size(55.0f, 20.0f));
+    button2->setTitleFontSize(12);
+    button2->setTitleText("重新定庄");
+    button2->setPosition(Vec2(110.0f, 115.0f));
+    cw::scaleLabelToFitWidth(button2->getTitleLabel(), 50.0f);
 
     std::array<ui::EditBox *, 4> editBoxes;
 
     for (int i = 0; i < 4; ++i) {
-        const float yPos = 110.0f - i * 25.0f;
+        const float yPos = 85.0f - i * 25.0f;
         Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
@@ -724,7 +769,18 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     }
 
     // EditBox的代理，使得能连续输入
-    auto delegate = std::make_shared<ContinuousEditBoxDelegate>(std::vector<ui::EditBox *>(editBoxes.begin(), editBoxes.end()));
+    auto delegate = std::make_shared<NameEditBoxDelegate>([editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
+        if (action == ui::EditBoxDelegate::EditBoxEndAction::TAB_TO_NEXT) {
+            auto it = std::find(editBoxes.begin(), editBoxes.end(), editBox);
+            if (it != editBoxes.end() && ++it != editBoxes.end()) {
+                editBox = *it;
+                editBox->scheduleOnce([editBox](float) {
+                    editBox->touchDownAction(editBox, cocos2d::ui::Widget::TouchEventType::ENDED);
+                }, 0.0f, "open_keyboard");
+            }
+        }
+    });
+
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
     editBoxes[2]->setDelegate(delegate.get());
@@ -732,6 +788,7 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     AlertDialog::Builder(this)
         .setTitle("输入选手姓名")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, editBoxes, delegate](AlertDialog *, int) {
         // 获取四个输入框内容
@@ -783,7 +840,15 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
     }, 0.0f, "open_keyboard");
 
-    button->addClickEventListener([this, editBoxes](Ref *) {
+    // 清空全部
+    button1->addClickEventListener([editBoxes](Ref *) {
+        for (ui::EditBox *editBox : editBoxes) {
+            editBox->setText("");
+        }
+    });
+
+    // 重新定庄
+    button2->addClickEventListener([this, editBoxes](Ref *) {
         // 获取四个输入框内容
         std::string names[4];
         for (int i = 0; i < 4; ++i) {
@@ -905,6 +970,8 @@ static std::string GetLongFanText(const Record::Detail &detail) {
     uint64_t fanFlag = detail.fan_flag;
     uint16_t uniqueFan = detail.unique_fan;
     uint64_t multipleFan = detail.multiple_fan;
+
+    // 大番
     if (fanFlag != 0) {
         for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
             if (TEST_FAN(fanFlag, n)) {
@@ -913,31 +980,44 @@ static std::string GetLongFanText(const Record::Detail &detail) {
                 fanText.append("」");
             }
         }
-
-        if (!fanText.empty()) {
-            fanText.append("等");
-        }
     }
-    else if (uniqueFan != 0 || multipleFan != 0) {
+
+    // 小番
+    if (uniqueFan != 0 || multipleFan != 0) {
+        uint16_t littleFanTable[25] = { 0 };
+
         for (unsigned n = 0; n < 14; ++n) {
             if (TEST_UNIQUE_FAN(uniqueFan, n)) {
-                fanText.append("「");
-                fanText.append(mahjong::fan_name[uniqueFanTable[n]]);
-                fanText.append("」");
+                int idx = static_cast<int>(uniqueFanTable[n]) - static_cast<int>(mahjong::DRAGON_PUNG);
+                littleFanTable[idx] = 1;
             }
         }
 
-        for (unsigned n = 0; n < 2; ++n) {
-            if (MULTIPLE_FAN_COUNT(multipleFan, n) > 0) {
-                fanText.append("「");
-                fanText.append(mahjong::fan_name[multipleFanTable[n]]);
-                fanText.append("」");
+        for (unsigned n = 0; n < 9; ++n) {
+            uint16_t cnt = MULTIPLE_FAN_COUNT(multipleFan, n);
+            if (cnt > 0) {
+                int idx = static_cast<int>(multipleFanTable[n]) - static_cast<int>(mahjong::DRAGON_PUNG);
+                littleFanTable[idx] = cnt;
             }
         }
 
-        if (!fanText.empty()) {
-            fanText.append("等");
+        for (int i = 0; i < 25; ++i) {
+            uint16_t cnt = littleFanTable[i];
+            if (cnt > 0) {
+                fanText.append("「");
+                fanText.append(mahjong::fan_name[static_cast<int>(mahjong::DRAGON_PUNG) + i]);
+                if (cnt > 1) {
+                    fanText.append("x");
+                    fanText.append(std::to_string(cnt));
+                }
+                fanText.append("」");
+
+            }
         }
+    }
+
+    if (!fanText.empty()) {
+        fanText.append("等");
     }
 
     return fanText;
@@ -1142,6 +1222,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
         .setTitle("清空表格")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, radioGroup](AlertDialog *, int) {
         if (radioGroup->getSelectedButtonIndex() == 0) {
@@ -1360,6 +1441,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
         .setTitle("追分策略")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [editBox, delegate](AlertDialog *, int) {
         const char *text = editBox->getText();

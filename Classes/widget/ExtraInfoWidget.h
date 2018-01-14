@@ -4,10 +4,11 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "../mahjong-algorithm/fan_calculator.h"
+#include "../cocos-wheels/CWCommon.h"
 
 class ExtraInfoWidget : public cocos2d::Node {
 public:
-    CREATE_FUNC(ExtraInfoWidget);
+    CREATE_FUNC_WITH_PARAM_2(ExtraInfoWidget, initWithWidth, float, maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &, callback);
 
     int getFlowerCount() const;
     void setFlowerCount(int cnt);
@@ -25,7 +26,8 @@ public:
     void refreshByWinTile(mahjong::tile_t winTile, bool maybeFourthTile, size_t winTileCountInFixedPacks, bool hasKong);
 
     void setInputCallback(const std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> &inputCallback) { _inputCallback = inputCallback; }
-    virtual bool init() override;
+
+    bool initWithWidth(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback);
 
 private:
     void onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);

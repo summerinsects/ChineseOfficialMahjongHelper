@@ -23,7 +23,7 @@ bool FanCalculatorScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 选牌面板
-    TilePickWidget *tilePicker = TilePickWidget::create();
+    TilePickWidget *tilePicker = TilePickWidget::create(visibleSize.width - 5.0f);
     const Size &widgetSize = tilePicker->getContentSize();
     this->addChild(tilePicker);
     tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
@@ -31,7 +31,7 @@ bool FanCalculatorScene::init() {
     _tilePicker = tilePicker;
 
     // 其他信息的相关控件
-    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
+    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create(visibleSize.width - 5.0f, [this](Ref *) { calculate(); });
     const Size &extraSize = extraInfo->getContentSize();
     this->addChild(extraInfo);
     extraInfo->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
@@ -39,16 +39,6 @@ bool FanCalculatorScene::init() {
     _extraInfo = extraInfo;
 
     extraInfo->setInputCallback(std::bind(&TilePickWidget::setData, _tilePicker, std::placeholders::_1, std::placeholders::_2));
-
-    // 番算按钮
-    ui::Button *button = UICommon::createButton();
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("算  番");
-    extraInfo->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 40.0f, 10.0f));
-    button->addClickEventListener([this](Ref *) { calculate(); });
 
     // 番种显示的Node
     Size areaSize(visibleSize.width, visibleSize.height - 35.0f - widgetSize.height - 5.0f - extraSize.height - 10.0f);

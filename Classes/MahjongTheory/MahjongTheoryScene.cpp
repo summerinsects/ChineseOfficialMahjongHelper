@@ -232,24 +232,10 @@ void MahjongTheoryScene::showInputAlert() {
         return;
     }
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width - 20;
+    const float maxWidth = AlertDialog::maxWidth();
 
-    // 选牌面板和其他信息的相关控件
-    TilePickWidget *tilePicker = TilePickWidget::create();
-
-    // 缩放
-    Size pickerSize = tilePicker->getContentSize();
-    const float pickerScale = maxWidth / pickerSize.width;
-    tilePicker->setScale(pickerScale);
-    pickerSize = Size(maxWidth, pickerSize.height * pickerScale);
-
-    // 布局在rootNode上
-    Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(maxWidth, pickerSize.height));
-    rootNode->addChild(tilePicker);
-    tilePicker->setPosition(Vec2(maxWidth * 0.5f, pickerSize.height * 0.5f));
-
+    // 选牌面板
+    TilePickWidget *tilePicker = TilePickWidget::create(maxWidth);
     if (handTiles.tile_count != 0 && servingTile != 0) {
         tilePicker->setData(handTiles, servingTile);
     }
@@ -257,7 +243,8 @@ void MahjongTheoryScene::showInputAlert() {
     // 通过AlertDialog显示出来
     AlertDialog::Builder(this)
         .setTitle("输入手牌")
-        .setContentNode(rootNode)
+        .setContentNode(tilePicker)
+        .setCloseOnTouchOutside(false)
         .setPositiveButton("确定", [this, tilePicker](AlertDialog *, int) {
         mahjong::hand_tiles_t handTiles;
         mahjong::tile_t servingTile;

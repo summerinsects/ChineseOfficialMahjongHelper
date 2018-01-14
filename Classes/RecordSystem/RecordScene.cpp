@@ -729,6 +729,11 @@ void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
     param.win_flag = _detail.win_hand.win_flag;
     param.flower_count = _detail.win_hand.flower_count;
 
+    int idx = _winGroup->getSelectedButtonIndex();
+    if (idx >= 0 && idx < 4) {
+        param.seat_wind = static_cast<mahjong::wind_t>(idx);
+    }
+
     showCalculator(param);
 }
 
@@ -838,6 +843,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     AlertDialog::Builder(this)
         .setTitle("罚分调整")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, penaltyScores](AlertDialog *, int) {
         memcpy(&_detail.penalty_scores, penaltyScores->data(), sizeof(_detail.penalty_scores));
@@ -955,6 +961,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
     AlertDialog::Builder(this)
         .setTitle("标记小番")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, checkBoxes, labels, callFromSubmiting](AlertDialog *, int) {
         uint16_t uniqueFan = 0;
@@ -1148,27 +1155,18 @@ void RecordScene::finish() {
 cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth);
 
 void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float maxWidth = visibleSize.width - 20;
+    const float maxWidth = AlertDialog::maxWidth();
 
     // 选牌面板和其他信息的相关控件
-    TilePickWidget *tilePicker = TilePickWidget::create();
-    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create();
+    TilePickWidget *tilePicker = TilePickWidget::create(maxWidth);
+    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create(maxWidth, nullptr);
 
     extraInfo->setFlowerCount(param.flower_count);
     extraInfo->setPrevalentWind(static_cast<mahjong::wind_t>(_handIdx / 4));
     extraInfo->setSeatWind(param.seat_wind);
 
-    // 缩放
-    Size pickerSize = tilePicker->getContentSize();
-    const float pickerScale = maxWidth / pickerSize.width;
-    tilePicker->setScale(pickerScale);
-    pickerSize = Size(maxWidth, pickerSize.height * pickerScale);
-
-    Size extraInfoSize = extraInfo->getContentSize();
-    const float extraInfoScale = maxWidth / extraInfoSize.width;
-    extraInfo->setScale(extraInfoScale);
-    extraInfoSize = Size(maxWidth, extraInfoSize.height * extraInfoScale);
+    const Size &pickerSize = tilePicker->getContentSize();
+    const Size &extraInfoSize = extraInfo->getContentSize();
 
     // 布局在rootNode上
     Node *rootNode = Node::create();
@@ -1196,6 +1194,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
     AlertDialog::Builder(this)
         .setTitle("记录和牌")
         .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
         .setPositiveButton("确定", [this, tilePicker, extraInfo, param](AlertDialog *dlg, int) {
         mahjong::calculate_param_t temp = { 0 };
@@ -1310,6 +1309,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
         AlertDialog::Builder(this)
             .setTitle("记录和牌")
             .setContentNode(innerNode)
+            .setCloseOnTouchOutside(false)
             .setPositiveButton("确定", [this, temp, fan, fanFlag, uniqueFan, multipleFan, dlg](AlertDialog *, int) {
             _detail.fan = std::max<uint16_t>(fan, 8);
             _detail.fan_flag = fanFlag;

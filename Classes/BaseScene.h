@@ -7,7 +7,6 @@
 #include "cocos-wheels/CWCommon.h"
 
 #define COLOR4B_BG          cocos2d::Color4B(245, 245, 245, 255)
-#define COLOR4B_NAVIGATION  cocos2d::Color4B(51, 204, 255, 255)
 
 #define ENABLE_LOGO 1
 
@@ -47,7 +46,7 @@ public:
 #endif
 
         // 导航栏
-        cocos2d::LayerColor *navigation = cocos2d::LayerColor::create(COLOR4B_NAVIGATION, visibleSize.width, 30.0f);
+        cocos2d::LayerColor *navigation = cocos2d::LayerColor::create(cocos2d::Color4B(51, 204, 255, 230), visibleSize.width, 30.0f);
         this->addChild(navigation);
         navigation->setPosition(cocos2d::Vec2(origin.x, origin.y + visibleSize.height - 30.0f));
 
