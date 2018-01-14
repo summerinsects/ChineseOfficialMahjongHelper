@@ -328,6 +328,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
             }
 
             // 「一色XXX」与「混一色」、「清一色」、「绿一色」合并「一色」二字
+            // 1.「一色XXX」出现在fan0
             if (fan0 == mahjong::PURE_SHIFTED_CHOWS
                 || fan0 == mahjong::FOUR_PURE_SHIFTED_CHOWS
                 || fan0 == mahjong::PURE_SHIFTED_PUNGS
@@ -345,6 +346,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
                 }
             }
 
+            // 2.「一色XXX」出现在fan0
             if (fan1 == mahjong::PURE_SHIFTED_CHOWS
                 || fan1 == mahjong::FOUR_PURE_SHIFTED_CHOWS
                 || fan1 == mahjong::PURE_SHIFTED_PUNGS
@@ -356,9 +358,14 @@ static std::string GetShortFanText(const Record::Detail &detail) {
                     std::string fanName1 = fan_short_name[fan1];
                     return fanName0.append(fanName1.erase(0, strlen("一色")));
                 }
+                else {
+                    // 太长的直接用最大番
+                    return mahjong::fan_name[fan0];
+                }
             }
 
-            // 「五门齐」与「三色XXX」可以省略「三色」二字
+            // 「三色XXX」
+            // 1.「五门齐」与「三色XXX」可以省略「三色」二字，观察番种表，「五门齐」出现在「三色XXX」之后，故而只有一个判断
             if (fan0 == mahjong::MIXED_SHIFTED_CHOWS
                 || fan0 == mahjong::MIXED_TRIPLE_CHOW
                 || fan0 == mahjong::MIXED_SHIFTED_PUNGS) {
@@ -367,9 +374,20 @@ static std::string GetShortFanText(const Record::Detail &detail) {
                     std::string fanName1 = fan_short_name[fan1];
                     return fanName1.append(fanName0.erase(0, strlen("三色")));
                 }
+                else {
+                    // 太长的直接用最大番
+                    return mahjong::fan_name[fan0];
+                }
             }
 
-            // 太长的直接用最大番
+            // 2.「三色XXX」与更大的番复合，只显示最大的番
+            if (fan1 == mahjong::MIXED_SHIFTED_CHOWS
+                || fan1 == mahjong::MIXED_TRIPLE_CHOW
+                || fan1 == mahjong::MIXED_SHIFTED_PUNGS) {
+                return mahjong::fan_name[fan0];
+            }
+
+            // 「双龙会」系列不复合
             if (fan0 == mahjong::PURE_TERMINAL_CHOWS
                 || fan0 == mahjong::THREE_SUITED_TERMINAL_CHOWS) {
                 return mahjong::fan_name[fan0];
