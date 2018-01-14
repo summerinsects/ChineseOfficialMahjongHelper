@@ -970,6 +970,8 @@ static std::string GetLongFanText(const Record::Detail &detail) {
     uint64_t fanFlag = detail.fan_flag;
     uint16_t uniqueFan = detail.unique_fan;
     uint64_t multipleFan = detail.multiple_fan;
+
+    // 大番
     if (fanFlag != 0) {
         for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
             if (TEST_FAN(fanFlag, n)) {
@@ -978,39 +980,44 @@ static std::string GetLongFanText(const Record::Detail &detail) {
                 fanText.append("」");
             }
         }
+    }
 
-        if (!fanText.empty()) {
-            fanText.append("等");
+    // 小番
+    if (uniqueFan != 0 || multipleFan != 0) {
+        uint16_t littleFanTable[25] = { 0 };
+
+        for (unsigned n = 0; n < 14; ++n) {
+            if (TEST_UNIQUE_FAN(uniqueFan, n)) {
+                int idx = static_cast<int>(uniqueFanTable[n]) - static_cast<int>(mahjong::DRAGON_PUNG);
+                littleFanTable[idx] = 1;
+            }
+        }
+
+        for (unsigned n = 0; n < 9; ++n) {
+            uint16_t cnt = MULTIPLE_FAN_COUNT(multipleFan, n);
+            if (cnt > 0) {
+                int idx = static_cast<int>(multipleFanTable[n]) - static_cast<int>(mahjong::DRAGON_PUNG);
+                littleFanTable[idx] = cnt;
+            }
+        }
+
+        for (int i = 0; i < 25; ++i) {
+            uint16_t cnt = littleFanTable[i];
+            if (cnt > 0) {
+                fanText.append("「");
+                fanText.append(mahjong::fan_name[static_cast<int>(mahjong::DRAGON_PUNG) + i]);
+                if (cnt > 1) {
+                    fanText.append("x");
+                    fanText.append(std::to_string(cnt));
+                }
+                fanText.append("」");
+
+            }
         }
     }
-    else if (uniqueFan != 0 || multipleFan != 0) {
-        for (unsigned n = 0; n < 8; ++n) {
-            if (TEST_UNIQUE_FAN(uniqueFan, n)) {
-                fanText.append("「");
-                fanText.append(mahjong::fan_name[uniqueFanTable[n]]);
-                fanText.append("」");
-            }
-        }
 
-        for (unsigned n = 0; n < 2; ++n) {
-            if (MULTIPLE_FAN_COUNT(multipleFan, n) > 0) {
-                fanText.append("「");
-                fanText.append(mahjong::fan_name[multipleFanTable[n]]);
-                fanText.append("」");
-            }
-        }
-
-        for (unsigned n = 8; n < 14; ++n) {
-            if (TEST_UNIQUE_FAN(uniqueFan, n)) {
-                fanText.append("「");
-                fanText.append(mahjong::fan_name[uniqueFanTable[n]]);
-                fanText.append("」");
-            }
-        }
-
-        if (!fanText.empty()) {
-            fanText.append("等");
-        }
+    if (!fanText.empty()) {
+        fanText.append("等");
     }
 
     return fanText;
