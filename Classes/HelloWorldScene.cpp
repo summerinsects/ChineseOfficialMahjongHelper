@@ -129,16 +129,25 @@ bool HelloWorld::init() {
     button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(40.0, 25.0f));
+    button->setContentSize(Size(40.0f, 25.0f));
     button->setTitleFontSize(14);
     button->setTitleText("关于");
     button->setPosition(Vec2(origin.x + 23.0f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    Sprite *sprite = Sprite::create("drawable/indicator_input_error.png");
+    sprite->setScale(CC_CONTENT_SCALE_FACTOR() * 0.5f);
+    button->addChild(sprite);
+    sprite->setPosition(Vec2(40.0f, 25.0f));
+    sprite->setVisible(false);
+    _redPointSprite = sprite;
+#endif
+
     button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
-    button->setContentSize(Size(40.0, 25.0f));
+    button->setContentSize(Size(40.0f, 25.0f));
     button->setTitleFontSize(14);
     button->setTitleText("捐赠");
     button->setPosition(Vec2(origin.x + visibleSize.width - 23.0f, origin.y + 15.0f));
@@ -162,22 +171,31 @@ bool HelloWorld::init() {
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 35.0f));
 #endif
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    requestVersion(false);
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    time_t lastTime = static_cast<time_t>(atoll(UserDefault::getInstance()->getStringForKey("not_notify").c_str()));
+    time_t now = time(nullptr);
+
+    struct tm tma = *localtime(&lastTime);
+    struct tm tmb = *localtime(&now);
+    if (tma.tm_year != tmb.tm_year || tma.tm_mon != tmb.tm_mon || tma.tm_mday != tmb.tm_mday) {
+        requestVersion(false);
+    }
 #endif
 
     return true;
 }
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 static void shareApplication() {
     const float width = AlertDialog::maxWidth();
 
     std::string version = Application::getInstance()->getVersion();
-    std::string str = Common::format("<div style=\"word-break:break-all\">https://github.com/summerinsects/ChineseOfficialMahjongHelper/releases/download/v%s/ChineseOfficialMahjongHelper_v%s.apk</div>",
-        version.c_str(), version.c_str());
-
-    Node *rootNode = Node::create();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    std::string str = "<div style=\"word-break:break-all\">https://www.pgyer.com/awtU</div>";
+#else
+    std::string str = "<div style=\"word-break:break-all\">https://www.pgyer.com/1lMK</div>";
+#endif
+    Node *rootNode = Node::create();
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
     webView->setContentSize(Size(width, 80.0f));
     webView->setBackgroundTransparent();
@@ -186,15 +204,7 @@ static void shareApplication() {
     rootNode->addChild(webView);
     webView->setPosition(Vec2(width * 0.5f, 40.0f));
     rootNode->setContentSize(Size(width, 80.0f));
-#else
-    Label *label = Label::createWithSystemFont(str, "Arail", 10, Size(width, 0.0f));
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
 
-    const Size &labelSize = label->getContentSize();
-    rootNode->setContentSize(Size(width, labelSize.height));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f));
-#endif
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
         .setTitle("下载地址")
         .setContentNode(rootNode)
@@ -202,6 +212,7 @@ static void shareApplication() {
         .setPositiveButton("确定", nullptr)
         .create()->show();
 }
+#endif
 
 void HelloWorld::onAboutButton(cocos2d::Ref *) {
     const float width = AlertDialog::maxWidth();
@@ -211,7 +222,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     Label *label = Label::createWithSystemFont(
         "1. 本软件开源，高端玩家可下载源代码自行编译。\n"
         "2. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper\n"
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
         "3. 如果觉得本软件好用，可点击「下载地址」获取下载链接，分享给他人。"
 #endif
         , "Arail", 10, Size(width, 0.0f));
@@ -220,7 +231,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
 
     const Size &labelSize = label->getContentSize();
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     ui::Button *button1 = UICommon::createButton();
     button1->setScale9Enabled(true);
     button1->setContentSize(Size(65.0, 20.0f));
@@ -228,6 +239,13 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     button1->setTitleText("检测新版本");
     button1->addClickEventListener([this](Ref *) { requestVersion(true); });
     rootNode->addChild(button1);
+
+    if (_redPointSprite->isVisible()) {
+        Sprite *sprite = Sprite::create("drawable/indicator_input_error.png");
+        sprite->setScale(CC_CONTENT_SCALE_FACTOR() * 0.4f);
+        button1->addChild(sprite);
+        sprite->setPosition(Vec2(65.0f, 20.0f));
+    }
 
     ui::Button *button2 = UICommon::createButton();
     button2->setScale9Enabled(true);
@@ -256,8 +274,9 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
         .create()->show();
 }
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 void HelloWorld::requestVersion(bool manual) {
+#if 1
     static bool checking = false;
     if (checking) {
         return;
@@ -299,16 +318,19 @@ void HelloWorld::requestVersion(bool manual) {
 
     network::HttpClient::getInstance()->sendImmediate(request);
     request->release();
+#else
+    std::string str =
+    "{"
+    "  \"tag_name\": \"v1.2.13\","
+    "  \"body\": \"1. 更换了新的图片\\r\\n2. 记分器的记录界面标记番种增加了「最近使用」\\r\\n3. 其他细节优化\""
+    "}";
+    std::vector<char> buffer(str.begin(), str.end());
+    checkVersion(&buffer, false);
+#endif
 }
 #endif
 
-static inline bool string_has_suffix(const char *str, const char *suffix) {
-    size_t suffix_len = strlen(suffix);
-    size_t str_len = strlen(str);
-    return (str_len >= suffix_len) && (strcmp(suffix, str + (str_len - suffix_len)) == 0);
-}
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
     if (buffer == nullptr) {
         return false;
@@ -328,41 +350,6 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
                 break;
             }
             std::string tag = it->value.GetString();
-
-            it = doc.FindMember("assets");
-            if (it == doc.MemberEnd() || !it->value.IsArray()) {
-                break;
-            }
-
-            rapidjson::Value::ConstArray assets = it->value.GetArray();
-            if (assets.Size() == 0) {
-                break;
-            }
-
-            rapidjson::Value::ConstArray::ValueIterator asset = std::find_if(assets.Begin(), assets.End(),
-                [](const rapidjson::Value &value) {
-                if (!value.IsObject()) return false;
-                rapidjson::Value::ConstMemberIterator it = value.FindMember("name");
-                if (it == value.MemberEnd() || !it->value.IsString()) return false;
-                return string_has_suffix(it->value.GetString(), ".apk");
-            });
-
-            if (asset == assets.End()) {
-                break;
-            }
-
-            it = asset->FindMember("browser_download_url");
-            if (it == asset->MemberEnd() || !it->value.IsString()) {
-                break;
-            }
-            std::string url = it->value.GetString();
-
-            it = asset->FindMember("size");
-            unsigned size = 0;
-            if (it != asset->MemberEnd() && it->value.IsUint()) {
-                size = it->value.GetUint();
-            }
-
             int major1, minor1, point1;
             if (sscanf(tag.c_str(), "v%d.%d.%d", &major1, &minor1, &point1) != 3) {
                 break;
@@ -396,6 +383,27 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
                 return true;
             }
 
+            _redPointSprite->setVisible(true);
+
+            Node *rootNode = Node::create();
+            ui::CheckBox *checkBox = nullptr;
+            if (!manual) {
+                checkBox = UICommon::createCheckBox();
+                rootNode->addChild(checkBox);
+                checkBox->setZoomScale(0.0f);
+                checkBox->ignoreContentAdaptWithSize(false);
+                checkBox->setContentSize(Size(20.0f, 20.0f));
+                checkBox->setPosition(Vec2(10.0f, 10.0f));
+
+                Label *label = Label::createWithSystemFont("今日之内不再提示", "Arial", 12);
+                label->setColor(Color3B::BLACK);
+                rootNode->addChild(label);
+                label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+                label->setPosition(Vec2(25.0f, 10.0f));
+
+                rootNode->setContentSize(Size(25.0f + label->getContentSize().width, 20.0f));
+            }
+
             it = doc.FindMember("body");
             std::string body;
             if (it != doc.MemberEnd() && it->value.IsString()) {
@@ -404,10 +412,27 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 
             AlertDialog::Builder(this)
                 .setTitle("检测到新版本")
-                .setMessage(Common::format("%s，大小%.2fM，是否下载？\n\n%s", tag.c_str(), size / 1048576.0f, body.c_str()))
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+                .setMessage(Common::format("%s，是否下载？\n\n%s", tag.c_str(), body.c_str()))
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+                .setMessage(Common::format("%s，是否下载？\n提取密码xyg\n\n%s", tag.c_str(), body.c_str()))
+#endif
+                .setContentNode(rootNode)
                 .setCloseOnTouchOutside(false)
-                .setNegativeButton("取消", nullptr)
-                .setPositiveButton("确定", [url](AlertDialog *, int) { Application::getInstance()->openURL(url); return true; })
+                .setNegativeButton("取消", [checkBox](AlertDialog *, int) {
+                    if (checkBox != nullptr && checkBox->isSelected()) {
+                        UserDefault::getInstance()->setStringForKey("not_notify", std::to_string(time(nullptr)));
+                    }
+                    return true;
+                })
+                .setPositiveButton("更新", [](AlertDialog *, int) {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+                    Application::getInstance()->openURL("https://www.pgyer.com/awtU");
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+                    Application::getInstance()->openURL("https://www.pgyer.com/1lMK");
+#endif
+                    return true;
+                })
                 .create()->show();
             return true;
         } while (0);
