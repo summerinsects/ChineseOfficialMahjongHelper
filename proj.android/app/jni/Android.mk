@@ -11,31 +11,31 @@ LOCAL_MODULE := MyGame_shared
 
 LOCAL_MODULE_FILENAME := libMyGame
 
-LOCAL_SRC_FILES := $(LOCAL_PATH)/hellocpp/main.cpp \
-                   $(LOCAL_PATH)/../../../Classes/AppDelegate.cpp \
-                   $(LOCAL_PATH)/../../../Classes/cocos-wheels/CWCommon.cpp \
-                   $(LOCAL_PATH)/../../../Classes/cocos-wheels/CWTableView.cpp \
-                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/CompetitionMainScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/CompetitionSystem/LatestCompetitionScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/FanCalculator/FanCalculatorScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/FanTable/FanDefinitionScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/FanTable/FanTableScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/HelloWorldScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/mahjong-algorithm/fan_calculator.cpp \
-                   $(LOCAL_PATH)/../../../Classes/mahjong-algorithm/stringify.cpp \
-                   $(LOCAL_PATH)/../../../Classes/mahjong-algorithm/shanten.cpp \
-                   $(LOCAL_PATH)/../../../Classes/MahjongTheory/MahjongTheoryScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/Other/OtherScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/RecordSystem/Record.cpp \
-                   $(LOCAL_PATH)/../../../Classes/RecordSystem/RecordHistoryScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/RecordSystem/RecordScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/RecordSystem/ScoreSheetScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/utils/common.cpp \
-                   $(LOCAL_PATH)/../../../Classes/widget/AlertDialog.cpp \
-                   $(LOCAL_PATH)/../../../Classes/widget/ExtraInfoWidget.cpp \
-                   $(LOCAL_PATH)/../../../Classes/widget/HandTilesWidget.cpp \
-                   $(LOCAL_PATH)/../../../Classes/widget/TilePickWidget.cpp \
-                   $(LOCAL_PATH)/../../../Classes/widget/Toast.cpp
+LOCAL_SRC_FILES := hellocpp/main.cpp \
+                   ../../../Classes/AppDelegate.cpp \
+                   ../../../Classes/cocos-wheels/CWCommon.cpp \
+                   ../../../Classes/cocos-wheels/CWTableView.cpp \
+                   ../../../Classes/CompetitionSystem/CompetitionMainScene.cpp \
+                   ../../../Classes/CompetitionSystem/LatestCompetitionScene.cpp \
+                   ../../../Classes/FanCalculator/FanCalculatorScene.cpp \
+                   ../../../Classes/FanTable/FanDefinitionScene.cpp \
+                   ../../../Classes/FanTable/FanTableScene.cpp \
+                   ../../../Classes/HelloWorldScene.cpp \
+                   ../../../Classes/mahjong-algorithm/fan_calculator.cpp \
+                   ../../../Classes/mahjong-algorithm/stringify.cpp \
+                   ../../../Classes/mahjong-algorithm/shanten.cpp \
+                   ../../../Classes/MahjongTheory/MahjongTheoryScene.cpp \
+                   ../../../Classes/Other/OtherScene.cpp \
+                   ../../../Classes/RecordSystem/Record.cpp \
+                   ../../../Classes/RecordSystem/RecordHistoryScene.cpp \
+                   ../../../Classes/RecordSystem/RecordScene.cpp \
+                   ../../../Classes/RecordSystem/ScoreSheetScene.cpp \
+                   ../../../Classes/utils/common.cpp \
+                   ../../../Classes/widget/AlertDialog.cpp \
+                   ../../../Classes/widget/ExtraInfoWidget.cpp \
+                   ../../../Classes/widget/HandTilesWidget.cpp \
+                   ../../../Classes/widget/TilePickWidget.cpp \
+                   ../../../Classes/widget/Toast.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../Classes
 
