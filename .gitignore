@@ -197,5 +197,5 @@ Classes/mahjong-algorithm/html
 Classes/mahjong-algorithm/latex
 
 # Android Studio
-proj.android-studio/.idea/
+proj.android/.idea/
 *.iml
