@@ -20,12 +20,8 @@ Chinese Official Mahjong Helper 国标小助手
 #### iOS版
 - 用xcode打开proj.ios_mac目录下的ChineseOfficialMahjongHelper.xcodeproj
 
-#### Android版(使用Eclipse ADT)
-- shift+右键“在此处打开命令行窗口”
-- cocos compile -p android（如果要编译release版本，请加参数-m release）
-
-#### Android版(Android Studio)
-- 用Android Studio导入proj.android-studio
+#### Android版
+- 用Android Studio导入proj.android
 
 ---
 
