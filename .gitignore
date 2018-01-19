@@ -70,6 +70,8 @@ Generated Files
 AppPackages
 SubmissionInfo
 *.hps
+.vs/
+*.VC.db
 
 # Ignore files build
 projects/
@@ -198,4 +200,7 @@ Classes/mahjong-algorithm/latex
 
 # Android Studio
 proj.android/.idea/
+project.properties
 *.iml
+/proj.android/app/build.xml
+/proj.android/app/proguard-project.txt
