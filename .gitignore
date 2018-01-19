@@ -177,10 +177,10 @@ $RECYCLE.BIN/
 /cocos2d/
 
 # Eclipse
-/proj.android/.classpath
-/proj.android/.cproject
-/proj.android/.project
-/proj.android/.settings
+/proj.android-eclipse/.classpath
+/proj.android-eclipse/.cproject
+/proj.android-eclipse/.project
+/proj.android-eclipse/.settings
 
 # xcode
 /proj.ios_mac/ChineseOfficialMahjongHelper.xcodeproj/project.xcworkspace
@@ -197,5 +197,5 @@ Classes/mahjong-algorithm/html
 Classes/mahjong-algorithm/latex
 
 # Android Studio
-proj.android-studio/.idea/
+proj.android/.idea/
 *.iml
