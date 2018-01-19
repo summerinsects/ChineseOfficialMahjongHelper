@@ -13,6 +13,14 @@
 #include "MahjongTheory/MahjongTheoryScene.h"
 #include "CompetitionSystem/CompetitionMainScene.h"
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#define DOWNLOAD_URL "https://www.pgyer.com/comh-android"
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+#define DOWNLOAD_URL "https://www.pgyer.com/comh-ios"
+#else
+#define DOWNLOAD_URL ""
+#endif
+
 USING_NS_CC;
 
 bool HelloWorld::init() {
@@ -190,11 +198,8 @@ static void shareApplication() {
     const float width = AlertDialog::maxWidth();
 
     std::string version = Application::getInstance()->getVersion();
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    std::string str = "<div style=\"word-break:break-all\">https://www.pgyer.com/awtU</div>";
-#else
-    std::string str = "<div style=\"word-break:break-all\">https://www.pgyer.com/1lMK</div>";
-#endif
+    std::string str = "<div style=\"word-break:break-all\">" DOWNLOAD_URL "</div>";
+
     Node *rootNode = Node::create();
     experimental::ui::WebView *webView = experimental::ui::WebView::create();
     webView->setContentSize(Size(width, 80.0f));
@@ -426,11 +431,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
                     return true;
                 })
                 .setPositiveButton("更新", [](AlertDialog *, int) {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-                    Application::getInstance()->openURL("https://www.pgyer.com/awtU");
-#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-                    Application::getInstance()->openURL("https://www.pgyer.com/1lMK");
-#endif
+                    Application::getInstance()->openURL(DOWNLOAD_URL);
                     return true;
                 })
                 .create()->show();
