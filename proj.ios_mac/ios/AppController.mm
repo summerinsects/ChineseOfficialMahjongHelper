@@ -51,8 +51,23 @@ static AppDelegate s_sharedApplication;
     // Add the view controller's view to the window and display.
     window = [[UIWindow alloc] initWithFrame: [[UIScreen mainScreen] bounds]];
 
+    CGRect viewFrame = [[UIScreen mainScreen] applicationFrame];
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 11.0f)
+    {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+        UIEdgeInsets safeAreaInsets = window.safeAreaInsets;
+        NSLog(@"aaa %@", NSStringFromUIEdgeInsets(safeAreaInsets));
+#pragma clang diagnostic pop
+        viewFrame.size.width -= safeAreaInsets.right;
+        viewFrame.size.height -= safeAreaInsets.bottom;
+    }
+#endif
+
     // Use RootViewController to manage CCEAGLView
-    _viewController = [[RootViewController alloc]init];
+    _viewController = [[RootViewController alloc] initWithViewFrame:viewFrame];
     _viewController.wantsFullScreenLayout = YES;
     
 
@@ -70,7 +85,7 @@ static AppDelegate s_sharedApplication;
 
     [window makeKeyAndVisible];
     [window setBackgroundColor:[UIColor blackColor]];
-    [_viewController.view setFrame:[[UIScreen mainScreen] applicationFrame]];
+    [_viewController.view setFrame:viewFrame];
 
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
     

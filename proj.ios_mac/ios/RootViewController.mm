@@ -40,10 +40,15 @@
 }
 */
 
+- (id)initWithViewFrame:(CGRect)frame {
+    _viewFrame = frame;
+    return [self init];
+}
+
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView {
     // Initialize the CCEAGLView
-    CCEAGLView *eaglView = [CCEAGLView viewWithFrame: [UIScreen mainScreen].applicationFrame
+    CCEAGLView *eaglView = [CCEAGLView viewWithFrame: _viewFrame
                                          pixelFormat: (__bridge NSString *)cocos2d::GLViewImpl::_pixelFormat
                                          depthFormat: cocos2d::GLViewImpl::_depthFormat
                                   preserveBackbuffer: NO
@@ -98,11 +103,6 @@
             cocos2d::Application::getInstance()->applicationScreenSizeChanged((int) s.width, (int) s.height);
         }
     }
-}
-
-//fix not hide status on ios7
-- (BOOL)prefersStatusBarHidden {
-    return NO;
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
