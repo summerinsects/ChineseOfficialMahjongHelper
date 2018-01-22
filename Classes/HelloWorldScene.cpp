@@ -193,32 +193,6 @@ bool HelloWorld::init() {
     return true;
 }
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-static void shareApplication() {
-    const float width = AlertDialog::maxWidth();
-
-    std::string version = Application::getInstance()->getVersion();
-    std::string str = "<div style=\"word-break:break-all\">" DOWNLOAD_URL "</div>";
-
-    Node *rootNode = Node::create();
-    experimental::ui::WebView *webView = experimental::ui::WebView::create();
-    webView->setContentSize(Size(width, 80.0f));
-    webView->setBackgroundTransparent();
-    webView->setScalesPageToFit(true);
-    webView->setOnEnterCallback(std::bind(&experimental::ui::WebView::loadHTMLString, webView, std::ref(str), ""));
-    rootNode->addChild(webView);
-    webView->setPosition(Vec2(width * 0.5f, 40.0f));
-    rootNode->setContentSize(Size(width, 80.0f));
-
-    AlertDialog::Builder(Director::getInstance()->getRunningScene())
-        .setTitle("下载地址")
-        .setContentNode(rootNode)
-        .setCloseOnTouchOutside(false)
-        .setPositiveButton("确定", nullptr)
-        .create()->show();
-}
-#endif
-
 void HelloWorld::onAboutButton(cocos2d::Ref *) {
     const float width = AlertDialog::maxWidth();
 
@@ -257,8 +231,9 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     button2->setContentSize(Size(65.0, 20.0f));
     button2->setTitleFontSize(12);
     button2->setTitleText("下载地址");
-    button2->addClickEventListener([](Ref *) {
-        shareApplication();
+    button2->addClickEventListener([this](Ref *) {
+        cw::setClipboardText(DOWNLOAD_URL);
+        Toast::makeText(this, "下载地址已复制到剪切板", Toast::LENGTH_LONG)->show();
     });
     rootNode->addChild(button2);
 

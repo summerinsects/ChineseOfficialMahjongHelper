@@ -29,6 +29,11 @@ package org.cocos2dx.cpp;
 import android.os.Bundle;
 import org.cocos2dx.lib.Cocos2dxActivity;
 
+import android.annotation.SuppressLint;
+import android.content.ClipboardManager;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+
 public class AppActivity extends Cocos2dxActivity {
 
     @Override
@@ -47,4 +52,33 @@ public class AppActivity extends Cocos2dxActivity {
         
     }
 
+    @SuppressLint("NewApi")
+	public static void setClipboardText(final String text) {
+        ((Cocos2dxActivity)Cocos2dxActivity.getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ClipboardManager cbm = (ClipboardManager)Cocos2dxActivity.getContext().getSystemService(CLIPBOARD_SERVICE);
+                cbm.setText(text);
+            }
+        });
+    }
+
+    @SuppressLint("NewApi")
+	public static String getClipboardText() {
+        FutureTask<String> result = new FutureTask<String>(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                ClipboardManager cbm = (ClipboardManager)Cocos2dxActivity.getContext().getSystemService(CLIPBOARD_SERVICE);
+                return cbm.getText().toString();
+            }
+        });
+        ((Cocos2dxActivity)Cocos2dxActivity.getContext()).runOnUiThread(result);
+        try {
+            return result.get();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 }

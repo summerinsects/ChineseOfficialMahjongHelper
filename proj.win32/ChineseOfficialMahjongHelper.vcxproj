@@ -148,6 +148,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\Classes\cocos-wheels\CWCommon-win32.cpp" />
     <ClCompile Include="..\Classes\cocos-wheels\CWCommon.cpp" />
     <ClCompile Include="..\Classes\cocos-wheels\CWTableView.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionMainScene.cpp" />
