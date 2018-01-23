@@ -716,8 +716,10 @@ bool ScoreSheetScene::submitName(const char *text, size_t idx) {
 }
 
 void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
+    const float limitWidth = std::min(AlertDialog::maxWidth(), 180.0f);
+
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(150.0f, 125.0f));
+    rootNode->setContentSize(Size(limitWidth, 125.0f));
 
     ui::Button *button1 = UICommon::createButton();
     rootNode->addChild(button1);
@@ -725,7 +727,7 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     button1->setContentSize(Size(55.0f, 20.0f));
     button1->setTitleFontSize(12);
     button1->setTitleText("清空全部");
-    button1->setPosition(Vec2(40.0f, 115.0f));
+    button1->setPosition(Vec2((limitWidth - 110.0f) / 3.0f + 27.5f, 115.0f));
     cw::scaleLabelToFitWidth(button1->getTitleLabel(), 50.0f);
 
     ui::Button *button2 = UICommon::createButton();
@@ -733,12 +735,14 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     button2->setScale9Enabled(true);
     button2->setContentSize(Size(55.0f, 20.0f));
     button2->setTitleFontSize(12);
-    button2->setTitleText("重新定庄");
-    button2->setPosition(Vec2(110.0f, 115.0f));
+    button2->setTitleText("随机排座");
+    button2->setPosition(Vec2(limitWidth - button1->getPositionX(), 115.0f));
     cw::scaleLabelToFitWidth(button2->getTitleLabel(), 50.0f);
 
+    // 输入框
+    const float editBoxWidth = limitWidth - 20 - 50;
+    const float editBoxPosX = editBoxWidth * 0.5f + 20.0f;
     std::array<ui::EditBox *, 4> editBoxes;
-
     for (int i = 0; i < 4; ++i) {
         const float yPos = 85.0f - i * 25.0f;
         Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
@@ -747,7 +751,7 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(5.0f, yPos));
 
-        ui::EditBox *editBox = UICommon::createEditBox(Size(120.0f, 20.0f));
+        ui::EditBox *editBox = UICommon::createEditBox(Size(editBoxWidth, 20.0f));
         editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
         editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
         editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
@@ -756,9 +760,43 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         editBox->setText(_record.name[i]);
         editBox->setMaxLength(NAME_SIZE - 1);
         rootNode->addChild(editBox);
-        editBox->setPosition(Vec2(85.0f, yPos));
+        editBox->setPosition(Vec2(editBoxPosX, yPos));
 
         editBoxes[i] = editBox;
+    }
+
+    // 上下移按钮
+    const float upPosX = limitWidth - 10.0f;
+    const float downPosX = limitWidth - 35.0f;
+    for (int i = 0; i < 4; ++i) {
+        const float yPos = 85.0f - i * 25.0f;
+        ui::Button *button = UICommon::createButton();
+        rootNode->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E");
+        button->setPosition(Vec2(upPosX, yPos));
+        button->setEnabled(i != 0);
+        button->addClickEventListener([editBoxes, i](Ref *) {
+            std::string temp = editBoxes[i]->getText();
+            editBoxes[i]->setText(editBoxes[i - 1]->getText());
+            editBoxes[i - 1]->setText(temp.c_str());
+        });
+
+        button = UICommon::createButton();
+        rootNode->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E");
+        button->setPosition(Vec2(downPosX, yPos));
+        button->setEnabled(i != 3);
+        button->addClickEventListener([editBoxes, i](Ref *) {
+            std::string temp = editBoxes[i]->getText();
+            editBoxes[i]->setText(editBoxes[i + 1]->getText());
+            editBoxes[i + 1]->setText(temp.c_str());
+        });
     }
 
     // 如果选手姓名皆为空，则填入上次对局的姓名
