@@ -600,7 +600,7 @@ void ScoreSheetScene::reset() {
 
 void ScoreSheetScene::onNameButton(cocos2d::Ref *, size_t idx) {
     if (_record.start_time == 0) {
-        editNameAllAtOnce(idx);
+        editNameAllAtOnce();
     }
     else {
         const char *message = (_record.current_index < 16) ? "对局已经开始，是否要修改选手姓名？" : "对局已经结束，是否要修改选手姓名？";
@@ -715,7 +715,7 @@ bool ScoreSheetScene::submitName(const char *text, size_t idx) {
     return true;
 }
 
-void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
+void ScoreSheetScene::editNameAllAtOnce() {
     const float limitWidth = std::min(AlertDialog::maxWidth(), 180.0f);
 
     Node *rootNode = Node::create();
@@ -871,12 +871,6 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         }
         return true;
     }).create()->show();
-
-    // 自动打开指定下标的editBox
-    ui::EditBox *editBox = editBoxes[idx];
-    editBox->scheduleOnce([editBox](float) {
-        editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
-    }, 0.0f, "open_keyboard");
 
     // 清空全部
     button1->addClickEventListener([editBoxes](Ref *) {
