@@ -46,11 +46,25 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    // 用来绘制表格线的根结点
+    DrawNode *drawNode = DrawNode::create();
+    this->addChild(drawNode);
+
+    const float gap = visibleSize.width / 6;  // 分成6份
+    _cellWidth = gap;
+
+    const int cellCount = 21;  // 姓名+开局+每圈+累计+16盘+名次=21行
+    const float cellHeight = std::min<float>((visibleSize.height - 85.0f) / cellCount, 20.0f);
+    const float tableHeight = cellHeight * cellCount;
+    const float tableOffsetY = (visibleSize.height - 85.0f - tableHeight) * 0.5f + 25.0f;
+
+    drawNode->setPosition(Vec2(origin.x, origin.y + tableOffsetY));
+
     // 上方4个按钮
     const float buttonGap = (visibleSize.width - 4.0f - 55.0f) / 3.0f;
 
-    float xPos = origin.x + 2.0f + 55.0f * 0.5f;
-    float yPos = origin.y + visibleSize.height - 45.0f;
+    const float xPos = origin.x + 2.0f + 55.0f * 0.5f;
+    const float yPos = origin.y + tableOffsetY + tableHeight + 15.0f;
     static const char *titleText[4] = { "追分策略", "清空表格", "历史记录", "使用说明" };
     static void (ScoreSheetScene::*callbacks[4])(Ref *) = {
         &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onInstructionButton
@@ -77,33 +91,20 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Label *label = Label::createWithSystemFont("当前时间", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + 12.0f));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + tableOffsetY - 12.0f));
     label->setColor(Color3B::BLACK);
     _timeLabel = label;
-
-    // 用来绘制表格线的根结点
-    DrawNode *node = DrawNode::create();
-    this->addChild(node);
-
-    const float gap = visibleSize.width / 6;  // 分成6份
-    _cellWidth = gap;
-
-    const int cellCount = 21;  // 姓名+开局+每圈+累计+16盘+名次=21行
-    const float cellHeight = std::min<float>((visibleSize.height - 85.0f) / cellCount, 20.0f);
-    const float tableHeight = cellHeight * cellCount;
-
-    node->setPosition(Vec2(origin.x, origin.y + (visibleSize.height - 85.0f - cellHeight * cellCount) * 0.5f + 25.0f));
 
     // 5条竖线
     for (int i = 0; i < 5; ++i) {
         const float x = gap * (i + 1);
-        node->drawLine(Vec2(x, 0.0f), Vec2(x, tableHeight), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 0.0f), Vec2(x, tableHeight), Color4F::BLACK);
     }
 
     // cellCount+1条横线
     for (int i = 0; i < cellCount + 1; ++i) {
         const float y = cellHeight * i;
-        node->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y),
+        drawNode->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y),
             (i > 0 && i < 16) ? Color4F(0.3f, 0.3f, 0.3f, 1.0f) : Color4F::BLACK);
     }
 
@@ -115,7 +116,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label = Label::createWithSystemFont("选手姓名", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line1Y));
-    node->addChild(label);
+    drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     // 4个用于弹出输入框的AlertLayer及同位置的label
@@ -125,18 +126,18 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         widget->setTouchEnabled(true);
         widget->setPosition(Vec2(colPosX[i + 1], line1Y));
         widget->setContentSize(Size(gap, cellHeight));
-        node->addChild(widget);
+        drawNode->addChild(widget);
         widget->addClickEventListener(std::bind(&ScoreSheetScene::onNameButton, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(Color3B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line1Y));
-        node->addChild(label);
+        drawNode->addChild(label);
         _nameLabel[i] = label;
     }
 
     ui::Button *button = UICommon::createButton();
-    node->addChild(button, -1);
+    drawNode->addChild(button, -1);
     button->setScale9Enabled(true);
     button->setContentSize(Size(gap, cellHeight));
     button->setTitleFontSize(12);
@@ -154,13 +155,13 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label = Label::createWithSystemFont(row0Text[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         label->setPosition(Vec2(colPosX[i], line2Y));
-        node->addChild(label);
+        drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         label = Label::createWithSystemFont(row1Text[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         label->setPosition(Vec2(colPosX[i], line3Y));
-        node->addChild(label);
+        drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
     }
 
@@ -169,21 +170,21 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label = Label::createWithSystemFont("累计", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line4Y));
-    node->addChild(label);
+    drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("+0", "Arail", 12);
         label->setColor(Color3B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line4Y));
-        node->addChild(label);
+        drawNode->addChild(label);
         _totalLabel[i] = label;
 
         ui::Widget *widget = ui::Widget::create();
         widget->setTouchEnabled(true);
         widget->setPosition(Vec2(colPosX[i + 1], line4Y));
         widget->setContentSize(Size(gap, cellHeight));
-        node->addChild(widget);
+        drawNode->addChild(widget);
         widget->addClickEventListener(std::bind(&ScoreSheetScene::onScoreButton, this, std::placeholders::_1, i));
     }
 
@@ -193,14 +194,14 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label = Label::createWithSystemFont("名次", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line5Y));
-    node->addChild(label);
+    drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(Color3B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line5Y));
-        node->addChild(label);
+        drawNode->addChild(label);
 
         _rankLabels[i] = label;
     }
@@ -208,7 +209,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label = Label::createWithSystemFont("番种备注", "Arail", 12);
     label->setColor(Color3B::BLACK);
     label->setPosition(Vec2(colPosX[5], line5Y));
-    node->addChild(label);
+    drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     // 第6~21栏，东风东~北风北的计分
@@ -219,19 +220,19 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
         label->setColor(C3B_GRAY);
         label->setPosition(Vec2(colPosX[0], y));
-        node->addChild(label);
+        drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 四位选手得分
         for (int i = 0; i < 4; ++i) {
             _scoreLabels[k][i] = Label::createWithSystemFont("", "Arail", 12);
             _scoreLabels[k][i]->setPosition(Vec2(colPosX[i + 1], y));
-            node->addChild(_scoreLabels[k][i]);
+            drawNode->addChild(_scoreLabels[k][i]);
         }
 
         // 计分按钮
         ui::Button *button = UICommon::createButton();
-        node->addChild(button, -1);
+        drawNode->addChild(button, -1);
         button->setScale9Enabled(true);
         button->setContentSize(Size(gap, cellHeight));
         button->setTitleFontSize(12);
@@ -246,13 +247,13 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(C3B_GRAY);
         label->setPosition(Vec2(colPosX[5], y));
-        node->addChild(label);
+        drawNode->addChild(label);
         label->setVisible(false);
         _fanNameLabel[k] = label;
 
         // 查看详情按钮
         ui::Widget *widget = ui::Widget::create();
-        node->addChild(widget);
+        drawNode->addChild(widget);
         widget->setTouchEnabled(true);
         widget->setContentSize(Size(gap, cellHeight));
         widget->setPosition(Vec2(colPosX[5], y));
