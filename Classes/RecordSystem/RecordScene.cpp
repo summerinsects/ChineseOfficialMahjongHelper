@@ -1035,12 +1035,13 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
     }
     updateScoreLabel();
 
+    // 点击的不是「最近使用」
     if (checkBox.cell_idx != 0) {
-        // 如果在「最近使用」里，则更新
+        // 如果该番在「最近使用」里，则更新
         const auto it = std::find(std::begin(recentFans), std::end(recentFans), fan);
         if (it != std::end(recentFans)) {
             CustomCell *cell = (CustomCell *)_tableView->cellAtIndex(0);
-            if (cell != nullptr) {
+            if (cell != nullptr) {  // 「最近使用」的cell在绘制
                 // 相应CheckBox的下标
                 const ptrdiff_t idx = it - std::begin(recentFans);
 
@@ -1056,11 +1057,11 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
         }
     }
     else {
-        // 点击「最近使用」，更新对应格子的番
-        ssize_t cellIdx = standardFanToCellIdx[fan];
+        // 点击「最近使用」，更新找到对应cell的番，更新
+        ssize_t cellIdx = standardFanToCellIdx[fan];  // 对应cell下标
         if (cellIdx != 0) {
             CustomCell *cell = (CustomCell *)_tableView->cellAtIndex(cellIdx);
-            if (cell != nullptr) {
+            if (cell != nullptr) {  // 该cell在绘制
                 // 相应CheckBox的下标
                 const CellDetail &detail = cellDetails[cellIdx];
                 const ssize_t idx = static_cast<ssize_t>(fan) - static_cast<ssize_t>(detail.first_fan);
