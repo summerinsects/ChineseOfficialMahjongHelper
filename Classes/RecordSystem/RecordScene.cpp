@@ -123,6 +123,26 @@ static CellDetail cellDetails[11] = {
     { "88番", &standardFans[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
 };
 
+static void loadRecentFans() {
+    std::string str = UserDefault::getInstance()->getStringForKey("recent_fans");
+    if (str.empty()) {
+        return;
+    }
+
+    int recentFansInt[8];
+    if (8 == sscanf(str.c_str(), "%d %d %d %d %d %d %d %d",
+        &recentFansInt[0], &recentFansInt[1], &recentFansInt[2], &recentFansInt[3],
+        &recentFansInt[4], &recentFansInt[5], &recentFansInt[6], &recentFansInt[7])) {
+        std::transform(std::begin(recentFansInt), std::end(recentFansInt), std::begin(recentFans), [](int fan) { return static_cast<mahjong::fan_t>(fan); });
+    }
+}
+
+static void saveRecentFans() {
+    UserDefault::getInstance()->setStringForKey("recent_fans", Common::format("%d %d %d %d %d %d %d %d",
+        static_cast<int>(recentFans[0]), static_cast<int>(recentFans[1]), static_cast<int>(recentFans[2]), static_cast<int>(recentFans[3]),
+        static_cast<int>(recentFans[4]), static_cast<int>(recentFans[5]), static_cast<int>(recentFans[6]), static_cast<int>(recentFans[7])));
+}
+
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
 }
@@ -135,6 +155,12 @@ static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
 bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const Record::Detail *detail, const SubmitCallback &callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
+    }
+
+    static bool recentFansLoaded = false;
+    if (!recentFansLoaded) {
+        loadRecentFans();
+        recentFansLoaded = true;
     }
 
     _handIdx = handIdx;
@@ -1114,6 +1140,7 @@ void RecordScene::adjustRecentFans() {
 
     cellDetails[0].count = cnt;
     std::copy(std::begin(temp), std::begin(temp) + cnt, std::begin(recentFans));
+    saveRecentFans();
 }
 
 void RecordScene::onSubmitButton(cocos2d::Ref *) {
