@@ -495,7 +495,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&label = std::get<0>(ext);
-        std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(ext);
+        FakeCheckBox *checkBoxes = std::get<1>(ext).data();
 
         label = Label::createWithSystemFont("1番", "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -544,7 +544,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
     CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
-    std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(ext);
+    FakeCheckBox *checkBoxes = std::get<1>(ext).data();
 
     label->setString(detail.title);
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
@@ -1046,7 +1046,7 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
                 const ptrdiff_t idx = it - std::begin(recentFans);
 
                 // 刷新CheckBox
-                std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(cell->getExtData());
+                FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (fan == cellDetails[0].fans[idx]) {
                     checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
                 }
@@ -1067,7 +1067,7 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
                 const ssize_t idx = static_cast<ssize_t>(fan) - static_cast<ssize_t>(detail.first_fan);
 
                 // 刷新CheckBox
-                std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(cell->getExtData());
+                FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (fan == detail.fans[idx]) {
                     checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
                 }

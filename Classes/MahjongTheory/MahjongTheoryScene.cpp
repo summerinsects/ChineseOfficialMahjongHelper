@@ -829,13 +829,13 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
+        LayerColor **layerColors = std::get<0>(ext).data();
         Label *&typeLabel = std::get<1>(ext);
         Label *&discardLabel = std::get<2>(ext);
         ui::Button *&discardButton = std::get<3>(ext);
-        std::array<Label *, 2> &usefulLabel = std::get<4>(ext);
-        std::array<ui::Button *, 34> &usefulButtons = std::get<5>(ext);
-        std::array<Label *, 2> &cntLabel = std::get<6>(ext);
+        Label **usefulLabel = std::get<4>(ext).data();
+        ui::Button **usefulButtons = std::get<5>(ext).data();
+        Label **cntLabel = std::get<6>(ext).data();
 
         // 背景色
         layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), _cellWidth, 0.0f);
@@ -908,13 +908,13 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    const std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
+    LayerColor *const *layerColors = std::get<0>(ext).data();
     Label *typeLabel = std::get<1>(ext);
     Label *discardLabel = std::get<2>(ext);
     ui::Button *discardButton = std::get<3>(ext);
-    const std::array<Label *, 2> &usefulLabel = std::get<4>(ext);
-    const std::array<ui::Button *, 34> &usefulButtons = std::get<5>(ext);
-    const std::array<Label *, 2> &cntLabel = std::get<6>(ext);
+    Label *const *usefulLabel = std::get<4>(ext).data();
+    ui::Button *const *usefulButtons = std::get<5>(ext).data();
+    Label *const *cntLabel = std::get<6>(ext).data();
 
     const float cellHeight = tableCellSizeForIndex(table, idx);
     size_t realIdx = _orderedIndices[idx];
