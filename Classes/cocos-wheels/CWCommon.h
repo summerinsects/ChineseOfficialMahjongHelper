@@ -83,6 +83,9 @@ void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width);
 
 void calculateColumnsCenterX(const float *colWidth, size_t col, float *xPos);
 
+std::string getClipboardText();
+void setClipboardText(const char *text);
+
 }
 
 #endif

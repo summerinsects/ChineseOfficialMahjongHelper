@@ -176,7 +176,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
         const float width = visibleSize.width - 5.0f;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
+        LayerColor **layerColors = std::get<0>(ext).data();
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
 
@@ -204,7 +204,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    const std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
+    LayerColor *const *layerColors = std::get<0>(ext).data();
     Label *label = std::get<1>(ext);
     ui::Button *delBtn = std::get<2>(ext);
 
@@ -490,9 +490,9 @@ namespace {
             CustomCell::ExtDataType &ext = cell->getExtData();
             Label *&titleLabel = std::get<0>(ext);
             ui::RadioButtonGroup *&radioGroup = std::get<1>(ext);
-            std::array<ui::RadioButton *, 4> &radioButtons = std::get<2>(ext);
-            std::array<Label *, 4> &labels = std::get<3>(ext);
-            std::array<LayerColor *, 2> &layerColors = std::get<4>(ext);
+            ui::RadioButton **radioButtons = std::get<2>(ext).data();
+            Label **labels = std::get<3>(ext).data();
+            LayerColor **layerColors = std::get<4>(ext).data();
 
             // 背景色
             layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 40.0f);
@@ -555,9 +555,9 @@ namespace {
         const CustomCell::ExtDataType &ext = cell->getExtData();
         Label *titleLabel = std::get<0>(ext);
         ui::RadioButtonGroup *radioGroup = std::get<1>(ext);
-        const std::array<ui::RadioButton *, 4> &radioButtons = std::get<2>(ext);
-        const std::array<Label *, 4> &labels = std::get<3>(ext);
-        const std::array<LayerColor *, 2> &layerColors = std::get<4>(ext);
+        ui::RadioButton *const *radioButtons = std::get<2>(ext).data();
+        Label *const *labels = std::get<3>(ext).data();
+        LayerColor *const *layerColors = std::get<4>(ext).data();
 
         layerColors[0]->setVisible(!(idx & 1));
         layerColors[1]->setVisible(!!(idx & 1));
@@ -690,7 +690,7 @@ namespace {
             CustomCell::ExtDataType &ext = cell->getExtData();
             Label *&label = std::get<0>(ext);
             ui::CheckBox *&checkBox = std::get<1>(ext);
-            std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+            LayerColor **layerColors = std::get<2>(ext).data();
 
             // 背景色
             layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 70.0f);
@@ -721,7 +721,7 @@ namespace {
         const CustomCell::ExtDataType &ext = cell->getExtData();
         Label *label = std::get<0>(ext);
         ui::CheckBox *checkBox = std::get<1>(ext);
-        const std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+        LayerColor *const *layerColors = std::get<2>(ext).data();
 
         layerColors[0]->setVisible(!(idx & 1));
         layerColors[1]->setVisible(!!(idx & 1));

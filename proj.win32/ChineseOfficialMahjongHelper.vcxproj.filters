@@ -51,6 +51,9 @@
     <ClCompile Include="..\Classes\cocos-wheels\CWCommon.cpp">
       <Filter>src\cocos-wheels</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\cocos-wheels\CWCommon-win32.cpp">
+      <Filter>src\cocos-wheels</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\cocos-wheels\CWTableView.cpp">
       <Filter>src\cocos-wheels</Filter>
     </ClCompile>

@@ -13,6 +13,7 @@ LOCAL_MODULE_FILENAME := libMyGame
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../../Classes/AppDelegate.cpp \
+                   ../../../Classes/cocos-wheels/CWCommon-android.cpp \
                    ../../../Classes/cocos-wheels/CWCommon.cpp \
                    ../../../Classes/cocos-wheels/CWTableView.cpp \
                    ../../../Classes/CompetitionSystem/Competition.cpp \

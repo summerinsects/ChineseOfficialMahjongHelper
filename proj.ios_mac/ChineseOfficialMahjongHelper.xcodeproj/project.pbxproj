@@ -53,6 +53,8 @@
 		1FDD94461C8337140031BC38 /* shanten.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD943F1C8337140031BC38 /* shanten.cpp */; };
 		1FDD950E1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
 		1FDD950F1C8338700031BC38 /* source_material in Resources */ = {isa = PBXBuildFile; fileRef = 1FDD950D1C8338700031BC38 /* source_material */; };
+		1FDEC0762015B94F006E9D1F /* CWCommon-ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1FDEC0742015B94F006E9D1F /* CWCommon-ios.mm */; };
+		1FDEC07A2015C4E6006E9D1F /* CWCommon-mac.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1FDEC0782015C4E5006E9D1F /* CWCommon-mac.mm */; };
 		1FE04ADE1C94682A008401EA /* FanCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04AD71C94682A008401EA /* FanCalculatorScene.cpp */; };
 		1FE04ADF1C94682A008401EA /* FanCalculatorScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04AD71C94682A008401EA /* FanCalculatorScene.cpp */; };
 		1FE04AE01C94682A008401EA /* RecordScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADA1C94682A008401EA /* RecordScene.cpp */; };
@@ -211,6 +213,8 @@
 		1FDD943F1C8337140031BC38 /* shanten.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = shanten.cpp; sourceTree = "<group>"; };
 		1FDD94401C8337140031BC38 /* shanten.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shanten.h; sourceTree = "<group>"; };
 		1FDD950D1C8338700031BC38 /* source_material */ = {isa = PBXFileReference; lastKnownFileType = folder; path = source_material; sourceTree = "<group>"; };
+		1FDEC0742015B94F006E9D1F /* CWCommon-ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "CWCommon-ios.mm"; sourceTree = "<group>"; };
+		1FDEC0782015C4E5006E9D1F /* CWCommon-mac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "CWCommon-mac.mm"; sourceTree = "<group>"; };
 		1FE04AD71C94682A008401EA /* FanCalculatorScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanCalculatorScene.cpp; sourceTree = "<group>"; };
 		1FE04AD81C94682A008401EA /* FanCalculatorScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanCalculatorScene.h; sourceTree = "<group>"; };
 		1FE04ADA1C94682A008401EA /* RecordScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecordScene.cpp; sourceTree = "<group>"; };
@@ -369,6 +373,8 @@
 		1FDCF7BB1F738E1C00D9C608 /* cocos-wheels */ = {
 			isa = PBXGroup;
 			children = (
+				1FDEC0742015B94F006E9D1F /* CWCommon-ios.mm */,
+				1FDEC0782015C4E5006E9D1F /* CWCommon-mac.mm */,
 				1FFE17A11F9BB17200714066 /* CWCommon.cpp */,
 				1FFE17A21F9BB17200714066 /* CWCommon.h */,
 				1FDCF7BD1F738E1D00D9C608 /* CWTableView.cpp */,
@@ -734,6 +740,7 @@
 				1AF87B8B1F6F782A007BE51C /* RootViewController.mm in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				1FFE17A31F9BB17200714066 /* CWCommon.cpp in Sources */,
+				1FDEC0762015B94F006E9D1F /* CWCommon-ios.mm in Sources */,
 				1FDD94451C8337140031BC38 /* shanten.cpp in Sources */,
 				1F11543C1FF8F586000EF358 /* CompetitionMainScene.cpp in Sources */,
 				1AF87B8A1F6F7822007BE51C /* main.m in Sources */,
@@ -780,6 +787,7 @@
 				1FE17A7C1EE0FF9300B47FE3 /* CompetitionTableScene.cpp in Sources */,
 				1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				46880B8B19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
+				1FDEC07A2015C4E6006E9D1F /* CWCommon-mac.mm in Sources */,
 				1FDD94461C8337140031BC38 /* shanten.cpp in Sources */,
 				1FC616281FFB39C3005FC2F7 /* Toast.cpp in Sources */,
 				1FE04AE11C94682A008401EA /* RecordScene.cpp in Sources */,

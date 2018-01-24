@@ -103,7 +103,7 @@ static const mahjong::fan_t standardFans[mahjong::FAN_TABLE_SIZE] = {
 namespace {
     typedef struct {
         const char *const title;
-        const mahjong::fan_t *fans;
+        const mahjong::fan_t *const fans;
         size_t count;
         const mahjong::fan_t first_fan;
     } CellDetail;
@@ -123,6 +123,26 @@ static CellDetail cellDetails[11] = {
     { "88番", &standardFans[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
 };
 
+static void loadRecentFans() {
+    std::string str = UserDefault::getInstance()->getStringForKey("recent_fans");
+    if (str.empty()) {
+        return;
+    }
+
+    int recentFansInt[8];
+    if (8 == sscanf(str.c_str(), "%d %d %d %d %d %d %d %d",
+        &recentFansInt[0], &recentFansInt[1], &recentFansInt[2], &recentFansInt[3],
+        &recentFansInt[4], &recentFansInt[5], &recentFansInt[6], &recentFansInt[7])) {
+        std::transform(std::begin(recentFansInt), std::end(recentFansInt), std::begin(recentFans), [](int fan) { return static_cast<mahjong::fan_t>(fan); });
+    }
+}
+
+static void saveRecentFans() {
+    UserDefault::getInstance()->setStringForKey("recent_fans", Common::format("%d %d %d %d %d %d %d %d",
+        static_cast<int>(recentFans[0]), static_cast<int>(recentFans[1]), static_cast<int>(recentFans[2]), static_cast<int>(recentFans[3]),
+        static_cast<int>(recentFans[4]), static_cast<int>(recentFans[5]), static_cast<int>(recentFans[6]), static_cast<int>(recentFans[7])));
+}
+
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
 }
@@ -135,6 +155,12 @@ static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
 bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const Record::Detail *detail, const SubmitCallback &callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
+    }
+
+    static bool recentFansLoaded = false;
+    if (!recentFansLoaded) {
+        loadRecentFans();
+        recentFansLoaded = true;
     }
 
     _handIdx = handIdx;
@@ -495,7 +521,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&label = std::get<0>(ext);
-        std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(ext);
+        FakeCheckBox *checkBoxes = std::get<1>(ext).data();
 
         label = Label::createWithSystemFont("1番", "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -544,7 +570,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
     CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
-    std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(ext);
+    FakeCheckBox *checkBoxes = std::get<1>(ext).data();
 
     label->setString(detail.title);
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
@@ -1035,17 +1061,18 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
     }
     updateScoreLabel();
 
+    // 点击的不是「最近使用」
     if (checkBox.cell_idx != 0) {
-        // 如果在「最近使用」里，则更新
+        // 如果该番在「最近使用」里，则更新
         const auto it = std::find(std::begin(recentFans), std::end(recentFans), fan);
         if (it != std::end(recentFans)) {
             CustomCell *cell = (CustomCell *)_tableView->cellAtIndex(0);
-            if (cell != nullptr) {
+            if (cell != nullptr) {  // 「最近使用」的cell在绘制
                 // 相应CheckBox的下标
                 const ptrdiff_t idx = it - std::begin(recentFans);
 
                 // 刷新CheckBox
-                std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(cell->getExtData());
+                FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (fan == cellDetails[0].fans[idx]) {
                     checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
                 }
@@ -1056,17 +1083,17 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
         }
     }
     else {
-        // 点击「最近使用」，更新对应格子的番
-        ssize_t cellIdx = standardFanToCellIdx[fan];
+        // 点击「最近使用」，更新找到对应cell的番，更新
+        ssize_t cellIdx = standardFanToCellIdx[fan];  // 对应cell下标
         if (cellIdx != 0) {
             CustomCell *cell = (CustomCell *)_tableView->cellAtIndex(cellIdx);
-            if (cell != nullptr) {
+            if (cell != nullptr) {  // 该cell在绘制
                 // 相应CheckBox的下标
                 const CellDetail &detail = cellDetails[cellIdx];
                 const ssize_t idx = static_cast<ssize_t>(fan) - static_cast<ssize_t>(detail.first_fan);
 
                 // 刷新CheckBox
-                std::array<FakeCheckBox, 9> &checkBoxes = std::get<1>(cell->getExtData());
+                FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (fan == detail.fans[idx]) {
                     checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
                 }
@@ -1113,6 +1140,7 @@ void RecordScene::adjustRecentFans() {
 
     cellDetails[0].count = cnt;
     std::copy(std::begin(temp), std::begin(temp) + cnt, std::begin(recentFans));
+    saveRecentFans();
 }
 
 void RecordScene::onSubmitButton(cocos2d::Ref *) {

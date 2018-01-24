@@ -195,8 +195,8 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         const float width = visibleSize.width - 5.0f;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
-        std::array<Label *, 2> &label = std::get<1>(ext);
+        LayerColor **layerColors = std::get<0>(ext).data();
+        Label **label = std::get<1>(ext).data();
         ui::Button *&detailBtn = std::get<2>(ext);
 
         layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 50.0f);
@@ -228,8 +228,8 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    const std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
-    const std::array<Label *, 2> &label = std::get<1>(ext);
+    LayerColor *const *layerColors = std::get<0>(ext).data();
+    Label *const *label = std::get<1>(ext).data();
     ui::Button *detailBtn = std::get<2>(ext);
 
     layerColors[0]->setVisible(!(idx & 1));

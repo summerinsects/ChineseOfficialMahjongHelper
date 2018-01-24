@@ -27,8 +27,9 @@
 
 
 @interface RootViewController : UIViewController {
-
+    CGRect _viewFrame;
 }
-- (BOOL) prefersStatusBarHidden;
+
+- (id)initWithViewFrame:(CGRect)frame;
 
 @end

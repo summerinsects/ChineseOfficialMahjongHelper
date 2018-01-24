@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="org.cocos2dx.ChineseOfficialMahjongHelper"
       android:versionCode="24"
-      android:versionName="1.2.12"
+      android:versionName="1.2.13"
       android:installLocation="auto">
 
     <uses-sdk android:minSdkVersion="9"/>

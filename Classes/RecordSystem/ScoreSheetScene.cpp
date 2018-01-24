@@ -46,11 +46,25 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    // 用来绘制表格线的根结点
+    DrawNode *drawNode = DrawNode::create();
+    this->addChild(drawNode);
+
+    const float gap = visibleSize.width / 6;  // 分成6份
+    _cellWidth = gap;
+
+    const int cellCount = 21;  // 姓名+开局+每圈+累计+16盘+名次=21行
+    const float cellHeight = std::min<float>((visibleSize.height - 85.0f) / cellCount, 20.0f);
+    const float tableHeight = cellHeight * cellCount;
+    const float tableOffsetY = (visibleSize.height - 85.0f - tableHeight) * 0.5f + 25.0f;
+
+    drawNode->setPosition(Vec2(origin.x, origin.y + tableOffsetY));
+
     // 上方4个按钮
     const float buttonGap = (visibleSize.width - 4.0f - 55.0f) / 3.0f;
 
-    float xPos = origin.x + 2.0f + 55.0f * 0.5f;
-    float yPos = origin.y + visibleSize.height - 45.0f;
+    const float xPos = origin.x + 2.0f + 55.0f * 0.5f;
+    const float yPos = origin.y + tableOffsetY + tableHeight + 15.0f;
     static const char *titleText[4] = { "追分策略", "清空表格", "历史记录", "使用说明" };
     static void (ScoreSheetScene::*callbacks[4])(Ref *) = {
         &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onInstructionButton
@@ -77,33 +91,20 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     Label *label = Label::createWithSystemFont("当前时间", "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + 12.0f));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + tableOffsetY - 12.0f));
     label->setColor(Color3B::BLACK);
     _timeLabel = label;
-
-    // 用来绘制表格线的根结点
-    DrawNode *node = DrawNode::create();
-    this->addChild(node);
-
-    const float gap = visibleSize.width / 6;  // 分成6份
-    _cellWidth = gap;
-
-    const int cellCount = 21;  // 姓名+开局+每圈+累计+16盘+名次=21行
-    const float cellHeight = std::min<float>((visibleSize.height - 85.0f) / cellCount, 20.0f);
-    const float tableHeight = cellHeight * cellCount;
-
-    node->setPosition(Vec2(origin.x, origin.y + (visibleSize.height - 85.0f - cellHeight * cellCount) * 0.5f + 25.0f));
 
     // 5条竖线
     for (int i = 0; i < 5; ++i) {
         const float x = gap * (i + 1);
-        node->drawLine(Vec2(x, 0.0f), Vec2(x, tableHeight), Color4F::BLACK);
+        drawNode->drawLine(Vec2(x, 0.0f), Vec2(x, tableHeight), Color4F::BLACK);
     }
 
     // cellCount+1条横线
     for (int i = 0; i < cellCount + 1; ++i) {
         const float y = cellHeight * i;
-        node->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y),
+        drawNode->drawLine(Vec2(0.0f, y), Vec2(visibleSize.width, y),
             (i > 0 && i < 16) ? Color4F(0.3f, 0.3f, 0.3f, 1.0f) : Color4F::BLACK);
     }
 
@@ -115,7 +116,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label = Label::createWithSystemFont("选手姓名", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line1Y));
-    node->addChild(label);
+    drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     // 4个用于弹出输入框的AlertLayer及同位置的label
@@ -125,18 +126,18 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         widget->setTouchEnabled(true);
         widget->setPosition(Vec2(colPosX[i + 1], line1Y));
         widget->setContentSize(Size(gap, cellHeight));
-        node->addChild(widget);
+        drawNode->addChild(widget);
         widget->addClickEventListener(std::bind(&ScoreSheetScene::onNameButton, this, std::placeholders::_1, i));
 
         label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(Color3B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line1Y));
-        node->addChild(label);
+        drawNode->addChild(label);
         _nameLabel[i] = label;
     }
 
     ui::Button *button = UICommon::createButton();
-    node->addChild(button, -1);
+    drawNode->addChild(button, -1);
     button->setScale9Enabled(true);
     button->setContentSize(Size(gap, cellHeight));
     button->setTitleFontSize(12);
@@ -154,13 +155,13 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label = Label::createWithSystemFont(row0Text[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         label->setPosition(Vec2(colPosX[i], line2Y));
-        node->addChild(label);
+        drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         label = Label::createWithSystemFont(row1Text[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
         label->setPosition(Vec2(colPosX[i], line3Y));
-        node->addChild(label);
+        drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
     }
 
@@ -169,21 +170,21 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label = Label::createWithSystemFont("累计", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line4Y));
-    node->addChild(label);
+    drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("+0", "Arail", 12);
         label->setColor(Color3B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line4Y));
-        node->addChild(label);
+        drawNode->addChild(label);
         _totalLabel[i] = label;
 
         ui::Widget *widget = ui::Widget::create();
         widget->setTouchEnabled(true);
         widget->setPosition(Vec2(colPosX[i + 1], line4Y));
         widget->setContentSize(Size(gap, cellHeight));
-        node->addChild(widget);
+        drawNode->addChild(widget);
         widget->addClickEventListener(std::bind(&ScoreSheetScene::onScoreButton, this, std::placeholders::_1, i));
     }
 
@@ -193,14 +194,14 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label = Label::createWithSystemFont("名次", "Arail", 12);
     label->setColor(Color3B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line5Y));
-    node->addChild(label);
+    drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(Color3B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line5Y));
-        node->addChild(label);
+        drawNode->addChild(label);
 
         _rankLabels[i] = label;
     }
@@ -208,7 +209,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label = Label::createWithSystemFont("番种备注", "Arail", 12);
     label->setColor(Color3B::BLACK);
     label->setPosition(Vec2(colPosX[5], line5Y));
-    node->addChild(label);
+    drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     // 第6~21栏，东风东~北风北的计分
@@ -219,19 +220,19 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
         label->setColor(C3B_GRAY);
         label->setPosition(Vec2(colPosX[0], y));
-        node->addChild(label);
+        drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         // 四位选手得分
         for (int i = 0; i < 4; ++i) {
             _scoreLabels[k][i] = Label::createWithSystemFont("", "Arail", 12);
             _scoreLabels[k][i]->setPosition(Vec2(colPosX[i + 1], y));
-            node->addChild(_scoreLabels[k][i]);
+            drawNode->addChild(_scoreLabels[k][i]);
         }
 
         // 计分按钮
         ui::Button *button = UICommon::createButton();
-        node->addChild(button, -1);
+        drawNode->addChild(button, -1);
         button->setScale9Enabled(true);
         button->setContentSize(Size(gap, cellHeight));
         button->setTitleFontSize(12);
@@ -246,13 +247,13 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label = Label::createWithSystemFont("", "Arail", 12);
         label->setColor(C3B_GRAY);
         label->setPosition(Vec2(colPosX[5], y));
-        node->addChild(label);
+        drawNode->addChild(label);
         label->setVisible(false);
         _fanNameLabel[k] = label;
 
         // 查看详情按钮
         ui::Widget *widget = ui::Widget::create();
-        node->addChild(widget);
+        drawNode->addChild(widget);
         widget->setTouchEnabled(true);
         widget->setContentSize(Size(gap, cellHeight));
         widget->setPosition(Vec2(colPosX[5], y));
@@ -600,7 +601,7 @@ void ScoreSheetScene::reset() {
 
 void ScoreSheetScene::onNameButton(cocos2d::Ref *, size_t idx) {
     if (_record.start_time == 0) {
-        editNameAllAtOnce(idx);
+        editNameAllAtOnce();
     }
     else {
         const char *message = (_record.current_index < 16) ? "对局已经开始，是否要修改选手姓名？" : "对局已经结束，是否要修改选手姓名？";
@@ -715,9 +716,11 @@ bool ScoreSheetScene::submitName(const char *text, size_t idx) {
     return true;
 }
 
-void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
+void ScoreSheetScene::editNameAllAtOnce() {
+    const float limitWidth = std::min(AlertDialog::maxWidth(), 180.0f);
+
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(150.0f, 125.0f));
+    rootNode->setContentSize(Size(limitWidth, 125.0f));
 
     ui::Button *button1 = UICommon::createButton();
     rootNode->addChild(button1);
@@ -725,7 +728,7 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     button1->setContentSize(Size(55.0f, 20.0f));
     button1->setTitleFontSize(12);
     button1->setTitleText("清空全部");
-    button1->setPosition(Vec2(40.0f, 115.0f));
+    button1->setPosition(Vec2((limitWidth - 110.0f) / 3.0f + 27.5f, 115.0f));
     cw::scaleLabelToFitWidth(button1->getTitleLabel(), 50.0f);
 
     ui::Button *button2 = UICommon::createButton();
@@ -733,12 +736,15 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     button2->setScale9Enabled(true);
     button2->setContentSize(Size(55.0f, 20.0f));
     button2->setTitleFontSize(12);
-    button2->setTitleText("重新定庄");
-    button2->setPosition(Vec2(110.0f, 115.0f));
+    button2->setTitleText("随机排座");
+    button2->setPosition(Vec2(limitWidth - button1->getPositionX(), 115.0f));
     cw::scaleLabelToFitWidth(button2->getTitleLabel(), 50.0f);
 
-    std::array<ui::EditBox *, 4> editBoxes;
-
+    // 输入框
+    const float editBoxWidth = limitWidth - 20 - 50;
+    const float editBoxPosX = editBoxWidth * 0.5f + 20.0f;
+    auto sharedEditBoxes = std::make_shared<std::array<ui::EditBox *, 4> >();
+    ui::EditBox **editBoxes = sharedEditBoxes->data();
     for (int i = 0; i < 4; ++i) {
         const float yPos = 85.0f - i * 25.0f;
         Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
@@ -747,7 +753,7 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(5.0f, yPos));
 
-        ui::EditBox *editBox = UICommon::createEditBox(Size(120.0f, 20.0f));
+        ui::EditBox *editBox = UICommon::createEditBox(Size(editBoxWidth, 20.0f));
         editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
         editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
         editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
@@ -756,9 +762,45 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         editBox->setText(_record.name[i]);
         editBox->setMaxLength(NAME_SIZE - 1);
         rootNode->addChild(editBox);
-        editBox->setPosition(Vec2(85.0f, yPos));
+        editBox->setPosition(Vec2(editBoxPosX, yPos));
 
         editBoxes[i] = editBox;
+    }
+
+    // 上下移按钮
+    const float upPosX = limitWidth - 10.0f;
+    const float downPosX = limitWidth - 35.0f;
+    for (int i = 0; i < 4; ++i) {
+        const float yPos = 85.0f - i * 25.0f;
+        ui::Button *button = UICommon::createButton();
+        rootNode->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E");
+        button->setPosition(Vec2(upPosX, yPos));
+        button->setEnabled(i != 0);
+        button->addClickEventListener([editBoxes, i](Ref *) {
+            Vec2 pos = editBoxes[i]->getPosition();
+            editBoxes[i]->setPosition(editBoxes[i - 1]->getPosition());
+            editBoxes[i - 1]->setPosition(pos);
+            std::swap(editBoxes[i], editBoxes[i - 1]);
+        });
+
+        button = UICommon::createButton();
+        rootNode->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(20.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E");
+        button->setPosition(Vec2(downPosX, yPos));
+        button->setEnabled(i != 3);
+        button->addClickEventListener([editBoxes, i](Ref *) {
+            Vec2 pos = editBoxes[i]->getPosition();
+            editBoxes[i]->setPosition(editBoxes[i + 1]->getPosition());
+            editBoxes[i + 1]->setPosition(pos);
+            std::swap(editBoxes[i], editBoxes[i + 1]);
+        });
     }
 
     // 如果选手姓名皆为空，则填入上次对局的姓名
@@ -771,8 +813,8 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
     // EditBox的代理，使得能连续输入
     auto delegate = std::make_shared<NameEditBoxDelegate>([editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
         if (action == ui::EditBoxDelegate::EditBoxEndAction::TAB_TO_NEXT) {
-            auto it = std::find(editBoxes.begin(), editBoxes.end(), editBox);
-            if (it != editBoxes.end() && ++it != editBoxes.end()) {
+            auto it = std::find(&editBoxes[0], &editBoxes[4], editBox);
+            if (it != &editBoxes[4] && ++it != &editBoxes[4]) {
                 editBox = *it;
                 editBox->scheduleOnce([editBox](float) {
                     editBox->touchDownAction(editBox, cocos2d::ui::Widget::TouchEventType::ENDED);
@@ -790,7 +832,8 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, editBoxes, delegate](AlertDialog *, int) {
+        .setPositiveButton("确定", [this, sharedEditBoxes, delegate](AlertDialog *, int) {
+        ui::EditBox **editBoxes = sharedEditBoxes->data();
         // 获取四个输入框内容
         std::string names[4];
         for (int i = 0; i < 4; ++i) {
@@ -834,16 +877,10 @@ void ScoreSheetScene::editNameAllAtOnce(size_t idx) {
         return true;
     }).create()->show();
 
-    // 自动打开指定下标的editBox
-    ui::EditBox *editBox = editBoxes[idx];
-    editBox->scheduleOnce([editBox](float) {
-        editBox->touchDownAction(editBox, ui::Widget::TouchEventType::ENDED);
-    }, 0.0f, "open_keyboard");
-
     // 清空全部
     button1->addClickEventListener([editBoxes](Ref *) {
-        for (ui::EditBox *editBox : editBoxes) {
-            editBox->setText("");
+        for (int i = 0; i < 4; ++i) {
+            editBoxes[i]->setText("");
         }
     });
 
