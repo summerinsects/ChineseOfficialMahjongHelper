@@ -59,7 +59,6 @@ static AppDelegate s_sharedApplication;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
         UIEdgeInsets safeAreaInsets = window.safeAreaInsets;
-        NSLog(@"aaa %@", NSStringFromUIEdgeInsets(safeAreaInsets));
 #pragma clang diagnostic pop
         viewFrame.size.width -= safeAreaInsets.right;
         viewFrame.size.height -= safeAreaInsets.bottom;
