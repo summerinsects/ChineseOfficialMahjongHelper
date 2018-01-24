@@ -743,7 +743,8 @@ void ScoreSheetScene::editNameAllAtOnce() {
     // 输入框
     const float editBoxWidth = limitWidth - 20 - 50;
     const float editBoxPosX = editBoxWidth * 0.5f + 20.0f;
-    std::array<ui::EditBox *, 4> editBoxes;
+    auto sharedEditBoxes = std::make_shared<std::array<ui::EditBox *, 4> >();
+    ui::EditBox **editBoxes = sharedEditBoxes->data();
     for (int i = 0; i < 4; ++i) {
         const float yPos = 85.0f - i * 25.0f;
         Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
@@ -780,9 +781,10 @@ void ScoreSheetScene::editNameAllAtOnce() {
         button->setPosition(Vec2(upPosX, yPos));
         button->setEnabled(i != 0);
         button->addClickEventListener([editBoxes, i](Ref *) {
-            std::string temp = editBoxes[i]->getText();
-            editBoxes[i]->setText(editBoxes[i - 1]->getText());
-            editBoxes[i - 1]->setText(temp.c_str());
+            Vec2 pos = editBoxes[i]->getPosition();
+            editBoxes[i]->setPosition(editBoxes[i - 1]->getPosition());
+            editBoxes[i - 1]->setPosition(pos);
+            std::swap(editBoxes[i], editBoxes[i - 1]);
         });
 
         button = UICommon::createButton();
@@ -794,9 +796,10 @@ void ScoreSheetScene::editNameAllAtOnce() {
         button->setPosition(Vec2(downPosX, yPos));
         button->setEnabled(i != 3);
         button->addClickEventListener([editBoxes, i](Ref *) {
-            std::string temp = editBoxes[i]->getText();
-            editBoxes[i]->setText(editBoxes[i + 1]->getText());
-            editBoxes[i + 1]->setText(temp.c_str());
+            Vec2 pos = editBoxes[i]->getPosition();
+            editBoxes[i]->setPosition(editBoxes[i + 1]->getPosition());
+            editBoxes[i + 1]->setPosition(pos);
+            std::swap(editBoxes[i], editBoxes[i + 1]);
         });
     }
 
@@ -810,8 +813,8 @@ void ScoreSheetScene::editNameAllAtOnce() {
     // EditBox的代理，使得能连续输入
     auto delegate = std::make_shared<NameEditBoxDelegate>([editBoxes](ui::EditBox *editBox, ui::EditBoxDelegate::EditBoxEndAction action) {
         if (action == ui::EditBoxDelegate::EditBoxEndAction::TAB_TO_NEXT) {
-            auto it = std::find(editBoxes.begin(), editBoxes.end(), editBox);
-            if (it != editBoxes.end() && ++it != editBoxes.end()) {
+            auto it = std::find(&editBoxes[0], &editBoxes[4], editBox);
+            if (it != &editBoxes[4] && ++it != &editBoxes[4]) {
                 editBox = *it;
                 editBox->scheduleOnce([editBox](float) {
                     editBox->touchDownAction(editBox, cocos2d::ui::Widget::TouchEventType::ENDED);
@@ -829,7 +832,8 @@ void ScoreSheetScene::editNameAllAtOnce() {
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, editBoxes, delegate](AlertDialog *, int) {
+        .setPositiveButton("确定", [this, sharedEditBoxes, delegate](AlertDialog *, int) {
+        ui::EditBox **editBoxes = sharedEditBoxes->data();
         // 获取四个输入框内容
         std::string names[4];
         for (int i = 0; i < 4; ++i) {
@@ -875,8 +879,8 @@ void ScoreSheetScene::editNameAllAtOnce() {
 
     // 清空全部
     button1->addClickEventListener([editBoxes](Ref *) {
-        for (ui::EditBox *editBox : editBoxes) {
-            editBox->setText("");
+        for (int i = 0; i < 4; ++i) {
+            editBoxes[i]->setText("");
         }
     });
 
