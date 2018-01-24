@@ -103,7 +103,7 @@ static const mahjong::fan_t standardFans[mahjong::FAN_TABLE_SIZE] = {
 namespace {
     typedef struct {
         const char *const title;
-        const mahjong::fan_t *fans;
+        const mahjong::fan_t *const fans;
         size_t count;
         const mahjong::fan_t first_fan;
     } CellDetail;

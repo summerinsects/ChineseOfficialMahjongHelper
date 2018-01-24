@@ -12,7 +12,7 @@ static const char *principle_title[] = { "不重复原则", "不拆移原则", "
 namespace {
     typedef struct {
         const char *const title;
-        const char **fan_names;
+        const char *const *fan_names;
         const size_t count;
         const size_t begin_index;
     } CellDetail;
@@ -117,7 +117,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
     size_t idx0 = detail.begin_index;
-    const char **titleTexts = detail.fan_names;
+    const char *const *titleTexts = detail.fan_names;
 
     for (size_t k = 0; k < currentLevelCount; ++k) {
         ui::Button *button = buttons[k];
