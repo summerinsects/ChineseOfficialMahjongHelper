@@ -317,101 +317,100 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
     }
 
     try {
-        do {
-            std::string str(buffer->begin(), buffer->end());
-            rapidjson::Document doc;
-            doc.Parse<0>(str.c_str());
-            if (doc.HasParseError() || !doc.IsObject()) {
-                break;
-            }
+        std::string str(buffer->begin(), buffer->end());
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError() || !doc.IsObject()) {
+            return false;
+        }
 
-            rapidjson::Value::ConstMemberIterator it = doc.FindMember("tag_name");
-            if (it == doc.MemberEnd() || !it->value.IsString()) {
-                break;
-            }
-            std::string tag = it->value.GetString();
-            int major1, minor1, point1;
-            if (sscanf(tag.c_str(), "v%d.%d.%d", &major1, &minor1, &point1) != 3) {
-                break;
-            }
+        rapidjson::Value::ConstMemberIterator it = doc.FindMember("tag_name");
+        if (it == doc.MemberEnd() || !it->value.IsString()) {
+            return false;
+        }
+        std::string tag = it->value.GetString();
+        int major1, minor1, point1;
+        if (sscanf(tag.c_str(), "v%d.%d.%d", &major1, &minor1, &point1) != 3) {
+            return false;
+        }
 
-            std::string version = Application::getInstance()->getVersion();
-            int a, b, c;
-            if (sscanf(version.c_str(), "%d.%d.%d", &a, &b, &c) != 3) {
-                break;
-            }
+        std::string version = Application::getInstance()->getVersion();
+        int a, b, c;
+        if (sscanf(version.c_str(), "%d.%d.%d", &a, &b, &c) != 3) {
+            return false;
+        }
 
-            bool hasNewVersion = false;
-            if (major1 > a) {
+        bool hasNewVersion = false;
+        if (major1 > a) {
+            hasNewVersion = true;
+        }
+        else if (major1 == a) {
+            if (minor1 > b) {
                 hasNewVersion = true;
             }
-            else if (major1 == a) {
-                if (minor1 > b) {
+            else if (minor1 == b) {
+                if (point1 > c) {
                     hasNewVersion = true;
                 }
-                else if (minor1 == b) {
-                    if (point1 > c) {
-                        hasNewVersion = true;
-                    }
-                }
             }
+        }
 
-            if (!hasNewVersion) {
-                if (manual) {
-                    Toast::makeText(this, __UTF8("已经是最新版本"), Toast::LENGTH_LONG)->show();
+        if (!hasNewVersion) {
+            if (manual) {
+                Toast::makeText(this, __UTF8("已经是最新版本"), Toast::LENGTH_LONG)->show();
+            }
+            return true;
+        }
+
+        _redPointSprite->setVisible(true);
+
+        Node *rootNode = Node::create();
+        ui::CheckBox *checkBox = nullptr;
+        if (!manual) {
+            checkBox = UICommon::createCheckBox();
+            rootNode->addChild(checkBox);
+            checkBox->setZoomScale(0.0f);
+            checkBox->ignoreContentAdaptWithSize(false);
+            checkBox->setContentSize(Size(20.0f, 20.0f));
+            checkBox->setPosition(Vec2(10.0f, 10.0f));
+
+            Label *label = Label::createWithSystemFont(__UTF8("今日之内不再提示"), "Arial", 12);
+            label->setColor(Color3B::BLACK);
+            rootNode->addChild(label);
+            label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+            label->setPosition(Vec2(25.0f, 10.0f));
+
+            rootNode->setContentSize(Size(25.0f + label->getContentSize().width, 20.0f));
+        }
+
+        it = doc.FindMember("body");
+        std::string body;
+        if (it != doc.MemberEnd() && it->value.IsString()) {
+            body = it->value.GetString();
+        }
+
+        AlertDialog::Builder(this)
+            .setTitle(__UTF8("检测到新版本"))
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+            .setMessage(Common::format(__UTF8("%s，是否下载？\n\n%s"), tag.c_str(), body.c_str()))
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+            .setMessage(Common::format(__UTF8("%s，是否下载？\n提取密码xyg\n\n%s"), tag.c_str(), body.c_str()))
+#endif
+            .setContentNode(rootNode)
+            .setCloseOnTouchOutside(false)
+            .setNegativeButton(__UTF8("取消"), [checkBox](AlertDialog *, int) {
+                if (checkBox != nullptr && checkBox->isSelected()) {
+                    UserDefault::getInstance()->setStringForKey("not_notify", std::to_string(time(nullptr)));
                 }
                 return true;
-            }
+            })
+            .setPositiveButton(__UTF8("更新"), [](AlertDialog *, int) {
+                Application::getInstance()->openURL(DOWNLOAD_URL);
+                return true;
+            })
+            .create()->show();
 
-            _redPointSprite->setVisible(true);
-
-            Node *rootNode = Node::create();
-            ui::CheckBox *checkBox = nullptr;
-            if (!manual) {
-                checkBox = UICommon::createCheckBox();
-                rootNode->addChild(checkBox);
-                checkBox->setZoomScale(0.0f);
-                checkBox->ignoreContentAdaptWithSize(false);
-                checkBox->setContentSize(Size(20.0f, 20.0f));
-                checkBox->setPosition(Vec2(10.0f, 10.0f));
-
-                Label *label = Label::createWithSystemFont(__UTF8("今日之内不再提示"), "Arial", 12);
-                label->setColor(Color3B::BLACK);
-                rootNode->addChild(label);
-                label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-                label->setPosition(Vec2(25.0f, 10.0f));
-
-                rootNode->setContentSize(Size(25.0f + label->getContentSize().width, 20.0f));
-            }
-
-            it = doc.FindMember("body");
-            std::string body;
-            if (it != doc.MemberEnd() && it->value.IsString()) {
-                body = it->value.GetString();
-            }
-
-            AlertDialog::Builder(this)
-                .setTitle(__UTF8("检测到新版本"))
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-                .setMessage(Common::format(__UTF8("%s，是否下载？\n\n%s"), tag.c_str(), body.c_str()))
-#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-                .setMessage(Common::format(__UTF8("%s，是否下载？\n提取密码xyg\n\n%s"), tag.c_str(), body.c_str()))
-#endif
-                .setContentNode(rootNode)
-                .setCloseOnTouchOutside(false)
-                .setNegativeButton(__UTF8("取消"), [checkBox](AlertDialog *, int) {
-                    if (checkBox != nullptr && checkBox->isSelected()) {
-                        UserDefault::getInstance()->setStringForKey("not_notify", std::to_string(time(nullptr)));
-                    }
-                    return true;
-                })
-                .setPositiveButton(__UTF8("更新"), [](AlertDialog *, int) {
-                    Application::getInstance()->openURL(DOWNLOAD_URL);
-                    return true;
-                })
-                .create()->show();
-            return true;
-        } while (0);
+        return true;
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
@@ -419,4 +418,5 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 
     return false;
 }
+
 #endif
