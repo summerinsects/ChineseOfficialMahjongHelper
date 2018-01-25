@@ -137,7 +137,7 @@ bool TilePickWidget::initWithWidth(float maxWidth) {
 
     // 排列按钮
     ui::Button *buttons[8];
-    static const char *titleText[8] = {"吃 _XX", "吃 X_X", "吃 XX_", "排序", "碰", "明杠", "暗杠", "清空" };
+    static const char *titleText[8] = { __UTF8("吃 _XX"), __UTF8("吃 X_X"), __UTF8("吃 XX_"), __UTF8("排序"), __UTF8("碰"), __UTF8("明杠"), __UTF8("暗杠"), __UTF8("清空") };
 
     for (int i = 0; i < 8; ++i) {
         int col = i >> 2;

@@ -14,14 +14,14 @@ USING_NS_CC;
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 bool LatestCompetitionScene::init() {
-    if (UNLIKELY(!BaseScene::initWithTitle("近期赛事"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("近期赛事")))) {
         return false;
     }
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Label *label = Label::createWithSystemFont("宣传赛事信息，请联系逍遥宫", "Arial", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("宣传赛事信息，请联系逍遥宫"), "Arial", 12);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
     label->setColor(Color3B::ORANGE);
@@ -40,7 +40,7 @@ bool LatestCompetitionScene::init() {
     this->addChild(tableView);
     _tableView = tableView;
 
-    label = Label::createWithSystemFont("无近期赛事信息", "Arial", 12);
+    label = Label::createWithSystemFont(__UTF8("无近期赛事信息"), "Arial", 12);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 75.0f));
     label->setColor(Color3B::BLACK);
@@ -76,10 +76,10 @@ void LatestCompetitionScene::requestCompetitions() {
         LatestCompetitionScene *pthis = thiz.get();
         if (response == nullptr) {
             AlertDialog::Builder(pthis)
-                .setTitle("提示")
-                .setMessage("获取近期赛事失败")
-                .setNegativeButton("取消", nullptr)
-                .setPositiveButton("重试", [pthis](AlertDialog *, int) {
+                .setTitle(__UTF8("提示"))
+                .setMessage(__UTF8("获取近期赛事失败"))
+                .setNegativeButton(__UTF8("取消"), nullptr)
+                .setPositiveButton(__UTF8("重试"), [pthis](AlertDialog *, int) {
                 pthis->requestCompetitions();
                 return true;
             }).create()->show();
@@ -92,10 +92,10 @@ void LatestCompetitionScene::requestCompetitions() {
             log("response failed");
             log("error buffer: %s", response->getErrorBuffer());
             AlertDialog::Builder(pthis)
-                .setTitle("提示")
-                .setMessage("获取近期赛事失败")
-                .setNegativeButton("取消", nullptr)
-                .setPositiveButton("重试", [pthis](AlertDialog *, int) {
+                .setTitle(__UTF8("提示"))
+                .setMessage(__UTF8("获取近期赛事失败"))
+                .setNegativeButton(__UTF8("取消"), nullptr)
+                .setPositiveButton(__UTF8("重试"), [pthis](AlertDialog *, int) {
                 pthis->requestCompetitions();
                 return true;
             }).create()->show();
@@ -221,7 +221,7 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         detailBtn->setScale9Enabled(true);
         detailBtn->setContentSize(Size(40.0f, 20.0f));
         detailBtn->setTitleFontSize(12);
-        detailBtn->setTitleText("详情");
+        detailBtn->setTitleText(__UTF8("详情"));
         detailBtn->addClickEventListener(std::bind(&LatestCompetitionScene::onDetailButton, this, std::placeholders::_1));
         cell->addChild(detailBtn);
         detailBtn->setPosition(Vec2(width - 25.0f, 25.0f));
@@ -245,38 +245,38 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
 
     switch (info.timeAccuracy) {
     default:
-        date = "具体时间待定";
+        date = __UTF8("具体时间待定");
         break;
     case TIME_ACCURACY::MONTHS:
-        date = Common::format("%d年%d月", ret.tm_year + 1900, ret.tm_mon + 1);
+        date = Common::format(__UTF8("%d年%d月"), ret.tm_year + 1900, ret.tm_mon + 1);
         if (info.endTime != 0) {
-            date.append("——");
+            date.append(__UTF8("——"));
             ret = *localtime(&info.endTime);
-            date.append(Common::format("%d年%d月", ret.tm_year + 1900, ret.tm_mon + 1));
+            date.append(Common::format(__UTF8("%d年%d月"), ret.tm_year + 1900, ret.tm_mon + 1));
         }
         break;
     case TIME_ACCURACY::DAYS:
-        date = Common::format("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
+        date = Common::format(__UTF8("%d年%d月%d日"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday);
         if (info.endTime != 0) {
-            date.append("——");
+            date.append(__UTF8("——"));
             ret = *localtime(&info.endTime);
-            date.append(Common::format("%d年%d月%d日", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday));
+            date.append(Common::format(__UTF8("%d年%d月%d日"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday));
         }
         break;
     case TIME_ACCURACY::HONRS:
-        date = Common::format("%d年%d月%d日%.2d点", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour);
+        date = Common::format(__UTF8("%d年%d月%d日%.2d点"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour);
         if (info.endTime != 0) {
-            date.append("——");
+            date.append(__UTF8("——"));
             ret = *localtime(&info.endTime);
-            date.append(Common::format("%d年%d月%d日%.2d点", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour));
+            date.append(Common::format(__UTF8("%d年%d月%d日%.2d点"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour));
         }
         break;
     case TIME_ACCURACY::MINUTES:
-        date = Common::format("%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        date = Common::format(__UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (info.endTime != 0) {
-            date.append("——");
+            date.append(__UTF8("——"));
             ret = *localtime(&info.endTime);
-            date.append(Common::format("%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
+            date.append(Common::format(__UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
         }
         break;
     }

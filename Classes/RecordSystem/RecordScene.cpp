@@ -110,17 +110,17 @@ namespace {
 }
 
 static CellDetail cellDetails[11] = {
-    { "最近使用", recentFans, 8, mahjong::FAN_NONE },
-    { "4番", &standardFans[mahjong::OUTSIDE_HAND], 4, mahjong::OUTSIDE_HAND },
-    { "6番", &standardFans[mahjong::ALL_PUNGS], 7, mahjong::ALL_PUNGS },
-    { "8番", &standardFans[mahjong::MIXED_STRAIGHT], 9, mahjong::MIXED_STRAIGHT },
-    { "12番", &standardFans[mahjong::LESSER_HONORS_AND_KNITTED_TILES], 5, mahjong::LESSER_HONORS_AND_KNITTED_TILES },
-    { "16番", &standardFans[mahjong::PURE_STRAIGHT], 6, mahjong::PURE_STRAIGHT },
-    { "24番", &standardFans[mahjong::SEVEN_PAIRS], 9, mahjong::SEVEN_PAIRS },
-    { "32番", &standardFans[mahjong::FOUR_PURE_SHIFTED_CHOWS], 3, mahjong::FOUR_PURE_SHIFTED_CHOWS },
-    { "48番", &standardFans[mahjong::QUADRUPLE_CHOW], 2, mahjong::QUADRUPLE_CHOW },
-    { "64番", &standardFans[mahjong::ALL_TERMINALS], 6, mahjong::ALL_TERMINALS },
-    { "88番", &standardFans[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
+    { __UTF8("最近使用"), recentFans, 8, mahjong::FAN_NONE },
+    { __UTF8("4番"), &standardFans[mahjong::OUTSIDE_HAND], 4, mahjong::OUTSIDE_HAND },
+    { __UTF8("6番"), &standardFans[mahjong::ALL_PUNGS], 7, mahjong::ALL_PUNGS },
+    { __UTF8("8番"), &standardFans[mahjong::MIXED_STRAIGHT], 9, mahjong::MIXED_STRAIGHT },
+    { __UTF8("12番"), &standardFans[mahjong::LESSER_HONORS_AND_KNITTED_TILES], 5, mahjong::LESSER_HONORS_AND_KNITTED_TILES },
+    { __UTF8("16番"), &standardFans[mahjong::PURE_STRAIGHT], 6, mahjong::PURE_STRAIGHT },
+    { __UTF8("24番"), &standardFans[mahjong::SEVEN_PAIRS], 9, mahjong::SEVEN_PAIRS },
+    { __UTF8("32番"), &standardFans[mahjong::FOUR_PURE_SHIFTED_CHOWS], 3, mahjong::FOUR_PURE_SHIFTED_CHOWS },
+    { __UTF8("48番"), &standardFans[mahjong::QUADRUPLE_CHOW], 2, mahjong::QUADRUPLE_CHOW },
+    { __UTF8("64番"), &standardFans[mahjong::ALL_TERMINALS], 6, mahjong::ALL_TERMINALS },
+    { __UTF8("88番"), &standardFans[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
 };
 
 static void loadRecentFans() {
@@ -199,7 +199,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     editBox->setDelegate(this);
     _editBox = editBox;
 
-    Label *label = Label::createWithSystemFont("番", "Arial", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("番"), "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -230,7 +230,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     checkBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
     _drawBox = checkBox;
 
-    label = Label::createWithSystemFont("荒庄", "Arial", 12);
+    label = Label::createWithSystemFont(__UTF8("荒庄"), "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -242,12 +242,12 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("罚分调整");
+    button->setTitleText(__UTF8("罚分调整"));
     button->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 70.0f));
     button->addClickEventListener(std::bind(&RecordScene::onPenaltyButton, this, std::placeholders::_1, names));
 
     // 说明文本
-    label = Label::createWithSystemFont("番数支持直接输入，强烈建议先「标记主番」直接增加番数，再用+-按钮调整。",
+    label = Label::createWithSystemFont(__UTF8("番数支持直接输入，强烈建议先「标记主番」直接增加番数，再用+-按钮调整。"),
         "Arial", 10, Size(visibleSize.width - 75.0f, 0.0f));
     label->setColor(C3B_GRAY);
     this->addChild(label);
@@ -295,7 +295,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         button->setPosition(Vec2(x - 15.0f, y));
         winGroup->addRadioButton(button);
 
-        label = Label::createWithSystemFont("和牌", "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("和牌"), "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -311,14 +311,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         button->setPosition(Vec2(x - 15.0f, y));
         claimGroup->addRadioButton(button);
 
-        label = Label::createWithSystemFont("点炮", "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("点炮"), "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, y));
         _byDiscardLabel[i] = label;
 
-        label = Label::createWithSystemFont("自摸", "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("自摸"), "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -328,7 +328,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 罚分
         y = origin.y + visibleSize.height - 195.0f;
-        label = Label::createWithSystemFont("调整 ", "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("调整 "), "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
@@ -359,7 +359,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     topNode->drawLine(Vec2(0.0f, 50.0f), Vec2(visibleSize.width, 50.0f), Color4F::BLACK);
 
     // 说明
-    label = Label::createWithSystemFont("标记主番（4番以上）", "Arial", 12);
+    label = Label::createWithSystemFont(__UTF8("标记主番（4番以上）"), "Arial", 12);
     label->setColor(Color3B::BLACK);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -377,7 +377,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("记录和牌");
+    button->setTitleText(__UTF8("记录和牌"));
     button->addClickEventListener([this](Ref *) { onRecordTilesButton(nullptr); });
     topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 100.0f, 35.0f));
@@ -388,7 +388,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("小番");
+    button->setTitleText(__UTF8("小番"));
     button->addClickEventListener([this](Ref *) { showLittleFanAlert(false); });
     topNode->addChild(button);
     button->setPosition(Vec2(visibleSize.width - 35.0f, 10.0f));
@@ -416,13 +416,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         if (layoutButton->getUserData()) {
             layoutSize.height = visibleSize.height - 145.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
-            layoutButton->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E收起");
+            layoutButton->setTitleText(__UTF8("\xE2\xAC\x87\xEF\xB8\x8E收起"));
             radioNode->setVisible(false);
         }
         else {
             layoutSize.height = visibleSize.height - 225.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(true));
-            layoutButton->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E展开");
+            layoutButton->setTitleText(__UTF8("\xE2\xAC\x86\xEF\xB8\x8E展开"));
             radioNode->setVisible(true);
         }
 
@@ -435,7 +435,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     layoutButton->addClickEventListener(onLayoutButton);
 
     // 跳到
-    label = Label::createWithSystemFont("跳到", "Arial", 12);
+    label = Label::createWithSystemFont(__UTF8("跳到"), "Arial", 12);
     label->setColor(Color3B::BLACK);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -443,7 +443,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
     // 6 8 12 16 24
     const float labelPosX = label->getContentSize().width + 5.0f + 2.0f;
-    static const char *text[] = { "6番", "8番", "12番", "16番", "24番" };
+    static const char *text[] = { __UTF8("6番"), __UTF8("8番"), __UTF8("12番"), __UTF8("16番"), __UTF8("24番") };
     for (size_t i = 0; i < 5; ++i) {
         button = UICommon::createButton();
         button->setScale9Enabled(true);
@@ -461,7 +461,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->setScale9Enabled(true);
     button->setContentSize(Size(50.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("提交");
+    button->setTitleText(__UTF8("提交"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&RecordScene::onSubmitButton, this, std::placeholders::_1));
     button->setEnabled(false);
@@ -523,7 +523,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         Label *&label = std::get<0>(ext);
         FakeCheckBox *checkBoxes = std::get<1>(ext).data();
 
-        label = Label::createWithSystemFont("1番", "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("1番"), "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
         label->setColor(Color3B::BLACK);
@@ -745,7 +745,7 @@ void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {
 
 void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
     if (_drawBox->isSelected()) {
-        Toast::makeText(this, "荒庄时不能记录和牌", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("荒庄时不能记录和牌"), Toast::LENGTH_LONG)->show();
         return;
     }
 
@@ -867,11 +867,11 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     }
 
     AlertDialog::Builder(this)
-        .setTitle("罚分调整")
+        .setTitle(__UTF8("罚分调整"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, penaltyScores](AlertDialog *, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, penaltyScores](AlertDialog *, int) {
         memcpy(&_detail.penalty_scores, penaltyScores->data(), sizeof(_detail.penalty_scores));
         for (int i = 0; i < 4; ++i) {
             updatePenaltyLabel(_penaltyLabel[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
@@ -985,11 +985,11 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
     }
 
     AlertDialog::Builder(this)
-        .setTitle("标记小番")
+        .setTitle(__UTF8("标记小番"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, checkBoxes, labels, callFromSubmiting](AlertDialog *, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, checkBoxes, labels, callFromSubmiting](AlertDialog *, int) {
         uint16_t uniqueFan = 0;
         uint64_t multipleFan = 0;
         for (int i = 0; i < 14; ++i) {
@@ -1147,10 +1147,10 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
     if (_detail.fan_flag != 0 || _detail.unique_fan != 0 || _detail.multiple_fan != 0) {  // 标记了番种
         if (_drawBox->isSelected()) {  // 荒庄
             AlertDialog::Builder(this)
-                .setTitle("记分")
-                .setMessage("你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？")
-                .setNegativeButton("取消", nullptr)
-                .setPositiveButton("确定", [this](AlertDialog *, int) {
+                .setTitle(__UTF8("记分"))
+                .setMessage(__UTF8("你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？"))
+                .setNegativeButton(__UTF8("取消"), nullptr)
+                .setPositiveButton(__UTF8("确定"), [this](AlertDialog *, int) {
                 _detail.fan_flag = 0;
                 _detail.unique_fan = 0;
                 _detail.multiple_fan = 0;
@@ -1220,31 +1220,31 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
 
     // 通过AlertDialog显示出来
     AlertDialog::Builder(this)
-        .setTitle("记录和牌")
+        .setTitle(__UTF8("记录和牌"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, tilePicker, extraInfo, param](AlertDialog *dlg, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, tilePicker, extraInfo, param](AlertDialog *dlg, int) {
         mahjong::calculate_param_t temp = { 0 };
         tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
         if (temp.win_tile == 0 && temp.hand_tiles.tile_count == 0 && temp.hand_tiles.pack_count == 0) {
             AlertDialog::Builder(this)
-                .setTitle("记录和牌")
-                .setMessage("确定不记录和牌吗？")
-                .setPositiveButton("确定", [this, dlg](AlertDialog *, int) { dlg->dismiss(); return true; })
-                .setNegativeButton("取消", nullptr)
+                .setTitle(__UTF8("记录和牌"))
+                .setMessage(__UTF8("确定不记录和牌吗？"))
+                .setPositiveButton(__UTF8("确定"), [this, dlg](AlertDialog *, int) { dlg->dismiss(); return true; })
+                .setNegativeButton(__UTF8("取消"), nullptr)
                 .create()->show();
             return false;
         }
 
         temp.flower_count = static_cast<uint8_t>(extraInfo->getFlowerCount());
         if (temp.flower_count > 8) {
-            Toast::makeText(this, "花牌数的范围为0~8", Toast::LENGTH_LONG)->show();
+            Toast::makeText(this, __UTF8("花牌数的范围为0~8"), Toast::LENGTH_LONG)->show();
             return false;
         }
 
         if (temp.win_tile == 0) {
-            Toast::makeText(this, "牌张数错误", Toast::LENGTH_LONG)->show();
+            Toast::makeText(this, __UTF8("牌张数错误"), Toast::LENGTH_LONG)->show();
             return false;
         }
 
@@ -1263,15 +1263,15 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
         int fan = mahjong::calculate_fan(&temp, &fan_table);
 
         if (fan == ERROR_NOT_WIN) {
-            Toast::makeText(this, "诈和", Toast::LENGTH_LONG)->show();
+            Toast::makeText(this, __UTF8("诈和"), Toast::LENGTH_LONG)->show();
             return false;
         }
         if (fan == ERROR_WRONG_TILES_COUNT) {
-            Toast::makeText(this, "牌张数错误", Toast::LENGTH_LONG)->show();
+            Toast::makeText(this, __UTF8("牌张数错误"), Toast::LENGTH_LONG)->show();
             return false;
         }
         if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
-            Toast::makeText(this, "同一种牌最多只能使用4枚", Toast::LENGTH_LONG)->show();
+            Toast::makeText(this, __UTF8("同一种牌最多只能使用4枚"), Toast::LENGTH_LONG)->show();
             return false;
         }
 
@@ -1335,10 +1335,10 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
         }
 
         AlertDialog::Builder(this)
-            .setTitle("记录和牌")
+            .setTitle(__UTF8("记录和牌"))
             .setContentNode(innerNode)
             .setCloseOnTouchOutside(false)
-            .setPositiveButton("确定", [this, temp, fan, fanFlag, uniqueFan, multipleFan, dlg](AlertDialog *, int) {
+            .setPositiveButton(__UTF8("确定"), [this, temp, fan, fanFlag, uniqueFan, multipleFan, dlg](AlertDialog *, int) {
             _detail.fan = std::max<uint16_t>(fan, 8);
             _detail.fan_flag = fanFlag;
             _detail.unique_fan = uniqueFan;
@@ -1368,7 +1368,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
             refresh();
             dlg->dismiss();
             return true;
-        }).setNegativeButton("取消", nullptr).create()->show();
+        }).setNegativeButton(__UTF8("取消"), nullptr).create()->show();
         return false;
     }).create()->show();
 }

@@ -5,6 +5,19 @@
 #pragma execution_character_set("utf-8")
 #endif
 
+#ifndef __UTF8_TEXT
+// VS2015 GCC4.7 Clang5.0
+#if (defined(_MSC_VER) && (_MSC_VER >= 1900)) || (defined(__GNUC__) && ((__GNUC__ << 8 | __GNUC_MINOR__) >= 0x407)) || (defined(__clang__) && (__clang_major__ >= 5))
+#define __UTF8_TEXT(quote) u8 ## quote
+#else
+#define __UTF8_TEXT(quote) quote
+#endif
+#endif
+
+#ifndef __UTF8
+#define __UTF8(quote) __UTF8_TEXT(quote)
+#endif
+
 // cdecl
 #ifndef CDECL
 #if defined(_MSC_VER)

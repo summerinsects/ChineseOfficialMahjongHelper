@@ -7,7 +7,7 @@ USING_NS_CC;
 
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
-static const char *principle_title[] = { "不重复原则", "不拆移原则", "不得相同原则", "就高不就低", "套算一次原则" };
+static const char *principle_title[] = { __UTF8("不重复原则"), __UTF8("不拆移原则"), __UTF8("不得相同原则"), __UTF8("就高不就低"), __UTF8("套算一次原则") };
 
 namespace {
     typedef struct {
@@ -19,19 +19,19 @@ namespace {
 }
 
 static const CellDetail cellDetails[13] = {
-    { "基本计分原则", principle_title, 5, 100 },
-    { "1番", &mahjong::fan_name[mahjong::PURE_DOUBLE_CHOW], 13, mahjong::PURE_DOUBLE_CHOW },
-    { "2番", &mahjong::fan_name[mahjong::DRAGON_PUNG], 10, mahjong::DRAGON_PUNG },
-    { "4番", &mahjong::fan_name[mahjong::OUTSIDE_HAND], 4, mahjong::OUTSIDE_HAND },
-    { "6番", &mahjong::fan_name[mahjong::ALL_PUNGS], 7, mahjong::ALL_PUNGS },
-    { "8番", &mahjong::fan_name[mahjong::MIXED_STRAIGHT], 9, mahjong::MIXED_STRAIGHT },
-    { "12番", &mahjong::fan_name[mahjong::LESSER_HONORS_AND_KNITTED_TILES], 5, mahjong::LESSER_HONORS_AND_KNITTED_TILES },
-    { "16番", &mahjong::fan_name[mahjong::PURE_STRAIGHT], 6, mahjong::PURE_STRAIGHT },
-    { "24番", &mahjong::fan_name[mahjong::SEVEN_PAIRS], 9, mahjong::SEVEN_PAIRS },
-    { "32番", &mahjong::fan_name[mahjong::FOUR_PURE_SHIFTED_CHOWS], 3, mahjong::FOUR_PURE_SHIFTED_CHOWS },
-    { "48番", &mahjong::fan_name[mahjong::QUADRUPLE_CHOW], 2, mahjong::QUADRUPLE_CHOW },
-    { "64番", &mahjong::fan_name[mahjong::ALL_TERMINALS], 6, mahjong::ALL_TERMINALS },
-    { "88番", &mahjong::fan_name[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
+    { __UTF8("基本计分原则"), principle_title, 5, 100 },
+    { __UTF8("1番"), &mahjong::fan_name[mahjong::PURE_DOUBLE_CHOW], 13, mahjong::PURE_DOUBLE_CHOW },
+    { __UTF8("2番"), &mahjong::fan_name[mahjong::DRAGON_PUNG], 10, mahjong::DRAGON_PUNG },
+    { __UTF8("4番"), &mahjong::fan_name[mahjong::OUTSIDE_HAND], 4, mahjong::OUTSIDE_HAND },
+    { __UTF8("6番"), &mahjong::fan_name[mahjong::ALL_PUNGS], 7, mahjong::ALL_PUNGS },
+    { __UTF8("8番"), &mahjong::fan_name[mahjong::MIXED_STRAIGHT], 9, mahjong::MIXED_STRAIGHT },
+    { __UTF8("12番"), &mahjong::fan_name[mahjong::LESSER_HONORS_AND_KNITTED_TILES], 5, mahjong::LESSER_HONORS_AND_KNITTED_TILES },
+    { __UTF8("16番"), &mahjong::fan_name[mahjong::PURE_STRAIGHT], 6, mahjong::PURE_STRAIGHT },
+    { __UTF8("24番"), &mahjong::fan_name[mahjong::SEVEN_PAIRS], 9, mahjong::SEVEN_PAIRS },
+    { __UTF8("32番"), &mahjong::fan_name[mahjong::FOUR_PURE_SHIFTED_CHOWS], 3, mahjong::FOUR_PURE_SHIFTED_CHOWS },
+    { __UTF8("48番"), &mahjong::fan_name[mahjong::QUADRUPLE_CHOW], 2, mahjong::QUADRUPLE_CHOW },
+    { __UTF8("64番"), &mahjong::fan_name[mahjong::ALL_TERMINALS], 6, mahjong::ALL_TERMINALS },
+    { __UTF8("88番"), &mahjong::fan_name[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
 };
 
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
@@ -39,7 +39,7 @@ static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
 }
 
 bool FanTableScene::init() {
-    if (UNLIKELY(!BaseScene::initWithTitle("国标麻将番种表"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("国标麻将番种表")))) {
         return false;
     }
 
@@ -87,7 +87,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         Label *&label = std::get<0>(ext);
         ui::Button **buttons = std::get<1>(ext).data();
 
-        label = Label::createWithSystemFont("1番", "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("1番"), "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
         label->setColor(Color3B::BLACK);

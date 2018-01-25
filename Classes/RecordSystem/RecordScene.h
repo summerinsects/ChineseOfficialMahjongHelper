@@ -11,8 +11,10 @@ class TilePickWidget;
 class ExtraInfoWidget;
 
 static const char *handNameText[] = {
-    "东风东", "东风南", "东风西", "东风北", "南风东", "南风南", "南风西", "南风北",
-    "西风东", "西风南", "西风西", "西风北", "北风东", "北风南", "北风西", "北风北"
+    __UTF8("东风东"), __UTF8("东风南"), __UTF8("东风西"), __UTF8("东风北"),
+    __UTF8("南风东"), __UTF8("南风南"), __UTF8("南风西"), __UTF8("南风北"),
+    __UTF8("西风东"), __UTF8("西风南"), __UTF8("西风西"), __UTF8("西风北"),
+    __UTF8("北风东"), __UTF8("北风南"), __UTF8("北风西"), __UTF8("北风北")
 };
 
 #define EMOJI_FLOWER "\xF0\x9F\x8C\xB8"

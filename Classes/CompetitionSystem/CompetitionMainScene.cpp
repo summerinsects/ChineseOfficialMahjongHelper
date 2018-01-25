@@ -5,7 +5,7 @@
 USING_NS_CC;
 
 bool CompetitionMainScene::init() {
-    if (UNLIKELY(!BaseScene::initWithTitle("比赛"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("比赛")))) {
         return false;
     }
 
@@ -17,7 +17,7 @@ bool CompetitionMainScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleText("近期赛事");
+    button->setTitleText(__UTF8("近期赛事"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
     button->addClickEventListener([this](Ref *) {
         Director::getInstance()->pushScene(LatestCompetitionScene::create());

@@ -16,7 +16,7 @@ static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 static mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile);
 
 bool MahjongTheoryScene::init() {
-    if (UNLIKELY(!BaseScene::initWithTitle("牌理"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("牌理")))) {
         return false;
     }
 
@@ -32,7 +32,7 @@ bool MahjongTheoryScene::init() {
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
-    editBox->setPlaceHolder("在此处输入");
+    editBox->setPlaceHolder(__UTF8("在此处输入"));
     editBox->setMaxLength(50);
     editBox->setDelegate(this);
     editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40.0f, origin.y + visibleSize.height - 50.0f));
@@ -52,7 +52,7 @@ bool MahjongTheoryScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("随机");
+    button->setTitleText(__UTF8("随机"));
     this->addChild(button);
     button->setPosition(Vec2(origin.x + visibleSize.width - 65.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener([this](Ref *) { setRandomInput(); });
@@ -62,7 +62,7 @@ bool MahjongTheoryScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("说明");
+    button->setTitleText(__UTF8("说明"));
     this->addChild(button);
     button->setPosition(Vec2(origin.x + visibleSize.width - 25.0f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
@@ -88,7 +88,7 @@ bool MahjongTheoryScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("撤销");
+    button->setTitleText(__UTF8("撤销"));
     this->addChild(button);
     button->setPosition(Vec2(origin.x + visibleSize.width - 65.0f, origin.y + visibleSize.height - 80.0f - widgetSize.height));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onUndoButton, this, std::placeholders::_1));
@@ -99,7 +99,7 @@ bool MahjongTheoryScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("重做");
+    button->setTitleText(__UTF8("重做"));
     this->addChild(button);
     button->setPosition(Vec2(origin.x + visibleSize.width - 25.0f, origin.y + visibleSize.height - 80.0f - widgetSize.height));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onRedoButton, this, std::placeholders::_1));
@@ -107,13 +107,13 @@ bool MahjongTheoryScene::init() {
     _redoButton = button;
 
     // 特殊和型选项
-    Label *label = Label::createWithSystemFont("考虑特殊和型", "Arial", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("考虑特殊和型"), "Arial", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 80.0f - widgetSize.height));
 
-    static const char *title[] = { "七对", "十三幺", "全不靠", "组合龙" };
+    static const char *title[] = { __UTF8("七对"), __UTF8("十三幺"), __UTF8("全不靠"), __UTF8("组合龙") };
     const float yPos = origin.y + visibleSize.height - 105.0f - widgetSize.height;
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
@@ -140,13 +140,13 @@ bool MahjongTheoryScene::init() {
 
     // 预先算好Cell及各label的Size
     _cellWidth = visibleSize.width - 5;
-    Label *tempLabel = Label::createWithSystemFont("打「", "Arial", 12);
+    Label *tempLabel = Label::createWithSystemFont(__UTF8("打「"), "Arial", 12);
     _discardLabelWidth = tempLabel->getContentSize().width;
-    tempLabel->setString("」摸「");
+    tempLabel->setString(__UTF8("」摸「"));
     _servingLabelWidth1 = tempLabel->getContentSize().width;
-    tempLabel->setString("」听「");
+    tempLabel->setString(__UTF8("」听「"));
     _waitingLabelWidth1 = tempLabel->getContentSize().width;
-    tempLabel->setString("」共0种，00枚");
+    tempLabel->setString(__UTF8("」共0种，00枚"));
     _totalLabelWidth = tempLabel->getContentSize().width;
 
     cw::TableView *tableView = cw::TableView::create();
@@ -174,23 +174,23 @@ bool MahjongTheoryScene::init() {
 void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
     const float maxWidth = AlertDialog::maxWidth();
     Label *label = Label::createWithSystemFont(
-        "牌理功能未经严格测试，可能存在bug。\n\n"
-        "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n"
-        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n"
-        "3.吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n"
-        "  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n"
-        "  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n"
-        "  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n"
-        "4.输入牌的总数不能超过14张。\n"
-        "5.当输入牌的数量为(n*3+2)时，最后一张牌作为摸上来的牌。\n"
-        "6.当输入牌的数量为(n*3+1)时，系统会随机补一张摸上来的牌。\n"
-        "7.基本和型暂不考虑国标番型。\n"
-        "8.暂不考虑吃碰杠操作。\n"
-        "9.点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n"
-        "10.点击手牌可切出对应牌，随机上牌。\n"
-        "输入范例1：[EEEE]288s349pSCFF2p\n"
-        "输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n"
-        "输入范例3：356m18s1579pWNFF9p",
+        __UTF8("牌理功能未经严格测试，可能存在bug。\n\n")
+        __UTF8("1.数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n")
+        __UTF8("2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n")
+        __UTF8("3.吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n")
+        __UTF8("  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n")
+        __UTF8("  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n")
+        __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n")
+        __UTF8("4.输入牌的总数不能超过14张。\n")
+        __UTF8("5.当输入牌的数量为(n*3+2)时，最后一张牌作为摸上来的牌。\n")
+        __UTF8("6.当输入牌的数量为(n*3+1)时，系统会随机补一张摸上来的牌。\n")
+        __UTF8("7.基本和型暂不考虑国标番型。\n")
+        __UTF8("8.暂不考虑吃碰杠操作。\n")
+        __UTF8("9.点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n")
+        __UTF8("10.点击手牌可切出对应牌，随机上牌。\n")
+        __UTF8("输入范例1：[EEEE]288s349pSCFF2p\n")
+        __UTF8("输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n")
+        __UTF8("输入范例3：356m18s1579pWNFF9p"),
         "Arial", 10, Size(maxWidth, 0.0f));
     label->setColor(Color3B::BLACK);
 
@@ -217,9 +217,9 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
     }
 
     AlertDialog::Builder(this)
-        .setTitle("使用说明")
+        .setTitle(__UTF8("使用说明"))
         .setContentNode(node)
-        .setPositiveButton("确定", nullptr)
+        .setPositiveButton(__UTF8("确定"), nullptr)
         .create()->show();
 }
 
@@ -242,10 +242,10 @@ void MahjongTheoryScene::showInputAlert() {
 
     // 通过AlertDialog显示出来
     AlertDialog::Builder(this)
-        .setTitle("输入手牌")
+        .setTitle(__UTF8("输入手牌"))
         .setContentNode(tilePicker)
         .setCloseOnTouchOutside(false)
-        .setPositiveButton("确定", [this, tilePicker](AlertDialog *, int) {
+        .setPositiveButton(__UTF8("确定"), [this, tilePicker](AlertDialog *, int) {
         mahjong::hand_tiles_t handTiles;
         mahjong::tile_t servingTile;
         tilePicker->getData(&handTiles, &servingTile);
@@ -257,7 +257,7 @@ void MahjongTheoryScene::showInputAlert() {
             editBoxReturn(_editBox);
         }
         return true;
-    }).setNegativeButton("取消", [this](AlertDialog *, int) {
+    }).setNegativeButton(__UTF8("取消"), [this](AlertDialog *, int) {
         _editBox->touchDownAction(_editBox, ui::Widget::TouchEventType::ENDED);
         return true;
     }).create()->show();
@@ -346,10 +346,10 @@ bool MahjongTheoryScene::parseInput(const char *input) {
         intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &serving_tile);
         if (ret != PARSE_NO_ERROR) {
             switch (ret) {
-            case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = "无法解析的字符"; break;
-            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = "数字后面需有后缀"; break;
-            case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: errorStr = "一组副露包含了错误的牌数目"; break;
-            case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = "无法正确解析副露"; break;
+            case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = __UTF8("无法解析的字符"); break;
+            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = __UTF8("数字后面需有后缀"); break;
+            case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: errorStr = __UTF8("一组副露包含了错误的牌数目"); break;
+            case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = __UTF8("无法正确解析副露"); break;
             default: break;
             }
             break;
@@ -385,8 +385,8 @@ bool MahjongTheoryScene::parseInput(const char *input) {
         ret = mahjong::check_calculator_input(&hand_tiles, serving_tile);
         if (ret != 0) {
             switch (ret) {
-            case ERROR_WRONG_TILES_COUNT: errorStr = "牌张数错误"; break;
-            case ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = "同一种牌最多只能使用4枚"; break;
+            case ERROR_WRONG_TILES_COUNT: errorStr = __UTF8("牌张数错误"); break;
+            case ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
             default: break;
             }
             break;
@@ -699,38 +699,38 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t ser
 static std::string getResultTypeString(uint8_t flag, int step) {
     std::string str;
     switch (step) {
-    case 0: str = "听牌("; break;
-    case -1: str = "和了("; break;
-    default: str = Common::format("%d上听(", step); break;
+    case 0: str = __UTF8("听牌("); break;
+    case -1: str = __UTF8("和了("); break;
+    default: str = Common::format(__UTF8("%d上听("), step); break;
     }
 
     bool needCaesuraSign = false;
 #define APPEND_CAESURA_SIGN_IF_NECESSARY() \
-    if (LIKELY(needCaesuraSign)) { str.append("、"); } needCaesuraSign = true
+    if (LIKELY(needCaesuraSign)) { str.append(__UTF8("、")); } needCaesuraSign = true
 
     if (flag & FORM_FLAG_BASIC_FORM) {
         needCaesuraSign = true;
-        str.append("基本和型");
+        str.append(__UTF8("基本和型"));
     }
     if (flag & FORM_FLAG_SEVEN_PAIRS) {
         APPEND_CAESURA_SIGN_IF_NECESSARY();
-        str.append("七对");
+        str.append(__UTF8("七对"));
     }
     if (flag & FORM_FLAG_THIRTEEN_ORPHANS) {
         APPEND_CAESURA_SIGN_IF_NECESSARY();
-        str.append("十三幺");
+        str.append(__UTF8("十三幺"));
     }
     if (flag & FORM_FLAG_HONORS_AND_KNITTED_TILES) {
         APPEND_CAESURA_SIGN_IF_NECESSARY();
-        str.append("全不靠");
+        str.append(__UTF8("全不靠"));
     }
     if (flag & FORM_FLAG_KNITTED_STRAIGHT) {
         APPEND_CAESURA_SIGN_IF_NECESSARY();
-        str.append("组合龙");
+        str.append(__UTF8("组合龙"));
     }
 #undef APPEND_CAESURA_SIGN_IF_NECESSARY
 
-    str.append(")");
+    str.append(__UTF8(")"));
     return str;
 }
 
@@ -852,7 +852,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         typeLabel = label;
 
         // 打label
-        label = Label::createWithSystemFont("打「", "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("打「"), "Arial", 12);
         label->setColor(C3B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
@@ -868,14 +868,14 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
         discardButton = button;
 
         // 摸label
-        label = Label::createWithSystemFont("」摸「", "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("」摸「"), "Arial", 12);
         label->setColor(C3B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
         usefulLabel[0] = label;
 
         // 听label
-        label = Label::createWithSystemFont("」听「", "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("」听「"), "Arial", 12);
         label->setColor(C3B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
@@ -983,7 +983,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     }
 
     // 共几种几枚分在两个label上
-    std::string str = Common::format("」共%d种，%d枚", result->count_in_tiles, result->count_total);
+    std::string str = Common::format(__UTF8("」共%d种，%d枚"), result->count_in_tiles, result->count_total);
     if (yPos > 15) {
         spiltStringToLabel(str, _cellWidth - SPACE * 2 - xPos, cntLabel[0], cntLabel[1]);
     }

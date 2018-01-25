@@ -37,13 +37,13 @@ void RecordHistoryScene::updateRecordTexts() {
         str[BUF_SIZE] = '\0';
 
         struct tm ret = *localtime(&record.start_time);
-        int len = snprintf(str, BUF_SIZE, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        int len = snprintf(str, BUF_SIZE, __UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (record.end_time != 0) {
             ret = *localtime(&record.end_time);
-            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         }
         else {
-            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——(未结束)");
+            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——(未结束)"));
         }
 
         typedef std::pair<int, int> SeatScore;
@@ -66,7 +66,7 @@ void RecordHistoryScene::updateRecordTexts() {
             return left.second > right.second;
         });
 
-        static const char *seatText[] = { "东", "南", "西", "北" };
+        static const char *seatText[] = { __UTF8("东"), __UTF8("南"), __UTF8("西"), __UTF8("北") };
         snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)",
             seatText[seatscore[0].first], record.name[seatscore[0].first], seatscore[0].second,
             seatText[seatscore[1].first], record.name[seatscore[1].first], seatscore[1].second,
@@ -77,7 +77,7 @@ void RecordHistoryScene::updateRecordTexts() {
 }
 
 bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
-    if (UNLIKELY(!BaseScene::initWithTitle("历史记录"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("历史记录")))) {
         return false;
     }
 
@@ -92,7 +92,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("个人汇总");
+    button->setTitleText(__UTF8("个人汇总"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&RecordHistoryScene::onSummaryButton, this, std::placeholders::_1));
 
@@ -102,7 +102,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("批量删除");
+    button->setTitleText(__UTF8("批量删除"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.75f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&RecordHistoryScene::onBatchDeleteButton, this, std::placeholders::_1));
 
@@ -223,10 +223,10 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
 
     AlertDialog::Builder(this)
-        .setTitle("删除记录")
-        .setMessage("删除后无法找回，确认删除？")
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, idx](AlertDialog *, int) {
+        .setTitle(__UTF8("删除记录"))
+        .setMessage(__UTF8("删除后无法找回，确认删除？"))
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, idx](AlertDialog *, int) {
         LoadingView *loadingView = LoadingView::create();
         this->addChild(loadingView);
         loadingView->setPosition(Director::getInstance()->getVisibleSize());
@@ -344,10 +344,10 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
     drawNode->drawLine(Vec2(width, 0.0f), Vec2(width, 160.0f), Color4F::BLACK);
 
     static const char *titleText[4][5] = {
-        { "一位", "二位", "三位", "四位", "标准分" },
-        { "一位率", "二位率", "三位率", "四位率", "均标准分" },
-        { "比赛分", "均比赛分", "均和牌番", "均点炮番", "" },
-        { "和牌率", "点炮率", "自摸率", "最大番", "" }
+        { __UTF8("一位"), __UTF8("二位"), __UTF8("三位"), __UTF8("四位"), __UTF8("标准分") },
+        { __UTF8("一位率"), __UTF8("二位率"), __UTF8("三位率"), __UTF8("四位率"), __UTF8("均标准分") },
+        { __UTF8("比赛分"), __UTF8("均比赛分"), __UTF8("均和牌番"), __UTF8("均点炮番"), "" },
+        { __UTF8("和牌率"), __UTF8("点炮率"), __UTF8("自摸率"), __UTF8("最大番"), "" }
     };
 
     std::string contentText[4][5];
@@ -427,13 +427,13 @@ namespace {
             str[BUF_SIZE] = '\0';
 
             struct tm ret = *localtime(&record.start_time);
-            int len = snprintf(str, BUF_SIZE, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+            int len = snprintf(str, BUF_SIZE, __UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
             if (record.end_time != 0) {
                 ret = *localtime(&record.end_time);
-                len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+                len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
             }
             else {
-                len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——(未结束)");
+                len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——(未结束)"));
             }
             return str;
         });
@@ -539,7 +539,7 @@ namespace {
             button->setScale9Enabled(true);
             button->setContentSize(Size(30.0f, 15.0f));
             button->setTitleFontSize(10);
-            button->setTitleText("清除");
+            button->setTitleText(__UTF8("清除"));
             button->setPosition(Vec2(cellWidth - 17.0f, 30.0f));
             button->addClickEventListener([this, radioGroup](Ref *) {
                 // 如果有选中，则清空
@@ -597,11 +597,11 @@ namespace {
 void RecordHistoryScene::onSummaryButton(cocos2d::Ref *) {
     SummaryTableNode *rootNode = SummaryTableNode::create();
     AlertDialog::Builder(this)
-        .setTitle("选择要汇总的对局")
+        .setTitle(__UTF8("选择要汇总的对局"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, rootNode](AlertDialog *, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, rootNode](AlertDialog *, int) {
         auto& currentFlags = rootNode->getCurrentFlags();
 
         RecordsStatistic rs;
@@ -609,9 +609,9 @@ void RecordHistoryScene::onSummaryButton(cocos2d::Ref *) {
 
         Node *node = createStatisticNode(rs);
         AlertDialog::Builder(this)
-            .setTitle("汇总")
+            .setTitle(__UTF8("汇总"))
             .setContentNode(node)
-            .setPositiveButton("确定", nullptr)
+            .setPositiveButton(__UTF8("确定"), nullptr)
             .create()->show();
         return true;
     }).create()->show();
@@ -744,18 +744,18 @@ namespace {
 void RecordHistoryScene::onBatchDeleteButton(cocos2d::Ref *) {
     BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(_recordTexts);
     AlertDialog::Builder(this)
-        .setTitle("选择要删除的对局")
+        .setTitle(__UTF8("选择要删除的对局"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, rootNode](AlertDialog *dlg, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, rootNode](AlertDialog *dlg, int) {
         auto currentFlags = std::make_shared<std::vector<bool> >(rootNode->getCurrentFlags());
 
         AlertDialog::Builder(this)
-            .setTitle("删除记录")
-            .setMessage("删除后无法找回，确认删除？")
-            .setNegativeButton("取消", nullptr)
-            .setPositiveButton("确定", [this, currentFlags, dlg](AlertDialog *, int) {
+            .setTitle(__UTF8("删除记录"))
+            .setMessage(__UTF8("删除后无法找回，确认删除？"))
+            .setNegativeButton(__UTF8("取消"), nullptr)
+            .setPositiveButton(__UTF8("确定"), [this, currentFlags, dlg](AlertDialog *, int) {
             LoadingView *loadingView = LoadingView::create();
             this->addChild(loadingView);
             loadingView->setPosition(Director::getInstance()->getVisibleSize());

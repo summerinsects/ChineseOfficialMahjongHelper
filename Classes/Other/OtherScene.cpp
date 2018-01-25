@@ -6,7 +6,7 @@ USING_NS_CC;
 static std::string g_text;
 
 bool OtherScene::init() {
-    if (UNLIKELY(!BaseScene::initWithTitle("其他"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("其他")))) {
         return false;
     }
 

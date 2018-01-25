@@ -15,7 +15,7 @@ static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 static const Color3B C3B_BLUE_THEME = Color3B(51, 204, 255);
 
 bool FanCalculatorScene::init() {
-    if (UNLIKELY(!BaseScene::initWithTitle("国标麻将算番器"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("国标麻将算番器")))) {
         return false;
     }
 
@@ -81,8 +81,8 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
         uint16_t f = mahjong::fan_value_table[j];
         uint16_t n = fan_table[j];
         fan += f * n;
-        std::string str = (n == 1) ? Common::format("%s %hu番\n", mahjong::fan_name[j], f)
-            : Common::format("%s %hu番x%hu\n", mahjong::fan_name[j], f, n);
+        std::string str = (n == 1) ? Common::format(__UTF8("%s %hu番\n"), mahjong::fan_name[j], f)
+            : Common::format(__UTF8("%s %hu番x%hu\n"), mahjong::fan_name[j], f, n);
 
         // 创建label，每行排2个
         Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
@@ -104,13 +104,13 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
         });
     }
 
-    Label *label = Label::createWithSystemFont(Common::format("总计：%hu番", fan), "Arial", static_cast<float>(fontSize));
+    Label *label = Label::createWithSystemFont(Common::format(__UTF8("总计：%hu番"), fan), "Arial", static_cast<float>(fontSize));
     label->setColor(Color3B::BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20.0f));
 
-    label = Label::createWithSystemFont("点击番种名可查看番种介绍。", "Arial", 10);
+    label = Label::createWithSystemFont(__UTF8("点击番种名可查看番种介绍。"), "Arial", 10);
     label->setColor(C3B_BLUE_THEME);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -127,14 +127,14 @@ void FanCalculatorScene::calculate() {
 
     int flowerCnt = _extraInfo->getFlowerCount();
     if (flowerCnt > 8) {
-        Toast::makeText(this, "花牌数的范围为0~8", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("花牌数的范围为0~8"), Toast::LENGTH_LONG)->show();
         return;
     }
 
     mahjong::calculate_param_t param;
     _tilePicker->getData(&param.hand_tiles, &param.win_tile);
     if (param.win_tile == 0) {
-        Toast::makeText(this, "牌张数错误", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("牌张数错误"), Toast::LENGTH_LONG)->show();
         return;
     }
 
@@ -157,15 +157,15 @@ void FanCalculatorScene::calculate() {
     int fan = calculate_fan(&param, &fan_table);
 
     if (fan == ERROR_NOT_WIN) {
-        Toast::makeText(this, "诈和", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("诈和"), Toast::LENGTH_LONG)->show();
         return;
     }
     if (fan == ERROR_WRONG_TILES_COUNT) {
-        Toast::makeText(this, "牌张数错误", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("牌张数错误"), Toast::LENGTH_LONG)->show();
         return;
     }
     if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
-        Toast::makeText(this, "同一种牌最多只能使用4枚", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("同一种牌最多只能使用4枚"), Toast::LENGTH_LONG)->show();
         return;
     }
 
