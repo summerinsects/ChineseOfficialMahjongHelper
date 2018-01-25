@@ -273,7 +273,6 @@ bool HelloWorld::needRequest() const {
 }
 
 void HelloWorld::requestVersion(bool manual) {
-#if 1
     static bool checking = false;
     if (checking) {
         return;
@@ -315,15 +314,6 @@ void HelloWorld::requestVersion(bool manual) {
 
     network::HttpClient::getInstance()->sendImmediate(request);
     request->release();
-#else
-    std::string str =
-    "{"
-    "  \"tag_name\": \"v1.2.13\","
-    "  \"body\": \"1. 更换了新的图片\\r\\n2. 记分器的记录界面标记番种增加了「最近使用」\\r\\n3. 其他细节优化\""
-    "}";
-    std::vector<char> buffer(str.begin(), str.end());
-    checkVersion(&buffer, false);
-#endif
 }
 
 bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
