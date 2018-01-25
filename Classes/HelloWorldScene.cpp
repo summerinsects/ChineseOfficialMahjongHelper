@@ -148,7 +148,7 @@ bool HelloWorld::init() {
     sprite->setScale(CC_CONTENT_SCALE_FACTOR() * 0.5f);
     button->addChild(sprite);
     sprite->setPosition(Vec2(40.0f, 25.0f));
-    sprite->setVisible(false);
+    sprite->setVisible(UserDefault::getInstance()->getBoolForKey("has_new_version"));
     _redPointSprite = sprite;
 #endif
 
@@ -180,12 +180,7 @@ bool HelloWorld::init() {
 #endif
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    time_t lastTime = static_cast<time_t>(atoll(UserDefault::getInstance()->getStringForKey("not_notify").c_str()));
-    time_t now = time(nullptr);
-
-    struct tm tma = *localtime(&lastTime);
-    struct tm tmb = *localtime(&now);
-    if (tma.tm_year != tmb.tm_year || tma.tm_mon != tmb.tm_mon || tma.tm_mday != tmb.tm_mday) {
+    if (needRequest()) {
         requestVersion(false);
     }
 #endif
@@ -255,8 +250,29 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
 }
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+
+bool HelloWorld::needRequest() const {
+    UserDefault *userDefault = UserDefault::getInstance();
+    userDefault->deleteValueForKey("not_notify");
+
+    // 有新版本
+    if (userDefault->getBoolForKey("has_new_version")) {
+        // 如果未选中明天提醒，则检测
+        // 如果选中明天提醒，超过一天时，检测
+        if (!userDefault->getBoolForKey("notify_tomorrow")) {
+            return true;
+        }
+    }
+
+    // 距离上次检测有间隔一天再检测
+    time_t lastTime = static_cast<time_t>(atoll(userDefault->getStringForKey("last_request_time").c_str()));
+    time_t now = time(nullptr);
+    struct tm tma = *localtime(&lastTime);
+    struct tm tmb = *localtime(&now);
+    return (tma.tm_year != tmb.tm_year || tma.tm_mon != tmb.tm_mon || tma.tm_mday != tmb.tm_mday);
+}
+
 void HelloWorld::requestVersion(bool manual) {
-#if 1
     static bool checking = false;
     if (checking) {
         return;
@@ -296,122 +312,115 @@ void HelloWorld::requestVersion(bool manual) {
         }
     });
 
-    network::HttpClient::getInstance()->sendImmediate(request);
+    network::HttpClient::getInstance()->send(request);
     request->release();
-#else
-    std::string str =
-    "{"
-    "  \"tag_name\": \"v1.2.13\","
-    "  \"body\": \"1. 更换了新的图片\\r\\n2. 记分器的记录界面标记番种增加了「最近使用」\\r\\n3. 其他细节优化\""
-    "}";
-    std::vector<char> buffer(str.begin(), str.end());
-    checkVersion(&buffer, false);
-#endif
 }
-#endif
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
     if (buffer == nullptr) {
         return false;
     }
 
     try {
-        do {
-            std::string str(buffer->begin(), buffer->end());
-            rapidjson::Document doc;
-            doc.Parse<0>(str.c_str());
-            if (doc.HasParseError() || !doc.IsObject()) {
-                break;
-            }
+        std::string str(buffer->begin(), buffer->end());
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError() || !doc.IsObject()) {
+            return false;
+        }
 
-            rapidjson::Value::ConstMemberIterator it = doc.FindMember("tag_name");
-            if (it == doc.MemberEnd() || !it->value.IsString()) {
-                break;
-            }
-            std::string tag = it->value.GetString();
-            int major1, minor1, point1;
-            if (sscanf(tag.c_str(), "v%d.%d.%d", &major1, &minor1, &point1) != 3) {
-                break;
-            }
+        rapidjson::Value::ConstMemberIterator it = doc.FindMember("tag_name");
+        if (it == doc.MemberEnd() || !it->value.IsString()) {
+            return false;
+        }
+        std::string tag = it->value.GetString();
+        int major1, minor1, point1;
+        if (sscanf(tag.c_str(), "v%d.%d.%d", &major1, &minor1, &point1) != 3) {
+            return false;
+        }
 
-            std::string version = Application::getInstance()->getVersion();
-            int a, b, c;
-            if (sscanf(version.c_str(), "%d.%d.%d", &a, &b, &c) != 3) {
-                break;
-            }
+        std::string version = Application::getInstance()->getVersion();
+        int a, b, c;
+        if (sscanf(version.c_str(), "%d.%d.%d", &a, &b, &c) != 3) {
+            return false;
+        }
 
-            bool hasNewVersion = false;
-            if (major1 > a) {
+        bool hasNewVersion = false;
+        if (major1 > a) {
+            hasNewVersion = true;
+        }
+        else if (major1 == a) {
+            if (minor1 > b) {
                 hasNewVersion = true;
             }
-            else if (major1 == a) {
-                if (minor1 > b) {
+            else if (minor1 == b) {
+                if (point1 > c) {
                     hasNewVersion = true;
                 }
-                else if (minor1 == b) {
-                    if (point1 > c) {
-                        hasNewVersion = true;
-                    }
-                }
             }
+        }
 
-            if (!hasNewVersion) {
-                if (manual) {
-                    Toast::makeText(this, __UTF8("已经是最新版本"), Toast::LENGTH_LONG)->show();
+        UserDefault *userDefault = UserDefault::getInstance();
+        userDefault->setBoolForKey("has_new_version", hasNewVersion);
+        userDefault->setStringForKey("last_request_time", std::to_string(time(nullptr)));
+        userDefault->setBoolForKey("notify_tomorrow", false);
+
+        if (!hasNewVersion) {
+            if (manual) {
+                Toast::makeText(this, __UTF8("已经是最新版本"), Toast::LENGTH_LONG)->show();
+            }
+            return true;
+        }
+
+        _redPointSprite->setVisible(true);
+
+        Node *rootNode = Node::create();
+        ui::CheckBox *checkBox = nullptr;
+        if (!manual) {
+            checkBox = UICommon::createCheckBox();
+            rootNode->addChild(checkBox);
+            checkBox->setZoomScale(0.0f);
+            checkBox->ignoreContentAdaptWithSize(false);
+            checkBox->setContentSize(Size(20.0f, 20.0f));
+            checkBox->setPosition(Vec2(10.0f, 10.0f));
+
+            Label *label = Label::createWithSystemFont(__UTF8("今日之内不再提示"), "Arial", 12);
+            label->setColor(Color3B::BLACK);
+            rootNode->addChild(label);
+            label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+            label->setPosition(Vec2(25.0f, 10.0f));
+
+            rootNode->setContentSize(Size(25.0f + label->getContentSize().width, 20.0f));
+        }
+
+        it = doc.FindMember("body");
+        std::string body;
+        if (it != doc.MemberEnd() && it->value.IsString()) {
+            body = it->value.GetString();
+        }
+
+        AlertDialog::Builder(this)
+            .setTitle(__UTF8("检测到新版本"))
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+            .setMessage(Common::format(__UTF8("%s，是否下载？\n\n%s"), tag.c_str(), body.c_str()))
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+            .setMessage(Common::format(__UTF8("%s，是否下载？\n提取密码xyg\n\n%s"), tag.c_str(), body.c_str()))
+#endif
+            .setContentNode(rootNode)
+            .setCloseOnTouchOutside(false)
+            .setNegativeButton(__UTF8("取消"), [checkBox](AlertDialog *, int) {
+                if (checkBox != nullptr && checkBox->isSelected()) {
+                    UserDefault::getInstance()->setBoolForKey("notify_tomorrow", true);
                 }
                 return true;
-            }
+            })
+            .setPositiveButton(__UTF8("更新"), [](AlertDialog *, int) {
+                Application::getInstance()->openURL(DOWNLOAD_URL);
+                return true;
+            })
+            .create()->show();
 
-            _redPointSprite->setVisible(true);
-
-            Node *rootNode = Node::create();
-            ui::CheckBox *checkBox = nullptr;
-            if (!manual) {
-                checkBox = UICommon::createCheckBox();
-                rootNode->addChild(checkBox);
-                checkBox->setZoomScale(0.0f);
-                checkBox->ignoreContentAdaptWithSize(false);
-                checkBox->setContentSize(Size(20.0f, 20.0f));
-                checkBox->setPosition(Vec2(10.0f, 10.0f));
-
-                Label *label = Label::createWithSystemFont(__UTF8("今日之内不再提示"), "Arial", 12);
-                label->setColor(Color3B::BLACK);
-                rootNode->addChild(label);
-                label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-                label->setPosition(Vec2(25.0f, 10.0f));
-
-                rootNode->setContentSize(Size(25.0f + label->getContentSize().width, 20.0f));
-            }
-
-            it = doc.FindMember("body");
-            std::string body;
-            if (it != doc.MemberEnd() && it->value.IsString()) {
-                body = it->value.GetString();
-            }
-
-            AlertDialog::Builder(this)
-                .setTitle(__UTF8("检测到新版本"))
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-                .setMessage(Common::format(__UTF8("%s，是否下载？\n\n%s"), tag.c_str(), body.c_str()))
-#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-                .setMessage(Common::format(__UTF8("%s，是否下载？\n提取密码xyg\n\n%s"), tag.c_str(), body.c_str()))
-#endif
-                .setContentNode(rootNode)
-                .setCloseOnTouchOutside(false)
-                .setNegativeButton(__UTF8("取消"), [checkBox](AlertDialog *, int) {
-                    if (checkBox != nullptr && checkBox->isSelected()) {
-                        UserDefault::getInstance()->setStringForKey("not_notify", std::to_string(time(nullptr)));
-                    }
-                    return true;
-                })
-                .setPositiveButton(__UTF8("更新"), [](AlertDialog *, int) {
-                    Application::getInstance()->openURL(DOWNLOAD_URL);
-                    return true;
-                })
-                .create()->show();
-            return true;
-        } while (0);
+        return true;
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
@@ -419,4 +428,5 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 
     return false;
 }
+
 #endif

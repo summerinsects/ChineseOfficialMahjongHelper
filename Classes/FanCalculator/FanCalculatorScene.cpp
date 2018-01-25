@@ -23,7 +23,7 @@ bool FanCalculatorScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 选牌面板
-    TilePickWidget *tilePicker = TilePickWidget::create(visibleSize.width - 5.0f);
+    TilePickWidget *tilePicker = TilePickWidget::create(visibleSize.width - 10.0f);
     const Size &widgetSize = tilePicker->getContentSize();
     this->addChild(tilePicker);
     tilePicker->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
@@ -31,7 +31,7 @@ bool FanCalculatorScene::init() {
     _tilePicker = tilePicker;
 
     // 其他信息的相关控件
-    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create(visibleSize.width - 5.0f, [this](Ref *) { calculate(); });
+    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create(visibleSize.width - 10.0f, [this](Ref *) { calculate(); });
     const Size &extraSize = extraInfo->getContentSize();
     this->addChild(extraInfo);
     extraInfo->setPosition(Vec2(origin.x + visibleSize.width * 0.5f,
