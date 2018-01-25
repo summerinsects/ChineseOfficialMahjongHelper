@@ -144,7 +144,7 @@ static void saveRecentFans() {
 }
 
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
-    return (cnt >> 2) + !!(cnt & 0x3);
+    return (cnt >> 2) + ((cnt & 0x3) != 0);
 }
 
 #define ORDER(flag_, i_) (((flag_) >> ((i_) << 1)) & 0x3U)

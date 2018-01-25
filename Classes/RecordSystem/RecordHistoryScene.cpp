@@ -206,8 +206,8 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
     Label *label = std::get<1>(ext);
     ui::Button *delBtn = std::get<2>(ext);
 
-    layerColors[0]->setVisible(!(idx & 1));
-    layerColors[1]->setVisible(!!(idx & 1));
+    layerColors[0]->setVisible((idx & 1) == 0);
+    layerColors[1]->setVisible((idx & 1) != 0);
 
     delBtn->setUserData(reinterpret_cast<void *>(idx));
 
@@ -557,8 +557,8 @@ namespace {
         Label *const *labels = std::get<3>(ext).data();
         LayerColor *const *layerColors = std::get<4>(ext).data();
 
-        layerColors[0]->setVisible(!(idx & 1));
-        layerColors[1]->setVisible(!!(idx & 1));
+        layerColors[0]->setVisible((idx & 1) == 0);
+        layerColors[1]->setVisible((idx & 1) != 0);
 
         const Record &record = g_records[idx];
         bool finished = record.end_time != 0;
@@ -721,8 +721,8 @@ namespace {
         ui::CheckBox *checkBox = std::get<1>(ext);
         LayerColor *const *layerColors = std::get<2>(ext).data();
 
-        layerColors[0]->setVisible(!(idx & 1));
-        layerColors[1]->setVisible(!!(idx & 1));
+        layerColors[0]->setVisible((idx & 1) == 0);
+        layerColors[1]->setVisible((idx & 1) != 0);
 
         const Record &record = g_records[idx];
         bool finished = record.end_time != 0;

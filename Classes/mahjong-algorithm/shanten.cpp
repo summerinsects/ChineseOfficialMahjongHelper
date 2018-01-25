@@ -602,10 +602,7 @@ static bool is_basic_form_win_2(const tile_table_t &cnt_table) {
         return false;
     }
     // 还有其他未使用的牌
-    if (std::any_of(it + 1, std::end(cnt_table), [](int n) { return n > 0; })) {
-        return false;
-    }
-    return true;
+    return std::none_of(it + 1, std::end(cnt_table), [](int n) { return n > 0; });
 }
 
 // 递归计算基本和型是否和牌
@@ -688,7 +685,7 @@ int seven_pairs_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, use
 
     // 有效牌
     if (useful_table != nullptr) {
-        std::transform(std::begin(cnt_table), std::end(cnt_table), std::begin(*useful_table), [](int n) { return !!n; });
+        std::transform(std::begin(cnt_table), std::end(cnt_table), std::begin(*useful_table), [](int n) { return n != 0; });
     }
     return 6 - pair_cnt;
 }

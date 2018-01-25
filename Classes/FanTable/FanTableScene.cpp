@@ -35,7 +35,7 @@ static const CellDetail cellDetails[13] = {
 };
 
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
-    return (cnt >> 2) + !!(cnt & 0x3);
+    return (cnt >> 2) + ((cnt & 0x3) != 0);
 }
 
 bool FanTableScene::init() {
