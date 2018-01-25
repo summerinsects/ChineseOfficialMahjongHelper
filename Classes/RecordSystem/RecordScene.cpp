@@ -287,13 +287,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 和牌
         float y = origin.y + visibleSize.height - 140.0f;
-        ui::RadioButton *button = UICommon::createRadioButton();
-        radioNode->addChild(button);
-        button->setZoomScale(0.0f);
-        button->ignoreContentAdaptWithSize(false);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, y));
-        winGroup->addRadioButton(button);
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
+        radioNode->addChild(radioButton);
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(x - 15.0f, y));
+        winGroup->addRadioButton(radioButton);
 
         label = Label::createWithSystemFont(__UTF8("和牌"), "Arial", 12);
         label->setColor(Color3B::BLACK);
@@ -303,13 +303,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 点炮或自摸
         y = origin.y + visibleSize.height - 170.0f;
-        button = UICommon::createRadioButton();
-        radioNode->addChild(button);
-        button->setZoomScale(0.0f);
-        button->ignoreContentAdaptWithSize(false);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, y));
-        claimGroup->addRadioButton(button);
+        radioButton = UICommon::createRadioButton();
+        radioNode->addChild(radioButton);
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(x - 15.0f, y));
+        claimGroup->addRadioButton(radioButton);
 
         label = Label::createWithSystemFont(__UTF8("点炮"), "Arial", 12);
         label->setColor(Color3B::BLACK);

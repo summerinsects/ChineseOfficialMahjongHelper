@@ -57,11 +57,11 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
             it = detail_json.FindMember("false_win");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
                 uint32_t false_win = it->value.GetUint();
-                for (int i = 0; i < 4; ++i) {
-                    if (false_win & (1 << i)) {
-                        detail_data.penalty_scores[i] -= 30;
+                for (int k = 0; k < 4; ++k) {
+                    if (false_win & (1 << k)) {
+                        detail_data.penalty_scores[k] -= 30;
                         for (int j = 0; j < 4; ++j) {
-                            if (j == i) continue;
+                            if (j == k) continue;
                             detail_data.penalty_scores[j] += 10;
                         }
                     }
@@ -343,8 +343,8 @@ void SaveHistoryRecords(const char *file, const std::vector<Record> &records) {
 void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
     // 我们认为开始时间相同的为同一个记录
     time_t start_time = r->start_time;
-    auto it = std::find_if(records.begin(), records.end(), [start_time](const Record &r) {
-        return (r.start_time == start_time);
+    auto it = std::find_if(records.begin(), records.end(), [start_time](const Record &rr) {
+        return (rr.start_time == start_time);
     });
 
     // 未找到，则添加；找到，则覆盖

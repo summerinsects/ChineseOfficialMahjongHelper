@@ -64,8 +64,8 @@ bool FanCalculatorScene::init() {
 
 cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth) {
     // 有n个番种，每行排2个
-    ptrdiff_t n = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
-    ptrdiff_t rows = (n >> 1) + (n & 1);  // 需要这么多行
+    ptrdiff_t fanCnt = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
+    ptrdiff_t rows = (fanCnt >> 1) + (fanCnt & 1);  // 需要这么多行
 
     // 排列
     Node *node = Node::create();
@@ -75,7 +75,7 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
     node->setContentSize(Size(resultAreaWidth, static_cast<float>(resultAreaHeight)));
 
     uint16_t fan = 0;
-    for (int i = 0, j = 0; i < n; ++i) {
+    for (int i = 0, j = 0; i < fanCnt; ++i) {
         while (fan_table[++j] == 0) continue;
 
         uint16_t f = mahjong::fan_value_table[j];

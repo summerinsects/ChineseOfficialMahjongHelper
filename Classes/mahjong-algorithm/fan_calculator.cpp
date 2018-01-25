@@ -1813,11 +1813,11 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
         if (fixed_cnt == 0) {  // 门清的牌有可能存在边张、嵌张、单钓将
             // 将除去组合龙的部分恢复成牌
             --cnt_table[win_tile];
-            tile_t tiles[4];
-            intptr_t cnt = packs_to_tiles(&packs[3], 2, tiles, 4);
+            tile_t temp[4];
+            intptr_t cnt = packs_to_tiles(&packs[3], 2, temp, 4);
 
             // 听牌方式校正，确定边张、嵌张、单钓将
-            adjust_by_waiting_form(packs + 3, 2, tiles, cnt, win_tile, fan_table);
+            adjust_by_waiting_form(packs + 3, 2, temp, cnt, win_tile, fan_table);
         }
         else {
             // 非门清状态如果听牌不在组合龙范围内，必然是单钓将
