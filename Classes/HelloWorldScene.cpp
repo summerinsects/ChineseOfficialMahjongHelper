@@ -233,7 +233,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     button2->setTitleText("下载地址");
     button2->addClickEventListener([this](Ref *) {
         cw::setClipboardText(DOWNLOAD_URL);
-        Toast::makeText(this, "下载地址已复制到剪切板", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, "下载地址已复制到剪切板", Toast::LENGTH_LONG)->show();
     });
     rootNode->addChild(button2);
 
