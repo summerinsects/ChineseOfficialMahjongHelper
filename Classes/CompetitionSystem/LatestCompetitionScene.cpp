@@ -106,7 +106,7 @@ void LatestCompetitionScene::requestCompetitions() {
         thiz->parseResponse(buffer);
     });
 
-    network::HttpClient::getInstance()->sendImmediate(request);
+    network::HttpClient::getInstance()->send(request);
     request->release();
 }
 
