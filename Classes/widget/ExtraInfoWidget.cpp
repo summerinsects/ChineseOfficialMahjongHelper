@@ -48,14 +48,14 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         radioButton->setZoomScale(0.0f);
         radioButton->ignoreContentAdaptWithSize(false);
         radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(20.0f + gapX * i, 100.0f));
+        radioButton->setPosition(Vec2(10.0f + gapX * i, 100.0f));
         radioGroup->addRadioButton(radioButton);
 
         Label *label = Label::createWithSystemFont(winTypeTexts[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(35.0f + gapX * i, 100.0f));
+        label->setPosition(Vec2(25.0f + gapX * i, 100.0f));
     }
     _winTypeGroup = radioGroup;
 
@@ -65,7 +65,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     checkBox->setZoomScale(0.0f);
     checkBox->ignoreContentAdaptWithSize(false);
     checkBox->setContentSize(Size(20.0f, 20.0f));
-    checkBox->setPosition(Vec2(20.0f + gapX * 2, 100.0f));
+    checkBox->setPosition(Vec2(10.0f + gapX * 2, 100.0f));
     checkBox->setEnabled(false);
     checkBox->addEventListener(std::bind(&ExtraInfoWidget::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
     _fourthTileBox = checkBox;
@@ -74,7 +74,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(35.0f + gapX * 2, 100.0f));
+    label->setPosition(Vec2(25.0f + gapX * 2, 100.0f));
 
     static const char *extTexts[] = { __UTF8("杠开"), __UTF8("抢杠"), __UTF8("海底") };
     ui::CheckBox *checkBoxes[3];
@@ -84,14 +84,14 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
         checkBox->setContentSize(Size(20.0f, 20.0f));
-        checkBox->setPosition(Vec2(20.0f + gapX * i, 70.0f));
+        checkBox->setPosition(Vec2(10.0f + gapX * i, 70.0f));
         checkBoxes[i] = checkBox;
 
         label = Label::createWithSystemFont(extTexts[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(35.0f + gapX * i, 70.0f));
+        label->setPosition(Vec2(25.0f + gapX * i, 70.0f));
     }
 
     checkBoxes[0]->setEnabled(false);
@@ -113,7 +113,8 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         label = Label::createWithSystemFont(windType[k], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
-        label->setPosition(Vec2(20.0f, posY));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(0.0f, posY));
 
         radioGroup = ui::RadioButtonGroup::create();
         this->addChild(radioGroup);
@@ -122,7 +123,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
             radioButton->setZoomScale(0.0f);
             radioButton->ignoreContentAdaptWithSize(false);
             radioButton->setContentSize(Size(20.0f, 20.0f));
-            radioButton->setPosition(Vec2(50.0f + i * 30, posY));
+            radioButton->setPosition(Vec2(40.0f + i * 30, posY));
             rootNode->addChild(radioButton);
 
             label = Label::createWithSystemFont(windName[i], "Arial", 12);
@@ -142,7 +143,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("直接输入"));
     rootNode->addChild(button);
-    button->setPosition(Vec2(contentSize.width - 40.0f, 100.0f));
+    button->setPosition(Vec2(contentSize.width - 27.5f, 100.0f));
     button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
 
     // 使用说明
@@ -152,7 +153,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("使用说明"));
     rootNode->addChild(button);
-    button->setPosition(Vec2(contentSize.width - 40.0f, 70.0f));
+    button->setPosition(Vec2(contentSize.width - 27.5f, 70.0f));
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
@@ -162,13 +163,13 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
 #endif
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(contentSize.width - 85.0f, 40.0f));
+    label->setPosition(Vec2(contentSize.width - 72.5f, 40.0f));
 
     label = Label::createWithSystemFont("x0", "Arial", 12);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(contentSize.width - 85.0f, 40.0f));
+    label->setPosition(Vec2(contentSize.width - 72.5f, 40.0f));
     label->setTag(0);
     _flowerLabel = label;
 
@@ -178,7 +179,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     button->setTitleFontSize(12);
     button->setTitleText("-1");
     rootNode->addChild(button);
-    button->setPosition(Vec2(contentSize.width - 55.0f, 40.0f));
+    button->setPosition(Vec2(contentSize.width - 42.5f, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = label->getTag();
         if (n > 0) {
@@ -193,7 +194,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     button->setTitleFontSize(12);
     button->setTitleText("+1");
     rootNode->addChild(button);
-    button->setPosition(Vec2(contentSize.width - 25.0f, 40.0f));
+    button->setPosition(Vec2(contentSize.width - 12.5f, 40.0f));
     button->addClickEventListener([label](Ref *) {
         int n = label->getTag();
         if (n < 8) {
@@ -210,7 +211,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         button->setTitleFontSize(12);
         button->setTitleText(__UTF8("算  番"));
         rootNode->addChild(button);
-        button->setPosition(Vec2(contentSize.width - 40.0f, 10.0f));
+        button->setPosition(Vec2(contentSize.width - 27.5f, 10.0f));
         button->addClickEventListener(callback);
     }
 
