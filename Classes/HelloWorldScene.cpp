@@ -148,7 +148,7 @@ bool HelloWorld::init() {
     sprite->setScale(CC_CONTENT_SCALE_FACTOR() * 0.5f);
     button->addChild(sprite);
     sprite->setPosition(Vec2(40.0f, 25.0f));
-    sprite->setVisible(false);
+    sprite->setVisible(UserDefault::getInstance()->getBoolForKey("has_new_version"));
     _redPointSprite = sprite;
 #endif
 
@@ -180,12 +180,7 @@ bool HelloWorld::init() {
 #endif
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    time_t lastTime = static_cast<time_t>(atoll(UserDefault::getInstance()->getStringForKey("not_notify").c_str()));
-    time_t now = time(nullptr);
-
-    struct tm tma = *localtime(&lastTime);
-    struct tm tmb = *localtime(&now);
-    if (tma.tm_year != tmb.tm_year || tma.tm_mon != tmb.tm_mon || tma.tm_mday != tmb.tm_mday) {
+    if (needRequest()) {
         requestVersion(false);
     }
 #endif
@@ -255,6 +250,28 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
 }
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+
+bool HelloWorld::needRequest() const {
+    UserDefault *userDefault = UserDefault::getInstance();
+    userDefault->deleteValueForKey("not_notify");
+
+    // 有新版本
+    if (userDefault->getBoolForKey("has_new_version")) {
+        // 如果未选中明天提醒，则检测
+        // 如果选中明天提醒，超过一天时，检测
+        if (!userDefault->getBoolForKey("notify_tomorrow")) {
+            return true;
+        }
+    }
+
+    // 距离上次检测有间隔一天再检测
+    time_t lastTime = static_cast<time_t>(atoll(userDefault->getStringForKey("last_request_time").c_str()));
+    time_t now = time(nullptr);
+    struct tm tma = *localtime(&lastTime);
+    struct tm tmb = *localtime(&now);
+    return (tma.tm_year != tmb.tm_year || tma.tm_mon != tmb.tm_mon || tma.tm_mday != tmb.tm_mday);
+}
+
 void HelloWorld::requestVersion(bool manual) {
 #if 1
     static bool checking = false;
@@ -308,9 +325,7 @@ void HelloWorld::requestVersion(bool manual) {
     checkVersion(&buffer, false);
 #endif
 }
-#endif
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
     if (buffer == nullptr) {
         return false;
@@ -354,6 +369,11 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
                 }
             }
         }
+
+        UserDefault *userDefault = UserDefault::getInstance();
+        userDefault->setBoolForKey("has_new_version", hasNewVersion);
+        userDefault->setStringForKey("last_request_time", std::to_string(time(nullptr)));
+        userDefault->setBoolForKey("notify_tomorrow", false);
 
         if (!hasNewVersion) {
             if (manual) {
@@ -400,7 +420,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
             .setCloseOnTouchOutside(false)
             .setNegativeButton(__UTF8("取消"), [checkBox](AlertDialog *, int) {
                 if (checkBox != nullptr && checkBox->isSelected()) {
-                    UserDefault::getInstance()->setStringForKey("not_notify", std::to_string(time(nullptr)));
+                    UserDefault::getInstance()->setBoolForKey("notify_tomorrow", true);
                 }
                 return true;
             })
