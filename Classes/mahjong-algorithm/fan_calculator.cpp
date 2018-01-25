@@ -158,7 +158,7 @@ static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intp
         // 顺子（只能是数牌）
         if (is_numbered_suit(t)) {
             if (tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-                work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, t + 1);  // 记录顺子
+                work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, static_cast<tile_t>(t + 1));  // 记录顺子
                 if (!is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
                     // 削减这组顺子，递归
                     --cnt_table[t];
@@ -1680,7 +1680,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     }
 
     // 和牌方式校正，确定不求人、全求人
-    adjust_by_self_drawn(packs, fixed_cnt, win_flag & WIN_FLAG_SELF_DRAWN, fan_table);
+    adjust_by_self_drawn(packs, fixed_cnt, (win_flag & WIN_FLAG_SELF_DRAWN) != 0, fan_table);
     // 雀头校正，确定平和、小三元、小四喜
     adjust_by_pair_tile(pack_get_tile(pair_pack), chow_cnt, fan_table);
     // 牌组特征校正，相关番种：全带幺、全带五、全双刻
@@ -1840,7 +1840,7 @@ static forceinline bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
 // 全不靠/七星不靠算番
 static bool calculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], fan_table_t &fan_table) {
     const tile_t *honor_begin = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
-    ptrdiff_t numbered_cnt = honor_begin - standing_tiles;
+    int numbered_cnt = static_cast<int>(honor_begin - standing_tiles);
     // 数牌张数大于9或者小于7必然不可能是全不靠
     if (numbered_cnt > 9 || numbered_cnt < 7) {
         return false;

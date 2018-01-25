@@ -100,9 +100,9 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
         switch (mahjong::pack_get_type(pack)) {
         case PACK_TYPE_CHOW:
             switch (mahjong::pack_get_offer(pack)) {
-            default: addFixedChowPack(tile - 1, 0); break;
+            default: addFixedChowPack(static_cast<mahjong::tile_t>(tile - 1), 0); break;
             case 2: addFixedChowPack(tile, 1); break;
-            case 3: addFixedChowPack(tile + 1, 2); break;
+            case 3: addFixedChowPack(static_cast<mahjong::tile_t>(tile + 1), 2); break;
             }
             ++_usedTilesTable[tile - 1];
             ++_usedTilesTable[tile];
@@ -626,7 +626,7 @@ bool HandTilesWidget::makeFixedChowPack(int meldedIdx) {
     // meldedIdx == 1: X_X 13吃2 tile+0
     // meldedIdx == 2: XX_ 12吃3 tile-1
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, tile + 1 - meldedIdx);
+    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, static_cast<mahjong::tile_t>(tile + 1 - meldedIdx));
     _fixedPacks.push_back(pack);
 
     // 这里迭代器不能连续使用，因为立牌不一定有序
@@ -669,7 +669,7 @@ bool HandTilesWidget::makeFixedPungPack() {
 
     mahjong::tile_t tile = _standingTiles[_currentIdx];
     int meldedIdx = calcMeldedIdx(2);
-    mahjong::pack_t pack = mahjong::make_pack(meldedIdx + 1, PACK_TYPE_PUNG, tile);
+    mahjong::pack_t pack = mahjong::make_pack(static_cast<uint8_t>(meldedIdx + 1), PACK_TYPE_PUNG, tile);
     _fixedPacks.push_back(pack);
 
     // 这里迭代器可以连续使用，因为移除的是同一种牌
@@ -692,7 +692,7 @@ bool HandTilesWidget::makeFixedMeldedKongPack() {
 
     mahjong::tile_t tile = _standingTiles[_currentIdx];
     int meldedIdx = calcMeldedIdx(3);
-    mahjong::pack_t pack = mahjong::make_pack(std::min(meldedIdx + 1, 3), PACK_TYPE_KONG, tile);
+    mahjong::pack_t pack = mahjong::make_pack(static_cast<uint8_t>(std::min(meldedIdx + 1, 3)), PACK_TYPE_KONG, tile);
     _fixedPacks.push_back(pack);
 
     // 这里迭代器可以连续使用，因为移除的是同一种牌

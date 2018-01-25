@@ -18,7 +18,7 @@ public:
     void setTileClickCallback(const std::function<void ()> &callback) { _tileClickCallback = callback; }
 
     size_t getCurrentIdx() const { return _currentIdx; }
-    mahjong::tile_t getCurrentTile() const { return _currentIdx < _standingTiles.size() ? _standingTiles[_currentIdx] : 0; }
+    mahjong::tile_t getCurrentTile() const { return _currentIdx < _standingTiles.size() ? _standingTiles[_currentIdx] : mahjong::tile_t(0); }
     int getUsedTileCount(mahjong::tile_t tile) const { return _usedTilesTable[tile]; }
     int getStandingTileCount(mahjong::tile_t tile) const { return _standingTilesTable[tile]; }
 

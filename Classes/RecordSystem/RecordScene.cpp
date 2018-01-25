@@ -147,7 +147,7 @@ static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
     return (cnt >> 2) + !!(cnt & 0x3);
 }
 
-#define ORDER(flag_, i_) (((flag_) >> ((i_) << 1)) & 0x3)
+#define ORDER(flag_, i_) (((flag_) >> ((i_) << 1)) & 0x3U)
 
 #define PLAYER_TO_UI(p_) ORDER(_seatFlag, (p_))
 #define UI_TO_PLAYER(u_) ORDER(_playerFlag, (u_))
@@ -696,7 +696,7 @@ void RecordScene::updateScoreLabel() {
     int claimIndex = -1;
     if (_winIndex != -1) {  // 有人和牌
         int fan = atoi(_editBox->getText());  // 获取输入框里所填番数
-        _detail.fan = std::max<uint16_t>(8, fan);
+        _detail.fan = static_cast<uint16_t>(std::max(8, fan));
         claimIndex = _claimGroup->getSelectedButtonIndex();
 
         // 记录和牌和点炮
@@ -1339,7 +1339,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
             .setContentNode(innerNode)
             .setCloseOnTouchOutside(false)
             .setPositiveButton(__UTF8("确定"), [this, temp, fan, fanFlag, uniqueFan, multipleFan, dlg](AlertDialog *, int) {
-            _detail.fan = std::max<uint16_t>(fan, 8);
+            _detail.fan = static_cast<uint16_t>(std::max(fan, 8));
             _detail.fan_flag = fanFlag;
             _detail.unique_fan = uniqueFan;
             _detail.multiple_fan = multipleFan;

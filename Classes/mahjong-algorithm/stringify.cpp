@@ -318,8 +318,8 @@ intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intp
         case PACK_TYPE_CHOW:
             if (p >= end) break;
             *p++ = '[';
-            temp[0] = t - 1; temp[1] = t; temp[2] = t + 1;
-            p += tiles_to_string(temp, 3, p, end - p);
+            temp[0] = static_cast<tile_t>(t - 1); temp[1] = t; temp[2] = static_cast<tile_t>(t + 1);
+            p += tiles_to_string(temp, 3, p, static_cast<intptr_t>(end - p));
             if (p >= end) break;
             *p++ = ',';
             if (p >= end) break;
@@ -331,7 +331,7 @@ intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intp
             if (p >= end) break;
             *p++ = '[';
             temp[0] = t; temp[1] = t; temp[2] = t;
-            p += tiles_to_string(temp, 3, p, end - p);
+            p += tiles_to_string(temp, 3, p, static_cast<intptr_t>(end - p));
             if (p >= end) break;
             *p++ = ',';
             if (p >= end) break;
@@ -343,7 +343,7 @@ intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intp
             if (p >= end) break;
             *p++ = '[';
             temp[0] = t; temp[1] = t; temp[2] = t; temp[3] = t;
-            p += tiles_to_string(temp, 4, p, end - p);
+            p += tiles_to_string(temp, 4, p, static_cast<intptr_t>(end - p));
             if (p >= end) break;
             *p++ = ',';
             if (p >= end) break;
@@ -355,7 +355,7 @@ intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intp
             break;
         case PACK_TYPE_PAIR:
             temp[0] = t; temp[1] = t;
-            p += tiles_to_string(temp, 2, p, end - p);
+            p += tiles_to_string(temp, 2, p, static_cast<intptr_t>(end - p));
             break;
         default: break;
         }
@@ -371,7 +371,7 @@ intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intp
 intptr_t hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, intptr_t max_size) {
     char *p = str, *end = str + max_size;
     p += packs_to_string(hand_tiles->fixed_packs, hand_tiles->pack_count, str, max_size);
-    if (p < end) p += tiles_to_string(hand_tiles->standing_tiles, hand_tiles->tile_count, p, end - p);
+    if (p < end) p += tiles_to_string(hand_tiles->standing_tiles, hand_tiles->tile_count, p, static_cast<intptr_t>(end - p));
     return static_cast<intptr_t>(p - str);
 }
 

@@ -41,9 +41,9 @@ intptr_t packs_to_tiles(const pack_t *packs, intptr_t pack_cnt, tile_t *tiles, i
         tile_t tile = pack_get_tile(packs[i]);
         switch (pack_get_type(packs[i])) {
         case PACK_TYPE_CHOW:
-            if (cnt < tile_cnt) tiles[cnt++] = tile - 1;
+            if (cnt < tile_cnt) tiles[cnt++] = static_cast<tile_t>(tile - 1);
             if (cnt < tile_cnt) tiles[cnt++] = tile;
-            if (cnt < tile_cnt) tiles[cnt++] = tile + 1;
+            if (cnt < tile_cnt) tiles[cnt++] = static_cast<tile_t>(tile + 1);
             break;
         case PACK_TYPE_PUNG:
             if (cnt < tile_cnt) tiles[cnt++] = tile;
@@ -171,7 +171,7 @@ static bool is_basic_form_branch_exist(const intptr_t fixed_cnt, const work_path
     }
 
     // depth处有信息，所以按stl风格的end应该要+1
-    const uint16_t depth = work_path->depth + 1;
+    const uint16_t depth = static_cast<uint16_t>(work_path->depth + 1);
 
     // std::includes要求有序，但又不能破坏当前数据
     work_path_t temp;
@@ -209,7 +209,7 @@ static void save_work_path(const intptr_t fixed_cnt, const work_path_t *work_pat
 // work_path保存当前正在计算的路径，
 // work_state保存了所有已经计算过的路径，
 // 从0到fixed_cnt的数据是不使用的，这些保留给了副露的面子
-static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool has_pair, const uint16_t pack_cnt, const uint16_t incomplete_cnt,
+static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool has_pair, const unsigned pack_cnt, const unsigned incomplete_cnt,
     const intptr_t fixed_cnt, work_path_t *work_path, work_state_t *work_state) {
     if (pack_cnt == 4) {  // 已经有4组面子
         return has_pair ? -1 : 0;  // 如果有雀头，则和了；如果无雀头，则是听牌
@@ -234,8 +234,8 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
     }
 
     // 当前路径深度
-    const uint16_t depth = pack_cnt + incomplete_cnt + has_pair;
-    work_path->depth = depth;
+    const unsigned depth = pack_cnt + incomplete_cnt + has_pair;
+    work_path->depth = static_cast<uint16_t>(depth);
 
     int result = max_ret;
 
