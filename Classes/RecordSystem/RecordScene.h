@@ -64,7 +64,7 @@ private:
 
     void refresh();
     void updateScoreLabel();
-    void showLittleFanAlert(bool callFromSubmiting);
+    void showLittleFanAlert(bool callFromSubmitting);
 
     void onPlusButton(cocos2d::Ref *sender, int delta);
     void onRecordTilesButton(cocos2d::Ref *sender);

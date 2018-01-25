@@ -881,7 +881,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     }).create()->show();
 }
 
-void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
+void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     const float maxWidth = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
@@ -989,7 +989,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [this, checkBoxes, labels, callFromSubmiting](AlertDialog *, int) {
+        .setPositiveButton(__UTF8("确定"), [this, checkBoxes, labels, callFromSubmitting](AlertDialog *, int) {
         uint16_t uniqueFan = 0;
         uint64_t multipleFan = 0;
         for (int i = 0; i < 14; ++i) {
@@ -1007,7 +1007,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
 
         _detail.unique_fan = uniqueFan;
         _detail.multiple_fan = multipleFan;
-        if (callFromSubmiting) {
+        if (callFromSubmitting) {
             finish();
         }
         return true;
