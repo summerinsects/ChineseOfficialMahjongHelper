@@ -8,7 +8,7 @@
 USING_NS_CC;
 
 bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
-    if (UNLIKELY(!BaseScene::initWithTitle(Common::format("%s第%" PRIzu "/%" PRIzu "轮",
+    if (UNLIKELY(!BaseScene::initWithTitle(Common::format(__UTF8("%s第%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu) __UTF8("轮"),
         competitionData->name.c_str(), currentRound + 1, competitionData->round_count)))) {
         return false;
     }
@@ -27,7 +27,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("上一轮");
+    button->setTitleText(__UTF8("上一轮"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 65.0f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener([this](Ref *) {
         if (_currentRound > 0) {
@@ -42,7 +42,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("登记成绩");
+    button->setTitleText(__UTF8("登记成绩"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener(std::bind(&CompetitionRoundScene::onReportButton, this, std::placeholders::_1));
 
@@ -52,7 +52,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("下一轮");
+    button->setTitleText(__UTF8("下一轮"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 65.0f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener([this](Ref *) {
         size_t nextRound = _currentRound + 1;
@@ -65,7 +65,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
                 Director::getInstance()->replaceScene(CompetitionRoundScene::create(_competitionData, nextRound));
             }
             else {
-                Toast::makeText(this, "当前一轮尚未结束，请先将所有桌的成绩登记完毕。", Toast::LENGTH_LONG)->show();
+                Toast::makeText(this, __UTF8("当前一轮尚未结束，请先将所有桌的成绩登记完毕。"), Toast::LENGTH_LONG)->show();
             }
         }
     });
@@ -84,7 +84,7 @@ bool CompetitionRoundScene::initWithData(const std::shared_ptr<CompetitionData> 
     cw::calculateColumnsCenterX(_colWidth, 7, _posX);
 
     // 表头
-    static const char *titleTexts[] = { "名次", "编号", "选手姓名", "本轮标准分", "本轮比赛分", "累计标准分", "累计比赛分" };
+    static const char *titleTexts[] = { __UTF8("名次"), __UTF8("编号"), __UTF8("选手姓名"), __UTF8("本轮标准分"), __UTF8("本轮比赛分"), __UTF8("累计标准分"), __UTF8("累计比赛分") };
     for (int i = 0; i < 7; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
@@ -147,8 +147,8 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<Label *, 7> &labels = std::get<0>(ext);
-        std::array<LayerColor *, 2> &layerColors = std::get<1>(ext);
+        Label **labels = std::get<0>(ext).data();
+        LayerColor **layerColors = std::get<1>(ext).data();
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -182,8 +182,8 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    const std::array<Label *, 7> &labels = std::get<0>(ext);
-    const std::array<LayerColor *, 2> &layerColors = std::get<1>(ext);
+    Label *const *labels = std::get<0>(ext).data();
+    LayerColor *const *layerColors = std::get<1>(ext).data();
 
     layerColors[0]->setVisible(!(idx & 1));
     layerColors[1]->setVisible(!!(idx & 1));

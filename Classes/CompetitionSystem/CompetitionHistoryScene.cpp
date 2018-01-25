@@ -38,24 +38,24 @@ void CompetitionHistoryScene::updateDataTexts() {
         str[BUF_SIZE] = '\0';
 
         struct tm ret = *localtime(&data.start_time);
-        int len = snprintf(str, BUF_SIZE, "%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        int len = snprintf(str, BUF_SIZE, __UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (data.finish_time != 0) {
             ret = *localtime(&data.finish_time);
-            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "——%d年%d月%d日%.2d:%.2d", ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         }
         else {
-            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "%s", "——(未结束)");
+            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "%s", __UTF8("——(未结束)"));
         }
 
         len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "\n%s", data.name.c_str());
-        snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "\n%" PRIzd "人，%" PRIzd "轮", data.players.size(), data.round_count);
+        snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("\n%") __UTF8(PRIzd) __UTF8("人，%") __UTF8(PRIzd) __UTF8("轮"), data.players.size(), data.round_count);
 
         return str;
     });
 }
 
 bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
-    if (UNLIKELY(!BaseScene::initWithTitle("历史记录"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("历史记录")))) {
         return false;
     }
 
@@ -116,7 +116,7 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
     // 测试代码
     g_competitions.resize(50);
     for (int i = 0; i < 50; ++i) {
-        g_competitions[i].name = Common::format("测试比赛%d", i + 1);
+        g_competitions[i].name = Common::format(__UTF8("测试比赛%d"), i + 1);
         g_competitions[i].start_time = time(nullptr) - 2000;
         g_competitions[i].finish_time = time(nullptr);
     }
@@ -143,7 +143,7 @@ cw::TableViewCell *CompetitionHistoryScene::tableCellAtIndex(cw::TableView *tabl
         const float width = visibleSize.width - 5.0f;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
+        LayerColor **layerColors = std::get<0>(ext).data();
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
 
@@ -171,7 +171,7 @@ cw::TableViewCell *CompetitionHistoryScene::tableCellAtIndex(cw::TableView *tabl
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    const std::array<LayerColor *, 2> &layerColors = std::get<0>(ext);
+    LayerColor *const *layerColors = std::get<0>(ext).data();
     Label *label = std::get<1>(ext);
     ui::Button *delBtn = std::get<2>(ext);
 
@@ -190,10 +190,10 @@ void CompetitionHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
 
     AlertDialog::Builder(this)
-        .setTitle("删除记录")
-        .setMessage("删除后无法找回，确认删除？")
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, idx](AlertDialog *, int) {
+        .setTitle(__UTF8("删除记录"))
+        .setMessage(__UTF8("删除后无法找回，确认删除？"))
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, idx](AlertDialog *, int) {
         LoadingView *loadingView = LoadingView::create();
         this->addChild(loadingView);
         loadingView->setPosition(Director::getInstance()->getVisibleSize());

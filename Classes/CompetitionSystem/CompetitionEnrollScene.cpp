@@ -9,7 +9,7 @@
 USING_NS_CC;
 
 bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData) {
-    if (UNLIKELY(!BaseScene::initWithTitle(std::string(competitionData->name).append("报名表")))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(std::string(competitionData->name).append(__UTF8("报名表"))))) {
         return false;
     }
 
@@ -19,22 +19,22 @@ bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData>
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 表头
-    Label *label = Label::createWithSystemFont("序号", "Arail", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("序号"), "Arail", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + 20.0f, origin.y + visibleSize.height - 50.0f));
 
-    label = Label::createWithSystemFont("选手姓名", "Arail", 12);
+    label = Label::createWithSystemFont(__UTF8("选手姓名"), "Arail", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.25f + 15.0f, origin.y + visibleSize.height - 50.0f));
 
-    label = Label::createWithSystemFont("序号", "Arail", 12);
+    label = Label::createWithSystemFont(__UTF8("序号"), "Arail", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f + 20.0f, origin.y + visibleSize.height - 50.0f));
 
-    label = Label::createWithSystemFont("选手姓名", "Arail", 12);
+    label = Label::createWithSystemFont(__UTF8("选手姓名"), "Arail", 12);
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.75f + 15.0f, origin.y + visibleSize.height - 50.0f));
@@ -61,7 +61,7 @@ bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData>
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("提交");
+    button->setTitleText(__UTF8("提交"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&CompetitionEnrollScene::onSubmitButton, this, std::placeholders::_1));
 
@@ -86,9 +86,9 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<Label *, 4> &labels = std::get<0>(ext);
-        std::array<ui::Widget *, 2> &widgets = std::get<1>(ext);
-        std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+        Label **labels = std::get<0>(ext).data();
+        ui::Widget **widgets = std::get<1>(ext).data();
+        LayerColor **layerColors = std::get<2>(ext).data();
 
         layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), visibleSize.width, 30.0f);
         cell->addChild(layerColors[0]);
@@ -138,9 +138,9 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    const std::array<Label *, 4> &labels = std::get<0>(ext);
-    const std::array<ui::Widget *, 2> &widgets = std::get<1>(ext);
-    const std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+    Label *const *labels = std::get<0>(ext).data();
+    ui::Widget *const *widgets = std::get<1>(ext).data();
+    LayerColor *const *layerColors = std::get<2>(ext).data();
 
     layerColors[0]->setVisible(!(idx & 1));
     layerColors[1]->setVisible(!!(idx & 1));
@@ -157,7 +157,7 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
 
     if (name0.empty()) {
         labels[1]->setColor(Color3B::GRAY);
-        labels[1]->setString("选手姓名");
+        labels[1]->setString(__UTF8("选手姓名"));
     }
     else {
         labels[1]->setColor(Color3B::ORANGE);
@@ -167,7 +167,7 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
 
     if (name1.empty()) {
         labels[3]->setColor(Color3B::GRAY);
-        labels[3]->setString("选手姓名");
+        labels[3]->setString(__UTF8("选手姓名"));
     }
     else {
         labels[3]->setColor(Color3B::ORANGE);
@@ -182,12 +182,12 @@ void CompetitionEnrollScene::onSubmitButton(cocos2d::Ref *) {
 #if 1  // 测试代码
     for (size_t i = 0, cnt = _competitionData->players.size(); i < cnt; ++i) {
         std::string &name = _competitionData->players.at(i).name;
-        if (name.empty()) name = Common::format("第%" PRIzu "号参赛选手", i + 1);
+        if (name.empty()) name = Common::format(__UTF8("第%") __UTF8(PRIzu) __UTF8("号参赛选手"), i + 1);
     }
 #endif
 
     if (!_competitionData->isEnrollmentOver()) {
-        Toast::makeText(this, "请录入所有选手姓名", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("请录入所有选手姓名"), Toast::LENGTH_LONG)->show();
         return;
     }
 
@@ -209,13 +209,13 @@ void CompetitionEnrollScene::onNameWidget(cocos2d::Ref *sender) {
     editBox->setText(_competitionData->players[idx].name.c_str());
     editBox->setMaxLength(64);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
-    editBox->setPlaceHolder("输入选手姓名");
+    editBox->setPlaceHolder(__UTF8("输入选手姓名"));
 
     AlertDialog::Builder(this)
-        .setTitle(Common::format("序号「%" PRIzu "」", idx + 1))
+        .setTitle(Common::format(__UTF8("序号「%") __UTF8(PRIzu) __UTF8("」"), idx + 1))
         .setContentNode(editBox)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, editBox, idx](AlertDialog *, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, editBox, idx](AlertDialog *, int) {
         _competitionData->players[idx].name = editBox->getText();
         _competitionData->writeToFile();
         _tableView->updateCellAtIndex(idx >> 1);

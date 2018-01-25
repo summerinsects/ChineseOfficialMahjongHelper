@@ -41,7 +41,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     rootNode->addChild(radioGroup);
     radioGroup->addEventListener(std::bind(&ExtraInfoWidget::onWinTypeGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-    static const char *winTypeTexts[] = { "点和", "自摸" };
+    static const char *winTypeTexts[] = { __UTF8("点和"), __UTF8("自摸") };
     for (int i = 0; i < 2; ++i) {
         ui::RadioButton *radioButton = UICommon::createRadioButton();
         rootNode->addChild(radioButton);
@@ -70,13 +70,13 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     checkBox->addEventListener(std::bind(&ExtraInfoWidget::onFourthTileBox, this, std::placeholders::_1, std::placeholders::_2));
     _fourthTileBox = checkBox;
 
-    Label *label = Label::createWithSystemFont("绝张", "Arial", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("绝张"), "Arial", 12);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(35.0f + gapX * 2, 100.0f));
 
-    static const char *extTexts[] = { "杠开", "抢杠", "海底" };
+    static const char *extTexts[] = { __UTF8("杠开"), __UTF8("抢杠"), __UTF8("海底") };
     ui::CheckBox *checkBoxes[3];
     for (int i = 0; i < 3; ++i) {
         ui::CheckBox *checkBox = UICommon::createCheckBox();
@@ -105,8 +105,8 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     _lastTileBox = checkBoxes[2];
 
     // 圈风和门风
-    static const char *windName[4] = { "东", "南", "西", "北" };
-    static const char *windType[2] = { "圈风", "门风" };
+    static const char *windName[4] = { __UTF8("东"), __UTF8("南"), __UTF8("西"), __UTF8("北") };
+    static const char *windType[2] = { __UTF8("圈风"), __UTF8("门风") };
     for (int k = 0; k < 2; ++k) {
         const float posY = 40.0f - k * 30.0f;
 
@@ -140,7 +140,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("直接输入");
+    button->setTitleText(__UTF8("直接输入"));
     rootNode->addChild(button);
     button->setPosition(Vec2(contentSize.width - 40.0f, 100.0f));
     button->addClickEventListener([this](Ref *) { showInputAlert(nullptr); });
@@ -150,7 +150,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("使用说明");
+    button->setTitleText(__UTF8("使用说明"));
     rootNode->addChild(button);
     button->setPosition(Vec2(contentSize.width - 40.0f, 70.0f));
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
@@ -208,7 +208,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         button->setScale9Enabled(true);
         button->setContentSize(Size(55.0f, 20.0f));
         button->setTitleFontSize(12);
-        button->setTitleText("算  番");
+        button->setTitleText(__UTF8("算  番"));
         rootNode->addChild(button);
         button->setPosition(Vec2(contentSize.width - 40.0f, 10.0f));
         button->addClickEventListener(callback);
@@ -410,19 +410,19 @@ void ExtraInfoWidget::refreshByWinTile(mahjong::tile_t winTile, bool maybeFourth
 void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
     const float maxWidth = AlertDialog::maxWidth();
     Label *label = Label::createWithSystemFont(
-        "1. 本程序不对和牌张位置的牌进行吃、碰、杠检测，如果要对某张牌进行吃、碰、杠操作，请将这张牌放在手牌范围内。\n"
-        "2. 本程序遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式，请以您所参加的比赛细则中之规定为准。\n"
-        "3. 手牌在形式上听多种牌（包括听第5张不存在的牌）时，不计边张、嵌张、单钓将。边张、嵌张、单钓将最多计其中一个。\n"
-        "4. 组合龙普通型和牌中，可加计平和。对于可解释为组合龙龙身部分的听牌，一律不计边张、嵌张、单钓将。\n"
-        "5. 必然门前清的番种（七对、全不靠、七星不靠、十三幺、四暗刻、连七对、九莲宝灯）自摸和牌时只计自摸，不计不求人。\n"
-        "6. 绿一色、字一色、清幺九、混幺九、全大、全中、全小、大于五、小于五均可复合七对。全双刻不可复合七对，对于由仅偶数牌组成的七对，只计七对+断幺。\n"
-        "7. 字一色、混幺九、清幺九不计碰碰和。\n"
-        "8. 至少缺一门花色的番种（包括大三元、小三元、三风刻、一色四同顺、一色四节高、一色四步高、推不倒），除推不倒不计缺一门以外，其他番种均可加计缺一门。\n"
-        "9. 有发的绿一色不计混一色。大四喜、小四喜可计混一色。\n"
-        "10. 清幺九不计双同刻，可计三同刻。\n"
-        "11. 九莲宝灯和258时计1个幺九刻，和其他牌不计幺九刻。\n"
-        "12. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n"
-        "13. 双暗杠6番，一明杠一暗杠5番，双明杠4番。暗杠的加计遵循国际麻将联盟（MIL）的规则，即杠系列和暗刻系列最多各计一个。",
+        __UTF8("1. 本程序不对和牌张位置的牌进行吃、碰、杠检测，如果要对某张牌进行吃、碰、杠操作，请将这张牌放在手牌范围内。\n")
+        __UTF8("2. 本程序遵循中国国家体育总局于1998年7月审定的《中国麻将竞赛规则（试行）》，一些争议之处采取大众普遍接受的通行计番方式，请以您所参加的比赛细则中之规定为准。\n")
+        __UTF8("3. 手牌在形式上听多种牌（包括听第5张不存在的牌）时，不计边张、嵌张、单钓将。边张、嵌张、单钓将最多计其中一个。\n")
+        __UTF8("4. 组合龙普通型和牌中，可加计平和。对于可解释为组合龙龙身部分的听牌，一律不计边张、嵌张、单钓将。\n")
+        __UTF8("5. 必然门前清的番种（七对、全不靠、七星不靠、十三幺、四暗刻、连七对、九莲宝灯）自摸和牌时只计自摸，不计不求人。\n")
+        __UTF8("6. 绿一色、字一色、清幺九、混幺九、全大、全中、全小、大于五、小于五均可复合七对。全双刻不可复合七对，对于由仅偶数牌组成的七对，只计七对+断幺。\n")
+        __UTF8("7. 字一色、混幺九、清幺九不计碰碰和。\n")
+        __UTF8("8. 至少缺一门花色的番种（包括大三元、小三元、三风刻、一色四同顺、一色四节高、一色四步高、推不倒），除推不倒不计缺一门以外，其他番种均可加计缺一门。\n")
+        __UTF8("9. 有发的绿一色不计混一色。大四喜、小四喜可计混一色。\n")
+        __UTF8("10. 清幺九不计双同刻，可计三同刻。\n")
+        __UTF8("11. 九莲宝灯和258时计1个幺九刻，和其他牌不计幺九刻。\n")
+        __UTF8("12. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n")
+        __UTF8("13. 双暗杠6番，一明杠一暗杠5番，双明杠4番。暗杠的加计遵循国际麻将联盟（MIL）的规则，即杠系列和暗刻系列最多各计一个。"),
         "Arail", 10, Size(maxWidth, 0.0f));
     label->setColor(Color3B::BLACK);
 
@@ -449,9 +449,9 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
     }
 
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
-        .setTitle("使用说明")
+        .setTitle(__UTF8("使用说明"))
         .setContentNode(node)
-        .setPositiveButton("确定", nullptr)
+        .setPositiveButton(__UTF8("确定"), nullptr)
         .create()->show();
 }
 
@@ -460,16 +460,16 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
 
     Node *rootNode = Node::create();
 
-    Label *label = Label::createWithSystemFont("使用说明：\n"
-        "1.数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n"
-        "2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n"
-        "3.吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n"
-        "  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n"
-        "  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n"
-        "  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n"
-        "输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n"
-        "输入范例2：1112345678999s9s\n"
-        "输入范例3：[WWWW,1][444s]45m678pFF6m\n", "Arial", 10, Size(width, 0.0f));
+    Label *label = Label::createWithSystemFont(__UTF8("使用说明：\n")
+        __UTF8("1.数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n")
+        __UTF8("2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n")
+        __UTF8("3.吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n")
+        __UTF8("  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n")
+        __UTF8("  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n")
+        __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n")
+        __UTF8("输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n")
+        __UTF8("输入范例2：1112345678999s9s\n")
+        __UTF8("输入范例3：[WWWW,1][444s]45m678pFF6m\n"), "Arial", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
 
@@ -481,7 +481,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
-    editBox->setPlaceHolder("输入手牌");
+    editBox->setPlaceHolder(__UTF8("输入手牌"));
     editBox->setMaxLength(50);
     if (prevInput != nullptr) {
         editBox->setText(prevInput);
@@ -495,11 +495,11 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 25.0f));
 
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
-        .setTitle("直接输入")
+        .setTitle(__UTF8("直接输入"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, editBox](AlertDialog *, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, editBox](AlertDialog *, int) {
         const char *input = editBox->getText();
         const char *errorStr = parseInput(input);
         if (errorStr != nullptr) {
@@ -520,23 +520,23 @@ const char *ExtraInfoWidget::parseInput(const char *input) {
     intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &win_tile);
     if (ret != PARSE_NO_ERROR) {
         switch (ret) {
-            case PARSE_ERROR_ILLEGAL_CHARACTER: return "无法解析的字符";
-            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: return "数字后面需有后缀";
-            case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: return "一组副露包含了错误的牌数目";
-            case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: return "无法正确解析副露";
+            case PARSE_ERROR_ILLEGAL_CHARACTER: return __UTF8("无法解析的字符");
+            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: return __UTF8("数字后面需有后缀");
+            case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: return __UTF8("一组副露包含了错误的牌数目");
+            case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: return __UTF8("无法正确解析副露");
             default: break;
         }
         return nullptr;
     }
     if (win_tile == 0) {
-        return "缺少和牌张";
+        return __UTF8("缺少和牌张");
     }
 
     ret = mahjong::check_calculator_input(&hand_tiles, win_tile);
     if (ret != 0) {
         switch (ret) {
-            case ERROR_WRONG_TILES_COUNT: return "牌张数错误";
-            case ERROR_TILE_COUNT_GREATER_THAN_4: return "同一种牌最多只能使用4枚";
+            case ERROR_WRONG_TILES_COUNT: return __UTF8("牌张数错误");
+            case ERROR_TILE_COUNT_GREATER_THAN_4: return __UTF8("同一种牌最多只能使用4枚");
             default: break;
         }
         return nullptr;

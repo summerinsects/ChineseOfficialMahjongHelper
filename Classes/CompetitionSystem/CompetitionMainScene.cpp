@@ -13,7 +13,7 @@
 USING_NS_CC;
 
 bool CompetitionMainScene::init() {
-    if (UNLIKELY(!BaseScene::initWithTitle("比赛"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("比赛")))) {
         return false;
     }
 
@@ -25,15 +25,15 @@ bool CompetitionMainScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleText("新建比赛");
+    button->setTitleText(__UTF8("新建比赛"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 75.0f));
     button->addClickEventListener([this](Ref *) {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
             AlertDialog::Builder(this)
-                .setTitle("新建比赛")
-                .setMessage("当前有未完成的比赛，新建比赛将会覆盖旧的比赛，是否继续？")
-                .setNegativeButton("取消", nullptr)
-                .setPositiveButton("继续", [this](AlertDialog *, int) { showNewCompetitionAlert("", 8, 5); return true; })
+                .setTitle(__UTF8("新建比赛"))
+                .setMessage(__UTF8("当前有未完成的比赛，新建比赛将会覆盖旧的比赛，是否继续？"))
+                .setNegativeButton(__UTF8("取消"), nullptr)
+                .setPositiveButton(__UTF8("继续"), [this](AlertDialog *, int) { showNewCompetitionAlert("", 8, 5); return true; })
                 .create()->show();
         }
         else {
@@ -46,7 +46,7 @@ bool CompetitionMainScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleText("继续比赛");
+    button->setTitleText(__UTF8("继续比赛"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f + 25.0f));
     button->addClickEventListener([this](Ref *) {
         if (_competitionData->start_time != 0 && _competitionData->finish_time == 0) {
@@ -70,7 +70,7 @@ bool CompetitionMainScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleText("历史记录");
+    button->setTitleText(__UTF8("历史记录"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 25.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(CompetitionHistoryScene::create([](CompetitionData *){ }));
@@ -81,7 +81,7 @@ bool CompetitionMainScene::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(90.0f, 32.0f));
     button->setTitleFontSize(20);
-    button->setTitleText("近期赛事");
+    button->setTitleText(__UTF8("近期赛事"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 75.0f));
     button->addClickEventListener([this](Ref *) {
         Director::getInstance()->pushScene(LatestCompetitionScene::create());
@@ -99,7 +99,7 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(220.0f, 90.0f));
 
-    Label *label = Label::createWithSystemFont("赛事名称", "Arial", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("赛事名称"), "Arial", 12);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -119,10 +119,10 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBox->setPosition(Vec2(135.0f, 75.0f));
     editBoxes[0] = editBox;
 #if 1  // 测试代码
-    editBox->setText("测试比赛");
+    editBox->setText(__UTF8("测试比赛"));
 #endif
 
-    static const char *titleText[2] = { "参赛人数", "比赛轮数" };
+    static const char *titleText[2] = { __UTF8("参赛人数"), __UTF8("比赛轮数") };
     size_t value[2] = { player, round };
 
     for (int i = 0; i < 2; ++i) {
@@ -153,17 +153,17 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
     editBoxes[0]->setDelegate(delegate.get());
     editBoxes[1]->setDelegate(delegate.get());
 
-    label = Label::createWithSystemFont("参赛人数必须为4的倍数。移动设备毕竟不比PC，不建议设置过多人数和轮数", "Arial", 10);
+    label = Label::createWithSystemFont(__UTF8("参赛人数必须为4的倍数。移动设备毕竟不比PC，不建议设置过多人数和轮数"), "Arial", 10);
     label->setColor(Color3B(0x60, 0x60, 0x60));
     rootNode->addChild(label);
     label->setPosition(Vec2(110.0f, 15.0f));
     label->setDimensions(220.0f, 0.0f);
 
     AlertDialog::Builder(this)
-        .setTitle("新建比赛")
+        .setTitle(__UTF8("新建比赛"))
         .setContentNode(rootNode)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, editBoxes, delegate](AlertDialog *dlg, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, editBoxes, delegate](AlertDialog *dlg, int) {
         std::string name;
         size_t player = 8, round = 5;
 
@@ -183,29 +183,29 @@ void CompetitionMainScene::showNewCompetitionAlert(const std::string &name, size
         }
 
         if (name.empty()) {
-            Toast::makeText(this, "请输入赛事名称", Toast::LENGTH_LONG)->show();
+            Toast::makeText(this, __UTF8("请输入赛事名称"), Toast::LENGTH_LONG)->show();
             return false;
         }
 
         if ((player & 0x3) || player == 0) {
-            Toast::makeText(this, "参赛人数必须为4的倍数，且大于0", Toast::LENGTH_LONG)->show();
+            Toast::makeText(this, __UTF8("参赛人数必须为4的倍数，且大于0"), Toast::LENGTH_LONG)->show();
             return false;
         }
 
         if (round == 0) {
-            Toast::makeText(this, "比赛轮数必须大于0", Toast::LENGTH_LONG)->show();
+            Toast::makeText(this, __UTF8("比赛轮数必须大于0"), Toast::LENGTH_LONG)->show();
             return false;
         }
 
-        Label *label = Label::createWithSystemFont(Common::format("「%s」\n%" PRIzu "人\n%" PRIzu "轮", name.c_str(), player, round), "Arial", 12);
+        Label *label = Label::createWithSystemFont(Common::format(__UTF8("「%s」\n%") __UTF8(PRIzu) __UTF8("人\n%") __UTF8(PRIzu) __UTF8("轮"), name.c_str(), player, round), "Arial", 12);
         label->setColor(Color3B::BLACK);
         label->setHorizontalAlignment(TextHAlignment::CENTER);
 
         AlertDialog::Builder(this)
-            .setTitle("新建比赛")
+            .setTitle(__UTF8("新建比赛"))
             .setContentNode(label)
-            .setNegativeButton("取消", nullptr)
-            .setPositiveButton("确定", [this, name, player, round, dlg](AlertDialog *, int) {
+            .setNegativeButton(__UTF8("取消"), nullptr)
+            .setPositiveButton(__UTF8("确定"), [this, name, player, round, dlg](AlertDialog *, int) {
             _competitionData->prepare(name, player, round);
             _competitionData->writeToFile();
             Director::getInstance()->pushScene(CompetitionEnrollScene::create(_competitionData));

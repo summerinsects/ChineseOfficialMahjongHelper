@@ -14,7 +14,7 @@
 
 USING_NS_CC;
 
-static const char *principle_title[] = { "不重复原则", "不拆移原则", "不得相同原则", "就高不就低原则", "套算一次原则" };
+static const char *principle_title[] = { __UTF8("不重复原则"), __UTF8("不拆移原则"), __UTF8("不得相同原则"), __UTF8("就高不就低原则"), __UTF8("套算一次原则") };
 
 static std::vector<std::string> g_principles;
 static std::vector<std::string> g_definitions;

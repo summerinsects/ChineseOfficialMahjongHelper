@@ -38,10 +38,10 @@ bool HelloWorld::init() {
         CC_UNUSED_PARAM(keyCode);
         CC_UNUSED_PARAM(unusedEvent);
         AlertDialog::Builder(this)
-            .setTitle("提示")
-            .setMessage("是否确定退出国标小助手？")
-            .setNegativeButton("取消", nullptr)
-            .setPositiveButton("确定", [](AlertDialog *, int) {
+            .setTitle(__UTF8("提示"))
+            .setMessage(__UTF8("是否确定退出国标小助手？"))
+            .setNegativeButton(__UTF8("取消"), nullptr)
+            .setPositiveButton(__UTF8("确定"), [](AlertDialog *, int) {
             Director::getInstance()->end();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
             exit(0);
@@ -73,7 +73,7 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
-    button->setTitleText("算番器");
+    button->setTitleText(__UTF8("算番器"));
     button->setPosition(Vec2(origin.x + buttonWidth * 0.5f + 4.0f, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(FanCalculatorScene::create());
@@ -84,7 +84,7 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
-    button->setTitleText("计分器");
+    button->setTitleText(__UTF8("计分器"));
     button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8.0f, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(ScoreSheetScene::create());
@@ -95,7 +95,7 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
-    button->setTitleText("番种表");
+    button->setTitleText(__UTF8("番种表"));
     button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12.0f, origin.y + visibleSize.height * 0.5f + buttonHeight * 0.5f + 12.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(FanTableScene::create());
@@ -106,7 +106,7 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
-    button->setTitleText("牌理");
+    button->setTitleText(__UTF8("牌理"));
     button->setPosition(Vec2(origin.x + buttonWidth * 0.5f + 4.0f, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(MahjongTheoryScene::create());
@@ -117,7 +117,7 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
-    button->setTitleText("比赛");
+    button->setTitleText(__UTF8("比赛"));
     button->setPosition(Vec2(origin.x + buttonWidth * 1.5f + 8.0f, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(CompetitionMainScene::create());
@@ -128,7 +128,7 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(buttonWidth, buttonHeight));
     button->setTitleFontSize(20);
-    button->setTitleText("其他");
+    button->setTitleText(__UTF8("其他"));
     button->setPosition(Vec2(origin.x + buttonWidth * 2.5f + 12.0f, origin.y + visibleSize.height * 0.5f - buttonHeight * 0.5f + 8.0f));
     button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(OtherScene::create());
@@ -139,7 +139,7 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(40.0f, 25.0f));
     button->setTitleFontSize(14);
-    button->setTitleText("关于");
+    button->setTitleText(__UTF8("关于"));
     button->setPosition(Vec2(origin.x + 23.0f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&HelloWorld::onAboutButton, this, std::placeholders::_1));
 
@@ -157,7 +157,7 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(40.0f, 25.0f));
     button->setTitleFontSize(14);
-    button->setTitleText("捐赠");
+    button->setTitleText(__UTF8("捐赠"));
     button->setPosition(Vec2(origin.x + visibleSize.width - 23.0f, origin.y + 15.0f));
     button->addClickEventListener([](Ref *) {
         Application::getInstance()->openURL("https://gitee.com/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
@@ -199,10 +199,10 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     Node *rootNode = Node::create();
 
     Label *label = Label::createWithSystemFont(
-        "1. 本软件开源，高端玩家可下载源代码自行编译。\n"
-        "2. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper\n"
+        __UTF8("1. 本软件开源，高端玩家可下载源代码自行编译。\n")
+        __UTF8("2. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper\n")
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-        "3. 如果觉得本软件好用，可点击「下载地址」获取下载链接，分享给他人。"
+        __UTF8("3. 如果觉得本软件好用，可点击「下载地址」获取下载链接，分享给他人。")
 #endif
         , "Arail", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
@@ -215,7 +215,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     button1->setScale9Enabled(true);
     button1->setContentSize(Size(65.0, 20.0f));
     button1->setTitleFontSize(12);
-    button1->setTitleText("检测新版本");
+    button1->setTitleText(__UTF8("检测新版本"));
     button1->addClickEventListener([this](Ref *) { requestVersion(true); });
     rootNode->addChild(button1);
 
@@ -230,10 +230,10 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     button2->setScale9Enabled(true);
     button2->setContentSize(Size(65.0, 20.0f));
     button2->setTitleFontSize(12);
-    button2->setTitleText("下载地址");
+    button2->setTitleText(__UTF8("下载地址"));
     button2->addClickEventListener([this](Ref *) {
         cw::setClipboardText(DOWNLOAD_URL);
-        Toast::makeText(this, "下载地址已复制到剪切板", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("下载地址已复制到剪切板"), Toast::LENGTH_LONG)->show();
     });
     rootNode->addChild(button2);
 
@@ -247,10 +247,10 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
 #endif
 
     AlertDialog::Builder(this)
-        .setTitle("关于")
+        .setTitle(__UTF8("关于"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
-        .setPositiveButton("确定", nullptr)
+        .setPositiveButton(__UTF8("确定"), nullptr)
         .create()->show();
 }
 
@@ -283,7 +283,7 @@ void HelloWorld::requestVersion(bool manual) {
             log("response failed");
             log("error buffer: %s", response->getErrorBuffer());
             if (manual) {
-                Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_LONG)->show();
+                Toast::makeText(this, __UTF8("获取最新版本失败"), Toast::LENGTH_LONG)->show();
             }
             return;
         }
@@ -291,7 +291,7 @@ void HelloWorld::requestVersion(bool manual) {
         std::vector<char> *buffer = response->getResponseData();
         if (!checkVersion(buffer, manual)) {
             if (manual) {
-                Toast::makeText(this, "获取最新版本失败", Toast::LENGTH_LONG)->show();
+                Toast::makeText(this, __UTF8("获取最新版本失败"), Toast::LENGTH_LONG)->show();
             }
         }
     });
@@ -358,7 +358,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 
             if (!hasNewVersion) {
                 if (manual) {
-                    Toast::makeText(this, "已经是最新版本", Toast::LENGTH_LONG)->show();
+                    Toast::makeText(this, __UTF8("已经是最新版本"), Toast::LENGTH_LONG)->show();
                 }
                 return true;
             }
@@ -375,7 +375,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
                 checkBox->setContentSize(Size(20.0f, 20.0f));
                 checkBox->setPosition(Vec2(10.0f, 10.0f));
 
-                Label *label = Label::createWithSystemFont("今日之内不再提示", "Arial", 12);
+                Label *label = Label::createWithSystemFont(__UTF8("今日之内不再提示"), "Arial", 12);
                 label->setColor(Color3B::BLACK);
                 rootNode->addChild(label);
                 label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -391,21 +391,21 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
             }
 
             AlertDialog::Builder(this)
-                .setTitle("检测到新版本")
+                .setTitle(__UTF8("检测到新版本"))
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-                .setMessage(Common::format("%s，是否下载？\n\n%s", tag.c_str(), body.c_str()))
+                .setMessage(Common::format(__UTF8("%s，是否下载？\n\n%s"), tag.c_str(), body.c_str()))
 #elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-                .setMessage(Common::format("%s，是否下载？\n提取密码xyg\n\n%s", tag.c_str(), body.c_str()))
+                .setMessage(Common::format(__UTF8("%s，是否下载？\n提取密码xyg\n\n%s"), tag.c_str(), body.c_str()))
 #endif
                 .setContentNode(rootNode)
                 .setCloseOnTouchOutside(false)
-                .setNegativeButton("取消", [checkBox](AlertDialog *, int) {
+                .setNegativeButton(__UTF8("取消"), [checkBox](AlertDialog *, int) {
                     if (checkBox != nullptr && checkBox->isSelected()) {
                         UserDefault::getInstance()->setStringForKey("not_notify", std::to_string(time(nullptr)));
                     }
                     return true;
                 })
-                .setPositiveButton("更新", [](AlertDialog *, int) {
+                .setPositiveButton(__UTF8("更新"), [](AlertDialog *, int) {
                     Application::getInstance()->openURL(DOWNLOAD_URL);
                     return true;
                 })

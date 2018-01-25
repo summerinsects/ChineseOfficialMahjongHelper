@@ -13,10 +13,10 @@ USING_NS_CC;
 extern "C++" void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]);
 extern "C++" void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]);
 
-static const char *seatText[] = { "东", "南", "西", "北" };
+static const char *seatText[] = { __UTF8("东"), __UTF8("南"), __UTF8("西"), __UTF8("北") };
 
 bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
-    if (UNLIKELY(!BaseScene::initWithTitle(Common::format("%s第%" PRIzu "/%" PRIzu "轮",
+    if (UNLIKELY(!BaseScene::initWithTitle(Common::format(__UTF8("%s第%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu) __UTF8("轮"),
         competitionData->name.c_str(), currentRound + 1, competitionData->round_count)))) {
         return false;
     }
@@ -41,7 +41,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     cw::calculateColumnsCenterX(_colWidth, 7, _posX);
 
     // 表头
-    static const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "标准分", "比赛分" };
+    static const char *titleTexts[] = { __UTF8("桌号"), __UTF8("座次"), __UTF8("编号"), __UTF8("选手姓名"), __UTF8("标准分"), __UTF8("比赛分") };
     for (int i = 0; i < 6; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
@@ -92,7 +92,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("排列座位");
+    button->setTitleText(__UTF8("排列座位"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f, origin.y + 15.0f));
     button->addClickEventListener([this](Ref *) { showArrangeAlert(); });
 
@@ -102,7 +102,7 @@ bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> 
     button->setScale9Enabled(true);
     button->setContentSize(Size(50.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("提交");
+    button->setTitleText(__UTF8("提交"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.75f, origin.y + 15.0f));
     button->addClickEventListener([](Ref *) { Director::getInstance()->popScene(); });
     button->setEnabled(_competitionData->isRoundFinished(_currentRound));
@@ -136,8 +136,8 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&tableLabel = std::get<0>(ext);
         std::array<std::array<Label *, 4>, 4> &labels = std::get<1>(ext);
-        std::array<ui::Button *, 2> &buttons = std::get<2>(ext);
-        std::array<LayerColor *, 2> &layerColors = std::get<3>(ext);
+        ui::Button **buttons = std::get<2>(ext).data();
+        LayerColor **layerColors = std::get<3>(ext).data();
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -185,7 +185,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         button->setScale9Enabled(true);
         button->setContentSize(Size(buttonWidth, 20.0f));
         button->setTitleFontSize(12);
-        button->setTitleText("输入");
+        button->setTitleText(__UTF8("输入"));
         button->setPosition(Vec2(_posX[6], 55.0f));
         button->addClickEventListener(std::bind(&CompetitionTableScene::onRecordButton, this, std::placeholders::_1));
         cw::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[5] - 10.0f);
@@ -197,7 +197,7 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
         button->setScale9Enabled(true);
         button->setContentSize(Size(buttonWidth, 20.0f));
         button->setTitleFontSize(12);
-        button->setTitleText("清空");
+        button->setTitleText(__UTF8("清空"));
         button->setPosition(Vec2(_posX[6], 25.0f));
         button->addClickEventListener(std::bind(&CompetitionTableScene::onClearButton, this, std::placeholders::_1));
         cw::scaleLabelToFitWidth(button->getTitleLabel(), _colWidth[5] - 10.0f);
@@ -222,8 +222,8 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
     const CustomCell::ExtDataType &ext = cell->getExtData();
     Label *tableLabel = std::get<0>(ext);
     const std::array<std::array<Label *, 4>, 4> &labels = std::get<1>(ext);
-    const std::array<ui::Button *, 2> &buttons = std::get<2>(ext);
-    const std::array<LayerColor *, 2> &layerColors = std::get<3>(ext);
+    ui::Button *const *buttons = std::get<2>(ext).data();
+    LayerColor *const *layerColors = std::get<3>(ext).data();
 
     layerColors[0]->setVisible(!(idx & 1));
     layerColors[1]->setVisible(!!(idx & 1));
@@ -297,10 +297,10 @@ void CompetitionTableScene::onRecordButton(cocos2d::Ref *sender) {
     if (std::any_of(std::begin(currentTable.player_indices), std::end(currentTable.player_indices),
         [](ptrdiff_t idx) { return idx == INVALID_INDEX; })) {
         AlertDialog::Builder(this)
-            .setTitle("登记成绩")
-            .setMessage("请先排座位")
-            .setNegativeButton("取消", nullptr)
-            .setPositiveButton("确定", [this](AlertDialog *, int) { showArrangeAlert(); return true; })
+            .setTitle(__UTF8("登记成绩"))
+            .setMessage(__UTF8("请先排座位"))
+            .setNegativeButton(__UTF8("取消"), nullptr)
+            .setPositiveButton(__UTF8("确定"), [this](AlertDialog *, int) { showArrangeAlert(); return true; })
             .create()->show();
         return;
     }
@@ -373,14 +373,14 @@ namespace {
             }
 
             // 检查
-            Label *label = Label::createWithSystemFont("检查：标准分总和7，比赛分总和0", "Arail", 10);
+            Label *label = Label::createWithSystemFont(__UTF8("检查：标准分总和7，比赛分总和0"), "Arail", 10);
             label->setColor(Color3B(254, 87, 110));
             this->addChild(label);
             label->setPosition(Vec2(width * 0.5f, 45.0f));
             cw::scaleLabelToFitWidth(label, width - 4.0f);
             _checkLabel = label;
 
-            static const char *titleTexts[] = { "座次", "编号", "选手姓名", "标准分", "比赛分" };
+            static const char *titleTexts[] = { __UTF8("座次"), __UTF8("编号"), __UTF8("选手姓名"), __UTF8("标准分"), __UTF8("比赛分") };
             for (int i = 0; i < 5; ++i) {
                 label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
                 label->setColor(Color3B::BLACK);
@@ -431,7 +431,7 @@ namespace {
             button->setScale9Enabled(true);
             button->setContentSize(Size(55.0f, 20.0f));
             button->setTitleFontSize(12);
-            button->setTitleText("自动计算");
+            button->setTitleText(__UTF8("自动计算"));
             button->setPosition(Vec2(width * 0.5f, 25.0f));
             button->addClickEventListener([this](Ref *) {
                 calculateRanks();
@@ -439,7 +439,7 @@ namespace {
             });
 
             // 说明文本
-            label = Label::createWithSystemFont("如采用4210标准分赛制，可使用「自动计算」", "Arail", 10);
+            label = Label::createWithSystemFont(__UTF8("如采用4210标准分赛制，可使用「自动计算」"), "Arail", 10);
             label->setColor(Color3B(0x60, 0x60, 0x60));
             this->addChild(label);
             label->setPosition(Vec2(width * 0.5f, 5.0f));
@@ -489,7 +489,7 @@ namespace {
                 ss += _results[i].standard_score;
                 cs += _results[i].competition_score;
             }
-            _checkLabel->setString(Common::format("检查：标准分总和%s，比赛分总和%d", CompetitionResult::standardScoreToString(ss).c_str(), cs));
+            _checkLabel->setString(Common::format(__UTF8("检查：标准分总和%s，比赛分总和%d"), CompetitionResult::standardScoreToString(ss).c_str(), cs));
         }
 
         void calculateStandardScores() {
@@ -513,17 +513,17 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
         _competitionData->players, _competitionTables->at(table));
 
     AlertDialog::Builder(this)
-        .setTitle(Common::format("第%" PRIzu "桌成绩", table + 1))
+        .setTitle(Common::format(__UTF8("第%") __UTF8(PRIzu) __UTF8("桌成绩"), table + 1))
         .setContentNode(rootNode)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, table, rootNode](AlertDialog *, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, table, rootNode](AlertDialog *, int) {
         rootNode->calculateRanks();
         const CompetitionResult (*results)[4] = &rootNode->getResults();
 
         // 如果有顺位为0，则提示重新输入
         if (std::any_of(std::begin(*results), std::end(*results),
             [](const CompetitionResult &result) { return result.rank == 0; })) {
-            Toast::makeText(this, "数据错误，请重新输入", Toast::LENGTH_LONG)->show();
+            Toast::makeText(this, __UTF8("数据错误，请重新输入"), Toast::LENGTH_LONG)->show();
             return false;
         }
 
@@ -544,7 +544,7 @@ void CompetitionTableScene::showRecordAlert(size_t table, const CompetitionResul
 
 void CompetitionTableScene::showArrangeAlert() {
     if (_competitionData->isRoundStarted(_currentRound)) {
-        Toast::makeText(this, "开始记录成绩后不允许重新排座位", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("开始记录成绩后不允许重新排座位"), Toast::LENGTH_LONG)->show();
         return;
     }
 
@@ -554,7 +554,7 @@ void CompetitionTableScene::showArrangeAlert() {
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
     rootNode->addChild(radioGroup);
 
-    static const char *titles[] = { "随机", "蛇形", "高高碰", "自定义" };
+    static const char *titles[] = { __UTF8("随机"), __UTF8("蛇形"), __UTF8("高高碰"), __UTF8("自定义") };
 
     for (int i = 0; i < 4; ++i) {
         const float yPos = 85.0f - i * 25.0f;
@@ -575,10 +575,10 @@ void CompetitionTableScene::showArrangeAlert() {
     }
 
     AlertDialog::Builder(this)
-        .setTitle("排列座位")
+        .setTitle(__UTF8("排列座位"))
         .setContentNode(rootNode)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, radioGroup](AlertDialog *, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, radioGroup](AlertDialog *, int) {
         switch (radioGroup->getSelectedButtonIndex()) {
         case 0: _competitionData->rankTablesByRandom(_currentRound); break;
         case 1: _competitionData->rankTablesBySnake(_currentRound); break;

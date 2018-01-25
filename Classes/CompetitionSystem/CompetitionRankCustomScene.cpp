@@ -6,10 +6,10 @@
 
 USING_NS_CC;
 
-static const char *seatText[] = { "东", "南", "西", "北" };
+static const char *seatText[] = { __UTF8("东"), __UTF8("南"), __UTF8("西"), __UTF8("北") };
 
 bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
-    if (UNLIKELY(!BaseScene::initWithTitle("自定义排座位"))) {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("自定义排座位")))) {
         return false;
     }
 
@@ -37,7 +37,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     cw::calculateColumnsCenterX(_colWidth, 8, _posX);
 
     // 表头
-    static const char *titleTexts[] = { "桌号", "座次", "编号", "选手姓名", "桌号", "座次", "编号", "选手姓名" };
+    static const char *titleTexts[] = { __UTF8("桌号"), __UTF8("座次"), __UTF8("编号"), __UTF8("选手姓名"), __UTF8("桌号"), __UTF8("座次"), __UTF8("编号"), __UTF8("选手姓名") };
     for (int i = 0; i < 8; ++i) {
         Label *label = Label::createWithSystemFont(titleTexts[i], "Arail", 12);
         label->setColor(Color3B::BLACK);
@@ -87,7 +87,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("清空");
+    button->setTitleText(__UTF8("清空"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&CompetitionRankCustomScene::onResetButton, this, std::placeholders::_1));
 
@@ -97,7 +97,7 @@ bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionD
     button->setScale9Enabled(true);
     button->setContentSize(Size(50.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("提交");
+    button->setTitleText(__UTF8("提交"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.75f, origin.y + 15.0f));
     button->addClickEventListener(std::bind(&CompetitionRankCustomScene::onSubmitButton, this, std::placeholders::_1));
     button->setEnabled(false);
@@ -122,11 +122,11 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
         cell = CustomCell::create();
 
         CustomCell::ExtDataType &ext = cell->getExtData();
-        std::array<ui::Widget *, 2> &rootWidgets = std::get<0>(ext);
-        std::array<Label *, 2> &tableLabels = std::get<1>(ext);
+        ui::Widget **rootWidgets = std::get<0>(ext).data();
+        Label **tableLabels = std::get<1>(ext).data();
         std::array<std::array<std::array<Label *, 2>, 4>, 2> &labels = std::get<2>(ext);
         std::array<std::array<ui::Widget *, 4>, 2> &touchedWidgets = std::get<3>(ext);
-        std::array<LayerColor *, 2> &layerColors = std::get<4>(ext);
+        LayerColor **layerColors = std::get<4>(ext).data();
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -205,11 +205,11 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
-    const std::array<ui::Widget *, 2> &rootWidgets = std::get<0>(ext);
-    const std::array<Label *, 2> &tableLabels = std::get<1>(ext);
+    ui::Widget *const *rootWidgets = std::get<0>(ext).data();
+    Label *const *tableLabels = std::get<1>(ext).data();
     const std::array<std::array<std::array<Label *, 2>, 4>, 2> &labels = std::get<2>(ext);
     const std::array<std::array<ui::Widget *, 4>, 2> &touchedWidgets = std::get<3>(ext);
-    const std::array<LayerColor *, 2> &layerColors = std::get<4>(ext);
+    LayerColor *const *layerColors = std::get<4>(ext).data();
 
     layerColors[0]->setVisible(!(idx & 1));
     layerColors[1]->setVisible(!!(idx & 1));
@@ -231,7 +231,7 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                 ptrdiff_t playerIndex = _playerIndices[realIndex];
                 if (playerIndex == INVALID_INDEX) {
                     labels[n][i][0]->setString("");
-                    labels[n][i][1]->setString("选择");
+                    labels[n][i][1]->setString(__UTF8("选择"));
                     labels[n][i][1]->setColor(Color3B::GRAY);
                 }
                 else {
@@ -255,10 +255,10 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
 
 void CompetitionRankCustomScene::onResetButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
-        .setTitle("清空")
-        .setMessage("确定清空？")
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("清空", [this](AlertDialog *, int) {
+        .setTitle(__UTF8("清空"))
+        .setMessage(__UTF8("确定清空？"))
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("清空"), [this](AlertDialog *, int) {
         _playerFlags.assign(_playerFlags.size(), false);
         _playerIndices.assign(_playerFlags.size(), INVALID_INDEX);
         _tableView->reloadData();
@@ -292,10 +292,10 @@ void CompetitionRankCustomScene::onNameWidget(cocos2d::Ref *sender) {
     }
     else {
         AlertDialog::Builder(this)
-            .setTitle(Common::format("%" PRIzd "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]))
-            .setMessage("该座位已经有人了，是否清除并重新选择")
-            .setNegativeButton("取消", nullptr)
-            .setPositiveButton("清除", [this, playerIndex, realIndex](AlertDialog *, int) {
+            .setTitle(Common::format(__UTF8("%") __UTF8(PRIzd) __UTF8("桌%s位"), (realIndex >> 2) + 1, seatText[realIndex & 3]))
+            .setMessage(__UTF8("该座位已经有人了，是否清除并重新选择"))
+            .setNegativeButton(__UTF8("取消"), nullptr)
+            .setPositiveButton(__UTF8("清除"), [this, playerIndex, realIndex](AlertDialog *, int) {
             _playerIndices[realIndex] = INVALID_INDEX;
             _playerFlags[playerIndex] = false;
             _tableView->updateCellAtIndex(realIndex >> 3);
@@ -380,9 +380,9 @@ namespace {
                 cell = CustomCell::create();
 
                 CustomCell::ExtDataType &ext = cell->getExtData();
-                std::array<ui::CheckBox *, 2> &checkBoxes = std::get<0>(ext);
+                ui::CheckBox **checkBoxes = std::get<0>(ext).data();
                 std::array<std::array<Label *, 2>, 2> &labels = std::get<1>(ext);
-                std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+                LayerColor **layerColors = std::get<2>(ext).data();
 
                 // 背景色
                 layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 30.0f);
@@ -417,9 +417,9 @@ namespace {
             }
 
             const CustomCell::ExtDataType &ext = cell->getExtData();
-            const std::array<ui::CheckBox *, 2> &checkBoxes = std::get<0>(ext);
+            ui::CheckBox *const *checkBoxes = std::get<0>(ext).data();
             const std::array<std::array<Label *, 2>, 2> &labels = std::get<1>(ext);
-            const std::array<LayerColor *, 2> &layerColors = std::get<2>(ext);
+            LayerColor *const *layerColors = std::get<2>(ext).data();
 
             layerColors[0]->setVisible(!(idx & 1));
             layerColors[1]->setVisible(!!(idx & 1));
@@ -452,10 +452,10 @@ namespace {
 void CompetitionRankCustomScene::showSelectPlayerAlert(ssize_t realIndex) {
     AlertInnerNode *innerNode = AlertInnerNode::create(&_competitionData->players, &_playerFlags, &_playerIndices);
     AlertDialog::Builder(this)
-        .setTitle(Common::format("选择选手：%" PRIzd "桌%s位", (realIndex >> 2) + 1, seatText[realIndex & 3]))
+        .setTitle(Common::format(__UTF8("选择选手：%") __UTF8(PRIzd) __UTF8("桌%s位"), (realIndex >> 2) + 1, seatText[realIndex & 3]))
         .setContentNode(innerNode)
-        .setNegativeButton("取消", nullptr)
-        .setPositiveButton("确定", [this, innerNode, realIndex](AlertDialog *, int) {
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, innerNode, realIndex](AlertDialog *, int) {
         const std::vector<uint8_t> &currentFlags = innerNode->getCurrentFlags();
         std::vector<size_t> selected;
         selected.reserve(8);
