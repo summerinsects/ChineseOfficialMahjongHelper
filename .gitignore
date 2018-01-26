@@ -204,3 +204,4 @@ project.properties
 *.iml
 /proj.android/app/build.xml
 /proj.android/app/proguard-project.txt
+*.apk
