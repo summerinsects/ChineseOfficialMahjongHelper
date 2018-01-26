@@ -116,58 +116,56 @@ bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
     }
 
     try {
-        do {
-            std::string str(buffer->begin(), buffer->end());
-            rapidjson::Document doc;
-            doc.Parse<0>(str.c_str());
-            if (doc.HasParseError() || !doc.IsArray()) {
-                break;
+        std::string str(buffer->begin(), buffer->end());
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError() || !doc.IsArray()) {
+            return false;
+        }
+
+        _competitions.clear();
+        _competitions.reserve(doc.Size());
+        std::transform(doc.Begin(), doc.End(), std::back_inserter(_competitions), [](const rapidjson::Value &json) {
+            CompetitionInfo info = { 0 };
+
+            rapidjson::Value::ConstMemberIterator it = json.FindMember("name");
+            if (it != json.MemberEnd() && it->value.IsString()) {
+                strncpy(info.name, it->value.GetString(), sizeof(info.name) - 1);
             }
 
-            _competitions.clear();
-            _competitions.reserve(doc.Size());
-            std::transform(doc.Begin(), doc.End(), std::back_inserter(_competitions), [](const rapidjson::Value &json) {
-                CompetitionInfo info = { 0 };
+            it = json.FindMember("start_time");
+            if (it != json.MemberEnd() && it->value.IsInt64()) {
+                info.startTime = static_cast<time_t>(it->value.GetInt64());
+            }
 
-                rapidjson::Value::ConstMemberIterator it = json.FindMember("name");
-                if (it != json.MemberEnd() && it->value.IsString()) {
-                    strncpy(info.name, it->value.GetString(), sizeof(info.name) - 1);
-                }
+            it = json.FindMember("end_time");
+            if (it != json.MemberEnd() && it->value.IsInt64()) {
+                info.endTime = static_cast<time_t>(it->value.GetInt64());
+            }
 
-                it = json.FindMember("start_time");
-                if (it != json.MemberEnd() && it->value.IsInt64()) {
-                    info.startTime = static_cast<time_t>(it->value.GetInt64());
-                }
+            it = json.FindMember("url");
+            if (it != json.MemberEnd() && it->value.IsString()) {
+                strncpy(info.url, it->value.GetString(), sizeof(info.url) - 1);
+            }
 
-                it = json.FindMember("end_time");
-                if (it != json.MemberEnd() && it->value.IsInt64()) {
-                    info.endTime = static_cast<time_t>(it->value.GetInt64());
-                }
+            it = json.FindMember("time_accuracy");
+            if (it != json.MemberEnd() && it->value.IsInt()) {
+                info.timeAccuracy = static_cast<TIME_ACCURACY>(it->value.GetInt());
+            }
+            return info;
+        });
 
-                it = json.FindMember("url");
-                if (it != json.MemberEnd() && it->value.IsString()) {
-                    strncpy(info.url, it->value.GetString(), sizeof(info.url) - 1);
-                }
+        time_t now = time(nullptr);
+        std::vector<CompetitionInfo>::iterator it = std::remove_if(_competitions.begin(), _competitions.end(),
+            [now](const CompetitionInfo &info) {
+            return (info.timeAccuracy != TIME_ACCURACY::UNDETERMINED && info.startTime < now);
+        });
+        _competitions.erase(it, _competitions.end());
 
-                it = json.FindMember("time_accuracy");
-                if (it != json.MemberEnd() && it->value.IsInt()) {
-                    info.timeAccuracy = static_cast<TIME_ACCURACY>(it->value.GetInt());
-                }
-                return info;
-            });
+        _tableView->reloadDataInplacement();
+        _emptyLabel->setVisible(_competitions.empty());
 
-            time_t now = time(nullptr);
-            std::vector<CompetitionInfo>::iterator it = std::remove_if(_competitions.begin(), _competitions.end(),
-                [now](const CompetitionInfo &info) {
-                return (info.timeAccuracy != TIME_ACCURACY::UNDETERMINED && info.startTime < now);
-            });
-            _competitions.erase(it, _competitions.end());
-
-            _tableView->reloadDataInplacement();
-            _emptyLabel->setVisible(_competitions.empty());
-
-            return true;
-        } while (0);
+        return true;
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
@@ -232,8 +230,8 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
     Label *const *label = std::get<1>(ext).data();
     ui::Button *detailBtn = std::get<2>(ext);
 
-    layerColors[0]->setVisible(!(idx & 1));
-    layerColors[1]->setVisible(!!(idx & 1));
+    layerColors[0]->setVisible((idx & 1) == 0);
+    layerColors[1]->setVisible((idx & 1) != 0);
 
     detailBtn->setUserData(reinterpret_cast<void *>(idx));
 
@@ -263,7 +261,7 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
             date.append(Common::format(__UTF8("%d年%d月%d日"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday));
         }
         break;
-    case TIME_ACCURACY::HONRS:
+    case TIME_ACCURACY::HOURS:
         date = Common::format(__UTF8("%d年%d月%d日%.2d点"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour);
         if (info.endTime != 0) {
             date.append(__UTF8("——"));
