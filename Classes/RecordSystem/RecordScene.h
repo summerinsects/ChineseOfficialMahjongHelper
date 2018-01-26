@@ -32,8 +32,6 @@ public:
     virtual void editBoxEditingDidBegin(cocos2d::ui::EditBox* editBox) override;
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
 
-    const Record::Detail &getDetail() const { return _detail; }
-
     static void SetScoreLabelColor(cocos2d::Label *(&scoreLabel)[4], int (&scoreTable)[4], uint8_t win_flag, uint8_t claim_flag, const int16_t (&penalty_scores)[4]);
 
 private:
@@ -64,7 +62,7 @@ private:
 
     void refresh();
     void updateScoreLabel();
-    void showLittleFanAlert(bool callFromSubmiting);
+    void showLittleFanAlert(bool callFromSubmitting);
 
     void onPlusButton(cocos2d::Ref *sender, int delta);
     void onRecordTilesButton(cocos2d::Ref *sender);

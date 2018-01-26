@@ -744,8 +744,8 @@ static void spiltStringToLabel(const std::string &str, float width, Label *label
     }
 
     StringUtils::StringUTF8 utf8(str);
-    long utf8Len = utf8.length();
-    long pos = static_cast<long>(width / size.width * utf8Len);  // 切这么多
+    size_t utf8Len = utf8.length();
+    size_t pos = static_cast<size_t>(width / size.width * utf8Len);  // 切这么多
 
     // 切没了，全部放在第2个label上
     if (pos <= 0) {

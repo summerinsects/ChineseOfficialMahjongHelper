@@ -144,10 +144,10 @@ static void saveRecentFans() {
 }
 
 static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
-    return (cnt >> 2) + !!(cnt & 0x3);
+    return (cnt >> 2) + ((cnt & 0x3) != 0);
 }
 
-#define ORDER(flag_, i_) (((flag_) >> ((i_) << 1)) & 0x3)
+#define ORDER(flag_, i_) (((flag_) >> ((i_) << 1)) & 0x3U)
 
 #define PLAYER_TO_UI(p_) ORDER(_seatFlag, (p_))
 #define UI_TO_PLAYER(u_) ORDER(_playerFlag, (u_))
@@ -287,13 +287,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 和牌
         float y = origin.y + visibleSize.height - 140.0f;
-        ui::RadioButton *button = UICommon::createRadioButton();
-        radioNode->addChild(button);
-        button->setZoomScale(0.0f);
-        button->ignoreContentAdaptWithSize(false);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, y));
-        winGroup->addRadioButton(button);
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
+        radioNode->addChild(radioButton);
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(x - 15.0f, y));
+        winGroup->addRadioButton(radioButton);
 
         label = Label::createWithSystemFont(__UTF8("和牌"), "Arial", 12);
         label->setColor(Color3B::BLACK);
@@ -303,13 +303,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 点炮或自摸
         y = origin.y + visibleSize.height - 170.0f;
-        button = UICommon::createRadioButton();
-        radioNode->addChild(button);
-        button->setZoomScale(0.0f);
-        button->ignoreContentAdaptWithSize(false);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setPosition(Vec2(x - 15.0f, y));
-        claimGroup->addRadioButton(button);
+        radioButton = UICommon::createRadioButton();
+        radioNode->addChild(radioButton);
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(x - 15.0f, y));
+        claimGroup->addRadioButton(radioButton);
 
         label = Label::createWithSystemFont(__UTF8("点炮"), "Arial", 12);
         label->setColor(Color3B::BLACK);
@@ -696,7 +696,7 @@ void RecordScene::updateScoreLabel() {
     int claimIndex = -1;
     if (_winIndex != -1) {  // 有人和牌
         int fan = atoi(_editBox->getText());  // 获取输入框里所填番数
-        _detail.fan = std::max<uint16_t>(8, fan);
+        _detail.fan = static_cast<uint16_t>(std::max(8, fan));
         claimIndex = _claimGroup->getSelectedButtonIndex();
 
         // 记录和牌和点炮
@@ -881,7 +881,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
     }).create()->show();
 }
 
-void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
+void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     const float maxWidth = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
@@ -989,7 +989,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [this, checkBoxes, labels, callFromSubmiting](AlertDialog *, int) {
+        .setPositiveButton(__UTF8("确定"), [this, checkBoxes, labels, callFromSubmitting](AlertDialog *, int) {
         uint16_t uniqueFan = 0;
         uint64_t multipleFan = 0;
         for (int i = 0; i < 14; ++i) {
@@ -1007,7 +1007,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmiting) {
 
         _detail.unique_fan = uniqueFan;
         _detail.multiple_fan = multipleFan;
-        if (callFromSubmiting) {
+        if (callFromSubmitting) {
             finish();
         }
         return true;
@@ -1339,7 +1339,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
             .setContentNode(innerNode)
             .setCloseOnTouchOutside(false)
             .setPositiveButton(__UTF8("确定"), [this, temp, fan, fanFlag, uniqueFan, multipleFan, dlg](AlertDialog *, int) {
-            _detail.fan = std::max<uint16_t>(fan, 8);
+            _detail.fan = static_cast<uint16_t>(std::max(fan, 8));
             _detail.fan_flag = fanFlag;
             _detail.unique_fan = uniqueFan;
             _detail.multiple_fan = multipleFan;

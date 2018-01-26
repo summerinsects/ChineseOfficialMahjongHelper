@@ -24,7 +24,7 @@ private:
     cocos2d::Label *_emptyLabel = nullptr;
 
     enum class TIME_ACCURACY {
-        UNDETERMINED = 0, MONTHS, DAYS, HONRS, MINUTES
+        UNDETERMINED = 0, MONTHS, DAYS, HOURS, MINUTES
     };
 
     struct CompetitionInfo {

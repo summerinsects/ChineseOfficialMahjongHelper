@@ -90,7 +90,7 @@ bool TilePickWidget::initWithWidth(float maxWidth) {
     // 万
     const float charactersY = TILE_HEIGHT * 3.5f;
     for (int i = 0; i < 9; ++i) {
-        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, i + 1);
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_CHARACTERS, static_cast<mahjong::rank_t>(i + 1));
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tilesContainer->addChild(button);
@@ -102,7 +102,7 @@ bool TilePickWidget::initWithWidth(float maxWidth) {
     // 条
     const float bambooY = TILE_HEIGHT * 2.5f;
     for (int i = 0; i < 9; ++i) {
-        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_BAMBOO, i + 1);
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_BAMBOO, static_cast<mahjong::rank_t>(i + 1));
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tilesContainer->addChild(button);
@@ -114,7 +114,7 @@ bool TilePickWidget::initWithWidth(float maxWidth) {
     // 饼
     const float dotsY = TILE_HEIGHT * 1.5f;
     for (int i = 0; i < 9; ++i) {
-        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DOTS, i + 1);
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_DOTS, static_cast<mahjong::rank_t>(i + 1));
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tilesContainer->addChild(button);
@@ -126,7 +126,7 @@ bool TilePickWidget::initWithWidth(float maxWidth) {
     // 字牌
     const float honorsY = TILE_HEIGHT * 0.5f;
     for (int i = 0; i < 7; ++i) {
-        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_HONORS, i + 1);
+        mahjong::tile_t tile = mahjong::make_tile(TILE_SUIT_HONORS, static_cast<mahjong::rank_t>(i + 1));
         ui::Button *button = ui::Button::create(tilesImageName[tile]);
         button->setScale(contentScaleFactor);
         tilesContainer->addChild(button);

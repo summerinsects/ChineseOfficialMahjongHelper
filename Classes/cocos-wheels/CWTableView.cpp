@@ -70,10 +70,10 @@ namespace cw {
             ui::ScrollView::setDirection(dir);
             break;
         case Direction::BOTH:
-            CCAssert(0, "TableView doesn't support both diretion!");
+            CCAssert(0, "TableView doesn't support both direction!");
             break;
         default:
-            CCAssert(0, "Unknown diretion!");
+            CCAssert(0, "Unknown direction!");
             break;
         }
     }

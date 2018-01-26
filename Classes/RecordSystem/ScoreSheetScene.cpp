@@ -231,7 +231,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         }
 
         // 计分按钮
-        ui::Button *button = UICommon::createButton();
+        button = UICommon::createButton();
         drawNode->addChild(button, -1);
         button->setScale9Enabled(true);
         button->setContentSize(Size(gap, cellHeight));
