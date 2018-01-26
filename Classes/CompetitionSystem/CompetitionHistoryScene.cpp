@@ -175,8 +175,8 @@ cw::TableViewCell *CompetitionHistoryScene::tableCellAtIndex(cw::TableView *tabl
     Label *label = std::get<1>(ext);
     ui::Button *delBtn = std::get<2>(ext);
 
-    layerColors[0]->setVisible(!(idx & 1));
-    layerColors[1]->setVisible(!!(idx & 1));
+    layerColors[0]->setVisible((idx & 1) == 0);
+    layerColors[1]->setVisible((idx & 1) != 0);
 
     delBtn->setUserData(reinterpret_cast<void *>(idx));
 

@@ -142,8 +142,8 @@ cw::TableViewCell *CompetitionEnrollScene::tableCellAtIndex(cw::TableView *table
     ui::Widget *const *widgets = std::get<1>(ext).data();
     LayerColor *const *layerColors = std::get<2>(ext).data();
 
-    layerColors[0]->setVisible(!(idx & 1));
-    layerColors[1]->setVisible(!!(idx & 1));
+    layerColors[0]->setVisible((idx & 1) == 0);
+    layerColors[1]->setVisible((idx & 1) != 0);
 
     ssize_t idx0 = idx << 1;
     ssize_t idx1 = idx0 | 1;

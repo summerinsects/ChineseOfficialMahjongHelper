@@ -211,8 +211,8 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
     const std::array<std::array<ui::Widget *, 4>, 2> &touchedWidgets = std::get<3>(ext);
     LayerColor *const *layerColors = std::get<4>(ext).data();
 
-    layerColors[0]->setVisible(!(idx & 1));
-    layerColors[1]->setVisible(!!(idx & 1));
+    layerColors[0]->setVisible((idx & 1) == 0);
+    layerColors[1]->setVisible((idx & 1) != 0);
 
     const std::vector<CompetitionPlayer> &players = _competitionData->players;
     ssize_t realTableIdx = idx << 1;
@@ -421,8 +421,8 @@ namespace {
             const std::array<std::array<Label *, 2>, 2> &labels = std::get<1>(ext);
             LayerColor *const *layerColors = std::get<2>(ext).data();
 
-            layerColors[0]->setVisible(!(idx & 1));
-            layerColors[1]->setVisible(!!(idx & 1));
+            layerColors[0]->setVisible((idx & 1) == 0);
+            layerColors[1]->setVisible((idx & 1) != 0);
 
             for (int i = 0; i < 2; ++i) {
                 ssize_t realIdx = (idx << 1) + i;

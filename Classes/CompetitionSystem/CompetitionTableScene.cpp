@@ -225,8 +225,8 @@ cw::TableViewCell *CompetitionTableScene::tableCellAtIndex(cw::TableView *table,
     ui::Button *const *buttons = std::get<2>(ext).data();
     LayerColor *const *layerColors = std::get<3>(ext).data();
 
-    layerColors[0]->setVisible(!(idx & 1));
-    layerColors[1]->setVisible(!!(idx & 1));
+    layerColors[0]->setVisible((idx & 1) == 0);
+    layerColors[1]->setVisible((idx & 1) != 0);
 
     const CompetitionTable &currentTable = _competitionTables->at(idx);
     tableLabel->setString(std::to_string(currentTable.serial + 1));  // 桌号
