@@ -196,8 +196,8 @@ cw::TableViewCell *CompetitionRankCustomScene::tableCellAtIndex(cw::TableView *t
                 drawNode->drawLine(Vec2(_colWidth[n * 4], posY), Vec2(posX, posY), Color4F::BLACK);
             }
             for (int i = 0; i < 3; ++i) {
-                const float posX = _posX[i] + _colWidth[i] * 0.5f;
-                drawNode->drawLine(Vec2(posX, 0.0f), Vec2(posX, 80.0f), Color4F::BLACK);
+                const float posX1 = _posX[i] + _colWidth[i] * 0.5f;
+                drawNode->drawLine(Vec2(posX1, 0.0f), Vec2(posX1, 80.0f), Color4F::BLACK);
             }
             drawNodes[n] = drawNode;
         }

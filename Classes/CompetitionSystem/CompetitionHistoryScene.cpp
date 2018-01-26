@@ -88,11 +88,9 @@ bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback)
 #if 1
     if (UNLIKELY(g_competitions.empty())) {
         this->scheduleOnce([this](float) {
-            Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
             LoadingView *loadingView = LoadingView::create();
             this->addChild(loadingView);
-            loadingView->setPosition(origin);
+            loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
 
             auto thiz = makeRef(this);  // 保证线程回来之前不析构
             std::thread([thiz, loadingView]() {
