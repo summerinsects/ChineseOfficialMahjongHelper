@@ -531,7 +531,7 @@ bool CompetitionData::readFromFile() {
         long size = ftell(fp);
         fseek(fp, 0, SEEK_SET);
         try {
-            str.resize(size + 1);
+            str.resize(static_cast<size_t>(size + 1));
             fread(&str[0], sizeof(char), static_cast<size_t>(size), fp);
         }
         catch (...) {
