@@ -16,11 +16,8 @@ bool OtherScene::init() {
     }
 
     this->scheduleOnce([this](float) {
-        Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
         LoadingView *loadingView = LoadingView::create();
-        this->addChild(loadingView);
-        loadingView->setPosition(origin);
+        loadingView->showInScene(this);
 
         auto thiz = makeRef(this);  // 保证线程回来之前不析构
         std::thread([thiz, loadingView]() {
@@ -35,7 +32,7 @@ bool OtherScene::init() {
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, text]() {
                 g_text.swap(*text);
                 if (LIKELY(thiz->isRunning())) {
-                    loadingView->removeFromParent();
+                    loadingView->dismiss();
                     thiz->createContentView();
                 }
             });

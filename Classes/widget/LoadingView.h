@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "../utils/compiler.h"
 
+#define LOADING_VIEW_Z_ORDER 100
+
 class LoadingView : public cocos2d::Layer {
 public:
     CREATE_FUNC(LoadingView);
@@ -41,6 +43,15 @@ public:
         _touchListener = touchListener;
 
         return true;
+    }
+
+    void showInScene(cocos2d::Scene *scene) {
+        scene->addChild(this, LOADING_VIEW_Z_ORDER);
+        this->setPosition(cocos2d::Director::getInstance()->getVisibleOrigin());
+    }
+
+    void dismiss() {
+        this->removeFromParent();
     }
 };
 

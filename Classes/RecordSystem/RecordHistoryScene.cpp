@@ -130,8 +130,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     if (UNLIKELY(g_records.empty())) {
         this->scheduleOnce([this](float) {
             LoadingView *loadingView = LoadingView::create();
-            this->addChild(loadingView);
-            loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
+            loadingView->showInScene(this);
 
             auto thiz = makeRef(this);  // 保证线程回来之前不析构
             std::thread([thiz, loadingView]() {
@@ -144,7 +143,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
 
                     if (LIKELY(thiz->isRunning())) {
                         thiz->updateRecordTexts();
-                        loadingView->removeFromParent();
+                        loadingView->dismiss();
                         thiz->_tableView->reloadData();
                     }
                 });
@@ -226,8 +225,7 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("确定"), [this, idx](AlertDialog *, int) {
         LoadingView *loadingView = LoadingView::create();
-        this->addChild(loadingView);
-        loadingView->setPosition(Director::getInstance()->getVisibleSize());
+        loadingView->showInScene(this);
 
         g_records.erase(g_records.begin() + idx);
 
@@ -240,7 +238,7 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
             Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
                 if (LIKELY(thiz->isRunning())) {
                     thiz->updateRecordTexts();
-                    loadingView->removeFromParent();
+                    loadingView->dismiss();
                     thiz->_tableView->reloadDataInplacement();
                 }
             });
@@ -755,8 +753,7 @@ void RecordHistoryScene::onBatchDeleteButton(cocos2d::Ref *) {
             .setNegativeButton(__UTF8("取消"), nullptr)
             .setPositiveButton(__UTF8("确定"), [this, currentFlags, dlg](AlertDialog *, int) {
             LoadingView *loadingView = LoadingView::create();
-            this->addChild(loadingView);
-            loadingView->setPosition(Director::getInstance()->getVisibleSize());
+            loadingView->showInScene(this);
 
             for (size_t i = currentFlags->size(); i-- > 0; ) {
                 if (currentFlags->at(i)) {
@@ -773,7 +770,7 @@ void RecordHistoryScene::onBatchDeleteButton(cocos2d::Ref *) {
                 Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
                     if (LIKELY(thiz->isRunning())) {
                         thiz->updateRecordTexts();
-                        loadingView->removeFromParent();
+                        loadingView->dismiss();
                         thiz->_tableView->reloadDataInplacement();
                     }
                 });

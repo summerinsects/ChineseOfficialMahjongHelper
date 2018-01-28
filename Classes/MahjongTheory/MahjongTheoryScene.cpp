@@ -514,8 +514,7 @@ void MahjongTheoryScene::calculate() {
     _allResults.clear();
 
     LoadingView *loadingView = LoadingView::create();
-    this->addChild(loadingView);
-    loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
+    loadingView->showInScene(this);
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     std::thread([thiz, hand_tiles, serving_tile, loadingView]() {
@@ -533,7 +532,7 @@ void MahjongTheoryScene::calculate() {
             if (thiz->isRunning()) {
                 thiz->filterResultsByFlag(thiz->getFilterFlag());
                 thiz->_tableView->reloadData();
-                loadingView->removeFromParent();
+                loadingView->dismiss();
             }
         });
     }).detach();
