@@ -13,7 +13,6 @@ public:
 private:
     float _cellWidth = 0.0f;
     cocos2d::Label *_nameLabel[4];
-    int _totalScores[4];
     cocos2d::ui::Button *_lockButton = nullptr;
     cocos2d::Label *_totalLabel[4];
     cocos2d::Label *_scoreLabels[16][4];
@@ -29,9 +28,11 @@ private:
 
     bool initWithRecord(Record *record);
 
-    void fillRow(size_t handIdx);
+    void skipScores(size_t handIdx, int (&totalScores)[4]) const;
+    void fillScores(size_t handIdx, int (&totalScores)[4]);
+    void fillDetail(size_t handIdx);
     void cleanRow(size_t handIdx);
-    void refreshRank();
+    void refreshRank(const int (&totalScores)[4]);
     void refreshStartTime();
     void refreshEndTime();
     void recover();
