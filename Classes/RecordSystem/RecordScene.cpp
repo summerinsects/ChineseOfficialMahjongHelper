@@ -410,19 +410,23 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     std::function<void (Ref *)> onLayoutButton = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
         ui::Button *layoutButton = (ui::Button *)sender;
 
+        static const std::string titleText[2] = {
+            std::string("\xE2\xAC\x87\xEF\xB8\x8E").append(__UTF8("收起")),
+            std::string("\xE2\xAC\x86\xEF\xB8\x8E").append(__UTF8("展开"))
+        };
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Size layoutSize;
         layoutSize.width = visibleSize.width;
         if (layoutButton->getUserData()) {
             layoutSize.height = visibleSize.height - 145.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
-            layoutButton->setTitleText(__UTF8("\xE2\xAC\x87\xEF\xB8\x8E收起"));
+            layoutButton->setTitleText(titleText[0]);
             radioNode->setVisible(false);
         }
         else {
             layoutSize.height = visibleSize.height - 225.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(true));
-            layoutButton->setTitleText(__UTF8("\xE2\xAC\x86\xEF\xB8\x8E展开"));
+            layoutButton->setTitleText(titleText[1]);
             radioNode->setVisible(true);
         }
 
