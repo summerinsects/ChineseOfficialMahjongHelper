@@ -24,12 +24,14 @@ private:
 
     Record _record;
     bool _isGlobal = false;
+    bool _isTotalMode = false;
     std::string _prevName[4];
 
     bool initWithRecord(Record *record);
 
     void skipScores(size_t handIdx, int (&totalScores)[4]) const;
-    void fillScores(size_t handIdx, int (&totalScores)[4]);
+    void fillScoresForSingleMode(size_t handIdx, int (&totalScores)[4]);
+    void fillScoresForTotalMode(size_t handIdx, int (&totalScores)[4]);
     void fillDetail(size_t handIdx);
     void cleanRow(size_t handIdx);
     void refreshRank(const int (&totalScores)[4]);
@@ -47,6 +49,7 @@ private:
     void editRecord(size_t handIdx, bool modify);
     void onTimeScheduler(float dt);
     void onInstructionButton(cocos2d::Ref *sender);
+    void onModeButton(cocos2d::Ref *sender);
     void onHistoryButton(cocos2d::Ref *sender);
     void onResetButton(cocos2d::Ref *sender);
     void onPursuitButton(cocos2d::Ref *sender);
