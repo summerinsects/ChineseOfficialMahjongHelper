@@ -16,6 +16,8 @@ static const Color3B C3B_GREEN = Color3B(49, 155, 28);
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
 
+#define RECENT_FANS "recent_fans"
+
 // 8个常用番作为初始的「最近使用」
 static mahjong::fan_t recentFans[8] = {
     mahjong::MIXED_SHIFTED_CHOWS,
@@ -124,7 +126,7 @@ static CellDetail cellDetails[11] = {
 };
 
 static void loadRecentFans() {
-    std::string str = UserDefault::getInstance()->getStringForKey("recent_fans");
+    std::string str = UserDefault::getInstance()->getStringForKey(RECENT_FANS);
     if (str.empty()) {
         return;
     }
@@ -138,7 +140,7 @@ static void loadRecentFans() {
 }
 
 static void saveRecentFans() {
-    UserDefault::getInstance()->setStringForKey("recent_fans", Common::format("%d %d %d %d %d %d %d %d",
+    UserDefault::getInstance()->setStringForKey(RECENT_FANS, Common::format("%d %d %d %d %d %d %d %d",
         static_cast<int>(recentFans[0]), static_cast<int>(recentFans[1]), static_cast<int>(recentFans[2]), static_cast<int>(recentFans[3]),
         static_cast<int>(recentFans[4]), static_cast<int>(recentFans[5]), static_cast<int>(recentFans[6]), static_cast<int>(recentFans[7])));
 }
