@@ -17,6 +17,7 @@ static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
 
 #define RECENT_FANS "recent_fans"
+#define USE_FIXED_SEAT_ORDER "use_fixed_seat_order"
 
 // 8个常用番作为初始的「最近使用」
 static mahjong::fan_t recentFans[8] = {
@@ -168,11 +169,18 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     _handIdx = handIdx;
     _submitCallback = callback;
 
-    switch (handIdx >> 2) {
-    default: _seatFlag = 0xE4; _playerFlag = 0xE4; break;  // 3210 3210
-    case 1: _seatFlag = 0xB1; _playerFlag = 0xB1; break;  // 2301 2301
-    case 2: _seatFlag = 0x1E; _playerFlag = 0x4B; break;  // 0132 1023
-    case 3: _seatFlag = 0x4B; _playerFlag = 0x1E; break;  // 1023 0132
+    bool isRealSeatOrder = !UserDefault::getInstance()->getBoolForKey(USE_FIXED_SEAT_ORDER);
+    if (isRealSeatOrder) {
+        switch (handIdx >> 2) {
+        default: _seatFlag = 0xE4; _playerFlag = 0xE4; break;  // 3210 3210
+        case 1: _seatFlag = 0xB1; _playerFlag = 0xB1; break;  // 2301 2301
+        case 2: _seatFlag = 0x1E; _playerFlag = 0x4B; break;  // 0132 1023
+        case 3: _seatFlag = 0x4B; _playerFlag = 0x1E; break;  // 1023 0132
+        }
+    }
+    else {
+        _seatFlag = 0xE4;
+        _playerFlag = 0xE4;
     }
 
     _winIndex = -1;
@@ -256,12 +264,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->addClickEventListener(std::bind(&RecordScene::onPenaltyButton, this, std::placeholders::_1, names));
 
     // 说明文本
-    label = Label::createWithSystemFont(__UTF8("番数支持直接输入，强烈建议先「标记主番」直接增加番数，再用+-按钮调整。"),
-        "Arial", 10, Size(visibleSize.width - 75.0f, 0.0f));
+    label = Label::createWithSystemFont(isRealSeatOrder ? __UTF8("当前模式为「换位」，选手顺序与当前圈座位相同") : __UTF8("当前模式为「固定」，选手顺序与开局座位相同"),
+        "Arial", 10);
     label->setColor(C3B_GRAY);
     this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 60.0f));
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 70.0f));
+    cw::scaleLabelToFitWidth(label, visibleSize.width - 75.0f);
 
     ui::RadioButtonGroup *winGroup = ui::RadioButtonGroup::create();
     winGroup->setAllowedNoSelection(true);
