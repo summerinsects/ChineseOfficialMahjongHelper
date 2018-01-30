@@ -470,7 +470,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
         __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n")
         __UTF8("输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n")
         __UTF8("输入范例2：1112345678999s9s\n")
-        __UTF8("输入范例3：[WWWW,1][444s]45m678pFF6m\n"), "Arial", 10, Size(width, 0.0f));
+        __UTF8("输入范例3：[WWWW,1][444s]45m678pFF6m"), "Arial", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
 
