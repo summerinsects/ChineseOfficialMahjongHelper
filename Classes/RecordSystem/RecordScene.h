@@ -64,6 +64,7 @@ private:
     void updateScoreLabel();
     void showLittleFanAlert(bool callFromSubmitting);
 
+    void onInstructionButton(cocos2d::Ref *sender);
     void onPlusButton(cocos2d::Ref *sender, int delta);
     void onRecordTilesButton(cocos2d::Ref *sender);
     void onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);

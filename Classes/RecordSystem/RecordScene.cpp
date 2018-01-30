@@ -184,6 +184,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    // 帮助按钮
+    ui::Button *button = ui::Button::create("source_material/help_128px.png");
+    this->addChild(button);
+    button->setScale(20.0f / button->getContentSize().width);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
+    button->addClickEventListener(std::bind(&RecordScene::onInstructionButton, this, std::placeholders::_1));
+
     float yPos = origin.y + visibleSize.height - 45.0f;
     // 番数输入框
     ui::EditBox *editBox = UICommon::createEditBox(Size(35.0f, 20.0f));
@@ -237,7 +244,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, yPos));
 
     // 罚分调整
-    ui::Button *button = UICommon::createButton();
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -733,6 +740,24 @@ void RecordScene::updateScoreLabel() {
         // 未选择是点炮还是自摸时，不允许确定
         _submitButton->setEnabled(claimIndex != -1);
     }
+}
+
+void RecordScene::onInstructionButton(cocos2d::Ref *sender) {
+    const float width = AlertDialog::maxWidth();
+    Label *label = Label::createWithSystemFont(
+        __UTF8("1.番数框支持直接输入，「标记主番」可快速增加番数，强烈建议先「标记主番」，再用+-按钮调整。\n")
+        __UTF8("2.「标记主番」出于简化代码逻辑考虑，未做排斥检测，即程序允许标记若干个自相矛盾的主番，但不建议你这样做。\n")
+        __UTF8("3.「小番」为2番及1番的番种。以复选框展现的，是不可复计的番种；以两侧-1和+1按钮展现的，是可复计的番种。\n")
+        __UTF8("4.「记录和牌」可根据当前和牌自动算番，自动标记番种。")
+        , "Arial", 10, Size(width, 0.0f));
+    label->setColor(Color3B::BLACK);
+
+    AlertDialog::Builder(Director::getInstance()->getRunningScene())
+        .setTitle(__UTF8("使用说明"))
+        .setContentNode(label)
+        .setCloseOnTouchOutside(false)
+        .setPositiveButton(__UTF8("确定"), nullptr)
+        .create()->show();
 }
 
 void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {
