@@ -2,6 +2,7 @@
 #include "network/HttpClient.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
+#include <array>
 #include "UICommon.h"
 #include "utils/common.h"
 #include "widget/AlertDialog.h"
@@ -161,11 +162,9 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(40.0f, 25.0f));
     button->setTitleFontSize(14);
-    button->setTitleText(__UTF8("捐赠"));
+    button->setTitleText(__UTF8("设置"));
     button->setPosition(Vec2(origin.x + visibleSize.width - 23.0f, origin.y + 15.0f));
-    button->addClickEventListener([](Ref *) {
-        Application::getInstance()->openURL("https://gitee.com/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
-    });
+    button->addClickEventListener(std::bind(&HelloWorld::onSettingButton, this, std::placeholders::_1));
 
     std::string version = Application::getInstance()->getVersion();
     Label *label = Label::createWithSystemFont(
@@ -200,18 +199,31 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     Label *label = Label::createWithSystemFont(
         __UTF8("1. 本软件开源，高端玩家可下载源代码自行编译。\n")
         __UTF8("2. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper\n")
-        __UTF8("3. 如果觉得本软件好用，可点击「分享二维码」，分享给他人扫码下载。")
+        __UTF8("3. 如果觉得本软件好用，可点击「分享二维码」，分享给他人扫码下载。\n")
+        __UTF8("4. 支持开源软件，欢迎打赏。")
         , "Arail", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
 
     const Size &labelSize = label->getContentSize();
 
+    // 打赏
+    ui::Button *button = UICommon::createButton();
+    rootNode->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(40.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("打赏"));
+    button->setPosition(Vec2(width * 0.5f, 10.0f));
+    button->addClickEventListener([](Ref *) {
+        Application::getInstance()->openURL("https://gitee.com/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
+    });
+
     ui::Button *button1 = UICommon::createButton();
     button1->setScale9Enabled(true);
-    button1->setContentSize(Size(65.0, 20.0f));
+    button1->setContentSize(Size(55.0, 20.0f));
     button1->setTitleFontSize(12);
-    button1->setTitleText(__UTF8("检测新版本"));
+    button1->setTitleText(__UTF8("版本检测"));
     button1->addClickEventListener([this](Ref *) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
         requestVersion(true);
@@ -226,23 +238,24 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
         Sprite *sprite = Sprite::create("drawable/indicator_input_error.png");
         sprite->setScale(CC_CONTENT_SCALE_FACTOR() * 0.4f);
         button1->addChild(sprite);
-        sprite->setPosition(Vec2(65.0f, 20.0f));
+        sprite->setPosition(Vec2(55.0f, 20.0f));
     }
 #endif
 
     ui::Button *button2 = UICommon::createButton();
     button2->setScale9Enabled(true);
-    button2->setContentSize(Size(65.0, 20.0f));
+    button2->setContentSize(Size(55.0, 20.0f));
     button2->setTitleFontSize(12);
-    button2->setTitleText(__UTF8("分享二维码"));
+    button2->setTitleText(__UTF8("二维码"));
     button2->addClickEventListener([this](Ref *) {
         requestQRCode();
     });
     rootNode->addChild(button2);
 
     rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
-    button1->setPosition(Vec2(width * 0.25f, 10.0f));
-    button2->setPosition(Vec2(width * 0.75f, 10.0f));
+    const float posX = (width - 150.0f) * 0.25f;
+    button1->setPosition(Vec2(posX + 27.5f, 10.0f));
+    button2->setPosition(Vec2(width - posX - 27.5f, 10.0f));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
 
     AlertDialog::Builder(this)
@@ -517,3 +530,96 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 }
 
 #endif
+
+#define SCORE_SHEET_TOTAL_MODE "score_sheet_scene_total_mode"
+#define USE_FIXED_SEAT_ORDER "use_fixed_seat_order"
+
+void HelloWorld::onSettingButton(cocos2d::Ref *) {
+    const float width = AlertDialog::maxWidth();
+
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(width, 120.0f));
+
+    // 子标题
+    Label *label = Label::createWithSystemFont(__UTF8("计分器设置"), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setPosition(Vec2(width * 0.5f, 110.0f));
+
+    std::array<ui::RadioButtonGroup *, 2> radioGroups;
+
+    // 1.计分表格分数显示
+    label = Label::createWithSystemFont(__UTF8("1.计分表格分数显示"), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 85.0f));
+
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    rootNode->addChild(radioGroup);
+    radioGroups[0] = radioGroup;
+
+    static const char *sheetTitleText[] = { __UTF8("单盘"), __UTF8("累计") };
+    for (int i = 0; i < 2; ++i) {
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 60.0f));
+        rootNode->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        label = Label::createWithSystemFont(sheetTitleText[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+    }
+    if (UserDefault::getInstance()->getBoolForKey(SCORE_SHEET_TOTAL_MODE)) {
+        radioGroup->setSelectedButton(1);
+    }
+
+    // 2.计分界面选手顺序
+    label = Label::createWithSystemFont(__UTF8("2.计分界面选手顺序"), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 35.0f));
+
+    radioGroup = ui::RadioButtonGroup::create();
+    rootNode->addChild(radioGroup);
+    radioGroups[1] = radioGroup;
+
+    static const char *recordTitleText[] = { __UTF8("换位"), __UTF8("固定") };
+    for (int i = 0; i < 2; ++i) {
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 10.0f));
+        rootNode->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        label = Label::createWithSystemFont(recordTitleText[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+    }
+    if (UserDefault::getInstance()->getBoolForKey(USE_FIXED_SEAT_ORDER)) {
+        radioGroup->setSelectedButton(1);
+    }
+
+    AlertDialog::Builder(this)
+        .setTitle(__UTF8("设置"))
+        .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, radioGroups](AlertDialog *, int) {
+            UserDefault::getInstance()->setBoolForKey(SCORE_SHEET_TOTAL_MODE, radioGroups[0]->getSelectedButtonIndex() == 1);
+            UserDefault::getInstance()->setBoolForKey(USE_FIXED_SEAT_ORDER, radioGroups[1]->getSelectedButtonIndex() == 1);
+            return true;
+        }).create()->show();
+}
