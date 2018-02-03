@@ -340,7 +340,6 @@ void HelloWorld::requestQRCode() {
         Image *image = new (std::nothrow) Image();
         image->initWithImageData(reinterpret_cast<const unsigned char *>(buffer->data()), static_cast<ssize_t>(buffer->size()));
         Texture2D *texture = Director::getInstance()->getTextureCache()->addImage(image, "shared_qrcode_texture");
-        Sprite *sprite = Sprite::createWithTexture(texture);
         image->release();
         showQRCodeAlertDialog(thiz.get(), texture);
     });
