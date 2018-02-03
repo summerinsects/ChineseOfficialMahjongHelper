@@ -440,7 +440,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 
         std::string version = Application::getInstance()->getVersion();
         int a, b, c, d;
-        if (sscanf(version.c_str(), "%d.%d.%d", &a, &b, &c, &d) != 4) {
+        if (sscanf(version.c_str(), "%d.%d.%d.%d", &a, &b, &c, &d) != 4) {
             return false;
         }
 
