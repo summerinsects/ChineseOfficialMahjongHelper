@@ -346,7 +346,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 罚分
         y = origin.y + visibleSize.height - 195.0f;
-        label = Label::createWithSystemFont(__UTF8("调整 "), "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("调整"), "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
@@ -356,7 +356,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         label->setColor(C3B_GRAY);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, y));
+        label->setPosition(Vec2(x + 2.0f, y));
         _penaltyLabel[i] = label;
     }
     _winGroup = winGroup;
