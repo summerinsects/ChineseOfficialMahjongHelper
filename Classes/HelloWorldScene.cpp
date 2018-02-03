@@ -433,14 +433,14 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
             return false;
         }
         std::string tag = it->value.GetString();
-        int major1, minor1, point1;
-        if (sscanf(tag.c_str(), "v%d.%d.%d", &major1, &minor1, &point1) != 3) {
+        int major1, minor1, point1, point2;
+        if (sscanf(tag.c_str(), "v%d.%d.%d.%d", &major1, &minor1, &point1, &point2) != 4) {
             return false;
         }
 
         std::string version = Application::getInstance()->getVersion();
-        int a, b, c;
-        if (sscanf(version.c_str(), "%d.%d.%d", &a, &b, &c) != 3) {
+        int a, b, c, d;
+        if (sscanf(version.c_str(), "%d.%d.%d", &a, &b, &c, &d) != 4) {
             return false;
         }
 
@@ -455,6 +455,11 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
             else if (minor1 == b) {
                 if (point1 > c) {
                     hasNewVersion = true;
+                }
+                else if (point1 == c) {
+                    if (point2 > d) {
+                        hasNewVersion = true;
+                    }
                 }
             }
         }
