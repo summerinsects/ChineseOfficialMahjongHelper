@@ -470,6 +470,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
         userDefault->setBoolForKey("notify_tomorrow", false);
 
         if (!hasNewVersion) {
+            _redPointSprite->setVisible(false);
             if (manual) {
                 Toast::makeText(this, __UTF8("已经是最新版本"), Toast::LENGTH_LONG)->show();
             }
