@@ -395,24 +395,25 @@ void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]) {
     }
 }
 
-void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]) {
+void RankToStandardScore(const unsigned (&ranks)[4], unsigned (&ss12)[4]) {
     // 并列的数目
     unsigned rankCnt[4] = { 0 };
     for (int i = 0; i < 4; ++i) {
         ++rankCnt[ranks[i]];
     }
 
-    static const float standardScore[] = { 4, 2, 1, 0 };
+    static const unsigned standardScore[] = { 48, 24, 12, 0 };
+
     for (int i = 0; i < 4; ++i) {
         unsigned rank = ranks[i];
         unsigned tieCnt = rankCnt[rank];  // 并列的人数
 
         // 累加并列的标准分
-        float ss0 = standardScore[rank];
+        unsigned ss0 = standardScore[rank];
         for (unsigned n = 1, cnt = tieCnt; n < cnt; ++n) {
             ss0 += standardScore[rank + n];
         }
         ss0 /= tieCnt;
-        ss[i] = ss0;
+        ss12[i] = ss0;
     }
 }

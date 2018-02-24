@@ -250,7 +250,7 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
 namespace {
     struct RecordsStatistic {
         size_t rank[4];
-        float standard_score;
+        unsigned standard_score12;
         int competition_score;
         uint16_t max_fan;
         size_t win;
@@ -309,9 +309,9 @@ static void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector
         ++result->rank[ranks[idx]];
         result->competition_score += totalScores[idx];
 
-        float ss[4];
+        unsigned ss[4];
         RankToStandardScore(ranks, ss);
-        result->standard_score += ss[idx];
+        result->standard_score12 += ss[idx];
     }
 }
 
@@ -353,8 +353,8 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
         contentText[0][i] = std::to_string(rs.rank[i]);
         contentText[1][i] = sum > 0 ? Common::format("%.2f%%", rs.rank[i] * 100 / static_cast<float>(sum)) : std::string("0.00%");
     }
-    contentText[0][4] = Common::format("%.2f", rs.standard_score);
-    contentText[1][4] = sum > 0 ? Common::format("%.2f", rs.standard_score / static_cast<float>(sum)) : std::string("0.00%");
+    contentText[0][4] = Common::format("%.2f", rs.standard_score12 / 12.0f);
+    contentText[1][4] = sum > 0 ? Common::format("%.2f", rs.standard_score12 / static_cast<float>(sum * 12)) : std::string("0.00%");
 
     contentText[2][0] = std::to_string(rs.competition_score);
     contentText[2][1] = sum > 0 ? Common::format("%.2f", rs.competition_score / static_cast<float>(sum)) : std::string("0.00");
