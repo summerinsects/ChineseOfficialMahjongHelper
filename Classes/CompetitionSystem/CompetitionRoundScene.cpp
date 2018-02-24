@@ -196,7 +196,7 @@ cw::TableViewCell *CompetitionRoundScene::tableCellAtIndex(cw::TableView *table,
     labels[2]->setString(player.name);
 
     // 本轮标准分和比赛分
-    std::pair<float, int> ret = player.getCurrentScoresByRound(_currentRound);
+    std::pair<unsigned, int> ret = player.getCurrentScoresByRound(_currentRound);
     labels[3]->setString(CompetitionResult::standardScoreToString(ret.first));
     labels[4]->setString(std::to_string(ret.second));
 

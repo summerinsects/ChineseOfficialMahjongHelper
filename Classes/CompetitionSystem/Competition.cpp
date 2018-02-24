@@ -11,9 +11,9 @@
 #include "../utils/common.h"
 
 // 标准分转换为字符串
-std::string CompetitionResult::standardScoreToString(float ss) {
+std::string CompetitionResult::standardScoreToString(unsigned ss12) {
     char str[64];  // FLT_MAX输出为340282346638528859811704183484516925440.00000010
-    int len = snprintf(str, sizeof(str), "%.3f", ss);
+    int len = snprintf(str, sizeof(str), "%.3f", ss12 / 12.0f);
 
     const char *dot = strchr(str, '.');  // 找到小数点
     if (LIKELY(dot != nullptr)) {
@@ -27,26 +27,26 @@ std::string CompetitionResult::standardScoreToString(float ss) {
 }
 
 // 获取指定一轮总成绩
-std::pair<float, int> CompetitionPlayer::getTotalScoresByRound(size_t round) const {
-    float ss = 0;
+std::pair<unsigned, int> CompetitionPlayer::getTotalScoresByRound(size_t round) const {
+    unsigned ss = 0;
     int cs = 0;
     for (size_t i = 0; i <= round; ++i) {
-        ss += competition_results[i].standard_score;
+        ss += competition_results[i].standard_score12;
         cs += competition_results[i].competition_score;
     }
     return std::make_pair(ss, cs);
 }
 
 // 获取指定一轮单轮成绩
-std::pair<float, int> CompetitionPlayer::getCurrentScoresByRound(size_t round) const {
-    return std::make_pair(competition_results[round].standard_score, competition_results[round].competition_score);
+std::pair<unsigned, int> CompetitionPlayer::getCurrentScoresByRound(size_t round) const {
+    return std::make_pair(competition_results[round].standard_score12, competition_results[round].competition_score);
 }
 
 namespace {
     // 排序附加信息，用来保存标准分和比赛分，使之仅计算一次
     struct ScoresSortInfo {
         const CompetitionPlayer *player = nullptr;
-        float standard_score = 0.0f;
+        unsigned standard_score12 = 0;
         int competition_score = 0;
         unsigned rank_cnt[4];
         int max_score;
@@ -63,11 +63,11 @@ void CompetitionRound::sortPlayers(size_t round, const std::vector<CompetitionPl
         memset(&ret, 0, sizeof(ret));
         ret.player = &player;
         for (size_t i = 0; i <= round; ++i) {
-            float ss = player.competition_results[i].standard_score;
+            unsigned ss = player.competition_results[i].standard_score12;
             int cs = player.competition_results[i].competition_score;
             unsigned rank = player.competition_results[i].rank;
 
-            ret.standard_score += ss;
+            ret.standard_score12 += ss;
             ret.competition_score += cs;
             ++ret.rank_cnt[rank - 1];
             ret.max_score = std::max(ret.max_score, cs);
@@ -83,7 +83,7 @@ void CompetitionRound::sortPlayers(size_t round, const std::vector<CompetitionPl
 
     // 3. 排序指针数组
     std::sort(ptemp.begin(), ptemp.end(), [](const ScoresSortInfo *a, const ScoresSortInfo *b) {
-        const float ss1 = a->standard_score, ss2 = b->standard_score;
+        const unsigned ss1 = a->standard_score12, ss2 = b->standard_score12;
         if (ss1 > ss2) return true;  // 标准分
         if (ss1 == ss2) {
             const int cs1 = a->competition_score, cs2 = b->competition_score;
@@ -267,9 +267,9 @@ void CompetitionResultFromJson(const rapidjson::Value &json, CompetitionResult &
         result.rank = it->value.GetUint();
     }
 
-    it = json.FindMember("standard_score");
-    if (it != json.MemberEnd() && it->value.IsFloat()) {
-        result.standard_score = it->value.GetFloat();
+    it = json.FindMember("standard_score12");
+    if (it != json.MemberEnd() && it->value.IsUint()) {
+        result.standard_score12 = it->value.IsUint();
     }
 
     it = json.FindMember("competition_score");
@@ -280,7 +280,7 @@ void CompetitionResultFromJson(const rapidjson::Value &json, CompetitionResult &
 
 void CompetitionResultToJson(const CompetitionResult &result, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
     json.AddMember("rank", rapidjson::Value(result.rank), alloc);
-    json.AddMember("standard_score", rapidjson::Value(result.standard_score), alloc);
+    json.AddMember("standard_score12", rapidjson::Value(result.standard_score12), alloc);
     json.AddMember("competition_score", rapidjson::Value(result.competition_score), alloc);
 }
 

@@ -11,7 +11,7 @@ USING_NS_CC;
 
 // in Record.cpp
 extern "C++" void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]);
-extern "C++" void RankToStandardScore(const unsigned (&ranks)[4], float (&ss)[4]);
+extern "C++" void RankToStandardScore(const unsigned (&ranks)[4], unsigned (&ss12)[4]);
 
 static const char *seatText[] = { __UTF8("东"), __UTF8("南"), __UTF8("西"), __UTF8("北") };
 
@@ -275,7 +275,7 @@ void CompetitionTableScene::onClearButton(cocos2d::Ref *sender) {
 
         CompetitionResult &result = players[idx].competition_results[_currentRound];
         result.rank = 0;
-        result.standard_score = 0;
+        result.standard_score12 = 0;
         result.competition_score = 0;
         updateFlag = true;
     }
@@ -396,7 +396,7 @@ namespace {
 
                 const float posY = 70.0f - 20.0f * i;
                 std::string text[5] = { seatText[i], std::to_string(player->serial + 1), player->name,
-                    CompetitionResult::standardScoreToString(_results[i].standard_score), std::to_string(_results[i].competition_score)
+                    CompetitionResult::standardScoreToString(_results[i].standard_score12), std::to_string(_results[i].competition_score)
                 };
 
                 for (int k = 0; k < 3; ++k) {
@@ -475,7 +475,7 @@ namespace {
             int i = tag >> 4, k = tag & 0xF;
 
             switch (k) {
-            case 0: _results[i].standard_score = static_cast<float>(atof(editBox->getText())); break;
+            case 0: _results[i].standard_score12 = static_cast<unsigned>(round(atof(editBox->getText()) * 12)); break;
             case 1: _results[i].competition_score = atoi(editBox->getText()); break;
             default: break;
             }
@@ -486,7 +486,7 @@ namespace {
             float ss = 0.0f;
             int cs = 0;
             for (int i = 0; i < 4; ++i) {
-                ss += _results[i].standard_score;
+                ss += _results[i].standard_score12;
                 cs += _results[i].competition_score;
             }
             _checkLabel->setString(Common::format(__UTF8("检查：标准分总和%s，比赛分总和%d"), CompetitionResult::standardScoreToString(ss).c_str(), cs));
@@ -494,13 +494,13 @@ namespace {
 
         void calculateStandardScores() {
             unsigned ranks[4] = { _results[0].rank - 1, _results[1].rank - 1, _results[2].rank - 1, _results[3].rank - 1 };
-            float ss[4];
-            RankToStandardScore(ranks, ss);
+            unsigned ss12[4];
+            RankToStandardScore(ranks, ss12);
 
             for (int i = 0; i < 4; ++i) {
                 CompetitionResult &result = _results[i];
-                result.standard_score = ss[i];
-                _editBoxes[i][0]->setText(CompetitionResult::standardScoreToString(ss[i]).c_str());
+                result.standard_score12 = ss12[i];
+                _editBoxes[i][0]->setText(CompetitionResult::standardScoreToString(ss12[i]).c_str());
             }
 
             refreshCheckLabel();

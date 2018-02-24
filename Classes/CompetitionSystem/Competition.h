@@ -12,10 +12,10 @@
 // 成绩
 struct CompetitionResult {
     unsigned rank = 0;  // 顺位，合法值为1 2 3 4
-    float standard_score = 0;  // 标准分
+    unsigned standard_score12 = 0;  // 标准分
     int competition_score = 0;  // 比赛分
 
-    static std::string standardScoreToString(float ss);  // 标准分转换为字符串
+    static std::string standardScoreToString(unsigned ss12);  // 标准分转换为字符串
 };
 
 // 队员
@@ -26,8 +26,8 @@ public:
     std::vector<CompetitionResult> competition_results;  // 每轮成绩
     ptrdiff_t team_index = INVALID_INDEX;  // 所在队伍
 
-    std::pair<float, int> getTotalScoresByRound(size_t round) const;  // 获取指定一轮总成绩
-    std::pair<float, int> getCurrentScoresByRound(size_t round) const;  // 获取指定一轮单轮成绩
+    std::pair<unsigned, int> getTotalScoresByRound(size_t round) const;  // 获取指定一轮总成绩
+    std::pair<unsigned, int> getCurrentScoresByRound(size_t round) const;  // 获取指定一轮单轮成绩
 };
 
 // 队伍
