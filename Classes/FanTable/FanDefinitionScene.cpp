@@ -77,11 +77,8 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
     }
 
     this->scheduleOnce([this, idx](float) {
-        Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
         LoadingView *loadingView = LoadingView::create();
-        this->addChild(loadingView);
-        loadingView->setPosition(origin);
+        loadingView->showInScene(this);
 
 #if HAS_WEBVIEW
         Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -126,7 +123,7 @@ bool FanDefinitionScene::initWithIndex(size_t idx) {
                 g_principles.swap(*principles);
 
                 if (LIKELY(thiz->isRunning())) {
-                    loadingView->removeFromParent();
+                    loadingView->dismiss();
                     thiz->createContentView(idx);
                 }
             });

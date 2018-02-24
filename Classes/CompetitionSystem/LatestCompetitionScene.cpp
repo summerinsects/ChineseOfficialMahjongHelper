@@ -54,8 +54,7 @@ bool LatestCompetitionScene::init() {
 
 void LatestCompetitionScene::requestCompetitions() {
     LoadingView *loadingView = LoadingView::create();
-    this->addChild(loadingView);
-    loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
+    loadingView->showInScene(this);
 
     network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
     request->setRequestType(network::HttpRequest::Type::GET);
@@ -71,7 +70,7 @@ void LatestCompetitionScene::requestCompetitions() {
             return;
         }
 
-        loadingView->removeFromParent();
+        loadingView->dismiss();
 
         LatestCompetitionScene *pthis = thiz.get();
         if (response == nullptr) {

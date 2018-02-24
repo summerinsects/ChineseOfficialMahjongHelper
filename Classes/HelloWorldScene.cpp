@@ -2,10 +2,12 @@
 #include "network/HttpClient.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
+#include <array>
 #include "UICommon.h"
 #include "utils/common.h"
 #include "widget/AlertDialog.h"
 #include "widget/Toast.h"
+#include "widget/LoadingView.h"
 #include "FanCalculator/FanCalculatorScene.h"
 #include "RecordSystem/ScoreSheetScene.h"
 #include "FanTable/FanTableScene.h"
@@ -15,10 +17,13 @@
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 #define DOWNLOAD_URL "https://www.pgyer.com/comh-android"
+#define QR_CODE_URL "https://www.pgyer.com/app/qrcode/comh-android"
 #elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #define DOWNLOAD_URL "https://www.pgyer.com/comh-ios"
+#define QR_CODE_URL "https://www.pgyer.com/app/qrcode/comh-ios"
 #else
 #define DOWNLOAD_URL ""
+#define QR_CODE_URL "https://www.pgyer.com/app/qrcode/comh-android"
 #endif
 
 USING_NS_CC;
@@ -157,11 +162,9 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(40.0f, 25.0f));
     button->setTitleFontSize(14);
-    button->setTitleText(__UTF8("捐赠"));
+    button->setTitleText(__UTF8("设置"));
     button->setPosition(Vec2(origin.x + visibleSize.width - 23.0f, origin.y + 15.0f));
-    button->addClickEventListener([](Ref *) {
-        Application::getInstance()->openURL("https://gitee.com/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
-    });
+    button->addClickEventListener(std::bind(&HelloWorld::onSettingButton, this, std::placeholders::_1));
 
     std::string version = Application::getInstance()->getVersion();
     Label *label = Label::createWithSystemFont(
@@ -196,50 +199,64 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     Label *label = Label::createWithSystemFont(
         __UTF8("1. 本软件开源，高端玩家可下载源代码自行编译。\n")
         __UTF8("2. 本项目源代码地址：https://github.com/summerinsects/ChineseOfficialMahjongHelper\n")
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-        __UTF8("3. 如果觉得本软件好用，可点击「下载地址」获取下载链接，分享给他人。")
-#endif
+        __UTF8("3. 如果觉得本软件好用，可点击「分享二维码」，分享给他人扫码下载。\n")
+        __UTF8("4. 支持开源软件，欢迎打赏。")
         , "Arail", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
 
     const Size &labelSize = label->getContentSize();
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    // 打赏
+    ui::Button *button = UICommon::createButton();
+    rootNode->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(40.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("打赏"));
+    button->setPosition(Vec2(width * 0.5f, 10.0f));
+    button->addClickEventListener([](Ref *) {
+        Application::getInstance()->openURL("https://gitee.com/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
+    });
+
     ui::Button *button1 = UICommon::createButton();
     button1->setScale9Enabled(true);
-    button1->setContentSize(Size(65.0, 20.0f));
+    button1->setContentSize(Size(55.0, 20.0f));
     button1->setTitleFontSize(12);
-    button1->setTitleText(__UTF8("检测新版本"));
-    button1->addClickEventListener([this](Ref *) { requestVersion(true); });
+    button1->setTitleText(__UTF8("版本检测"));
+    button1->addClickEventListener([this](Ref *) {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+        requestVersion(true);
+#else
+        Toast::makeText(this, "当前平台不支持该操作", Toast::LENGTH_LONG)->show();
+#endif
+    });
     rootNode->addChild(button1);
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     if (_redPointSprite->isVisible()) {
         Sprite *sprite = Sprite::create("drawable/indicator_input_error.png");
         sprite->setScale(CC_CONTENT_SCALE_FACTOR() * 0.4f);
         button1->addChild(sprite);
-        sprite->setPosition(Vec2(65.0f, 20.0f));
+        sprite->setPosition(Vec2(55.0f, 20.0f));
     }
+#endif
 
     ui::Button *button2 = UICommon::createButton();
     button2->setScale9Enabled(true);
-    button2->setContentSize(Size(65.0, 20.0f));
+    button2->setContentSize(Size(55.0, 20.0f));
     button2->setTitleFontSize(12);
-    button2->setTitleText(__UTF8("下载地址"));
+    button2->setTitleText(__UTF8("二维码"));
     button2->addClickEventListener([this](Ref *) {
-        cw::setClipboardText(DOWNLOAD_URL);
-        Toast::makeText(this, __UTF8("下载地址已复制到剪切板"), Toast::LENGTH_LONG)->show();
+        requestQRCode();
     });
     rootNode->addChild(button2);
 
     rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
-    button1->setPosition(Vec2(width * 0.25f, 10.0f));
-    button2->setPosition(Vec2(width * 0.75f, 10.0f));
+    const float posX = (width - 150.0f) * 0.25f;
+    button1->setPosition(Vec2(posX + 27.5f, 10.0f));
+    button2->setPosition(Vec2(width - posX - 27.5f, 10.0f));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
-#else
-    rootNode->setContentSize(Size(width, labelSize.height));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f));
-#endif
 
     AlertDialog::Builder(this)
         .setTitle(__UTF8("关于"))
@@ -247,6 +264,88 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
         .setCloseOnTouchOutside(false)
         .setPositiveButton(__UTF8("确定"), nullptr)
         .create()->show();
+}
+
+static void showQRCodeAlertDialog(Scene *scene, Texture2D *texture) {
+    Node *rootNode = Node::create();
+
+    ui::Button *button = UICommon::createButton();
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(65.0, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("复制链接"));
+    button->addClickEventListener([scene](Ref *) {
+        cw::setClipboardText(DOWNLOAD_URL);
+        Toast::makeText(scene, __UTF8("下载地址已复制到剪切板"), Toast::LENGTH_LONG)->show();
+    });
+    rootNode->addChild(button);
+
+    Sprite *sprite = Sprite::createWithTexture(texture);
+    rootNode->addChild(sprite);
+
+    const Size &spriteSize = sprite->getContentSize();
+    rootNode->setContentSize(Size(spriteSize.width, spriteSize.height + 25.0f));
+    sprite->setPosition(Vec2(spriteSize.width * 0.5f, spriteSize.height * 0.5f));
+    button->setPosition(Vec2(spriteSize.width * 0.5f, spriteSize.height + 15.0f));
+
+    AlertDialog::Builder(scene)
+        .setTitle(__UTF8("分享二维码"))
+        .setMessage(__UTF8("二维码iOS与Android通用"))
+        .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
+        .setPositiveButton(__UTF8("确定"), nullptr)
+        .create()->show();
+}
+
+void HelloWorld::requestQRCode() {
+    Texture2D *texture = Director::getInstance()->getTextureCache()->getTextureForKey("shared_qrcode_texture");
+    if (texture != nullptr) {
+        showQRCodeAlertDialog(this, texture);
+        return;
+    }
+
+    const float realWidth = AlertDialog::maxWidth() * CC_CONTENT_SCALE_FACTOR();
+    const int factor = static_cast<int>(realWidth / 43.0f);
+
+    network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
+    request->setRequestType(network::HttpRequest::Type::GET);
+    request->setUrl(Common::format("%s?pixsize=%d", QR_CODE_URL, factor * 43));
+
+    LoadingView *loadingView = LoadingView::create();
+    loadingView->showInScene(this);
+    auto thiz = makeRef(this);
+    request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
+        network::HttpClient::destroyInstance();
+
+        loadingView->dismiss();
+        if (response == nullptr) {
+            return;
+        }
+
+        log("HTTP Status Code: %ld", response->getResponseCode());
+
+        if (!response->isSucceed()) {
+            log("response failed");
+            log("error buffer: %s", response->getErrorBuffer());
+            Toast::makeText(thiz.get(), __UTF8("获取二维码本失败"), Toast::LENGTH_LONG)->show();
+            return;
+        }
+
+        std::vector<char> *buffer = response->getResponseData();
+        if (buffer == nullptr) {
+            Toast::makeText(thiz.get(), __UTF8("获取二维码本失败"), Toast::LENGTH_LONG)->show();
+            return;
+        }
+
+        Image *image = new (std::nothrow) Image();
+        image->initWithImageData(reinterpret_cast<const unsigned char *>(buffer->data()), static_cast<ssize_t>(buffer->size()));
+        Texture2D *texture = Director::getInstance()->getTextureCache()->addImage(image, "shared_qrcode_texture");
+        image->release();
+        showQRCodeAlertDialog(thiz.get(), texture);
+    });
+
+    network::HttpClient::getInstance()->send(request);
+    request->release();
 }
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
@@ -334,14 +433,14 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
             return false;
         }
         std::string tag = it->value.GetString();
-        int major1, minor1, point1;
-        if (sscanf(tag.c_str(), "v%d.%d.%d", &major1, &minor1, &point1) != 3) {
+        int major1, minor1, point1, point2;
+        if (sscanf(tag.c_str(), "v%d.%d.%d.%d", &major1, &minor1, &point1, &point2) != 4) {
             return false;
         }
 
         std::string version = Application::getInstance()->getVersion();
-        int a, b, c;
-        if (sscanf(version.c_str(), "%d.%d.%d", &a, &b, &c) != 3) {
+        int a, b, c, d;
+        if (sscanf(version.c_str(), "%d.%d.%d.%d", &a, &b, &c, &d) != 4) {
             return false;
         }
 
@@ -357,6 +456,11 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
                 if (point1 > c) {
                     hasNewVersion = true;
                 }
+                else if (point1 == c) {
+                    if (point2 > d) {
+                        hasNewVersion = true;
+                    }
+                }
             }
         }
 
@@ -366,6 +470,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
         userDefault->setBoolForKey("notify_tomorrow", false);
 
         if (!hasNewVersion) {
+            _redPointSprite->setVisible(false);
             if (manual) {
                 Toast::makeText(this, __UTF8("已经是最新版本"), Toast::LENGTH_LONG)->show();
             }
@@ -430,3 +535,96 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 }
 
 #endif
+
+#define SCORE_SHEET_TOTAL_MODE "score_sheet_scene_total_mode"
+#define USE_FIXED_SEAT_ORDER "use_fixed_seat_order"
+
+void HelloWorld::onSettingButton(cocos2d::Ref *) {
+    const float width = AlertDialog::maxWidth();
+
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(width, 120.0f));
+
+    // 子标题
+    Label *label = Label::createWithSystemFont(__UTF8("计分器设置"), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setPosition(Vec2(width * 0.5f, 110.0f));
+
+    std::array<ui::RadioButtonGroup *, 2> radioGroups;
+
+    // 1.计分表格分数显示
+    label = Label::createWithSystemFont(__UTF8("1.计分表格分数显示"), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 85.0f));
+
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    rootNode->addChild(radioGroup);
+    radioGroups[0] = radioGroup;
+
+    static const char *sheetTitleText[] = { __UTF8("单盘"), __UTF8("累计") };
+    for (int i = 0; i < 2; ++i) {
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 60.0f));
+        rootNode->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        label = Label::createWithSystemFont(sheetTitleText[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+    }
+    if (UserDefault::getInstance()->getBoolForKey(SCORE_SHEET_TOTAL_MODE)) {
+        radioGroup->setSelectedButton(1);
+    }
+
+    // 2.计分界面选手顺序
+    label = Label::createWithSystemFont(__UTF8("2.计分界面选手顺序"), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 35.0f));
+
+    radioGroup = ui::RadioButtonGroup::create();
+    rootNode->addChild(radioGroup);
+    radioGroups[1] = radioGroup;
+
+    static const char *recordTitleText[] = { __UTF8("换位"), __UTF8("固定") };
+    for (int i = 0; i < 2; ++i) {
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 10.0f));
+        rootNode->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        label = Label::createWithSystemFont(recordTitleText[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+    }
+    if (UserDefault::getInstance()->getBoolForKey(USE_FIXED_SEAT_ORDER)) {
+        radioGroup->setSelectedButton(1);
+    }
+
+    AlertDialog::Builder(this)
+        .setTitle(__UTF8("设置"))
+        .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, radioGroups](AlertDialog *, int) {
+            UserDefault::getInstance()->setBoolForKey(SCORE_SHEET_TOTAL_MODE, radioGroups[0]->getSelectedButtonIndex() == 1);
+            UserDefault::getInstance()->setBoolForKey(USE_FIXED_SEAT_ORDER, radioGroups[1]->getSelectedButtonIndex() == 1);
+            return true;
+        }).create()->show();
+}

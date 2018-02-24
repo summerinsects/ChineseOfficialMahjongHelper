@@ -23,8 +23,15 @@ bool MahjongTheoryScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    // 使用说明
+    ui::Button *button = cocos2d::ui::Button::create("source_material/help_128px.png");
+    this->addChild(button);
+    button->setScale(20.0f / button->getContentSize().width);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
+    button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
+
     // 输入框
-    ui::EditBox *editBox = UICommon::createEditBox(Size(visibleSize.width - 95.0f, 20.0f));
+    ui::EditBox *editBox = UICommon::createEditBox(Size(visibleSize.width - 50.0f, 20.0f));
     this->addChild(editBox);
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -35,7 +42,7 @@ bool MahjongTheoryScene::init() {
     editBox->setPlaceHolder(__UTF8("在此处输入"));
     editBox->setMaxLength(50);
     editBox->setDelegate(this);
-    editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 40.0f, origin.y + visibleSize.height - 50.0f));
+    editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 20.0f, origin.y + visibleSize.height - 50.0f));
     _editBox = editBox;
 
     // 与输入框同位置的空白button
@@ -48,24 +55,14 @@ bool MahjongTheoryScene::init() {
     widget->setPosition(Vec2(editSize.width * 0.5f, editSize.height * 0.5f));
 
     // 随机按钮
-    ui::Button *button = UICommon::createButton();
+    button = UICommon::createButton();
     button->setScale9Enabled(true);
     button->setContentSize(Size(35.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("随机"));
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 65.0f, origin.y + visibleSize.height - 50.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 22.5f, origin.y + visibleSize.height - 50.0f));
     button->addClickEventListener([this](Ref *) { setRandomInput(); });
-
-    // 说明按钮
-    button = UICommon::createButton();
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(35.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("说明"));
-    this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 25.0f, origin.y + visibleSize.height - 50.0f));
-    button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
 
     // 手牌
     HandTilesWidget *handTilesWidget = HandTilesWidget::create();
@@ -514,8 +511,7 @@ void MahjongTheoryScene::calculate() {
     _allResults.clear();
 
     LoadingView *loadingView = LoadingView::create();
-    this->addChild(loadingView);
-    loadingView->setPosition(Director::getInstance()->getVisibleOrigin());
+    loadingView->showInScene(this);
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     std::thread([thiz, hand_tiles, serving_tile, loadingView]() {
@@ -533,7 +529,7 @@ void MahjongTheoryScene::calculate() {
             if (thiz->isRunning()) {
                 thiz->filterResultsByFlag(thiz->getFilterFlag());
                 thiz->_tableView->reloadData();
-                loadingView->removeFromParent();
+                loadingView->dismiss();
             }
         });
     }).detach();

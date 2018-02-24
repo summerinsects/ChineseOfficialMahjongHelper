@@ -16,6 +16,9 @@ static const Color3B C3B_GREEN = Color3B(49, 155, 28);
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
 
+#define RECENT_FANS "recent_fans"
+#define USE_FIXED_SEAT_ORDER "use_fixed_seat_order"
+
 // 8个常用番作为初始的「最近使用」
 static mahjong::fan_t recentFans[8] = {
     mahjong::MIXED_SHIFTED_CHOWS,
@@ -124,7 +127,7 @@ static CellDetail cellDetails[11] = {
 };
 
 static void loadRecentFans() {
-    std::string str = UserDefault::getInstance()->getStringForKey("recent_fans");
+    std::string str = UserDefault::getInstance()->getStringForKey(RECENT_FANS);
     if (str.empty()) {
         return;
     }
@@ -138,7 +141,7 @@ static void loadRecentFans() {
 }
 
 static void saveRecentFans() {
-    UserDefault::getInstance()->setStringForKey("recent_fans", Common::format("%d %d %d %d %d %d %d %d",
+    UserDefault::getInstance()->setStringForKey(RECENT_FANS, Common::format("%d %d %d %d %d %d %d %d",
         static_cast<int>(recentFans[0]), static_cast<int>(recentFans[1]), static_cast<int>(recentFans[2]), static_cast<int>(recentFans[3]),
         static_cast<int>(recentFans[4]), static_cast<int>(recentFans[5]), static_cast<int>(recentFans[6]), static_cast<int>(recentFans[7])));
 }
@@ -166,11 +169,18 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     _handIdx = handIdx;
     _submitCallback = callback;
 
-    switch (handIdx >> 2) {
-    default: _seatFlag = 0xE4; _playerFlag = 0xE4; break;  // 3210 3210
-    case 1: _seatFlag = 0xB1; _playerFlag = 0xB1; break;  // 2301 2301
-    case 2: _seatFlag = 0x1E; _playerFlag = 0x4B; break;  // 0132 1023
-    case 3: _seatFlag = 0x4B; _playerFlag = 0x1E; break;  // 1023 0132
+    bool isRealSeatOrder = !UserDefault::getInstance()->getBoolForKey(USE_FIXED_SEAT_ORDER);
+    if (isRealSeatOrder) {
+        switch (handIdx >> 2) {
+        default: _seatFlag = 0xE4; _playerFlag = 0xE4; break;  // 3210 3210
+        case 1: _seatFlag = 0xB1; _playerFlag = 0xB1; break;  // 2301 2301
+        case 2: _seatFlag = 0x1E; _playerFlag = 0x4B; break;  // 0132 1023
+        case 3: _seatFlag = 0x4B; _playerFlag = 0x1E; break;  // 1023 0132
+        }
+    }
+    else {
+        _seatFlag = 0xE4;
+        _playerFlag = 0xE4;
     }
 
     _winIndex = -1;
@@ -183,6 +193,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    // 帮助按钮
+    ui::Button *button = ui::Button::create("source_material/help_128px.png");
+    this->addChild(button);
+    button->setScale(20.0f / button->getContentSize().width);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
+    button->addClickEventListener(std::bind(&RecordScene::onInstructionButton, this, std::placeholders::_1));
 
     float yPos = origin.y + visibleSize.height - 45.0f;
     // 番数输入框
@@ -237,7 +254,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, yPos));
 
     // 罚分调整
-    ui::Button *button = UICommon::createButton();
+    button = UICommon::createButton();
     this->addChild(button);
     button->setScale9Enabled(true);
     button->setContentSize(Size(55.0f, 20.0f));
@@ -247,12 +264,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->addClickEventListener(std::bind(&RecordScene::onPenaltyButton, this, std::placeholders::_1, names));
 
     // 说明文本
-    label = Label::createWithSystemFont(__UTF8("番数支持直接输入，强烈建议先「标记主番」直接增加番数，再用+-按钮调整。"),
-        "Arial", 10, Size(visibleSize.width - 75.0f, 0.0f));
+    label = Label::createWithSystemFont(isRealSeatOrder ? __UTF8("当前模式为「换位」，选手顺序与当前圈座位相同") : __UTF8("当前模式为「固定」，选手顺序与开局座位相同"),
+        "Arial", 10);
     label->setColor(C3B_GRAY);
     this->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 60.0f));
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 70.0f));
+    cw::scaleLabelToFitWidth(label, visibleSize.width - 75.0f);
 
     ui::RadioButtonGroup *winGroup = ui::RadioButtonGroup::create();
     winGroup->setAllowedNoSelection(true);
@@ -328,7 +346,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 罚分
         y = origin.y + visibleSize.height - 195.0f;
-        label = Label::createWithSystemFont(__UTF8("调整 "), "Arial", 12);
+        label = Label::createWithSystemFont(__UTF8("调整"), "Arial", 12);
         label->setColor(Color3B::BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
@@ -338,7 +356,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         label->setColor(C3B_GRAY);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x, y));
+        label->setPosition(Vec2(x + 2.0f, y));
         _penaltyLabel[i] = label;
     }
     _winGroup = winGroup;
@@ -410,19 +428,23 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     std::function<void (Ref *)> onLayoutButton = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
         ui::Button *layoutButton = (ui::Button *)sender;
 
+        static const std::string titleText[2] = {
+            std::string("\xE2\xAC\x87\xEF\xB8\x8E").append(__UTF8("收起")),
+            std::string("\xE2\xAC\x86\xEF\xB8\x8E").append(__UTF8("展开"))
+        };
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Size layoutSize;
         layoutSize.width = visibleSize.width;
         if (layoutButton->getUserData()) {
             layoutSize.height = visibleSize.height - 145.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
-            layoutButton->setTitleText(__UTF8("\xE2\xAC\x87\xEF\xB8\x8E收起"));
+            layoutButton->setTitleText(titleText[0]);
             radioNode->setVisible(false);
         }
         else {
             layoutSize.height = visibleSize.height - 225.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(true));
-            layoutButton->setTitleText(__UTF8("\xE2\xAC\x86\xEF\xB8\x8E展开"));
+            layoutButton->setTitleText(titleText[1]);
             radioNode->setVisible(true);
         }
 
@@ -729,6 +751,25 @@ void RecordScene::updateScoreLabel() {
         // 未选择是点炮还是自摸时，不允许确定
         _submitButton->setEnabled(claimIndex != -1);
     }
+}
+
+void RecordScene::onInstructionButton(cocos2d::Ref *sender) {
+    const float width = AlertDialog::maxWidth();
+    Label *label = Label::createWithSystemFont(
+        __UTF8("1.「换位」模式下，选手顺序与当前圈座位相同；「固定」模式下，选手顺序与开局座位相同。可通过主界面的「设置」进行切换。\n")
+        __UTF8("2.番数框支持直接输入，「标记主番」可快速增加番数，强烈建议先「标记主番」，再用两侧的+和-按钮调整。\n")
+        __UTF8("3.「标记主番」出于简化代码逻辑考虑，未做排斥检测，即程序允许标记若干个自相矛盾的主番，但不建议你这样做。\n")
+        __UTF8("4.「小番」为2番及1番的番种。以复选框展现的，是不可复计的番种；以两侧-1和+1按钮展现的，是可复计的番种。\n")
+        __UTF8("5.「记录和牌」可根据当前和牌自动算番，自动标记番种。")
+        , "Arial", 10, Size(width, 0.0f));
+    label->setColor(Color3B::BLACK);
+
+    AlertDialog::Builder(Director::getInstance()->getRunningScene())
+        .setTitle(__UTF8("使用说明"))
+        .setContentNode(label)
+        .setCloseOnTouchOutside(false)
+        .setPositiveButton(__UTF8("确定"), nullptr)
+        .create()->show();
 }
 
 void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {

@@ -36,15 +36,24 @@ bool ScoreSheetScene::init() {
     return ScoreSheetScene::initWithRecord(&g_currentRecord);
 }
 
+#define SCORE_SHEET_TOTAL_MODE "score_sheet_scene_total_mode"
+
 bool ScoreSheetScene::initWithRecord(Record *record) {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("国标麻将记分器")))) {
         return false;
     }
 
-    memset(_totalScores, 0, sizeof(_totalScores));
+    _isTotalMode = UserDefault::getInstance()->getBoolForKey(SCORE_SHEET_TOTAL_MODE);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    // 使用说明
+    ui::Button *button = cocos2d::ui::Button::create("source_material/help_128px.png");
+    this->addChild(button);
+    button->setScale(20.0f / button->getContentSize().width);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onInstructionButton, this, std::placeholders::_1));
 
     // 用来绘制表格线的根结点
     DrawNode *drawNode = DrawNode::create();
@@ -65,14 +74,14 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     const float xPos = origin.x + 2.0f + 55.0f * 0.5f;
     const float yPos = origin.y + tableOffsetY + tableHeight + 15.0f;
-    static const char *titleText[4] = { __UTF8("追分策略"), __UTF8("清空表格"), __UTF8("历史记录"), __UTF8("使用说明") };
+    static const char *titleText[4] = { __UTF8("追分策略"), __UTF8("清空表格"), __UTF8("历史记录"), __UTF8("模式切换") };
     static void (ScoreSheetScene::*callbacks[4])(Ref *) = {
-        &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onInstructionButton
+        &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onModeButton
     };
 
     ui::Button *topButtons[4];
     for (int i = 0; i < 4; ++i) {
-        ui::Button *button = UICommon::createButton();
+        button = UICommon::createButton();
         this->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(55.0f, 20.0f));
@@ -86,6 +95,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     }
     topButtons[1]->setEnabled(record == &g_currentRecord);
     topButtons[2]->setEnabled(record == &g_currentRecord);
+    topButtons[3]->setTitleText(_isTotalMode ? __UTF8("单盘模式") : __UTF8("累计模式"));
 
     // 底部时间label
     Label *label = Label::createWithSystemFont(__UTF8("当前时间"), "Arial", 12);
@@ -136,7 +146,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         _nameLabel[i] = label;
     }
 
-    ui::Button *button = UICommon::createButton();
+    button = UICommon::createButton();
     drawNode->addChild(button, -1);
     button->setScale9Enabled(true);
     button->setContentSize(Size(gap, cellHeight));
@@ -277,6 +287,46 @@ void ScoreSheetScene::cleanRow(size_t handIdx) {
     _recordButton[handIdx]->setEnabled(false);
     _fanNameLabel[handIdx]->setVisible(false);
     _detailWidget[handIdx]->setEnabled(false);
+}
+
+void ScoreSheetScene::skipScores(size_t handIdx, int (&totalScores)[4]) const {
+    int scoreTable[4];
+    const Record::Detail &detail = _record.detail[handIdx];
+    TranslateDetailToScoreTable(detail, scoreTable);
+
+    for (int i = 0; i < 4; ++i) {
+        totalScores[i] += scoreTable[i];  // 更新总分
+    }
+}
+
+void ScoreSheetScene::fillScoresForSingleMode(size_t handIdx, int (&totalScores)[4]) {
+    int scoreTable[4];
+    const Record::Detail &detail = _record.detail[handIdx];
+    TranslateDetailToScoreTable(detail, scoreTable);
+
+    // 填入这一盘四位选手的得分
+    for (int i = 0; i < 4; ++i) {
+        _scoreLabels[handIdx][i]->setString(Common::format("%+d", scoreTable[i]));
+        totalScores[i] += scoreTable[i];  // 更新总分
+    }
+
+    // 使用不同颜色
+    RecordScene::SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_flag, detail.claim_flag, detail.penalty_scores);
+}
+
+void ScoreSheetScene::fillScoresForTotalMode(size_t handIdx, int (&totalScores)[4]) {
+    int scoreTable[4];
+    const Record::Detail &detail = _record.detail[handIdx];
+    TranslateDetailToScoreTable(detail, scoreTable);
+
+    // 填入这一盘之后四位选手的总分
+    for (int i = 0; i < 4; ++i) {
+        totalScores[i] += scoreTable[i];  // 更新总分
+        _scoreLabels[handIdx][i]->setString(Common::format("%+d", totalScores[i]));
+    }
+
+    // 使用不同颜色
+    RecordScene::SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_flag, detail.claim_flag, detail.penalty_scores);
 }
 
 static const char *fan_short_name[] = {
@@ -456,34 +506,21 @@ static std::string GetShortFanText(const Record::Detail &detail) {
     return __UTF8("未标记番种");
 }
 
-void ScoreSheetScene::fillRow(size_t handIdx) {
-    int scoreTable[4];
-    const Record::Detail &detail = _record.detail[handIdx];
-    TranslateDetailToScoreTable(detail, scoreTable);
-
-    // 填入这一盘四位选手的得分
-    for (int i = 0; i < 4; ++i) {
-        _scoreLabels[handIdx][i]->setString(Common::format("%+d", scoreTable[i]));
-        _totalScores[i] += scoreTable[i];  // 更新总分
-    }
-
-    // 使用不同颜色
-    RecordScene::SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_flag, detail.claim_flag, detail.penalty_scores);
-
+void ScoreSheetScene::fillDetail(size_t handIdx) {
     // 禁用并隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
     _recordButton[handIdx]->setEnabled(false);
     _detailWidget[handIdx]->setEnabled(true);
 
     Label *label = _fanNameLabel[handIdx];
-    label->setString(GetShortFanText(detail));
+    label->setString(GetShortFanText(_record.detail[handIdx]));
     label->setVisible(true);
     cw::scaleLabelToFitWidth(label, _cellWidth - 4.0f);
 }
 
-void ScoreSheetScene::refreshRank() {
+void ScoreSheetScene::refreshRank(const int (&totalScores)[4]) {
     unsigned rank[4] = {0};
-    CalculateRankFromScore(_totalScores, rank);
+    CalculateRankFromScore(totalScores, rank);
 
     static const char *text[] = { __UTF8("一"), __UTF8("二"), __UTF8("三"), __UTF8("四") };
     for (int i = 0; i < 4; ++i) {
@@ -535,12 +572,20 @@ void ScoreSheetScene::recover() {
     _lockButton->setEnabled(false);
     _lockButton->setVisible(false);
 
-    // 初始化总分
-    memset(_totalScores, 0, sizeof(_totalScores));
+    int totalScores[4] = { 0 };
 
     // 逐行填入数据
-    for (size_t i = 0; i < _record.current_index; ++i) {
-        fillRow(i);
+    if (_isTotalMode) {
+        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+            fillScoresForTotalMode(i, totalScores);
+            fillDetail(i);
+        }
+    }
+    else {
+        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+            fillScoresForSingleMode(i, totalScores);
+            fillDetail(i);
+        }
     }
     for (size_t i = _record.current_index; i < 16; ++i) {
         cleanRow(i);
@@ -548,11 +593,11 @@ void ScoreSheetScene::recover() {
 
     // 刷新总分和名次label
     for (int i = 0; i < 4; ++i) {
-        _totalLabel[i]->setString(Common::format("%+d", _totalScores[i]));
+        _totalLabel[i]->setString(Common::format("%+d", totalScores[i]));
         _rankLabels[i]->setVisible(false);
     }
     if (_record.current_index > 0) {
-        refreshRank();
+        refreshRank(totalScores);
     }
 
     // 如果不是北风北，则显示下一行的计分按钮
@@ -580,8 +625,6 @@ void ScoreSheetScene::reset() {
     if (_isGlobal) {
         writeToFile(_record);
     }
-
-    memset(_totalScores, 0, sizeof(_totalScores));
 
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setVisible(false);
@@ -920,8 +963,6 @@ void ScoreSheetScene::onLockButton(cocos2d::Ref *) {
         return;
     }
 
-    memset(_totalScores, 0, sizeof(_totalScores));
-
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setVisible(true);
         _nameLabel[i]->setString(name[i]);
@@ -953,28 +994,41 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
         [this, handIdx](const Record::Detail &detail) {
         bool isModify = (handIdx != _record.current_index);
 
-        // 更新数据时，要先删除原来的记录
-        if (isModify) {
-            int scores[4];
-            TranslateDetailToScoreTable(_record.detail[handIdx], scores);
-            for (int i = 0; i < 4; ++i) {
-                _totalScores[i] -= scores[i];
-            }
-        }
-
         // 将计分面板的数据更新到当前数据中
         memcpy(&_record.detail[handIdx], &detail, sizeof(Record::Detail));
 
+        int totalScores[4] = { 0 };
+        for (size_t i = 0, cnt = handIdx; i < cnt; ++i) {
+            skipScores(i, totalScores);
+        }
+
+        fillDetail(handIdx);
+
         // 填入当前行
-        fillRow(handIdx);
+        if (!_isTotalMode) {
+            fillScoresForSingleMode(handIdx, totalScores);
+
+            // 单盘模式直接统计之后的行
+            for (size_t i = handIdx + 1, cnt = _record.current_index; i < cnt; ++i) {
+                skipScores(i, totalScores);
+            }
+        }
+        else {
+            fillScoresForTotalMode(handIdx, totalScores);
+
+            // 累计模式下还需要修改随后的所有行
+            for (size_t i = handIdx + 1, cnt = _record.current_index; i < cnt; ++i) {
+                fillScoresForTotalMode(i, totalScores);
+            }
+        }
 
         // 更新总分
         for (int i = 0; i < 4; ++i) {
-            _totalLabel[i]->setString(Common::format("%+d", _totalScores[i]));
+            _totalLabel[i]->setString(Common::format("%+d", totalScores[i]));
         }
 
         // 更新名次
-        refreshRank();
+        refreshRank(totalScores);
 
         if (isModify) {
             if (_record.end_time != 0) {
@@ -1191,6 +1245,27 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
         .setContentNode(label)
         .setPositiveButton(__UTF8("确定"), nullptr)
         .create()->show();
+}
+
+void ScoreSheetScene::onModeButton(cocos2d::Ref *sender) {
+    _isTotalMode = !_isTotalMode;
+    ((ui::Button *)sender)->setTitleText(_isTotalMode ? __UTF8("单盘模式") : __UTF8("累计模式"));
+    UserDefault::getInstance()->setBoolForKey(SCORE_SHEET_TOTAL_MODE, _isTotalMode);
+
+    // 逐行填入数据
+    int totalScores[4] = { 0 };
+    if (!_isTotalMode) {
+        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+            fillScoresForSingleMode(i, totalScores);
+            fillDetail(i);
+        }
+    }
+    else {
+        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+            fillScoresForTotalMode(i, totalScores);
+            fillDetail(i);
+        }
+    }
 }
 
 void ScoreSheetScene::onHistoryButton(cocos2d::Ref *) {
@@ -1441,9 +1516,15 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     // 当当前一局比赛未结束时，显示快捷分差按钮
     if (std::none_of(std::begin(name), std::end(name), &Common::isCStringEmpty)
         && _record.current_index < 16) {
+
+        int totalScores[4] = { 0 };
+        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+            skipScores(i, totalScores);
+        }
+
         rootNode = Node::create();
 
-        DrawNode *drawNode = createPursuitTable(name, _totalScores);
+        DrawNode *drawNode = createPursuitTable(name, totalScores);
         const Size &drawNodeSize = drawNode->getContentSize();
 
         rootNode->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30.0f));
@@ -1497,6 +1578,11 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *, size_t idx) {
         return;
     }
 
+    int totalScores[4] = { 0 };
+    for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+        skipScores(i, totalScores);
+    }
+
     static const size_t cmpIdx[][3] = { { 1, 2, 3 }, { 0, 2, 3 }, { 0, 1, 3 }, { 0, 1, 2 } };
 
     Node *rootNode = Node::create();
@@ -1504,7 +1590,7 @@ void ScoreSheetScene::onScoreButton(cocos2d::Ref *, size_t idx) {
 
     for (int i = 0; i < 3; ++i) {
         size_t dst = cmpIdx[idx][i];
-        int delta = _totalScores[idx] - _totalScores[dst];
+        int delta = totalScores[idx] - totalScores[dst];
 
         ui::Button *button = UICommon::createButton();
         button->setScale9Enabled(true);

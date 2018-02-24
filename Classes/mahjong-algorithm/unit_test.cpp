@@ -84,7 +84,7 @@ void test_points(const char *str, win_flag_t win_flag, wind_t prevalent_wind, wi
     param.win_flag = win_flag;
     param.prevalent_wind = prevalent_wind;
     param.seat_wind = seat_wind;
-    int points = calculate_fan(&param, fan_table);
+    int points = calculate_fan(&param, &fan_table);
 
     printf("max points = %d\n\n", points);
     if (points < 0) {
@@ -126,7 +126,7 @@ void test_shanten(const char *str) {
         }
 
         tile_table_t cnt_table;
-        map_hand_tiles(hand_tiles, cnt_table);
+        map_hand_tiles(hand_tiles, &cnt_table);
 
         printf("%d枚", count_useful_tile(cnt_table, useful_table));
     };

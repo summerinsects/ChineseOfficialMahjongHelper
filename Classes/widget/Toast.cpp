@@ -62,6 +62,8 @@ void Toast::show() {
     float dt = _duration == LENGTH_LONG ? 3.5f : 2.0f;
     auto thiz = makeRef(this);
 
+    char key[64];
+    snprintf(key, sizeof(key), "Toast::show %p", this);
     Director::getInstance()->getScheduler()->schedule([thiz](float) { thiz->removeFromParent(); },
-        reinterpret_cast<void *>(1), 0.0f, 0U, dt, false, "Toast::show");
+        reinterpret_cast<void *>(1), 0.0f, 0U, dt, false, key);
 }
