@@ -1099,7 +1099,7 @@ static void adjust_by_packs_traits(const pack_t (&packs)[5], fan_table_t &fan_ta
 // 牌特性校正，相关番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
 static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
     // 断幺
-    if (!std::any_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
+    if (std::none_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
         fan_table[ALL_SIMPLES] = 1;
     }
 
