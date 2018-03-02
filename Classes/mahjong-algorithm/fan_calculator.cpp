@@ -29,6 +29,34 @@
 #include "standard_tiles.h"
 #include "shanten.h"
 
+/**
+ * 算番流程概述：
+ * 1. 判断特殊和型
+ *   (1) 门清状态——七对、十三幺、组合龙、全不靠
+ *   (2) 1副露状态——组合龙
+ * 2. 按基本和型划分（留意七对）
+ * 3. 对第2步中的划分结果进行算番，取最大值
+
+ * 对划分后的结果算番流程：
+ * 1. 计数顺子个数和刻子个数，对刻子自身算番（涉及：幺九刻、箭刻）
+ * 2. 分情况对面子算番
+ *   (1) 4顺——先判断三色/一色双龙会，没有再计算4顺的番
+ *   (2) 3顺1刻——计算3顺的番
+ *   (3) 2顺2刻——计算2顺的番，计算2刻的番
+ *   (4) 1顺3刻——计算3刻的番
+ * 3. 九莲宝灯判断
+ * 4. 根据和牌方式调整——涉及：不求人、全求人
+ * 5. 根据雀头调整——涉及：平和、小三元、小四喜
+ * 6. 根据牌组特征调整——涉及：全带幺、全带五、全双刻
+ * 7. 根据花色调整——涉及：无字、缺一门、混一色、清一色、五门齐
+ * 8. 根据牌特性调整——涉及：断幺、推不倒、绿一色、字一色、清幺九、混幺九
+ * 9. 根据数牌的范围调整——涉及：大于五、小于五、全大、全中、全小
+ * 10. 计算四归一
+ * 11. 根据听牌方式调整——涉及：边张、嵌张、单钓将
+ * 12. 根据风调整——涉及：圈风刻、门风刻
+ * 13. 最后统一调整规则中规定不计的，得到算番结果。如果为0番，则调整为无番和
+ */
+
 #define MAX_DIVISION_CNT 20  // 一副牌最多也没有20种划分吧，够用了
 
 #if 0
@@ -44,6 +72,8 @@ namespace mahjong {
 #if 0  // Debug
 extern intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intptr_t max_size);
 #endif
+
+//-------------------------------- 划分 --------------------------------
 
 namespace {
 
@@ -194,6 +224,8 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
     memcpy(work_division.packs, fixed_packs, fixed_cnt * sizeof(pack_t));
     return divide_recursively(cnt_table, fixed_cnt, 0, &work_division, result);
 }
+
+//-------------------------------- 算番 --------------------------------
 
 // 4组递增1
 static forceinline bool is_four_shifted_1(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
@@ -921,7 +953,7 @@ static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t
     }
 }
 
-// 和牌方式校正，确定不求人、全求人
+// 根据和牌方式调整——涉及番种：不求人、全求人
 static void adjust_by_self_drawn(const pack_t (&packs)[5], intptr_t fixed_cnt, bool self_drawn, fan_table_t &fan_table) {
     ptrdiff_t melded_cnt = std::count_if(&packs[0], &packs[fixed_cnt], &is_pack_melded);  // 明副露的组数
 
@@ -941,7 +973,7 @@ static void adjust_by_self_drawn(const pack_t (&packs)[5], intptr_t fixed_cnt, b
     }
 }
 
-// 雀头校正，确定平和、小三元、小四喜
+// 根据雀头调整——涉及番种：平和、小三元、小四喜
 static void adjust_by_pair_tile(tile_t pair_tile, intptr_t chow_cnt, fan_table_t &fan_table) {
     if (chow_cnt == 4) {  // 4组都是顺子
         if (is_numbered_suit_quick(pair_tile)) {  // 数牌雀头
@@ -968,7 +1000,7 @@ static void adjust_by_pair_tile(tile_t pair_tile, intptr_t chow_cnt, fan_table_t
     }
 }
 
-// 花色校正，相关番种：无字、缺一门、混一色、清一色、五门齐
+// 根据花色调整——涉及番种：无字、缺一门、混一色、清一色、五门齐
 static void adjust_by_suits(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
     // 打表标记有哪些花色，用bit操作
     uint8_t suit_flag = 0;
@@ -1009,7 +1041,7 @@ static void adjust_by_suits(const tile_t *tiles, intptr_t tile_cnt, fan_table_t 
     }
 }
 
-// 数牌的范围校正，相关番种：大于五、小于五、全大、全中、全小
+// 根据数牌的范围调整——涉及番种：大于五、小于五、全大、全中、全小
 static void adjust_by_rank_range(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
 #ifdef STRICT_98_RULE
     if (fan_table[SEVEN_PAIRS]) {
@@ -1048,7 +1080,7 @@ static void adjust_by_rank_range(const tile_t *tiles, intptr_t tile_cnt, fan_tab
     }
 }
 
-// 牌组特征校正，相关番种：全带幺、全带五、全双刻
+// 根据牌组特征调整——涉及番种：全带幺、全带五、全双刻
 static void adjust_by_packs_traits(const pack_t (&packs)[5], fan_table_t &fan_table) {
     // 统计包含数牌19、字牌、5、双数牌的组数
     int terminal_pack = 0;
@@ -1096,7 +1128,7 @@ static void adjust_by_packs_traits(const pack_t (&packs)[5], fan_table_t &fan_ta
     }
 }
 
-// 牌特性校正，相关番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
+// 根据牌特性调整——涉及番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
 static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
     // 断幺
     if (std::none_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
@@ -1140,7 +1172,7 @@ static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_t
     }
 }
 
-// 四归一校正
+// 四归一调整
 static void adjust_by_tiles_hog(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
     intptr_t kong_cnt = tile_cnt - 14;  // 标准和牌14张，多出几张就说明有几个杠
     tile_table_t cnt_table;
@@ -1150,7 +1182,7 @@ static void adjust_by_tiles_hog(const tile_t *tiles, intptr_t tile_cnt, fan_tabl
     fan_table[TILE_HOG] = static_cast<uint8_t>(_4_cnt - kong_cnt);
 }
 
-// 听牌方式校正，确定边张、嵌张、单钓将
+// 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
 static void adjust_by_waiting_form(const pack_t *concealed_packs, intptr_t pack_cnt, const tile_t *standing_tiles, intptr_t standing_cnt,
     tile_t win_tile, fan_table_t &fan_table) {
     // 全求人和四杠不计单钓将，也不可能有边张、嵌张
@@ -1218,7 +1250,7 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, intptr_t pack_
     }
 }
 
-// 单个牌组用风校正，确定圈风刻、门风刻
+// 根据风调整——涉及番种：圈风刻、门风刻
 static void adjust_by_winds(tile_t tile, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
     rank_t delta = tile - TILE_E;
     if (delta == static_cast<int>(prevalent_wind) - static_cast<int>(wind_t::EAST)) {
@@ -1229,7 +1261,7 @@ static void adjust_by_winds(tile_t tile, wind_t prevalent_wind, wind_t seat_wind
     }
 }
 
-// 统一校正一些不计的
+// 统一调整一些不计的
 static void adjust_fan_table(fan_table_t &fan_table, bool prevalent_eq_seat) {
     // 大四喜不计三风刻、碰碰和、圈风刻、门风刻、幺九刻
     if (fan_table[BIG_FOUR_WINDS]) {
@@ -1533,7 +1565,7 @@ static void adjust_fan_table(fan_table_t &fan_table, bool prevalent_eq_seat) {
     }
 }
 
-// 和牌标记校正，确定和绝张、妙手回春、海底捞月、自摸
+// 根据和牌标记调整——涉及番种：和绝张、妙手回春、海底捞月、自摸
 static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
     if (win_flag & WIN_FLAG_4TH_TILE) {
         fan_table[LAST_TILE] = 1;
@@ -1573,7 +1605,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     tile_t win_tile = calculate_param->win_tile;
     win_flag_t win_flag = calculate_param->win_flag;
 
-    // 和牌标记校正，确定和绝张、妙手回春、海底捞月、自摸
+    // 根据和牌标记调整——涉及番种：和绝张、妙手回春、海底捞月、自摸
     adjust_by_win_flag(win_flag, fan_table);
 
     // 点和的牌张，如果不能解释为顺子中的一张，那么将其解释为刻子，并标记这个刻子为明刻
@@ -1679,11 +1711,11 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
         }
     }
 
-    // 和牌方式校正，确定不求人、全求人
+    // 根据和牌方式调整——涉及番种：不求人、全求人
     adjust_by_self_drawn(packs, fixed_cnt, (win_flag & WIN_FLAG_SELF_DRAWN) != 0, fan_table);
-    // 雀头校正，确定平和、小三元、小四喜
+    // 根据雀头调整——涉及番种：平和、小三元、小四喜
     adjust_by_pair_tile(pack_get_tile(pair_pack), chow_cnt, fan_table);
-    // 牌组特征校正，相关番种：全带幺、全带五、全双刻
+    // 根据牌组特征调整——涉及番种：全带幺、全带五、全双刻
     adjust_by_packs_traits(packs, fan_table);
 
     tile_t tiles[18];
@@ -1692,23 +1724,23 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     tile_cnt += standing_cnt;
     tiles[tile_cnt++] = win_tile;
 
-    // 花色校正，相关番种：无字、缺一门、混一色、清一色、五门齐
+    // 根据花色调整——涉及番种：无字、缺一门、混一色、清一色、五门齐
     adjust_by_suits(tiles, tile_cnt, fan_table);
-    // 牌特性校正，相关番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
+    // 根据牌特性调整——涉及番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
     adjust_by_tiles_traits(tiles, tile_cnt, fan_table);
-    // 数牌的范围校正，相关番种：大于五、小于五、全大、全中、全小
+    // 根据数牌的范围调整——涉及番种：大于五、小于五、全大、全中、全小
     adjust_by_rank_range(tiles, tile_cnt, fan_table);
-    // 四归一校正
+    // 四归一调整
     adjust_by_tiles_hog(tiles, tile_cnt, fan_table);
-    // 听牌方式校正，确定边张、嵌张、单钓将
+    // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
     adjust_by_waiting_form(packs + fixed_cnt, 5 - fixed_cnt, standing_tiles, standing_cnt, win_tile, fan_table);
 
-    // 用风校正，确定圈风刻、门风刻
+    // 根据风调整——涉及番种：圈风刻、门风刻
     for (intptr_t i = 0; i < pung_cnt; ++i) {
         adjust_by_winds(pack_get_tile(pung_packs[i]), prevalent_wind, seat_wind, fan_table);
     }
 
-    // 统一校正一些不计的
+    // 统一调整一些不计的
     adjust_fan_table(fan_table, prevalent_wind == seat_wind);
 
     // 如果什么番都没有，则计为无番和
@@ -1781,7 +1813,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     else {
         calculate_kongs(&packs[3], 1, fan_table);
 
-        // 用风校正，确定圈风刻、门风刻
+        // 根据风调整——涉及番种：圈风刻、门风刻
         adjust_by_winds(pack_get_tile(packs[3]), prevalent_wind, seat_wind, fan_table);
     }
 
@@ -1802,10 +1834,10 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     intptr_t tile_cnt = packs_to_tiles(&packs[3], 2, tiles + 9, 6);  // 一组面子+一对雀头 最多6张牌
     tile_cnt += 9;
 
-    // 花色校正，相关番种：无字、缺一门、混一色、清一色、五门齐
+    // 根据花色调整——涉及番种：无字、缺一门、混一色、清一色、五门齐
     adjust_by_suits(tiles, tile_cnt, fan_table);
-    // 牌组以及牌特征就不需要校正了，有组合龙的存在绝对不可能存在全带幺、全带五、全双刻，断幺、推不倒、绿一色、字一色、清幺九、混幺九
-    // 四归一校正
+    // 牌组以及牌特征就不需要调整了，有组合龙的存在绝对不可能存在全带幺、全带五、全双刻，断幺、推不倒、绿一色、字一色、清幺九、混幺九
+    // 四归一调整
     adjust_by_tiles_hog(tiles, tile_cnt, fan_table);
 
     // 和牌张是组合龙范围的牌，不计边张、嵌张、单钓将
@@ -1816,7 +1848,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
             tile_t temp[4];
             intptr_t cnt = packs_to_tiles(&packs[3], 2, temp, 4);
 
-            // 听牌方式校正，确定边张、嵌张、单钓将
+            // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
             adjust_by_waiting_form(packs + 3, 2, temp, cnt, win_tile, fan_table);
         }
         else {
@@ -1825,7 +1857,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
         }
     }
 
-    // 统一校正一些不计的
+    // 统一调整一些不计的
     adjust_fan_table(fan_table, prevalent_wind == seat_wind);
     return true;
 }
@@ -1897,13 +1929,13 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
             // 普通七对
             fan_table[SEVEN_PAIRS] = 1;
 
-            // 花色校正，相关番种：无字、缺一门、混一色、清一色、五门齐
+            // 根据花色调整——涉及番种：无字、缺一门、混一色、清一色、五门齐
             adjust_by_suits(standing_tiles, 14, fan_table);
-            // 牌特性校正，相关番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
+            // 根据牌特性调整——涉及番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
             adjust_by_tiles_traits(standing_tiles, 14, fan_table);
-            // 数牌的范围校正，相关番种：大于五、小于五、全大、全中、全小
+            // 根据数牌的范围调整——涉及番种：大于五、小于五、全大、全中、全小
             adjust_by_rank_range(standing_tiles, 14, fan_table);
-            // 四归一校正
+            // 四归一调整
             adjust_by_tiles_hog(standing_tiles, 14, fan_table);
         }
     }
@@ -1919,8 +1951,8 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
     }
 
     adjust_by_win_flag(win_flag, fan_table);
-    // 风校正就没必要了，这些特殊和型都没有面子，不存在圈风刻、门风刻
-    // 统一校正一些不计的
+    // 根据风调整就没必要了，这些特殊和型都没有面子，不存在圈风刻、门风刻
+    // 统一调整一些不计的
     adjust_fan_table(fan_table, false);
     return true;
 }
@@ -1992,7 +2024,9 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 算番
+//
 int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table) {
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
     tile_t win_tile = calculate_param->win_tile;

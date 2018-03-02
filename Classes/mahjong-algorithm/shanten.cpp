@@ -663,7 +663,7 @@ bool is_basic_form_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile
     return is_basic_form_win_recursively(cnt_table, standing_cnt + 1);
 }
 
-// 七对
+//-------------------------------- 七对 --------------------------------
 
 // 七对上听数
 int seven_pairs_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
@@ -712,7 +712,7 @@ bool is_seven_pairs_win(const tile_t *standing_tiles, intptr_t standing_cnt, til
         && useful_table[test_tile]);
 }
 
-// 十三幺
+//-------------------------------- 十三幺 --------------------------------
 
 // 十三幺上听数
 int thirteen_orphans_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
@@ -785,7 +785,7 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, intptr_t standing_cnt
         && useful_table[test_tile]);
 }
 
-// “组合龙+面子+雀头”和型
+//-------------------------------- “组合龙+面子+雀头”和型 --------------------------------
 
 // 以表格为参数计算组合龙是否听牌
 static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, intptr_t left_cnt, useful_table_t *waiting_table) {
@@ -956,7 +956,7 @@ bool is_knitted_straight_win(const tile_t *standing_tiles, intptr_t standing_cnt
         && waiting_table[test_tile]);
 }
 
-// 全不靠/七星不靠
+//-------------------------------- 全不靠/七星不靠 --------------------------------
 
 // 1种组合龙的全不靠上听数
 static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, intptr_t standing_cnt, int which_seq, useful_table_t *useful_table) {
@@ -1073,6 +1073,8 @@ bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, intptr_t stan
     }
     return false;
 }
+
+//-------------------------------- 枚举打牌 --------------------------------
 
 // 枚举打哪张牌1次
 static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_tile, uint8_t form_flag,
