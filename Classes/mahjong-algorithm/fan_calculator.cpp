@@ -1846,7 +1846,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
             // 将除去组合龙的部分恢复成牌
             --cnt_table[win_tile];
             tile_t temp[4];
-            intptr_t cnt = packs_to_tiles(&packs[3], 2, temp, 4);
+            intptr_t cnt = table_to_tiles(cnt_table, temp, 4);
 
             // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
             adjust_by_waiting_form(packs + 3, 2, temp, cnt, win_tile, fan_table);
