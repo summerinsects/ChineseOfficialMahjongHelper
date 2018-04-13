@@ -187,6 +187,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label = Label::createWithSystemFont("+0", "Arail", 12);
         label->setColor(Color3B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line4Y));
+        label->enableUnderline();
         drawNode->addChild(label);
         _totalLabel[i] = label;
 
@@ -1573,8 +1574,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
 
 void ScoreSheetScene::onScoreButton(cocos2d::Ref *, size_t idx) {
     const char (&name)[4][NAME_SIZE] = _record.name;
-    if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)
-        || _record.current_index == 16) {
+    if (_record.start_time == 0 || _record.current_index == 16) {
         return;
     }
 
