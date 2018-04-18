@@ -137,8 +137,8 @@ static bool divide_tail(tile_table_t &cnt_table, intptr_t fixed_cnt, division_t 
 
 // 判断一条划分分支是否来过
 static bool is_division_branch_exist(intptr_t fixed_cnt, intptr_t step, const division_t *work_division, const division_result_t *result) {
-    // 没有划分时，以及划分步骤小于2时，不检测，因为至少要有3步递归才会产生不同划分
-    if (result->count <= 0 || step < 2) {
+    // 没有划分时，以及划分步骤小于3时，不检测，因为至少要有3步递归才会产生不同划分
+    if (result->count <= 0 || step < 3) {
         return false;
     }
 

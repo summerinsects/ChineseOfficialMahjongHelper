@@ -171,6 +171,7 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+    test_points("1122233334444s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_wait("33469m258s147pWW");
     test_points("33469m258s147pWW2m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_wait("19m19s199pESWNCF");  // 十三幺听白
