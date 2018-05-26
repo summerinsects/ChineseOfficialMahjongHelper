@@ -7,14 +7,14 @@ Chinese Official Mahjong Helper 国标小助手
 
 ## 配置步骤
 
-- 下载[cocos2dx v3.16](http://www.cocos2d-x.org/download)
+- 下载[cocos2dx v3.17](http://www.cocos2d-x.org/download)
 - clone本项目
 - 随便创建一个c++工程，工程名可以随便取（命令行：cocos new -l cpp --portrait 工程名）
 - 将在上一步创建的工程目录下的cocos2d目录拷贝到本项目Classes的同一级目录下
 - cocos2dx引擎源码修改：将文件夹cocos2d_improvements里面的内容复制到cocos2d
 
 #### Win32版
-- 用VS2013/VS2015/VS2017打开proj.win32目录下的ChineseOfficialMahjongHelper.sln
+- 用VS2015/VS2017打开proj.win32目录下的ChineseOfficialMahjongHelper.sln
 - PS: 当第一次编译完成后，可以将引擎相关的项目都卸载了，以节约下次编译的时间
 
 #### iOS版
