@@ -13,11 +13,11 @@ Chinese Official Mahjong Helper 国标小助手
 4. 将在上一步创建的工程目录下的cocos2d目录拷贝到本项目Classes的同一级目录下
 5. cocos2dx引擎源码修改：将文件夹cocos2d_improvements里面的内容复制到cocos2d
 
-- 配置步骤的第3、4步也可改为如下两步：
+#### 配置步骤的第3、4步也可改为如下两步：（但推荐使用上面一种方式，上一种方式cocos2d目录体积更小）
 3. 将在本项目Classes的同一级目录下新建一个cocos2d目录
 4. 将解压cocos2dx引擎后的文件，除templates、tests、web外，其他全部复制到cocos2d目录
 
-- 配置完成后项目的目录结构为：
+#### 配置完成后项目的目录结构为：
    - attachment/
    - Classes/
    - cocos2d/
