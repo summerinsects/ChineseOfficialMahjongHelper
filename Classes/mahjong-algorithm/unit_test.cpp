@@ -168,12 +168,40 @@ int main(int argc, const char *argv[]) {
     //test_shanten("19m19s22pESWCFPP");
     //test_shanten("278m3378s3779pEC");
     test_shanten("111m 5m12p1569sSWP");
+    test_shanten("[111m]5m12p1569sSWP");
     //return 0;
 
 #if 1
-    test_points("1122233334444s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_wait("33469m258s147pWW");
+    // BUG测试
+
+    test_points("1122233334444s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);  // 剪枝BUG 2018.4.18
+
+    // 组合龙莫名其妙的边张Bug 2018.3.29
     test_points("33469m258s147pWW2m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+
+    // 套算一次原则相关bug
+    test_points("234s2233445678p8p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST); // 喜相逢、一般高、连六 2017.11.10
+    test_points("[123m][789p]789s1299p3p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);  // 漏算老少副BUG 2017.10.23
+
+    // 清龙+同色龙顺，统一改为一般高 2017.5.22
+    test_points("112233456789mEE", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("123445566789sSS", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("123456778899pWW", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+
+    // 三杠少计双暗刻 2017.4.9
+    test_points("[2222s][3333s][5555p,1]67mEE8m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    // 七星七对误判为连七对 2017.3.26
+    test_points("EESSWWNNCCFFPP", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    // 小四喜的牌型中不会有幺九刻（这样是混幺九）2016.12.15
+    test_points("[EEE][WWW][NNN]11sSS1s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    // 门清一的色双龙漏计边嵌钓 2016.7.28
+    test_points("1122355778899m3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("1123355778899s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("1122335778899p5p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    // 七对与基本和型多面听，多计了边嵌钓2016.7.23
+    test_points("445566m2277779s8s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+
+    // 基本测试
     test_wait("19m19s199pESWNCF");  // 十三幺听白
     test_wait("19m19s19pESWNCFP");  // 十三幺13面听
 
