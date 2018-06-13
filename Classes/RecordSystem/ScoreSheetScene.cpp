@@ -37,6 +37,7 @@ bool ScoreSheetScene::init() {
 }
 
 #define SCORE_SHEET_TOTAL_MODE "score_sheet_scene_total_mode"
+#define USE_FIXED_SEAT_ORDER "use_fixed_seat_order"
 
 bool ScoreSheetScene::initWithRecord(Record *record) {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("国标麻将记分器")))) {
@@ -74,9 +75,9 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     const float xPos = origin.x + 2.0f + 55.0f * 0.5f;
     const float yPos = origin.y + tableOffsetY + tableHeight + 15.0f;
-    static const char *titleText[4] = { __UTF8("追分策略"), __UTF8("清空表格"), __UTF8("历史记录"), __UTF8("模式切换") };
+    static const char *titleText[4] = { __UTF8("追分策略"), __UTF8("清空表格"), __UTF8("历史记录"), __UTF8("更多设置") };
     static void (ScoreSheetScene::*callbacks[4])(Ref *) = {
-        &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onModeButton
+        &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onSettingButton
     };
 
     ui::Button *topButtons[4];
@@ -95,7 +96,6 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     }
     topButtons[1]->setEnabled(record == &g_currentRecord);
     topButtons[2]->setEnabled(record == &g_currentRecord);
-    topButtons[3]->setTitleText(_isTotalMode ? __UTF8("单盘模式") : __UTF8("累计模式"));
 
     // 底部时间label
     Label *label = Label::createWithSystemFont(__UTF8("当前时间"), "Arial", 12);
@@ -1248,11 +1248,96 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
         .create()->show();
 }
 
-void ScoreSheetScene::onModeButton(cocos2d::Ref *sender) {
-    _isTotalMode = !_isTotalMode;
-    ((ui::Button *)sender)->setTitleText(_isTotalMode ? __UTF8("单盘模式") : __UTF8("累计模式"));
-    UserDefault::getInstance()->setBoolForKey(SCORE_SHEET_TOTAL_MODE, _isTotalMode);
+void ScoreSheetScene::onSettingButton(cocos2d::Ref *sender) {
+    const float width = AlertDialog::maxWidth();
 
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(width, 95.0f));
+
+    std::array<ui::RadioButtonGroup *, 2> radioGroups;
+
+    // 1.计分表格分数显示
+    Label *label = Label::createWithSystemFont(__UTF8("1.计分表格分数显示"), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 85.0f));
+
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    rootNode->addChild(radioGroup);
+    radioGroups[0] = radioGroup;
+
+    static const char *sheetTitleText[] = { __UTF8("单盘"), __UTF8("累计") };
+    for (int i = 0; i < 2; ++i) {
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 60.0f));
+        rootNode->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        label = Label::createWithSystemFont(sheetTitleText[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+    }
+    if (UserDefault::getInstance()->getBoolForKey(SCORE_SHEET_TOTAL_MODE)) {
+        radioGroup->setSelectedButton(1);
+    }
+
+    // 2.计分界面选手顺序
+    label = Label::createWithSystemFont(__UTF8("2.计分界面选手顺序"), "Arail", 12);
+    label->setColor(Color3B::BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 35.0f));
+
+    radioGroup = ui::RadioButtonGroup::create();
+    rootNode->addChild(radioGroup);
+    radioGroups[1] = radioGroup;
+
+    static const char *recordTitleText[] = { __UTF8("换位"), __UTF8("固定") };
+    for (int i = 0; i < 2; ++i) {
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 10.0f));
+        rootNode->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        label = Label::createWithSystemFont(recordTitleText[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+    }
+    if (UserDefault::getInstance()->getBoolForKey(USE_FIXED_SEAT_ORDER)) {
+        radioGroup->setSelectedButton(1);
+    }
+
+    AlertDialog::Builder(this)
+        .setTitle(__UTF8("更多设置"))
+        .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, radioGroups](AlertDialog *, int) {
+
+        if (_isTotalMode != (radioGroups[0]->getSelectedButtonIndex() == 1)) {
+            _isTotalMode = !_isTotalMode;
+            refreshScoresByMode();
+        }
+        UserDefault::getInstance()->setBoolForKey(SCORE_SHEET_TOTAL_MODE, radioGroups[0]->getSelectedButtonIndex() == 1);
+        UserDefault::getInstance()->setBoolForKey(USE_FIXED_SEAT_ORDER, radioGroups[1]->getSelectedButtonIndex() == 1);
+        return true;
+    }).create()->show();
+}
+
+void ScoreSheetScene::refreshScoresByMode() {
     // 逐行填入数据
     int totalScores[4] = { 0 };
     if (!_isTotalMode) {

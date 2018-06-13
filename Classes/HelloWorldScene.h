@@ -11,7 +11,6 @@ public:
 
 private:
     void onAboutButton(cocos2d::Ref *sender);
-    void onSettingButton(cocos2d::Ref *sender);
 
     void requestQRCode();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)

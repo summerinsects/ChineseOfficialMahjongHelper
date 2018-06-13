@@ -37,6 +37,7 @@ private:
     void refreshRank(const int (&totalScores)[4]);
     void refreshStartTime();
     void refreshEndTime();
+    void refreshScoresByMode();
     void recover();
     void reset();
     void onNameButton(cocos2d::Ref *sender, size_t idx);
@@ -49,7 +50,7 @@ private:
     void editRecord(size_t handIdx, bool modify);
     void onTimeScheduler(float dt);
     void onInstructionButton(cocos2d::Ref *sender);
-    void onModeButton(cocos2d::Ref *sender);
+    void onSettingButton(cocos2d::Ref *sender);
     void onHistoryButton(cocos2d::Ref *sender);
     void onResetButton(cocos2d::Ref *sender);
     void onPursuitButton(cocos2d::Ref *sender);
