@@ -9,6 +9,7 @@
 #include <vector>
 
 #define NAME_SIZE 32
+#define TITLE_SIZE 128
 
 struct Record {
     char name[4][NAME_SIZE];        // 选手姓名
@@ -30,6 +31,7 @@ struct Record {
     size_t current_index;   // 当前打到第几盘
     time_t start_time;      // 开始时间
     time_t end_time;        // 结束时间
+    char title[TITLE_SIZE]; // 对局名称
 };
 
 #define SET_WIN_CLAIM(wc_, n_) ((wc_) |= (1 << (n_)))

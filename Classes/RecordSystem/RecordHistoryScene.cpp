@@ -33,11 +33,19 @@ void RecordHistoryScene::updateRecordTexts() {
     _recordTexts.reserve(g_records.size());
 
     std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record)->std::string {
+        int len = 0;
         char str[BUF_SIZE + 1];
         str[BUF_SIZE] = '\0';
 
+        if (record.title[0] != '\0') {
+            len = snprintf(str, BUF_SIZE, "%s\n", record.title);
+        }
+        else {
+            len = snprintf(str, BUF_SIZE, __UTF8("(无对局名称)\n"));
+        }
+
         struct tm ret = *localtime(&record.start_time);
-        int len = snprintf(str, BUF_SIZE, __UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+        len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
         if (record.end_time != 0) {
             ret = *localtime(&record.end_time);
             len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
@@ -154,12 +162,14 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     return true;
 }
 
+#define CELL_HEIGHT 84.0f
+
 ssize_t RecordHistoryScene::numberOfCellsInTableView(cw::TableView *) {
     return _recordTexts.size();
 }
 
 float RecordHistoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
-    return 70.0f;
+    return CELL_HEIGHT;
 }
 
 cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
@@ -177,25 +187,25 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
         Label *&label = std::get<1>(ext);
         ui::Button *&delBtn = std::get<2>(ext);
 
-        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 70.0f);
+        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, CELL_HEIGHT);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 70.0f);
+        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, CELL_HEIGHT);
         cell->addChild(layerColors[1]);
 
         label = Label::createWithSystemFont("", "Arail", 10);
         label->setColor(Color3B::BLACK);
         cell->addChild(label);
-        label->setPosition(Vec2(2.0f, 35.0f));
+        label->setPosition(Vec2(2.0f, CELL_HEIGHT * 0.5f));
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
         delBtn = ui::Button::create("drawable/btn_trash_bin.png");
         delBtn->setScale(Director::getInstance()->getContentScaleFactor() * 0.5f);
         delBtn->addClickEventListener(std::bind(&RecordHistoryScene::onDeleteButton, this, std::placeholders::_1));
         cell->addChild(delBtn);
-        delBtn->setPosition(Vec2(width - 20.0f, 35.0f));
+        delBtn->setPosition(Vec2(width - 20.0f, CELL_HEIGHT * 0.5f));
 
-        cell->setContentSize(Size(width, 70.0f));
+        cell->setContentSize(Size(width, CELL_HEIGHT));
         cell->setTouchEnabled(true);
         cell->addClickEventListener(std::bind(&RecordHistoryScene::onCellClicked, this, std::placeholders::_1));
     }
@@ -671,7 +681,7 @@ namespace {
     }
 
     float BatchDeleteTableNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
-        return 70.0f;
+        return CELL_HEIGHT;
     }
 
     cw::TableViewCell *BatchDeleteTableNode::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
@@ -689,17 +699,17 @@ namespace {
             LayerColor **layerColors = std::get<2>(ext).data();
 
             // 背景色
-            layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 70.0f);
+            layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, CELL_HEIGHT);
             cell->addChild(layerColors[0]);
 
-            layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 70.0f);
+            layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, CELL_HEIGHT);
             cell->addChild(layerColors[1]);
 
             label = Label::createWithSystemFont("", "Arail", 10);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-            label->setPosition(Vec2(2.0f, 35.0f));
+            label->setPosition(Vec2(2.0f, CELL_HEIGHT * 0.5f));
 
             checkBox = UICommon::createCheckBox();
             cell->addChild(checkBox);
