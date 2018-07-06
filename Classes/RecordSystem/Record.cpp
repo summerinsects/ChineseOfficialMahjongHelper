@@ -127,9 +127,15 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 detail_data.fan = static_cast<uint16_t>(it->value.GetUint());
             }
 
+            // 兼容旧的key until 2018.07.06 4dc5ffb
             it = detail_json.FindMember("fan_flag");
             if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
-                detail_data.fan_flag = it->value.GetUint64();
+                detail_data.fan_bits = it->value.GetUint64();
+            }
+
+            it = detail_json.FindMember("fan_bits");
+            if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
+                detail_data.fan_bits = it->value.GetUint64();
             }
 
             it = detail_json.FindMember("unique_fan");
@@ -207,7 +213,7 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
         detail_json.AddMember("win_flag", rapidjson::Value(detail_data.win_flag), alloc);
         detail_json.AddMember("claim_flag", rapidjson::Value(detail_data.claim_flag), alloc);
         detail_json.AddMember("fan", rapidjson::Value(detail_data.fan), alloc);
-        detail_json.AddMember("fan_flag", rapidjson::Value(detail_data.fan_flag), alloc);
+        detail_json.AddMember("fan_bits", rapidjson::Value(detail_data.fan_bits), alloc);
         detail_json.AddMember("unique_fan", rapidjson::Value(detail_data.unique_fan), alloc);
         detail_json.AddMember("multiple_fan", rapidjson::Value(detail_data.multiple_fan), alloc);
 

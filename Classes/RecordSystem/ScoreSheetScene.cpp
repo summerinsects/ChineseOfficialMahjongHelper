@@ -369,19 +369,19 @@ static std::string GetShortFanText(const Record::Detail &detail) {
         return __UTF8("荒庄");
     }
 
-    uint64_t fanFlag = detail.fan_flag;
-    if (fanFlag != 0) {
-        if (__get1bitscount(fanFlag) > 1) {
+    uint64_t fanBits = detail.fan_bits;
+    if (fanBits != 0) {
+        if (__get1bitscount(fanBits) > 1) {
             // 选取标记的最大的两个番种显示出来
             unsigned fan0 = 0, fan1 = 0;
             for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-                if (TEST_FAN(fanFlag, n)) {
+                if (TEST_FAN(fanBits, n)) {
                     fan0 = n;
                     break;
                 }
             }
             for (unsigned n = fan0 + 1; n < mahjong::DRAGON_PUNG; ++n) {
-                if (TEST_FAN(fanFlag, n)) {
+                if (TEST_FAN(fanBits, n)) {
                     fan1 = n;
                     break;
                 }
@@ -460,7 +460,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
         }
         else {
             for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-                if (TEST_FAN(fanFlag, n)) {
+                if (TEST_FAN(fanBits, n)) {
                     return mahjong::fan_name[n];
                 }
             }
@@ -1053,14 +1053,14 @@ void ScoreSheetScene::editRecord(size_t handIdx, bool modify) {
 static std::string GetLongFanText(const Record::Detail &detail) {
     std::string fanText;
 
-    uint64_t fanFlag = detail.fan_flag;
+    uint64_t fanBits = detail.fan_bits;
     uint16_t uniqueFan = detail.unique_fan;
     uint64_t multipleFan = detail.multiple_fan;
 
     // 大番
-    if (fanFlag != 0) {
+    if (fanBits != 0) {
         for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-            if (TEST_FAN(fanFlag, n)) {
+            if (TEST_FAN(fanBits, n)) {
                 fanText.append(__UTF8("「"));
                 fanText.append(mahjong::fan_name[n]);
                 fanText.append(__UTF8("」"));

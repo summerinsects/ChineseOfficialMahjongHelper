@@ -613,7 +613,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         size_t row = k >> 2;
         checkBox.root_widget->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
-        checkBox.setSelectd(TEST_FAN(_detail.fan_flag, fan));
+        checkBox.setSelectd(TEST_FAN(_detail.fan_bits, fan));
     }
 
     for (size_t k = currentLevelCount; k < 9; ++k) {
@@ -1077,18 +1077,18 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
     // 标记/取消标记番种
     if (checkBox.is_selected) {
         checkBox.setSelectd(false);
-        RESET_FAN(_detail.fan_flag, fan);
+        RESET_FAN(_detail.fan_bits, fan);
     }
     else {
         checkBox.setSelectd(true);
-        SET_FAN(_detail.fan_flag, fan);
+        SET_FAN(_detail.fan_bits, fan);
     }
 
     // 计算番数
     int prevWinScore = atoi(_editBox->getText());
     int currentWinScore = 0;
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-        if (TEST_FAN(_detail.fan_flag, n)) {
+        if (TEST_FAN(_detail.fan_bits, n)) {
             currentWinScore += mahjong::fan_value_table[n];
         }
     }
@@ -1115,7 +1115,7 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
                 // 刷新CheckBox
                 FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (fan == cellDetails[0].fans[idx]) {
-                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
+                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_bits, fan));
                 }
                 else {
                     assert(0);
@@ -1136,7 +1136,7 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
                 // 刷新CheckBox
                 FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (fan == detail.fans[idx]) {
-                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
+                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_bits, fan));
                 }
                 else {
                     assert(0);
@@ -1147,8 +1147,8 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
 }
 
 void RecordScene::adjustRecentFans() {
-    uint64_t fanFlag = _detail.fan_flag;
-    if (fanFlag == 0) {
+    uint64_t fanBits = _detail.fan_bits;
+    if (fanBits == 0) {
         return;
     }
 
@@ -1157,7 +1157,7 @@ void RecordScene::adjustRecentFans() {
 
     // 1. 将所有标记的番写到temp
     for (int fan = mahjong::BIG_FOUR_WINDS; fan < mahjong::DRAGON_PUNG; ++fan) {
-        if (TEST_FAN(fanFlag, fan)) {
+        if (TEST_FAN(fanBits, fan)) {
             temp[cnt++] = static_cast<mahjong::fan_t>(fan);
             if (cnt >= 8) {
                 break;
@@ -1169,7 +1169,7 @@ void RecordScene::adjustRecentFans() {
     if (cnt < 8) {
         for (int i = 0; i < 8; ++i) {
             mahjong::fan_t fan = recentFans[i];
-            if (TEST_FAN(fanFlag, fan)) {
+            if (TEST_FAN(fanBits, fan)) {
                 continue;
             }
             temp[cnt++] = fan;
@@ -1185,14 +1185,14 @@ void RecordScene::adjustRecentFans() {
 }
 
 void RecordScene::onSubmitButton(cocos2d::Ref *) {
-    if (_detail.fan_flag != 0 || _detail.unique_fan != 0 || _detail.multiple_fan != 0) {  // 标记了番种
+    if (_detail.fan_bits != 0 || _detail.unique_fan != 0 || _detail.multiple_fan != 0) {  // 标记了番种
         if (_drawBox->isSelected()) {  // 荒庄
             AlertDialog::Builder(this)
                 .setTitle(__UTF8("记分"))
                 .setMessage(__UTF8("你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？"))
                 .setNegativeButton(__UTF8("取消"), nullptr)
                 .setPositiveButton(__UTF8("确定"), [this](AlertDialog *, int) {
-                _detail.fan_flag = 0;
+                _detail.fan_bits = 0;
                 _detail.unique_fan = 0;
                 _detail.multiple_fan = 0;
                 memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
@@ -1381,7 +1381,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
             .setCloseOnTouchOutside(false)
             .setPositiveButton(__UTF8("确定"), [this, temp, fan, fanFlag, uniqueFan, multipleFan, dlg](AlertDialog *, int) {
             _detail.fan = static_cast<uint16_t>(std::max(fan, 8));
-            _detail.fan_flag = fanFlag;
+            _detail.fan_bits = fanFlag;
             _detail.unique_fan = uniqueFan;
             _detail.multiple_fan = multipleFan;
 
