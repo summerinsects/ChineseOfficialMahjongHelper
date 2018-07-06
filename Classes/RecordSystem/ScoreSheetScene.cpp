@@ -706,12 +706,12 @@ void ScoreSheetScene::editNameAndTitle() {
     const float limitWidth = std::min(AlertDialog::maxWidth(), 180.0f);
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(limitWidth, 200.0f));
+    rootNode->setContentSize(Size(limitWidth, 220.0f));
 
     Label *label = Label::createWithSystemFont(__UTF8("【选手姓名】"), "Arial", 12);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
-    label->setPosition(Vec2(limitWidth * 0.5f, 190.0f));
+    label->setPosition(Vec2(limitWidth * 0.5f, 210.0f));
 
     ui::Button *button1 = UICommon::createButton();
     rootNode->addChild(button1);
@@ -719,7 +719,7 @@ void ScoreSheetScene::editNameAndTitle() {
     button1->setContentSize(Size(55.0f, 20.0f));
     button1->setTitleFontSize(12);
     button1->setTitleText(__UTF8("清空全部"));
-    button1->setPosition(Vec2((limitWidth - 110.0f) / 3.0f + 27.5f, 165.0f));
+    button1->setPosition(Vec2((limitWidth - 110.0f) / 3.0f + 27.5f, 185.0f));
     cw::scaleLabelToFitWidth(button1->getTitleLabel(), 50.0f);
 
     ui::Button *button2 = UICommon::createButton();
@@ -728,7 +728,7 @@ void ScoreSheetScene::editNameAndTitle() {
     button2->setContentSize(Size(55.0f, 20.0f));
     button2->setTitleFontSize(12);
     button2->setTitleText(__UTF8("随机排座"));
-    button2->setPosition(Vec2(limitWidth - button1->getPositionX(), 165.0f));
+    button2->setPosition(Vec2(limitWidth - button1->getPositionX(), 185.0f));
     cw::scaleLabelToFitWidth(button2->getTitleLabel(), 50.0f);
 
     // 输入框
@@ -737,7 +737,7 @@ void ScoreSheetScene::editNameAndTitle() {
     auto sharedEditBoxes = std::make_shared<std::array<ui::EditBox *, 5> >();
     ui::EditBox **editBoxes = sharedEditBoxes->data();
     for (int i = 0; i < 4; ++i) {
-        const float yPos = 135.0f - i * 25.0f;
+        const float yPos = 155.0f - i * 25.0f;
         Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
@@ -763,7 +763,7 @@ void ScoreSheetScene::editNameAndTitle() {
     const float upPosX = limitWidth - 10.0f;
     const float downPosX = limitWidth - 35.0f;
     for (int i = 0; i < 4; ++i) {
-        const float yPos = 135.0f - i * 25.0f;
+        const float yPos = 155.0f - i * 25.0f;
         ui::Button *button = UICommon::createButton();
         rootNode->addChild(button);
         button->setScale9Enabled(true);
@@ -798,7 +798,7 @@ void ScoreSheetScene::editNameAndTitle() {
     label = Label::createWithSystemFont(__UTF8("【对局名称】"), "Arial", 12);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
-    label->setPosition(Vec2(limitWidth * 0.5f, 30.0f));
+    label->setPosition(Vec2(limitWidth * 0.5f, 50.0f));
 
     ui::EditBox *editBox = UICommon::createEditBox(Size(limitWidth - 10.0f, 20.0f));
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
@@ -809,8 +809,14 @@ void ScoreSheetScene::editNameAndTitle() {
     editBox->setText(_record.title[0] == '\0' ? _prevTitle.c_str() : _record.title);
     editBox->setMaxLength(TITLE_SIZE - 1);
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(limitWidth * 0.5f, 10.0f));
+    editBox->setPosition(Vec2(limitWidth * 0.5f, 30.0f));
     editBoxes[4] = editBox;
+
+    label = Label::createWithSystemFont(__UTF8("所输入的对局名称将在界面标题上显示"), "Arial", 10);
+    label->setColor(C3B_GRAY);
+    rootNode->addChild(label);
+    label->setPosition(Vec2(limitWidth * 0.5f, 10.0f));
+    cw::scaleLabelToFitWidth(label, limitWidth - 4.0f);
 
     // 如果选手姓名皆为空，则填入上次对局的姓名
     if (std::all_of(std::begin(_record.name), std::end(_record.name), [](const char (&s)[NAME_SIZE]) { return s[0] == '\0'; })) {
