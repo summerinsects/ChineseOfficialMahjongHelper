@@ -1188,7 +1188,7 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
     if (_detail.fan_bits != 0 || _detail.unique_fan != 0 || _detail.multiple_fan != 0) {  // 标记了番种
         if (_drawBox->isSelected()) {  // 荒庄
             AlertDialog::Builder(this)
-                .setTitle(__UTF8("记分"))
+                .setTitle(__UTF8("计分"))
                 .setMessage(__UTF8("你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？"))
                 .setNegativeButton(__UTF8("取消"), nullptr)
                 .setPositiveButton(__UTF8("确定"), [this](AlertDialog *, int) {

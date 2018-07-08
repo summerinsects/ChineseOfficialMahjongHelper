@@ -539,7 +539,7 @@ void ScoreSheetScene::refreshRank(const int (&totalScores)[4]) {
 }
 
 void ScoreSheetScene::refreshTitle() {
-    _titleLabel->setString(_record.title[0] == '\0' ? __UTF8("国标麻将记分器") : _record.title);
+    _titleLabel->setString(_record.title[0] == '\0' ? __UTF8("国标麻将计分器") : _record.title);
     Size visibleSize = Director::getInstance()->getVisibleSize();
     cw::trimLabelStringWithEllipsisToFitWidth(_titleLabel, visibleSize.width - 64.0f);
 }
@@ -1226,11 +1226,11 @@ void ScoreSheetScene::onTimeScheduler(float) {
 
 void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
     Label *label = Label::createWithSystemFont(
-        __UTF8("1. 使用步骤：点击「编辑」，输入四名选手姓名及对局名称，点击「开始」，开始「记分」。\n")
+        __UTF8("1. 使用步骤：点击「编辑」，输入四名选手姓名及对局名称，点击「开始」，开始「计分」。\n")
         __UTF8("2. 计分时如果有标记番种，则「番种备注」一栏会选取一个最大的番种名予以显示。\n")
-        __UTF8("3. 对于已经记分的，点击「番种备注」一栏可修改记录。\n")
+        __UTF8("3. 对于已经计分的，点击「番种备注」一栏可修改记录。\n")
         __UTF8("4. 对局未完成时，点击「累计」一栏处，可显示分差并有快捷计算追分选项。\n")
-        __UTF8("5. 「北风北」记分完成后，会自动添加入「历史记录」。\n")
+        __UTF8("5. 「北风北」计分完成后，会自动添加入「历史记录」。\n")
         __UTF8("6. 「历史记录」里的内容只要不卸载程序就会一直保存。"),
         "Arial", 10, Size(AlertDialog::maxWidth(), 0.0f));
     label->setColor(Color3B::BLACK);
