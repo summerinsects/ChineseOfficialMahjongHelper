@@ -1418,63 +1418,6 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     }).create()->show();
 }
 
-static void showPursuit(int delta) {
-    if (delta == 0) {
-        AlertDialog::Builder(Director::getInstance()->getRunningScene())
-            .setTitle(__UTF8("追分与保位"))
-            .setMessage(__UTF8("平分"))
-            .setPositiveButton(__UTF8("确定"), nullptr)
-            .create()->show();
-        return;
-    }
-
-    std::string msg;
-    msg.reserve(256);
-    if (delta < 0) {
-        delta = -delta;
-    }
-    msg.append(Common::format(__UTF8("分差%d分\n\n超分需"), delta));
-
-    int d1 = delta - 32;
-    if (d1 < 8) {
-        msg.append("任意和牌");
-    }
-    else {
-        int d2 = d1 >> 1;
-        if (d2 < 8) {
-            msg.append(Common::format(__UTF8("任意自摸或对点，旁点至少%d番"), d1 + 1));
-        }
-        else {
-            int d4 = d2 >> 1;
-            if (d4 < 8) {
-                msg.append(Common::format(__UTF8("任意自摸，对点至少%d番，旁点至少%d番"), d2 + 1, d1 + 1));
-            }
-            else {
-                msg.append(Common::format(__UTF8("自摸至少%d番，对点至少%d番，旁点至少%d番"), d4 + 1, d2 + 1, d1 + 1));
-            }
-        }
-    }
-
-    if (delta <= 8) {
-        msg.append(__UTF8("\n\n点炮无法保位"));
-    }
-    else {
-        int d2 = d1 >> 1;
-        if (d2 <= 8) {
-            msg.append(Common::format(__UTF8("\n\n对点无法保位，保位可旁点至多%d番"), delta - 1));
-        }
-        else {
-            msg.append(Common::format(__UTF8("\n\n保位可对点至多%d番，旁点至多%d番"), (d1 & 1) ? d2 : d2 - 1, delta - 1));
-        }
-    }
-
-    AlertDialog::Builder(Director::getInstance()->getRunningScene())
-        .setTitle(__UTF8("追分与保位"))
-        .setMessage(msg)
-        .setPositiveButton(__UTF8("确定"), nullptr)
-        .create()->show();
-}
-
 static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int (&totalScores)[4]) {
     // 下标
     int indices[4] = { 0, 1, 2, 3 };
@@ -1567,77 +1510,127 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
     return drawNode;
 }
 
-namespace {
-    class PursuitEditBoxDelegate : public cocos2d::ui::EditBoxDelegate {
-    public:
-        virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override {
-            const char *text = editBox->getText();
+static void showPursuit() {
+    const float limitWidth = AlertDialog::maxWidth();
+
+    Label *label = Label::createWithSystemFont(
+        __UTF8("输入分差，可计算超分自摸、对点、旁点各需要多少番（超过）。\n")
+        __UTF8("输入自摸、对点、旁点的番数，可计算能追多少分（追平）。"),
+        "Arial", 10, Size(limitWidth, 0.0f));
+    label->setColor(Color3B::BLACK);
+
+    const Size &labelSize = label->getContentSize();
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(limitWidth, labelSize.height + 100.0f));
+    rootNode->addChild(label);
+    label->setPosition(Vec2(limitWidth * 0.5f, 100.0f + labelSize.height * 0.5f));
+
+    // 文本+输入框+按钮
+    const float buttonPosX = limitWidth * 0.5f + 40.0f;
+    const float editBoxPosX = buttonPosX - 45.0f;
+    const float labelPosX = editBoxPosX - 40.0f;
+    static const char *titleText[] = { __UTF8("分差"), __UTF8("自摸"), __UTF8("对点"), __UTF8("旁点") };
+    std::array<ui::EditBox *, 4> editBoxes;
+    ui::Button *buttons[4];
+    for (int i = 0; i < 4; ++i) {
+        const float yPos = 85.0f - i * 25.0f;
+        Label *label = Label::createWithSystemFont(titleText[i], "Arial", 12);
+        label->setColor(Color3B::BLACK);
+        rootNode->addChild(label);
+        label->setPosition(Vec2(labelPosX, yPos));
+
+        ui::EditBox *editBox = UICommon::createEditBox(Size(40.0f, 20.0f));
+        editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+        editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
+        editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+        editBox->setFontColor(Color3B::BLACK);
+        editBox->setFontSize(12);
+        editBox->setMaxLength(4);
+        rootNode->addChild(editBox);
+        editBox->setPosition(Vec2(editBoxPosX, yPos));
+        editBoxes[i] = editBox;
+
+        ui::Button *button = UICommon::createButton();
+        rootNode->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(40.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText(__UTF8("计算"));
+        button->setPosition(Vec2(buttonPosX, yPos));
+        buttons[i] = button;
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        buttons[i]->addClickEventListener([editBoxes, i](Ref *) {
+            const char *text = editBoxes[i]->getText();
             if (!Common::isCStringEmpty(text)) {
-                int delta = atoi(text);
-                showPursuit(delta);
+                int value = atoi(text);
+                char buf[16];
+                if (i == 0) {
+                    int delta = value - 32;
+                    snprintf(buf, sizeof(buf), "%d", std::max((delta >> 2) + 1, 8));
+                    editBoxes[1]->setText(buf);
+                    snprintf(buf, sizeof(buf), "%d", std::max((delta >> 1) + 1, 8));
+                    editBoxes[2]->setText(buf);
+                    snprintf(buf, sizeof(buf), "%d", std::max(delta + 1, 8));
+                    editBoxes[3]->setText(buf);
+                }
+                else {
+                    snprintf(buf, sizeof(buf), "%d", (value << (3 - i)) + 32);
+                    editBoxes[0]->setText(buf);
+                    for (int k = 1; k < 4; ++k) {
+                        if (k != i) {
+                            editBoxes[k]->setText("");
+                        }
+                    }
+                }
             }
-        }
-    };
+        });
+    }
+
+    AlertDialog::Builder(Director::getInstance()->getRunningScene())
+        .setTitle(__UTF8("追分策略"))
+        .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
+        .setPositiveButton(__UTF8("确定"), nullptr).create()->show();
 }
 
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
-    const char (&name)[4][NAME_SIZE] = _record.name;
-    Node *rootNode = nullptr;
-
-    // 当当前一局比赛未结束时，显示快捷分差按钮
-    if (std::none_of(std::begin(name), std::end(name), &Common::isCStringEmpty)
-        && _record.current_index < 16) {
-
-        int totalScores[4] = { 0 };
-        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
-            skipScores(i, totalScores);
-        }
-
-        rootNode = Node::create();
-
-        DrawNode *drawNode = createPursuitTable(name, totalScores);
-        const Size &drawNodeSize = drawNode->getContentSize();
-
-        rootNode->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30.0f));
-        rootNode->addChild(drawNode);
-        drawNode->setPosition(Vec2(0.0f, 30.0f));
+    // 比赛未开始时，直接显示更多追分界面
+    if (_record.start_time == 0 || _record.current_index >= 16) {
+        showPursuit();
+        return;
     }
 
-    // 自定义分差输入
-    ui::EditBox *editBox = UICommon::createEditBox(Size(120.0f, 20.0f));
-    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
-    editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
-    editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-    editBox->setFontColor(Color4B::BLACK);
-    editBox->setFontSize(12);
-    editBox->setPlaceholderFontColor(Color4B::GRAY);
-    editBox->setPlaceHolder(__UTF8("输入任意分差"));
-
-    if (rootNode != nullptr) {
-        rootNode->addChild(editBox);
-        const Size &rootSize = rootNode->getContentSize();
-        editBox->setPosition(Vec2(rootSize.width * 0.5f, 10.0f));
-    }
-    else {
-        rootNode = editBox;
+    int totalScores[4] = { 0 };
+    for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+        skipScores(i, totalScores);
     }
 
-    // EditBox的代理
-    auto delegate = std::make_shared<PursuitEditBoxDelegate>();
-    editBox->setDelegate(delegate.get());
+    DrawNode *drawNode = createPursuitTable(_record.name, totalScores);
+    const Size &drawNodeSize = drawNode->getContentSize();
+
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30.0f));
+    rootNode->addChild(drawNode);
+    drawNode->setPosition(Vec2(0.0f, 30.0f));
+
+    // 更多追分
+    ui::Button *button = UICommon::createButton();
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("更多追分"));
+    button->addClickEventListener([](Ref *) { showPursuit(); });
+
+    rootNode->addChild(button);
+    const Size &rootSize = rootNode->getContentSize();
+    button->setPosition(Vec2(rootSize.width * 0.5f, 10.0f));
 
     // 使这个代理随AlertDialog一起析构
     AlertDialog::Builder(this)
         .setTitle(__UTF8("追分策略"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
-        .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [editBox, delegate](AlertDialog *, int) {
-        const char *text = editBox->getText();
-        if (!Common::isCStringEmpty(text)) {
-            int delta = atoi(text);
-            showPursuit(delta);
-        }
-        return false;
-    }).create()->show();
+        .setPositiveButton(__UTF8("确定"), nullptr).create()->show();
 }
