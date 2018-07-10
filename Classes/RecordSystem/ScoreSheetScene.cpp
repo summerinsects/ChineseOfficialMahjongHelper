@@ -185,16 +185,8 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         label = Label::createWithSystemFont("+0", "Arail", 12);
         label->setColor(Color3B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line4Y));
-        label->enableUnderline();
         drawNode->addChild(label);
         _totalLabel[i] = label;
-
-        ui::Widget *widget = ui::Widget::create();
-        widget->setTouchEnabled(true);
-        widget->setPosition(Vec2(colPosX[i + 1], line4Y));
-        widget->setContentSize(Size(gap, cellHeight));
-        drawNode->addChild(widget);
-        widget->addClickEventListener(std::bind(&ScoreSheetScene::onScoreButton, this, std::placeholders::_1, i));
     }
 
     button = UICommon::createButton();
@@ -1648,52 +1640,4 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
         }
         return false;
     }).create()->show();
-}
-
-void ScoreSheetScene::onScoreButton(cocos2d::Ref *, size_t idx) {
-    const char (&name)[4][NAME_SIZE] = _record.name;
-    if (_record.start_time == 0 || _record.current_index == 16) {
-        return;
-    }
-
-    int totalScores[4] = { 0 };
-    for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
-        skipScores(i, totalScores);
-    }
-
-    static const size_t cmpIdx[][3] = { { 1, 2, 3 }, { 0, 2, 3 }, { 0, 1, 3 }, { 0, 1, 2 } };
-
-    Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(150.0f, 70.0f));
-
-    for (int i = 0; i < 3; ++i) {
-        size_t dst = cmpIdx[idx][i];
-        int delta = totalScores[idx] - totalScores[dst];
-
-        ui::Button *button = UICommon::createButton();
-        button->setScale9Enabled(true);
-        button->setContentSize(Size(150.0f, 20.0f));
-        button->setTitleFontSize(12);
-        if (delta > 0) {
-            button->setTitleText(Common::format(__UTF8("领先「%s」%d分"), name[dst], delta));
-        }
-        else if (delta < 0) {
-            button->setTitleText(Common::format(__UTF8("落后「%s」%d分"), name[dst], -delta));
-        }
-        else {
-            button->setTitleText(Common::format(__UTF8("与「%s」平分"), name[dst]));
-        }
-        cw::scaleLabelToFitWidth(button->getTitleLabel(), 148.0f);
-        rootNode->addChild(button);
-        button->setPosition(Vec2(75.0f, 60.0f - i * 25.0f));
-        button->addClickEventListener([delta](Ref *) {
-            showPursuit(delta);
-        });
-    }
-
-    AlertDialog::Builder(this)
-        .setTitle(name[idx])
-        .setContentNode(rootNode)
-        .setPositiveButton(__UTF8("确定"), nullptr)
-        .create()->show();
 }
