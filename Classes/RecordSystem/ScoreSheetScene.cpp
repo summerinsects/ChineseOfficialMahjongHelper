@@ -804,7 +804,7 @@ void ScoreSheetScene::editNameAndTitle() {
     editBox->setPosition(Vec2(limitWidth * 0.5f, 30.0f));
     editBoxes[4] = editBox;
 
-    label = Label::createWithSystemFont(__UTF8("所输入的对局名称将在界面标题上显示"), "Arial", 10);
+    label = Label::createWithSystemFont(__UTF8("输入的对局名称将在标题上显示"), "Arial", 10);
     label->setColor(C3B_GRAY);
     rootNode->addChild(label);
     label->setPosition(Vec2(limitWidth * 0.5f, 10.0f));
