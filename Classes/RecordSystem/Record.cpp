@@ -275,28 +275,26 @@ void ReadRecordFromFile(const char *file, Record &record) {
 }
 
 void WriteRecordToFile(const char *file, const Record &record) {
-    try {
-        rapidjson::Document doc(rapidjson::Type::kObjectType);
-        RecordToJson(record, doc, doc.GetAllocator());
+    FILE *fp = fopen(file, "wb");
+    if (LIKELY(fp != nullptr)) {
+        try {
+            rapidjson::Document doc(rapidjson::Type::kObjectType);
+            RecordToJson(record, doc, doc.GetAllocator());
 
-        rapidjson::StringBuffer buf;
+            rapidjson::StringBuffer buf;
 #ifdef COCOS2D_DEBUG
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
 #else
-        rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
 #endif
-        doc.Accept(writer);
+            doc.Accept(writer);
 
-        MYLOG("%.*s", static_cast<int>(buf.GetSize()), buf.GetString());
-
-        FILE *fp = fopen(file, "wb");
-        if (LIKELY(fp != nullptr)) {
             fwrite(buf.GetString(), 1, buf.GetSize(), fp);
-            fclose(fp);
         }
-    }
-    catch (std::exception &e) {
-        MYLOG("%s %s", __FUNCTION__, e.what());
+        catch (std::exception &e) {
+            MYLOG("%s %s", __FUNCTION__, e.what());
+        }
+        fclose(fp);
     }
 }
 
