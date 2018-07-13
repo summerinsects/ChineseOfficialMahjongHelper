@@ -27,6 +27,8 @@
 
 USING_NS_CC;
 
+static bool isVersionNewer(const char *version1, const char *version2);
+
 bool HelloWorld::init() {
     if (UNLIKELY(!Scene::init())) {
         return false;
@@ -419,36 +421,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
             return false;
         }
         std::string tag = it->value.GetString();
-        int major1, minor1, point1, point2;
-        if (sscanf(tag.c_str(), "v%d.%d.%d.%d", &major1, &minor1, &point1, &point2) != 4) {
-            return false;
-        }
-
-        std::string version = Application::getInstance()->getVersion();
-        int a, b, c, d;
-        if (sscanf(version.c_str(), "%d.%d.%d.%d", &a, &b, &c, &d) != 4) {
-            return false;
-        }
-
-        bool hasNewVersion = false;
-        if (major1 > a) {
-            hasNewVersion = true;
-        }
-        else if (major1 == a) {
-            if (minor1 > b) {
-                hasNewVersion = true;
-            }
-            else if (minor1 == b) {
-                if (point1 > c) {
-                    hasNewVersion = true;
-                }
-                else if (point1 == c) {
-                    if (point2 > d) {
-                        hasNewVersion = true;
-                    }
-                }
-            }
-        }
+        bool hasNewVersion = isVersionNewer(tag.c_str() + 1, Application::getInstance()->getVersion().c_str());
 
         UserDefault *userDefault = UserDefault::getInstance();
         userDefault->setBoolForKey("has_new_version", hasNewVersion);
@@ -521,3 +494,36 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 }
 
 #endif
+
+static bool isVersionNewer(const char *version1, const char *version2) {
+    int major1, minor1, build1, revision1;
+    if (sscanf(version1, "%d.%d.%d.%d", &major1, &minor1, &build1, &revision1) != 4) {
+        return false;
+    }
+
+    int major2, minor2, build2, revision2;
+    if (sscanf(version2, "%d.%d.%d.%d", &major2, &minor2, &build2, &revision2) != 4) {
+        return false;
+    }
+
+    if (major1 > major2) {
+        return true;
+    }
+    if (major1 == major2) {
+        if (minor1 > minor2) {
+            return true;
+        }
+        if (minor1 == minor2) {
+            if (build1 > build2) {
+                return true;
+            }
+            if (build1 == build2) {
+                if (revision1 > revision2) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
