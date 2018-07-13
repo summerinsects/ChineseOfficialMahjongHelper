@@ -27,6 +27,9 @@
 
 USING_NS_CC;
 
+extern void UpgradeRecordInFile(const char *file);
+void UpgradeHistoryRecords(const char *file);
+
 static bool isVersionNewer(const char *version1, const char *version2);
 
 bool HelloWorld::init() {
@@ -182,6 +185,8 @@ bool HelloWorld::init() {
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 35.0f));
 #endif
+
+    upgradeData();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     if (needRequest()) {
@@ -526,4 +531,24 @@ static bool isVersionNewer(const char *version1, const char *version2) {
     }
 
     return false;
+}
+
+void HelloWorld::upgradeData() {
+    std::string version = Application::getInstance()->getVersion();
+    std::string dv = UserDefault::getInstance()->getStringForKey("data_version");
+    if (dv.empty() || isVersionNewer(version.c_str(), dv.c_str())) {
+        LoadingView *loadingView = LoadingView::create();
+        loadingView->showInScene(this);
+        auto thiz = makeRef(this);
+        std::thread([thiz, loadingView, version]() {
+            const std::string path = FileUtils::getInstance()->getWritablePath();
+            UpgradeRecordInFile((path + "record.json").c_str());
+            UpgradeHistoryRecords((path + "history_record.json").c_str());
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([loadingView]() {
+                loadingView->dismiss();
+            });
+
+            UserDefault::getInstance()->setStringForKey("data_version", version);
+        }).detach();
+    }
 }
