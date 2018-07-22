@@ -242,7 +242,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     button2->setTitleFontSize(12);
     button2->setTitleText(__UTF8("打赏"));
     button2->addClickEventListener([](Ref *) {
-        Application::getInstance()->openURL("https://gitee.com/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
+        Application::getInstance()->openURL("https://gitee.com/summerinsects/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
     });
     rootNode->addChild(button2);
 
