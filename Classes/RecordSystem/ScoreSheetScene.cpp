@@ -584,22 +584,23 @@ void ScoreSheetScene::recover() {
     _startButton->setEnabled(false);
     _startButton->setVisible(false);
 
+    size_t currentIdx = _record.current_index;
     int totalScores[4] = { 0 };
 
     // 逐行填入数据
     if (_isTotalMode) {
-        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+        for (size_t i = 0; i < currentIdx; ++i) {
             fillScoresForTotalMode(i, totalScores);
             fillDetail(i);
         }
     }
     else {
-        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+        for (size_t i = 0; i < currentIdx; ++i) {
             fillScoresForSingleMode(i, totalScores);
             fillDetail(i);
         }
     }
-    for (size_t i = _record.current_index; i < 16; ++i) {
+    for (size_t i = currentIdx; i < 16; ++i) {
         cleanRow(i);
     }
 
@@ -608,14 +609,14 @@ void ScoreSheetScene::recover() {
         _totalLabel[i]->setString(Common::format("%+d", totalScores[i]));
         _rankLabels[i]->setVisible(false);
     }
-    if (_record.current_index > 0) {
+    if (currentIdx > 0) {
         refreshRank(totalScores);
     }
 
     // 如果不是北风北，则显示下一行的计分按钮
-    if (_record.current_index < 16) {
-        _recordButton[_record.current_index]->setVisible(true);
-        _recordButton[_record.current_index]->setEnabled(true);
+    if (currentIdx < 16) {
+        _recordButton[currentIdx]->setVisible(true);
+        _recordButton[currentIdx]->setEnabled(true);
 
         refreshStartTime();
     }
@@ -978,7 +979,8 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *, size_t handIdx) {
 void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
     const std::array<const char *, 4> name = { _record.name[0], _record.name[1], _record.name[2], _record.name[3] };
     auto scene = RecordScene::create(handIdx, name, detail, [this, handIdx](const Record::Detail &detail) {
-        bool isModify = (handIdx != _record.current_index);
+        size_t currentIdx = _record.current_index;
+        bool isModify = (handIdx != currentIdx);
 
         // 将计分面板的数据更新到当前数据中
         memcpy(&_record.detail[handIdx], &detail, sizeof(Record::Detail));
@@ -995,7 +997,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
             fillScoresForSingleMode(handIdx, totalScores);
 
             // 单盘模式直接统计之后的行
-            for (size_t i = handIdx + 1, cnt = _record.current_index; i < cnt; ++i) {
+            for (size_t i = handIdx + 1; i < currentIdx; ++i) {
                 addUpScores(i, totalScores);
             }
         }
@@ -1003,7 +1005,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
             fillScoresForTotalMode(handIdx, totalScores);
 
             // 累计模式下还需要修改随后的所有行
-            for (size_t i = handIdx + 1, cnt = _record.current_index; i < cnt; ++i) {
+            for (size_t i = handIdx + 1; i < currentIdx; ++i) {
                 fillScoresForTotalMode(i, totalScores);
             }
         }
@@ -1024,8 +1026,8 @@ void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
         else {
             // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
             if (++_record.current_index < 16) {
-                _recordButton[_record.current_index]->setVisible(true);
-                _recordButton[_record.current_index]->setEnabled(true);
+                _recordButton[currentIdx + 1]->setVisible(true);
+                _recordButton[currentIdx + 1]->setEnabled(true);
             }
             else {
                 _record.end_time = time(nullptr);
