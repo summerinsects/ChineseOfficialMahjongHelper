@@ -1355,7 +1355,7 @@ void ScoreSheetScene::onHistoryButton(cocos2d::Ref *) {
 
 void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     // 未开始或已结束时，随便清空
-    if (_record.start_time == 0 || _record.current_index == 16) {
+    if (_record.current_index == 0 || _record.current_index == 16) {
         reset();
         return;
     }
