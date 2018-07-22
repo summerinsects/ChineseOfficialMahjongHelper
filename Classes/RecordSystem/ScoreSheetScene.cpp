@@ -199,6 +199,19 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->addClickEventListener(std::bind(&ScoreSheetScene::onStartButton, this, std::placeholders::_1));
     _startButton = button;
 
+    button = UICommon::createButton();
+    drawNode->addChild(button, -1);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(gap, cellHeight));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("强制结束"));
+    button->setPosition(Vec2(colPosX[5], line4Y));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onFinishButton, this, std::placeholders::_1));
+    cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 6.0f);
+    button->setVisible(false);
+    button->setEnabled(false);
+    _finishButton = button;
+
     // 第5栏：名次
     const float line5Y = tableHeight - cellHeight * 4.5f;
 
@@ -615,6 +628,11 @@ void ScoreSheetScene::recover() {
 
     // 如果不是北风北，则显示下一行的计分按钮
     if (currentIdx < 16) {
+        if (currentIdx > 0) {  // 已经过了东风东，则启用和显示强制结束按钮
+            _finishButton->setEnabled(true);
+            _finishButton->setVisible(true);
+        }
+
         _recordButton[currentIdx]->setVisible(true);
         _recordButton[currentIdx]->setEnabled(true);
 
@@ -652,6 +670,8 @@ void ScoreSheetScene::reset() {
 
     _startButton->setEnabled(true);
     _startButton->setVisible(true);
+    _finishButton->setEnabled(false);
+    _finishButton->setVisible(false);
     onTimeScheduler(0.0f);
     this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
 
@@ -972,6 +992,29 @@ void ScoreSheetScene::onStartButton(cocos2d::Ref *) {
     }
 }
 
+void ScoreSheetScene::onFinishButton(cocos2d::Ref *) {
+    AlertDialog::Builder(this)
+        .setTitle(__UTF8("警告"))
+        .setMessage(__UTF8("强制结束会将未打完盘数标记为荒庄"))
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("结束"), [this](AlertDialog *, int) { forceFinish(); return true; })
+        .create()->show();
+}
+
+void ScoreSheetScene::forceFinish() {
+    _finishButton->setEnabled(false);
+    _finishButton->setVisible(false);
+
+    while (_record.current_index < 16) {
+        fillDetail(_record.current_index++);
+    }
+    refreshScores();
+
+    _record.end_time = time(nullptr);
+    refreshEndTime();
+    RecordHistoryScene::modifyRecord(&_record);
+}
+
 void ScoreSheetScene::onRecordButton(cocos2d::Ref *, size_t handIdx) {
     editRecord(handIdx, nullptr);
 }
@@ -1024,6 +1067,11 @@ void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
             }
         }
         else {
+            if (currentIdx == 0) {  // 东风东过后，启用强制结束按钮
+                _finishButton->setEnabled(true);
+                _finishButton->setVisible(true);
+            }
+
             // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
             if (++_record.current_index < 16) {
                 _recordButton[currentIdx + 1]->setVisible(true);

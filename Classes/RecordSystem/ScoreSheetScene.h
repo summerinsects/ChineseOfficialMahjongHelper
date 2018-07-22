@@ -15,6 +15,7 @@ private:
     cocos2d::Label *_titleLabel = nullptr;
     cocos2d::Label *_nameLabel[4];
     cocos2d::ui::Button *_startButton = nullptr;
+    cocos2d::ui::Button *_finishButton = nullptr;
     cocos2d::Label *_totalLabel[4];
     cocos2d::Label *_scoreLabels[16][4];
     cocos2d::ui::Button *_recordButton[16];
@@ -43,9 +44,11 @@ private:
     void refreshScores();
     void recover();
     void reset();
+    void forceFinish();
     void onEditButton(cocos2d::Ref *sender);
     void editNameAndTitle();
     void onStartButton(cocos2d::Ref *sender);
+    void onFinishButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender, size_t handIdx);
     void onDetailButton(cocos2d::Ref *sender, size_t handIdx);
     void editRecord(size_t handIdx, const Record::Detail *detail);
