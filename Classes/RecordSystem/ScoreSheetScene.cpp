@@ -290,7 +290,7 @@ void ScoreSheetScene::cleanRow(size_t handIdx) {
     _detailWidget[handIdx]->setEnabled(false);
 }
 
-void ScoreSheetScene::skipScores(size_t handIdx, int (&totalScores)[4]) const {
+void ScoreSheetScene::addUpScores(size_t handIdx, int (&totalScores)[4]) const {
     int scoreTable[4];
     const Record::Detail &detail = _record.detail[handIdx];
     TranslateDetailToScoreTable(detail, scoreTable);
@@ -985,7 +985,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
 
         int totalScores[4] = { 0 };
         for (size_t i = 0, cnt = handIdx; i < cnt; ++i) {
-            skipScores(i, totalScores);
+            addUpScores(i, totalScores);
         }
 
         fillDetail(handIdx);
@@ -996,7 +996,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
 
             // 单盘模式直接统计之后的行
             for (size_t i = handIdx + 1, cnt = _record.current_index; i < cnt; ++i) {
-                skipScores(i, totalScores);
+                addUpScores(i, totalScores);
             }
         }
         else {
@@ -1314,7 +1314,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
 
         if (_isTotalMode != (radioGroups[0]->getSelectedButtonIndex() == 1)) {
             _isTotalMode = !_isTotalMode;
-            refreshScoresByMode();
+            refreshScores();
         }
         UserDefault::getInstance()->setBoolForKey(SCORE_SHEET_TOTAL_MODE, radioGroups[0]->getSelectedButtonIndex() == 1);
         UserDefault::getInstance()->setBoolForKey(USE_FIXED_SEAT_ORDER, radioGroups[1]->getSelectedButtonIndex() == 1);
@@ -1322,19 +1322,17 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
     }).create()->show();
 }
 
-void ScoreSheetScene::refreshScoresByMode() {
+void ScoreSheetScene::refreshScores() {
     // 逐行填入数据
     int totalScores[4] = { 0 };
     if (!_isTotalMode) {
         for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
             fillScoresForSingleMode(i, totalScores);
-            fillDetail(i);
         }
     }
     else {
         for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
             fillScoresForTotalMode(i, totalScores);
-            fillDetail(i);
         }
     }
 }
@@ -1604,7 +1602,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
 
     int totalScores[4] = { 0 };
     for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
-        skipScores(i, totalScores);
+        addUpScores(i, totalScores);
     }
 
     DrawNode *drawNode = createPursuitTable(_record.name, totalScores);

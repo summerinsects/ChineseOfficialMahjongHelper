@@ -31,7 +31,7 @@ private:
 
     bool initWithRecord(Record *record);
 
-    void skipScores(size_t handIdx, int (&totalScores)[4]) const;
+    void addUpScores(size_t handIdx, int (&totalScores)[4]) const;
     void fillScoresForSingleMode(size_t handIdx, int (&totalScores)[4]);
     void fillScoresForTotalMode(size_t handIdx, int (&totalScores)[4]);
     void fillDetail(size_t handIdx);
@@ -40,7 +40,7 @@ private:
     void refreshTitle();
     void refreshStartTime();
     void refreshEndTime();
-    void refreshScoresByMode();
+    void refreshScores();
     void recover();
     void reset();
     void onEditButton(cocos2d::Ref *sender);
