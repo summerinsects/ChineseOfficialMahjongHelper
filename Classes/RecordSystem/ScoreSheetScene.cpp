@@ -730,7 +730,7 @@ void ScoreSheetScene::editNameAndTitle() {
     ui::EditBox **editBoxes = sharedEditBoxes->data();
     for (int i = 0; i < 4; ++i) {
         const float yPos = 155.0f - i * 25.0f;
-        Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
+        label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -1233,7 +1233,7 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
         .create()->show();
 }
 
-void ScoreSheetScene::onSettingButton(cocos2d::Ref *sender) {
+void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
     const float width = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
@@ -1534,7 +1534,7 @@ static void showPursuit() {
     ui::Button *buttons[4];
     for (int i = 0; i < 4; ++i) {
         const float yPos = 85.0f - i * 25.0f;
-        Label *label = Label::createWithSystemFont(titleText[i], "Arial", 12);
+        label = Label::createWithSystemFont(titleText[i], "Arial", 12);
         label->setColor(Color3B::BLACK);
         rootNode->addChild(label);
         label->setPosition(Vec2(labelPosX, yPos));

@@ -308,6 +308,7 @@ void HelloWorld::requestQRCode() {
     loadingView->showInScene(this);
     auto thiz = makeRef(this);
     request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
+        CC_UNUSED_PARAM(client);
         network::HttpClient::destroyInstance();
 
         loadingView->dismiss();

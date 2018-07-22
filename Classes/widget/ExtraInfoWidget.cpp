@@ -79,7 +79,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     static const char *extTexts[] = { __UTF8("杠开"), __UTF8("抢杠"), __UTF8("海底") };
     ui::CheckBox *checkBoxes[3];
     for (int i = 0; i < 3; ++i) {
-        ui::CheckBox *checkBox = UICommon::createCheckBox();
+        checkBox = UICommon::createCheckBox();
         rootNode->addChild(checkBox);
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
@@ -205,7 +205,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
 
     if (callback != nullptr) {
         // 番算按钮
-        ui::Button *button = UICommon::createButton();
+        button = UICommon::createButton();
         button->setScale9Enabled(true);
         button->setContentSize(Size(55.0f, 20.0f));
         button->setTitleFontSize(12);

@@ -227,7 +227,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     static const char *titleText[4] = { "-5", "-1", "+1", "+5" };
     static const int delta[4] = { -5, -1, 1, 5 };
     for (int i = 0; i < 4; ++i) {
-        ui::Button *button = UICommon::createButton();
+        button = UICommon::createButton();
         this->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(25.0f, 20.0f));
@@ -428,7 +428,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     std::function<void (Ref *)> onLayoutButton = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
         ui::Button *layoutButton = (ui::Button *)sender;
 
-        static const std::string titleText[2] = {
+        static const std::string layoutText[2] = {
             std::string("\xE2\xAC\x87\xEF\xB8\x8E").append(__UTF8("收起")),
             std::string("\xE2\xAC\x86\xEF\xB8\x8E").append(__UTF8("展开"))
         };
@@ -438,13 +438,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         if (layoutButton->getUserData()) {
             layoutSize.height = visibleSize.height - 145.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
-            layoutButton->setTitleText(titleText[0]);
+            layoutButton->setTitleText(layoutText[0]);
             radioNode->setVisible(false);
         }
         else {
             layoutSize.height = visibleSize.height - 225.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(true));
-            layoutButton->setTitleText(titleText[1]);
+            layoutButton->setTitleText(layoutText[1]);
             radioNode->setVisible(true);
         }
 
@@ -753,7 +753,7 @@ void RecordScene::updateScoreLabel() {
     }
 }
 
-void RecordScene::onInstructionButton(cocos2d::Ref *sender) {
+void RecordScene::onInstructionButton(cocos2d::Ref *) {
     const float width = AlertDialog::maxWidth();
     Label *label = Label::createWithSystemFont(
         __UTF8("1.「换位」模式下，选手顺序与当前圈座位相同；「固定」模式下，选手顺序与开局座位相同。可通过主界面的「设置」进行切换。\n")
