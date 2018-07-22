@@ -6,6 +6,13 @@
 
 struct Record;
 
+struct RecordTexts {
+    const Record *source;
+    const char *title;
+    std::string time;
+    std::string players[4];
+};
+
 class RecordHistoryScene : public BaseScene, cw::TableViewDelegate {
 public:
     typedef std::function<void (Record *)> ViewCallback;
@@ -16,7 +23,7 @@ public:
     static void modifyRecord(const Record *record);
 
 private:
-    std::vector<std::string> _recordTexts;
+    std::vector<RecordTexts> _recordTexts;
 
     void updateRecordTexts();
 
