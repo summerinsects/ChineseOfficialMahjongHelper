@@ -154,7 +154,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionMainScene.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\LatestCompetitionScene.cpp" />
     <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp" />
-    <ClCompile Include="..\Classes\FanTable\FanDefinitionScene.cpp" />
     <ClCompile Include="..\Classes\FanTable\FanTableScene.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp" />
@@ -168,6 +167,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\RecordSystem\ScoreSheetScene.cpp" />
     <ClCompile Include="..\Classes\utils\common.cpp" />
     <ClCompile Include="..\Classes\widget\AlertDialog.cpp" />
+    <ClCompile Include="..\Classes\widget\CommonWebViewScene.cpp" />
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp" />
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp" />
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp" />
@@ -182,7 +182,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\CompetitionSystem\CompetitionMainScene.h" />
     <ClInclude Include="..\Classes\CompetitionSystem\LatestCompetitionScene.h" />
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h" />
-    <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanTableScene.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h" />
@@ -202,6 +201,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\utils\common.h" />
     <ClInclude Include="..\Classes\utils\compiler.h" />
     <ClInclude Include="..\Classes\widget\AlertDialog.h" />
+    <ClInclude Include="..\Classes\widget\CommonWebViewScene.h" />
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h" />
     <ClInclude Include="..\Classes\widget\HandTilesWidget.h" />
     <ClInclude Include="..\Classes\widget\LoadingView.h" />

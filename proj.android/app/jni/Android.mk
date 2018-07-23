@@ -19,7 +19,6 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../../Classes/CompetitionSystem/CompetitionMainScene.cpp \
                    ../../../Classes/CompetitionSystem/LatestCompetitionScene.cpp \
                    ../../../Classes/FanCalculator/FanCalculatorScene.cpp \
-                   ../../../Classes/FanTable/FanDefinitionScene.cpp \
                    ../../../Classes/FanTable/FanTableScene.cpp \
                    ../../../Classes/HelloWorldScene.cpp \
                    ../../../Classes/mahjong-algorithm/fan_calculator.cpp \
@@ -33,6 +32,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../../Classes/RecordSystem/ScoreSheetScene.cpp \
                    ../../../Classes/utils/common.cpp \
                    ../../../Classes/widget/AlertDialog.cpp \
+                   ../../../Classes/widget/CommonWebViewScene.cpp \
                    ../../../Classes/widget/ExtraInfoWidget.cpp \
                    ../../../Classes/widget/HandTilesWidget.cpp \
                    ../../../Classes/widget/TilePickWidget.cpp \

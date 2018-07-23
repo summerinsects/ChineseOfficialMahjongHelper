@@ -7,7 +7,7 @@
 #include "../widget/TilePickWidget.h"
 #include "../widget/ExtraInfoWidget.h"
 #include "../widget/Toast.h"
-#include "../FanTable/FanDefinitionScene.h"
+#include "../FanTable/FanTableScene.h"
 
 USING_NS_CC;
 
@@ -100,7 +100,7 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
         widget->setContentSize(label->getContentSize());
         node->addChild(widget);
         widget->addClickEventListener([j](Ref *) {
-            Director::getInstance()->pushScene(FanDefinitionScene::create(static_cast<size_t>(j)));
+            FanTableScene::asyncShowFanDefinition(static_cast<size_t>(j));
         });
     }
 

@@ -1,13 +1,20 @@
 ﻿#include "FanTableScene.h"
 #include <array>
+#include <algorithm>
 #include "../mahjong-algorithm/fan_calculator.h"
-#include "FanDefinitionScene.h"
+#include "../mahjong-algorithm/stringify.h"
+#include "../TilesImage.h"
+#include "../widget/CommonWebViewScene.h"
+#include "../widget/LoadingView.h"
 
 USING_NS_CC;
 
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 static const char *principle_title[] = { __UTF8("不重复原则"), __UTF8("不拆移原则"), __UTF8("不得相同原则"), __UTF8("就高不就低"), __UTF8("套算一次原则") };
+
+static std::vector<std::string> g_principles;
+static std::vector<std::string> g_definitions;
 
 namespace {
     typedef struct {
@@ -143,5 +150,118 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
 void FanTableScene::onFanNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
-    Director::getInstance()->pushScene(FanDefinitionScene::create(idx));
+    asyncShowFanDefinition(idx);
+}
+
+static void replaceTilesToImage(std::string &text, float scale) {
+    const int width = static_cast<int>(TILE_WIDTH * scale);
+    const int height = static_cast<int>(TILE_HEIGHT * scale);
+
+    char tilesStr[128];
+    mahjong::tile_t tiles[14];
+    char imgStr[1024];
+
+    std::string::size_type pos = text.find('[');
+    while (pos != std::string::npos) {
+        const char *str = text.c_str();
+        int readLen;
+        if (sscanf(str + pos + 1, "%[^]]%n", tilesStr, &readLen) != EOF
+            && str[pos + readLen + 1] == ']') {
+
+            size_t totalWriteLen = 0;
+            const char *p = tilesStr;
+            if (*p == '_') {
+                int writeLen = snprintf(imgStr, sizeof(imgStr),
+                    "<img src=\"tiles/bg.png\" width=\"%d\" height=\"%d\"/>", width, height);
+                totalWriteLen += writeLen;
+                ++p;
+            }
+
+            intptr_t tilesCnt = mahjong::parse_tiles(p, tiles, 14);
+            for (intptr_t i = 0; i < tilesCnt; ++i) {
+                int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
+                    "<img src=\"%s\" width=\"%d\" height=\"%d\"/>", tilesImageName[tiles[i]], width, height);
+                totalWriteLen += writeLen;
+            }
+
+            if (tilesStr[readLen - 1] == '_') {
+                int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
+                    "<img src=\"tiles/bg.png\" width=\"%d\" height=\"%d\"/>", width, height);
+                totalWriteLen += writeLen;
+            }
+
+            text.replace(pos, static_cast<std::string::size_type>(readLen + 2), imgStr);
+            pos = text.find('[', pos + totalWriteLen);
+        }
+        else {
+            pos = text.find('[', pos + 1);
+        }
+    }
+}
+
+static void showFanDefinition(size_t idx) {
+    const char *title = idx < 100 ? mahjong::fan_name[idx] : principle_title[idx - 100];
+    const std::string &text = idx < 100 ? g_definitions[idx] : g_principles[idx - 100];
+    CommonWebViewScene *scene = CommonWebViewScene::create(title, text, CommonWebViewScene::ContentType::HTML);
+    Director::getInstance()->pushScene(scene);
+}
+
+void FanTableScene::asyncShowFanDefinition(size_t idx) {
+    if (LIKELY(g_definitions.size() == 82 && g_principles.size() == 5)) {
+        showFanDefinition(idx);
+        return;
+    }
+
+    auto runningScene = makeRef(Director::getInstance()->getRunningScene());  // 保证线程回来之前不析构
+
+    LoadingView *loadingView = LoadingView::create();
+    loadingView->showInScene(runningScene.get());
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+
+    float scale = 1.0f;
+    float maxWidth = (visibleSize.width - 10) / 18;
+    if (maxWidth < 25) {
+        scale = maxWidth / TILE_WIDTH;
+    }
+#else
+    float scale = 0.5f;
+#endif
+
+    std::thread([runningScene, idx, scale, loadingView]() {
+        // 读文件
+        auto definitions = std::make_shared<std::vector<std::string> >();
+        ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
+        if (valueVec.size() == 82) {
+            definitions->reserve(82);
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(*definitions), [scale](const Value &value) {
+                std::string ret = value.asString();
+                replaceTilesToImage(ret, scale);
+                return std::move(ret);
+            });
+        }
+
+        auto principles = std::make_shared<std::vector<std::string> >();
+        valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
+        if (valueVec.size() == 5) {
+            principles->reserve(5);
+            std::transform(valueVec.begin(), valueVec.end(), std::back_inserter(*principles), [scale](const Value &value) {
+                std::string ret = value.asString();
+                replaceTilesToImage(ret, scale);
+                return std::move(ret);
+            });
+        }
+
+        // 切换到cocos线程
+        Director::getInstance()->getScheduler()->performFunctionInCocosThread([runningScene, idx, loadingView, definitions, principles]() {
+            g_definitions.swap(*definitions);
+            g_principles.swap(*principles);
+
+            if (LIKELY(runningScene->isRunning())) {
+                loadingView->dismiss();
+                showFanDefinition(idx);
+            }
+        });
+    }).detach();
 }

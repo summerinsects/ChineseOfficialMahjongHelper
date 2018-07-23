@@ -35,6 +35,8 @@
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1FA6933A1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
 		1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
+		1FB8479B21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */; };
+		1FB8479C21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */; };
 		1FC616271FFB39C3005FC2F7 /* Toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC616251FFB39C3005FC2F7 /* Toast.cpp */; };
 		1FC616281FFB39C3005FC2F7 /* Toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC616251FFB39C3005FC2F7 /* Toast.cpp */; };
 		1FCC3C021CC47200001C9555 /* RecordHistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */; };
@@ -59,8 +61,6 @@
 		1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */; };
 		1FE1019A1F74964E001C3FA8 /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDCF7C51F738EE400D9C608 /* common.cpp */; };
 		1FE1019E1F74964E001C3FA8 /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FDCF7C51F738EE400D9C608 /* common.cpp */; };
-		1FE2A3EB1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */; };
-		1FE2A3EC1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */; };
 		1FE2A3ED1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */; };
 		1FE2A3EE1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */; };
 		1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */; };
@@ -179,6 +179,8 @@
 		1F7DF3582001E4EE002C1D22 /* UICommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UICommon.h; sourceTree = "<group>"; };
 		1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtraInfoWidget.cpp; sourceTree = "<group>"; };
 		1FA693391E83552300E839CC /* ExtraInfoWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtraInfoWidget.h; sourceTree = "<group>"; };
+		1FB8479921055D4A00261A9A /* CommonWebViewScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonWebViewScene.h; sourceTree = "<group>"; };
+		1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommonWebViewScene.cpp; sourceTree = "<group>"; };
 		1FC616251FFB39C3005FC2F7 /* Toast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Toast.cpp; sourceTree = "<group>"; };
 		1FC616261FFB39C3005FC2F7 /* Toast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Toast.h; sourceTree = "<group>"; };
 		1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecordHistoryScene.cpp; sourceTree = "<group>"; };
@@ -205,8 +207,6 @@
 		1FE04ADB1C94682A008401EA /* RecordScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordScene.h; sourceTree = "<group>"; };
 		1FE04ADC1C94682A008401EA /* ScoreSheetScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScoreSheetScene.cpp; sourceTree = "<group>"; };
 		1FE04ADD1C94682A008401EA /* ScoreSheetScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreSheetScene.h; sourceTree = "<group>"; };
-		1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanDefinitionScene.cpp; sourceTree = "<group>"; };
-		1FE2A3E81CBB30D1008C45C5 /* FanDefinitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanDefinitionScene.h; sourceTree = "<group>"; };
 		1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanTableScene.cpp; sourceTree = "<group>"; };
 		1FE2A3EA1CBB30D1008C45C5 /* FanTableScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanTableScene.h; sourceTree = "<group>"; };
 		1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilePickWidget.cpp; sourceTree = "<group>"; };
@@ -411,8 +411,6 @@
 		1FE2A3E61CBB30D1008C45C5 /* FanTable */ = {
 			isa = PBXGroup;
 			children = (
-				1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */,
-				1FE2A3E81CBB30D1008C45C5 /* FanDefinitionScene.h */,
 				1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */,
 				1FE2A3EA1CBB30D1008C45C5 /* FanTableScene.h */,
 			);
@@ -424,6 +422,8 @@
 			children = (
 				1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */,
 				1F2D25861E076FC20071ADE2 /* AlertDialog.h */,
+				1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */,
+				1FB8479921055D4A00261A9A /* CommonWebViewScene.h */,
 				1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */,
 				1FA693391E83552300E839CC /* ExtraInfoWidget.h */,
 				1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */,
@@ -694,6 +694,7 @@
 				1FE1019A1F74964E001C3FA8 /* common.cpp in Sources */,
 				1F154E411E440A160083F8B3 /* stringify.cpp in Sources */,
 				1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
+				1FB8479B21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */,
 				1F2D25871E076FC20071ADE2 /* AlertDialog.cpp in Sources */,
 				1AF87B781F6F77F7007BE51C /* AppController.mm in Sources */,
 				1AF87B8B1F6F782A007BE51C /* RootViewController.mm in Sources */,
@@ -708,7 +709,6 @@
 				1FC616271FFB39C3005FC2F7 /* Toast.cpp in Sources */,
 				1FCC3C021CC47200001C9555 /* RecordHistoryScene.cpp in Sources */,
 				1FE04AE01C94682A008401EA /* RecordScene.cpp in Sources */,
-				1FE2A3EB1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
 				1FE04ADE1C94682A008401EA /* FanCalculatorScene.cpp in Sources */,
 				1FE04AE21C94682A008401EA /* ScoreSheetScene.cpp in Sources */,
 			);
@@ -724,7 +724,6 @@
 				1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
 				1FDCF7C01F738E1D00D9C608 /* CWTableView.cpp in Sources */,
 				1FE2A3EE1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
-				1FE2A3EC1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
 				1FFE17A41F9BB17200714066 /* CWCommon.cpp in Sources */,
 				1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
 				1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */,
@@ -732,6 +731,7 @@
 				1F2D25881E076FC20071ADE2 /* AlertDialog.cpp in Sources */,
 				1F0828A61ED26F8C00F4C424 /* Record.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
+				1FB8479C21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,
 				1F11543D1FF8F586000EF358 /* CompetitionMainScene.cpp in Sources */,
 				1FE04ADF1C94682A008401EA /* FanCalculatorScene.cpp in Sources */,
