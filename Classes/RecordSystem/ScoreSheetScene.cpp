@@ -1292,7 +1292,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
     std::array<ui::RadioButtonGroup *, 2> radioGroups;
 
     // 1.计分表格分数显示
-    Label *label = Label::createWithSystemFont(__UTF8("1.计分表格分数显示"), "Arail", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("1. 计分表格分数显示"), "Arail", 12);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -1324,7 +1324,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
     }
 
     // 2.计分界面选手顺序
-    label = Label::createWithSystemFont(__UTF8("2.计分界面选手顺序"), "Arail", 12);
+    label = Label::createWithSystemFont(__UTF8("2. 计分界面选手顺序"), "Arail", 12);
     label->setColor(Color3B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
