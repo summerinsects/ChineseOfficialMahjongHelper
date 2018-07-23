@@ -32,7 +32,6 @@ public:
         bool _isCloseOnTouchOutside = true;
 
     public:
-        Builder() { }
         explicit Builder(cocos2d::Scene *scene) : _scene(scene) { }
 
         Builder &setTitle(const std::string &title) { _title = title; return *this; }
