@@ -222,7 +222,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
         requestVersion(true);
 #else
-        Toast::makeText(this, "当前平台不支持该操作", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("当前平台不支持该操作"), Toast::LENGTH_LONG)->show();
 #endif
     });
     rootNode->addChild(button1);
