@@ -39,13 +39,13 @@ public:
         Builder &setMessage(const std::string &message) { _message = message; return *this; }
         Builder &setContentNode(cocos2d::Node *node) { _contentNode = node; return *this; }
 
-        Builder &setPositiveButton(const std::string &title, const ButtonCallback callback) {
+        Builder &setPositiveButton(const std::string &title, const ButtonCallback &callback) {
             _positiveTitle = title;
             _positiveCallback = callback;
             return *this;
         }
 
-        Builder &setNegativeButton(const std::string &title, const ButtonCallback callback) {
+        Builder &setNegativeButton(const std::string &title, const ButtonCallback &callback) {
             _negativeTitle = title;
             _negativeCallback = callback;
             return *this;
