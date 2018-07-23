@@ -7,6 +7,8 @@
 
 USING_NS_CC;
 
+#define NO_NAME_TITLE __UTF8("(未命名对局)")
+
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 static std::vector<Record> g_records;
@@ -51,7 +53,7 @@ void RecordHistoryScene::updateRecordTexts() {
     std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record) {
         RecordTexts texts;
         texts.source = &record;
-        texts.title = record.title[0] != '\0' ? record.title : __UTF8("(无对局名称)");
+        texts.title = record.title[0] != '\0' ? record.title : NO_NAME_TITLE;
         texts.time = formatTime(record.start_time, record.end_time);
 
         typedef std::pair<int, int> SeatScore;
@@ -247,6 +249,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
 
     const RecordTexts &texts = _recordTexts[idx];
     titleLabel->setString(texts.title);
+    cw::scaleLabelToFitWidth(titleLabel, cellWidth - 4.0f);
 
     timeLabel->setString(texts.time);
     cw::scaleLabelToFitWidth(timeLabel, cellWidth - 30.0f);
@@ -614,7 +617,7 @@ namespace {
         bool finished = record.end_time != 0;
 
         // 标题
-        titleLabel->setString(record.title[0] != '\0' ? record.title : __UTF8("(无对局名称)"));
+        titleLabel->setString(record.title[0] != '\0' ? record.title : NO_NAME_TITLE);
         cw::scaleLabelToFitWidth(titleLabel, cellWidth - 35.0f - 2.0f);
 
         // 时间
@@ -803,6 +806,7 @@ namespace {
 
         const RecordTexts &texts = _texts->at(idx);
         titleLabel->setString(texts.title);
+        cw::scaleLabelToFitWidth(titleLabel, cellWidth - 4.0f);
 
         timeLabel->setString(texts.time);
         cw::scaleLabelToFitWidth(timeLabel, cellWidth - 30.0f);
