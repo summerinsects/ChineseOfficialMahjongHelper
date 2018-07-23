@@ -42,7 +42,7 @@ bool MahjongTheoryScene::init() {
     editBox->setPlaceHolder(__UTF8("在此处输入"));
     editBox->setMaxLength(50);
     editBox->setDelegate(this);
-    editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 20.0f, origin.y + visibleSize.height - 50.0f));
+    editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 20.0f, origin.y + visibleSize.height - 45.0f));
     _editBox = editBox;
 
     // 与输入框同位置的空白button
@@ -61,7 +61,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("随机"));
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 22.5f, origin.y + visibleSize.height - 50.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 22.5f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener([this](Ref *) { setRandomInput(); });
 
     // 手牌
@@ -77,7 +77,7 @@ bool MahjongTheoryScene::init() {
         widgetSize.width = visibleSize.width - 4.0f;
         widgetSize.height *= scale;
     }
-    handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 65.0f - widgetSize.height * 0.5f));
+    handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 60.0f - widgetSize.height * 0.5f));
     _handTilesWidget = handTilesWidget;
 
     // 撤销与重做按钮
@@ -87,7 +87,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("撤销"));
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 65.0f, origin.y + visibleSize.height - 80.0f - widgetSize.height));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 62.5f, origin.y + visibleSize.height - 75.0f - widgetSize.height));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onUndoButton, this, std::placeholders::_1));
     button->setEnabled(false);
     _undoButton = button;
@@ -98,7 +98,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("重做"));
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 25.0f, origin.y + visibleSize.height - 80.0f - widgetSize.height));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 22.5f, origin.y + visibleSize.height - 75.0f - widgetSize.height));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onRedoButton, this, std::placeholders::_1));
     button->setEnabled(false);
     _redoButton = button;
@@ -108,10 +108,10 @@ bool MahjongTheoryScene::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 80.0f - widgetSize.height));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 75.0f - widgetSize.height));
 
     static const char *title[] = { __UTF8("七对"), __UTF8("十三幺"), __UTF8("全不靠"), __UTF8("组合龙") };
-    const float yPos = origin.y + visibleSize.height - 105.0f - widgetSize.height;
+    const float yPos = origin.y + visibleSize.height - 100.0f - widgetSize.height;
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float xPos = origin.x + gap * (i + 0.5f);
@@ -151,12 +151,12 @@ bool MahjongTheoryScene::init() {
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
-    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 130.0f - widgetSize.height));
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 120.0f - widgetSize.height));
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 60.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 57.5f));
     this->addChild(tableView);
     _tableView = tableView;
 
