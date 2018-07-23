@@ -10,7 +10,8 @@ public:
     CREATE_FUNC(OtherScene);
 
 private:
-    void createContentView();
+    void onTipsButton(cocos2d::Ref *sender);
+    void onRecreationsButton(cocos2d::Ref *sender);
 };
 
 #endif
