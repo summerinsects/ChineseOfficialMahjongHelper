@@ -9,7 +9,7 @@
 #include <vector>
 
 #define NAME_SIZE 32
-#define TITLE_SIZE 128
+#define TITLE_SIZE 64
 
 struct Record {
     char name[4][NAME_SIZE];        // 选手姓名
