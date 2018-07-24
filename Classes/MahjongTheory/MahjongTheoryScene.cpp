@@ -24,9 +24,9 @@ bool MahjongTheoryScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 使用说明
-    ui::Button *button = cocos2d::ui::Button::create("source_material/help_128px.png");
+    ui::Button *button = cocos2d::ui::Button::create("icon/question-circle.png");
     this->addChild(button);
-    button->setScale(20.0f / button->getContentSize().width);
+    button->setScale(24.0f / button->getContentSize().width);
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
 
@@ -42,7 +42,7 @@ bool MahjongTheoryScene::init() {
     editBox->setPlaceHolder(__UTF8("在此处输入"));
     editBox->setMaxLength(50);
     editBox->setDelegate(this);
-    editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 20.0f, origin.y + visibleSize.height - 50.0f));
+    editBox->setPosition(Vec2(origin.x + visibleSize.width * 0.5f - 20.0f, origin.y + visibleSize.height - 45.0f));
     _editBox = editBox;
 
     // 与输入框同位置的空白button
@@ -61,7 +61,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("随机"));
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 22.5f, origin.y + visibleSize.height - 50.0f));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 22.5f, origin.y + visibleSize.height - 45.0f));
     button->addClickEventListener([this](Ref *) { setRandomInput(); });
 
     // 手牌
@@ -77,7 +77,7 @@ bool MahjongTheoryScene::init() {
         widgetSize.width = visibleSize.width - 4.0f;
         widgetSize.height *= scale;
     }
-    handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 65.0f - widgetSize.height * 0.5f));
+    handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 60.0f - widgetSize.height * 0.5f));
     _handTilesWidget = handTilesWidget;
 
     // 撤销与重做按钮
@@ -87,7 +87,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("撤销"));
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 65.0f, origin.y + visibleSize.height - 80.0f - widgetSize.height));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 62.5f, origin.y + visibleSize.height - 75.0f - widgetSize.height));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onUndoButton, this, std::placeholders::_1));
     button->setEnabled(false);
     _undoButton = button;
@@ -98,7 +98,7 @@ bool MahjongTheoryScene::init() {
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("重做"));
     this->addChild(button);
-    button->setPosition(Vec2(origin.x + visibleSize.width - 25.0f, origin.y + visibleSize.height - 80.0f - widgetSize.height));
+    button->setPosition(Vec2(origin.x + visibleSize.width - 22.5f, origin.y + visibleSize.height - 75.0f - widgetSize.height));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onRedoButton, this, std::placeholders::_1));
     button->setEnabled(false);
     _redoButton = button;
@@ -108,10 +108,10 @@ bool MahjongTheoryScene::init() {
     label->setColor(Color3B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - 80.0f - widgetSize.height));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 75.0f - widgetSize.height));
 
     static const char *title[] = { __UTF8("七对"), __UTF8("十三幺"), __UTF8("全不靠"), __UTF8("组合龙") };
-    const float yPos = origin.y + visibleSize.height - 105.0f - widgetSize.height;
+    const float yPos = origin.y + visibleSize.height - 100.0f - widgetSize.height;
     const float gap = (visibleSize.width - 4.0f) * 0.25f;
     for (int i = 0; i < 4; ++i) {
         const float xPos = origin.x + gap * (i + 0.5f);
@@ -151,12 +151,12 @@ bool MahjongTheoryScene::init() {
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
-    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 130.0f - widgetSize.height));
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 120.0f - widgetSize.height));
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 60.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + (visibleSize.height - widgetSize.height) * 0.5f - 57.5f));
     this->addChild(tableView);
     _tableView = tableView;
 
@@ -172,22 +172,22 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
     const float maxWidth = AlertDialog::maxWidth();
     Label *label = Label::createWithSystemFont(
         __UTF8("牌理功能未经严格测试，可能存在bug。\n\n")
-        __UTF8("1.数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n")
-        __UTF8("2.字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n")
-        __UTF8("3.吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n")
+        __UTF8("1. 数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n")
+        __UTF8("2. 字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n")
+        __UTF8("3. 吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n")
         __UTF8("  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n")
         __UTF8("  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n")
         __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n")
-        __UTF8("4.输入牌的总数不能超过14张。\n")
-        __UTF8("5.当输入牌的数量为(n*3+2)时，最后一张牌作为摸上来的牌。\n")
-        __UTF8("6.当输入牌的数量为(n*3+1)时，系统会随机补一张摸上来的牌。\n")
-        __UTF8("7.基本和型暂不考虑国标番型。\n")
-        __UTF8("8.暂不考虑吃碰杠操作。\n")
-        __UTF8("9.点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n")
-        __UTF8("10.点击手牌可切出对应牌，随机上牌。\n")
-        __UTF8("输入范例1：[EEEE]288s349pSCFF2p\n")
-        __UTF8("输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n")
-        __UTF8("输入范例3：356m18s1579pWNFF9p"),
+        __UTF8("4. 输入牌的总数不能超过14张。\n")
+        __UTF8("5. 当输入牌的数量为(n*3+2)时，最后一张牌作为摸上来的牌。\n")
+        __UTF8("6. 当输入牌的数量为(n*3+1)时，系统会随机补一张摸上来的牌。\n")
+        __UTF8("7. 基本和型暂不考虑国标番型。\n")
+        __UTF8("8. 暂不考虑吃碰杠操作。\n")
+        __UTF8("9. 点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n")
+        __UTF8("10. 点击手牌可切出对应牌，随机上牌。\n")
+        __UTF8("  输入范例1：[EEEE]288s349pSCFF2p\n")
+        __UTF8("  输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n")
+        __UTF8("  输入范例3：356m18s1579pWNFF9p"),
         "Arial", 10, Size(maxWidth, 0.0f));
     label->setColor(Color3B::BLACK);
 

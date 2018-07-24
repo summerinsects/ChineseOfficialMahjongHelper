@@ -202,8 +202,4 @@
 #define PRIzx        _PFX_z "x"
 #define PRIzX        _PFX_z "X"
 
-#ifdef ANDROID
-#include "to_string.h"
-#endif  // ANDROID
-
 #endif

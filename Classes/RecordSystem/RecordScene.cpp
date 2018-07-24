@@ -18,6 +18,7 @@ static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
 
 #define RECENT_FANS "recent_fans"
 #define USE_FIXED_SEAT_ORDER "use_fixed_seat_order"
+#define NEVER_NOTIFY_LITTLE_FAN "never_notify_little_fan"
 
 // 8个常用番作为初始的「最近使用」
 static mahjong::fan_t recentFans[8] = {
@@ -195,9 +196,9 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 帮助按钮
-    ui::Button *button = ui::Button::create("source_material/help_128px.png");
+    ui::Button *button = ui::Button::create("icon/question-circle.png");
     this->addChild(button);
-    button->setScale(20.0f / button->getContentSize().width);
+    button->setScale(24.0f / button->getContentSize().width);
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
     button->addClickEventListener(std::bind(&RecordScene::onInstructionButton, this, std::placeholders::_1));
 
@@ -227,7 +228,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     static const char *titleText[4] = { "-5", "-1", "+1", "+5" };
     static const int delta[4] = { -5, -1, 1, 5 };
     for (int i = 0; i < 4; ++i) {
-        ui::Button *button = UICommon::createButton();
+        button = UICommon::createButton();
         this->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(25.0f, 20.0f));
@@ -386,10 +387,10 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     // 展开/收起
     ui::Button *layoutButton = UICommon::createButton();
     layoutButton->setScale9Enabled(true);
-    layoutButton->setContentSize(Size(55.0f, 20.0f));
+    layoutButton->setContentSize(Size(45.0f, 20.0f));
     layoutButton->setTitleFontSize(12);
     topNode->addChild(layoutButton);
-    layoutButton->setPosition(Vec2(visibleSize.width - 35.0f, 35.0f));
+    layoutButton->setPosition(Vec2(visibleSize.width - 30.0f, 35.0f));
 
     button = UICommon::createButton();
     button->setScale9Enabled(true);
@@ -398,18 +399,18 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->setTitleText(__UTF8("记录和牌"));
     button->addClickEventListener([this](Ref *) { onRecordTilesButton(nullptr); });
     topNode->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 100.0f, 35.0f));
+    button->setPosition(Vec2(visibleSize.width - 90.0f, 35.0f));
     _recordTilesButton = button;
 
     // 小番
     button = UICommon::createButton();
     button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
+    button->setContentSize(Size(45.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("小番"));
     button->addClickEventListener([this](Ref *) { showLittleFanAlert(false); });
     topNode->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 35.0f, 10.0f));
+    button->setPosition(Vec2(visibleSize.width - 30.0f, 10.0f));
     _littleFanButton = button;
 
     cw::TableView *tableView = cw::TableView::create();
@@ -428,7 +429,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     std::function<void (Ref *)> onLayoutButton = [radioNode, rootLayout, topNode, tableView](Ref *sender) {
         ui::Button *layoutButton = (ui::Button *)sender;
 
-        static const std::string titleText[2] = {
+        static const std::string layoutText[2] = {
             std::string("\xE2\xAC\x87\xEF\xB8\x8E").append(__UTF8("收起")),
             std::string("\xE2\xAC\x86\xEF\xB8\x8E").append(__UTF8("展开"))
         };
@@ -438,13 +439,13 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         if (layoutButton->getUserData()) {
             layoutSize.height = visibleSize.height - 145.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
-            layoutButton->setTitleText(titleText[0]);
+            layoutButton->setTitleText(layoutText[0]);
             radioNode->setVisible(false);
         }
         else {
             layoutSize.height = visibleSize.height - 225.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(true));
-            layoutButton->setTitleText(titleText[1]);
+            layoutButton->setTitleText(layoutText[1]);
             radioNode->setVisible(true);
         }
 
@@ -613,7 +614,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         size_t row = k >> 2;
         checkBox.root_widget->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
-        checkBox.setSelectd(TEST_FAN(_detail.fan_flag, fan));
+        checkBox.setSelectd(TEST_FAN(_detail.fan_bits, fan));
     }
 
     for (size_t k = currentLevelCount; k < 9; ++k) {
@@ -753,14 +754,14 @@ void RecordScene::updateScoreLabel() {
     }
 }
 
-void RecordScene::onInstructionButton(cocos2d::Ref *sender) {
+void RecordScene::onInstructionButton(cocos2d::Ref *) {
     const float width = AlertDialog::maxWidth();
     Label *label = Label::createWithSystemFont(
-        __UTF8("1.「换位」模式下，选手顺序与当前圈座位相同；「固定」模式下，选手顺序与开局座位相同。可通过主界面的「设置」进行切换。\n")
-        __UTF8("2.番数框支持直接输入，「标记主番」可快速增加番数，强烈建议先「标记主番」，再用两侧的+和-按钮调整。\n")
-        __UTF8("3.「标记主番」出于简化代码逻辑考虑，未做排斥检测，即程序允许标记若干个自相矛盾的主番，但不建议你这样做。\n")
-        __UTF8("4.「小番」为2番及1番的番种。以复选框展现的，是不可复计的番种；以两侧-1和+1按钮展现的，是可复计的番种。\n")
-        __UTF8("5.「记录和牌」可根据当前和牌自动算番，自动标记番种。")
+        __UTF8("1. 「换位」模式下，选手顺序与当前圈座位相同；「固定」模式下，选手顺序与开局座位相同。可通过主界面的「设置」进行切换。\n")
+        __UTF8("2. 番数框支持直接输入，「标记主番」可快速增加番数，强烈建议先「标记主番」，再用两侧的+和-按钮调整。\n")
+        __UTF8("3. 「标记主番」出于简化代码逻辑考虑，未做排斥检测，即程序允许标记若干个自相矛盾的主番，但不建议你这样做。\n")
+        __UTF8("4. 「小番」为2番及1番的番种。以复选框展现的，是不可复计的番种；以两侧-1和+1按钮展现的，是可复计的番种。\n")
+        __UTF8("5. 「记录和牌」可根据当前和牌自动算番，自动标记番种。")
         , "Arial", 10, Size(width, 0.0f));
     label->setColor(Color3B::BLACK);
 
@@ -926,7 +927,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     const float maxWidth = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(maxWidth, 255.0f));
+    rootNode->setContentSize(Size(maxWidth, 285.0f));
 
     uint16_t uniqueFan = _detail.unique_fan;
     uint64_t multipleFan = _detail.multiple_fan;
@@ -939,7 +940,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     for (int i = 0, totalRows = 5; i < 14; ++i) {
         div_t ret = div(i, 3);
         const float xPos = width3 * ret.rem;
-        const float yPos = 130.0f + (totalRows - ret.quot - 0.5f) * 25.0f;
+        const float yPos = 160.0f + (totalRows - ret.quot - 0.5f) * 25.0f;
 
         ui::CheckBox *checkBox = UICommon::createCheckBox();
         checkBox->setZoomScale(0.0f);
@@ -965,7 +966,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     const float width2 = maxWidth * 0.5f;
     for (int i = 0, totalRows = 5; i < 9; ++i) {
         const float xPos = width2 * (i & 1);
-        const float yPos = (totalRows - (i >> 1) - 0.5f) * 25.0f;
+        const float yPos = 30.0f + (totalRows - (i >> 1) - 0.5f) * 25.0f;
 
         // 方框背景
         ui::Scale9Sprite *sprite = ui::Scale9Sprite::create("source_material/btn_square_normal.png");
@@ -1025,12 +1026,28 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         cw::scaleLabelToFitWidth(label, width2 - 72.0f);
     }
 
+    ui::CheckBox *checkBox = UICommon::createCheckBox();
+    checkBox->setZoomScale(0.0f);
+    checkBox->ignoreContentAdaptWithSize(false);
+    checkBox->setContentSize(Size(20.0f, 20.0f));
+    checkBox->setPosition(Vec2(12.0f, 10.0f));
+    rootNode->addChild(checkBox);
+    checkBox->setSelected(UserDefault::getInstance()->getBoolForKey(NEVER_NOTIFY_LITTLE_FAN, false));
+
+    Label *label = Label::createWithSystemFont(__UTF8("不再提示标记小番"), "Arial", 12);
+    label->setColor(Color3B::BLACK);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    rootNode->addChild(label);
+    label->setPosition(Vec2(27.0f, 10.0f));
+
     AlertDialog::Builder(this)
         .setTitle(__UTF8("标记小番"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [this, checkBoxes, labels, callFromSubmitting](AlertDialog *, int) {
+        .setPositiveButton(__UTF8("确定"), [this, checkBoxes, labels, checkBox, callFromSubmitting](AlertDialog *, int) {
+        UserDefault::getInstance()->setBoolForKey(NEVER_NOTIFY_LITTLE_FAN, checkBox->isSelected());
+
         uint16_t uniqueFan = 0;
         uint64_t multipleFan = 0;
         for (int i = 0; i < 14; ++i) {
@@ -1077,18 +1094,18 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
     // 标记/取消标记番种
     if (checkBox.is_selected) {
         checkBox.setSelectd(false);
-        RESET_FAN(_detail.fan_flag, fan);
+        RESET_FAN(_detail.fan_bits, fan);
     }
     else {
         checkBox.setSelectd(true);
-        SET_FAN(_detail.fan_flag, fan);
+        SET_FAN(_detail.fan_bits, fan);
     }
 
     // 计算番数
     int prevWinScore = atoi(_editBox->getText());
     int currentWinScore = 0;
     for (int n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
-        if (TEST_FAN(_detail.fan_flag, n)) {
+        if (TEST_FAN(_detail.fan_bits, n)) {
             currentWinScore += mahjong::fan_value_table[n];
         }
     }
@@ -1115,7 +1132,7 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
                 // 刷新CheckBox
                 FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (fan == cellDetails[0].fans[idx]) {
-                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
+                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_bits, fan));
                 }
                 else {
                     assert(0);
@@ -1136,7 +1153,7 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
                 // 刷新CheckBox
                 FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (fan == detail.fans[idx]) {
-                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_flag, fan));
+                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_bits, fan));
                 }
                 else {
                     assert(0);
@@ -1147,8 +1164,8 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
 }
 
 void RecordScene::adjustRecentFans() {
-    uint64_t fanFlag = _detail.fan_flag;
-    if (fanFlag == 0) {
+    uint64_t fanBits = _detail.fan_bits;
+    if (fanBits == 0) {
         return;
     }
 
@@ -1157,7 +1174,7 @@ void RecordScene::adjustRecentFans() {
 
     // 1. 将所有标记的番写到temp
     for (int fan = mahjong::BIG_FOUR_WINDS; fan < mahjong::DRAGON_PUNG; ++fan) {
-        if (TEST_FAN(fanFlag, fan)) {
+        if (TEST_FAN(fanBits, fan)) {
             temp[cnt++] = static_cast<mahjong::fan_t>(fan);
             if (cnt >= 8) {
                 break;
@@ -1169,7 +1186,7 @@ void RecordScene::adjustRecentFans() {
     if (cnt < 8) {
         for (int i = 0; i < 8; ++i) {
             mahjong::fan_t fan = recentFans[i];
-            if (TEST_FAN(fanFlag, fan)) {
+            if (TEST_FAN(fanBits, fan)) {
                 continue;
             }
             temp[cnt++] = fan;
@@ -1185,14 +1202,14 @@ void RecordScene::adjustRecentFans() {
 }
 
 void RecordScene::onSubmitButton(cocos2d::Ref *) {
-    if (_detail.fan_flag != 0 || _detail.unique_fan != 0 || _detail.multiple_fan != 0) {  // 标记了番种
+    if (_detail.fan_bits != 0 || _detail.unique_fan != 0 || _detail.multiple_fan != 0) {  // 标记了番种
         if (_drawBox->isSelected()) {  // 荒庄
             AlertDialog::Builder(this)
-                .setTitle(__UTF8("记分"))
+                .setTitle(__UTF8("计分"))
                 .setMessage(__UTF8("你标记了番种却选择了荒庄，是否忽略标记这些番种，记录本盘为荒庄？"))
                 .setNegativeButton(__UTF8("取消"), nullptr)
                 .setPositiveButton(__UTF8("确定"), [this](AlertDialog *, int) {
-                _detail.fan_flag = 0;
+                _detail.fan_bits = 0;
                 _detail.unique_fan = 0;
                 _detail.multiple_fan = 0;
                 memset(&_detail.win_hand, 0, sizeof(_detail.win_hand));
@@ -1205,7 +1222,8 @@ void RecordScene::onSubmitButton(cocos2d::Ref *) {
         }
     }
     else {  // 未标记番种
-        if (_winIndex != -1 && Common::isCStringEmpty(_detail.win_hand.tiles) && _detail.unique_fan == 0 && _detail.multiple_fan == 0) {
+        bool shouldShow = !UserDefault::getInstance()->getBoolForKey(NEVER_NOTIFY_LITTLE_FAN, false);
+        if (_winIndex != -1 && Common::isCStringEmpty(_detail.win_hand.tiles) && _detail.unique_fan == 0 && _detail.multiple_fan == 0 && shouldShow) {
             showLittleFanAlert(true);
         }
         else {
@@ -1381,7 +1399,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
             .setCloseOnTouchOutside(false)
             .setPositiveButton(__UTF8("确定"), [this, temp, fan, fanFlag, uniqueFan, multipleFan, dlg](AlertDialog *, int) {
             _detail.fan = static_cast<uint16_t>(std::max(fan, 8));
-            _detail.fan_flag = fanFlag;
+            _detail.fan_bits = fanFlag;
             _detail.unique_fan = uniqueFan;
             _detail.multiple_fan = multipleFan;
 

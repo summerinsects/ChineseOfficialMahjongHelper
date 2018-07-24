@@ -2,7 +2,6 @@
 #include "network/HttpClient.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
-#include <array>
 #include "UICommon.h"
 #include "utils/common.h"
 #include "widget/AlertDialog.h"
@@ -27,6 +26,11 @@
 #endif
 
 USING_NS_CC;
+
+extern void UpgradeRecordInFile(const char *file);
+void UpgradeHistoryRecords(const char *file);
+
+static bool isVersionNewer(const char *version1, const char *version2);
 
 bool HelloWorld::init() {
     if (UNLIKELY(!Scene::init())) {
@@ -162,9 +166,9 @@ bool HelloWorld::init() {
     button->setScale9Enabled(true);
     button->setContentSize(Size(40.0f, 25.0f));
     button->setTitleFontSize(14);
-    button->setTitleText(__UTF8("设置"));
+    button->setTitleText(__UTF8("分享"));
     button->setPosition(Vec2(origin.x + visibleSize.width - 23.0f, origin.y + 15.0f));
-    button->addClickEventListener(std::bind(&HelloWorld::onSettingButton, this, std::placeholders::_1));
+    button->addClickEventListener([this](Ref *) { requestQRCode(); });
 
     std::string version = Application::getInstance()->getVersion();
     Label *label = Label::createWithSystemFont(
@@ -181,6 +185,8 @@ bool HelloWorld::init() {
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 35.0f));
 #endif
+
+    upgradeData();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     if (needRequest()) {
@@ -207,28 +213,16 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
 
     const Size &labelSize = label->getContentSize();
 
-    // 打赏
-    ui::Button *button = UICommon::createButton();
-    rootNode->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(40.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("打赏"));
-    button->setPosition(Vec2(width * 0.5f, 10.0f));
-    button->addClickEventListener([](Ref *) {
-        Application::getInstance()->openURL("https://gitee.com/201103L/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
-    });
-
     ui::Button *button1 = UICommon::createButton();
     button1->setScale9Enabled(true);
-    button1->setContentSize(Size(55.0, 20.0f));
+    button1->setContentSize(Size(65.0, 20.0f));
     button1->setTitleFontSize(12);
     button1->setTitleText(__UTF8("版本检测"));
     button1->addClickEventListener([this](Ref *) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
         requestVersion(true);
 #else
-        Toast::makeText(this, "当前平台不支持该操作", Toast::LENGTH_LONG)->show();
+        Toast::makeText(this, __UTF8("当前平台不支持该操作"), Toast::LENGTH_LONG)->show();
 #endif
     });
     rootNode->addChild(button1);
@@ -244,18 +238,17 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
 
     ui::Button *button2 = UICommon::createButton();
     button2->setScale9Enabled(true);
-    button2->setContentSize(Size(55.0, 20.0f));
+    button2->setContentSize(Size(65.0, 20.0f));
     button2->setTitleFontSize(12);
-    button2->setTitleText(__UTF8("二维码"));
-    button2->addClickEventListener([this](Ref *) {
-        requestQRCode();
+    button2->setTitleText(__UTF8("打赏"));
+    button2->addClickEventListener([](Ref *) {
+        Application::getInstance()->openURL("https://gitee.com/summerinsects/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
     });
     rootNode->addChild(button2);
 
     rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
-    const float posX = (width - 150.0f) * 0.25f;
-    button1->setPosition(Vec2(posX + 27.5f, 10.0f));
-    button2->setPosition(Vec2(width - posX - 27.5f, 10.0f));
+    button1->setPosition(Vec2(width * 0.25f, 10.0f));
+    button2->setPosition(Vec2(width * 0.75f, 10.0f));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
 
     AlertDialog::Builder(this)
@@ -315,6 +308,7 @@ void HelloWorld::requestQRCode() {
     loadingView->showInScene(this);
     auto thiz = makeRef(this);
     request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
+        CC_UNUSED_PARAM(client);
         network::HttpClient::destroyInstance();
 
         loadingView->dismiss();
@@ -433,36 +427,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
             return false;
         }
         std::string tag = it->value.GetString();
-        int major1, minor1, point1, point2;
-        if (sscanf(tag.c_str(), "v%d.%d.%d.%d", &major1, &minor1, &point1, &point2) != 4) {
-            return false;
-        }
-
-        std::string version = Application::getInstance()->getVersion();
-        int a, b, c, d;
-        if (sscanf(version.c_str(), "%d.%d.%d.%d", &a, &b, &c, &d) != 4) {
-            return false;
-        }
-
-        bool hasNewVersion = false;
-        if (major1 > a) {
-            hasNewVersion = true;
-        }
-        else if (major1 == a) {
-            if (minor1 > b) {
-                hasNewVersion = true;
-            }
-            else if (minor1 == b) {
-                if (point1 > c) {
-                    hasNewVersion = true;
-                }
-                else if (point1 == c) {
-                    if (point2 > d) {
-                        hasNewVersion = true;
-                    }
-                }
-            }
-        }
+        bool hasNewVersion = isVersionNewer(tag.c_str() + 1, Application::getInstance()->getVersion().c_str());
 
         UserDefault *userDefault = UserDefault::getInstance();
         userDefault->setBoolForKey("has_new_version", hasNewVersion);
@@ -536,95 +501,55 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
 
 #endif
 
-#define SCORE_SHEET_TOTAL_MODE "score_sheet_scene_total_mode"
-#define USE_FIXED_SEAT_ORDER "use_fixed_seat_order"
-
-void HelloWorld::onSettingButton(cocos2d::Ref *) {
-    const float width = AlertDialog::maxWidth();
-
-    Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(width, 120.0f));
-
-    // 子标题
-    Label *label = Label::createWithSystemFont(__UTF8("计分器设置"), "Arail", 12);
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
-    label->setPosition(Vec2(width * 0.5f, 110.0f));
-
-    std::array<ui::RadioButtonGroup *, 2> radioGroups;
-
-    // 1.计分表格分数显示
-    label = Label::createWithSystemFont(__UTF8("1.计分表格分数显示"), "Arail", 12);
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 85.0f));
-
-    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
-    rootNode->addChild(radioGroup);
-    radioGroups[0] = radioGroup;
-
-    static const char *sheetTitleText[] = { __UTF8("单盘"), __UTF8("累计") };
-    for (int i = 0; i < 2; ++i) {
-        ui::RadioButton *radioButton = UICommon::createRadioButton();
-        radioButton->setZoomScale(0.0f);
-        radioButton->ignoreContentAdaptWithSize(false);
-        radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 60.0f));
-        rootNode->addChild(radioButton);
-        radioGroup->addRadioButton(radioButton);
-
-        label = Label::createWithSystemFont(sheetTitleText[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
-        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
-        radioButton->addChild(label);
-        label->setPosition(Vec2(25.0f, 10.0f));
-    }
-    if (UserDefault::getInstance()->getBoolForKey(SCORE_SHEET_TOTAL_MODE)) {
-        radioGroup->setSelectedButton(1);
+static bool isVersionNewer(const char *version1, const char *version2) {
+    int major1, minor1, build1, revision1;
+    if (sscanf(version1, "%d.%d.%d.%d", &major1, &minor1, &build1, &revision1) != 4) {
+        return false;
     }
 
-    // 2.计分界面选手顺序
-    label = Label::createWithSystemFont(__UTF8("2.计分界面选手顺序"), "Arail", 12);
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 35.0f));
-
-    radioGroup = ui::RadioButtonGroup::create();
-    rootNode->addChild(radioGroup);
-    radioGroups[1] = radioGroup;
-
-    static const char *recordTitleText[] = { __UTF8("换位"), __UTF8("固定") };
-    for (int i = 0; i < 2; ++i) {
-        ui::RadioButton *radioButton = UICommon::createRadioButton();
-        radioButton->setZoomScale(0.0f);
-        radioButton->ignoreContentAdaptWithSize(false);
-        radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 10.0f));
-        rootNode->addChild(radioButton);
-        radioGroup->addRadioButton(radioButton);
-
-        label = Label::createWithSystemFont(recordTitleText[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
-        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
-        radioButton->addChild(label);
-        label->setPosition(Vec2(25.0f, 10.0f));
-    }
-    if (UserDefault::getInstance()->getBoolForKey(USE_FIXED_SEAT_ORDER)) {
-        radioGroup->setSelectedButton(1);
+    int major2, minor2, build2, revision2;
+    if (sscanf(version2, "%d.%d.%d.%d", &major2, &minor2, &build2, &revision2) != 4) {
+        return false;
     }
 
-    AlertDialog::Builder(this)
-        .setTitle(__UTF8("设置"))
-        .setContentNode(rootNode)
-        .setCloseOnTouchOutside(false)
-        .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [this, radioGroups](AlertDialog *, int) {
-            UserDefault::getInstance()->setBoolForKey(SCORE_SHEET_TOTAL_MODE, radioGroups[0]->getSelectedButtonIndex() == 1);
-            UserDefault::getInstance()->setBoolForKey(USE_FIXED_SEAT_ORDER, radioGroups[1]->getSelectedButtonIndex() == 1);
+    if (major1 > major2) {
+        return true;
+    }
+    if (major1 == major2) {
+        if (minor1 > minor2) {
             return true;
-        }).create()->show();
+        }
+        if (minor1 == minor2) {
+            if (build1 > build2) {
+                return true;
+            }
+            if (build1 == build2) {
+                if (revision1 > revision2) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+void HelloWorld::upgradeData() {
+    std::string version = Application::getInstance()->getVersion();
+    std::string dv = UserDefault::getInstance()->getStringForKey("data_version");
+    if (dv.empty() || isVersionNewer(version.c_str(), dv.c_str())) {
+        LoadingView *loadingView = LoadingView::create();
+        loadingView->showInScene(this);
+        auto thiz = makeRef(this);
+        std::thread([thiz, loadingView, version]() {
+            const std::string path = FileUtils::getInstance()->getWritablePath();
+            UpgradeRecordInFile((path + "record.json").c_str());
+            UpgradeHistoryRecords((path + "history_record.json").c_str());
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([loadingView]() {
+                loadingView->dismiss();
+            });
+
+            UserDefault::getInstance()->setStringForKey("data_version", version);
+        }).detach();
+    }
 }

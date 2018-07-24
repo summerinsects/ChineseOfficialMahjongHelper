@@ -84,9 +84,6 @@
     <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp">
       <Filter>src\FanCalculator</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\FanTable\FanDefinitionScene.cpp">
-      <Filter>src\FanTable</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\FanTable\FanTableScene.cpp">
       <Filter>src\FanTable</Filter>
     </ClCompile>
@@ -126,10 +123,16 @@
     <ClCompile Include="..\Classes\widget\AlertDialog.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\widget\CommonWebViewScene.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\widget\PopupMenu.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp">
@@ -181,9 +184,6 @@
     </ClInclude>
     <ClInclude Include="..\Classes\CompetitionSystem\LatestCompetitionScene.h">
       <Filter>src\CompetitionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h">
-      <Filter>src\FanTable</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\FanTable\FanTableScene.h">
       <Filter>src\FanTable</Filter>
@@ -245,6 +245,9 @@
     <ClInclude Include="..\Classes\widget\AlertDialog.h">
       <Filter>src\widget</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\widget\CommonWebViewScene.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h">
       <Filter>src\widget</Filter>
     </ClInclude>
@@ -252,6 +255,9 @@
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\LoadingView.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\PopupMenu.h">
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\TilePickWidget.h">

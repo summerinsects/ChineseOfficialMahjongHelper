@@ -160,7 +160,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\CompetitionSystem\CompetitionTableScene.cpp" />
     <ClCompile Include="..\Classes\CompetitionSystem\LatestCompetitionScene.cpp" />
     <ClCompile Include="..\Classes\FanCalculator\FanCalculatorScene.cpp" />
-    <ClCompile Include="..\Classes\FanTable\FanDefinitionScene.cpp" />
     <ClCompile Include="..\Classes\FanTable\FanTableScene.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\fan_calculator.cpp" />
@@ -174,8 +173,10 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\RecordSystem\ScoreSheetScene.cpp" />
     <ClCompile Include="..\Classes\utils\common.cpp" />
     <ClCompile Include="..\Classes\widget\AlertDialog.cpp" />
+    <ClCompile Include="..\Classes\widget\CommonWebViewScene.cpp" />
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp" />
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp" />
+    <ClCompile Include="..\Classes\widget\PopupMenu.cpp" />
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp" />
     <ClCompile Include="..\Classes\widget\Toast.cpp" />
     <ClCompile Include="main.cpp" />
@@ -195,7 +196,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\CompetitionSystem\EditBoxDelegateWrapper.hpp" />
     <ClInclude Include="..\Classes\CompetitionSystem\LatestCompetitionScene.h" />
     <ClInclude Include="..\Classes\FanCalculator\FanCalculatorScene.h" />
-    <ClInclude Include="..\Classes\FanTable\FanDefinitionScene.h" />
     <ClInclude Include="..\Classes\FanTable\FanTableScene.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\fan_calculator.h" />
@@ -215,9 +215,11 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\utils\common.h" />
     <ClInclude Include="..\Classes\utils\compiler.h" />
     <ClInclude Include="..\Classes\widget\AlertDialog.h" />
+    <ClInclude Include="..\Classes\widget\CommonWebViewScene.h" />
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h" />
     <ClInclude Include="..\Classes\widget\HandTilesWidget.h" />
     <ClInclude Include="..\Classes\widget\LoadingView.h" />
+    <ClInclude Include="..\Classes\widget\PopupMenu.h" />
     <ClInclude Include="..\Classes\widget\TilePickWidget.h" />
     <ClInclude Include="..\Classes\widget\Toast.h" />
     <ClInclude Include="main.h" />
@@ -229,9 +231,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     </ProjectReference>
     <ProjectReference Include="..\cocos2d\cocos\editor-support\spine\proj.win32\libSpine.vcxproj">
       <Project>{b7c2a162-dec9-4418-972e-240ab3cbfcae}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\cocos2d\external\Box2D\proj.win32\libbox2d.vcxproj">
-      <Project>{929480e7-23c0-4df6-8456-096d71547116}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

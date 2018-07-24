@@ -4,8 +4,11 @@
 #include "../UICommon.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/LoadingView.h"
+#include "../widget/PopupMenu.h"
 
 USING_NS_CC;
+
+#define NO_NAME_TITLE __UTF8("(未命名对局)")
 
 static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
@@ -28,23 +31,31 @@ static void saveRecords(const std::vector<Record> &records) {
 
 #define BUF_SIZE 511
 
+static std::string formatTime(time_t startTime, time_t endTime) {
+    char str[BUF_SIZE + 1];
+    str[BUF_SIZE] = '\0';
+
+    struct tm ret = *localtime(&startTime);
+    int len = snprintf(str, BUF_SIZE, __UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+    if (endTime != 0) {
+        ret = *localtime(&endTime);
+        len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
+    }
+    else {
+        len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——(未结束)"));
+    }
+    return str;
+}
+
 void RecordHistoryScene::updateRecordTexts() {
     _recordTexts.clear();
     _recordTexts.reserve(g_records.size());
 
-    std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record)->std::string {
-        char str[BUF_SIZE + 1];
-        str[BUF_SIZE] = '\0';
-
-        struct tm ret = *localtime(&record.start_time);
-        int len = snprintf(str, BUF_SIZE, __UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
-        if (record.end_time != 0) {
-            ret = *localtime(&record.end_time);
-            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
-        }
-        else {
-            len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——(未结束)"));
-        }
+    std::transform(g_records.begin(), g_records.end(), std::back_inserter(_recordTexts), [](const Record &record) {
+        RecordTexts texts;
+        texts.source = &record;
+        texts.title = record.title[0] != '\0' ? record.title : NO_NAME_TITLE;
+        texts.time = formatTime(record.start_time, record.end_time);
 
         typedef std::pair<int, int> SeatScore;
         SeatScore seatscore[4];
@@ -67,12 +78,14 @@ void RecordHistoryScene::updateRecordTexts() {
         });
 
         static const char *seatText[] = { __UTF8("东"), __UTF8("南"), __UTF8("西"), __UTF8("北") };
-        snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), "\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)\n%s: %s (%+d)",
-            seatText[seatscore[0].first], record.name[seatscore[0].first], seatscore[0].second,
-            seatText[seatscore[1].first], record.name[seatscore[1].first], seatscore[1].second,
-            seatText[seatscore[2].first], record.name[seatscore[2].first], seatscore[2].second,
-            seatText[seatscore[3].first], record.name[seatscore[3].first], seatscore[3].second);
-        return str;
+        for (int i = 0; i < 4; ++i) {
+            int seat = seatscore[i].first;
+            int score = seatscore[i].second;
+            texts.players[i] = Common::format("%s: %s (%+d)",
+                seatText[seat], record.name[seat], score);
+        }
+
+        return texts;
     });
 }
 
@@ -86,37 +99,24 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    // 个人汇总按钮
-    ui::Button *button = UICommon::createButton();
+    // 更多按钮
+    ui::Button *button = cocos2d::ui::Button::create("icon/menu.png");
     this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("个人汇总"));
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener(std::bind(&RecordHistoryScene::onSummaryButton, this, std::placeholders::_1));
-
-    // 批量删除按钮
-    button = UICommon::createButton();
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("批量删除"));
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.75f, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener(std::bind(&RecordHistoryScene::onBatchDeleteButton, this, std::placeholders::_1));
+    button->setScale(20.0f / button->getContentSize().width);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
+    button->addClickEventListener(std::bind(&RecordHistoryScene::onMoreButton, this, std::placeholders::_1));
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
-    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 65.0f));
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35.0f));
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 27.5f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     this->addChild(tableView);
     _tableView = tableView;
 
@@ -159,58 +159,93 @@ ssize_t RecordHistoryScene::numberOfCellsInTableView(cw::TableView *) {
 }
 
 float RecordHistoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
-    return 70.0f;
+    return 65.0f;
 }
 
 cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-    typedef cw::TableViewCellEx<std::array<LayerColor *, 2>, Label *, ui::Button *> CustomCell;
+    typedef cw::TableViewCellEx<std::array<LayerColor *, 2>, Label *, Label *, std::array<Label *, 4>, ui::Button *> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
+
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    const float cellWidth = visibleSize.width - 5.0f;
 
     if (cell == nullptr) {
         cell = CustomCell::create();
 
-        Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = visibleSize.width - 5.0f;
-
         CustomCell::ExtDataType &ext = cell->getExtData();
         LayerColor **layerColors = std::get<0>(ext).data();
-        Label *&label = std::get<1>(ext);
-        ui::Button *&delBtn = std::get<2>(ext);
+        Label *&titleLabel = std::get<1>(ext);
+        Label *&timeLabel = std::get<2>(ext);
+        Label **playerLabels = std::get<3>(ext).data();
+        ui::Button *&delBtn = std::get<4>(ext);
 
-        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 70.0f);
+        // 背景色
+        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 65.0f);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 70.0f);
+        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 65.0f);
         cell->addChild(layerColors[1]);
 
-        label = Label::createWithSystemFont("", "Arail", 10);
+        // 标题
+        Label *label = Label::createWithSystemFont("", "Arail", 10);
         label->setColor(Color3B::BLACK);
         cell->addChild(label);
-        label->setPosition(Vec2(2.0f, 35.0f));
+        label->setPosition(Vec2(2.0f, 55.0f));
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        titleLabel = label;
+
+        // 时间
+        label = Label::createWithSystemFont("", "Arail", 10);
+        label->setColor(C3B_GRAY);
+        cell->addChild(label);
+        label->setPosition(Vec2(2.0f, 40.0f));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        timeLabel = label;
+
+        // 四名选手
+        for (int i = 0; i < 4; ++i) {
+            label = Label::createWithSystemFont("", "Arail", 10);
+            label->setColor(C3B_GRAY);
+            cell->addChild(label);
+            label->setPosition(Vec2(2.0f + (i & 1) * cellWidth * 0.5f, 23.0f - (i >> 1) * 15.0f));
+            label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+            playerLabels[i] = label;
+        }
 
         delBtn = ui::Button::create("drawable/btn_trash_bin.png");
         delBtn->setScale(Director::getInstance()->getContentScaleFactor() * 0.5f);
         delBtn->addClickEventListener(std::bind(&RecordHistoryScene::onDeleteButton, this, std::placeholders::_1));
         cell->addChild(delBtn);
-        delBtn->setPosition(Vec2(width - 20.0f, 35.0f));
+        delBtn->setPosition(Vec2(cellWidth - 15.0f, 40.0f));
 
-        cell->setContentSize(Size(width, 70.0f));
+        cell->setContentSize(Size(cellWidth, 65.0f));
         cell->setTouchEnabled(true);
         cell->addClickEventListener(std::bind(&RecordHistoryScene::onCellClicked, this, std::placeholders::_1));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
     LayerColor *const *layerColors = std::get<0>(ext).data();
-    Label *label = std::get<1>(ext);
-    ui::Button *delBtn = std::get<2>(ext);
+    Label *titleLabel = std::get<1>(ext);
+    Label *timeLabel = std::get<2>(ext);
+    Label *const *playerLabels = std::get<3>(ext).data();
+    ui::Button *delBtn = std::get<4>(ext);
 
     layerColors[0]->setVisible((idx & 1) == 0);
     layerColors[1]->setVisible((idx & 1) != 0);
 
     delBtn->setUserData(reinterpret_cast<void *>(idx));
 
-    label->setString(_recordTexts[idx]);
+    const RecordTexts &texts = _recordTexts[idx];
+    titleLabel->setString(texts.title);
+    cw::scaleLabelToFitWidth(titleLabel, cellWidth - 4.0f);
+
+    timeLabel->setString(texts.time);
+    cw::scaleLabelToFitWidth(timeLabel, cellWidth - 30.0f);
+
+    for (int i = 0; i < 4; ++i) {
+        playerLabels[i]->setString(texts.players[i]);
+        cw::scaleLabelToFitWidth(playerLabels[i], cellWidth * 0.5f - 4.0f);
+    }
 
     return cell;
 }
@@ -219,9 +254,19 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
 
+    std::string msg = __UTF8("你将删除记录：\n\n");
+    msg += _recordTexts[idx].title;
+    msg += '\n';
+    msg += _recordTexts[idx].time;
+    for (int i = 0; i < 4; ++i) {
+        msg += '\n';
+        msg += _recordTexts[idx].players[i];
+    }
+    msg += __UTF8("\n\n删除后无法找回，确认删除？");
+
     AlertDialog::Builder(this)
-        .setTitle(__UTF8("删除记录"))
-        .setMessage(__UTF8("删除后无法找回，确认删除？"))
+        .setTitle(__UTF8("警告"))
+        .setMessage(std::move(msg))
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("确定"), [this, idx](AlertDialog *, int) {
         LoadingView *loadingView = LoadingView::create();
@@ -245,6 +290,20 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         }).detach();
         return true;
     }).create()->show();
+}
+
+void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
+    Vec2 pos = ((ui::Button *)sender)->getPosition();
+    pos.y -= 15.0f;
+    PopupMenu *menu = PopupMenu::create(this, { __UTF8("个人汇总"), __UTF8("批量删除") }, pos, Vec2::ANCHOR_TOP_RIGHT);
+    menu->setMenuItemCallback([this](PopupMenu *, size_t idx) {
+        switch (idx) {
+        case 0: this->onSummaryButton(); break;
+        case 1: this->onBatchDeleteButton(); break;
+        default: break;
+        }
+    });
+    menu->show();
 }
 
 namespace {
@@ -393,7 +452,7 @@ namespace {
 
     class SummaryTableNode : public Node, cw::TableViewDelegate {
     private:
-        std::vector<std::string> _titles;
+        std::vector<std::string> _timeTexts;
         std::vector<int8_t> _currentFlags;
 
     public:
@@ -417,21 +476,9 @@ namespace {
 
         _currentFlags.assign(g_records.size(), -1);
 
-        _titles.reserve(g_records.size());
-        std::transform(g_records.begin(), g_records.end(), std::back_inserter(_titles), [](const Record &record)->std::string {
-            char str[BUF_SIZE + 1];
-            str[BUF_SIZE] = '\0';
-
-            struct tm ret = *localtime(&record.start_time);
-            int len = snprintf(str, BUF_SIZE, __UTF8("%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
-            if (record.end_time != 0) {
-                ret = *localtime(&record.end_time);
-                len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——%d年%d月%d日%.2d:%.2d"), ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min);
-            }
-            else {
-                len += snprintf(str + len, static_cast<size_t>(BUF_SIZE - len), __UTF8("——(未结束)"));
-            }
-            return str;
+        _timeTexts.reserve(g_records.size());
+        std::transform(g_records.begin(), g_records.end(), std::back_inserter(_timeTexts), [](const Record &record) {
+            return formatTime(record.start_time, record.end_time);
         });
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -471,11 +518,11 @@ namespace {
     }
 
     float SummaryTableNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
-        return 40.0f;
+        return 50.0f;
     }
 
     cw::TableViewCell *SummaryTableNode::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-        typedef cw::TableViewCellEx<Label *, ui::RadioButtonGroup *, std::array<ui::RadioButton *, 4>, std::array<Label *, 4>, std::array<LayerColor *, 2> > CustomCell;
+        typedef cw::TableViewCellEx<Label *, Label *, ui::RadioButtonGroup *, std::array<ui::RadioButton *, 4>, std::array<Label *, 4>, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
         const float cellWidth = AlertDialog::maxWidth();
@@ -485,16 +532,17 @@ namespace {
 
             CustomCell::ExtDataType &ext = cell->getExtData();
             Label *&titleLabel = std::get<0>(ext);
-            ui::RadioButtonGroup *&radioGroup = std::get<1>(ext);
-            ui::RadioButton **radioButtons = std::get<2>(ext).data();
-            Label **labels = std::get<3>(ext).data();
-            LayerColor **layerColors = std::get<4>(ext).data();
+            Label *&timeLabel = std::get<1>(ext);
+            ui::RadioButtonGroup *&radioGroup = std::get<2>(ext);
+            ui::RadioButton **radioButtons = std::get<3>(ext).data();
+            Label **labels = std::get<4>(ext).data();
+            LayerColor **layerColors = std::get<5>(ext).data();
 
             // 背景色
-            layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 40.0f);
+            layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 50.0f);
             cell->addChild(layerColors[0]);
 
-            layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 40.0f);
+            layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 50.0f);
             cell->addChild(layerColors[1]);
 
             // 标题
@@ -502,8 +550,16 @@ namespace {
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-            label->setPosition(Vec2(2.0f, 30.0f));
+            label->setPosition(Vec2(2.0f, 43.0f));
             titleLabel = label;
+
+            // 时间
+            label = Label::createWithSystemFont("", "Arail", 10);
+            label->setColor(C3B_GRAY);
+            cell->addChild(label);
+            label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+            label->setPosition(Vec2(2.0f, 28.0f));
+            timeLabel = label;
 
             // 4个RadioButton和人名文本
             radioGroup = ui::RadioButtonGroup::create();
@@ -521,7 +577,7 @@ namespace {
                 radioGroup->addRadioButton(radioButton);
 
                 label = Label::createWithSystemFont("", "Arail", 10);
-                label->setColor(Color3B::BLACK);
+                label->setColor(C3B_GRAY);
                 cell->addChild(label);
                 label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
                 label->setPosition(Vec2(cellWidth * 0.25f * i + 20.0f, 10.0f));
@@ -536,7 +592,7 @@ namespace {
             button->setContentSize(Size(30.0f, 15.0f));
             button->setTitleFontSize(10);
             button->setTitleText(__UTF8("清除"));
-            button->setPosition(Vec2(cellWidth - 17.0f, 30.0f));
+            button->setPosition(Vec2(cellWidth - 17.0f, 40.0f));
             button->addClickEventListener([this, radioGroup](Ref *) {
                 // 如果有选中，则清空
                 int selectedButton = radioGroup->getSelectedButtonIndex();
@@ -550,10 +606,11 @@ namespace {
 
         const CustomCell::ExtDataType &ext = cell->getExtData();
         Label *titleLabel = std::get<0>(ext);
-        ui::RadioButtonGroup *radioGroup = std::get<1>(ext);
-        ui::RadioButton *const *radioButtons = std::get<2>(ext).data();
-        Label *const *labels = std::get<3>(ext).data();
-        LayerColor *const *layerColors = std::get<4>(ext).data();
+        Label *timeLabel = std::get<1>(ext);
+        ui::RadioButtonGroup *radioGroup = std::get<2>(ext);
+        ui::RadioButton *const *radioButtons = std::get<3>(ext).data();
+        Label *const *labels = std::get<4>(ext).data();
+        LayerColor *const *layerColors = std::get<5>(ext).data();
 
         layerColors[0]->setVisible((idx & 1) == 0);
         layerColors[1]->setVisible((idx & 1) != 0);
@@ -562,8 +619,12 @@ namespace {
         bool finished = record.end_time != 0;
 
         // 标题
-        titleLabel->setString(_titles[idx]);
+        titleLabel->setString(record.title[0] != '\0' ? record.title : NO_NAME_TITLE);
         cw::scaleLabelToFitWidth(titleLabel, cellWidth - 35.0f - 2.0f);
+
+        // 时间
+        timeLabel->setString(_timeTexts[idx]);
+        cw::scaleLabelToFitWidth(timeLabel, cellWidth - 35.0f - 2.0f);
 
         // 人名文本
         for (int i = 0; i < 4; ++i) {
@@ -590,7 +651,7 @@ namespace {
     }
 }
 
-void RecordHistoryScene::onSummaryButton(cocos2d::Ref *) {
+void RecordHistoryScene::onSummaryButton() {
     SummaryTableNode *rootNode = SummaryTableNode::create();
     AlertDialog::Builder(this)
         .setTitle(__UTF8("选择要汇总的对局"))
@@ -617,30 +678,29 @@ namespace {
 
     class BatchDeleteTableNode : public Node, cw::TableViewDelegate {
     private:
-        std::vector<std::string> _texts;
+        const std::vector<RecordTexts> *_texts;
         std::vector<bool> _currentFlags;
 
     public:
         const std::vector<bool> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_1(BatchDeleteTableNode, initWithText, const std::vector<std::string> &, texts);
+        CREATE_FUNC_WITH_PARAM_1(BatchDeleteTableNode, initWithText, const std::vector<RecordTexts> *, texts);
 
-        bool initWithText(const std::vector<std::string> &texts);
+        bool initWithText(const std::vector<RecordTexts> *texts);
 
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
         virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
         virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
     };
 
-    bool BatchDeleteTableNode::initWithText(const std::vector<std::string> &texts) {
+    bool BatchDeleteTableNode::initWithText(const std::vector<RecordTexts> *texts) {
         if (UNLIKELY(!Node::init())) {
             return false;
         }
 
         _currentFlags.assign(g_records.size(), 0);
 
-        _texts.reserve(texts.size());
-        std::copy(texts.begin(), texts.end(), std::back_inserter(_texts));
+        _texts = texts;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
         const float width = AlertDialog::maxWidth();
@@ -667,15 +727,15 @@ namespace {
     }
 
     ssize_t BatchDeleteTableNode::numberOfCellsInTableView(cw::TableView *) {
-        return g_records.size();
+        return _texts->size();
     }
 
     float BatchDeleteTableNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
-        return 70.0f;
+        return 65.0f;
     }
 
     cw::TableViewCell *BatchDeleteTableNode::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
-        typedef cw::TableViewCellEx<Label *, ui::CheckBox *, std::array<LayerColor *, 2> > CustomCell;
+        typedef cw::TableViewCellEx<Label *, Label *, std::array<Label *, 4>, ui::CheckBox *, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
         const float cellWidth = AlertDialog::maxWidth();
@@ -684,29 +744,51 @@ namespace {
             cell = CustomCell::create();
 
             CustomCell::ExtDataType &ext = cell->getExtData();
-            Label *&label = std::get<0>(ext);
-            ui::CheckBox *&checkBox = std::get<1>(ext);
-            LayerColor **layerColors = std::get<2>(ext).data();
+            Label *&titleLabel = std::get<0>(ext);
+            Label *&timeLabel = std::get<1>(ext);
+            Label **playerLabels = std::get<2>(ext).data();
+            ui::CheckBox *&checkBox = std::get<3>(ext);
+            LayerColor **layerColors = std::get<4>(ext).data();
 
             // 背景色
-            layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 70.0f);
+            layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 65.0f);
             cell->addChild(layerColors[0]);
 
-            layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 70.0f);
+            layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 65.0f);
             cell->addChild(layerColors[1]);
 
-            label = Label::createWithSystemFont("", "Arail", 10);
+            // 标题
+            Label *label = Label::createWithSystemFont("", "Arail", 10);
             label->setColor(Color3B::BLACK);
             cell->addChild(label);
+            label->setPosition(Vec2(2.0f, 55.0f));
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-            label->setPosition(Vec2(2.0f, 35.0f));
+            titleLabel = label;
+
+            // 时间
+            label = Label::createWithSystemFont("", "Arail", 10);
+            label->setColor(C3B_GRAY);
+            cell->addChild(label);
+            label->setPosition(Vec2(2.0f, 40.0f));
+            label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+            timeLabel = label;
+
+            // 四名选手
+            for (int i = 0; i < 4; ++i) {
+                label = Label::createWithSystemFont("", "Arail", 10);
+                label->setColor(C3B_GRAY);
+                cell->addChild(label);
+                label->setPosition(Vec2(2.0f + (i & 1) * cellWidth * 0.5f, 23.0f - (i >> 1) * 15.0f));
+                label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+                playerLabels[i] = label;
+            }
 
             checkBox = UICommon::createCheckBox();
             cell->addChild(checkBox);
             checkBox->setZoomScale(0.0f);
             checkBox->ignoreContentAdaptWithSize(false);
             checkBox->setContentSize(Size(15.0f, 15.0f));
-            checkBox->setPosition(Vec2(cellWidth - 20.0f, 30.0f));
+            checkBox->setPosition(Vec2(cellWidth - 15.0f, 40.0f));
             checkBox->addEventListener([this](Ref *sender, ui::CheckBox::EventType) {
                 ui::CheckBox *checkBox = (ui::CheckBox *)sender;
                 ssize_t idx = reinterpret_cast<ssize_t>(checkBox->getUserData());
@@ -715,18 +797,29 @@ namespace {
         }
 
         const CustomCell::ExtDataType &ext = cell->getExtData();
-        Label *label = std::get<0>(ext);
-        ui::CheckBox *checkBox = std::get<1>(ext);
-        LayerColor *const *layerColors = std::get<2>(ext).data();
+        Label *titleLabel = std::get<0>(ext);
+        Label *timeLabel = std::get<1>(ext);
+        Label *const *playerLabels = std::get<2>(ext).data();
+        ui::CheckBox *checkBox = std::get<3>(ext);
+        LayerColor *const *layerColors = std::get<4>(ext).data();
 
         layerColors[0]->setVisible((idx & 1) == 0);
         layerColors[1]->setVisible((idx & 1) != 0);
 
-        const Record &record = g_records[idx];
-        bool finished = record.end_time != 0;
+        const RecordTexts &texts = _texts->at(idx);
+        titleLabel->setString(texts.title);
+        cw::scaleLabelToFitWidth(titleLabel, cellWidth - 4.0f);
 
-        label->setString(_texts[idx]);
-        cw::scaleLabelToFitWidth(label, cellWidth - 4.0f);
+        timeLabel->setString(texts.time);
+        cw::scaleLabelToFitWidth(timeLabel, cellWidth - 30.0f);
+
+        for (int i = 0; i < 4; ++i) {
+            playerLabels[i]->setString(texts.players[i]);
+            cw::scaleLabelToFitWidth(playerLabels[i], cellWidth * 0.5f - 4.0f);
+        }
+
+        const Record &record = *texts.source;
+        bool finished = record.end_time != 0;
 
         // 设置选中
         checkBox->setUserData(reinterpret_cast<void *>(idx));
@@ -737,8 +830,8 @@ namespace {
     }
 }
 
-void RecordHistoryScene::onBatchDeleteButton(cocos2d::Ref *) {
-    BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(_recordTexts);
+void RecordHistoryScene::onBatchDeleteButton() {
+    BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(&_recordTexts);
     AlertDialog::Builder(this)
         .setTitle(__UTF8("选择要删除的对局"))
         .setContentNode(rootNode)

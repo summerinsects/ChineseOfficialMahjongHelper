@@ -21,7 +21,9 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
         rapidjson::Value::ConstArray name = it->value.GetArray();
         if (name.Size() == 4) {
             for (int i = 0; i < 4; ++i) {
-                strncpy(record.name[i], name[i].GetString(), NAME_SIZE - 1);
+                if (name[i].IsString()) {
+                    strncpy(record.name[i], name[i].GetString(), NAME_SIZE - 1);
+                }
             }
         }
     }
@@ -35,14 +37,6 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
             Record::Detail &detail_data = record.detail[i];
             const rapidjson::Value &detail_json = detail[static_cast<rapidjson::SizeType>(i)];
 
-            // 兼容旧的key until 2017.12.29 7eed14a
-            it = detail_json.FindMember("win_claim");
-            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                uint32_t wc = it->value.GetUint();
-                detail_data.win_flag = static_cast<uint8_t>((wc >> 4) & 0xF);
-                detail_data.claim_flag = static_cast<uint8_t>(wc & 0xF);
-            }
-
             it = detail_json.FindMember("win_flag");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
                 detail_data.win_flag = static_cast<uint8_t>(it->value.GetUint());
@@ -53,81 +47,14 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 detail_data.claim_flag = static_cast<uint8_t>(it->value.GetUint());
             }
 
-            // 兼容旧的key until 2017.12.17 a3dffdc
-            it = detail_json.FindMember("false_win");
-            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                uint32_t false_win = it->value.GetUint();
-                for (int k = 0; k < 4; ++k) {
-                    if (false_win & (1 << k)) {
-                        detail_data.penalty_scores[k] -= 30;
-                        for (int j = 0; j < 4; ++j) {
-                            if (j == k) continue;
-                            detail_data.penalty_scores[j] += 10;
-                        }
-                    }
-                }
-            }
-
-            // 兼容旧的key until 2017.12.30 31cd281
-            it = detail_json.FindMember("packed_fan");
-            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                uint32_t packed_fan = it->value.GetUint();
-                uint16_t unique_fan = 0;
-                uint64_t multiple_fan = 0;
-                switch (packed_fan) {
-                case 1:  // 门断平
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_SIMPLES);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS);
-                    break;
-                case 2:  // 门清平和
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS);
-                    break;
-                case 3:  // 断幺平和
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_SIMPLES);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS);
-                    break;
-                case 4:  // 连风刻
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_PREVALENT_WIND);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_SEAT_WIND);
-                    break;
-                case 5:  // 番牌暗杠
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_KONG);
-                    break;
-                case 6:  // 双同幺九
-                    SET_MULTIPLE_FAN(multiple_fan, MULTIPLE_FAN_DOUBLE_PUNG, 1);
-                    SET_MULTIPLE_FAN(multiple_fan, MULTIPLE_FAN_PUNG_OF_TERMINALS_OR_HONORS, 2);
-                    break;
-                case 7:  // 门清双暗
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_TWO_CONCEALED_PUNGS);
-                    break;
-                case 8:  // 双暗暗杠
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_KONG);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_TWO_CONCEALED_PUNGS);
-                    break;
-                default:
-                    break;
-                }
-                detail_data.unique_fan = unique_fan;
-                detail_data.multiple_fan = multiple_fan;
-            }
-
             it = detail_json.FindMember("fan");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
                 detail_data.fan = static_cast<uint16_t>(it->value.GetUint());
             }
 
-            // 兼容旧的key until 2017.12.17 b2e18bc
-            it = detail_json.FindMember("score");
-            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.fan = static_cast<uint16_t>(it->value.GetUint());
-            }
-
-            it = detail_json.FindMember("fan_flag");
+            it = detail_json.FindMember("fan_bits");
             if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
-                detail_data.fan_flag = it->value.GetUint64();
+                detail_data.fan_bits = it->value.GetUint64();
             }
 
             it = detail_json.FindMember("unique_fan");
@@ -182,6 +109,11 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
     if (it != json.MemberEnd() && it->value.IsUint64()) {
         record.end_time = static_cast<time_t>(it->value.GetUint64());
     }
+
+    it = json.FindMember("title");
+    if (it != json.MemberEnd() && it->value.IsString()) {
+        strncpy(record.title, it->value.GetString(), sizeof(record.title) - 1);
+    }
 }
 
 void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
@@ -200,7 +132,7 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
         detail_json.AddMember("win_flag", rapidjson::Value(detail_data.win_flag), alloc);
         detail_json.AddMember("claim_flag", rapidjson::Value(detail_data.claim_flag), alloc);
         detail_json.AddMember("fan", rapidjson::Value(detail_data.fan), alloc);
-        detail_json.AddMember("fan_flag", rapidjson::Value(detail_data.fan_flag), alloc);
+        detail_json.AddMember("fan_bits", rapidjson::Value(detail_data.fan_bits), alloc);
         detail_json.AddMember("unique_fan", rapidjson::Value(detail_data.unique_fan), alloc);
         detail_json.AddMember("multiple_fan", rapidjson::Value(detail_data.multiple_fan), alloc);
 
@@ -225,6 +157,112 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
 
     json.AddMember("start_time", rapidjson::Value(static_cast<uint64_t>(record.start_time)), alloc);
     json.AddMember("end_time", rapidjson::Value(static_cast<uint64_t>(record.end_time)), alloc);
+    json.AddMember("title", rapidjson::StringRef(record.title), alloc);
+}
+
+void UpgradeJson(rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc) {
+    rapidjson::Value::MemberIterator it = json.FindMember("detail");
+    if (it != json.MemberEnd() && it->value.IsArray()) {
+        rapidjson::Value::Array detail = it->value.GetArray();
+        size_t count = detail.Size();
+
+        for (size_t i = 0; i < count; ++i) {
+            rapidjson::Value &detail_json = detail[static_cast<rapidjson::SizeType>(i)];
+
+            // 兼容旧的key until 2017.12.29 7eed14a
+            it = detail_json.FindMember("win_claim");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                uint32_t wc = it->value.GetUint();
+                detail_json.EraseMember(it);
+                detail_json.AddMember("win_flag", rapidjson::Value(static_cast<uint8_t>((wc >> 4) & 0xF)), alloc);
+                detail_json.AddMember("claim_flag", rapidjson::Value(static_cast<uint8_t>(wc & 0xF)), alloc);
+            }
+
+            // 兼容旧的key until 2017.12.17 a3dffdc
+            it = detail_json.FindMember("false_win");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                uint32_t false_win = it->value.GetUint();
+                int ps[4] = { 0, 0, 0, 0 };
+                for (int k = 0; k < 4; ++k) {
+                    if (false_win & (1 << k)) {
+                        ps[k] -= 30;
+                        for (int j = 0; j < 4; ++j) {
+                            if (j == k) continue;
+                            ps[j] += 10;
+                        }
+                    }
+                }
+
+                detail_json.EraseMember(it);
+                rapidjson::Value penalty_scores(rapidjson::Type::kArrayType);
+                penalty_scores.Reserve(4, alloc);
+                for (int n = 0; n < 4; ++n) {
+                    penalty_scores.PushBack(rapidjson::Value(ps[n]), alloc);
+                }
+                detail_json.AddMember("penalty_scores", std::move(penalty_scores), alloc);
+            }
+
+            // 兼容旧的key until 2017.12.30 31cd281
+            it = detail_json.FindMember("packed_fan");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                uint32_t packed_fan = it->value.GetUint();
+                uint16_t unique_fan = 0;
+                uint64_t multiple_fan = 0;
+                switch (packed_fan) {
+                case 1:  // 门断平
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND);
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_SIMPLES);
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS);
+                    break;
+                case 2:  // 门清平和
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND);
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS);
+                    break;
+                case 3:  // 断幺平和
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_SIMPLES);
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS);
+                    break;
+                case 4:  // 连风刻
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_PREVALENT_WIND);
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_SEAT_WIND);
+                    break;
+                case 5:  // 番牌暗杠
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_KONG);
+                    break;
+                case 6:  // 双同幺九
+                    SET_MULTIPLE_FAN(multiple_fan, MULTIPLE_FAN_DOUBLE_PUNG, 1);
+                    SET_MULTIPLE_FAN(multiple_fan, MULTIPLE_FAN_PUNG_OF_TERMINALS_OR_HONORS, 2);
+                    break;
+                case 7:  // 门清双暗
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND);
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_TWO_CONCEALED_PUNGS);
+                    break;
+                case 8:  // 双暗暗杠
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_KONG);
+                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_TWO_CONCEALED_PUNGS);
+                    break;
+                default:
+                    break;
+                }
+
+                detail_json.EraseMember(it);
+                detail_json.AddMember("unique_fan", rapidjson::Value(unique_fan), alloc);
+                detail_json.AddMember("multiple_fan", rapidjson::Value(multiple_fan), alloc);
+            }
+
+            // 兼容旧的key until 2017.12.17 b2e18bc
+            it = detail_json.FindMember("score");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                it->name = "fan";
+            }
+
+            // 兼容旧的key until 2018.07.06 4dc5ffb
+            it = detail_json.FindMember("fan_flag");
+            if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
+                it->name = "fan_bits";
+            }
+        }
+    }
 }
 
 void SortRecords(std::vector<Record> &records) {
@@ -261,28 +299,64 @@ void ReadRecordFromFile(const char *file, Record &record) {
 }
 
 void WriteRecordToFile(const char *file, const Record &record) {
-    try {
-        rapidjson::Document doc(rapidjson::Type::kObjectType);
-        RecordToJson(record, doc, doc.GetAllocator());
+    FILE *fp = fopen(file, "wb");
+    if (LIKELY(fp != nullptr)) {
+        try {
+            rapidjson::Document doc(rapidjson::Type::kObjectType);
+            RecordToJson(record, doc, doc.GetAllocator());
 
-        rapidjson::StringBuffer buf;
+            rapidjson::StringBuffer buf;
 #ifdef COCOS2D_DEBUG
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
 #else
-        rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
 #endif
-        doc.Accept(writer);
+            doc.Accept(writer);
 
-        MYLOG("%.*s", static_cast<int>(buf.GetSize()), buf.GetString());
-
-        FILE *fp = fopen(file, "wb");
-        if (LIKELY(fp != nullptr)) {
             fwrite(buf.GetString(), 1, buf.GetSize(), fp);
-            fclose(fp);
         }
+        catch (std::exception &e) {
+            MYLOG("%s %s", __FUNCTION__, e.what());
+        }
+        fclose(fp);
     }
-    catch (std::exception &e) {
-        MYLOG("%s %s", __FUNCTION__, e.what());
+}
+
+void UpgradeRecordInFile(const char *file) {
+    FILE *fp = fopen(file, "rb+");
+    if (LIKELY(fp != nullptr)) {
+        try {
+            std::vector<char> str;
+            fseek(fp, 0, SEEK_END);
+            long size = ftell(fp);
+            fseek(fp, 0, SEEK_SET);
+            str.resize(size + 1);
+            fread(&str[0], sizeof(char), size, fp);
+
+            rapidjson::Document doc;
+            doc.Parse<0>(str.data());
+            if (doc.HasParseError()) {
+                return;
+            }
+
+            UpgradeJson(doc, doc.GetAllocator());
+
+            rapidjson::StringBuffer buf;
+#ifdef COCOS2D_DEBUG
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+#else
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+#endif
+            doc.Accept(writer);
+
+            fseek(fp, 0, SEEK_SET);
+            fwrite(buf.GetString(), 1, buf.GetSize(), fp);
+            fflush(fp);
+        }
+        catch (std::exception &e) {
+            MYLOG("%s %s", __FUNCTION__, e.what());
+        }
+        fclose(fp);
     }
 }
 
@@ -332,6 +406,46 @@ void SaveHistoryRecords(const char *file, const std::vector<Record> &records) {
             doc.Accept(writer);
 
             fwrite(buf.GetString(), 1, buf.GetSize(), fp);
+        }
+        catch (std::exception &e) {
+            MYLOG("%s %s", __FUNCTION__, e.what());
+        }
+        fclose(fp);
+    }
+}
+
+void UpgradeHistoryRecords(const char *file) {
+    FILE *fp = fopen(file, "rb+");
+    if (LIKELY(fp != nullptr)) {
+        try {
+            std::vector<char> str;
+            fseek(fp, 0, SEEK_END);
+            long size = ftell(fp);
+            fseek(fp, 0, SEEK_SET);
+            str.resize(size + 1);
+            fread(&str[0], sizeof(char), size, fp);
+
+            rapidjson::Document doc;
+            doc.Parse<0>(str.data());
+            if (doc.HasParseError() || !doc.IsArray()) {
+                return;
+            }
+
+            std::for_each(doc.Begin(), doc.End(), [&doc](rapidjson::Value &json) {
+                UpgradeJson(json, doc.GetAllocator());
+            });
+
+            rapidjson::StringBuffer buf;
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+#else
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+#endif
+            doc.Accept(writer);
+
+            fseek(fp, 0, SEEK_SET);
+            fwrite(buf.GetString(), 1, buf.GetSize(), fp);
+            fflush(fp);
         }
         catch (std::exception &e) {
             MYLOG("%s %s", __FUNCTION__, e.what());

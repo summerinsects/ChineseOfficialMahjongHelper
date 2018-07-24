@@ -10,6 +10,8 @@ public:
 
     CREATE_FUNC(FanTableScene);
 
+    static void asyncShowFanDefinition(size_t idx);
+
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
     virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;

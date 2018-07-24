@@ -6,6 +6,13 @@
 
 struct Record;
 
+struct RecordTexts {
+    const Record *source;
+    const char *title;
+    std::string time;
+    std::string players[4];
+};
+
 class RecordHistoryScene : public BaseScene, cw::TableViewDelegate {
 public:
     typedef std::function<void (Record *)> ViewCallback;
@@ -16,7 +23,7 @@ public:
     static void modifyRecord(const Record *record);
 
 private:
-    std::vector<std::string> _recordTexts;
+    std::vector<RecordTexts> _recordTexts;
 
     void updateRecordTexts();
 
@@ -24,8 +31,9 @@ private:
     virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
-    void onSummaryButton(cocos2d::Ref *sender);
-    void onBatchDeleteButton(cocos2d::Ref *sender);
+    void onMoreButton(cocos2d::Ref *sender);
+    void onSummaryButton();
+    void onBatchDeleteButton();
 
     void onDeleteButton(cocos2d::Ref *sender);
     void onCellClicked(cocos2d::Ref *sender);

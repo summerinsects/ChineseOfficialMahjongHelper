@@ -33,12 +33,18 @@
 		1F154E421E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
 		1F2D25871E076FC20071ADE2 /* AlertDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */; };
 		1F2D25881E076FC20071ADE2 /* AlertDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */; };
+		1F4EB9B02106B21F00C8D1CA /* PopupMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4EB9AF2106B21E00C8D1CA /* PopupMenu.cpp */; };
+		1F4EB9B12106B21F00C8D1CA /* PopupMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4EB9AF2106B21E00C8D1CA /* PopupMenu.cpp */; };
+		1F4EB9BA2106BBEF00C8D1CA /* icon in Resources */ = {isa = PBXBuildFile; fileRef = 1F4EB9B82106BBEF00C8D1CA /* icon */; };
+		1F4EB9BB2106BBEF00C8D1CA /* icon in Resources */ = {isa = PBXBuildFile; fileRef = 1F4EB9B82106BBEF00C8D1CA /* icon */; };
 		1F68AFC91F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */; };
 		1F68AFCA1F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */; };
 		1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1FA6933A1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
 		1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
+		1FB8479B21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */; };
+		1FB8479C21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */; };
 		1FC616271FFB39C3005FC2F7 /* Toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC616251FFB39C3005FC2F7 /* Toast.cpp */; };
 		1FC616281FFB39C3005FC2F7 /* Toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC616251FFB39C3005FC2F7 /* Toast.cpp */; };
 		1FCC3C021CC47200001C9555 /* RecordHistoryScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */; };
@@ -71,8 +77,6 @@
 		1FE17A7A1EE0FF9300B47FE3 /* CompetitionRoundScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A711EE0FF9300B47FE3 /* CompetitionRoundScene.cpp */; };
 		1FE17A7B1EE0FF9300B47FE3 /* CompetitionTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */; };
 		1FE17A7C1EE0FF9300B47FE3 /* CompetitionTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */; };
-		1FE2A3EB1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */; };
-		1FE2A3EC1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */; };
 		1FE2A3ED1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */; };
 		1FE2A3EE1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */; };
 		1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */; };
@@ -187,6 +191,9 @@
 		1F2487531FF7662D00FE12F2 /* LittleFan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LittleFan.h; sourceTree = "<group>"; };
 		1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertDialog.cpp; sourceTree = "<group>"; };
 		1F2D25861E076FC20071ADE2 /* AlertDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialog.h; sourceTree = "<group>"; };
+		1F4EB9AD2106B21E00C8D1CA /* PopupMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopupMenu.h; sourceTree = "<group>"; };
+		1F4EB9AF2106B21E00C8D1CA /* PopupMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PopupMenu.cpp; sourceTree = "<group>"; };
+		1F4EB9B82106BBEF00C8D1CA /* icon */ = {isa = PBXFileReference; lastKnownFileType = folder; path = icon; sourceTree = "<group>"; };
 		1F68AFC51F03366800B4BB97 /* CompetitionEnrollScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompetitionEnrollScene.cpp; sourceTree = "<group>"; };
 		1F68AFC61F03366800B4BB97 /* CompetitionEnrollScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompetitionEnrollScene.h; sourceTree = "<group>"; };
 		1F6A373D1CBDD3C9001617E6 /* BaseScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseScene.h; sourceTree = "<group>"; };
@@ -195,6 +202,8 @@
 		1F7DF3582001E4EE002C1D22 /* UICommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UICommon.h; sourceTree = "<group>"; };
 		1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtraInfoWidget.cpp; sourceTree = "<group>"; };
 		1FA693391E83552300E839CC /* ExtraInfoWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtraInfoWidget.h; sourceTree = "<group>"; };
+		1FB8479921055D4A00261A9A /* CommonWebViewScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonWebViewScene.h; sourceTree = "<group>"; };
+		1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommonWebViewScene.cpp; sourceTree = "<group>"; };
 		1FC616251FFB39C3005FC2F7 /* Toast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Toast.cpp; sourceTree = "<group>"; };
 		1FC616261FFB39C3005FC2F7 /* Toast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Toast.h; sourceTree = "<group>"; };
 		1FCC3BFF1CC47200001C9555 /* RecordHistoryScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecordHistoryScene.cpp; sourceTree = "<group>"; };
@@ -229,8 +238,6 @@
 		1FE17A721EE0FF9300B47FE3 /* CompetitionRoundScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompetitionRoundScene.h; sourceTree = "<group>"; };
 		1FE17A731EE0FF9300B47FE3 /* CompetitionTableScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompetitionTableScene.cpp; sourceTree = "<group>"; };
 		1FE17A741EE0FF9300B47FE3 /* CompetitionTableScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompetitionTableScene.h; sourceTree = "<group>"; };
-		1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanDefinitionScene.cpp; sourceTree = "<group>"; };
-		1FE2A3E81CBB30D1008C45C5 /* FanDefinitionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanDefinitionScene.h; sourceTree = "<group>"; };
 		1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FanTableScene.cpp; sourceTree = "<group>"; };
 		1FE2A3EA1CBB30D1008C45C5 /* FanTableScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FanTableScene.h; sourceTree = "<group>"; };
 		1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TilePickWidget.cpp; sourceTree = "<group>"; };
@@ -436,8 +443,6 @@
 		1FE2A3E61CBB30D1008C45C5 /* FanTable */ = {
 			isa = PBXGroup;
 			children = (
-				1FE2A3E71CBB30D1008C45C5 /* FanDefinitionScene.cpp */,
-				1FE2A3E81CBB30D1008C45C5 /* FanDefinitionScene.h */,
 				1FE2A3E91CBB30D1008C45C5 /* FanTableScene.cpp */,
 				1FE2A3EA1CBB30D1008C45C5 /* FanTableScene.h */,
 			);
@@ -449,11 +454,15 @@
 			children = (
 				1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */,
 				1F2D25861E076FC20071ADE2 /* AlertDialog.h */,
+				1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */,
+				1FB8479921055D4A00261A9A /* CommonWebViewScene.h */,
 				1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */,
 				1FA693391E83552300E839CC /* ExtraInfoWidget.h */,
 				1FD228F01E39837E00DF5C1D /* HandTilesWidget.cpp */,
 				1FD228F11E39837E00DF5C1D /* HandTilesWidget.h */,
 				1F16A6311F5F8CFB00974F88 /* LoadingView.h */,
+				1F4EB9AF2106B21E00C8D1CA /* PopupMenu.cpp */,
+				1F4EB9AD2106B21E00C8D1CA /* PopupMenu.h */,
 				1FE5CFDB1CAE029200A5C38B /* TilePickWidget.cpp */,
 				1FE5CFDC1CAE029200A5C38B /* TilePickWidget.h */,
 				1FC616251FFB39C3005FC2F7 /* Toast.cpp */,
@@ -532,6 +541,7 @@
 			children = (
 				1F0828A71ED2756500F4C424 /* drawable */,
 				521A8EA819F11F5000D177D7 /* fonts */,
+				1F4EB9B82106BBEF00C8D1CA /* icon */,
 				1FDD950D1C8338700031BC38 /* source_material */,
 				1F0828AA1ED276D200F4C424 /* text */,
 				1FE5D0471CAE046300A5C38B /* tiles */,
@@ -689,6 +699,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				46880B8119C43A67006E1F66 /* xyg.png in Resources */,
+				1F4EB9BA2106BBEF00C8D1CA /* icon in Resources */,
 				1F0828A81ED2756500F4C424 /* drawable in Resources */,
 				1F0828AB1ED276D200F4C424 /* text in Resources */,
 				1FE5D0481CAE046300A5C38B /* tiles in Resources */,
@@ -709,6 +720,7 @@
 				521A8EAA19F11F5000D177D7 /* fonts in Resources */,
 				1FE5D0491CAE046300A5C38B /* tiles in Resources */,
 				1F0828A91ED2756500F4C424 /* drawable in Resources */,
+				1F4EB9BB2106BBEF00C8D1CA /* icon in Resources */,
 				1FDD950F1C8338700031BC38 /* source_material in Resources */,
 				1F0828AC1ED276D200F4C424 /* text in Resources */,
 			);
@@ -734,6 +746,8 @@
 				1FE1019A1F74964E001C3FA8 /* common.cpp in Sources */,
 				1F154E411E440A160083F8B3 /* stringify.cpp in Sources */,
 				1F154E3C1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
+				1FB8479B21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */,
+				1F4EB9B02106B21F00C8D1CA /* PopupMenu.cpp in Sources */,
 				1F2D25871E076FC20071ADE2 /* AlertDialog.cpp in Sources */,
 				1FE17A771EE0FF9300B47FE3 /* CompetitionRankCustomScene.cpp in Sources */,
 				1AF87B781F6F77F7007BE51C /* AppController.mm in Sources */,
@@ -752,7 +766,6 @@
 				1FC616271FFB39C3005FC2F7 /* Toast.cpp in Sources */,
 				1FCC3C021CC47200001C9555 /* RecordHistoryScene.cpp in Sources */,
 				1FE04AE01C94682A008401EA /* RecordScene.cpp in Sources */,
-				1FE2A3EB1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
 				1FE04ADE1C94682A008401EA /* FanCalculatorScene.cpp in Sources */,
 				1FE04AE21C94682A008401EA /* ScoreSheetScene.cpp in Sources */,
 			);
@@ -771,15 +784,16 @@
 				1FF6025C1F00D792006BF5E3 /* LatestCompetitionScene.cpp in Sources */,
 				1FDCF7C01F738E1D00D9C608 /* CWTableView.cpp in Sources */,
 				1FE2A3EE1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
-				1FE2A3EC1CBB30D1008C45C5 /* FanDefinitionScene.cpp in Sources */,
 				1FFE17A41F9BB17200714066 /* CWCommon.cpp in Sources */,
 				1F154E3D1E4409420083F8B3 /* MahjongTheoryScene.cpp in Sources */,
+				1F4EB9B12106B21F00C8D1CA /* PopupMenu.cpp in Sources */,
 				1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */,
 				1FD228F31E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
 				1F2D25881E076FC20071ADE2 /* AlertDialog.cpp in Sources */,
 				1F68AFCA1F03366900B4BB97 /* CompetitionEnrollScene.cpp in Sources */,
 				1F0828A61ED26F8C00F4C424 /* Record.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
+				1FB8479C21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,
 				1F11543D1FF8F586000EF358 /* CompetitionMainScene.cpp in Sources */,
 				1FE04ADF1C94682A008401EA /* FanCalculatorScene.cpp in Sources */,

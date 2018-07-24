@@ -7,7 +7,7 @@
 #include "../widget/TilePickWidget.h"
 #include "../widget/ExtraInfoWidget.h"
 #include "../widget/Toast.h"
-#include "../FanTable/FanDefinitionScene.h"
+#include "../FanTable/FanTableScene.h"
 
 USING_NS_CC;
 
@@ -74,6 +74,7 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
     resultAreaHeight += (5 + lineHeight) + 20;  // 总计+提示
     node->setContentSize(Size(resultAreaWidth, static_cast<float>(resultAreaHeight)));
 
+    char str[64];
     uint16_t fan = 0;
     for (int i = 0, j = 0; i < fanCnt; ++i) {
         while (fan_table[++j] == 0) continue;
@@ -81,8 +82,13 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
         uint16_t f = mahjong::fan_value_table[j];
         uint16_t n = fan_table[j];
         fan += f * n;
-        std::string str = (n == 1) ? Common::format(__UTF8("%s %hu番\n"), mahjong::fan_name[j], f)
-            : Common::format(__UTF8("%s %hu番x%hu\n"), mahjong::fan_name[j], f, n);
+
+        strncpy(str, mahjong::fan_name[j], sizeof(str) - 1);
+        size_t len = strlen(str);
+        len += snprintf(str + len, sizeof(str) - len, __UTF8(" %hu番"), f);
+        if (n > 1) {
+            snprintf(str + len, sizeof(str) - len, __UTF8("x%hu"), n);
+        }
 
         // 创建label，每行排2个
         Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
@@ -90,7 +96,7 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
         node->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         div_t ret = div(i, 2);
-        label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, static_cast<float>(resultAreaHeight - lineHeight * (ret.quot + 1))));
+        label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, static_cast<float>(resultAreaHeight - lineHeight * (ret.quot + 0.5f))));
 
         // 创建与label同位置的widget
         ui::Widget *widget = ui::Widget::create();
@@ -100,11 +106,12 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
         widget->setContentSize(label->getContentSize());
         node->addChild(widget);
         widget->addClickEventListener([j](Ref *) {
-            Director::getInstance()->pushScene(FanDefinitionScene::create(static_cast<size_t>(j)));
+            FanTableScene::asyncShowFanDefinition(static_cast<size_t>(j));
         });
     }
 
-    Label *label = Label::createWithSystemFont(Common::format(__UTF8("总计：%hu番"), fan), "Arial", static_cast<float>(fontSize));
+    snprintf(str, sizeof(str), __UTF8("总计：%hu番"), fan);
+    Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
     label->setColor(Color3B::BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
