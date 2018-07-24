@@ -4,6 +4,7 @@
 #include "../UICommon.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/LoadingView.h"
+#include "../widget/PopupMenu.h"
 
 USING_NS_CC;
 
@@ -98,37 +99,24 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    // 个人汇总按钮
-    ui::Button *button = UICommon::createButton();
+    // 更多按钮
+    ui::Button *button = cocos2d::ui::Button::create("icon/menu.png");
     this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("个人汇总"));
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.25f, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener(std::bind(&RecordHistoryScene::onSummaryButton, this, std::placeholders::_1));
-
-    // 批量删除按钮
-    button = UICommon::createButton();
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("批量删除"));
-    button->setPosition(Vec2(origin.x + visibleSize.width * 0.75f, origin.y + visibleSize.height - 45.0f));
-    button->addClickEventListener(std::bind(&RecordHistoryScene::onBatchDeleteButton, this, std::placeholders::_1));
+    button->setScale(20.0f / button->getContentSize().width);
+    button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
+    button->addClickEventListener(std::bind(&RecordHistoryScene::onMoreButton, this, std::placeholders::_1));
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
-    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 65.0f));
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35.0f));
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 27.5f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     this->addChild(tableView);
     _tableView = tableView;
 
@@ -302,6 +290,20 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         }).detach();
         return true;
     }).create()->show();
+}
+
+void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
+    Vec2 pos = ((ui::Button *)sender)->getPosition();
+    pos.y -= 15.0f;
+    PopupMenu *menu = PopupMenu::create(this, { __UTF8("个人汇总"), __UTF8("批量删除") }, pos, Vec2::ANCHOR_TOP_RIGHT);
+    menu->setMenuItemCallback([this](PopupMenu *, size_t idx) {
+        switch (idx) {
+        case 0: this->onSummaryButton(); break;
+        case 1: this->onBatchDeleteButton(); break;
+        default: break;
+        }
+    });
+    menu->show();
 }
 
 namespace {
@@ -649,7 +651,7 @@ namespace {
     }
 }
 
-void RecordHistoryScene::onSummaryButton(cocos2d::Ref *) {
+void RecordHistoryScene::onSummaryButton() {
     SummaryTableNode *rootNode = SummaryTableNode::create();
     AlertDialog::Builder(this)
         .setTitle(__UTF8("选择要汇总的对局"))
@@ -828,7 +830,7 @@ namespace {
     }
 }
 
-void RecordHistoryScene::onBatchDeleteButton(cocos2d::Ref *) {
+void RecordHistoryScene::onBatchDeleteButton() {
     BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(&_recordTexts);
     AlertDialog::Builder(this)
         .setTitle(__UTF8("选择要删除的对局"))

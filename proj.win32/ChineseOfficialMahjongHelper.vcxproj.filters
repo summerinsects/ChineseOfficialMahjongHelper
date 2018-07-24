@@ -114,6 +114,9 @@
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\widget\PopupMenu.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\widget\TilePickWidget.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
@@ -213,6 +216,9 @@
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\LoadingView.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\PopupMenu.h">
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\TilePickWidget.h">
