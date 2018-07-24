@@ -10,7 +10,7 @@ public:
     CREATE_FUNC_WITH_PARAM_4(PopupMenu, initWithScene, cocos2d::Scene *, scene, const std::vector<std::string> &, menuTexts, const cocos2d::Vec2 &, basePos, const cocos2d::Vec2 &, anchorPoint);
     bool initWithScene(cocos2d::Scene *scene, const std::vector<std::string> &menuTexts, const cocos2d::Vec2 &basePos, const cocos2d::Vec2 &anchorPoint);
 
-    void setMenuItemCallback(const std::function<void (PopupMenu *, size_t)> &onMenuItemCallback) { _onMenuItemCallback = onMenuItemCallback; }
+    void setMenuItemCallback(std::function<void (PopupMenu *, size_t)> &&onMenuItemCallback) { _onMenuItemCallback.swap(onMenuItemCallback); }
 
     void show() {
         _scene->addChild(this, 100);

@@ -34,30 +34,30 @@ public:
     public:
         explicit Builder(cocos2d::Scene *scene) : _scene(scene) { }
 
-        Builder &setTitle(const std::string &title) { _title = title; return *this; }
-        Builder &setMessage(const std::string &message) { _message = message; return *this; }
+        Builder &setTitle(std::string &&title) { _title.swap(title); return *this; }
+        Builder &setMessage(std::string &&message) { _message.swap(message); return *this; }
         Builder &setContentNode(cocos2d::Node *node) { _contentNode = node; return *this; }
 
-        Builder &setPositiveButton(const std::string &title, const ButtonCallback &callback) {
-            _positiveTitle = title;
-            _positiveCallback = callback;
+        Builder &setPositiveButton(std::string &&title, ButtonCallback &&callback) {
+            _positiveTitle.swap(title);
+            _positiveCallback.swap(callback);
             return *this;
         }
 
-        Builder &setNegativeButton(const std::string &title, const ButtonCallback &callback) {
-            _negativeTitle = title;
-            _negativeCallback = callback;
+        Builder &setNegativeButton(std::string &&title, ButtonCallback &&callback) {
+            _negativeTitle.swap(title);
+            _negativeCallback.swap(callback);
             return *this;
         }
 
         Builder &setCancelable(bool isCancelable) { _isCancelable = isCancelable; return *this; }
         Builder &setCloseOnTouchOutside(bool isCloseOnTouchOutside) { _isCloseOnTouchOutside = isCloseOnTouchOutside; return *this; }
 
-        AlertDialog *create() const;
+        AlertDialog *create();
     };
 
-    static AlertDialog *createWithBuilder(const Builder &builder);
-    bool initWithBuilder(const Builder &builder);
+    static AlertDialog *createWithBuilder(Builder &&builder);
+    bool initWithBuilder(Builder &&builder);
 
     void setCloseOnTouchOutside(bool isCloseOnTouchOutside) {
         _isCloseOnTouchOutside = isCloseOnTouchOutside;

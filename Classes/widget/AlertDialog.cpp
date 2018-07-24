@@ -6,13 +6,13 @@ USING_NS_CC;
 
 static const Color3B C3B_BLUE_THEME = Color3B(51, 204, 255);
 
-AlertDialog *AlertDialog::Builder::create() const {
-    return AlertDialog::createWithBuilder(*this);
+AlertDialog *AlertDialog::Builder::create() {
+    return AlertDialog::createWithBuilder(std::move(*this));
 }
 
-AlertDialog *AlertDialog::createWithBuilder(const Builder &builder) {
+AlertDialog *AlertDialog::createWithBuilder(Builder &&builder) {
     AlertDialog *ret = new (std::nothrow) AlertDialog();
-    if (ret != nullptr && ret->initWithBuilder(builder)) {
+    if (ret != nullptr && ret->initWithBuilder(std::move(builder))) {
         ret->autorelease();
         return ret;
     }
@@ -20,14 +20,14 @@ AlertDialog *AlertDialog::createWithBuilder(const Builder &builder) {
     return nullptr;
 }
 
-bool AlertDialog::initWithBuilder(const Builder &builder) {
+bool AlertDialog::initWithBuilder(Builder &&builder) {
     if (UNLIKELY(!Layer::init())) {
         return false;
     }
 
-    _scene = builder._scene;
-    _positiveCallback = builder._positiveCallback;
-    _negativeCallback = builder._negativeCallback;
+    _scene.swap(builder._scene);
+    _positiveCallback.swap(builder._positiveCallback);
+    _negativeCallback.swap(builder._negativeCallback);
     _isCancelable = builder._isCancelable;
     _isCloseOnTouchOutside = builder._isCloseOnTouchOutside;
 

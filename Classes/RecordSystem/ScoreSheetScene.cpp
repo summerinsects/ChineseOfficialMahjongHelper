@@ -1167,7 +1167,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     const Record::Detail &detail = _record.detail[handIdx];
     if (detail.fan == 0) {
         AlertDialog::Builder(this)
-            .setTitle(std::string(handNameText[handIdx]).append(__UTF8("详情")))
+            .setTitle(std::move(std::string(handNameText[handIdx]).append(__UTF8("详情"))))
             .setMessage(__UTF8("荒庄。\n\n是否需要修改这盘的记录？"))
             .setNegativeButton(__UTF8("取消"), nullptr)
             .setPositiveButton(__UTF8("确定"), [this, handIdx](AlertDialog *, int) { editRecord(handIdx, &_record.detail[handIdx]); return true; })
@@ -1180,8 +1180,8 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
 
     if (Common::isCStringEmpty(detail.win_hand.tiles)) {
         AlertDialog::Builder(this)
-            .setTitle(std::string(handNameText[handIdx]).append(__UTF8("详情")))
-            .setMessage(message)
+            .setTitle(std::move(std::string(handNameText[handIdx]).append(__UTF8("详情"))))
+            .setMessage(std::move(message))
             .setNegativeButton(__UTF8("取消"), nullptr)
             .setPositiveButton(__UTF8("确定"), [this, handIdx](AlertDialog *, int) { editRecord(handIdx, &_record.detail[handIdx]); return true; })
             .create()->show();
@@ -1242,7 +1242,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
     label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f));
 
     AlertDialog::Builder(this)
-        .setTitle(std::string(handNameText[handIdx]).append(__UTF8("详情")))
+        .setTitle(std::move(std::string(handNameText[handIdx]).append(__UTF8("详情"))))
         .setContentNode(container)
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("确定"), [this, handIdx](AlertDialog *, int) { editRecord(handIdx, &_record.detail[handIdx]); return true; })

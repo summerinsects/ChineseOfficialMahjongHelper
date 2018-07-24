@@ -266,7 +266,7 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
 
     AlertDialog::Builder(this)
         .setTitle(__UTF8("警告"))
-        .setMessage(msg)
+        .setMessage(std::move(msg))
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("确定"), [this, idx](AlertDialog *, int) {
         LoadingView *loadingView = LoadingView::create();
