@@ -67,5 +67,5 @@ Chinese Official Mahjong Helper 国标小助手
 
 ## 特别鸣谢
 1. 牌画来源：[日语维基——中国麻雀](https://ja.wikipedia.org/wiki/%E4%B8%AD%E5%9B%BD%E9%BA%BB%E9%9B%80)
-2. 其他图片来源：CrossApp
+2. Ant Design 官方图标库
 3. Android自带素材

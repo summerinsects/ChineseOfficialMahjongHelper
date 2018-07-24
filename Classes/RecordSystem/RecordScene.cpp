@@ -196,9 +196,9 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 帮助按钮
-    ui::Button *button = ui::Button::create("source_material/help_128px.png");
+    ui::Button *button = ui::Button::create("icon/question-circle.png");
     this->addChild(button);
-    button->setScale(20.0f / button->getContentSize().width);
+    button->setScale(24.0f / button->getContentSize().width);
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
     button->addClickEventListener(std::bind(&RecordScene::onInstructionButton, this, std::placeholders::_1));
 

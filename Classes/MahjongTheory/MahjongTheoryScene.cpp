@@ -24,9 +24,9 @@ bool MahjongTheoryScene::init() {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 使用说明
-    ui::Button *button = cocos2d::ui::Button::create("source_material/help_128px.png");
+    ui::Button *button = cocos2d::ui::Button::create("icon/question-circle.png");
     this->addChild(button);
-    button->setScale(20.0f / button->getContentSize().width);
+    button->setScale(24.0f / button->getContentSize().width);
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
     button->addClickEventListener(std::bind(&MahjongTheoryScene::onGuideButton, this, std::placeholders::_1));
 

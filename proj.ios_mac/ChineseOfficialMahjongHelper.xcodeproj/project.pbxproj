@@ -31,6 +31,8 @@
 		1F154E421E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
 		1F2D25871E076FC20071ADE2 /* AlertDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */; };
 		1F2D25881E076FC20071ADE2 /* AlertDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */; };
+		1F4EB9BA2106BBEF00C8D1CA /* icon in Resources */ = {isa = PBXBuildFile; fileRef = 1F4EB9B82106BBEF00C8D1CA /* icon */; };
+		1F4EB9BB2106BBEF00C8D1CA /* icon in Resources */ = {isa = PBXBuildFile; fileRef = 1F4EB9B82106BBEF00C8D1CA /* icon */; };
 		1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */; };
 		1FA6933A1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
@@ -173,6 +175,7 @@
 		1F2487531FF7662D00FE12F2 /* LittleFan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LittleFan.h; sourceTree = "<group>"; };
 		1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertDialog.cpp; sourceTree = "<group>"; };
 		1F2D25861E076FC20071ADE2 /* AlertDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialog.h; sourceTree = "<group>"; };
+		1F4EB9B82106BBEF00C8D1CA /* icon */ = {isa = PBXFileReference; lastKnownFileType = folder; path = icon; sourceTree = "<group>"; };
 		1F6A373D1CBDD3C9001617E6 /* BaseScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseScene.h; sourceTree = "<group>"; };
 		1F764BE91CC5DB1F00844DAF /* OtherScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OtherScene.cpp; sourceTree = "<group>"; };
 		1F764BEA1CC5DB1F00844DAF /* OtherScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OtherScene.h; sourceTree = "<group>"; };
@@ -494,6 +497,7 @@
 			children = (
 				1F0828A71ED2756500F4C424 /* drawable */,
 				521A8EA819F11F5000D177D7 /* fonts */,
+				1F4EB9B82106BBEF00C8D1CA /* icon */,
 				1FDD950D1C8338700031BC38 /* source_material */,
 				1F0828AA1ED276D200F4C424 /* text */,
 				1FE5D0471CAE046300A5C38B /* tiles */,
@@ -651,6 +655,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				46880B8119C43A67006E1F66 /* xyg.png in Resources */,
+				1F4EB9BA2106BBEF00C8D1CA /* icon in Resources */,
 				1F0828A81ED2756500F4C424 /* drawable in Resources */,
 				1F0828AB1ED276D200F4C424 /* text in Resources */,
 				1FE5D0481CAE046300A5C38B /* tiles in Resources */,
@@ -671,6 +676,7 @@
 				521A8EAA19F11F5000D177D7 /* fonts in Resources */,
 				1FE5D0491CAE046300A5C38B /* tiles in Resources */,
 				1F0828A91ED2756500F4C424 /* drawable in Resources */,
+				1F4EB9BB2106BBEF00C8D1CA /* icon in Resources */,
 				1FDD950F1C8338700031BC38 /* source_material in Resources */,
 				1F0828AC1ED276D200F4C424 /* text in Resources */,
 			);
