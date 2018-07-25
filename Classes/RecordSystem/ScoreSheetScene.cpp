@@ -105,7 +105,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 5.0f, origin.y + tableOffsetY - 12.0f));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     _timeLabel = label;
 
     // 5条竖线
@@ -127,7 +127,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     // 第1栏：选手姓名
     const float line1Y = tableHeight - cellHeight * 0.5f;
     label = Label::createWithSystemFont(__UTF8("选手姓名"), "Arail", 12);
-    label->setColor(Color3B::ORANGE);
+    label->setTextColor(Color4B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line1Y));
     drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
@@ -135,7 +135,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     // 4个名字label
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("", "Arail", 12);
-        label->setColor(Color3B::ORANGE);
+        label->setTextColor(Color4B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line1Y));
         drawNode->addChild(label);
         _nameLabel[i] = label;
@@ -157,13 +157,13 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     static const char *row1Text[] = { __UTF8("每圈座位"), __UTF8("东南北西"), __UTF8("南东西北"), __UTF8("西北东南"), __UTF8("北西南东") };
     for (int i = 0; i < 5; ++i) {
         label = Label::createWithSystemFont(row0Text[i], "Arail", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         label->setPosition(Vec2(colPosX[i], line2Y));
         drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
         label = Label::createWithSystemFont(row1Text[i], "Arail", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         label->setPosition(Vec2(colPosX[i], line3Y));
         drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
@@ -172,14 +172,14 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     // 第4栏：累计
     const float line4Y = tableHeight - cellHeight * 3.5f;
     label = Label::createWithSystemFont(__UTF8("累计"), "Arail", 12);
-    label->setColor(Color3B::ORANGE);
+    label->setTextColor(Color4B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line4Y));
     drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("+0", "Arail", 12);
-        label->setColor(Color3B::ORANGE);
+        label->setTextColor(Color4B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line4Y));
         drawNode->addChild(label);
         _totalLabel[i] = label;
@@ -212,14 +212,14 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     const float line5Y = tableHeight - cellHeight * 4.5f;
 
     label = Label::createWithSystemFont(__UTF8("名次"), "Arail", 12);
-    label->setColor(Color3B::ORANGE);
+    label->setTextColor(Color4B::ORANGE);
     label->setPosition(Vec2(colPosX[0], line5Y));
     drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
         label = Label::createWithSystemFont("", "Arail", 12);
-        label->setColor(Color3B::ORANGE);
+        label->setTextColor(Color4B::ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line5Y));
         drawNode->addChild(label);
 
@@ -227,7 +227,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     }
 
     label = Label::createWithSystemFont(__UTF8("番种备注"), "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     label->setPosition(Vec2(colPosX[5], line5Y));
     drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
@@ -238,7 +238,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
         // 东风东~北风北名字
         label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
-        label->setColor(C3B_GRAY);
+        label->setTextColor(C4B_GRAY);
         label->setPosition(Vec2(colPosX[0], y));
         drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
@@ -265,7 +265,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
         // 备注的番种label
         label = Label::createWithSystemFont("", "Arail", 12);
-        label->setColor(C3B_GRAY);
+        label->setTextColor(C4B_GRAY);
         label->setPosition(Vec2(colPosX[5], y));
         drawNode->addChild(label);
         label->setVisible(false);
@@ -728,7 +728,7 @@ void ScoreSheetScene::editNameAndTitle() {
     for (int i = 0; i < 4; ++i) {
         const float yPos = 160.0f - i * 25.0f;
         Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(0.0f, yPos));
@@ -737,7 +737,7 @@ void ScoreSheetScene::editNameAndTitle() {
         editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
         editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
         editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
-        editBox->setFontColor(Color3B::BLACK);
+        editBox->setFontColor(Color4B::BLACK);
         editBox->setFontSize(12);
         editBox->setText(_record.name[i]);
         editBox->setMaxLength(NAME_SIZE - 1);
@@ -804,7 +804,7 @@ void ScoreSheetScene::editNameAndTitle() {
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
-    editBox->setFontColor(Color3B::BLACK);
+    editBox->setFontColor(Color4B::BLACK);
     editBox->setFontSize(12);
     editBox->setText(_record.title[0] == '\0' ? _prevTitle.c_str() : _record.title);
     editBox->setMaxLength(TITLE_SIZE - 1);
@@ -814,7 +814,7 @@ void ScoreSheetScene::editNameAndTitle() {
     editBoxes[4] = editBox;
 
     Label *label = Label::createWithSystemFont(__UTF8("输入的对局名称将在标题上显示"), "Arial", 10);
-    label->setColor(C3B_GRAY);
+    label->setTextColor(C4B_GRAY);
     rootNode->addChild(label);
     label->setPosition(Vec2(limitWidth * 0.5f, 5.0f));
     cw::scaleLabelToFitWidth(label, limitWidth - 4.0f);
@@ -1213,7 +1213,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
 
     // 描述文本
     Label *label = Label::createWithSystemFont(message, "Arial", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     if (label->getContentSize().width > maxWidth) {  // 当宽度超过时，设置范围，使文本换行
         label->setDimensions(maxWidth, 0.0f);
     }
@@ -1261,7 +1261,7 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
         __UTF8("4. 「北风北」计分完成后，会自动添加入「历史记录」。\n")
         __UTF8("5. 「历史记录」里的内容只要不卸载程序就会一直保存。"),
         "Arial", 10, Size(AlertDialog::maxWidth(), 0.0f));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
 
     AlertDialog::Builder(this)
         .setTitle(__UTF8("使用说明"))
@@ -1280,7 +1280,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
 
     // 1.计分表格分数显示
     Label *label = Label::createWithSystemFont(__UTF8("1. 计分表格分数显示"), "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 85.0f));
@@ -1300,7 +1300,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
         radioGroup->addRadioButton(radioButton);
 
         label = Label::createWithSystemFont(sheetTitleText[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
         radioButton->addChild(label);
@@ -1312,7 +1312,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
 
     // 2.计分界面选手顺序
     label = Label::createWithSystemFont(__UTF8("2. 计分界面选手顺序"), "Arail", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 35.0f));
@@ -1332,7 +1332,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
         radioGroup->addRadioButton(radioButton);
 
         label = Label::createWithSystemFont(recordTitleText[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cw::scaleLabelToFitWidth(label, width * 0.5f - 30.0f);
         radioButton->addChild(label);
@@ -1401,7 +1401,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     Label *label = Label::createWithSystemFont(__UTF8("在清空表格之前，请选择「保存」或「丢弃」"), "Arail", 12);
     rootNode->addChild(label);
     label->setPosition(Vec2(100.0f, 60.0f));
-    label->setColor(C3B_GRAY);
+    label->setTextColor(C4B_GRAY);
     cw::scaleLabelToFitWidth(label, 200.0f);
 
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
@@ -1416,7 +1416,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     radioGroup->addRadioButton(radioButton);
 
     label = Label::createWithSystemFont(__UTF8("保存，将未打完盘数标记为荒庄"), "Arial", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     cw::scaleLabelToFitWidth(label, 175.0f);
     radioButton->addChild(label);
@@ -1431,7 +1431,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     radioGroup->addRadioButton(radioButton);
 
     label = Label::createWithSystemFont(__UTF8("丢弃，不保存当前一局记录"), "Arial", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     cw::scaleLabelToFitWidth(label, 175.0f);
     radioButton->addChild(label);
@@ -1493,11 +1493,11 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
     drawNode->drawLine(Vec2(width, 0.0f), Vec2(width, 200.0f), Color4F::BLACK);
 
     static const char *titleText[] = { __UTF8("追者"), __UTF8("被追"), __UTF8("分差"), __UTF8("自摸"), __UTF8("对点"), __UTF8("旁点") };
-    static const Color3B titleColor[] = { Color3B::ORANGE, Color3B::ORANGE, C3B_GRAY, C3B_RED, C3B_BLUE, C3B_GREEN };
+    static const Color4B titleColor[] = { Color4B::ORANGE, Color4B::ORANGE, C4B_GRAY, C4B_RED, C4B_BLUE, C4B_GREEN };
 
     for (int i = 0; i < 6; ++i) {
         Label *label = Label::createWithSystemFont(titleText[i], "Arail", 12);
-        label->setColor(titleColor[i]);
+        label->setTextColor(titleColor[i]);
         label->setPosition(Vec2(xPos[i], 190.0f));
         drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, colWidth[i] - 4.0f);
@@ -1509,7 +1509,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
     // n位。n=1表示二位，以此类推
     for (int n = 1; n < 4; ++n) {
         Label *label = Label::createWithSystemFont(name[indices[n]], "Arail", 12);
-        label->setColor(titleColor[0]);
+        label->setTextColor(titleColor[0]);
         label->setPosition(Vec2(xPos[0], nameY[n - 1]));
         drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, colWidth[0] - 4.0f);
@@ -1519,7 +1519,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
             const float posY = numbersStartY[n - 1] - k * 20;
 
             label = Label::createWithSystemFont(name[indices[k]], "Arail", 12);
-            label->setColor(titleColor[1]);
+            label->setTextColor(titleColor[1]);
             label->setPosition(Vec2(xPos[1], posY));
             drawNode->addChild(label);
             cw::scaleLabelToFitWidth(label, colWidth[1] - 4.0f);
@@ -1534,7 +1534,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
 
             for (int i = 0; i < 4; ++i) {
                 label = Label::createWithSystemFont(std::to_string(numbers[i]), "Arail", 12);
-                label->setColor(titleColor[i + 2]);
+                label->setTextColor(titleColor[i + 2]);
                 label->setPosition(Vec2(xPos[2 + i], posY));
                 drawNode->addChild(label);
                 cw::scaleLabelToFitWidth(label, colWidth[2 + i] - 4.0f);
@@ -1552,7 +1552,7 @@ static void showPursuit() {
         __UTF8("输入分差，可计算超分自摸、对点、旁点各需要多少番（超过）。\n")
         __UTF8("输入自摸、对点、旁点的番数，可计算能追多少分（追平）。"),
         "Arial", 10, Size(limitWidth, 0.0f));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
 
     const Size &labelSize = label->getContentSize();
     Node *rootNode = Node::create();
@@ -1570,7 +1570,7 @@ static void showPursuit() {
     for (int i = 0; i < 4; ++i) {
         const float yPos = 85.0f - i * 25.0f;
         label = Label::createWithSystemFont(titleText[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         rootNode->addChild(label);
         label->setPosition(Vec2(labelPosX, yPos));
 
@@ -1578,7 +1578,7 @@ static void showPursuit() {
         editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
         editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
         editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-        editBox->setFontColor(Color3B::BLACK);
+        editBox->setFontColor(Color4B::BLACK);
         editBox->setFontSize(12);
         editBox->setMaxLength(4);
         rootNode->addChild(editBox);

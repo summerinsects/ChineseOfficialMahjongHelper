@@ -51,7 +51,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         radioGroup->addRadioButton(radioButton);
 
         Label *label = Label::createWithSystemFont(winTypeTexts[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(25.0f + gapX * i, 100.0f));
@@ -70,7 +70,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     _fourthTileBox = checkBox;
 
     Label *label = Label::createWithSystemFont(__UTF8("绝张"), "Arial", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(25.0f + gapX * 2, 100.0f));
@@ -87,7 +87,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         checkBoxes[i] = checkBox;
 
         label = Label::createWithSystemFont(extTexts[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(25.0f + gapX * i, 70.0f));
@@ -110,7 +110,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         const float posY = 40.0f - k * 30.0f;
 
         label = Label::createWithSystemFont(windType[k], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(0.0f, posY));
@@ -126,7 +126,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
             rootNode->addChild(radioButton);
 
             label = Label::createWithSystemFont(windName[i], "Arial", 12);
-            label->setColor(C3B_GRAY);
+            label->setTextColor(C4B_GRAY);
             radioButton->addChild(label);
             label->setPosition(Vec2(10.0f, 10.0f));
 
@@ -165,7 +165,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     label->setPosition(Vec2(contentSize.width - 72.5f, 40.0f));
 
     label = Label::createWithSystemFont("x0", "Arial", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(contentSize.width - 72.5f, 40.0f));
@@ -424,7 +424,7 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
         __UTF8("12. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n")
         __UTF8("13. 双暗杠6番，一明杠一暗杠5番，双明杠4番。暗杠的加计遵循国际麻将联盟（MIL）的规则，即杠系列和暗刻系列最多各计一个。"),
         "Arail", 10, Size(maxWidth, 0.0f));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
 
     Node *node = nullptr;
 
@@ -470,7 +470,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
         __UTF8("  输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n")
         __UTF8("  输入范例2：1112345678999s9s\n")
         __UTF8("  输入范例3：[WWWW,1][444s]45m678pFF6m"), "Arial", 10, Size(width, 0.0f));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     rootNode->addChild(label);
 
     // 输入手牌

@@ -90,7 +90,7 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
 
         // 创建label，每行排2个
         Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
-        label->setColor(C3B_GRAY);
+        label->setTextColor(C4B_GRAY);
         node->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         div_t ret = div(i, 2);
@@ -110,13 +110,13 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
 
     snprintf(str, sizeof(str), __UTF8("总计：%hu番"), fan);
     Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20.0f));
 
     label = Label::createWithSystemFont(__UTF8("点击番种名可查看番种介绍。"), "Arial", 10);
-    label->setColor(C3B_BLUE_THEME);
+    label->setTextColor(C4B_BLUE_THEME);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(0.0f, 5.0f));

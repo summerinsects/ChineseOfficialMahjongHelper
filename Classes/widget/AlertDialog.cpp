@@ -146,7 +146,7 @@ bool AlertDialog::initWithBuilder(Builder &&builder) {
         totalHeight += 10.0f;
 
         Label *label = Label::createWithSystemFont(builder._message, "Arail", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         if (label->getContentSize().width > maxWidth1) {  // 当宽度超过时，设置范围，使文本换行
             label->setDimensions(maxWidth1, 0.0f);
         }
@@ -169,7 +169,7 @@ bool AlertDialog::initWithBuilder(Builder &&builder) {
 
         // 标题
         Label *label = Label::createWithSystemFont(builder._title, "Arail", 14);
-        label->setColor(C3B_BLUE_THEME);
+        label->setTextColor(C4B_BLUE_THEME);
         background->addChild(label);
         label->setPosition(Vec2(totalWidth * 0.5f, totalHeight + 15.0f));
         cw::trimLabelStringWithEllipsisToFitWidth(label, totalWidth - 4.0f);

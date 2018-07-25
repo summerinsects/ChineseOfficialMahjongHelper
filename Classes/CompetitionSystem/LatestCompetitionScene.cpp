@@ -23,7 +23,7 @@ bool LatestCompetitionScene::init() {
     Label *label = Label::createWithSystemFont(__UTF8("宣传赛事信息，请联系逍遥宫"), "Arial", 12);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
-    label->setColor(Color3B::ORANGE);
+    label->setTextColor(Color4B::ORANGE);
 
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
@@ -42,7 +42,7 @@ bool LatestCompetitionScene::init() {
     label = Label::createWithSystemFont(__UTF8("无近期赛事信息"), "Arial", 12);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 75.0f));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     label->setVisible(false);
     _emptyLabel = label;
 
@@ -202,13 +202,13 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         cell->addChild(layerColors[1]);
 
         label[0] = Label::createWithSystemFont("", "Arail", 10);
-        label[0]->setColor(Color3B::BLACK);
+        label[0]->setTextColor(Color4B::BLACK);
         cell->addChild(label[0]);
         label[0]->setPosition(Vec2(5.0f, 35.0f));
         label[0]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
         label[1] = Label::createWithSystemFont("", "Arail", 10);
-        label[1]->setColor(C3B_GRAY);
+        label[1]->setTextColor(C4B_GRAY);
         cell->addChild(label[1]);
         label[1]->setPosition(Vec2(5.0f, 15.0f));
         label[1]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);

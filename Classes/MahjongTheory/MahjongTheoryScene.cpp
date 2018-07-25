@@ -104,7 +104,7 @@ bool MahjongTheoryScene::init() {
 
     // 特殊和型选项
     Label *label = Label::createWithSystemFont(__UTF8("考虑特殊和型"), "Arial", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 75.0f - widgetSize.height));
@@ -128,7 +128,7 @@ bool MahjongTheoryScene::init() {
         _checkBoxes[i] = checkBox;
 
         label = Label::createWithSystemFont(title[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(Color4B::BLACK);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(xPos - 5.0f, yPos));
@@ -188,7 +188,7 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
         __UTF8("  输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n")
         __UTF8("  输入范例3：356m18s1579pWNFF9p"),
         "Arial", 10, Size(maxWidth, 0.0f));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(Color4B::BLACK);
 
     Node *node = nullptr;
 
@@ -841,14 +841,14 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
         // 和牌型label
         Label *label = Label::createWithSystemFont("", "Arial", 12);
-        label->setColor(C3B_GRAY);
+        label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
         typeLabel = label;
 
         // 打label
         label = Label::createWithSystemFont(__UTF8("打「"), "Arial", 12);
-        label->setColor(C3B_GRAY);
+        label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
         discardLabel = label;
@@ -864,14 +864,14 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
         // 摸label
         label = Label::createWithSystemFont(__UTF8("」摸「"), "Arial", 12);
-        label->setColor(C3B_GRAY);
+        label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
         usefulLabel[0] = label;
 
         // 听label
         label = Label::createWithSystemFont(__UTF8("」听「"), "Arial", 12);
-        label->setColor(C3B_GRAY);
+        label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
         usefulLabel[1] = label;
@@ -889,13 +889,13 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
 
         // 共几种几枚分在两个label上
         label = Label::createWithSystemFont("", "Arial", 12);
-        label->setColor(C3B_GRAY);
+        label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
         cntLabel[0] = label;
 
         label = Label::createWithSystemFont("", "Arial", 12);
-        label->setColor(C3B_GRAY);
+        label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
         label->setPosition(Vec2(SPACE, TILE_WIDTH_SMALL));
@@ -930,7 +930,7 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     // 和牌型label
     typeLabel->setString(getResultTypeString(result->form_flag, result->shanten));
     typeLabel->setPosition(Vec2(SPACE, cellHeight - 10.0f));
-    typeLabel->setColor(result->shanten != -1 ? C3B_GRAY : Color3B::ORANGE);
+    typeLabel->setTextColor(result->shanten != -1 ? C4B_GRAY : Color4B::ORANGE);
 
     float xPos = SPACE;
     float yPos = cellHeight - 35.0f;
