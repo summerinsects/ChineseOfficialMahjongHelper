@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <iterator>
 #include "../mahjong-algorithm/stringify.h"
-#include "UICommon.h"
+#include "../UICommon.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "../widget/HandTilesWidget.h"
