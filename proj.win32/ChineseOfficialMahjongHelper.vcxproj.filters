@@ -194,6 +194,9 @@
     <ClInclude Include="..\Classes\TilesImage.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\UIColors.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\UICommon.h">
       <Filter>src</Filter>
     </ClInclude>
