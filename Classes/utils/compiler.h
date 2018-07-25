@@ -56,7 +56,7 @@
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 #define FORCE_INLINE __forceinline
 #elif defined(__GNUC__) && ((__GNUC__ << 8 | __GNUC_MINOR__) >= 0x301)
-#define FORCE_INLINE __inline__ __attribute__((always_inline))
+#define FORCE_INLINE __inline__ __attribute__((__always_inline__))
 #else
 #define FORCE_INLINE inline
 #endif
@@ -67,7 +67,7 @@
 #if defined(_MSC_VER) && (_MSC_VER >= 1300)
 #define NOINLINE __declspec(noinline)
 #elif defined(__GNUC__) && ((__GNUC__ << 8 | __GNUC_MINOR__) >= 0x301)
-#define NOINLINE __attribute__((noinline))
+#define NOINLINE __attribute__((__noinline__))
 #else
 #define NOINLINE
 #endif
