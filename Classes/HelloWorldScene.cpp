@@ -174,7 +174,7 @@ bool HelloWorld::init() {
     std::string version = Application::getInstance()->getVersion();
     Label *label = Label::createWithSystemFont(
         Common::format("v%s\n%s", version.c_str(), "Built  " __DATE__ "  " __TIME__), "Arial", 10);
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setAlignment(TextHAlignment::CENTER);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
@@ -182,7 +182,7 @@ bool HelloWorld::init() {
 #if 0
     label = Label::createWithSystemFont(Common::format("{{%.2f, %.2f}, {%.2f, %.2f}}", origin.x, origin.y, visibleSize.width, visibleSize.height),
         "Arial", 10);
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 35.0f));
 #endif
@@ -209,7 +209,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
         __UTF8("3. 如果觉得本软件好用，可点击「分享二维码」，分享给他人扫码下载。\n")
         __UTF8("4. 支持开源软件，欢迎打赏。")
         , "Arail", 10, Size(width, 0.0f));
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     rootNode->addChild(label);
 
     const Size &labelSize = label->getContentSize();
@@ -456,7 +456,7 @@ bool HelloWorld::checkVersion(const std::vector<char> *buffer, bool manual) {
             checkBox->setPosition(Vec2(10.0f, 10.0f));
 
             Label *label = Label::createWithSystemFont(__UTF8("今日之内不再提示"), "Arial", 12);
-            label->setTextColor(Color4B::BLACK);
+            label->setTextColor(C4B_BLACK);
             rootNode->addChild(label);
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
             label->setPosition(Vec2(25.0f, 10.0f));

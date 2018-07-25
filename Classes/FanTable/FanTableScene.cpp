@@ -96,7 +96,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         label = Label::createWithSystemFont(__UTF8("1番"), "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
 
         for (size_t k = 0; k < 13; ++k) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");

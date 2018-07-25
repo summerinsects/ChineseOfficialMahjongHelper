@@ -187,7 +187,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
 
         // 标题
         Label *label = Label::createWithSystemFont("", "Arail", 10);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         cell->addChild(label);
         label->setPosition(Vec2(2.0f, 55.0f));
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -431,7 +431,7 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
             const float posX = colWidth * (i + 0.5f);
             const float posY = 150.0f - n * 40.0f;
             Label *label = Label::createWithSystemFont(titleText[n][i], "Arail", 12);
-            label->setTextColor(Color4B::BLACK);
+            label->setTextColor(C4B_BLACK);
             label->setPosition(Vec2(posX, posY));
             drawNode->addChild(label);
             cw::scaleLabelToFitWidth(label, colWidth - 4.0f);
@@ -546,7 +546,7 @@ namespace {
 
             // 标题
             Label *label = Label::createWithSystemFont("", "Arail", 10);
-            label->setTextColor(Color4B::BLACK);
+            label->setTextColor(C4B_BLACK);
             cell->addChild(label);
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
             label->setPosition(Vec2(2.0f, 43.0f));
@@ -758,7 +758,7 @@ namespace {
 
             // 标题
             Label *label = Label::createWithSystemFont("", "Arail", 10);
-            label->setTextColor(Color4B::BLACK);
+            label->setTextColor(C4B_BLACK);
             cell->addChild(label);
             label->setPosition(Vec2(2.0f, 55.0f));
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);

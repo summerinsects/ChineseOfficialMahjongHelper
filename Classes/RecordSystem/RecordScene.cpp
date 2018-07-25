@@ -204,7 +204,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::NUMERIC);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontColor(C4B_BLACK);
     editBox->setFontSize(12);
     editBox->setText("8");
     editBox->setMaxLength(3);  // 理论最高番332番，所以最大为3位
@@ -213,7 +213,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     _editBox = editBox;
 
     Label *label = Label::createWithSystemFont(__UTF8("番"), "Arial", 12);
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 104.0f, yPos));
@@ -244,7 +244,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     _drawBox = checkBox;
 
     label = Label::createWithSystemFont(__UTF8("荒庄"), "Arial", 12);
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, yPos));
@@ -310,7 +310,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         winGroup->addRadioButton(radioButton);
 
         label = Label::createWithSystemFont(__UTF8("和牌"), "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, y));
@@ -326,14 +326,14 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         claimGroup->addRadioButton(radioButton);
 
         label = Label::createWithSystemFont(__UTF8("点炮"), "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, y));
         _byDiscardLabel[i] = label;
 
         label = Label::createWithSystemFont(__UTF8("自摸"), "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(x, y));
@@ -343,7 +343,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
         // 罚分
         y = origin.y + visibleSize.height - 195.0f;
         label = Label::createWithSystemFont(__UTF8("调整"), "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         radioNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
         label->setPosition(Vec2(x, y));
@@ -374,7 +374,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
     // 说明
     label = Label::createWithSystemFont(__UTF8("标记主番（4番以上）"), "Arial", 12);
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 35.0f));
@@ -454,7 +454,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
     // 跳到
     label = Label::createWithSystemFont(__UTF8("跳到"), "Arial", 12);
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     topNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(5.0f, 10.0f));
@@ -544,7 +544,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         label = Label::createWithSystemFont(__UTF8("1番"), "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
 
         for (size_t k = 0; k < 9; ++k) {
             Size size(gap - 4.0f, 20.0f);
@@ -758,7 +758,7 @@ void RecordScene::onInstructionButton(cocos2d::Ref *) {
         __UTF8("4. 「小番」为2番及1番的番种。以复选框展现的，是不可复计的番种；以两侧-1和+1按钮展现的，是可复计的番种。\n")
         __UTF8("5. 「记录和牌」可根据当前和牌自动算番，自动标记番种。")
         , "Arial", 10, Size(width, 0.0f));
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
 
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
         .setTitle(__UTF8("使用说明"))
@@ -947,7 +947,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         checkBoxes[i] = checkBox;
 
         Label *label = Label::createWithSystemFont(mahjong::fan_name[uniqueFanTable[i]], "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         rootNode->addChild(label);
         label->setPosition(Vec2(xPos + 27.0f, yPos));
@@ -973,7 +973,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
 
         // 显示数量的Label
         Label *label = Label::createWithSystemFont(std::to_string(cnt), "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         rootNode->addChild(label);
         label->setPosition(Vec2(xPos + 35.0f, yPos));
         label->setTag(cnt);
@@ -1014,7 +1014,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
 
         // 番名Label
         label = Label::createWithSystemFont(mahjong::fan_name[multipleFanTable[i]], "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(xPos + 70.0f, yPos));
@@ -1030,7 +1030,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     checkBox->setSelected(UserDefault::getInstance()->getBoolForKey(NEVER_NOTIFY_LITTLE_FAN, false));
 
     Label *label = Label::createWithSystemFont(__UTF8("不再提示标记小番"), "Arial", 12);
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     rootNode->addChild(label);
     label->setPosition(Vec2(27.0f, 10.0f));

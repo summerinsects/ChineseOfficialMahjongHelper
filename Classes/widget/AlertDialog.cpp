@@ -146,7 +146,7 @@ bool AlertDialog::initWithBuilder(Builder &&builder) {
         totalHeight += 10.0f;
 
         Label *label = Label::createWithSystemFont(builder._message, "Arail", 12);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         if (label->getContentSize().width > maxWidth1) {  // 当宽度超过时，设置范围，使文本换行
             label->setDimensions(maxWidth1, 0.0f);
         }

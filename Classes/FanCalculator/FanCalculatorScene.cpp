@@ -110,7 +110,7 @@ cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fo
 
     snprintf(str, sizeof(str), __UTF8("总计：%hu番"), fan);
     Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     node->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20.0f));

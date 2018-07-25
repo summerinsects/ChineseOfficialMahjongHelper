@@ -35,7 +35,7 @@ bool MahjongTheoryScene::init() {
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontColor(C4B_BLACK);
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder(__UTF8("在此处输入"));
@@ -104,7 +104,7 @@ bool MahjongTheoryScene::init() {
 
     // 特殊和型选项
     Label *label = Label::createWithSystemFont(__UTF8("考虑特殊和型"), "Arial", 12);
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 75.0f - widgetSize.height));
@@ -128,7 +128,7 @@ bool MahjongTheoryScene::init() {
         _checkBoxes[i] = checkBox;
 
         label = Label::createWithSystemFont(title[i], "Arial", 12);
-        label->setTextColor(Color4B::BLACK);
+        label->setTextColor(C4B_BLACK);
         this->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(xPos - 5.0f, yPos));
@@ -188,7 +188,7 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
         __UTF8("  输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n")
         __UTF8("  输入范例3：356m18s1579pWNFF9p"),
         "Arial", 10, Size(maxWidth, 0.0f));
-    label->setTextColor(Color4B::BLACK);
+    label->setTextColor(C4B_BLACK);
 
     Node *node = nullptr;
 
