@@ -3,6 +3,7 @@
 #include <iterator>
 #include "../mahjong-algorithm/stringify.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "../widget/HandTilesWidget.h"
@@ -11,11 +12,6 @@
 #include "LittleFan.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_RED = Color3B(254, 87, 110);
-static const Color3B C3B_BLUE = Color3B(44, 121, 178);
-static const Color3B C3B_GREEN = Color3B(49, 155, 28);
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 static Record g_currentRecord;
 

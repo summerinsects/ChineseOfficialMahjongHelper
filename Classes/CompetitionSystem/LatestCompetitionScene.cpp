@@ -6,12 +6,11 @@
 #include "json/document.h"
 #include "json/stringbuffer.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 #include "../widget/LoadingView.h"
 #include "../widget/AlertDialog.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 bool LatestCompetitionScene::init() {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("近期赛事")))) {

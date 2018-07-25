@@ -1,11 +1,10 @@
 ﻿#include "TilePickWidget.h"
 #include "../utils/compiler.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 #include "../TilesImage.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 bool TilePickWidget::initWithWidth(float maxWidth) {
     if (UNLIKELY(!Node::init())) {

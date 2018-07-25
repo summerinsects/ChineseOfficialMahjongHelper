@@ -1,6 +1,7 @@
 ﻿#include "RecordScene.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "../widget/TilePickWidget.h"
@@ -9,12 +10,6 @@
 #include "LittleFan.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_RED = Color3B(254, 87, 110);
-static const Color3B C3B_BLUE = Color3B(44, 121, 178);
-static const Color3B C3B_GREEN = Color3B(49, 155, 28);
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
-static const Color3B C3B_PURPLE = Color3B(89, 16, 89);
 
 #define RECENT_FANS "recent_fans"
 #define USE_FIXED_SEAT_ORDER "use_fixed_seat_order"

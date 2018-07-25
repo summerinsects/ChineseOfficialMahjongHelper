@@ -1,10 +1,9 @@
 ﻿#include "AlertDialog.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 #include "../cocos-wheels/CWCommon.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_BLUE_THEME = Color3B(51, 204, 255);
 
 AlertDialog *AlertDialog::Builder::create() {
     return AlertDialog::createWithBuilder(std::move(*this));

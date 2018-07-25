@@ -4,10 +4,9 @@
 #include "Toast.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback) {
     if (UNLIKELY(!Node::init())) {

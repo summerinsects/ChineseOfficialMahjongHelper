@@ -3,6 +3,7 @@
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 #include "../TilesImage.h"
 #include "../widget/TilePickWidget.h"
 #include "../widget/AlertDialog.h"
@@ -10,8 +11,6 @@
 #include "../widget/LoadingView.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 static mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile);
 

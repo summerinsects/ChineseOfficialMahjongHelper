@@ -1,9 +1,8 @@
 ﻿#include "PopupMenu.h"
 #include "../utils/compiler.h"
+#include "../UIColors.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 bool PopupMenu::initWithScene(cocos2d::Scene *scene, const std::vector<std::string> &menuTexts, const cocos2d::Vec2 &basePos, const cocos2d::Vec2 &anchorPoint) {
     if (UNLIKELY(!Layer::init())) {

@@ -4,12 +4,11 @@
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../TilesImage.h"
+#include "../UIColors.h"
 #include "../widget/CommonWebViewScene.h"
 #include "../widget/LoadingView.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 static const char *principle_title[] = { __UTF8("不重复原则"), __UTF8("不拆移原则"), __UTF8("不得相同原则"), __UTF8("就高不就低"), __UTF8("套算一次原则") };
 

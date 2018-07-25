@@ -4,15 +4,13 @@
 #include "../mahjong-algorithm/stringify.h"
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 #include "../widget/TilePickWidget.h"
 #include "../widget/ExtraInfoWidget.h"
 #include "../widget/Toast.h"
 #include "../FanTable/FanTableScene.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
-static const Color3B C3B_BLUE_THEME = Color3B(51, 204, 255);
 
 bool FanCalculatorScene::init() {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("国标麻将算番器")))) {

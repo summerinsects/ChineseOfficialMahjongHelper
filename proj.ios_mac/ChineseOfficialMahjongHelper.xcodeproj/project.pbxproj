@@ -174,6 +174,7 @@
 		1F154E401E440A160083F8B3 /* stringify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringify.h; sourceTree = "<group>"; };
 		1F16A62F1F5F8CD500974F88 /* standard_tiles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = standard_tiles.h; sourceTree = "<group>"; };
 		1F16A6311F5F8CFB00974F88 /* LoadingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingView.h; sourceTree = "<group>"; };
+		1F16D5E321082831006CE04C /* UIColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIColors.h; sourceTree = "<group>"; };
 		1F2487531FF7662D00FE12F2 /* LittleFan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LittleFan.h; sourceTree = "<group>"; };
 		1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertDialog.cpp; sourceTree = "<group>"; };
 		1F2D25861E076FC20071ADE2 /* AlertDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialog.h; sourceTree = "<group>"; };
@@ -530,6 +531,7 @@
 				1F764BE81CC5DB1F00844DAF /* Other */,
 				1FE04AD91C94682A008401EA /* RecordSystem */,
 				1FF8820B1F5E60BE009C3449 /* TilesImage.h */,
+				1F16D5E321082831006CE04C /* UIColors.h */,
 				1F7DF3582001E4EE002C1D22 /* UICommon.h */,
 				1FDCF7C41F738EE400D9C608 /* utils */,
 				1FE5CFDA1CAE029200A5C38B /* widget */,

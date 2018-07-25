@@ -2,6 +2,7 @@
 #include <array>
 #include "Record.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/LoadingView.h"
 #include "../widget/PopupMenu.h"
@@ -9,8 +10,6 @@
 USING_NS_CC;
 
 #define NO_NAME_TITLE __UTF8("(未命名对局)")
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 static std::vector<Record> g_records;
 static std::mutex g_mutex;
