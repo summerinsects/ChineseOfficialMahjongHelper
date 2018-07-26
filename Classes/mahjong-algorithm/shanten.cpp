@@ -183,7 +183,7 @@ static void save_work_path(const intptr_t fixed_cnt, const work_path_t *work_pat
     // 判断是否重复
     if (std::none_of(&work_state->paths[0], &work_state->paths[work_state->count],
         [&temp, fixed_cnt](const work_path_t &path) {
-        return (path.depth == temp.depth && std::equal(&path.units[fixed_cnt], &path.units[path.depth + 1], &temp.units[fixed_cnt], &temp.units[temp.depth + 1]));
+        return (path.depth == temp.depth && std::equal(&path.units[fixed_cnt], &path.units[path.depth + 1], &temp.units[fixed_cnt]));
     })) {
         if (work_state->count < MAX_STATE) {
             work_path_t &path = work_state->paths[work_state->count++];
