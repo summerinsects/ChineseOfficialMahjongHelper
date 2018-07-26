@@ -186,16 +186,25 @@ static bool is_basic_form_branch_exist(const intptr_t fixed_cnt, const work_path
 
 // 保存路径
 static void save_work_path(const intptr_t fixed_cnt, const work_path_t *work_path, work_state_t *work_state) {
-    if (work_state->count < MAX_STATE) {
-        work_path_t &path = work_state->paths[work_state->count++];
-        path.depth = work_path->depth;
-        std::copy(&work_path->units[fixed_cnt], &work_path->units[work_path->depth], &path.units[fixed_cnt]);
+    // 复制一份数据，不破坏当前数据
+    work_path_t temp;
+    temp.depth = work_path->depth;
+    std::copy(&work_path->units[fixed_cnt], &work_path->units[temp.depth + 1], &temp.units[fixed_cnt]);
+    std::sort(&temp.units[fixed_cnt], &temp.units[temp.depth + 1]);
 
-        // 检测是否重复路径时，std::includes要求有序，所以这里将它排序
-        std::sort(&path.units[fixed_cnt], &path.units[path.depth]);
-    }
-    else {
-        assert(0 && "too many state!");
+    // 判断是否重复
+    if (std::none_of(&work_state->paths[0], &work_state->paths[work_state->count],
+        [&temp, fixed_cnt](const work_path_t &path) {
+        return (path.depth == temp.depth && std::equal(&path.units[fixed_cnt], &path.units[path.depth + 1], &temp.units[fixed_cnt], &temp.units[temp.depth + 1]));
+    })) {
+        if (work_state->count < MAX_STATE) {
+            work_path_t &path = work_state->paths[work_state->count++];
+            path.depth = temp.depth;
+            std::copy(&temp.units[fixed_cnt], &temp.units[temp.depth + 1], &path.units[fixed_cnt]);
+        }
+        else {
+            assert(0 && "too many state!");
+        }
     }
 }
 
