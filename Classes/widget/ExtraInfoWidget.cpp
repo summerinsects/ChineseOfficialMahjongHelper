@@ -467,10 +467,13 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
         __UTF8("  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n")
         __UTF8("  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n")
         __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n")
-        __UTF8("  输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n")
-        __UTF8("  输入范例2：1112345678999s9s\n")
-        __UTF8("  输入范例3：[WWWW,1][444s]45m678pFF6m"), "Arial", 10, Size(width, 0.0f));
+        __UTF8("输入范例：\n")
+        __UTF8("  (1) [EEEE][CCCC][FFFF][PPPP]NN\n")
+        __UTF8("  (2) 1112345678999s9s\n")
+        __UTF8("  (3) [WWWW,1][444s]45m678pFF6m"),
+        "Arial", 10, Size(width, 0.0f));
     label->setTextColor(C4B_BLACK);
+
     rootNode->addChild(label);
 
     // 输入手牌

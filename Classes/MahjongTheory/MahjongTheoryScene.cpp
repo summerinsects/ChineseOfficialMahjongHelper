@@ -184,9 +184,10 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
         __UTF8("8. 暂不考虑吃碰杠操作。\n")
         __UTF8("9. 点击表格中的有效牌，可切出该切法的弃牌，并上指定牌。\n")
         __UTF8("10. 点击手牌可切出对应牌，随机上牌。\n")
-        __UTF8("  输入范例1：[EEEE]288s349pSCFF2p\n")
-        __UTF8("  输入范例2：[123p,1][345s,2][999s,3]6m6pEW1m\n")
-        __UTF8("  输入范例3：356m18s1579pWNFF9p"),
+        __UTF8("输入范例：\n")
+        __UTF8("  (1) [EEEE]288s349pSCFF2p\n")
+        __UTF8("  (2) [123p,1][345s,2][999s,3]6m6pEW1m\n")
+        __UTF8("  (3) 356m18s1579pWNFF9p"),
         "Arial", 10, Size(maxWidth, 0.0f));
     label->setTextColor(C4B_BLACK);
 
