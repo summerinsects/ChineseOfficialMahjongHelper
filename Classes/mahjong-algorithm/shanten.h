@@ -72,15 +72,6 @@ intptr_t table_to_tiles(const tile_table_t &cnt_table, tile_t *tiles, intptr_t m
 typedef bool useful_table_t[TILE_TABLE_SIZE];
 
 /**
- * @brief 计数有效牌枚数
- *
- * @param [in] used_table 已经的使用牌的数量表
- * @param [in] useful_table 有效牌标记表
- * @return int 有效牌枚数
- */
-int count_useful_tile(const tile_table_t &used_table, const useful_table_t &useful_table);
-
-/**
  * @addtogroup shanten
  * @{
  */

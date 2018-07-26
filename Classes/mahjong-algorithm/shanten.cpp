@@ -117,18 +117,6 @@ intptr_t table_to_tiles(const tile_table_t &cnt_table, tile_t *tiles, intptr_t m
     return cnt;
 }
 
-// 计数有效牌枚数
-int count_useful_tile(const tile_table_t &used_table, const useful_table_t &useful_table) {
-    int cnt = 0;
-    for (int i = 0; i < 34; ++i) {
-        tile_t t = all_tiles[i];
-        if (useful_table[t]) {
-            cnt += 4 - used_table[t];
-        }
-    }
-    return cnt;
-}
-
 namespace {
 
     // 路径单元，单元有面子、雀头、搭子等种类，见下面的宏

@@ -27,6 +27,7 @@ private:
     struct ResultEx : mahjong::enum_result_t {
         int count_in_tiles;
         int count_total;
+        bool imaginary_table[34];
     };
     std::vector<mahjong::enum_result_t> _allResults;
     std::vector<ResultEx> _resultSources;

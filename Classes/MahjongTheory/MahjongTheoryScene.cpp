@@ -431,16 +431,24 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
         }
     }
 
-    // 更新count
+    // 更新ResultEx
     std::for_each(_resultSources.begin(), _resultSources.end(), [this](ResultEx &result) {
         result.count_in_tiles = 0;
+        result.count_total = 0;
+        memset(result.imaginary_table, 0, sizeof(result.imaginary_table));
         for (int i = 0; i < 34; ++i) {
             mahjong::tile_t t = mahjong::all_tiles[i];
             if (result.useful_table[t]) {
                 ++result.count_in_tiles;
+                int tile_count = 4 - _handTilesTable[t];
+                if (tile_count > 0) {
+                    result.count_total += tile_count;
+                }
+                else {
+                    result.imaginary_table[i] = true;
+                }
             }
         }
-        result.count_total = mahjong::count_useful_tile(_handTilesTable, result.useful_table);
     });
 
     if (_resultSources.empty()) {
@@ -963,11 +971,13 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     for (int i = 0; i < 34; ++i) {
         if (!result->useful_table[mahjong::all_tiles[i]]) {
             usefulButtons[i]->setVisible(false);
+            usefulButtons[i]->setEnabled(false);
             continue;
         }
 
         usefulButtons[i]->setUserData(reinterpret_cast<void *>(realIdx));
         usefulButtons[i]->setVisible(true);
+        usefulButtons[i]->setEnabled(!result->imaginary_table[i]);
 
         if (xPos + TILE_WIDTH_SMALL > _cellWidth - SPACE * 2) {
             xPos = SPACE;
