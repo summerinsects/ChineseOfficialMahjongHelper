@@ -287,7 +287,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
 
         // 名字
         label = Label::createWithSystemFont(names[PLAYER_TO_UI(i)], "Arial", 12.0f);
-        label->setTextColor(Color4B::ORANGE);
+        label->setTextColor(C4B_ORANGE);
         this->addChild(label);
         label->setPosition(Vec2(x, origin.y + visibleSize.height - 95.0f));
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
@@ -645,7 +645,7 @@ void RecordScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
 static inline void updatePenaltyLabel(Label *label, int16_t ps) {
     label->setString(Common::format("%+hd", ps));
 
-    if (ps < 0) label->setTextColor(C4B_GREEN);
+    if (ps < 0) label->setTextColor(C4B_PURPLE);
     else if (ps > 0) label->setTextColor(C4B_RED);
     else label->setTextColor(C4B_GRAY);
 }
@@ -870,7 +870,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
 
         // 名字
         Label *label = Label::createWithSystemFont(names[PLAYER_TO_UI(i)], "Arial", 12.0f);
-        label->setTextColor(Color4B::ORANGE);
+        label->setTextColor(C4B_ORANGE);
         rootNode->addChild(label);
         label->setPosition(Vec2(x, 135.0f));
         cw::scaleLabelToFitWidth(label, gap - 2.0f);

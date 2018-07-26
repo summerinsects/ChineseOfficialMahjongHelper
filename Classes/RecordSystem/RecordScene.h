@@ -10,6 +10,12 @@
 class TilePickWidget;
 class ExtraInfoWidget;
 
+#define C4B_ORANGE      cocos2d::Color4B::ORANGE
+#define C4B_RED         cocos2d::Color4B(254,  87, 110, 255)
+#define C4B_BLUE        cocos2d::Color4B( 44, 121, 178, 255)
+#define C4B_GREEN       cocos2d::Color4B( 45, 175,  90, 255)
+#define C4B_PURPLE      cocos2d::Color4B(182, 118, 226, 255)
+
 static const char *handNameText[] = {
     __UTF8("东风东"), __UTF8("东风南"), __UTF8("东风西"), __UTF8("东风北"),
     __UTF8("南风东"), __UTF8("南风南"), __UTF8("南风西"), __UTF8("南风北"),
