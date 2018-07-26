@@ -1274,7 +1274,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
     const float width = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(width, 95.0f));
+    rootNode->setContentSize(Size(width, 100.0f));
 
     std::array<ui::RadioButtonGroup *, 2> radioGroups;
 
@@ -1283,7 +1283,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
     label->setTextColor(C4B_BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 85.0f));
+    label->setPosition(Vec2(5.0f, 90.0f));
 
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
     rootNode->addChild(radioGroup);
@@ -1295,7 +1295,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
         radioButton->setZoomScale(0.0f);
         radioButton->ignoreContentAdaptWithSize(false);
         radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 60.0f));
+        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 65.0f));
         rootNode->addChild(radioButton);
         radioGroup->addRadioButton(radioButton);
 

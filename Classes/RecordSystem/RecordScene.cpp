@@ -394,7 +394,7 @@ bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const 
     button->setTitleText(__UTF8("记录和牌"));
     button->addClickEventListener([this](Ref *) { onRecordTilesButton(nullptr); });
     topNode->addChild(button);
-    button->setPosition(Vec2(visibleSize.width - 90.0f, 35.0f));
+    button->setPosition(Vec2(visibleSize.width - 85.0f, 35.0f));
     _recordTilesButton = button;
 
     // 小番

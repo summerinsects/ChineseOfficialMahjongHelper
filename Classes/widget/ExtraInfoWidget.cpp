@@ -474,7 +474,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     rootNode->addChild(label);
 
     // 输入手牌
-    ui::EditBox *editBox = UICommon::createEditBox(Size(width - 10.0f, 20.0f));
+    ui::EditBox *editBox = UICommon::createEditBox(Size(width, 20.0f));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
