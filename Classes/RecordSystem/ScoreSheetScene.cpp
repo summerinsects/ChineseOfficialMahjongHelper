@@ -800,6 +800,11 @@ void ScoreSheetScene::editNameAndTitle() {
     button2->setPosition(Vec2(limitWidth - button1->getPositionX(), 55.0f));
     cw::scaleLabelToFitWidth(button2->getTitleLabel(), 45.0f);
 
+    if (_record.start_time != 0) {
+        button1->setEnabled(false);
+        button2->setEnabled(false);
+    }
+
     ui::EditBox *editBox = UICommon::createEditBox(Size(limitWidth, 20.0f));
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
@@ -923,7 +928,7 @@ void ScoreSheetScene::editNameAndTitle() {
         }
     });
 
-    // 重新定庄
+    // 随机排座
     button2->addClickEventListener([this, editBoxes](Ref *) {
         // 获取四个输入框内容
         std::string names[4];
