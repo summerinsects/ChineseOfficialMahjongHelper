@@ -42,6 +42,8 @@ private:
     std::vector<StateData> _undoCache;
     std::vector<StateData> _redoCache;
 
+    char _tileString[64];
+
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
     void setRandomInput();
     void onGuideButton(cocos2d::Ref *sender);
@@ -56,6 +58,7 @@ private:
     void onUndoButton(cocos2d::Ref *sender);
     void onRedoButton(cocos2d::Ref *sender);
     void refreshStepLabel();
+    bool updateTileString(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile);
     void deduce(mahjong::tile_t discardTile, mahjong::tile_t servingTile);
 
     float _cellWidth = 0.0f;

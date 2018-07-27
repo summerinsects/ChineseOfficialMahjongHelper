@@ -254,11 +254,10 @@ void MahjongTheoryScene::showInputAlert() {
         mahjong::hand_tiles_t handTiles;
         mahjong::tile_t servingTile;
         tilePicker->getData(&handTiles, &servingTile);
-        char str[64];
-        intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, str, 64);
-        if (ret > 0) {
-            mahjong::tiles_to_string(&servingTile, 1, &str[ret], 64 - ret);
-            _editBox->setText(str);
+
+        char temp[sizeof(_tileString)];
+        memcpy(temp, _tileString, sizeof(temp));
+        if (updateTileString(handTiles, servingTile) && 0 != strncmp(temp, _tileString, sizeof(temp))) {
             editBoxReturn(_editBox);
         }
         return true;
@@ -299,12 +298,7 @@ void MahjongTheoryScene::setRandomInput() {
 
     // 设置UI
     _handTilesWidget->setData(handTiles, servingTile);
-
-    // 转化为字符串，显示在输入框内
-    char str[64];
-    intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
-    mahjong::tiles_to_string(&servingTile, 1, str + ret, sizeof(str) - ret);
-    _editBox->setText(str);
+    updateTileString(handTiles, servingTile);
 
     _allResults.clear();
     _resultSources.clear();
@@ -344,9 +338,11 @@ bool MahjongTheoryScene::parseInput(const char *input) {
         return false;
     }
 
-    const char *errorStr = nullptr;
-    std::string str = input;
+    if (0 == strncmp(_tileString, input, sizeof(_tileString))) {
+        return false;
+    }
 
+    const char *errorStr = nullptr;
     do {
         mahjong::hand_tiles_t hand_tiles = { 0 };
         mahjong::tile_t serving_tile = 0;
@@ -382,10 +378,16 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             mahjong::map_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count, &cnt_table);
             serving_tile = serveRandomTile(cnt_table, 0);
 
-            char temp[64];
-            mahjong::tiles_to_string(&serving_tile, 1, temp, sizeof(temp));
-            str.append(temp);
-            _editBox->setText(str.c_str());
+            memset(_tileString, 0, sizeof(_tileString));
+            strncpy(_tileString, input, sizeof(_tileString));
+            size_t len = strlen(_tileString);
+            mahjong::tiles_to_string(&serving_tile, 1, &_tileString[len], sizeof(_tileString) - len);
+
+            _editBox->setText(_tileString);
+        }
+        else {
+            memset(_tileString, 0, sizeof(_tileString));
+            strncpy(_tileString, input, sizeof(_tileString));
         }
 
         // 检查输入的合法性
@@ -626,11 +628,7 @@ void MahjongTheoryScene::onStandingTileEvent() {
 void MahjongTheoryScene::recoverFromState(StateData &state) {
     // 设置UI
     _handTilesWidget->setData(state.handTiles, state.servingTile);
-
-    char str[64];
-    intptr_t ret = mahjong::hand_tiles_to_string(&state.handTiles, str, sizeof(str));
-    mahjong::tiles_to_string(&state.servingTile, 1, str + ret, sizeof(str) - ret);
-    _editBox->setText(str);
+    updateTileString(state.handTiles, state.servingTile);
 
     // 打表
     mahjong::map_hand_tiles(&state.handTiles, &_handTilesTable);
@@ -684,6 +682,18 @@ void MahjongTheoryScene::refreshStepLabel() {
     _stepLabel->setString(str);
 }
 
+bool MahjongTheoryScene::updateTileString(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile) {
+    memset(_tileString, 0, sizeof(_tileString));
+    intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, _tileString, sizeof(_tileString));
+    if (ret > 0) {
+        mahjong::tiles_to_string(&servingTile, 1, &_tileString[ret], sizeof(_tileString) - ret);
+        _editBox->setText(_tileString);
+        return true;
+    }
+
+    return false;
+}
+
 // 推演
 void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t servingTile) {
     if (discardTile == servingTile) {
@@ -714,11 +724,7 @@ void MahjongTheoryScene::deduce(mahjong::tile_t discardTile, mahjong::tile_t ser
 
     // 设置UI
     _handTilesWidget->setData(handTiles, servingTile);
-
-    char str[64];
-    intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
-    mahjong::tiles_to_string(&servingTile, 1, str + ret, sizeof(str) - ret);
-    _editBox->setText(str);
+    updateTileString(handTiles, servingTile);
 
     // 计算
     calculate();
