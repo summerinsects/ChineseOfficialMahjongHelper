@@ -102,8 +102,16 @@ bool MahjongTheoryScene::init() {
     button->setEnabled(false);
     _redoButton = button;
 
+    // 步数Label
+    Label *label = Label::createWithSystemFont(__UTF8("步数：0"), "Arial", 10);
+    label->setTextColor(C4B_GRAY);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+    label->setPosition(Vec2(origin.x + visibleSize.width - 85.0f, origin.y + visibleSize.height - 75.0f - widgetSize.height));
+    _stepLabel = label;
+
     // 特殊和型选项
-    Label *label = Label::createWithSystemFont(__UTF8("考虑特殊和型"), "Arial", 12);
+    label = Label::createWithSystemFont(__UTF8("考虑特殊和型"), "Arial", 12);
     label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -308,6 +316,7 @@ void MahjongTheoryScene::setRandomInput() {
     _redoCache.clear();
     _undoButton->setEnabled(false);
     _redoButton->setEnabled(false);
+    _stepLabel->setString(__UTF8("步数：0"));
 
     calculate();
 }
@@ -324,6 +333,7 @@ void MahjongTheoryScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
         _redoCache.clear();
         _undoButton->setEnabled(false);
         _redoButton->setEnabled(false);
+        _stepLabel->setString(__UTF8("步数：0"));
 
         calculate();
     }
@@ -586,6 +596,8 @@ void MahjongTheoryScene::onTileButton(cocos2d::Ref *sender) {
     _handTilesWidget->getData(&state.handTiles, &state.servingTile);
     state.allResults = _allResults;
 
+    refreshStepLabel();
+
     deduce(discardTile, servingTile);
 }
 
@@ -605,6 +617,8 @@ void MahjongTheoryScene::onStandingTileEvent() {
     StateData &state = _undoCache.back();
     _handTilesWidget->getData(&state.handTiles, &state.servingTile);
     state.allResults.swap(_allResults);
+
+    refreshStepLabel();
 
     deduce(discardTile, servingTile);
 }
@@ -642,6 +656,8 @@ void MahjongTheoryScene::onUndoButton(cocos2d::Ref *) {
         _undoCache.pop_back();
         _undoButton->setEnabled(!_undoCache.empty());
         _redoButton->setEnabled(true);
+
+        refreshStepLabel();
     }
 }
 
@@ -657,7 +673,15 @@ void MahjongTheoryScene::onRedoButton(cocos2d::Ref *) {
         _redoCache.pop_back();
         _undoButton->setEnabled(true);
         _redoButton->setEnabled(!_redoCache.empty());
+
+        refreshStepLabel();
     }
+}
+
+void MahjongTheoryScene::refreshStepLabel() {
+    char str[64];
+    snprintf(str, sizeof(str), __UTF8("步数：%ld"), static_cast<long>(_undoCache.size()));
+    _stepLabel->setString(str);
 }
 
 // 推演

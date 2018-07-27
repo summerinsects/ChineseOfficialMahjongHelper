@@ -17,6 +17,7 @@ public:
 private:
     cocos2d::ui::EditBox *_editBox = nullptr;
     HandTilesWidget *_handTilesWidget = nullptr;
+    cocos2d::Label *_stepLabel = nullptr;
     cocos2d::ui::Button *_undoButton = nullptr;
     cocos2d::ui::Button *_redoButton = nullptr;
     cocos2d::ui::CheckBox *_checkBoxes[4];
@@ -54,6 +55,7 @@ private:
     void recoverFromState(StateData &state);
     void onUndoButton(cocos2d::Ref *sender);
     void onRedoButton(cocos2d::Ref *sender);
+    void refreshStepLabel();
     void deduce(mahjong::tile_t discardTile, mahjong::tile_t servingTile);
 
     float _cellWidth = 0.0f;
