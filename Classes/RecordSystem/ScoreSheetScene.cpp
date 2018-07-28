@@ -838,7 +838,7 @@ void ScoreSheetScene::editNameAndTitle() {
             if (it != &editBoxes[5] && ++it != &editBoxes[5]) {
                 editBox = *it;
                 editBox->scheduleOnce([editBox](float) {
-                    editBox->touchDownAction(editBox, cocos2d::ui::Widget::TouchEventType::ENDED);
+                    editBox->openKeyboard();
                 }, 0.0f, "open_keyboard");
             }
         }

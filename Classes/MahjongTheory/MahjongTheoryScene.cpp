@@ -232,7 +232,7 @@ void MahjongTheoryScene::showInputAlert() {
     mahjong::hand_tiles_t handTiles;
     mahjong::tile_t servingTile;
     if (PARSE_NO_ERROR != mahjong::string_to_tiles(_editBox->getText(), &handTiles, &servingTile)) {
-        _editBox->touchDownAction(_editBox, ui::Widget::TouchEventType::ENDED);
+        _editBox->openKeyboard();
         return;
     }
 
@@ -261,7 +261,7 @@ void MahjongTheoryScene::showInputAlert() {
         }
         return true;
     }).setNegativeButton(__UTF8("取消"), [this](AlertDialog *, int) {
-        _editBox->touchDownAction(_editBox, ui::Widget::TouchEventType::ENDED);
+        _editBox->openKeyboard();
         return true;
     }).create()->show();
 }

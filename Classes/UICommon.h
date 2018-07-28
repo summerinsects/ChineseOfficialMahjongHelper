@@ -20,7 +20,7 @@ namespace UICommon {
     }
 
     static FORCE_INLINE cocos2d::ui::EditBox *createEditBox(const cocos2d::Size &size) {
-        return cocos2d::ui::EditBox::create(size, cocos2d::ui::Scale9Sprite::create("source_material/btn_square_normal.png"));
+        return cocos2d::ui::EditBox::create(size, "source_material/btn_square_normal.png", "source_material/btn_square_highlight_edge.png");
     }
 
 }
