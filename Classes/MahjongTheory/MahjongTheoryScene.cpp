@@ -357,7 +357,8 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             case PARSE_ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
             default: errorStr = __UTF8("未知错误"); break;
             }
-            break;
+            Toast::makeText(this, errorStr, Toast::LENGTH_LONG)->show();
+            return false;
         }
 
         if (hand_tiles.tile_count < 13) {
@@ -400,7 +401,10 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             case ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
             default: break;
             }
-            break;
+            if (errorStr != nullptr) {
+                Toast::makeText(this, errorStr, Toast::LENGTH_LONG)->show();
+            }
+            return false;
         }
 
         // 设置UI
@@ -408,9 +412,6 @@ bool MahjongTheoryScene::parseInput(const char *input) {
         return true;
     } while (0);
 
-    if (errorStr != nullptr) {
-        Toast::makeText(this, errorStr, Toast::LENGTH_LONG)->show();
-    }
     return false;
 }
 
