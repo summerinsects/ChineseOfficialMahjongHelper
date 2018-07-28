@@ -187,7 +187,7 @@ bool HelloWorld::init() {
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 35.0f));
 #endif
 
-    upgradeData();
+    upgradeDataIfNecessary();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     if (needRequest()) {
@@ -535,7 +535,7 @@ static bool isVersionNewer(const char *version1, const char *version2) {
     return false;
 }
 
-void HelloWorld::upgradeData() {
+void HelloWorld::upgradeDataIfNecessary() {
     std::string version = Application::getInstance()->getVersion();
     std::string dv = UserDefault::getInstance()->getStringForKey("data_version");
     if (dv.empty() || isVersionNewer(version.c_str(), dv.c_str())) {
