@@ -62,7 +62,7 @@
 #if 0
 #define LOG(fmt_, ...) printf(fmt_, ##__VA_ARGS__)
 #else
-#define LOG(...) do { } while (0)
+#define LOG(...) ((void)0)
 #endif
 
 //#define STRICT_98_RULE
