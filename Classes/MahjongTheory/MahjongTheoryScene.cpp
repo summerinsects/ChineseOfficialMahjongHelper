@@ -343,76 +343,73 @@ bool MahjongTheoryScene::parseInput(const char *input) {
     }
 
     const char *errorStr = nullptr;
-    do {
-        mahjong::hand_tiles_t hand_tiles = { 0 };
-        mahjong::tile_t serving_tile = 0;
-        intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &serving_tile);
-        if (ret != PARSE_NO_ERROR) {
-            switch (ret) {
-            case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = __UTF8("无法解析的字符"); break;
-            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = __UTF8("数字后面需有后缀"); break;
-            case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: errorStr = __UTF8("一组副露包含了错误的牌数目"); break;
-            case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = __UTF8("无法正确解析副露"); break;
-            case PARSE_ERROR_TOO_MANY_TILES: errorStr = __UTF8("手牌过多"); break;
-            case PARSE_ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
-            default: errorStr = __UTF8("未知错误"); break;
-            }
+
+    mahjong::hand_tiles_t hand_tiles = { 0 };
+    mahjong::tile_t serving_tile = 0;
+    intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &serving_tile);
+    if (ret != PARSE_NO_ERROR) {
+        switch (ret) {
+        case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = __UTF8("无法解析的字符"); break;
+        case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = __UTF8("数字后面需有后缀"); break;
+        case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: errorStr = __UTF8("一组副露包含了错误的牌数目"); break;
+        case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = __UTF8("无法正确解析副露"); break;
+        case PARSE_ERROR_TOO_MANY_TILES: errorStr = __UTF8("手牌过多"); break;
+        case PARSE_ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
+        default: errorStr = __UTF8("未知错误"); break;
+        }
+        Toast::makeText(this, errorStr, Toast::LENGTH_LONG)->show();
+        return false;
+    }
+
+    if (hand_tiles.tile_count < 13) {
+        switch (hand_tiles.tile_count % 3) {
+        case 2:
+            // 将最后一张作为上牌，不需要break
+            serving_tile = hand_tiles.standing_tiles[--hand_tiles.tile_count];
+        case 1:
+            // 修正副露组数，以便骗过检查
+            hand_tiles.pack_count = 4 - hand_tiles.tile_count / 3;
+            break;
+        default:
+            break;
+        }
+    }
+
+    // 随机上牌
+    if (serving_tile == 0) {
+        mahjong::tile_table_t cnt_table;
+        mahjong::map_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count, &cnt_table);
+        serving_tile = serveRandomTile(cnt_table, 0);
+
+        memset(_tileString, 0, sizeof(_tileString));
+        strncpy(_tileString, input, sizeof(_tileString));
+        size_t len = strlen(_tileString);
+        mahjong::tiles_to_string(&serving_tile, 1, &_tileString[len], sizeof(_tileString) - len);
+
+        _editBox->setText(_tileString);
+    }
+    else {
+        memset(_tileString, 0, sizeof(_tileString));
+        strncpy(_tileString, input, sizeof(_tileString));
+    }
+
+    // 检查输入的合法性
+    ret = mahjong::check_calculator_input(&hand_tiles, serving_tile);
+    if (ret != 0) {
+        switch (ret) {
+        case ERROR_WRONG_TILES_COUNT: errorStr = __UTF8("牌张数错误"); break;
+        case ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
+        default: break;
+        }
+        if (errorStr != nullptr) {
             Toast::makeText(this, errorStr, Toast::LENGTH_LONG)->show();
-            return false;
         }
+        return false;
+    }
 
-        if (hand_tiles.tile_count < 13) {
-            switch (hand_tiles.tile_count % 3) {
-            case 2:
-                // 将最后一张作为上牌，不需要break
-                serving_tile = hand_tiles.standing_tiles[--hand_tiles.tile_count];
-            case 1:
-                // 修正副露组数，以便骗过检查
-                hand_tiles.pack_count = 4 - hand_tiles.tile_count / 3;
-                break;
-            default:
-                break;
-            }
-        }
-
-        // 随机上牌
-        if (serving_tile == 0) {
-            mahjong::tile_table_t cnt_table;
-            mahjong::map_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count, &cnt_table);
-            serving_tile = serveRandomTile(cnt_table, 0);
-
-            memset(_tileString, 0, sizeof(_tileString));
-            strncpy(_tileString, input, sizeof(_tileString));
-            size_t len = strlen(_tileString);
-            mahjong::tiles_to_string(&serving_tile, 1, &_tileString[len], sizeof(_tileString) - len);
-
-            _editBox->setText(_tileString);
-        }
-        else {
-            memset(_tileString, 0, sizeof(_tileString));
-            strncpy(_tileString, input, sizeof(_tileString));
-        }
-
-        // 检查输入的合法性
-        ret = mahjong::check_calculator_input(&hand_tiles, serving_tile);
-        if (ret != 0) {
-            switch (ret) {
-            case ERROR_WRONG_TILES_COUNT: errorStr = __UTF8("牌张数错误"); break;
-            case ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
-            default: break;
-            }
-            if (errorStr != nullptr) {
-                Toast::makeText(this, errorStr, Toast::LENGTH_LONG)->show();
-            }
-            return false;
-        }
-
-        // 设置UI
-        _handTilesWidget->setData(hand_tiles, serving_tile);
-        return true;
-    } while (0);
-
-    return false;
+    // 设置UI
+    _handTilesWidget->setData(hand_tiles, serving_tile);
+    return true;
 }
 
 void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
