@@ -527,7 +527,10 @@ const char *ExtraInfoWidget::parseInput(const char *input) {
             case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: return __UTF8("数字后面需有后缀");
             case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: return __UTF8("一组副露包含了错误的牌数目");
             case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: return __UTF8("无法正确解析副露");
-            default: break;
+            case PARSE_ERROR_TOO_MANY_FIXED_PACKS: return __UTF8("副露最多4组");
+            case PARSE_ERROR_TOO_MANY_TILES: return __UTF8("手牌过多");
+            case PARSE_ERROR_TILE_COUNT_GREATER_THAN_4: return __UTF8("同一种牌最多只能使用4枚");
+            default: return __UTF8("未知错误");
         }
         return nullptr;
     }

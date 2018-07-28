@@ -353,7 +353,9 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = __UTF8("数字后面需有后缀"); break;
             case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: errorStr = __UTF8("一组副露包含了错误的牌数目"); break;
             case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = __UTF8("无法正确解析副露"); break;
-            default: break;
+            case PARSE_ERROR_TOO_MANY_TILES: errorStr = __UTF8("手牌过多"); break;
+            case PARSE_ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
+            default: errorStr = __UTF8("未知错误"); break;
             }
             break;
         }

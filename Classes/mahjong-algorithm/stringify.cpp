@@ -22,6 +22,8 @@
 
 #include "stringify.h"
 #include <string.h>
+#include <algorithm>
+#include <iterator>
 
 namespace mahjong {
 
@@ -38,6 +40,10 @@ static intptr_t parse_tiles_impl(const char *str, tile_t *tiles, intptr_t max_cn
         if (tiles[--i] & 0xF0) break;       \
         tiles[i] |= value_;                 \
         } (void)0
+
+#define SET_SUIT_FOR_CHARACTERS()   SET_SUIT_FOR_NUMBERED(0x10)
+#define SET_SUIT_FOR_BAMBOO()       SET_SUIT_FOR_NUMBERED(0x20)
+#define SET_SUIT_FOR_DOTS()         SET_SUIT_FOR_NUMBERED(0x30)
 
 #define SET_SUIT_FOR_HONOR() \
     for (intptr_t i = tile_cnt; i > 0;) {   \
@@ -63,9 +69,9 @@ static intptr_t parse_tiles_impl(const char *str, tile_t *tiles, intptr_t max_cn
         case '7': tiles[tile_cnt++] = 7; break;
         case '8': tiles[tile_cnt++] = 8; break;
         case '9': tiles[tile_cnt++] = 9; break;
-        case 'm': SET_SUIT_FOR_NUMBERED(0x10); break;
-        case 's': SET_SUIT_FOR_NUMBERED(0x20); break;
-        case 'p': SET_SUIT_FOR_NUMBERED(0x30); break;
+        case 'm': SET_SUIT_FOR_CHARACTERS(); break;
+        case 's': SET_SUIT_FOR_BAMBOO(); break;
+        case 'p': SET_SUIT_FOR_DOTS(); break;
         case 'z': SET_SUIT_FOR_HONOR(); break;
         case 'E': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_E; break;
         case 'S': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_S; break;
@@ -74,36 +80,43 @@ static intptr_t parse_tiles_impl(const char *str, tile_t *tiles, intptr_t max_cn
         case 'C': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_C; break;
         case 'F': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_F; break;
         case 'P': CHECK_SUFFIX(); tiles[tile_cnt++] = TILE_P; break;
-        default: goto parse_finish;
+        default: goto finish_parse;
         }
     }
 
-parse_finish:
-    // 一连串数字+后缀，但已经超过容量，那么放弃中间一部分数字，直接解析最近的后缀
+finish_parse:
+    // 一连串数字+后缀，但已经超过容量，说明牌过多
     if (NO_SUFFIX_AFTER_DIGIT()) {
+        // 这里的逻辑为：放弃中间一部分数字，直接解析最近的后缀
         const char *p1 = strpbrk(p, "mspz");
         if (p1 == nullptr) {
             return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT;
         }
 
         switch (*p1) {
-        case 'm': SET_SUIT_FOR_NUMBERED(0x10); break;
-        case 's': SET_SUIT_FOR_NUMBERED(0x20); break;
-        case 'p': SET_SUIT_FOR_NUMBERED(0x30); break;
+        case 'm': SET_SUIT_FOR_CHARACTERS(); break;
+        case 's': SET_SUIT_FOR_BAMBOO(); break;
+        case 'p': SET_SUIT_FOR_DOTS(); break;
         case 'z': SET_SUIT_FOR_HONOR(); break;
         default: return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT;
         }
+
+        if (p1 != p) {  // 放弃过中间的数字
+            return PARSE_ERROR_TOO_MANY_TILES;
+        }
+
         p = p1 + 1;
     }
 
 #undef SET_SUIT_FOR_NUMBERED
+#undef SET_SUIT_FOR_CHARACTERS
+#undef SET_SUIT_FOR_BAMBOO
+#undef SET_SUIT_FOR_DOTS
 #undef SET_SUIT_FOR_HONOR
 #undef NO_SUFFIX_AFTER_DIGIT
 #undef CHECK_SUFFIX
 
-    if (out_tile_cnt != nullptr) {
-        *out_tile_cnt = tile_cnt;
-    }
+    *out_tile_cnt = tile_cnt;
     return static_cast<intptr_t>(p - str);
 }
 
@@ -173,53 +186,87 @@ intptr_t string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serv
 
     pack_t packs[4];
     intptr_t pack_cnt = 0;
+    tile_t standing_tiles[14];
+    intptr_t standing_cnt = 0;
+
     bool in_brackets = false;
-    tile_t tiles[14];
-    intptr_t tile_cnt = 0;
+    tile_t temp_tiles[14];
+    intptr_t temp_cnt = 0;
+    intptr_t max_cnt = 14;
     uint8_t offer = 0;
+
+    tile_table_t cnt_table = { 0 };
 
     const char *p = str;
     while (char c = *p) {
         const char *q;
         switch (c) {
-        case ',': {
+        case ',': {  // 副露来源
             if (!in_brackets) {
                 return PARSE_ERROR_ILLEGAL_CHARACTER;
             }
             offer = static_cast<uint8_t>(*++p - '0');
             q = ++p;
+            if (*p != ']') {
+                return PARSE_ERROR_ILLEGAL_CHARACTER;
+            }
             break;
         }
-        case '[': {
+        case '[': {  // 开始一组副露
+            if (in_brackets) {
+                return PARSE_ERROR_ILLEGAL_CHARACTER;
+            }
             if (pack_cnt > 4) {
                 return PARSE_ERROR_TOO_MANY_FIXED_PACKS;
             }
+            if (temp_cnt > 0) {  // 处理[]符号外面的牌
+                if (standing_cnt + temp_cnt >= max_cnt) {
+                    return PARSE_ERROR_TOO_MANY_TILES;
+                }
+                // 放到立牌中
+                memcpy(&standing_tiles[standing_cnt], temp_tiles, temp_cnt * sizeof(tile_t));
+                standing_cnt += temp_cnt;
+                temp_cnt = 0;
+            }
+
             q = ++p;
             in_brackets = true;
             offer = 0;
+            max_cnt = 4;  // 副露的牌组最多包含4张牌
             break;
         }
-        case ']': {
+        case ']': {  // 结束一副副露
             if (!in_brackets) {
                 return PARSE_ERROR_ILLEGAL_CHARACTER;
             }
-            q = ++p;
-            intptr_t ret = make_fixed_pack(tiles, tile_cnt, &packs[pack_cnt], offer);
+            // 生成副露
+            intptr_t ret = make_fixed_pack(temp_tiles, temp_cnt, &packs[pack_cnt], offer);
             if (ret < 0) {
                 return ret;
             }
+
+            q = ++p;
+            temp_cnt = 0;
             in_brackets = false;
             ++pack_cnt;
-            tile_cnt = 0;
+            max_cnt = 14 - standing_cnt - pack_cnt * 3;  // 余下立牌数的最大值
             break;
         }
-        default: {
-            intptr_t ret = parse_tiles_impl(p, tiles, 14, &tile_cnt);
-            if (ret < 0) {
+        default: {  // 牌
+            if (temp_cnt != 0) {  // 重复进入
+                return PARSE_ERROR_TOO_MANY_TILES;
+            }
+            // 解析max_cnt张牌
+            intptr_t ret = parse_tiles_impl(p, temp_tiles, max_cnt, &temp_cnt);
+            if (ret < 0) {  // 出错
                 return ret;
             }
             if (ret == 0) {
                 return PARSE_ERROR_ILLEGAL_CHARACTER;
+            }
+            // 对牌打表
+            for (intptr_t i = 0; i < temp_cnt; ++i) {
+                ++cnt_table[temp_tiles[i]];
             }
             q = p + ret;
             break;
@@ -228,23 +275,40 @@ intptr_t string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serv
         p = q;
     }
 
-    memcpy(hand_tiles->fixed_packs, packs, pack_cnt * sizeof(pack_t));
-    hand_tiles->pack_count = pack_cnt;
-    intptr_t max_cnt = 13 - pack_cnt * 3;
-    if (tile_cnt > max_cnt) {
-        memcpy(hand_tiles->standing_tiles, tiles, max_cnt * sizeof(tile_t));
-        hand_tiles->tile_count = max_cnt;
-        if (serving_tile != nullptr) {
-            *serving_tile = tiles[max_cnt];
+    max_cnt = 14 - pack_cnt * 3;
+    if (temp_cnt > 0) {  // 处理[]符号外面的牌
+        if (standing_cnt + temp_cnt > max_cnt) {
+            return PARSE_ERROR_TOO_MANY_TILES;
         }
+        // 放到立牌中
+        memcpy(&standing_tiles[standing_cnt], temp_tiles, temp_cnt * sizeof(tile_t));
+        standing_cnt += temp_cnt;
+    }
+
+    if (standing_cnt > max_cnt) {
+        return PARSE_ERROR_TOO_MANY_TILES;
+    }
+
+    // 如果某张牌超过4
+    if (std::any_of(std::begin(cnt_table), std::end(cnt_table), [](int cnt) { return cnt > 4; })) {
+        return PARSE_ERROR_TILE_COUNT_GREATER_THAN_4;
+    }
+
+    // 无错误时再写回数据
+    tile_t last_tile = 0;
+    if (standing_cnt == max_cnt) {
+        memcpy(hand_tiles->standing_tiles, standing_tiles, (max_cnt - 1) * sizeof(tile_t));
+        hand_tiles->tile_count = max_cnt - 1;
+        last_tile = standing_tiles[max_cnt - 1];
     }
     else {
-        memcpy(hand_tiles->standing_tiles, tiles, tile_cnt * sizeof(tile_t));
-        hand_tiles->tile_count = tile_cnt;
-        if (serving_tile != nullptr) {
-            *serving_tile = 0;
-        }
+        memcpy(hand_tiles->standing_tiles, standing_tiles, standing_cnt * sizeof(tile_t));
+        hand_tiles->tile_count = standing_cnt;
     }
+
+    memcpy(hand_tiles->fixed_packs, packs, pack_cnt * sizeof(pack_t));
+    hand_tiles->pack_count = pack_cnt;
+    *serving_tile = last_tile;
 
     return PARSE_NO_ERROR;
 }
@@ -350,8 +414,6 @@ intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intp
             *p++ = '0' + o;
             if (p >= end) break;
             *p++ = ']';
-
-            //if (!is_pack_melded(pack))
             break;
         case PACK_TYPE_PAIR:
             temp[0] = t; temp[1] = t;
@@ -376,4 +438,3 @@ intptr_t hand_tiles_to_string(const hand_tiles_t *hand_tiles, char *str, intptr_
 }
 
 }
-
