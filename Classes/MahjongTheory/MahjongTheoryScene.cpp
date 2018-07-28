@@ -1,7 +1,6 @@
 ﻿#include "MahjongTheoryScene.h"
 #include <array>
 #include "../mahjong-algorithm/stringify.h"
-#include "../mahjong-algorithm/fan_calculator.h"
 #include "../UICommon.h"
 #include "../UIColors.h"
 #include "../TilesImage.h"
@@ -13,6 +12,7 @@
 USING_NS_CC;
 
 static mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile);
+static bool getStringFromTiles(char (&str)[64], const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile);
 
 bool MahjongTheoryScene::init() {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("牌理")))) {
@@ -231,8 +231,7 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
 void MahjongTheoryScene::showInputAlert() {
     mahjong::hand_tiles_t handTiles;
     mahjong::tile_t servingTile;
-    mahjong::string_to_tiles(_editBox->getText(), &handTiles, &servingTile);
-    if (0 != mahjong::check_calculator_input(&handTiles, servingTile)) {
+    if (PARSE_NO_ERROR != mahjong::string_to_tiles(_editBox->getText(), &handTiles, &servingTile)) {
         _editBox->touchDownAction(_editBox, ui::Widget::TouchEventType::ENDED);
         return;
     }
@@ -256,9 +255,9 @@ void MahjongTheoryScene::showInputAlert() {
         tilePicker->getData(&handTiles, &servingTile);
 
         char temp[sizeof(_tileString)];
-        memcpy(temp, _tileString, sizeof(temp));
-        if (updateTileString(handTiles, servingTile) && 0 != strncmp(temp, _tileString, sizeof(temp))) {
-            editBoxReturn(_editBox);
+        if (getStringFromTiles(temp, handTiles, servingTile) && 0 != strncmp(temp, _tileString, sizeof(temp))) {
+            parseInput(temp);
+            _editBox->setText(temp);
         }
         return true;
     }).setNegativeButton(__UTF8("取消"), [this](AlertDialog *, int) {
@@ -316,49 +315,31 @@ void MahjongTheoryScene::setRandomInput() {
 }
 
 void MahjongTheoryScene::editBoxReturn(cocos2d::ui::EditBox *editBox) {
-    if (parseInput(editBox->getText())) {
-        _allResults.clear();
-        _resultSources.clear();
-        _orderedIndices.clear();
-
-        _tableView->reloadData();
-
-        _undoCache.clear();
-        _redoCache.clear();
-        _undoButton->setEnabled(false);
-        _redoButton->setEnabled(false);
-        _stepLabel->setString(__UTF8("步数：0"));
-
-        calculate();
-    }
+    parseInput(editBox->getText());
 }
 
-bool MahjongTheoryScene::parseInput(const char *input) {
-    if (*input == '\0') {
-        return false;
+void MahjongTheoryScene::parseInput(const char *input) {
+    if (*input == '\0' || 0 == strncmp(_tileString, input, sizeof(_tileString))) {
+        return;
     }
-
-    if (0 == strncmp(_tileString, input, sizeof(_tileString))) {
-        return false;
-    }
-
-    const char *errorStr = nullptr;
 
     mahjong::hand_tiles_t hand_tiles = { 0 };
     mahjong::tile_t serving_tile = 0;
     intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &serving_tile);
     if (ret != PARSE_NO_ERROR) {
+        const char *errorStr = nullptr;
         switch (ret) {
         case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = __UTF8("无法解析的字符"); break;
         case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = __UTF8("数字后面需有后缀"); break;
         case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: errorStr = __UTF8("一组副露包含了错误的牌数目"); break;
         case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = __UTF8("无法正确解析副露"); break;
+        case PARSE_ERROR_TOO_MANY_FIXED_PACKS: errorStr = __UTF8("副露最多4组"); break;
         case PARSE_ERROR_TOO_MANY_TILES: errorStr = __UTF8("手牌过多"); break;
         case PARSE_ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
         default: errorStr = __UTF8("未知错误"); break;
         }
         Toast::makeText(this, errorStr, Toast::LENGTH_LONG)->show();
-        return false;
+        return;
     }
 
     if (hand_tiles.tile_count < 13) {
@@ -367,11 +348,13 @@ bool MahjongTheoryScene::parseInput(const char *input) {
             // 将最后一张作为上牌，不需要break
             serving_tile = hand_tiles.standing_tiles[--hand_tiles.tile_count];
         case 1:
-            // 修正副露组数，以便骗过检查
+            // 非满手的情况
+            // 修正副露组数，以便正确绘制
             hand_tiles.pack_count = 4 - hand_tiles.tile_count / 3;
             break;
         default:
-            break;
+            Toast::makeText(this, __UTF8("不正确的牌数目"), Toast::LENGTH_LONG)->show();
+            return;
         }
     }
 
@@ -393,23 +376,22 @@ bool MahjongTheoryScene::parseInput(const char *input) {
         strncpy(_tileString, input, sizeof(_tileString));
     }
 
-    // 检查输入的合法性
-    ret = mahjong::check_calculator_input(&hand_tiles, serving_tile);
-    if (ret != 0) {
-        switch (ret) {
-        case ERROR_WRONG_TILES_COUNT: errorStr = __UTF8("牌张数错误"); break;
-        case ERROR_TILE_COUNT_GREATER_THAN_4: errorStr = __UTF8("同一种牌最多只能使用4枚"); break;
-        default: break;
-        }
-        if (errorStr != nullptr) {
-            Toast::makeText(this, errorStr, Toast::LENGTH_LONG)->show();
-        }
-        return false;
-    }
-
     // 设置UI
     _handTilesWidget->setData(hand_tiles, serving_tile);
-    return true;
+
+    _allResults.clear();
+    _resultSources.clear();
+    _orderedIndices.clear();
+
+    _tableView->reloadData();
+
+    _undoCache.clear();
+    _redoCache.clear();
+    _undoButton->setEnabled(false);
+    _redoButton->setEnabled(false);
+    _stepLabel->setString(__UTF8("步数：0"));
+
+    calculate();
 }
 
 void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
@@ -682,15 +664,22 @@ void MahjongTheoryScene::refreshStepLabel() {
     _stepLabel->setString(str);
 }
 
-bool MahjongTheoryScene::updateTileString(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile) {
-    memset(_tileString, 0, sizeof(_tileString));
-    intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, _tileString, sizeof(_tileString));
+static bool getStringFromTiles(char (&str)[64], const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile) {
+    memset(str, 0, sizeof(str));
+    intptr_t ret = mahjong::hand_tiles_to_string(&handTiles, str, sizeof(str));
     if (ret > 0) {
-        mahjong::tiles_to_string(&servingTile, 1, &_tileString[ret], sizeof(_tileString) - ret);
-        _editBox->setText(_tileString);
+        mahjong::tiles_to_string(&servingTile, 1, &str[ret], sizeof(str) - ret);
         return true;
     }
 
+    return false;
+}
+
+bool MahjongTheoryScene::updateTileString(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile) {
+    if (getStringFromTiles(_tileString, handTiles, servingTile)) {
+        _editBox->setText(_tileString);
+        return true;
+    }
     return false;
 }
 

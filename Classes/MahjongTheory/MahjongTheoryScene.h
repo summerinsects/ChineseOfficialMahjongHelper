@@ -48,7 +48,7 @@ private:
     void setRandomInput();
     void onGuideButton(cocos2d::Ref *sender);
     void showInputAlert();
-    bool parseInput(const char *input);
+    void parseInput(const char *input);
     void calculate();
     void filterResultsByFlag(uint8_t flag);
     uint8_t getFilterFlag() const;
