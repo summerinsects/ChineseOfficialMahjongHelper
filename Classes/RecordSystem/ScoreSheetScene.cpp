@@ -77,7 +77,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     const float buttonGap = (visibleSize.width - 4.0f - 55.0f) / 3.0f;
 
     const float xPos = origin.x + 2.0f + 55.0f * 0.5f;
-    const float yPos = origin.y + tableOffsetY + tableHeight + 15.0f;
+    const float yPos = origin.y + visibleSize.height * 0.5f - 15.0f + tableOffsetY * 0.5f + tableHeight * 0.5f;
     static const char *titleText[4] = { __UTF8("追分策略"), __UTF8("清空表格"), __UTF8("历史记录"), __UTF8("更多设置") };
     static void (ScoreSheetScene::*callbacks[4])(Ref *) = {
         &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onSettingButton
@@ -104,7 +104,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     label = Label::createWithSystemFont(__UTF8("当前时间"), "Arial", 12);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + tableOffsetY - 12.0f));
+    label->setPosition(Vec2(origin.x + 5.0f, origin.y + tableOffsetY * 0.5f));
     label->setTextColor(C4B_BLACK);
     _timeLabel = label;
 
