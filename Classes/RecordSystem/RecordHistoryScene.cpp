@@ -90,12 +90,12 @@ void RecordHistoryScene::updateRecordTexts() {
     });
 }
 
-bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
+bool RecordHistoryScene::initWithCallback(ViewCallback &&viewCallback) {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("历史记录")))) {
         return false;
     }
 
-    _viewCallback = viewCallback;
+    _viewCallback.swap(viewCallback);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();

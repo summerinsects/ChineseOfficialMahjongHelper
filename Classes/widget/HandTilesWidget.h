@@ -11,8 +11,8 @@ public:
 
     static cocos2d::Node *createStaticNode(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile);
 
-    void setCurrentIdxChangedCallback(const std::function<void ()> &callback) { _currentIdxChangedCallback = callback; }
-    void setTileClickCallback(const std::function<void ()> &callback) { _tileClickCallback = callback; }
+    void setCurrentIdxChangedCallback(std::function<void ()> &&callback) { _currentIdxChangedCallback.swap(callback); }
+    void setTileClickCallback(std::function<void ()> &&callback) { _tileClickCallback.swap(callback); }
 
     mahjong::tile_t getCurrentTile() const { return _currentIdx < _standingTiles.size() ? _standingTiles[_currentIdx] : mahjong::tile_t(0); }
     int getUsedTileCount(mahjong::tile_t tile) const { return _usedTilesTable[tile]; }

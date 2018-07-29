@@ -25,7 +25,7 @@ public:
     void refreshByKong(bool hasKong);
     void refreshByWinTile(mahjong::tile_t winTile, bool maybeFourthTile, size_t winTileCountInFixedPacks, bool hasKong);
 
-    void setInputCallback(const std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> &inputCallback) { _inputCallback = inputCallback; }
+    void setInputCallback(std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> &&inputCallback) { _inputCallback.swap(inputCallback); }
 
     bool initWithWidth(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback);
 

@@ -7,7 +7,8 @@
 #define CREATE_FUNC_WITH_PARAM_1(class_name_, init_func_, arg_type1_, arg1_)    \
 static class_name_ *create(arg_type1_ arg1_) {              \
     class_name_ *ret = new (std::nothrow) class_name_();    \
-    if (ret != nullptr && ret->init_func_(arg1_)) {         \
+    if (ret != nullptr && ret->init_func_(                  \
+        std::forward<arg_type1_>(arg1_))) {                 \
         ret->autorelease();                                 \
         return ret;                                         \
     }                                                       \
@@ -21,7 +22,9 @@ static class_name_ *create(arg_type1_ arg1_) {              \
     arg_type2_, arg2_)                                              \
 static class_name_ *create(arg_type1_ arg1_, arg_type2_ arg2_) {    \
     class_name_ *ret = new (std::nothrow) class_name_();            \
-    if (ret != nullptr && ret->init_func_(arg1_, arg2_)) {          \
+    if (ret != nullptr && ret->init_func_(                          \
+        std::forward<arg_type1_>(arg1_),                            \
+        std::forward<arg_type2_>(arg2_))) {                         \
         ret->autorelease();                                         \
         return ret;                                                 \
     }                                                               \
@@ -36,7 +39,8 @@ static class_name_ *create(arg_type1_ arg1_, arg_type2_ arg2_) {    \
 static class_name_ *create(arg_type1_ arg1_, arg_type2_ arg2_,                  \
     arg_type3_ arg3_) {                                                         \
     class_name_ *ret = new (std::nothrow) class_name_();                        \
-    if (ret != nullptr && ret->init_func_(arg1_, arg2_, arg3_)) {               \
+    if (ret != nullptr && ret->init_func_(std::forward<arg_type1_>(arg1_),      \
+        std::forward<arg_type2_>(arg2_), std::forward<arg_type3_>(arg3_))) {    \
         ret->autorelease();                                                     \
         return ret;                                                             \
     }                                                                           \
@@ -51,7 +55,9 @@ static class_name_ *create(arg_type1_ arg1_, arg_type2_ arg2_,                  
 static class_name_ *create(arg_type1_ arg1_, arg_type2_ arg2_,                  \
     arg_type3_ arg3_, arg_type4_ arg4_) {                                       \
     class_name_ *ret = new (std::nothrow) class_name_();                        \
-    if (ret != nullptr && ret->init_func_(arg1_, arg2_, arg3_, arg4_)) {        \
+    if (ret != nullptr && ret->init_func_(std::forward<arg_type1_>(arg1_),      \
+        std::forward<arg_type2_>(arg2_), std::forward<arg_type3_>(arg3_),       \
+        std::forward<arg_type4_>(arg4_))) {                                     \
         ret->autorelease();                                                     \
         return ret;                                                             \
     }                                                                           \
@@ -66,7 +72,9 @@ static class_name_ *create(arg_type1_ arg1_, arg_type2_ arg2_,                  
 static class_name_ *create(arg_type1_ arg1_, arg_type2_ arg2_,                  \
     arg_type3_ arg3_, arg_type4_ arg4_, arg_type5_ arg5_) {                     \
     class_name_ *ret = new (std::nothrow) class_name_();                        \
-    if (ret != nullptr && ret->init_func_(arg1_, arg2_, arg3_, arg4_, arg5_)) { \
+    if (ret != nullptr && ret->init_func_(std::forward<arg_type1_>(arg1_),      \
+        std::forward<arg_type2_>(arg2_), std::forward<arg_type3_>(arg3_),       \
+        std::forward<arg_type4_>(arg4_), std::forward<arg_type5_>(arg5_))) {    \
         ret->autorelease();                                                     \
         return ret;                                                             \
     }                                                                           \

@@ -10,8 +10,8 @@ public:
 
     typedef std::function<void ()> TilePickCallback;
 
-    void setFixedPacksChangedCallback(const TilePickCallback &callback) { _fixedPacksChangedCallback = callback; }
-    void setWinTileChangedCallback(const TilePickCallback &callback) { _winTileChangedCallback = callback; }
+    void setFixedPacksChangedCallback(TilePickCallback &&callback) { _fixedPacksChangedCallback.swap(callback); }
+    void setWinTileChangedCallback(TilePickCallback &&callback) { _winTileChangedCallback.swap(callback); }
     void setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile);
 
     bool initWithWidth(float maxWidth);
