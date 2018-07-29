@@ -121,13 +121,6 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     this->addChild(tableView);
     _tableView = tableView;
 
-    tableView->setOnEnterCallback([this]() {
-        if (LIKELY(!g_records.empty())) {
-            updateRecordTexts();
-            _tableView->reloadDataInplacement();
-        }
-    });
-
     if (UNLIKELY(!g_hasLoaded)) {
         this->scheduleOnce([this](float) {
             LoadingView *loadingView = LoadingView::create();
@@ -144,9 +137,8 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
                     g_hasLoaded = true;
 
                     if (LIKELY(thiz->isRunning())) {
-                        thiz->updateRecordTexts();
+                        thiz->refresh();
                         loadingView->dismiss();
-                        thiz->_tableView->reloadData();
                     }
                 });
             }).detach();
@@ -154,6 +146,19 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     }
 
     return true;
+}
+
+void RecordHistoryScene::refresh() {
+    updateRecordTexts();
+    _tableView->reloadDataInplacement();
+}
+
+void RecordHistoryScene::onEnter() {
+    BaseScene::onEnter();
+
+    if (LIKELY(g_hasLoaded)) {
+        refresh();
+    }
 }
 
 ssize_t RecordHistoryScene::numberOfCellsInTableView(cw::TableView *) {
@@ -271,27 +276,29 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
         .setMessage(std::move(msg))
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("确定"), [this, idx](AlertDialog *, int) {
-        LoadingView *loadingView = LoadingView::create();
-        loadingView->showInScene(this);
-
         g_records.erase(g_records.begin() + idx);
-
-        auto thiz = makeRef(this);  // 保证线程回来之前不析构
-        auto temp = std::make_shared<std::vector<Record> >(g_records);
-        std::thread([thiz, temp, loadingView](){
-            saveRecords(*temp);
-
-            // 切换到cocos线程
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-                if (LIKELY(thiz->isRunning())) {
-                    thiz->updateRecordTexts();
-                    loadingView->dismiss();
-                    thiz->_tableView->reloadDataInplacement();
-                }
-            });
-        }).detach();
+        saveRecordsAndRefresh();
         return true;
     }).create()->show();
+}
+
+void RecordHistoryScene::saveRecordsAndRefresh() {
+    LoadingView *loadingView = LoadingView::create();
+    loadingView->showInScene(this);
+
+    auto thiz = makeRef(this);  // 保证线程回来之前不析构
+    auto temp = std::make_shared<std::vector<Record> >(g_records);
+    std::thread([thiz, temp, loadingView](){
+        saveRecords(*temp);
+
+        // 切换到cocos线程
+        Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
+            if (LIKELY(thiz->isRunning())) {
+                thiz->refresh();
+                loadingView->dismiss();
+            }
+        });
+    }).detach();
 }
 
 void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
@@ -857,29 +864,12 @@ void RecordHistoryScene::onBatchDeleteButton() {
             .setMessage(__UTF8("删除后无法找回，确认删除？"))
             .setNegativeButton(__UTF8("取消"), nullptr)
             .setPositiveButton(__UTF8("确定"), [this, currentFlags, dlg](AlertDialog *, int) {
-            LoadingView *loadingView = LoadingView::create();
-            loadingView->showInScene(this);
-
             for (size_t i = currentFlags->size(); i-- > 0; ) {
                 if (currentFlags->at(i)) {
                     g_records.erase(g_records.begin() + i);
                 }
             }
-
-            auto thiz = makeRef(this);  // 保证线程回来之前不析构
-            auto temp = std::make_shared<std::vector<Record> >(g_records);
-            std::thread([thiz, temp, loadingView](){
-                saveRecords(*temp);
-
-                // 切换到cocos线程
-                Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-                    if (LIKELY(thiz->isRunning())) {
-                        thiz->updateRecordTexts();
-                        loadingView->dismiss();
-                        thiz->_tableView->reloadDataInplacement();
-                    }
-                });
-            }).detach();
+            saveRecordsAndRefresh();
             dlg->dismiss();
             return true;
         }).create()->show();

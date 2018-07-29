@@ -22,9 +22,12 @@ public:
 
     static void modifyRecord(const Record *record);
 
+    virtual void onEnter() override;
+
 private:
     std::vector<RecordTexts> _recordTexts;
 
+    void refresh();
     void updateRecordTexts();
 
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
@@ -37,6 +40,8 @@ private:
 
     void onDeleteButton(cocos2d::Ref *sender);
     void onCellClicked(cocos2d::Ref *sender);
+
+    void saveRecordsAndRefresh();
 
     cw::TableView *_tableView = nullptr;
     ViewCallback _viewCallback;
