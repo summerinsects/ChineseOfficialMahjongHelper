@@ -537,7 +537,7 @@ void MahjongTheoryScene::calculate() {
     }).detach();
 }
 
-mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile) {
+static mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile) {
     // 没用到的牌表
     mahjong::tile_table_t remainTable;
     std::transform(std::begin(usedTable), std::end(usedTable), std::begin(remainTable),

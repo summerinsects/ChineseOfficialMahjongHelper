@@ -1236,7 +1236,7 @@ void RecordScene::finish() {
 }
 
 // in FanCalculatorScene.cpp
-cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth);
+extern cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth);
 
 void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
     const float maxWidth = AlertDialog::maxWidth();
