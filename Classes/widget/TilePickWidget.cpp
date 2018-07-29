@@ -6,7 +6,7 @@
 
 USING_NS_CC;
 
-bool TilePickWidget::initWithWidth(float maxWidth) {
+bool TilePickWidget::init(float maxWidth) {
     if (UNLIKELY(!Node::init())) {
         return false;
     }

@@ -32,8 +32,8 @@ public:
     typedef std::function<void (const Record::Detail &)> SubmitCallback;
     typedef std::array<const char *, 4> PlayerNames;
 
-    CREATE_FUNC_WITH_PARAM_4(RecordScene, initWithIndex, size_t, handIdx, const PlayerNames &, names, const Record::Detail *, detail, SubmitCallback &&, okCallback);
-    bool initWithIndex(size_t handIdx, const PlayerNames &names, const Record::Detail *detail, SubmitCallback &&callback);
+    CREATE_FUNC_WITH_PARAM_4(RecordScene, size_t, handIdx, const PlayerNames &, names, const Record::Detail *, detail, SubmitCallback &&, okCallback);
+    bool init(size_t handIdx, const PlayerNames &names, const Record::Detail *detail, SubmitCallback &&callback);
 
     virtual void editBoxEditingDidBegin(cocos2d::ui::EditBox* editBox) override;
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;

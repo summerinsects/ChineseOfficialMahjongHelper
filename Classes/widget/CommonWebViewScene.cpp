@@ -2,7 +2,7 @@
 
 USING_NS_CC;
 
-bool CommonWebViewScene::initWithTitle(const char *title, const std::string &content, CommonWebViewScene::ContentType type) {
+bool CommonWebViewScene::init(const char *title, const std::string &content, CommonWebViewScene::ContentType type) {
     if (UNLIKELY(!BaseScene::initWithTitle(title))) {
         return false;
     }

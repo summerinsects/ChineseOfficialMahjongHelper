@@ -151,7 +151,7 @@ static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
 #define PLAYER_TO_UI(p_) ORDER(_seatFlag, (p_))
 #define UI_TO_PLAYER(u_) ORDER(_playerFlag, (u_))
 
-bool RecordScene::initWithIndex(size_t handIdx, const PlayerNames &names, const Record::Detail *detail, SubmitCallback &&callback) {
+bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::Detail *detail, SubmitCallback &&callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
     }

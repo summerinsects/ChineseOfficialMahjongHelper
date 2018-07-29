@@ -90,7 +90,7 @@ void RecordHistoryScene::updateRecordTexts() {
     });
 }
 
-bool RecordHistoryScene::initWithCallback(ViewCallback &&viewCallback) {
+bool RecordHistoryScene::init(ViewCallback &&viewCallback) {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("历史记录")))) {
         return false;
     }
@@ -711,16 +711,16 @@ namespace {
     public:
         const std::vector<bool> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_1(BatchDeleteTableNode, initWithText, const std::vector<RecordTexts> *, texts);
+        CREATE_FUNC_WITH_PARAM_1(BatchDeleteTableNode, const std::vector<RecordTexts> *, texts);
 
-        bool initWithText(const std::vector<RecordTexts> *texts);
+        bool init(const std::vector<RecordTexts> *texts);
 
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
         virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
         virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
     };
 
-    bool BatchDeleteTableNode::initWithText(const std::vector<RecordTexts> *texts) {
+    bool BatchDeleteTableNode::init(const std::vector<RecordTexts> *texts) {
         if (UNLIKELY(!Node::init())) {
             return false;
         }

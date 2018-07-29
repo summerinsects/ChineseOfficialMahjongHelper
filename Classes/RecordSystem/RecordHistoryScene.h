@@ -17,8 +17,8 @@ class RecordHistoryScene : public BaseScene, cw::TableViewDelegate {
 public:
     typedef std::function<void (Record *)> ViewCallback;
 
-    CREATE_FUNC_WITH_PARAM_1(RecordHistoryScene, initWithCallback, ViewCallback &&, viewCallback);
-    bool initWithCallback(ViewCallback &&viewCallback);
+    CREATE_FUNC_WITH_PARAM_1(RecordHistoryScene, ViewCallback &&, viewCallback);
+    bool init(ViewCallback &&viewCallback);
 
     static void modifyRecord(const Record *record);
 

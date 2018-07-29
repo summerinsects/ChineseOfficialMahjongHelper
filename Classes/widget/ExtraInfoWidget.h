@@ -8,7 +8,7 @@
 
 class ExtraInfoWidget : public cocos2d::Node {
 public:
-    CREATE_FUNC_WITH_PARAM_2(ExtraInfoWidget, initWithWidth, float, maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &, callback);
+    CREATE_FUNC_WITH_PARAM_2(ExtraInfoWidget, float, maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &, callback);
 
     int getFlowerCount() const;
     void setFlowerCount(int cnt);
@@ -27,7 +27,7 @@ public:
 
     void setInputCallback(std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> &&inputCallback) { _inputCallback.swap(inputCallback); }
 
-    bool initWithWidth(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback);
+    bool init(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback);
 
 private:
     void onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);

@@ -8,7 +8,7 @@
 
 USING_NS_CC;
 
-bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback) {
+bool ExtraInfoWidget::init(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback) {
     if (UNLIKELY(!Node::init())) {
         return false;
     }

@@ -4,7 +4,7 @@
 
 USING_NS_CC;
 
-bool PopupMenu::initWithScene(cocos2d::Scene *scene, const std::vector<std::string> &menuTexts, const cocos2d::Vec2 &basePos, const cocos2d::Vec2 &anchorPoint) {
+bool PopupMenu::init(cocos2d::Scene *scene, const std::vector<std::string> &menuTexts, const cocos2d::Vec2 &basePos, const cocos2d::Vec2 &anchorPoint) {
     if (UNLIKELY(!Layer::init())) {
         return false;
     }

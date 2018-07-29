@@ -6,7 +6,7 @@
 
 class TilePickWidget : public cocos2d::Node {
 public:
-    CREATE_FUNC_WITH_PARAM_1(TilePickWidget, initWithWidth, float, maxWidth);
+    CREATE_FUNC_WITH_PARAM_1(TilePickWidget, float, maxWidth);
 
     typedef std::function<void ()> TilePickCallback;
 
@@ -14,7 +14,7 @@ public:
     void setWinTileChangedCallback(TilePickCallback &&callback) { _winTileChangedCallback.swap(callback); }
     void setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile);
 
-    bool initWithWidth(float maxWidth);
+    bool init(float maxWidth);
 
 private:
     HandTilesWidget *_handTilesWidget = nullptr;
