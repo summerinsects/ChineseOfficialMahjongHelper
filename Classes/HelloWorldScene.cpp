@@ -322,13 +322,13 @@ void HelloWorld::requestQRCode() {
         if (!response->isSucceed()) {
             log("response failed");
             log("error buffer: %s", response->getErrorBuffer());
-            Toast::makeText(thiz.get(), __UTF8("获取二维码本失败"), Toast::LENGTH_LONG)->show();
+            Toast::makeText(thiz.get(), __UTF8("获取二维码失败"), Toast::LENGTH_LONG)->show();
             return;
         }
 
         std::vector<char> *buffer = response->getResponseData();
         if (buffer == nullptr) {
-            Toast::makeText(thiz.get(), __UTF8("获取二维码本失败"), Toast::LENGTH_LONG)->show();
+            Toast::makeText(thiz.get(), __UTF8("获取二维码失败"), Toast::LENGTH_LONG)->show();
             return;
         }
 
