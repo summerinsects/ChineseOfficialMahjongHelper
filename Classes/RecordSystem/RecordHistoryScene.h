@@ -43,6 +43,7 @@ private:
 
     void saveRecordsAndRefresh();
 
+    cocos2d::Label *_emptyLabel = nullptr;
     cw::TableView *_tableView = nullptr;
     ViewCallback _viewCallback;
 };

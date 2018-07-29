@@ -107,6 +107,13 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
     button->addClickEventListener(std::bind(&RecordHistoryScene::onMoreButton, this, std::placeholders::_1));
 
+    Label *label = Label::createWithSystemFont(__UTF8("无历史记录"), "Arial", 12);
+    this->addChild(label);
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
+    label->setTextColor(C4B_BLACK);
+    label->setVisible(false);
+    _emptyLabel = label;
+
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
@@ -151,6 +158,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
 void RecordHistoryScene::refresh() {
     updateRecordTexts();
     _tableView->reloadDataInplacement();
+    _emptyLabel->setVisible(g_records.empty());
 }
 
 void RecordHistoryScene::onEnter() {
