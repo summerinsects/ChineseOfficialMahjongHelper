@@ -4,6 +4,7 @@
 #include "../UICommon.h"
 #include "../UIColors.h"
 #include "../widget/AlertDialog.h"
+#include "../widget/Toast.h"
 #include "../widget/LoadingView.h"
 #include "../widget/PopupMenu.h"
 
@@ -11,6 +12,7 @@ USING_NS_CC;
 
 #define NO_NAME_TITLE __UTF8("(未命名对局)")
 
+static bool g_hasLoaded = false;
 static std::vector<Record> g_records;
 static std::mutex g_mutex;
 
@@ -126,7 +128,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
         }
     });
 
-    if (UNLIKELY(g_records.empty())) {
+    if (UNLIKELY(!g_hasLoaded)) {
         this->scheduleOnce([this](float) {
             LoadingView *loadingView = LoadingView::create();
             loadingView->showInScene(this);
@@ -139,6 +141,7 @@ bool RecordHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
                 // 切换到cocos线程
                 Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() {
                     g_records.swap(*temp);
+                    g_hasLoaded = true;
 
                     if (LIKELY(thiz->isRunning())) {
                         thiz->updateRecordTexts();
@@ -292,10 +295,20 @@ void RecordHistoryScene::onDeleteButton(cocos2d::Ref *sender) {
 }
 
 void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
+    if (UNLIKELY(!g_hasLoaded)) {
+        Toast::makeText(this, __UTF8("请等待加载完成"), Toast::Duration::LENGTH_LONG)->show();
+        return;
+    }
+
     Vec2 pos = ((ui::Button *)sender)->getPosition();
     pos.y -= 15.0f;
     PopupMenu *menu = PopupMenu::create(this, { __UTF8("个人汇总"), __UTF8("批量删除") }, pos, Vec2::ANCHOR_TOP_RIGHT);
     menu->setMenuItemCallback([this](PopupMenu *, size_t idx) {
+        if (UNLIKELY(g_records.empty())) {
+            Toast::makeText(this, __UTF8("无历史记录"), Toast::Duration::LENGTH_LONG)->show();
+            return;
+        }
+
         switch (idx) {
         case 0: this->onSummaryButton(); break;
         case 1: this->onBatchDeleteButton(); break;
@@ -880,7 +893,7 @@ void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {
 }
 
 void RecordHistoryScene::modifyRecord(const Record *record) {
-    if (UNLIKELY(g_records.empty())) {  // 如果当前没有加载过历史记录
+    if (UNLIKELY(!g_hasLoaded)) {  // 如果当前没有加载过历史记录
         auto r = std::make_shared<Record>(*record);  // 复制当前记录
         // 子线程中加载、修改、保存
         std::thread([r]() {
