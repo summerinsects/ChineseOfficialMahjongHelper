@@ -83,7 +83,9 @@ bool PopupMenu::init(cocos2d::Scene *scene, const std::vector<std::string> &menu
 void PopupMenu::onMenuButton(cocos2d::Ref *sender) {
     if (_onMenuItemCallback) {
         size_t idx = reinterpret_cast<size_t>(((ui::Button *)sender)->getUserData());
+        this->retain();
         _onMenuItemCallback(this, idx);
+        this->release();
     }
     this->dismiss();
 }
