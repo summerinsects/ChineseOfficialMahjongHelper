@@ -39,7 +39,6 @@ private:
     void cleanRow(size_t handIdx);
     void refreshRank(const int (&totalScores)[4]);
     void refreshTitle();
-    void refreshStartTime();
     void refreshEndTime();
     void refreshScores();
     void recover();

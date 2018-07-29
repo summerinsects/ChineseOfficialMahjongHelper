@@ -545,11 +545,24 @@ void ScoreSheetScene::refreshTitle() {
     cw::trimLabelStringWithEllipsisToFitWidth(_titleLabel, visibleSize.width - 64.0f);
 }
 
-void ScoreSheetScene::refreshStartTime() {
-    struct tm ret = *localtime(&_record.start_time);
-    _timeLabel->setString(Common::format(__UTF8("开始时间：%d年%d月%d日%.2d:%.2d"),
-        ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
-    _timeLabel->setScale(1);
+void ScoreSheetScene::onTimeScheduler(float) {
+    time_t now = time(nullptr);
+    if (_record.start_time == 0) {
+        struct tm ret = *localtime(&now);
+        _timeLabel->setString(Common::format(__UTF8("当前时间：%d年%d月%d日%.2d:%.2d"),
+            ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
+        _timeLabel->setScale(1);
+    }
+    else {
+        time_t diff = now - _record.start_time;
+        ldiv_t dv = ldiv(diff / 60L, 60L);
+        struct tm ret = *localtime(&_record.start_time);
+        _timeLabel->setString(Common::format(__UTF8("开始时间：%d年%d月%d日%.2d:%.2d（已用时：%ld小时%ld分）"),
+            ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min, dv.quot, dv.rem));
+
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        cw::scaleLabelToFitWidth(_timeLabel, visibleSize.width - 10.0f);
+    }
 }
 
 void ScoreSheetScene::refreshEndTime() {
@@ -561,6 +574,8 @@ void ScoreSheetScene::refreshEndTime() {
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     cw::scaleLabelToFitWidth(_timeLabel, visibleSize.width - 10.0f);
+
+    this->unschedule(schedule_selector(ScoreSheetScene::onTimeScheduler));
 }
 
 void ScoreSheetScene::recover() {
@@ -632,12 +647,12 @@ void ScoreSheetScene::recover() {
         _recordButton[currentIdx]->setVisible(true);
         _recordButton[currentIdx]->setEnabled(true);
 
-        refreshStartTime();
+        onTimeScheduler(0.0f);
+        this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
     }
     else {
         refreshEndTime();
     }
-    this->unschedule(schedule_selector(ScoreSheetScene::onTimeScheduler));
 }
 
 void ScoreSheetScene::reset() {
@@ -975,10 +990,8 @@ void ScoreSheetScene::onStartButton(cocos2d::Ref *) {
     _startButton->setEnabled(false);
     _startButton->setVisible(false);
 
-    this->unschedule(schedule_selector(ScoreSheetScene::onTimeScheduler));
-
     _record.start_time = time(nullptr);
-    refreshStartTime();
+    onTimeScheduler(0.0f);
 
     if (_isGlobal) {
         writeToFile(_record);
@@ -1248,14 +1261,6 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("确定"), [this, handIdx](AlertDialog *, int) { editRecord(handIdx, &_record.detail[handIdx]); return true; })
         .create()->show();
-}
-
-void ScoreSheetScene::onTimeScheduler(float) {
-    time_t t = time(nullptr);
-    struct tm ret = *localtime(&t);
-    _timeLabel->setString(Common::format(__UTF8("当前时间：%d年%d月%d日%.2d:%.2d"),
-        ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min));
-    _timeLabel->setScale(1);
 }
 
 void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
