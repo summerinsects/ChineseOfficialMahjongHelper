@@ -378,7 +378,7 @@ void HelloWorld::requestVersion(bool manual) {
     request->setRequestType(network::HttpRequest::Type::GET);
     request->setUrl("https://api.github.com/repos/summerinsects/ChineseOfficialMahjongHelper/releases/latest");
 
-    request->setResponseCallback([this, manual](network::HttpClient *client, network::HttpResponse *response) {
+    request->setResponseCallback([this, manual](network::HttpClient *, network::HttpResponse *response) {
         network::HttpClient::destroyInstance();
 
         checking = false;
