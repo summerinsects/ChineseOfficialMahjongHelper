@@ -13,6 +13,7 @@ private:
     void onAboutButton(cocos2d::Ref *sender);
 
     void requestQRCode();
+    void requestChangeLog();
     void upgradeDataIfNecessary();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     bool needRequest() const;

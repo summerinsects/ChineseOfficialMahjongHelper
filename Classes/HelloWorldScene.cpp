@@ -29,7 +29,7 @@
 USING_NS_CC;
 
 extern void UpgradeRecordInFile(const char *file);
-void UpgradeHistoryRecords(const char *file);
+extern void UpgradeHistoryRecords(const char *file);
 
 static bool isVersionNewer(const char *version1, const char *version2);
 
@@ -216,7 +216,7 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
 
     ui::Button *button1 = UICommon::createButton();
     button1->setScale9Enabled(true);
-    button1->setContentSize(Size(65.0, 20.0f));
+    button1->setContentSize(Size(55.0, 20.0f));
     button1->setTitleFontSize(12);
     button1->setTitleText(__UTF8("版本检测"));
     button1->addClickEventListener([this](Ref *) {
@@ -237,19 +237,29 @@ void HelloWorld::onAboutButton(cocos2d::Ref *) {
     }
 #endif
 
-    ui::Button *button2 = UICommon::createButton();
-    button2->setScale9Enabled(true);
-    button2->setContentSize(Size(65.0, 20.0f));
-    button2->setTitleFontSize(12);
-    button2->setTitleText(__UTF8("打赏"));
-    button2->addClickEventListener([](Ref *) {
+    ui::Button *button = UICommon::createButton();
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(35.0, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("打赏"));
+    button->addClickEventListener([this](Ref *) {
         Application::getInstance()->openURL("https://gitee.com/summerinsects/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
     });
+    rootNode->addChild(button);
+    button->setPosition(Vec2(width * 0.5f, 10.0f));
+
+    ui::Button *button2 = UICommon::createButton();
+    button2->setScale9Enabled(true);
+    button2->setContentSize(Size(55.0, 20.0f));
+    button2->setTitleFontSize(12);
+    button2->setTitleText(__UTF8("更新日志"));
+    button2->addClickEventListener([this](Ref *) { requestChangeLog(); });
     rootNode->addChild(button2);
 
+    const float gap = (width - 145.0f) / 4.0f;
     rootNode->setContentSize(Size(width, labelSize.height + 30.0f));
-    button1->setPosition(Vec2(width * 0.25f, 10.0f));
-    button2->setPosition(Vec2(width * 0.75f, 10.0f));
+    button1->setPosition(Vec2(gap + 55.0f * 0.5f, 10.0f));
+    button2->setPosition(Vec2(width - gap - 55.0f * 0.5f, 10.0f));
     label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 30.0f));
 
     AlertDialog::Builder(this)
@@ -378,7 +388,8 @@ void HelloWorld::requestVersion(bool manual) {
     request->setRequestType(network::HttpRequest::Type::GET);
     request->setUrl("https://api.github.com/repos/summerinsects/ChineseOfficialMahjongHelper/releases/latest");
 
-    request->setResponseCallback([this, manual](network::HttpClient *, network::HttpResponse *response) {
+    request->setResponseCallback([this, manual](network::HttpClient *client, network::HttpResponse *response) {
+        CC_UNUSED_PARAM(client);
         network::HttpClient::destroyInstance();
 
         checking = false;
@@ -553,4 +564,84 @@ void HelloWorld::upgradeDataIfNecessary() {
             UserDefault::getInstance()->setStringForKey("data_version", version);
         }).detach();
     }
+}
+
+static void showChangeLog(Scene *scene, const std::string &str) {
+    const float maxWidth = AlertDialog::maxWidth();
+    Label *label = Label::createWithSystemFont(str, "Arail", 10, Size(maxWidth, 0.0f));
+    label->setTextColor(C4B_BLACK);
+
+    Node *node = nullptr;
+
+    // 超出高度就使用ScrollView
+    const Size &labelSize = label->getContentSize();
+    const float maxHeight = cocos2d::Director::getInstance()->getVisibleSize().height * 0.8f - 80.0f;
+    if (labelSize.height <= maxHeight) {
+        node = label;
+    }
+    else {
+        ui::ScrollView *scrollView = ui::ScrollView::create();
+        scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
+        scrollView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+        scrollView->setScrollBarWidth(4.0f);
+        scrollView->setScrollBarOpacity(0x99);
+        scrollView->setContentSize(Size(maxWidth, maxHeight));
+        scrollView->setInnerContainerSize(labelSize);
+        scrollView->addChild(label);
+        label->setPosition(Vec2(labelSize.width * 0.5f, labelSize.height * 0.5f));
+
+        node = scrollView;
+    }
+
+    AlertDialog::Builder(scene)
+        .setTitle(__UTF8("更新日志"))
+        .setContentNode(node)
+        .setPositiveButton(__UTF8("确定"), nullptr)
+        .create()->show();
+}
+
+void HelloWorld::requestChangeLog() {
+    static std::string changelog;
+    if (!changelog.empty()) {
+        showChangeLog(this, changelog);
+        return;
+    }
+
+    network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
+    request->setRequestType(network::HttpRequest::Type::GET);
+    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongHelper/master/CHANGELOG");
+
+    LoadingView *loadingView = LoadingView::create();
+    loadingView->showInScene(this);
+    auto thiz = makeRef(this);
+    request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
+        CC_UNUSED_PARAM(client);
+        network::HttpClient::destroyInstance();
+
+        loadingView->dismiss();
+        if (response == nullptr) {
+            return;
+        }
+
+        log("HTTP Status Code: %ld", response->getResponseCode());
+
+        if (!response->isSucceed()) {
+            log("response failed");
+            log("error buffer: %s", response->getErrorBuffer());
+            Toast::makeText(thiz.get(), __UTF8("获取更新日志失败"), Toast::LENGTH_LONG)->show();
+            return;
+        }
+
+        std::vector<char> *buffer = response->getResponseData();
+        if (buffer == nullptr) {
+            Toast::makeText(thiz.get(), __UTF8("获取更新日志失败"), Toast::LENGTH_LONG)->show();
+            return;
+        }
+
+        changelog.assign(buffer->data(), buffer->size());
+        showChangeLog(thiz.get(), changelog);
+    });
+
+    network::HttpClient::getInstance()->send(request);
+    request->release();
 }
