@@ -105,6 +105,9 @@
     <ClCompile Include="..\Classes\widget\AlertDialog.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\widget\CheckBoxScale9.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\widget\CommonWebViewScene.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
@@ -207,6 +210,9 @@
       <Filter>src\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\AlertDialog.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\CheckBoxScale9.h">
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\CommonWebViewScene.h">

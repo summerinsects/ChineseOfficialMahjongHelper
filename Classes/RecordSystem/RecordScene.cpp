@@ -4,6 +4,7 @@
 #include "../UIColors.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
+#include "../widget/CheckBoxScale9.h"
 #include "../widget/TilePickWidget.h"
 #include "../widget/ExtraInfoWidget.h"
 #include "../mahjong-algorithm/stringify.h"
@@ -502,30 +503,7 @@ float RecordScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
 }
 
 namespace {
-    struct FakeCheckBox {
-        ui::Widget *root_widget = nullptr;
-        ui::Scale9Sprite *normal_sprite = nullptr;
-        ui::Scale9Sprite *selected_sprite = nullptr;
-        Label *title_label = nullptr;
-        bool is_selected = false;
-        ssize_t cell_idx = 0;
-        mahjong::fan_t fan = mahjong::FAN_NONE;
-
-        inline void setSelectd(bool selected) {
-            if (selected) {
-                is_selected = true;
-                normal_sprite->setVisible(false);
-                selected_sprite->setVisible(true);
-            }
-            else {
-                is_selected = false;
-                normal_sprite->setVisible(true);
-                selected_sprite->setVisible(false);
-            }
-        }
-    };
-
-    typedef cw::TableViewCellEx<Label *, std::array<FakeCheckBox, 9> > CustomCell;
+    typedef cw::TableViewCellEx<Label *, std::array<ui::CheckBox *, 9>, std::array<Label *, 9> > CustomCell;
 }
 
 cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
@@ -539,7 +517,8 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         Label *&label = std::get<0>(ext);
-        FakeCheckBox *checkBoxes = std::get<1>(ext).data();
+        ui::CheckBox **checkBoxes = std::get<1>(ext).data();
+        Label **titleLabels = std::get<2>(ext).data();
 
         label = Label::createWithSystemFont(__UTF8("1番"), "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -550,35 +529,22 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             Size size(gap - 4.0f, 20.0f);
             Vec2 pos(size.width * 0.5f, size.height * 0.5f);
 
-            ui::Widget *rootWidget = ui::Widget::create();
-            rootWidget->setTouchEnabled(true);
-            rootWidget->setContentSize(size);
-            rootWidget->addClickEventListener(std::bind(&RecordScene::onFanNameButton, this, std::placeholders::_1));
-
-            ui::Scale9Sprite *normalSprite = ui::Scale9Sprite::create("source_material/btn_square_normal.png");
-            rootWidget->addChild(normalSprite);
-            normalSprite->setContentSize(size);
-            normalSprite->setPosition(pos);
-
-            ui::Scale9Sprite *selectedSprite = ui::Scale9Sprite::create("source_material/btn_square_highlighted.png");
-            rootWidget->addChild(selectedSprite);
-            selectedSprite->setContentSize(size);
-            selectedSprite->setPosition(pos);
+            CheckBoxScale9 *checkBox = CheckBoxScale9::create();
+            checkBox->loadTextures("source_material/btn_square_normal.png",
+                "source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png",
+                "source_material/btn_radio_disabled.png", "source_material/btn_radio_disabled.png");
+            checkBox->setZoomScale(0.0f);
+            checkBox->ignoreContentAdaptWithSize(false);
+            checkBox->setContentSize(size);
+            checkBox->addEventListener(std::bind(&RecordScene::onFanNameBox, this, std::placeholders::_1, std::placeholders::_2));
+            cell->addChild(checkBox);
+            checkBoxes[k] = checkBox;
 
             Label *titleLabel = Label::createWithSystemFont("", "Arail", 12);
             titleLabel->setTextColor(C4B_GRAY);
-            rootWidget->addChild(titleLabel);
+            checkBox->addChild(titleLabel);
             titleLabel->setPosition(pos);
-
-            cell->addChild(rootWidget);
-
-            FakeCheckBox &checkBox = checkBoxes[k];
-            checkBox.root_widget = rootWidget;
-            checkBox.normal_sprite = normalSprite;
-            checkBox.selected_sprite = selectedSprite;
-            checkBox.title_label = titleLabel;
-            checkBox.is_selected = false;
-            rootWidget->setUserData(&checkBox);
+            titleLabels[k] = titleLabel;
         }
     }
 
@@ -588,7 +554,8 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
 
     CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
-    FakeCheckBox *checkBoxes = std::get<1>(ext).data();
+    ui::CheckBox *const *checkBoxes = std::get<1>(ext).data();
+    Label *const *titleLabels = std::get<2>(ext).data();
 
     label->setString(detail.title);
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
@@ -597,25 +564,25 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     for (size_t k = 0; k < currentLevelCount; ++k) {
         mahjong::fan_t fan = fans[k];
 
-        FakeCheckBox &checkBox = checkBoxes[k];
-        checkBox.cell_idx = idx;
-        checkBox.fan = fan;
+        ui::CheckBox *checkBox = checkBoxes[k];
+        Label *titleLabel = titleLabels[k];
+        checkBox->setUserData(reinterpret_cast<void *>(idx));
+        checkBox->setTag(static_cast<int>(fan));
 
-        checkBox.root_widget->setVisible(true);
-        checkBox.title_label->setString(mahjong::fan_name[fan]);
-        cw::scaleLabelToFitWidth(checkBox.title_label, gap - 8.0f);
+        checkBox->setVisible(true);
+        titleLabel->setString(mahjong::fan_name[fan]);
+        cw::scaleLabelToFitWidth(titleLabel, gap - 8.0f);
 
         size_t col = k & 0x3;
         size_t row = k >> 2;
-        checkBox.root_widget->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
-
-        checkBox.setSelectd(TEST_FAN(_detail.fan_bits, fan));
+        checkBox->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
+        checkBox->setSelected(TEST_FAN(_detail.fan_bits, fan));
     }
 
     for (size_t k = currentLevelCount; k < 9; ++k) {
-        FakeCheckBox &checkBox = checkBoxes[k];
-        checkBox.root_widget->setVisible(false);
-        checkBox.is_selected = false;
+        ui::CheckBox *checkBox = checkBoxes[k];
+        checkBox->setVisible(false);
+        checkBox->setSelected(false);
     }
 
     return cell;
@@ -1083,19 +1050,17 @@ static const ssize_t standardFanToCellIdx[mahjong::FAN_TABLE_SIZE] {
     1, 1, 1, 1,
 };
 
-void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
-    ui::Button *button = (ui::Button *)sender;
-    FakeCheckBox &checkBox = *(FakeCheckBox *)button->getUserData();
-    const mahjong::fan_t fan = checkBox.fan;
+void RecordScene::onFanNameBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
+    ui::CheckBox *checkBox = (ui::CheckBox *)sender;
+    ssize_t cellIdx = reinterpret_cast<ssize_t>(checkBox->getUserData());
+    const mahjong::fan_t fan = static_cast<mahjong::fan_t>(checkBox->getTag());
 
     // 标记/取消标记番种
-    if (checkBox.is_selected) {
-        checkBox.setSelectd(false);
-        RESET_FAN(_detail.fan_bits, fan);
+    if (event == ui::CheckBox::EventType::SELECTED) {
+        SET_FAN(_detail.fan_bits, fan);
     }
     else {
-        checkBox.setSelectd(true);
-        SET_FAN(_detail.fan_bits, fan);
+        RESET_FAN(_detail.fan_bits, fan);
     }
 
     // 计算番数
@@ -1117,7 +1082,7 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
     updateScoreLabel();
 
     // 点击的不是「最近使用」
-    if (checkBox.cell_idx != 0) {
+    if (cellIdx != 0) {
         // 如果该番在「最近使用」里，则更新
         const auto it = std::find(std::begin(recentFans), std::end(recentFans), fan);
         if (it != std::end(recentFans)) {
@@ -1127,9 +1092,9 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
                 const ptrdiff_t idx = it - std::begin(recentFans);
 
                 // 刷新CheckBox
-                FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
+                ui::CheckBox **checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (LIKELY(fan == cellDetails[0].fans[idx])) {
-                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_bits, fan));
+                    checkBoxes[idx]->setSelected(TEST_FAN(_detail.fan_bits, fan));
                 }
                 else {
                     UNREACHABLE();
@@ -1148,9 +1113,9 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
                 const ssize_t idx = static_cast<ssize_t>(fan) - static_cast<ssize_t>(detail.first_fan);
 
                 // 刷新CheckBox
-                FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
+                ui::CheckBox **checkBoxes = std::get<1>(cell->getExtData()).data();
                 if (LIKELY(fan == detail.fans[idx])) {
-                    checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_bits, fan));
+                    checkBoxes[idx]->setSelected(TEST_FAN(_detail.fan_bits, fan));
                 }
                 else {
                     UNREACHABLE();

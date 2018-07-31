@@ -78,7 +78,7 @@ private:
     void onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
     void onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
 
-    void onFanNameButton(cocos2d::Ref *sender);
+    void onFanNameBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onSubmitButton(cocos2d::Ref *sender);
 
     void adjustRecentFans();

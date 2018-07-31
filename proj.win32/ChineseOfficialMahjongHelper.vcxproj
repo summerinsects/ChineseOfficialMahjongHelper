@@ -167,6 +167,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\RecordSystem\ScoreSheetScene.cpp" />
     <ClCompile Include="..\Classes\utils\common.cpp" />
     <ClCompile Include="..\Classes\widget\AlertDialog.cpp" />
+    <ClCompile Include="..\Classes\widget\CheckBoxScale9.cpp" />
     <ClCompile Include="..\Classes\widget\CommonWebViewScene.cpp" />
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp" />
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp" />
@@ -203,6 +204,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\utils\common.h" />
     <ClInclude Include="..\Classes\utils\compiler.h" />
     <ClInclude Include="..\Classes\widget\AlertDialog.h" />
+    <ClInclude Include="..\Classes\widget\CheckBoxScale9.h" />
     <ClInclude Include="..\Classes\widget\CommonWebViewScene.h" />
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h" />
     <ClInclude Include="..\Classes\widget\HandTilesWidget.h" />

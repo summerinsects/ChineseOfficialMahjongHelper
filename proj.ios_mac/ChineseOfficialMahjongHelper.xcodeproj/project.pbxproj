@@ -31,6 +31,8 @@
 		1F154E421E440A160083F8B3 /* stringify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F154E3F1E440A160083F8B3 /* stringify.cpp */; };
 		1F2D25871E076FC20071ADE2 /* AlertDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */; };
 		1F2D25881E076FC20071ADE2 /* AlertDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */; };
+		1F47F7A7210FF64A00ECE533 /* CheckBoxScale9.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F47F7A6210FF64900ECE533 /* CheckBoxScale9.cpp */; };
+		1F47F7A8210FF64A00ECE533 /* CheckBoxScale9.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F47F7A6210FF64900ECE533 /* CheckBoxScale9.cpp */; };
 		1F4EB9B02106B21F00C8D1CA /* PopupMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4EB9AF2106B21E00C8D1CA /* PopupMenu.cpp */; };
 		1F4EB9B12106B21F00C8D1CA /* PopupMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F4EB9AF2106B21E00C8D1CA /* PopupMenu.cpp */; };
 		1F4EB9BA2106BBEF00C8D1CA /* icon in Resources */ = {isa = PBXBuildFile; fileRef = 1F4EB9B82106BBEF00C8D1CA /* icon */; };
@@ -178,6 +180,8 @@
 		1F2487531FF7662D00FE12F2 /* LittleFan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LittleFan.h; sourceTree = "<group>"; };
 		1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlertDialog.cpp; sourceTree = "<group>"; };
 		1F2D25861E076FC20071ADE2 /* AlertDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialog.h; sourceTree = "<group>"; };
+		1F47F7A4210FF64900ECE533 /* CheckBoxScale9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CheckBoxScale9.h; sourceTree = "<group>"; };
+		1F47F7A6210FF64900ECE533 /* CheckBoxScale9.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckBoxScale9.cpp; sourceTree = "<group>"; };
 		1F4EB9AD2106B21E00C8D1CA /* PopupMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopupMenu.h; sourceTree = "<group>"; };
 		1F4EB9AF2106B21E00C8D1CA /* PopupMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PopupMenu.cpp; sourceTree = "<group>"; };
 		1F4EB9B82106BBEF00C8D1CA /* icon */ = {isa = PBXFileReference; lastKnownFileType = folder; path = icon; sourceTree = "<group>"; };
@@ -430,6 +434,8 @@
 			children = (
 				1F2D25851E076FC20071ADE2 /* AlertDialog.cpp */,
 				1F2D25861E076FC20071ADE2 /* AlertDialog.h */,
+				1F47F7A6210FF64900ECE533 /* CheckBoxScale9.cpp */,
+				1F47F7A4210FF64900ECE533 /* CheckBoxScale9.h */,
 				1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */,
 				1FB8479921055D4A00261A9A /* CommonWebViewScene.h */,
 				1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */,
@@ -716,6 +722,7 @@
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				1FFE17A31F9BB17200714066 /* CWCommon.cpp in Sources */,
 				1FDEC0762015B94F006E9D1F /* CWCommon-ios.mm in Sources */,
+				1F47F7A7210FF64A00ECE533 /* CheckBoxScale9.cpp in Sources */,
 				1FDD94451C8337140031BC38 /* shanten.cpp in Sources */,
 				1F11543C1FF8F586000EF358 /* CompetitionMainScene.cpp in Sources */,
 				1AF87B8A1F6F7822007BE51C /* main.m in Sources */,
@@ -758,6 +765,7 @@
 				1FDD94461C8337140031BC38 /* shanten.cpp in Sources */,
 				1FC616281FFB39C3005FC2F7 /* Toast.cpp in Sources */,
 				1FE04AE11C94682A008401EA /* RecordScene.cpp in Sources */,
+				1F47F7A8210FF64A00ECE533 /* CheckBoxScale9.cpp in Sources */,
 				1FE5CFDE1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
 				1FE04AE31C94682A008401EA /* ScoreSheetScene.cpp in Sources */,
 			);
