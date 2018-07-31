@@ -775,12 +775,12 @@ void RecordScene::onDrawBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType eve
         _recordTilesButton->setEnabled(false);
         _littleFanButton->setEnabled(false);
         _winIndex = -1;
-        // 禁用所有人的和、自摸/点炮
+        // 禁用所有人的和、自摸/点炮、第二行显示点炮
         for (int i = 0; i < 4; ++i) {
-            ui::RadioButton *button = _winGroup->getRadioButtonByIndex(i);
-            button->setEnabled(false);
-            button = _claimGroup->getRadioButtonByIndex(i);
-            button->setEnabled(false);
+            _winGroup->getRadioButtonByIndex(i)->setEnabled(false);
+            _claimGroup->getRadioButtonByIndex(i)->setEnabled(false);
+            _byDiscardLabel[i]->setVisible(true);
+            _selfDrawnLabel[i]->setVisible(false);
         }
     }
     else {
@@ -790,29 +790,31 @@ void RecordScene::onDrawBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType eve
         _winIndex = _winGroup->getSelectedButtonIndex();
         // 启用所有人的和、自摸/点炮
         for (int i = 0; i < 4; ++i) {
-            ui::RadioButton *button = _winGroup->getRadioButtonByIndex(i);
-            button->setEnabled(true);
-            button = _claimGroup->getRadioButtonByIndex(i);
-            button->setEnabled(true);
+            _winGroup->getRadioButtonByIndex(i)->setEnabled(true);
+            _claimGroup->getRadioButtonByIndex(i)->setEnabled(true);
+        }
+        // 和的选手，显示自摸
+        if (_winIndex != -1) {
+            _byDiscardLabel[_winIndex]->setVisible(false);
+            _selfDrawnLabel[_winIndex]->setVisible(true);
         }
     }
     updateScoreLabel();
 }
 
 void RecordScene::onWinGroup(cocos2d::ui::RadioButton *, int index, cocos2d::ui::RadioButtonGroup::EventType) {
+    int prevIndex = _winIndex;
     _winIndex = index;
-    for (int i = 0; i < 4; ++i) {
-        if (i == index) {
-            // 和的选手，显示自摸
-            _byDiscardLabel[i]->setVisible(false);
-            _selfDrawnLabel[i]->setVisible(true);
-        }
-        else {
-            // 未和的选手，显示点炮
-            _byDiscardLabel[i]->setVisible(true);
-            _selfDrawnLabel[i]->setVisible(false);
-        }
+
+    if (prevIndex != -1) {
+        // 未和的选手，显示点炮
+        _byDiscardLabel[prevIndex]->setVisible(true);
+        _selfDrawnLabel[prevIndex]->setVisible(false);
     }
+    // 和的选手，显示自摸
+    _byDiscardLabel[index]->setVisible(false);
+    _selfDrawnLabel[index]->setVisible(true);
+
     updateScoreLabel();
 }
 
