@@ -169,6 +169,15 @@
 #define UNLIKELY(expr_) BUILTIN_EXPECT(!!(expr_), 0)
 #endif
 
+// unreachable
+#ifndef UNREACHABLE
+#if defined(_MSC_VER) && (_MSC_VER >= 1300)
+#define UNREACHABLE() __assume(0)
+#else
+#define UNREACHABLE() assert(0)
+#endif
+#endif
+
 #ifndef FORMAT_CHECK_PRINTF
 #if defined(__GNUC__) && (__GNUC__ >= 4)
 #define FORMAT_CHECK_PRINTF(format_pos_, arg_pos_) __attribute__((__format__(printf, format_pos_, arg_pos_)))

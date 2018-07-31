@@ -1594,7 +1594,13 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
         case PACK_TYPE_PUNG:
         case PACK_TYPE_KONG: pung_packs[pung_cnt++] = packs[i]; break;
         case PACK_TYPE_PAIR: pair_pack = packs[i]; break;
-        default: assert(0); return;
+        default:
+#if defined(_MSC_VER) && (_MSC_VER >= 1300)
+            __assume(0);
+#else
+            assert(0);
+#endif
+            return;
         }
     }
 

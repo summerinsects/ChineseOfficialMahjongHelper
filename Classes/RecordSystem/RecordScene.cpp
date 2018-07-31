@@ -1128,11 +1128,11 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
 
                 // 刷新CheckBox
                 FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
-                if (fan == cellDetails[0].fans[idx]) {
+                if (LIKELY(fan == cellDetails[0].fans[idx])) {
                     checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_bits, fan));
                 }
                 else {
-                    assert(0);
+                    UNREACHABLE();
                 }
             }
         }
@@ -1149,11 +1149,11 @@ void RecordScene::onFanNameButton(cocos2d::Ref *sender) {
 
                 // 刷新CheckBox
                 FakeCheckBox *checkBoxes = std::get<1>(cell->getExtData()).data();
-                if (fan == detail.fans[idx]) {
+                if (LIKELY(fan == detail.fans[idx])) {
                     checkBoxes[idx].setSelectd(TEST_FAN(_detail.fan_bits, fan));
                 }
                 else {
-                    assert(0);
+                    UNREACHABLE();
                 }
             }
         }
