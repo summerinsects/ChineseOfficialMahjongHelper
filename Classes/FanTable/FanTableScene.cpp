@@ -130,7 +130,6 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         button->setTitleText(titleTexts[k]);
         button->setUserData(reinterpret_cast<void *>(idx0 + k));
         button->setVisible(true);
-        button->setEnabled(true);
         size_t col = k & 0x3;
         size_t row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
@@ -140,7 +139,6 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
 
     for (size_t k = currentLevelCount; k < 13; ++k) {
         buttons[k]->setVisible(false);
-        buttons[k]->setEnabled(false);
     }
 
     return cell;

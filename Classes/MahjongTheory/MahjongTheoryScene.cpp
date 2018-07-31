@@ -991,7 +991,6 @@ cw::TableViewCell *MahjongTheoryScene::tableCellAtIndex(cw::TableView *table, ss
     for (int i = 0; i < 34; ++i) {
         if (!result->useful_table[mahjong::all_tiles[i]]) {
             usefulButtons[i]->setVisible(false);
-            usefulButtons[i]->setEnabled(false);
             continue;
         }
 

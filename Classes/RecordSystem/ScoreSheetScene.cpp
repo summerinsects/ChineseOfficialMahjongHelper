@@ -205,7 +205,6 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->addClickEventListener(std::bind(&ScoreSheetScene::onFinishButton, this, std::placeholders::_1));
     cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 6.0f);
     button->setVisible(false);
-    button->setEnabled(false);
     _finishButton = button;
 
     // 第5栏：名次
@@ -260,7 +259,6 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         button->setPosition(Vec2(colPosX[5], y));
         button->setTag(k);
         button->addClickEventListener(std::bind(&ScoreSheetScene::onRecordButton, this, std::placeholders::_1));
-        button->setEnabled(false);
         button->setVisible(false);
         _recordButton[k] = button;
 
@@ -280,7 +278,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         widget->setPosition(Vec2(colPosX[5], y));
         widget->setTag(k);
         widget->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1));
-        widget->setEnabled(false);
+        widget->setVisible(false);
         _detailWidget[k] = widget;
     }
 
@@ -296,9 +294,8 @@ void ScoreSheetScene::cleanRow(size_t handIdx) {
         _scoreLabels[handIdx][i]->setString("");
     }
     _recordButton[handIdx]->setVisible(false);
-    _recordButton[handIdx]->setEnabled(false);
     _fanNameLabel[handIdx]->setVisible(false);
-    _detailWidget[handIdx]->setEnabled(false);
+    _detailWidget[handIdx]->setVisible(false);
 }
 
 void ScoreSheetScene::addUpScores(size_t handIdx, int (&totalScores)[4]) const {
@@ -519,10 +516,9 @@ static std::string GetShortFanText(const Record::Detail &detail) {
 }
 
 void ScoreSheetScene::fillDetail(size_t handIdx) {
-    // 禁用并隐藏这一行的计分按钮
+    // 隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
-    _recordButton[handIdx]->setEnabled(false);
-    _detailWidget[handIdx]->setEnabled(true);
+    _detailWidget[handIdx]->setVisible(true);
 
     Label *label = _fanNameLabel[handIdx];
     label->setString(GetShortFanText(_record.detail[handIdx]));
@@ -606,8 +602,7 @@ void ScoreSheetScene::recover() {
         return;
     }
 
-    // 禁用和隐藏开始按钮
-    _startButton->setEnabled(false);
+    // 隐藏开始按钮
     _startButton->setVisible(false);
 
     size_t currentIdx = _record.current_index;
@@ -641,13 +636,11 @@ void ScoreSheetScene::recover() {
 
     // 如果不是北风北，则显示下一行的计分按钮
     if (currentIdx < 16) {
-        if (currentIdx > 0) {  // 已经过了东风东，则启用和显示强制结束按钮
-            _finishButton->setEnabled(true);
+        if (currentIdx > 0) {  // 已经过了东风东，则显示强制结束按钮
             _finishButton->setVisible(true);
         }
 
         _recordButton[currentIdx]->setVisible(true);
-        _recordButton[currentIdx]->setEnabled(true);
 
         onTimeScheduler(0.0f);
         this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
@@ -681,9 +674,7 @@ void ScoreSheetScene::reset() {
         _rankLabels[i]->setVisible(false);
     }
 
-    _startButton->setEnabled(true);
     _startButton->setVisible(true);
-    _finishButton->setEnabled(false);
     _finishButton->setVisible(false);
     onTimeScheduler(0.0f);
     this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
@@ -988,8 +979,6 @@ void ScoreSheetScene::onStartButton(cocos2d::Ref *) {
     }
 
     _recordButton[0]->setVisible(true);
-    _recordButton[0]->setEnabled(true);
-    _startButton->setEnabled(false);
     _startButton->setVisible(false);
 
     _record.start_time = time(nullptr);
@@ -1010,7 +999,6 @@ void ScoreSheetScene::onFinishButton(cocos2d::Ref *) {
 }
 
 void ScoreSheetScene::forceFinish() {
-    _finishButton->setEnabled(false);
     _finishButton->setVisible(false);
 
     while (_record.current_index < 16) {
@@ -1076,15 +1064,13 @@ void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
             }
         }
         else {
-            if (currentIdx == 0) {  // 东风东过后，启用强制结束按钮
-                _finishButton->setEnabled(true);
+            if (currentIdx == 0) {  // 东风东过后，显示强制结束按钮
                 _finishButton->setVisible(true);
             }
 
             // 如果不是北风北，则显示下一行的计分按钮，否则一局结束，并增加新的历史记录
             if (++_record.current_index < 16) {
                 _recordButton[currentIdx + 1]->setVisible(true);
-                _recordButton[currentIdx + 1]->setEnabled(true);
             }
             else {
                 _record.end_time = time(nullptr);
