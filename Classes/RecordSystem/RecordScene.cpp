@@ -231,7 +231,8 @@ bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::D
         button->setTitleFontSize(12);
         button->setTitleText(titleText[i]);
         button->setPosition(Vec2(origin.x + xPos[i], yPos));
-        button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1, delta[i]));
+        button->setTag(delta[i]);
+        button->addClickEventListener(std::bind(&RecordScene::onPlusButton, this, std::placeholders::_1));
     }
 
     // 荒庄
@@ -735,7 +736,8 @@ void RecordScene::onInstructionButton(cocos2d::Ref *) {
         .create()->show();
 }
 
-void RecordScene::onPlusButton(cocos2d::Ref *, int delta) {
+void RecordScene::onPlusButton(cocos2d::Ref *sender) {
+    int delta = ((ui::Button *)sender)->getTag();
     int winScore = atoi(_editBox->getText());
     int temp = winScore + delta;
     if (temp < 8) temp = 8;

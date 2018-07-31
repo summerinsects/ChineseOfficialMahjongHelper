@@ -36,7 +36,7 @@ private:
     void refreshTilesTableButton(mahjong::tile_t tile);
     void refreshAllTilesTableButton();
     void refreshActionButtons();
-    void onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t tile);
+    void onTileTableButton(cocos2d::Ref *sender);
     void onChowButton(cocos2d::Ref *sender);
     void onPungButton(cocos2d::Ref *sender);
     void onMeldedKongButton(cocos2d::Ref *sender);

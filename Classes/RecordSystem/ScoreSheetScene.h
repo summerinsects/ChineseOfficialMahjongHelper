@@ -48,8 +48,8 @@ private:
     void editNameAndTitle();
     void onStartButton(cocos2d::Ref *sender);
     void onFinishButton(cocos2d::Ref *sender);
-    void onRecordButton(cocos2d::Ref *sender, size_t handIdx);
-    void onDetailButton(cocos2d::Ref *sender, size_t handIdx);
+    void onRecordButton(cocos2d::Ref *sender);
+    void onDetailButton(cocos2d::Ref *sender);
     void editRecord(size_t handIdx, const Record::Detail *detail);
     void onTimeScheduler(float dt);
     void onInstructionButton(cocos2d::Ref *sender);

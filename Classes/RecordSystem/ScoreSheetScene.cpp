@@ -258,7 +258,8 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         button->setTitleFontSize(12);
         button->setTitleText(__UTF8("计分"));
         button->setPosition(Vec2(colPosX[5], y));
-        button->addClickEventListener(std::bind(&ScoreSheetScene::onRecordButton, this, std::placeholders::_1, k));
+        button->setTag(k);
+        button->addClickEventListener(std::bind(&ScoreSheetScene::onRecordButton, this, std::placeholders::_1));
         button->setEnabled(false);
         button->setVisible(false);
         _recordButton[k] = button;
@@ -277,7 +278,8 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         widget->setTouchEnabled(true);
         widget->setContentSize(Size(gap, cellHeight));
         widget->setPosition(Vec2(colPosX[5], y));
-        widget->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1, k));
+        widget->setTag(k);
+        widget->addClickEventListener(std::bind(&ScoreSheetScene::onDetailButton, this, std::placeholders::_1));
         widget->setEnabled(false);
         _detailWidget[k] = widget;
     }
@@ -1021,7 +1023,8 @@ void ScoreSheetScene::forceFinish() {
     RecordHistoryScene::modifyRecord(&_record);
 }
 
-void ScoreSheetScene::onRecordButton(cocos2d::Ref *, size_t handIdx) {
+void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender) {
+    ssize_t handIdx = static_cast<ssize_t>(((ui::Button *)sender)->getTag());
     editRecord(handIdx, nullptr);
 }
 
@@ -1177,7 +1180,8 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
     return ret;
 }
 
-void ScoreSheetScene::onDetailButton(cocos2d::Ref *, size_t handIdx) {
+void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender) {
+    ssize_t handIdx = static_cast<ssize_t>(((ui::Widget *)sender)->getTag());
     const Record::Detail &detail = _record.detail[handIdx];
     if (detail.fan == 0) {
         AlertDialog::Builder(this)
