@@ -99,7 +99,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         label->setTextColor(C4B_BLACK);
 
         for (size_t k = 0; k < 13; ++k) {
-            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png");
             button->setScale9Enabled(true);
             button->setContentSize(Size(gap - 4.0f, 20.0f));
             button->setTitleColor(C3B_GRAY);

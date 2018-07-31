@@ -118,7 +118,9 @@ bool ExtraInfoWidget::init(float maxWidth, const cocos2d::ui::Widget::ccWidgetCl
         radioGroup = ui::RadioButtonGroup::create();
         this->addChild(radioGroup);
         for (int i = 0; i < 4; ++i) {
-            ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png",
+                "source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png",
+                "source_material/btn_radio_disabled.png", "source_material/btn_radio_disabled.png");
             radioButton->setZoomScale(0.0f);
             radioButton->ignoreContentAdaptWithSize(false);
             radioButton->setContentSize(Size(20.0f, 20.0f));
