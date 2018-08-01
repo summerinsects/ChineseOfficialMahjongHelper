@@ -34,6 +34,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../../Classes/widget/AlertDialog.cpp \
                    ../../../Classes/widget/CheckBoxScale9.cpp \
                    ../../../Classes/widget/CommonWebViewScene.cpp \
+                   ../../../Classes/widget/DatePicker.cpp \
                    ../../../Classes/widget/ExtraInfoWidget.cpp \
                    ../../../Classes/widget/HandTilesWidget.cpp \
                    ../../../Classes/widget/PopupMenu.cpp \

@@ -111,6 +111,9 @@
     <ClCompile Include="..\Classes\widget\CommonWebViewScene.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\widget\DatePicker.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
@@ -216,6 +219,9 @@
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\CommonWebViewScene.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\DatePicker.h">
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h">
