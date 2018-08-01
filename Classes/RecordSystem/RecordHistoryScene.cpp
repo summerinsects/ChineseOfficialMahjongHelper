@@ -82,8 +82,7 @@ void RecordHistoryScene::updateRecordTexts() {
         for (int i = 0; i < 4; ++i) {
             int seat = seatscore[i].first;
             int score = seatscore[i].second;
-            texts.players[i] = Common::format("%s: %s (%+d)",
-                seatText[seat], record.name[seat], score);
+            texts.players[i] = Common::format("%s: %s (%+d)", seatText[seat], record.name[seat], score);
         }
 
         return texts;
