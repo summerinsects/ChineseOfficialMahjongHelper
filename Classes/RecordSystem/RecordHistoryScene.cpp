@@ -326,8 +326,8 @@ void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
         }
 
         switch (idx) {
-        case 0: this->onSummaryButton(); break;
-        case 1: this->onBatchDeleteButton(); break;
+        case 0: showSummaryAlert(); break;
+        case 1: showBatchDeleteAlert(); break;
         default: break;
         }
     });
@@ -679,7 +679,7 @@ namespace {
     }
 }
 
-void RecordHistoryScene::onSummaryButton() {
+void RecordHistoryScene::showSummaryAlert() {
     SummaryTableNode *rootNode = SummaryTableNode::create();
     AlertDialog::Builder(this)
         .setTitle(__UTF8("选择要汇总的对局"))
@@ -858,7 +858,7 @@ namespace {
     }
 }
 
-void RecordHistoryScene::onBatchDeleteButton() {
+void RecordHistoryScene::showBatchDeleteAlert() {
     BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(&_recordTexts);
     AlertDialog::Builder(this)
         .setTitle(__UTF8("选择要删除的对局"))

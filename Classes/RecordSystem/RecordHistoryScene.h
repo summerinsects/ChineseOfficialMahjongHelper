@@ -35,8 +35,8 @@ private:
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
     void onMoreButton(cocos2d::Ref *sender);
-    void onSummaryButton();
-    void onBatchDeleteButton();
+    void showSummaryAlert();
+    void showBatchDeleteAlert();
 
     void onDeleteButton(cocos2d::Ref *sender);
     void onCellClicked(cocos2d::Ref *sender);
