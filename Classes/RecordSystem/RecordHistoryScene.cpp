@@ -144,6 +144,7 @@ bool RecordHistoryScene::init(ViewCallback &&viewCallback) {
                     g_hasLoaded = true;
 
                     if (LIKELY(thiz->isRunning())) {
+                        thiz->updateRecordTexts();
                         thiz->refresh();
                         loadingView->dismiss();
                     }
@@ -156,7 +157,6 @@ bool RecordHistoryScene::init(ViewCallback &&viewCallback) {
 }
 
 void RecordHistoryScene::refresh() {
-    updateRecordTexts();
     _tableView->reloadDataInplacement();
     _emptyLabel->setVisible(g_records.empty());
 }
@@ -165,6 +165,7 @@ void RecordHistoryScene::onEnter() {
     BaseScene::onEnter();
 
     if (LIKELY(g_hasLoaded)) {
+        updateRecordTexts();
         refresh();
     }
 }
@@ -302,6 +303,7 @@ void RecordHistoryScene::saveRecordsAndRefresh() {
         // 切换到cocos线程
         Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
             if (LIKELY(thiz->isRunning())) {
+                thiz->updateRecordTexts();
                 thiz->refresh();
                 loadingView->dismiss();
             }
