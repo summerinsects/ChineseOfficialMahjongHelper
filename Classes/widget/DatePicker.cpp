@@ -6,7 +6,10 @@
 
 USING_NS_CC;
 
-#define C4B_BLUE Color4B(44, 121, 178, 255)
+#define C4B_BLUE cocos2d::Color4B(44, 121, 178, 255)
+
+#define LOWER_BOUND 1900
+#define UPPER_BOUND 2099
 
 static const char *weekTexts[] = { __UTF8("日"), __UTF8("一"), __UTF8("二"), __UTF8("三"), __UTF8("四"), __UTF8("五"), __UTF8("六") };
 
@@ -187,6 +190,7 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
 
     totalHeight += containerSize.height + 10.0f;
 
+    // 用来切换的按钮
     button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png");
     button->setScale9Enabled(true);
     button->setContentSize(Size(80.0f, 20.0f));
@@ -197,6 +201,7 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     button->setPosition(Vec2(45.0f, totalHeight + 15.0f));
     _switchButton = button;
 
+    // 上下按钮
     button = ui::Button::create("icon/left-circle.png");
     background->addChild(button);
     button->setScale(20 / button->getContentSize().width);
@@ -215,6 +220,7 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
 
     totalHeight += 25.0f;
 
+    // 上方背景及所选日期显示
     LayerColor *bg2 = LayerColor::create(C4B_BLUE_THEME, totalWidth, 30.0f);
     background->addChild(bg2);
     bg2->setPosition(Vec2(0.0f, totalHeight + 5.0f));
@@ -288,13 +294,14 @@ void DatePicker::setupDayContainer() {
     _yearsContainer->setVisible(false);
     _switchButton->setTitleText(Common::format(__UTF8("%d年%d月"), _picked.year, _picked.month));
 
+    // 本月的1号是星期几，那么前面的天数属于上个月
     int weekday = CaculateWeekDay(_picked.year, _picked.month, 1);
     for (int i = 0; i < weekday; ++i) {
         _dayBoxes[i]->setVisible(false);
     }
-
     _dayOffset = weekday;
 
+    // 本月的天数
     int days = DaysForMonth(_picked.year, _picked.month);
     char str[32];
     for (int i = 0; i < days; ++i) {
@@ -308,10 +315,12 @@ void DatePicker::setupDayContainer() {
         label->setTextColor(C4B_GRAY);
     }
 
+    // 超出的属于下个月
     for (int i = weekday + days; i < 42; ++i) {
         _dayBoxes[i]->setVisible(false);
     }
 
+    // 高亮今天
     if (_picked.year == _today.year && _picked.month == _today.month) {
         ((Label *)_dayBoxes[weekday + _today.day - 1]->getUserData())->setTextColor(C4B_BLUE);
     }
@@ -398,20 +407,20 @@ void DatePicker::onUpButton(cocos2d::Ref *) {
             --_picked.month;
             setupDayContainer();
         }
-        else if (_picked.year > 1970) {
+        else if (_picked.year > LOWER_BOUND) {
             --_picked.year;
             _picked.month = 12;
             setupDayContainer();
         }
         break;
     case PICK_STATE::MONTH:
-        if (_picked.year > 1970) {
+        if (_picked.year > LOWER_BOUND) {
             --_picked.year;
             setupMonthContainer();
         }
         break;
     case PICK_STATE::YEAR:
-        if (_decadeStart >= 1980) {
+        if (_decadeStart - 10 >= LOWER_BOUND) {
             _decadeStart -= 10;
             setupYearContainer();
         }
@@ -428,20 +437,20 @@ void DatePicker::onDownButton(cocos2d::Ref *) {
             ++_picked.month;
             setupDayContainer();
         }
-        else if (_picked.year < 2099) {
+        else if (_picked.year < UPPER_BOUND) {
             ++_picked.year;
             _picked.month = 1;
             setupDayContainer();
         }
         break;
     case PICK_STATE::MONTH:
-        if (_picked.year < 2099) {
+        if (_picked.year < UPPER_BOUND) {
             ++_picked.year;
             setupMonthContainer();
         }
         break;
     case PICK_STATE::YEAR:
-        if (_decadeStart <= 2089) {
+        if (_decadeStart + 10 <= UPPER_BOUND) {
             _decadeStart += 10;
             setupYearContainer();
         }
