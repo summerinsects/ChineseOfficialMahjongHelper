@@ -30,7 +30,7 @@ public:
     }
 
 private:
-    void refreshResultLabel();
+    void refreshTitle();
 
     void setupDayContainer();
     void setupMonthContainer();
@@ -53,9 +53,12 @@ private:
     cocos2d::ui::CheckBox *_dayBoxes[42];
     cocos2d::ui::CheckBox *_monthBoxes[12];
     cocos2d::ui::CheckBox *_yearBoxes[10];
+    cocos2d::Label *_dayLabelsLarge[42];
+    cocos2d::Label *_dayLabelsSmall[42];
 
     cocos2d::ui::Button *_switchButton = nullptr;
-    cocos2d::Label *_resultLabel = nullptr;
+    cocos2d::Label *_titleLabel = nullptr;
+    cocos2d::Label *_chineseDateLabel = nullptr;
 
     enum class PICK_STATE { DAY, MONTH, YEAR };
     PICK_STATE _state = PICK_STATE::DAY;

@@ -115,7 +115,13 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
         label->setTextColor(C4B_GRAY);
         checkBox->addChild(label);
         label->setPosition(Vec2(15.0f, 15.0f));
-        checkBox->setUserData(label);
+        _dayLabelsLarge[i] = label;
+
+        label = Label::createWithSystemFont("", "Arial", 8);
+        label->setTextColor(C4B_GRAY);
+        checkBox->addChild(label);
+        label->setPosition(Vec2(15.0f, 6.0f));
+        _dayLabelsSmall[i] = label;
     }
 
     background->addChild(container);
@@ -228,8 +234,13 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     Label *label = Label::createWithSystemFont("", "Arial", 16);
     background->addChild(label);
     label->setPosition(Vec2(totalWidth * 0.5f, totalHeight + 20.0f));
-    _resultLabel = label;
-    _resultLabel = label;
+    _titleLabel = label;
+
+    label = Label::createWithSystemFont("", "Arial", 10);
+    background->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+    label->setPosition(Vec2(totalWidth - 2.0f, totalHeight + 12.0f));
+    _chineseDateLabel = label;
     totalHeight += 35.0f;
 
     background->setContentSize(Size(totalWidth, totalHeight));
@@ -279,20 +290,22 @@ static void adjustDate(DatePicker::Date *date) {
     date->day = std::min(date->day, maxDays);
 }
 
-void DatePicker::refreshResultLabel() {
-    _resultLabel->setString(Common::format(__UTF8("%d年%d月%d日 星期%s"),
+void DatePicker::refreshTitle() {
+    _titleLabel->setString(Common::format(__UTF8("%d年%d月%d日 星期%s"),
         _picked.year, _picked.month, _picked.day, weekTexts[CaculateWeekDay(_picked.year, _picked.month, _picked.day)]));
 }
 
 void DatePicker::setupDayContainer() {
     adjustDate(&_picked);
-    refreshResultLabel();
+    refreshTitle();
 
     _state = PICK_STATE::DAY;
     _daysContainer->setVisible(true);
     _monthsContainer->setVisible(false);
     _yearsContainer->setVisible(false);
     _switchButton->setTitleText(Common::format(__UTF8("%d年%d月"), _picked.year, _picked.month));
+
+    char str[32];
 
     // 本月的1号是星期几，那么前面的天数属于上个月
     int weekday = CaculateWeekDay(_picked.year, _picked.month, 1);
@@ -301,35 +314,41 @@ void DatePicker::setupDayContainer() {
     }
     _dayOffset = weekday;
 
+    Date date = { _picked.year, _picked.month, 1 };
+    int lastDay = DaysForMonth(_picked.year, _picked.month);
+
     // 本月的天数
-    int days = DaysForMonth(_picked.year, _picked.month);
-    char str[32];
-    for (int i = 0; i < days; ++i) {
-        ui::CheckBox *checkBox = _dayBoxes[weekday + i];
+    for (int i = 0; i < lastDay; ++i) {
+        int idx = weekday + i;
+        ui::CheckBox *checkBox = _dayBoxes[idx];
         checkBox->setVisible(true);
         checkBox->setSelected(false);
 
-        snprintf(str, sizeof(str), "%d", i + 1);
-        Label *label = (Label *)checkBox->getUserData();
+        snprintf(str, sizeof(str), "%d", date.day);
+        Label *label = _dayLabelsLarge[idx];
         label->setString(str);
         label->setTextColor(C4B_GRAY);
+
+        ++date.day;
     }
 
     // 超出的属于下个月
-    for (int i = weekday + days; i < 42; ++i) {
+    for (int i = weekday + lastDay; i < 42; ++i) {
         _dayBoxes[i]->setVisible(false);
     }
 
     // 高亮今天
     if (_picked.year == _today.year && _picked.month == _today.month) {
-        ((Label *)_dayBoxes[weekday + _today.day - 1]->getUserData())->setTextColor(C4B_BLUE);
+        int idx = weekday + _today.day - 1;
+        Label *label = _dayLabelsLarge[idx];
+        label->setTextColor(C4B_BLUE);
     }
     _dayBoxes[_dayOffset + _picked.day - 1]->setSelected(true);
 }
 
 void DatePicker::setupMonthContainer() {
     adjustDate(&_picked);
-    refreshResultLabel();
+    refreshTitle();
 
     _state = PICK_STATE::MONTH;
     _daysContainer->setVisible(false);
@@ -470,7 +489,7 @@ void DatePicker::onDayBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType
         if (day != _picked.day) {
             _dayBoxes[_dayOffset + _picked.day - 1]->setSelected(false);
             _picked.day = day;
-            refreshResultLabel();
+            refreshTitle();
         }
     }
 }
