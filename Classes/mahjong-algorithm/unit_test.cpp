@@ -11,6 +11,17 @@
 
 using namespace mahjong;
 
+int count_useful_tile(const tile_table_t &used_table, const useful_table_t &useful_table) {
+    int cnt = 0;
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (useful_table[t]) {
+            cnt += 4 - used_table[t];
+        }
+    }
+    return cnt;
+}
+
 void test_wait(const char *str) {
     hand_tiles_t hand_tiles;
     string_to_tiles(str, &hand_tiles, nullptr);
