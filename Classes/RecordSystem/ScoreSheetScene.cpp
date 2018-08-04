@@ -646,6 +646,7 @@ void ScoreSheetScene::recover() {
         this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
     }
     else {
+        _finishButton->setVisible(false);
         refreshEndTime();
     }
 }
@@ -1009,6 +1010,10 @@ void ScoreSheetScene::forceFinish() {
     _record.end_time = time(nullptr);
     refreshEndTime();
     RecordHistoryScene::modifyRecord(&_record);
+
+    if (LIKELY(_isGlobal)) {
+        writeToFile(_record);
+    }
 }
 
 void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender) {
