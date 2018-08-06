@@ -404,76 +404,64 @@ static void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector
 
 static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
     const float width = AlertDialog::maxWidth();
-    const float height = 8 * 20;
+    const float height = 115.0f;
 
-    DrawNode *drawNode = DrawNode::create();
-    drawNode->setContentSize(Size(width, height));
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(width, height));
 
-    // 横线
-    for (int i = 0; i < 9; ++i) {
-        drawNode->drawLine(Vec2(0, 20.0f * i), Vec2(width, 20.0f * i), Color4F::BLACK);
-    }
-
-    // 竖线
-    drawNode->drawLine(Vec2(0.0f, 0.0f), Vec2(0.0f, 160.0f), Color4F::BLACK);
-    for (int i = 0; i < 4; ++i) {
-        const float x = width * 0.2f * (i + 1);
-        drawNode->drawLine(Vec2(x, 80.0f), Vec2(x, 160.0f), Color4F::BLACK);
-    }
-    for (int i = 0; i < 3; ++i) {
-        const float x = width * 0.25f * (i + 1);
-        drawNode->drawLine(Vec2(x, 0.0f), Vec2(x, 80.0f), Color4F::BLACK);
-    }
-    drawNode->drawLine(Vec2(width, 0.0f), Vec2(width, 160.0f), Color4F::BLACK);
-
-    static const char *titleText[4][5] = {
-        { __UTF8("一位"), __UTF8("二位"), __UTF8("三位"), __UTF8("四位"), __UTF8("标准分") },
-        { __UTF8("一位率"), __UTF8("二位率"), __UTF8("三位率"), __UTF8("四位率"), __UTF8("均标准分") },
-        { __UTF8("比赛分"), __UTF8("均比赛分"), __UTF8("均和牌番"), __UTF8("均点炮番"), "" },
-        { __UTF8("和牌率"), __UTF8("点炮率"), __UTF8("自摸率"), __UTF8("最大番"), "" }
-    };
-
-    std::string contentText[4][5];
     size_t sum = rs.rank[0] + rs.rank[1] + rs.rank[2] + rs.rank[3];
 
+    std::string texts[14];
     for (int i = 0; i < 4; ++i) {
-        contentText[0][i] = std::to_string(rs.rank[i]);
-        contentText[1][i] = sum > 0 ? Common::format("%.2f%%", rs.rank[i] * 100 / static_cast<float>(sum)) : std::string("0.00%");
+        texts[i] = Common::format(__UTF8("%d位：%2") __UTF8(PRIzd) __UTF8(" (%5.2f%%)"), i + 1, rs.rank[i], sum > 0 ? rs.rank[i] * 100 / static_cast<float>(sum) : 0.0f);
     }
-    contentText[0][4] = Common::format("%.2f", rs.standard_score12 / 12.0f);
-    contentText[1][4] = sum > 0 ? Common::format("%.2f", rs.standard_score12 / static_cast<float>(sum * 12)) : std::string("0.00%");
+    texts[4] = Common::format(__UTF8("标准分：%.2f"), rs.standard_score12 / 12.0f);
+    texts[5] = Common::format(__UTF8("比赛分：%d"), rs.competition_score);
+    texts[6] = Common::format(__UTF8("平均标准分：%.2f"), sum > 0 ? rs.standard_score12 / static_cast<float>(sum * 12) : 0.0f);
+    texts[7] = Common::format(__UTF8("平均比赛分：%.2f"), sum > 0 ? rs.competition_score / static_cast<float>(sum) : 0.0f);
+    texts[8] = Common::format(__UTF8("和牌率：%.2f%%"), sum > 0 ? rs.win * 100 / static_cast<float>(sum * 16) : 0.0f);
+    texts[9] = Common::format(__UTF8("点炮率：%.2f%%"), sum > 0 ? rs.claim * 100 / static_cast<float>(sum * 16) : 0.0f);
+    texts[10] = Common::format(__UTF8("自摸率：%.2f%%"), rs.win > 0 ? rs.self_drawn * 100 / static_cast<float>(rs.win) : 0.0f);
+    texts[11] = Common::format(__UTF8("平均和牌番：%.2f"), rs.win > 0 ? rs.win_fan / static_cast<float>(rs.win) : 0.0f);
+    texts[12] = Common::format(__UTF8("平均点炮番：%.2f"), rs.claim > 0 ? rs.claim_fan / static_cast<float>(rs.claim) : 0.0f);
+    texts[13] = Common::format(__UTF8("和牌最大番：%hu"), rs.max_fan);
 
-    contentText[2][0] = std::to_string(rs.competition_score);
-    contentText[2][1] = sum > 0 ? Common::format("%.2f", rs.competition_score / static_cast<float>(sum)) : std::string("0.00");
-    contentText[2][2] = rs.win > 0 ? Common::format("%.2f", rs.win_fan / static_cast<float>(rs.win)) : std::string("0.00");
-    contentText[2][3] = rs.claim > 0 ? Common::format("%.2f", rs.claim_fan / static_cast<float>(rs.claim)) : std::string("0.00");
+    const float labelWidth = width * 0.5f - 4.0f;
+    for (int i = 0; i < 4; ++i) {
+        const float yPos = 105.0f - 15.0f * i;
+        Label *label = Label::createWithSystemFont(texts[i], "Arail", 10);
+        label->setTextColor(C4B_GRAY);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(2.0f, yPos));
+        rootNode->addChild(label);
+        cw::scaleLabelToFitWidth(label, labelWidth);
 
-    contentText[3][0] = sum > 0 ? Common::format("%.2f%%", rs.win * 100 / static_cast<float>(sum * 16)) : std::string("0.00");
-    contentText[3][1] = sum > 0 ? Common::format("%.2f%%", rs.claim * 100 / static_cast<float>(sum * 16)) : std::string("0.00");
-    contentText[3][2] = rs.win > 0 ? Common::format("%.2f%%", rs.self_drawn * 100 / static_cast<float>(rs.win)) : std::string("0.00");
-    contentText[3][3] = std::to_string(rs.max_fan);
-
-    for (int n = 0; n < 4; ++n) {
-        int cnt = n < 2 ? 5 : 4;
-        float colWidth = width / cnt;
-        for (int i = 0; i < cnt; ++i) {
-            const float posX = colWidth * (i + 0.5f);
-            const float posY = 150.0f - n * 40.0f;
-            Label *label = Label::createWithSystemFont(titleText[n][i], "Arail", 12);
-            label->setTextColor(C4B_BLACK);
-            label->setPosition(Vec2(posX, posY));
-            drawNode->addChild(label);
-            cw::scaleLabelToFitWidth(label, colWidth - 4.0f);
-
-            label = Label::createWithSystemFont(contentText[n][i], "Arail", 12);
-            label->setTextColor(C4B_GRAY);
-            label->setPosition(Vec2(posX, posY - 20.0f));
-            drawNode->addChild(label);
-            cw::scaleLabelToFitWidth(label, colWidth - 4.0f);
-        }
+        label = Label::createWithSystemFont(texts[4 + i], "Arail", 10);
+        label->setTextColor(C4B_GRAY);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(2.0f + width * 0.5f, yPos));
+        rootNode->addChild(label);
+        cw::scaleLabelToFitWidth(label, labelWidth);
     }
 
-    return drawNode;
+    for (int i = 0; i < 3; ++i) {
+        const float yPos = 40.0f - 15.0f * i;
+        Label *label = Label::createWithSystemFont(texts[8 + i], "Arail", 10);
+        label->setTextColor(C4B_GRAY);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(2.0f, yPos));
+        rootNode->addChild(label);
+        cw::scaleLabelToFitWidth(label, labelWidth);
+
+        label = Label::createWithSystemFont(texts[11 + i], "Arail", 10);
+        label->setTextColor(C4B_GRAY);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(2.0f + width * 0.5f, yPos));
+        rootNode->addChild(label);
+        cw::scaleLabelToFitWidth(label, labelWidth);
+    }
+
+    return rootNode;
 }
 
 namespace {
@@ -692,9 +680,11 @@ void RecordHistoryScene::showSummaryAlert() {
         RecordsStatistic rs;
         SummarizeRecords(currentFlags, g_records, &rs);
 
+        size_t sum = rs.rank[0] + rs.rank[1] + rs.rank[2] + rs.rank[3];
+
         Node *node = createStatisticNode(rs);
         AlertDialog::Builder(this)
-            .setTitle(__UTF8("汇总"))
+            .setTitle(Common::format(__UTF8("%") __UTF8(PRIzd) __UTF8("局汇总"), sum))
             .setContentNode(node)
             .setPositiveButton(__UTF8("确定"), nullptr)
             .create()->show();
