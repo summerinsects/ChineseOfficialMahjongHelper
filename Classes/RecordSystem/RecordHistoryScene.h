@@ -11,6 +11,7 @@ struct RecordTexts {
     const char *title;
     std::string time;
     std::string players[4];
+    int seats[4];
 };
 
 class RecordHistoryScene : public BaseScene, cw::TableViewDelegate {
@@ -27,6 +28,19 @@ public:
 private:
     std::vector<RecordTexts> _recordTexts;
 
+    struct FilterCriteria {
+        time_t start_time;
+        time_t finish_time;
+        bool ignore_case;
+        bool whole_word;
+        bool regular_enabled;
+        char name[64];
+        char title[128];
+    };
+    FilterCriteria _filterCriteria;
+    std::vector<std::pair<size_t, uint8_t> > _filterIndices;
+
+    void filter();
     void refresh();
     void updateRecordTexts();
 
@@ -35,6 +49,7 @@ private:
     virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
     void onMoreButton(cocos2d::Ref *sender);
+    void showFilterAlert();
     void showSummaryAlert();
     void showBatchDeleteAlert();
 

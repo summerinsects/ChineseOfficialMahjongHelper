@@ -1,5 +1,6 @@
 ﻿#include "RecordHistoryScene.h"
 #include <array>
+#include <regex>
 #include "Record.h"
 #include "../UICommon.h"
 #include "../UIColors.h"
@@ -7,10 +8,15 @@
 #include "../widget/Toast.h"
 #include "../widget/LoadingView.h"
 #include "../widget/PopupMenu.h"
+#include "../widget/DatePicker.h"
 
 USING_NS_CC;
 
 #define NO_NAME_TITLE __UTF8("(未命名对局)")
+
+#define C4B_RED cocos2d::Color4B(254,  87, 110, 255)
+
+#define SECONDS_PER_DAY 86400
 
 static bool g_hasLoaded = false;
 static std::vector<Record> g_records;
@@ -83,6 +89,7 @@ void RecordHistoryScene::updateRecordTexts() {
             int seat = seatscore[i].first;
             int score = seatscore[i].second;
             texts.players[i] = Common::format("%s: %s (%+d)", seatText[seat], record.name[seat], score);
+            texts.seats[i] = seat;
         }
 
         return texts;
@@ -94,6 +101,7 @@ bool RecordHistoryScene::init(ViewCallback &&viewCallback) {
         return false;
     }
 
+    memset(&_filterCriteria, 0, sizeof(_filterCriteria));
     _viewCallback.swap(viewCallback);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -155,9 +163,207 @@ bool RecordHistoryScene::init(ViewCallback &&viewCallback) {
     return true;
 }
 
+#ifdef _MSC_VER
+#define strcasecmp _stricmp
+
+const char *strcasestr(const char *haystack, const char *needle) {
+    size_t len = strlen(needle);
+    while (*haystack != '\0') {
+        if (_strnicmp(haystack, needle, len) == 0) {
+            return haystack;
+        }
+        ++haystack;
+    }
+    return nullptr;
+}
+
+#endif
+
+void RecordHistoryScene::filter() {
+    // first指向数据源，second存放匹配人名的位标记
+    std::vector<std::pair<const Record *, uint8_t> > temp1;
+    temp1.reserve(g_records.size());
+    std::transform(g_records.begin(), g_records.end(), std::back_inserter(temp1), [](const Record &r) { return std::make_pair(&r, 0); });
+
+    std::vector<std::pair<const Record *, uint8_t> > temp2;
+    temp2.reserve(g_records.size());
+
+    // 筛选起始时间
+    time_t startTime = _filterCriteria.start_time;
+    if (!temp1.empty() && startTime != 0) {
+        std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [startTime](const std::pair<const Record *, uint8_t> &d) { return d.first->start_time >= startTime; });
+        temp1.swap(temp2);
+        temp2.clear();
+    }
+
+    // 筛选截止时间
+    time_t finishTime = _filterCriteria.finish_time;
+    if (!temp1.empty() && finishTime != 0) {
+        finishTime += SECONDS_PER_DAY;
+        std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [finishTime](const std::pair<const Record *, uint8_t> &d) { return d.first->end_time < finishTime; });
+        temp1.swap(temp2);
+        temp2.clear();
+    }
+
+    if (_filterCriteria.regular_enabled) {  // 正则匹配
+        // 筛选选手姓名
+        if (!temp1.empty() && !Common::isCStringEmpty(_filterCriteria.name)) {
+            std::regex_constants::syntax_option_type type = std::regex_constants::ECMAScript;
+            if (_filterCriteria.ignore_case) type |= std::regex_constants::icase;  // 忽略大小写
+
+            std::regex reg(_filterCriteria.name, type);
+            if (_filterCriteria.whole_word) {  // 全词匹配
+                std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [&reg](std::pair<const Record *, uint8_t> &d) {
+                    uint8_t flag = 0;
+                    if (std::regex_match(d.first->name[0], reg)) flag |= 0x1;
+                    if (std::regex_match(d.first->name[1], reg)) flag |= 0x2;
+                    if (std::regex_match(d.first->name[2], reg)) flag |= 0x4;
+                    if (std::regex_match(d.first->name[3], reg)) flag |= 0x8;
+                    d.second = flag;
+                    return (flag != 0);
+                });
+            }
+            else {  // 部分匹配
+                std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [&reg](std::pair<const Record *, uint8_t> &d) {
+                    uint8_t flag = 0;
+                    if (std::regex_search(d.first->name[0], reg)) flag |= 0x1;
+                    if (std::regex_search(d.first->name[1], reg)) flag |= 0x2;
+                    if (std::regex_search(d.first->name[2], reg)) flag |= 0x4;
+                    if (std::regex_search(d.first->name[3], reg)) flag |= 0x8;
+                    d.second = flag;
+                    return (flag != 0);
+                });
+            }
+            temp1.swap(temp2);
+            temp2.clear();
+        }
+
+        // 筛选对局名称
+        if (!temp1.empty() && !Common::isCStringEmpty(_filterCriteria.title)) {
+            std::regex_constants::syntax_option_type type = std::regex_constants::ECMAScript;
+            if (_filterCriteria.ignore_case) type |= std::regex_constants::icase;  // 忽略大小写
+
+            std::regex reg(_filterCriteria.title, type);
+            if (_filterCriteria.whole_word) {  // 全词匹配
+                std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [&reg](std::pair<const Record *, uint8_t> &d) {
+                    return std::regex_match(d.first->title, reg);
+                });
+            }
+            else {  // 部分匹配
+                std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [&reg](std::pair<const Record *, uint8_t> &d) {
+                    return std::regex_search(d.first->title, reg);
+                });
+            }
+            temp1.swap(temp2);
+            temp2.clear();
+        }
+    }
+    else {  // 普通匹配
+        // 筛选选手姓名
+        if (!temp1.empty() && !Common::isCStringEmpty(_filterCriteria.name)) {
+            const char *str = _filterCriteria.name;
+            if (_filterCriteria.ignore_case) {  // 忽略大小写
+                if (_filterCriteria.whole_word) {  // 全词匹配
+                    std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [str](std::pair<const Record *, uint8_t> &d) {
+                        uint8_t flag = 0;
+                        if (strcasecmp(d.first->name[0], str) == 0) flag |= 0x1;
+                        if (strcasecmp(d.first->name[1], str) == 0) flag |= 0x2;
+                        if (strcasecmp(d.first->name[2], str) == 0) flag |= 0x4;
+                        if (strcasecmp(d.first->name[3], str) == 0) flag |= 0x8;
+                        d.second = flag;
+                        return (flag != 0);
+                    });
+                }
+                else {  // 部分匹配
+                    std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [str](std::pair<const Record *, uint8_t> &d) {
+                        uint8_t flag = 0;
+                        if (strcasestr(d.first->name[0], str) != nullptr) flag |= 0x1;
+                        if (strcasestr(d.first->name[1], str) != nullptr) flag |= 0x2;
+                        if (strcasestr(d.first->name[2], str) != nullptr) flag |= 0x4;
+                        if (strcasestr(d.first->name[3], str) != nullptr) flag |= 0x8;
+                        d.second = flag;
+                        return (flag != 0);
+                    });
+                }
+            }
+            else {
+                if (_filterCriteria.whole_word) {  // 全词匹配
+                    std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [str](std::pair<const Record *, uint8_t> &d) {
+                        uint8_t flag = 0;
+                        if (strcmp(d.first->name[0], str) == 0) flag |= 0x1;
+                        if (strcmp(d.first->name[1], str) == 0) flag |= 0x2;
+                        if (strcmp(d.first->name[2], str) == 0) flag |= 0x4;
+                        if (strcmp(d.first->name[3], str) == 0) flag |= 0x8;
+                        d.second = flag;
+                        return (flag != 0);
+                    });
+                }
+                else {  // 部分匹配
+                    std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [str](std::pair<const Record *, uint8_t> &d) {
+                        uint8_t flag = 0;
+                        if (strstr(d.first->name[0], str) != nullptr) flag |= 0x1;
+                        if (strstr(d.first->name[1], str) != nullptr) flag |= 0x2;
+                        if (strstr(d.first->name[2], str) != nullptr) flag |= 0x4;
+                        if (strstr(d.first->name[3], str) != nullptr) flag |= 0x8;
+                        d.second = flag;
+                        return (flag != 0);
+                    });
+                }
+            }
+            temp1.swap(temp2);
+            temp2.clear();
+        }
+
+        // 筛选对局名称
+        if (!temp1.empty() && !Common::isCStringEmpty(_filterCriteria.title)) {
+            const char *str = _filterCriteria.title;
+            if (_filterCriteria.ignore_case) {  // 忽略大小写
+                if (_filterCriteria.whole_word) {  // 全词匹配
+                    std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [str](std::pair<const Record *, uint8_t> &d) {
+                        return (strcasecmp(d.first->title, str) == 0);
+                    });
+                }
+                else {  // 部分匹配
+                    std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [str](std::pair<const Record *, uint8_t> &d) {
+                        return (strcasestr(d.first->title, str) != nullptr);
+                    });
+                }
+            }
+            else {
+                if (_filterCriteria.whole_word) {  // 全词匹配
+                    std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [str](std::pair<const Record *, uint8_t> &d) {
+                        return (strcmp(d.first->title, str) == 0);
+                    });
+                }
+                else {  // 部分匹配
+                    std::copy_if(temp1.begin(), temp1.end(), std::back_inserter(temp2), [str](std::pair<const Record *, uint8_t> &d) {
+                        return (strstr(d.first->title, str) != nullptr);
+                    });
+                }
+            }
+            temp1.swap(temp2);
+            temp2.clear();
+        }
+    }
+
+    _filterIndices.clear();
+    const Record *p = &g_records[0];
+    std::transform(temp1.begin(), temp1.end(), std::back_inserter(_filterIndices), [p](const std::pair<const Record *, uint8_t> &d) {
+        return std::make_pair(static_cast<size_t>(d.first - p), d.second);  // first转换为下标
+    });
+}
+
 void RecordHistoryScene::refresh() {
+    try {
+        filter();
+    }
+    catch (std::regex_error &) {
+        Toast::makeText(this, __UTF8("正则表达式错误，请尝试重置筛选条件"), Toast::Duration::LENGTH_LONG)->show();
+        return;
+    }
+
     _tableView->reloadDataInplacement();
-    _emptyLabel->setVisible(g_records.empty());
+    _emptyLabel->setVisible(_filterIndices.empty());
 }
 
 void RecordHistoryScene::onEnter() {
@@ -170,7 +376,7 @@ void RecordHistoryScene::onEnter() {
 }
 
 ssize_t RecordHistoryScene::numberOfCellsInTableView(cw::TableView *) {
-    return _recordTexts.size();
+    return _filterIndices.size();
 }
 
 float RecordHistoryScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
@@ -220,7 +426,6 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
         // 四名选手
         for (int i = 0; i < 4; ++i) {
             label = Label::createWithSystemFont("", "Arail", 10);
-            label->setTextColor(C4B_GRAY);
             cell->addChild(label);
             label->setPosition(Vec2(2.0f + (i & 1) * cellWidth * 0.5f, 23.0f - (i >> 1) * 15.0f));
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -248,18 +453,23 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
     layerColors[0]->setVisible((idx & 1) == 0);
     layerColors[1]->setVisible((idx & 1) != 0);
 
-    delBtn->setUserData(reinterpret_cast<void *>(idx));
+    const std::pair<size_t, uint8_t> &data = _filterIndices[idx];
+    size_t realIdx = data.first;
+    delBtn->setUserData(reinterpret_cast<void *>(realIdx));
 
-    const RecordTexts &texts = _recordTexts[idx];
+    const RecordTexts &texts = _recordTexts[realIdx];
     titleLabel->setString(texts.title);
     cw::scaleLabelToFitWidth(titleLabel, cellWidth - 4.0f);
 
     timeLabel->setString(texts.time);
     cw::scaleLabelToFitWidth(timeLabel, cellWidth - 30.0f);
 
+    uint8_t flag = data.second;
     for (int i = 0; i < 4; ++i) {
-        playerLabels[i]->setString(texts.players[i]);
-        cw::scaleLabelToFitWidth(playerLabels[i], cellWidth * 0.5f - 4.0f);
+        Label *label = playerLabels[i];
+        label->setString(texts.players[i]);
+        label->setTextColor(((1U << texts.seats[i]) & flag) ? C4B_RED : C4B_GRAY);
+        cw::scaleLabelToFitWidth(label, cellWidth * 0.5f - 4.0f);
     }
 
     return cell;
@@ -318,7 +528,7 @@ void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
 
     Vec2 pos = ((ui::Button *)sender)->getPosition();
     pos.y -= 15.0f;
-    PopupMenu *menu = PopupMenu::create(this, { __UTF8("个人汇总"), __UTF8("批量删除") }, pos, Vec2::ANCHOR_TOP_RIGHT);
+    PopupMenu *menu = PopupMenu::create(this, { __UTF8("筛选条件"), __UTF8("个人汇总"), __UTF8("批量删除") }, pos, Vec2::ANCHOR_TOP_RIGHT);
     menu->setMenuItemCallback([this](PopupMenu *, size_t idx) {
         if (UNLIKELY(g_records.empty())) {
             Toast::makeText(this, __UTF8("无历史记录"), Toast::Duration::LENGTH_LONG)->show();
@@ -326,12 +536,226 @@ void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
         }
 
         switch (idx) {
-        case 0: showSummaryAlert(); break;
-        case 1: showBatchDeleteAlert(); break;
+        case 0: showFilterAlert(); break;
+        case 1: showSummaryAlert(); break;
+        case 2: showBatchDeleteAlert(); break;
         default: break;
         }
     });
     menu->show();
+}
+
+static const char *reportRegexError(const std::regex_error &e) {
+    switch (e.code()) {
+    case std::regex_constants::error_collate: return __UTF8("表达式中包含无效的排序规则元素名");
+    case std::regex_constants::error_ctype: return __UTF8("表达式中包含无效的字符类名");
+    case std::regex_constants::error_escape: return __UTF8("表达式包含无效转义序列");
+    case std::regex_constants::error_backref: return __UTF8("表达式中包含无效的回溯引用");
+    case std::regex_constants::error_brack: return __UTF8("表达式中包含不匹配的“[”或“]”");
+    case std::regex_constants::error_paren: return __UTF8("表达式中包含不匹配的“(”或“)”");
+    case std::regex_constants::error_brace: return __UTF8("表达式中包含不匹配的“{”或“}”");
+    case std::regex_constants::error_badbrace: return __UTF8("表达式在 { } 表达式中包含无效计数");
+    case std::regex_constants::error_range: return __UTF8("表达式中包含无效的字符范围说明符");
+    case std::regex_constants::error_space: return __UTF8("分析正则表达式失败，因为没有足够的资源");
+    case std::regex_constants::error_badrepeat: return __UTF8("重复表达式签名没有表达式");
+    case std::regex_constants::error_complexity: return __UTF8("尝试的匹配的复杂度超过了预定义的等级");
+    case std::regex_constants::error_stack: return __UTF8("尝试匹配失败，因为没有足够的内存");
+    default: return __UTF8("未知错误");
+    }
+}
+
+void RecordHistoryScene::showFilterAlert() {
+    const float limitWidth = AlertDialog::maxWidth();
+
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(limitWidth, 170.0f));
+
+    std::array<ui::CheckBox *, 4> checkBoxes;
+    std::array<ui::Button *, 2> buttons;
+    std::array<ui::EditBox *, 2> editBoxes;
+
+    bool dateEnabled = (_filterCriteria.start_time != 0 || _filterCriteria.finish_time != 0);
+
+    ui::CheckBox *checkBox = UICommon::createCheckBox();
+    checkBox->setZoomScale(0.0f);
+    checkBox->ignoreContentAdaptWithSize(false);
+    checkBox->setContentSize(Size(20.0f, 20.0f));
+    rootNode->addChild(checkBox);
+    checkBox->setPosition(Vec2(10.0f, 160.0f));
+    checkBox->setSelected(dateEnabled);
+    checkBoxes[0] = checkBox;
+
+    // 文本+日期控件
+    static const char *titleText1[] = { __UTF8("起始日期"), __UTF8("截止日期") };
+    const float buttonWidth = (limitWidth - 30.0f) * 0.5f;
+    for (int i = 0; i < 2; ++i) {
+        Label *label = Label::createWithSystemFont(titleText1[i], "Arial", 10);
+        label->setTextColor(C4B_GRAY);
+        rootNode->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(25.0f + (5.0f + buttonWidth) * i, 160.0f));
+
+        ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png", "source_material/btn_square_disabled.png");
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(buttonWidth, 30.0f));
+        button->setTitleColor(C3B_GRAY);
+        button->setTitleFontSize(14);
+        button->setEnabled(dateEnabled);
+        rootNode->addChild(button);
+        button->setPosition(Vec2(25.0f + buttonWidth * 0.5f + (5.0f + buttonWidth) * i, 135.0f));
+        button->setTag(i);
+        buttons[i] = button;
+    }
+
+    auto setupButton = [](ui::Button *button, time_t t) {
+        struct tm tms = *localtime(&t);
+        char str[64];
+        snprintf(str, sizeof(str), "%d-%.2d-%.2d", tms.tm_year + 1900, tms.tm_mon + 1, tms.tm_mday);
+        button->setTitleText(str);
+        if (tms.tm_hour != 0 || tms.tm_min != 0 || tms.tm_sec != 0) {  // 规整到一天的00：00：00
+            tms.tm_hour = 0;
+            tms.tm_min = 0;
+            tms.tm_sec = 0;
+            t = mktime(&tms);
+        }
+        button->setUserData(reinterpret_cast<void *>(t));
+    };
+    setupButton(buttons[0], _filterCriteria.start_time != 0 ? _filterCriteria.start_time : time(nullptr) - 7 * SECONDS_PER_DAY);
+    setupButton(buttons[1], _filterCriteria.finish_time != 0 ? _filterCriteria.finish_time : time(nullptr));
+
+    std::function<void (Ref *)> onButton = [this](Ref *sender) {
+        ui::Button *button = (ui::Button *)sender;
+        time_t t = reinterpret_cast<time_t>(button->getUserData());
+        struct tm ts = *localtime(&t);
+        DatePicker::Date date;
+        date.year = ts.tm_year + 1900;
+        date.month = ts.tm_mon + 1;
+        date.day = ts.tm_mday;
+        DatePicker::create(&date, [button](DatePicker *dp, bool confirm) {
+            if (!confirm) return;
+
+            const DatePicker::Date &date = dp->getDate();
+            char str[64];
+            snprintf(str, sizeof(str), "%d-%.2d-%.2d", date.year, date.month, date.day);
+            button->setTitleText(str);
+
+            struct tm ts = { 0 };
+            ts.tm_year = date.year - 1900;
+            ts.tm_mon = date.month - 1;
+            ts.tm_mday = date.day;
+            time_t t = mktime(&ts);
+            button->setUserData(reinterpret_cast<void *>(t));
+        })->showInScene(this);
+    };
+    buttons[0]->addClickEventListener(onButton);
+    buttons[1]->addClickEventListener(onButton);
+
+    checkBoxes[0]->addEventListener([buttons](Ref *, ui::CheckBox::EventType event) {
+        if (event == ui::CheckBox::EventType::SELECTED) {
+            buttons[0]->setEnabled(true);
+            buttons[1]->setEnabled(true);
+        }
+        else {
+            buttons[0]->setEnabled(false);
+            buttons[1]->setEnabled(false);
+        }
+    });
+
+    // 文本+输入框
+    static const char *titleText2[] = { __UTF8("选手姓名"), __UTF8("对局名称") };
+    for (int i = 0; i < 2; ++i) {
+        const float yPos = 100.0f - i * 25.0f;
+        Label *label = Label::createWithSystemFont(titleText2[i], "Arial", 12);
+        label->setTextColor(C4B_BLACK);
+        rootNode->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(0.0f, yPos));
+
+        ui::EditBox *editBox = UICommon::createEditBox(Size(limitWidth - 55.0f, 20.0f));
+        editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+        editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+        editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
+        editBox->setFontColor(C4B_BLACK);
+        editBox->setFontSize(12);
+        rootNode->addChild(editBox);
+        editBox->setPosition(Vec2(limitWidth * 0.5f + 27.5f, yPos));
+        editBoxes[i] = editBox;
+    }
+
+    editBoxes[0]->setMaxLength(sizeof(_filterCriteria.name) - 1);
+    editBoxes[0]->setText(_filterCriteria.name);
+    editBoxes[1]->setMaxLength(sizeof(_filterCriteria.title) - 1);
+    editBoxes[1]->setText(_filterCriteria.title);
+
+    // 忽略大小写 & 全词匹配
+    static const char *titleText3[] = { __UTF8("忽略大小写"), __UTF8("全词匹配") };
+    for (int i = 0; i < 2; ++i) {
+        checkBox = UICommon::createCheckBox();
+        checkBox->setZoomScale(0.0f);
+        checkBox->ignoreContentAdaptWithSize(false);
+        checkBox->setContentSize(Size(20.0f, 20.0f));
+        rootNode->addChild(checkBox);
+        checkBox->setPosition(Vec2(10.0f + i * limitWidth * 0.5f, 45.0f));
+        checkBoxes[1 + i] = checkBox;
+
+        Label *label = Label::createWithSystemFont(titleText3[i], "Arial", 12);
+        label->setTextColor(C4B_GRAY);
+        rootNode->addChild(label);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(25.0f + i * limitWidth * 0.5f, 45.0f));
+    }
+    checkBoxes[1]->setSelected(_filterCriteria.ignore_case);
+    checkBoxes[2]->setSelected(_filterCriteria.whole_word);
+
+    checkBox = UICommon::createCheckBox();
+    checkBox->setZoomScale(0.0f);
+    checkBox->ignoreContentAdaptWithSize(false);
+    checkBox->setContentSize(Size(15.0f, 15.0f));
+    rootNode->addChild(checkBox);
+    checkBox->setPosition(Vec2(7.5f, 10.0f));
+    checkBox->setSelected(_filterCriteria.regular_enabled);
+    checkBoxes[3] = checkBox;
+
+    Label *label = Label::createWithSystemFont(__UTF8("正则（如果你不知道正则是什么，请勿勾选）"), "Arial", 10);
+    label->setTextColor(C4B_GRAY);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(20.0f, 10.0f));
+    cw::scaleLabelToFitWidth(label, limitWidth - 20.0f);
+
+    AlertDialog::Builder(this)
+        .setTitle(__UTF8("筛选条件"))
+        .setContentNode(rootNode)
+        .setNegativeButton(__UTF8("取消"), nullptr)
+        .setPositiveButton(__UTF8("确定"), [this, buttons, editBoxes, checkBoxes](AlertDialog *, int) {
+        FilterCriteria temp = { 0 };
+        if (checkBoxes[0]->isSelected()) {
+            temp.start_time = reinterpret_cast<time_t>(buttons[0]->getUserData());
+            temp.finish_time = reinterpret_cast<time_t>(buttons[1]->getUserData());
+        }
+        strncpy(temp.name, editBoxes[0]->getText(), sizeof(temp.name) - 1);
+        strncpy(temp.title, editBoxes[1]->getText(), sizeof(temp.title) - 1);
+        temp.ignore_case = checkBoxes[1]->isSelected();
+        temp.whole_word = checkBoxes[2]->isSelected();
+        temp.regular_enabled = checkBoxes[3]->isSelected();
+
+        if (memcmp(&temp, &_filterCriteria, sizeof(temp)) != 0) {  // 筛选条件发生改变
+            std::swap(temp, _filterCriteria);
+            try {
+                filter();
+            }
+            catch (std::regex_error &e) {
+                // 正则表达式抛异常，恢复原来的筛选条件
+                std::swap(temp, _filterCriteria);
+                const char *error = reportRegexError(e);
+                Toast::makeText(this, error, Toast::Duration::LENGTH_LONG)->show();
+                return false;
+            }
+            _tableView->reloadDataInplacement();
+            _emptyLabel->setVisible(_filterIndices.empty());
+        }
+        return true;
+    }).create()->show();
 }
 
 namespace {
@@ -468,16 +892,19 @@ namespace {
 
     class SummaryTableNode : public Node, cw::TableViewDelegate {
     private:
+        const std::vector<std::pair<size_t, uint8_t> > *_filterIndices;
         std::vector<std::string> _timeTexts;
         std::vector<int8_t> _currentFlags;
 
     public:
         const std::vector<int8_t> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC(SummaryTableNode);
+        typedef std::vector<std::pair<size_t, uint8_t> > FilterIndicesType;
+        CREATE_FUNC_WITH_PARAM_1(SummaryTableNode, const FilterIndicesType *, filterIndices);
 
-        virtual bool init() override;
+        bool init(const std::vector<std::pair<size_t, uint8_t> > *filterIndices);
 
+    private:
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
         virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
         virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
@@ -485,22 +912,23 @@ namespace {
         void onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType event);
     };
 
-    bool SummaryTableNode::init() {
+    bool SummaryTableNode::init(const std::vector<std::pair<size_t, uint8_t> > *filterIndices) {
         if (UNLIKELY(!Node::init())) {
             return false;
         }
 
         _currentFlags.assign(g_records.size(), -1);
 
-        _timeTexts.reserve(g_records.size());
-        std::transform(g_records.begin(), g_records.end(), std::back_inserter(_timeTexts), [](const Record &record) {
+        _filterIndices = filterIndices;
+        _timeTexts.reserve(filterIndices->size());
+        std::transform(filterIndices->begin(), filterIndices->end(), std::back_inserter(_timeTexts), [](const std::pair<size_t, uint8_t> &data) {
+            const Record &record = g_records[data.first];
             return formatTime(record.start_time, record.end_time);
         });
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
         const float width = AlertDialog::maxWidth();
         const float height = visibleSize.height * 0.8f - 80.0f;
-
         this->setContentSize(Size(width, height));
 
         // 表格
@@ -519,8 +947,8 @@ namespace {
         this->addChild(tableView);
 
         // 使表格跳到第一个未选择的选项处
-        for (size_t i = 0, cnt = g_records.size(); i < cnt; ++i) {
-            if (_currentFlags[i] == -1) {
+        for (size_t i = 0, cnt = _filterIndices->size(); i < cnt; ++i) {
+            if (_currentFlags[_filterIndices->at(i).first] == -1) {
                 tableView->jumpToCell(i);
                 break;
             }
@@ -530,7 +958,7 @@ namespace {
     }
 
     ssize_t SummaryTableNode::numberOfCellsInTableView(cw::TableView *) {
-        return g_records.size();
+        return _filterIndices->size();
     }
 
     float SummaryTableNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
@@ -593,7 +1021,6 @@ namespace {
                 radioGroup->addRadioButton(radioButton);
 
                 label = Label::createWithSystemFont("", "Arail", 10);
-                label->setTextColor(C4B_GRAY);
                 cell->addChild(label);
                 label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
                 label->setPosition(Vec2(cellWidth * 0.25f * i + 20.0f, 10.0f));
@@ -631,7 +1058,10 @@ namespace {
         layerColors[0]->setVisible((idx & 1) == 0);
         layerColors[1]->setVisible((idx & 1) != 0);
 
-        const Record &record = g_records[idx];
+        const std::pair<size_t, uint8_t> &data = _filterIndices->at(idx);
+        size_t realIdx = data.first;
+
+        const Record &record = g_records[realIdx];
         bool finished = record.end_time != 0;
 
         // 标题
@@ -644,14 +1074,17 @@ namespace {
 
         // 人名文本
         for (int i = 0; i < 4; ++i) {
-            radioButtons[i]->setEnabled(finished);
-            radioButtons[i]->setUserData(reinterpret_cast<void *>(idx));
-            labels[i]->setString(record.name[i]);
-            cw::scaleLabelToFitWidth(labels[i], cellWidth * 0.25f - 20.0f - 2.0f);
+            ui::RadioButton *radioButton = radioButtons[i];
+            Label *label = labels[i];
+            radioButton->setEnabled(finished);
+            radioButton->setUserData(reinterpret_cast<void *>(realIdx));
+            label->setString(record.name[i]);
+            label->setTextColor(((1U << i) & data.second) ? C4B_RED : C4B_GRAY);
+            cw::scaleLabelToFitWidth(label, cellWidth * 0.25f - 20.0f - 2.0f);
         }
 
         // 设置选中
-        int8_t flag = _currentFlags[idx];
+        int8_t flag = _currentFlags[realIdx];
         radioGroup->setSelectedButton(flag == -1 ? nullptr : radioButtons[flag]);
 
         return cell;
@@ -668,7 +1101,7 @@ namespace {
 }
 
 void RecordHistoryScene::showSummaryAlert() {
-    SummaryTableNode *rootNode = SummaryTableNode::create();
+    SummaryTableNode *rootNode = SummaryTableNode::create(&_filterIndices);
     AlertDialog::Builder(this)
         .setTitle(__UTF8("选择要汇总的对局"))
         .setContentNode(rootNode)
@@ -697,21 +1130,23 @@ namespace {
     class BatchDeleteTableNode : public Node, cw::TableViewDelegate {
     private:
         const std::vector<RecordTexts> *_texts;
+        const std::vector<std::pair<size_t, uint8_t> > *_filterIndices;
         std::vector<bool> _currentFlags;
 
     public:
         const std::vector<bool> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_1(BatchDeleteTableNode, const std::vector<RecordTexts> *, texts);
+        typedef std::vector<std::pair<size_t, uint8_t> > FilterIndicesType;
+        CREATE_FUNC_WITH_PARAM_2(BatchDeleteTableNode, const std::vector<RecordTexts> *, texts, const FilterIndicesType *, filterIndices);
 
-        bool init(const std::vector<RecordTexts> *texts);
+        bool init(const std::vector<RecordTexts> * texts, const std::vector<std::pair<size_t, uint8_t> > *filterIndices);
 
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
         virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
         virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
     };
 
-    bool BatchDeleteTableNode::init(const std::vector<RecordTexts> *texts) {
+    bool BatchDeleteTableNode::init(const std::vector<RecordTexts> * texts, const std::vector<std::pair<size_t, uint8_t> > *filterIndices) {
         if (UNLIKELY(!Node::init())) {
             return false;
         }
@@ -719,6 +1154,7 @@ namespace {
         _currentFlags.assign(g_records.size(), 0);
 
         _texts = texts;
+        _filterIndices = filterIndices;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
         const float width = AlertDialog::maxWidth();
@@ -745,7 +1181,7 @@ namespace {
     }
 
     ssize_t BatchDeleteTableNode::numberOfCellsInTableView(cw::TableView *) {
-        return _texts->size();
+        return _filterIndices->size();
     }
 
     float BatchDeleteTableNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
@@ -794,7 +1230,6 @@ namespace {
             // 四名选手
             for (int i = 0; i < 4; ++i) {
                 label = Label::createWithSystemFont("", "Arail", 10);
-                label->setTextColor(C4B_GRAY);
                 cell->addChild(label);
                 label->setPosition(Vec2(2.0f + (i & 1) * cellWidth * 0.5f, 23.0f - (i >> 1) * 15.0f));
                 label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -824,24 +1259,30 @@ namespace {
         layerColors[0]->setVisible((idx & 1) == 0);
         layerColors[1]->setVisible((idx & 1) != 0);
 
-        const RecordTexts &texts = _texts->at(idx);
+        const std::pair<size_t, uint8_t> &data = _filterIndices->at(idx);
+        size_t realIdx = data.first;
+
+        const RecordTexts &texts = _texts->at(realIdx);
         titleLabel->setString(texts.title);
         cw::scaleLabelToFitWidth(titleLabel, cellWidth - 4.0f);
 
         timeLabel->setString(texts.time);
         cw::scaleLabelToFitWidth(timeLabel, cellWidth - 30.0f);
 
+        uint8_t flag = data.second;
         for (int i = 0; i < 4; ++i) {
-            playerLabels[i]->setString(texts.players[i]);
-            cw::scaleLabelToFitWidth(playerLabels[i], cellWidth * 0.5f - 4.0f);
+            Label *label = playerLabels[i];
+            label->setString(texts.players[i]);
+            label->setTextColor(((1U << texts.seats[i]) & flag) ? C4B_RED : C4B_GRAY);
+            cw::scaleLabelToFitWidth(label, cellWidth * 0.5f - 4.0f);
         }
 
         const Record &record = *texts.source;
         bool finished = record.end_time != 0;
 
         // 设置选中
-        checkBox->setUserData(reinterpret_cast<void *>(idx));
-        checkBox->setSelected(_currentFlags[idx]);
+        checkBox->setUserData(reinterpret_cast<void *>(realIdx));
+        checkBox->setSelected(_currentFlags[realIdx]);
         checkBox->setEnabled(finished);
 
         return cell;
@@ -849,7 +1290,7 @@ namespace {
 }
 
 void RecordHistoryScene::showBatchDeleteAlert() {
-    BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(&_recordTexts);
+    BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(&_recordTexts, &_filterIndices);
     AlertDialog::Builder(this)
         .setTitle(__UTF8("选择要删除的对局"))
         .setContentNode(rootNode)
