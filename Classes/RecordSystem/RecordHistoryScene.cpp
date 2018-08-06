@@ -760,6 +760,8 @@ void RecordHistoryScene::showFilterAlert() {
 
 namespace {
     struct RecordsStatistic {
+        size_t competition_count;
+        size_t hand_count;
         size_t rank[4];
         unsigned standard_score12;
         int competition_score;
@@ -786,10 +788,12 @@ static void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector
             continue;
         }
 
+        ++result->competition_count;
         int totalScores[4] = { 0 };
 
         for (int k = 0; k < 16; ++k) {
             const Record::Detail &detail = record.detail[k];
+            ++result->hand_count;
 
             int scoreTable[4];
             TranslateDetailToScoreTable(detail, scoreTable);
@@ -828,29 +832,44 @@ static void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector
 
 static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
     const float width = AlertDialog::maxWidth();
-    const float height = 115.0f;
+    const float height = 135.0f;
 
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(width, height));
 
-    size_t sum = rs.rank[0] + rs.rank[1] + rs.rank[2] + rs.rank[3];
-
-    std::string texts[14];
+    std::string texts[16];
     for (int i = 0; i < 4; ++i) {
-        texts[i] = Common::format(__UTF8("%d位：%2") __UTF8(PRIzd) __UTF8(" (%5.2f%%)"), i + 1, rs.rank[i], sum > 0 ? rs.rank[i] * 100 / static_cast<float>(sum) : 0.0f);
+        texts[i] = Common::format(__UTF8("%d位：%2") __UTF8(PRIzd) __UTF8(" (%5.2f%%)"), i + 1, rs.rank[i], rs.competition_count > 0 ? rs.rank[i] * 100 / static_cast<float>(rs.competition_count) : 0.0f);
     }
     texts[4] = Common::format(__UTF8("标准分：%.2f"), rs.standard_score12 / 12.0f);
     texts[5] = Common::format(__UTF8("比赛分：%d"), rs.competition_score);
-    texts[6] = Common::format(__UTF8("平均标准分：%.2f"), sum > 0 ? rs.standard_score12 / static_cast<float>(sum * 12) : 0.0f);
-    texts[7] = Common::format(__UTF8("平均比赛分：%.2f"), sum > 0 ? rs.competition_score / static_cast<float>(sum) : 0.0f);
-    texts[8] = Common::format(__UTF8("和牌率：%.2f%%"), sum > 0 ? rs.win * 100 / static_cast<float>(sum * 16) : 0.0f);
-    texts[9] = Common::format(__UTF8("点炮率：%.2f%%"), sum > 0 ? rs.claim * 100 / static_cast<float>(sum * 16) : 0.0f);
+    texts[6] = Common::format(__UTF8("平均标准分：%.2f"), rs.competition_count > 0 ? rs.standard_score12 / static_cast<float>(rs.competition_count * 12) : 0.0f);
+    texts[7] = Common::format(__UTF8("平均比赛分：%.2f"), rs.competition_count > 0 ? rs.competition_score / static_cast<float>(rs.competition_count) : 0.0f);
+    texts[8] = Common::format(__UTF8("和牌率：%.2f%%"), rs.hand_count > 0 ? rs.win * 100 / static_cast<float>(rs.hand_count) : 0.0f);
+    texts[9] = Common::format(__UTF8("点炮率：%.2f%%"), rs.hand_count > 0 ? rs.claim * 100 / static_cast<float>(rs.hand_count) : 0.0f);
     texts[10] = Common::format(__UTF8("自摸率：%.2f%%"), rs.win > 0 ? rs.self_drawn * 100 / static_cast<float>(rs.win) : 0.0f);
     texts[11] = Common::format(__UTF8("平均和牌番：%.2f"), rs.win > 0 ? rs.win_fan / static_cast<float>(rs.win) : 0.0f);
     texts[12] = Common::format(__UTF8("平均点炮番：%.2f"), rs.claim > 0 ? rs.claim_fan / static_cast<float>(rs.claim) : 0.0f);
     texts[13] = Common::format(__UTF8("和牌最大番：%hu"), rs.max_fan);
+    texts[14] = Common::format(__UTF8("统计局数：%") __UTF8(PRIzd), rs.competition_count);
+    texts[15] = Common::format(__UTF8("有效盘数：%") __UTF8(PRIzd), rs.hand_count);
 
     const float labelWidth = width * 0.5f - 4.0f;
+
+    Label *label = Label::createWithSystemFont(texts[14], "Arail", 10);
+    label->setTextColor(C4B_GRAY);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(2.0f, 125.0f));
+    rootNode->addChild(label);
+    cw::scaleLabelToFitWidth(label, labelWidth);
+
+    label = Label::createWithSystemFont(texts[15], "Arail", 10);
+    label->setTextColor(C4B_GRAY);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(2.0f + width * 0.5f, 125.0f));
+    rootNode->addChild(label);
+    cw::scaleLabelToFitWidth(label, labelWidth);
+
     for (int i = 0; i < 4; ++i) {
         const float yPos = 105.0f - 15.0f * i;
         Label *label = Label::createWithSystemFont(texts[i], "Arail", 10);
@@ -1113,11 +1132,9 @@ void RecordHistoryScene::showSummaryAlert() {
         RecordsStatistic rs;
         SummarizeRecords(currentFlags, g_records, &rs);
 
-        size_t sum = rs.rank[0] + rs.rank[1] + rs.rank[2] + rs.rank[3];
-
         Node *node = createStatisticNode(rs);
         AlertDialog::Builder(this)
-            .setTitle(Common::format(__UTF8("%") __UTF8(PRIzd) __UTF8("局汇总"), sum))
+            .setTitle(__UTF8("汇总"))
             .setContentNode(node)
             .setPositiveButton(__UTF8("确定"), nullptr)
             .create()->show();
