@@ -918,6 +918,8 @@ namespace {
         std::vector<std::string> _timeTexts;
         std::vector<int8_t> _currentFlags;
 
+        Label *_countLabel = nullptr;
+
     public:
         const std::vector<int8_t> &getCurrentFlags() { return _currentFlags; }
 
@@ -932,6 +934,8 @@ namespace {
         virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
         void onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType event);
+
+        void refreshCountLabel();
     };
 
     bool SummaryTableNode::init(const std::vector<std::pair<size_t, uint8_t> > *filterIndices) {
@@ -952,6 +956,14 @@ namespace {
         const float width = AlertDialog::maxWidth();
         const float height = visibleSize.height * 0.8f - 80.0f;
         this->setContentSize(Size(width, height));
+
+        // 选择了几个的Label，位置在外面
+        Label *label = Label::createWithSystemFont("", "Arail", 8);
+        label->setTextColor(C4B_GRAY);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+        label->setPosition(Vec2(width, height + 5.0f));
+        this->addChild(label);
+        _countLabel = label;
 
         // 表格
         cw::TableView *tableView = cw::TableView::create();
@@ -976,7 +988,17 @@ namespace {
             }
         }
 
+        refreshCountLabel();
+
         return true;
+    }
+
+    void SummaryTableNode::refreshCountLabel() {
+        char str[128];
+        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
+            _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), -1),
+            _currentFlags.size());
+        _countLabel->setString(str);
     }
 
     ssize_t SummaryTableNode::numberOfCellsInTableView(cw::TableView *) {
@@ -1065,6 +1087,7 @@ namespace {
                     ssize_t idx = reinterpret_cast<ssize_t>(radioGroup->getRadioButtonByIndex(selectedButton)->getUserData());
                     _currentFlags[idx] = -1;
                     radioGroup->setSelectedButton(nullptr);
+                    refreshCountLabel();
                 }
             });
         }
@@ -1119,6 +1142,7 @@ namespace {
 
         ssize_t idx = reinterpret_cast<ssize_t>(radioButton->getUserData());
         _currentFlags[idx] = static_cast<int8_t>(index);
+        refreshCountLabel();
     }
 }
 
@@ -1134,6 +1158,10 @@ void RecordHistoryScene::showSummaryAlert() {
 
         RecordsStatistic rs;
         SummarizeRecords(currentFlags, g_records, &rs);
+        if (rs.competition_count == 0) {
+            Toast::makeText(this, __UTF8("请选择要汇总的对局"), Toast::Duration::LENGTH_LONG)->show();
+            return false;
+        }
 
         Node *node = createStatisticNode(rs);
         AlertDialog::Builder(this)
@@ -1153,6 +1181,8 @@ namespace {
         const std::vector<std::pair<size_t, uint8_t> > *_filterIndices;
         std::vector<bool> _currentFlags;
 
+        Label *_countLabel = nullptr;
+
     public:
         const std::vector<bool> &getCurrentFlags() { return _currentFlags; }
 
@@ -1161,9 +1191,12 @@ namespace {
 
         bool init(const std::vector<RecordTexts> * texts, const std::vector<std::pair<size_t, uint8_t> > *filterIndices);
 
+    private:
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
         virtual float tableCellSizeForIndex(cw::TableView *table, ssize_t idx) override;
         virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
+
+        void refreshCountLabel();
     };
 
     bool BatchDeleteTableNode::init(const std::vector<RecordTexts> * texts, const std::vector<std::pair<size_t, uint8_t> > *filterIndices) {
@@ -1179,8 +1212,15 @@ namespace {
         Size visibleSize = Director::getInstance()->getVisibleSize();
         const float width = AlertDialog::maxWidth();
         const float height = visibleSize.height * 0.8f - 80.0f;
-
         this->setContentSize(Size(width, height));
+
+        // 选择了几个的Label，位置在外面
+        Label *label = Label::createWithSystemFont("", "Arail", 8);
+        label->setTextColor(C4B_GRAY);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+        label->setPosition(Vec2(width, height + 5.0f));
+        this->addChild(label);
+        _countLabel = label;
 
         // 表格
         cw::TableView *tableView = cw::TableView::create();
@@ -1197,7 +1237,17 @@ namespace {
         tableView->reloadData();
         this->addChild(tableView);
 
+        refreshCountLabel();
+
         return true;
+    }
+
+    void BatchDeleteTableNode::refreshCountLabel() {
+        char str[128];
+        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
+            _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), false),
+            _currentFlags.size());
+        _countLabel->setString(str);
     }
 
     ssize_t BatchDeleteTableNode::numberOfCellsInTableView(cw::TableView *) {
@@ -1266,6 +1316,7 @@ namespace {
                 ui::CheckBox *checkBox = (ui::CheckBox *)sender;
                 ssize_t idx = reinterpret_cast<ssize_t>(checkBox->getUserData());
                 _currentFlags[idx] = checkBox->isSelected();
+                refreshCountLabel();
             });
         }
 
@@ -1318,6 +1369,11 @@ void RecordHistoryScene::showBatchDeleteAlert() {
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("确定"), [this, rootNode](AlertDialog *dlg, int) {
         auto currentFlags = std::make_shared<std::vector<bool> >(rootNode->getCurrentFlags());
+
+        if (std::none_of(currentFlags->begin(), currentFlags->end(), [](bool f) { return f; })) {
+            Toast::makeText(this, __UTF8("请选择要删除的对局"), Toast::Duration::LENGTH_LONG)->show();
+            return false;
+        }
 
         AlertDialog::Builder(this)
             .setTitle(__UTF8("删除记录"))
