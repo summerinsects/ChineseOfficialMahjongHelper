@@ -842,7 +842,7 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
 
     std::string texts[16];
     for (int i = 0; i < 4; ++i) {
-        texts[i] = Common::format(__UTF8("%d位：%2") __UTF8(PRIzd) __UTF8(" (%5.2f%%)"), i + 1, rs.rank[i], rs.competition_count > 0 ? rs.rank[i] * 100 / static_cast<float>(rs.competition_count) : 0.0f);
+        texts[i] = Common::format(__UTF8("%d位：%2") __UTF8(PRIzd) __UTF8(" (%.2f%%)"), i + 1, rs.rank[i], rs.competition_count > 0 ? rs.rank[i] * 100 / static_cast<float>(rs.competition_count) : 0.0f);
     }
     texts[4] = Common::format(__UTF8("标准分：%.2f"), rs.standard_score12 / 12.0f);
     texts[5] = Common::format(__UTF8("比赛分：%d"), rs.competition_score);
