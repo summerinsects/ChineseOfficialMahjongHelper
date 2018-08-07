@@ -289,4 +289,123 @@ namespace calendar {
         return str;
     }
 
+    enum GregorianDateFestival {
+        GREGORIAN_FESTIVAL_NONE,
+        /*  1月 */ NEW_YEARS_DAY,
+        /*  2月 */ VALENTINES_DAY,
+        /*  3月 */ WOMENS_DAY, CHINA_ARBOR_DAY, WORLD_CONSUMER_RIGHTS_DAY,
+        /*  4月 */ APRIL_FOOLS_DAY, COLD_FOOD_FESTIVAL,
+        /*  5月 */ LABOUR_DAY, CHINESE_YOUTH_DAY, MOTHERS_DAY,
+        /*  6月 */ CHILDRENS_DAY, FATHERS_DAY,
+        /*  7月 */ PARTYS_DAY,
+        /*  8月 */ ARMY_DAY,
+        /*  9月 */ VICTORY_MEMORIAL_DAY, TEACHERS_DAY,
+        /* 10月 */ NATIONAL_DAY,
+        /* 11月 */ THANKSGIVING_DAY,
+        /* 12月 */ NATIONAL_MEMORIAL_DAY, CHRISTMAS_EVE, CHRISTMAS_DAY
+    };
+    static const char *GregorianDateFestivalNames[] = {
+        nullptr,
+        /*  1月 */ __UTF8("元旦"),
+        /*  2月 */ __UTF8("情人节"),
+        /*  3月 */ __UTF8("妇女节"), __UTF8("植树节"), __UTF8("消费者权益日"),
+        /*  4月 */ __UTF8("愚人节"), __UTF8("寒食节"),
+        /*  5月 */ __UTF8("劳动节"), __UTF8("青年节"), __UTF8("母亲节"),
+        /*  6月 */ __UTF8("儿童节"), __UTF8("父亲节"),
+        /*  7月 */ __UTF8("建党节"),
+        /*  8月 */ __UTF8("建军节"),
+        /*  9月 */ __UTF8("抗战胜利"), __UTF8("教师节"),
+        /* 10月 */ __UTF8("国庆节"),
+        /* 11月 */ __UTF8("感恩节"),
+        /* 12月 */ __UTF8("国家公祭日"), __UTF8("平安夜"), __UTF8("圣诞节")
+    };
+
+    static std::pair<GregorianDateFestival, int> GetGregorianFestival(const calendar::GregorianDate &date, int offset, const std::pair<int, int> &solarTerms) {
+        int md = date.month << 8 | date.day;
+        switch (md) {
+        case 0x0101: return std::make_pair(NEW_YEARS_DAY, 3);
+        case 0x020E: return std::make_pair(VALENTINES_DAY, 2);
+        case 0x0308: if (date.year > 1975) return std::make_pair(WOMENS_DAY, 3); break;
+        case 0x030C: if (date.year >= 1979) return std::make_pair(CHINA_ARBOR_DAY, 2); break;
+        case 0x030F: if (date.year > 1983) return std::make_pair(WORLD_CONSUMER_RIGHTS_DAY, 2); break;
+        case 0x0401: return std::make_pair(APRIL_FOOLS_DAY, 2);
+        case 0x0501: if (date.year > 1949) return std::make_pair(LABOUR_DAY, 3); break;
+        case 0x0504: if (date.year > 1949) return std::make_pair(CHINESE_YOUTH_DAY, 2); break;
+        case 0x0601: if (date.year > 1949) return std::make_pair(CHILDRENS_DAY, 2); break;
+        case 0x0701: if (date.year >= 1938) return std::make_pair(PARTYS_DAY, 2); break;
+        case 0x0801: if (date.year >= 1933) return std::make_pair(ARMY_DAY, 2); break;
+        case 0x0903: if (date.year >= 1945) return std::make_pair(VICTORY_MEMORIAL_DAY, 2); break;
+        case 0x090A: if (date.year >= 1985) return std::make_pair(TEACHERS_DAY, 2); break;
+        case 0x0A01: if (date.year >= 1949) return std::make_pair(NATIONAL_DAY, 3); break;
+        case 0x0C0D: if (date.year >= 2014) return std::make_pair(NATIONAL_MEMORIAL_DAY, 2); break;
+        case 0x0C18: return std::make_pair(CHRISTMAS_EVE, 2);
+        case 0x0C19: return std::make_pair(CHRISTMAS_DAY, 2);
+        default:
+            switch (date.month) {
+            case 4: if (date.day == solarTerms.first - 1) return std::make_pair(COLD_FOOD_FESTIVAL, 2); break;
+            case 5: if (date.year >= 1913 && date.day == (offset > 0 ? 15 - offset : 8)) return std::make_pair(MOTHERS_DAY, 1); break;
+            case 6: if (date.year >= 1910 && date.day == (offset > 0 ? 22 - offset : 15)) return std::make_pair(FATHERS_DAY, 1); break;
+            case 11: if (date.day == (offset < 5 ? 26 - offset : 33 - offset)) return std::make_pair(THANKSGIVING_DAY, 1); break;
+            default: break;
+            }
+            break;
+        }
+        return std::make_pair(GREGORIAN_FESTIVAL_NONE, 0);
+    }
+
+    enum ChineseDateFestival {
+        CHINESE_FESTIVAL_NONE,
+        /* 正　月 */ SPRING_FESTIVAL, LANTERN_FESTIVAL,
+        /* 二　月 */ DRAGON_HEAD_RAISING_FESTIVAL,
+        /* 三　月 */ SHANGSI_FESTIVAL,
+        /* 四　月 */ BUDDHAS_BIRTHDAY ,
+        /* 五　月 */ DRAGON_BOAT_FESTIVAL,
+        /* 六　月 */
+        /* 七　月 */ DOUBLE_SEVENTH_FESTIVAL, GHOST_FESTIVAL,
+        /* 八　月 */ MID_AUTUMN_FESTIVAL,
+        /* 九　月 */ DOUBLE_NINTH_FESTIVAL,
+        /* 十　月 */ WINTER_CLOTHING_FESTIVAL, XIA_YUAN_FESTIVAL,
+        /* 十一月 */
+        /* 十二月 */ LABA_FESTIVAL, NORTHERN_OFF_YEAR, SOUTHERN_OFF_YEAR, SPRING_FESTIVAL_EVE
+    };
+    static const char *ChineseDateFestivalNames[] = {
+        nullptr,
+        /* 正　月 */ __UTF8("春节"), __UTF8("元宵节"),
+        /* 二　月 */ __UTF8("龙头节"),
+        /* 三　月 */ __UTF8("上巳节"),
+        /* 四　月 */ __UTF8("佛诞"),
+        /* 五　月 */ __UTF8("端午节"),
+        /* 六　月 */
+        /* 七　月 */ __UTF8("七夕节"), __UTF8("中元节"),
+        /* 八　月 */ __UTF8("中秋节"),
+        /* 九　月 */ __UTF8("重阳节"),
+        /* 十　月 */ __UTF8("寒衣节"), __UTF8("下元节"),
+        /* 十一月 */
+        /* 十二月 */ __UTF8("腊八节"), __UTF8("北方小年"), __UTF8("南方小年"), __UTF8("除夕")
+    };
+    static std::pair<ChineseDateFestival, int> GetChineseFestival(const calendar::ChineseDate &date) {
+        if (date.is_leap) return std::make_pair(CHINESE_FESTIVAL_NONE, 0);
+        int md = date.month << 8 | date.day;
+        switch (md) {
+        case 0x0101: return std::make_pair(SPRING_FESTIVAL, 3);
+        case 0x010F: return std::make_pair(LANTERN_FESTIVAL, 2);
+        case 0x0202: return std::make_pair(DRAGON_HEAD_RAISING_FESTIVAL, 1);
+        case 0x0303: return std::make_pair(SHANGSI_FESTIVAL, 1);
+        case 0x0408: return std::make_pair(BUDDHAS_BIRTHDAY, 1);
+        case 0x0505: return std::make_pair(DRAGON_BOAT_FESTIVAL, 3);
+        case 0x0707: return std::make_pair(DOUBLE_SEVENTH_FESTIVAL, 1);
+        case 0x070F: return std::make_pair(GHOST_FESTIVAL, 1);
+        case 0x080F: return std::make_pair(MID_AUTUMN_FESTIVAL, 3);
+        case 0x0909: return std::make_pair(DOUBLE_NINTH_FESTIVAL, 1);
+        case 0x0A01: return std::make_pair(WINTER_CLOTHING_FESTIVAL, 1);
+        case 0x0A0F: return std::make_pair(XIA_YUAN_FESTIVAL, 1);
+        case 0x0C08: return std::make_pair(LABA_FESTIVAL, 1);
+        case 0x0C17: return std::make_pair(NORTHERN_OFF_YEAR, 1);
+        case 0x0C18: return std::make_pair(SOUTHERN_OFF_YEAR, 1);
+        case 0x0C1D: if (!date.is_long) return std::make_pair(SPRING_FESTIVAL_EVE, 3); break;
+        case 0x0C1E: return std::make_pair(SPRING_FESTIVAL_EVE, 3);
+        default: break;
+        }
+        return std::make_pair(CHINESE_FESTIVAL_NONE, 0);
+    }
 }

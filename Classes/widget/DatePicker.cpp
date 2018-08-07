@@ -277,13 +277,36 @@ void DatePicker::refreshTitle() {
     _chineseDateLabel->setString(calendar::GetChineseDateTextLong(calendar::Gregorian2Chinese(_picked)));
 }
 
-static void setupLabelSmall(cocos2d::Label *label, const std::pair<int, int> &solarTerms, const calendar::GregorianDate &dateGC, const calendar::ChineseDate &dateCC) {
-    if (solarTerms.first == dateGC.day) {
+static void setupLabelSmall(cocos2d::Label *label, int dayOffset, const std::pair<int, int> &solarTerms, const calendar::GregorianDate &dateGC, const calendar::ChineseDate &dateCC) {
+    std::pair<calendar::GregorianDateFestival, int> gf = calendar::GetGregorianFestival(dateGC, dayOffset, solarTerms);
+    std::pair<calendar::ChineseDateFestival, int> cf = calendar::GetChineseFestival(dateCC);
+
+    if (gf.second == 3) {
+        label->setString(calendar::GregorianDateFestivalNames[gf.first]);
+        label->setTextColor(C4B_RED);
+    }
+    else if (cf.second >= 2) {
+        label->setString(calendar::ChineseDateFestivalNames[cf.first]);
+        label->setTextColor(C4B_RED);
+    }
+    else if (gf.second >= 2) {
+        label->setString(calendar::GregorianDateFestivalNames[gf.first]);
+        label->setTextColor(C4B_RED);
+    }
+    else if (solarTerms.first == dateGC.day) {
         label->setString(calendar::SolarTermsText[dateGC.month * 2 - 2]);
         label->setTextColor(C4B_RED);
     }
     else if (solarTerms.second == dateGC.day) {
         label->setString(calendar::SolarTermsText[dateGC.month * 2 - 1]);
+        label->setTextColor(C4B_RED);
+    }
+    else if (cf.second > 0) {
+        label->setString(calendar::ChineseDateFestivalNames[cf.first]);
+        label->setTextColor(C4B_RED);
+    }
+    else if (gf.second > 0) {
+        label->setString(calendar::GregorianDateFestivalNames[gf.first]);
         label->setTextColor(C4B_RED);
     }
     else {  // 没有节气的话，再显示日子
@@ -343,7 +366,7 @@ void DatePicker::setupDayContainer() {
         label->setTextColor(C4B_GRAY);
 
         label = _dayLabelsSmall[idx];
-        setupLabelSmall(label, solarTerms, dateGC, dateCC);
+        setupLabelSmall(label, weekday, solarTerms, dateGC, dateCC);
 
         // 日期增加
         ++dateGC.day;
