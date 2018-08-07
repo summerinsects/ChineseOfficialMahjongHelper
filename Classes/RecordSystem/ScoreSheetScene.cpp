@@ -1,4 +1,5 @@
 ﻿#include "ScoreSheetScene.h"
+#include <array>
 #include <algorithm>
 #include <iterator>
 #include "../mahjong-algorithm/stringify.h"
@@ -366,7 +367,7 @@ static int __get1bitscount(uint64_t v) {
 
 static std::string GetShortFanText(const Record::Detail &detail) {
     if (detail.fan == 0) {
-        return __UTF8("荒庄");
+        return detail.timeout ? __UTF8("超时") : __UTF8("荒庄");
     }
 
     uint64_t fanBits = detail.fan_bits;
@@ -993,7 +994,7 @@ void ScoreSheetScene::onStartButton(cocos2d::Ref *) {
 void ScoreSheetScene::onFinishButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
         .setTitle(__UTF8("警告"))
-        .setMessage(__UTF8("强制结束会将未打完盘数标记为荒庄"))
+        .setMessage(__UTF8("强制结束会将未打完盘数标记为超时"))
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("结束"), [this](AlertDialog *, int) { forceFinish(); return true; })
         .create()->show();
@@ -1003,6 +1004,7 @@ void ScoreSheetScene::forceFinish() {
     _finishButton->setVisible(false);
 
     while (_record.current_index < 16) {
+        _record.detail[_record.current_index].timeout = true;
         fillDetail(_record.current_index++);
     }
     refreshScores();
@@ -1022,7 +1024,7 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender) {
 }
 
 void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
-    const std::array<const char *, 4> name = { _record.name[0], _record.name[1], _record.name[2], _record.name[3] };
+    const char *name[4] = { _record.name[0], _record.name[1], _record.name[2], _record.name[3] };
     auto scene = RecordScene::create(handIdx, name, detail, [this, handIdx](const Record::Detail &detail) {
         size_t currentIdx = _record.current_index;
         bool isModify = (handIdx != currentIdx);
@@ -1177,7 +1179,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender) {
     if (detail.fan == 0) {
         AlertDialog::Builder(this)
             .setTitle(std::move(std::string(handNameText[handIdx]).append(__UTF8("详情"))))
-            .setMessage(__UTF8("荒庄。\n\n是否需要修改这盘的记录？"))
+            .setMessage(detail.timeout ? __UTF8("超时。\n\n是否需要修改这盘的记录？") : __UTF8("荒庄。\n\n是否需要修改这盘的记录？"))
             .setNegativeButton(__UTF8("取消"), nullptr)
             .setPositiveButton(__UTF8("确定"), [this, handIdx](AlertDialog *, int) { editRecord(handIdx, &_record.detail[handIdx]); return true; })
             .create()->show();
@@ -1420,7 +1422,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     rootNode->addChild(radioButton);
     radioGroup->addRadioButton(radioButton);
 
-    label = Label::createWithSystemFont(__UTF8("保存，将未打完盘数标记为荒庄"), "Arial", 12);
+    label = Label::createWithSystemFont(__UTF8("保存，将未打完盘数标记为超时"), "Arial", 12);
     label->setTextColor(C4B_BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     cw::scaleLabelToFitWidth(label, 175.0f);
@@ -1449,7 +1451,10 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("确定"), [this, radioGroup](AlertDialog *, int) {
         if (radioGroup->getSelectedButtonIndex() == 0) {
-            _record.current_index = 16;
+            while (_record.current_index < 16) {
+                _record.detail[_record.current_index].timeout = true;
+                ++_record.current_index;
+            }
             _record.end_time = time(nullptr);
             RecordHistoryScene::modifyRecord(&_record);
         }

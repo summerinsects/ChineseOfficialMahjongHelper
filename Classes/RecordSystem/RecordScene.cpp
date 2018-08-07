@@ -1,4 +1,5 @@
 ﻿#include "RecordScene.h"
+#include <array>
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../UICommon.h"
 #include "../UIColors.h"
@@ -152,7 +153,7 @@ static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
 #define PLAYER_TO_UI(p_) ORDER(_seatFlag, (p_))
 #define UI_TO_PLAYER(u_) ORDER(_playerFlag, (u_))
 
-bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::Detail *detail, SubmitCallback &&callback) {
+bool RecordScene::init(size_t handIdx, const char **names, const Record::Detail *detail, SubmitCallback &&callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
     }
@@ -164,6 +165,7 @@ bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::D
     }
 
     _handIdx = handIdx;
+    memcpy(_playerNames, names, sizeof(_playerNames));
     _submitCallback.swap(callback);
 
     bool isRealSeatOrder = !UserDefault::getInstance()->getBoolForKey(USE_FIXED_SEAT_ORDER);
@@ -198,7 +200,7 @@ bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::D
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
     button->addClickEventListener(std::bind(&RecordScene::onInstructionButton, this, std::placeholders::_1));
 
-    float yPos = origin.y + visibleSize.height - 45.0f;
+    const float yPos = origin.y + visibleSize.height - 45.0f;
     // 番数输入框
     ui::EditBox *editBox = UICommon::createEditBox(Size(35.0f, 20.0f));
     this->addChild(editBox);
@@ -242,7 +244,7 @@ bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::D
     checkBox->ignoreContentAdaptWithSize(false);
     checkBox->setContentSize(Size(20.0f, 20.0f));
     checkBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, yPos));
-    checkBox->addEventListener(std::bind(&RecordScene::onDrawBox, this, std::placeholders::_1, std::placeholders::_2));
+    checkBox->addEventListener(std::bind(&RecordScene::onDrawTimeoutBox, this, std::placeholders::_1, std::placeholders::_2));
     _drawBox = checkBox;
 
     label = Label::createWithSystemFont(__UTF8("荒庄"), "Arial", 12);
@@ -251,15 +253,21 @@ bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::D
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, yPos));
 
-    // 罚分调整
-    button = UICommon::createButton();
-    this->addChild(button);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(55.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("罚分调整"));
-    button->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, origin.y + visibleSize.height - 70.0f));
-    button->addClickEventListener(std::bind(&RecordScene::onPenaltyButton, this, std::placeholders::_1, names));
+    // 超时
+    checkBox = UICommon::createCheckBox();
+    this->addChild(checkBox);
+    checkBox->setZoomScale(0.0f);
+    checkBox->ignoreContentAdaptWithSize(false);
+    checkBox->setContentSize(Size(20.0f, 20.0f));
+    checkBox->setPosition(Vec2(origin.x + visibleSize.width - 50.0f, yPos - 25.0f));
+    checkBox->addEventListener(std::bind(&RecordScene::onDrawTimeoutBox, this, std::placeholders::_1, std::placeholders::_2));
+    _timeoutBox = checkBox;
+
+    label = Label::createWithSystemFont(__UTF8("超时"), "Arial", 12);
+    label->setTextColor(C4B_BLACK);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + visibleSize.width - 35.0f, yPos - 25.0f));
 
     // 说明文本
     label = Label::createWithSystemFont(isRealSeatOrder ? __UTF8("当前模式为「换位」，选手顺序与当前圈座位相同") : __UTF8("当前模式为「固定」，选手顺序与开局座位相同"),
@@ -267,7 +275,7 @@ bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::D
     label->setTextColor(C4B_GRAY);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 5.0f, origin.y + visibleSize.height - 70.0f));
+    label->setPosition(Vec2(origin.x + 5.0f, yPos - 25.0f));
     cw::scaleLabelToFitWidth(label, visibleSize.width - 75.0f);
 
     ui::RadioButtonGroup *winGroup = ui::RadioButtonGroup::create();
@@ -344,18 +352,21 @@ bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::D
 
         // 罚分
         y = origin.y + visibleSize.height - 195.0f;
-        label = Label::createWithSystemFont(__UTF8("调整"), "Arial", 12);
-        label->setTextColor(C4B_BLACK);
-        radioNode->addChild(label);
-        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-        label->setPosition(Vec2(x, y));
 
-        label = Label::createWithSystemFont("+0", "Arial", 12);
-        label->setTextColor(C4B_GRAY);
-        radioNode->addChild(label);
-        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(x + 2.0f, y));
-        _penaltyLabel[i] = label;
+        button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png");
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(gap - 8.0f, 20.0f));
+        button->addClickEventListener(std::bind(&RecordScene::onPenaltyButton, this, std::placeholders::_1));
+        radioNode->addChild(button);
+        button->setPosition(Vec2(x, y));
+
+        ui::RichText *richText = ui::RichText::create();
+        radioNode->addChild(richText);
+        richText->setPosition(Vec2(x, y));
+
+        richText->pushBackElement(ui::RichElementText::create(0, Color3B(C4B_BLACK), 255, __UTF8("调整 "), "Arial", 12));
+        richText->pushBackElement(ui::RichElementText::create(1, C3B_GRAY, 255, "+0", "Arial", 12));
+        _penaltyText[i] = richText;
     }
     _winGroup = winGroup;
     _claimGroup = claimGroup;
@@ -434,21 +445,21 @@ bool RecordScene::init(size_t handIdx, const PlayerNames &names, const Record::D
         Size layoutSize;
         layoutSize.width = visibleSize.width;
         if (layoutButton->getUserData()) {
-            layoutSize.height = visibleSize.height - 145.0f;
+            layoutSize.height = visibleSize.height - 155.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(false));
             layoutButton->setTitleText(layoutText[0]);
             radioNode->setVisible(false);
         }
         else {
-            layoutSize.height = visibleSize.height - 225.0f;
+            layoutSize.height = visibleSize.height - 240.0f;
             layoutButton->setUserData(reinterpret_cast<void *>(true));
             layoutButton->setTitleText(layoutText[1]);
             radioNode->setVisible(true);
         }
 
         rootLayout->setContentSize(layoutSize);
-        topNode->setPosition(Vec2(visibleSize.width * 0.5f, layoutSize.height - 35.0f));
-        tableView->setContentSize(Size(visibleSize.width - 5.0f, layoutSize.height - 65.0f));
+        topNode->setPosition(Vec2(visibleSize.width * 0.5f, layoutSize.height - 25.0f));
+        tableView->setContentSize(Size(visibleSize.width - 5.0f, layoutSize.height - 55.0f));
         tableView->reloadData();
     };
     onLayoutButton(layoutButton);
@@ -618,18 +629,29 @@ static inline void updatePenaltyLabel(Label *label, int16_t ps) {
     else label->setTextColor(C4B_GRAY);
 }
 
+static inline void updatePenaltyText(ui::RichText *richText, int16_t ps) {
+    Color3B color;
+    if (ps < 0) color = Color3B(C4B_PURPLE);
+    else if (ps > 0) color = Color3B(C4B_RED);
+    else color = Color3B(C4B_GRAY);
+
+    richText->removeElement(1);
+    richText->pushBackElement(ui::RichElementText::create(0, color, 255, Common::format("%+hd", ps), "Arial", 12));
+}
+
 void RecordScene::refresh() {
     uint8_t wf = _detail.win_flag;
     uint8_t cf = _detail.claim_flag;
-    if (_detail.fan >= 8) {
+    uint16_t fan = _detail.fan;
+    if (fan >= 8) {
         char str[32];
-        snprintf(str, sizeof(str), "%hu", _detail.fan);
+        snprintf(str, sizeof(str), "%hu", fan);
         _editBox->setText(str);
     }
 
     // 罚分
     for (int i = 0; i < 4; ++i) {
-        updatePenaltyLabel(_penaltyLabel[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
+        updatePenaltyText(_penaltyText[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
     }
 
     _winIndex = WIN_CLAIM_INDEX(wf);
@@ -641,9 +663,14 @@ void RecordScene::refresh() {
         }
     }
 
-    if (_detail.fan == 0) {
-        _drawBox->setSelected(true);
-        onDrawBox(_drawBox, ui::CheckBox::EventType::SELECTED);
+    if (fan == 0) {
+        if (UNLIKELY(_detail.timeout)) {
+            _timeoutBox->setSelected(true);
+            onDrawTimeoutBox(_timeoutBox, ui::CheckBox::EventType::SELECTED);
+        } else {
+            _drawBox->setSelected(true);
+            onDrawTimeoutBox(_drawBox, ui::CheckBox::EventType::SELECTED);
+        }
     }
     else {
         updateScoreLabel();
@@ -691,8 +718,9 @@ void RecordScene::updateScoreLabel() {
             SET_WIN_CLAIM(_detail.claim_flag, PLAYER_TO_UI(claimIndex));
         }
     }
-    else {  // 荒庄
+    else {  // 荒庄或者超时
         _detail.fan = 0;
+        _detail.timeout = _timeoutBox->isSelected();
     }
 
     int scoreTable[4];
@@ -708,8 +736,8 @@ void RecordScene::updateScoreLabel() {
 
     // 未选择和牌
     if (_winIndex == -1) {
-        // 荒庄时允许确定
-        _submitButton->setEnabled(_drawBox->isSelected());
+        // 荒庄或者超时时允许确定
+        _submitButton->setEnabled(_drawBox->isSelected() || _timeoutBox->isSelected());
     }
     else {
         // 未选择是点炮还是自摸时，不允许确定
@@ -769,11 +797,18 @@ void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
     showCalculator(param);
 }
 
-void RecordScene::onDrawBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType event) {
+void RecordScene::onDrawTimeoutBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event) {
     if (event == ui::CheckBox::EventType::SELECTED) {
         _tableView->setEnabled(false);
         _recordTilesButton->setEnabled(false);
         _littleFanButton->setEnabled(false);
+        if (sender == _drawBox) {
+            _timeoutBox->setEnabled(false);
+        }
+        else {
+            _drawBox->setEnabled(false);
+        }
+
         _winIndex = -1;
         // 禁用所有人的和、自摸/点炮、第二行显示点炮
         for (int i = 0; i < 4; ++i) {
@@ -787,6 +822,13 @@ void RecordScene::onDrawBox(cocos2d::Ref *, cocos2d::ui::CheckBox::EventType eve
         _tableView->setEnabled(true);
         _recordTilesButton->setEnabled(true);
         _littleFanButton->setEnabled(true);
+        if (sender == _drawBox) {
+            _timeoutBox->setEnabled(true);
+        }
+        else {
+            _drawBox->setEnabled(true);
+        }
+
         _winIndex = _winGroup->getSelectedButtonIndex();
         // 启用所有人的和、自摸/点炮
         for (int i = 0; i < 4; ++i) {
@@ -823,7 +865,7 @@ void RecordScene::onClaimGroup(cocos2d::ui::RadioButton *, int, cocos2d::ui::Rad
     updateScoreLabel();
 }
 
-void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
+void RecordScene::onPenaltyButton(cocos2d::Ref *) {
     float maxWidth = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
@@ -842,7 +884,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
         const float x = gap * (i + 0.5f);
 
         // 名字
-        Label *label = Label::createWithSystemFont(names[PLAYER_TO_UI(i)], "Arial", 12.0f);
+        Label *label = Label::createWithSystemFont(_playerNames[PLAYER_TO_UI(i)], "Arial", 12.0f);
         label->setTextColor(C4B_ORANGE);
         rootNode->addChild(label);
         label->setPosition(Vec2(x, 135.0f));
@@ -884,7 +926,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *, const PlayerNames &names) {
         .setPositiveButton(__UTF8("确定"), [this, penaltyScores](AlertDialog *, int) {
         memcpy(&_detail.penalty_scores, penaltyScores->data(), sizeof(_detail.penalty_scores));
         for (int i = 0; i < 4; ++i) {
-            updatePenaltyLabel(_penaltyLabel[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
+            updatePenaltyText(_penaltyText[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
         }
         updateScoreLabel();
         return true;
@@ -1169,10 +1211,10 @@ void RecordScene::adjustRecentFans() {
 
 void RecordScene::onSubmitButton(cocos2d::Ref *) {
     if (_detail.fan_bits != 0 || _detail.unique_fan != 0 || _detail.multiple_fan != 0) {  // 标记了番种
-        if (_drawBox->isSelected()) {  // 荒庄
+        if (_drawBox->isSelected() || _timeoutBox->isSelected()) {  // 荒庄或者超时
             AlertDialog::Builder(this)
                 .setTitle(__UTF8("计分"))
-                .setMessage(__UTF8("选择「荒庄」将忽略标记的番种"))
+                .setMessage(__UTF8("选择「荒庄」或者「超时」将忽略标记的番种"))
                 .setNegativeButton(__UTF8("取消"), nullptr)
                 .setPositiveButton(__UTF8("确定"), [this](AlertDialog *, int) {
                 _detail.fan_bits = 0;

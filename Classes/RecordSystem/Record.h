@@ -18,6 +18,7 @@ struct Record {
         uint8_t claim_flag;         // 点炮选手（0123bit），当点炮选手=和牌选手时，为自摸
         uint16_t fan;               // 番数
         int16_t penalty_scores[4];  // 处罚分
+        bool timeout;               // 是否超时
         uint64_t fan_bits;          // 标记番种
         uint16_t unique_fan;        // 只存在一个的番14个：箭刻、圈风刻、门风刻、门前清、平和、双暗刻、暗杠、断幺、明杠、无字、边张、嵌张、单钓将、自摸
         uint64_t multiple_fan;      // 可复计的番9个(每个番占用4bit)：四归一(3)、双同刻(2)、一般高(2)、喜相逢(2)、连六(2)、老少副(2)、幺九刻(4)、缺一门(3)、花牌(8)

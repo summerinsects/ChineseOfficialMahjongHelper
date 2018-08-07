@@ -793,6 +793,9 @@ static void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector
 
         for (int k = 0; k < 16; ++k) {
             const Record::Detail &detail = record.detail[k];
+            if (UNLIKELY(detail.timeout)) {
+                continue;
+            }
             ++result->hand_count;
 
             int scoreTable[4];

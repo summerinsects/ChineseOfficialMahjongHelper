@@ -77,6 +77,11 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 }
             }
 
+            it = detail_json.FindMember("timeout");
+            if (it != detail_json.MemberEnd() && it->value.IsBool()) {
+                detail_data.timeout = it->value.GetBool();
+            }
+
             it = detail_json.FindMember("win_hand");
             if (it != detail_json.MemberEnd() && it->value.IsObject()) {
                 Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
@@ -142,6 +147,7 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
             penalty_scores.PushBack(rapidjson::Value(detail_data.penalty_scores[n]), alloc);
         }
         detail_json.AddMember("penalty_scores", std::move(penalty_scores), alloc);
+        detail_json.AddMember("timeout", rapidjson::Value(detail_data.timeout), alloc);
 
         const Record::Detail::WinHand &win_hand_data = detail_data.win_hand;
         rapidjson::Value win_hand_json(rapidjson::Type::kObjectType);

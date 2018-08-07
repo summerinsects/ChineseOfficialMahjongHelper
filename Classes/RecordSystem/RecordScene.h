@@ -2,7 +2,6 @@
 #define _RECORD_SCENE_H_
 
 #include "../BaseScene.h"
-#include <array>
 #include "../cocos-wheels/CWTableView.h"
 #include "Record.h"
 #include "../mahjong-algorithm/fan_calculator.h"
@@ -30,10 +29,9 @@ static const char *handNameText[] = {
 class RecordScene : public BaseScene, cocos2d::ui::EditBoxDelegate, cw::TableViewDelegate {
 public:
     typedef std::function<void (const Record::Detail &)> SubmitCallback;
-    typedef std::array<const char *, 4> PlayerNames;
 
-    CREATE_FUNC_WITH_PARAM_4(RecordScene, size_t, handIdx, const PlayerNames &, names, const Record::Detail *, detail, SubmitCallback &&, okCallback);
-    bool init(size_t handIdx, const PlayerNames &names, const Record::Detail *detail, SubmitCallback &&callback);
+    CREATE_FUNC_WITH_PARAM_4(RecordScene, size_t, handIdx, const char **, names, const Record::Detail *, detail, SubmitCallback &&, okCallback);
+    bool init(size_t handIdx, const char **names, const Record::Detail *detail, SubmitCallback &&callback);
 
     virtual void editBoxEditingDidBegin(cocos2d::ui::EditBox* editBox) override;
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
@@ -43,12 +41,13 @@ public:
 private:
     cocos2d::ui::EditBox *_editBox = nullptr;
     cocos2d::ui::CheckBox *_drawBox = nullptr;
+    cocos2d::ui::CheckBox *_timeoutBox = nullptr;
     cocos2d::ui::RadioButtonGroup *_winGroup = nullptr;
     cocos2d::ui::RadioButtonGroup *_claimGroup = nullptr;
     cocos2d::Label *_byDiscardLabel[4];
     cocos2d::Label *_selfDrawnLabel[4];
     cocos2d::Label *_scoreLabel[4];
-    cocos2d::Label *_penaltyLabel[4];
+    cocos2d::ui::RichText *_penaltyText[4];
 
     cocos2d::ui::Button *_recordTilesButton = nullptr;
     cocos2d::ui::Button *_littleFanButton = nullptr;
@@ -56,6 +55,7 @@ private:
     cocos2d::ui::Button *_submitButton = nullptr;
 
     size_t _handIdx = 0;
+    const char *_playerNames[4];
     int _winIndex = -1;
     Record::Detail _detail;
     SubmitCallback _submitCallback;
@@ -73,8 +73,8 @@ private:
     void onInstructionButton(cocos2d::Ref *sender);
     void onPlusButton(cocos2d::Ref *sender);
     void onRecordTilesButton(cocos2d::Ref *sender);
-    void onDrawBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
-    void onPenaltyButton(cocos2d::Ref *sender, const PlayerNames &names);
+    void onDrawTimeoutBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
+    void onPenaltyButton(cocos2d::Ref *sender);
     void onWinGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
     void onClaimGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
 
