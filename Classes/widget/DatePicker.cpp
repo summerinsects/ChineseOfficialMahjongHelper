@@ -3,10 +3,12 @@
 #include "../UICommon.h"
 #include "../UIColors.h"
 #include "../utils/common.h"
+#include "calendar-inline.h"
 
 USING_NS_CC;
 
 #define C4B_BLUE cocos2d::Color4B(44, 121, 178, 255)
+#define C4B_RED  cocos2d::Color4B(254,  87, 110, 255)
 
 #define LOWER_BOUND 1900
 #define UPPER_BOUND 2099
@@ -111,13 +113,13 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
         checkBox->setPosition(Vec2(20.0f + ret.rem * 32.0f, containerHeight - 35.0f - ret.quot * 32.0f));
         _dayBoxes[i] = checkBox;
 
-        Label *label = Label::createWithSystemFont("", "Arial", 12);
+        Label *label = Label::createWithSystemFont("", "Arial", 14);
         label->setTextColor(C4B_GRAY);
         checkBox->addChild(label);
-        label->setPosition(Vec2(15.0f, 15.0f));
+        label->setPosition(Vec2(15.0f, 20.0f));
         _dayLabelsLarge[i] = label;
 
-        label = Label::createWithSystemFont("", "Arial", 8);
+        label = Label::createWithSystemFont("", "Arial", 7);
         label->setTextColor(C4B_GRAY);
         checkBox->addChild(label);
         label->setPosition(Vec2(15.0f, 6.0f));
@@ -227,13 +229,13 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     totalHeight += 25.0f;
 
     // 上方背景及所选日期显示
-    LayerColor *bg2 = LayerColor::create(C4B_BLUE_THEME, totalWidth, 30.0f);
+    LayerColor *bg2 = LayerColor::create(C4B_BLUE_THEME, totalWidth, 40.0f);
     background->addChild(bg2);
     bg2->setPosition(Vec2(0.0f, totalHeight + 5.0f));
 
     Label *label = Label::createWithSystemFont("", "Arial", 16);
     background->addChild(label);
-    label->setPosition(Vec2(totalWidth * 0.5f, totalHeight + 20.0f));
+    label->setPosition(Vec2(totalWidth * 0.5f, totalHeight + 30.0f));
     _titleLabel = label;
 
     label = Label::createWithSystemFont("", "Arial", 10);
@@ -241,7 +243,8 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     label->setPosition(Vec2(totalWidth - 2.0f, totalHeight + 12.0f));
     _chineseDateLabel = label;
-    totalHeight += 35.0f;
+
+    totalHeight += 45.0f;
 
     background->setContentSize(Size(totalWidth, totalHeight));
     if (totalWidth > visibleSize.width * 0.8f || totalHeight > visibleSize.height * 0.8f) {
@@ -263,36 +266,38 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     return true;
 }
 
-static bool IsLeapYear(int year) {
-    return ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0);
-}
-
-static int DaysForMonth(int year, int month) {
-    static int daysForMonth[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-    int days = daysForMonth[month];
-    if (month == 2 && IsLeapYear(year)) {
-        ++days;
-    }
-    return days;
-}
-
-static int CaculateWeekDay(int y, int m, int d) {
-    // 基姆拉尔森计算公式
-    if (m == 1 || m == 2) {
-        m += 12;
-        --y;
-    }
-    return (1 + d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) % 7;
-}
-
-static void adjustDate(DatePicker::Date *date) {
-    int maxDays = DaysForMonth(date->year, date->month);
-    date->day = std::min(date->day, maxDays);
+static void adjustDate(calendar::GregorianDate *date) {
+    int lastDay = calendar::Gregorian_LastDayOfMonth(date->year, date->month);
+    date->day = std::min(date->day, lastDay);
 }
 
 void DatePicker::refreshTitle() {
     _titleLabel->setString(Common::format(__UTF8("%d年%d月%d日 星期%s"),
-        _picked.year, _picked.month, _picked.day, weekTexts[CaculateWeekDay(_picked.year, _picked.month, _picked.day)]));
+        _picked.year, _picked.month, _picked.day, weekTexts[calendar::Gregorian_CaculateWeekDay(_picked.year, _picked.month, _picked.day)]));
+    _chineseDateLabel->setString(calendar::GetChineseDateTextLong(calendar::Gregorian2Chinese(_picked)));
+}
+
+static void setupLabelSmall(cocos2d::Label *label, const std::pair<int, int> &solarTerms, const calendar::GregorianDate &dateGC, const calendar::ChineseDate &dateCC) {
+    if (solarTerms.first == dateGC.day) {
+        label->setString(calendar::SolarTermsText[dateGC.month * 2 - 2]);
+        label->setTextColor(C4B_RED);
+    }
+    else if (solarTerms.second == dateGC.day) {
+        label->setString(calendar::SolarTermsText[dateGC.month * 2 - 1]);
+        label->setTextColor(C4B_RED);
+    }
+    else {  // 没有节气的话，再显示日子
+        if (dateCC.day > 1) {  // 不是初一
+            label->setString(calendar::Chinese_DayText[dateCC.day - 1]);
+            label->setTextColor(C4B_GRAY);
+        }
+        else {
+            // 将初一显示为（闰）某月大/小的形式
+            label->setString(calendar::GetChineseDateTextShort(dateCC));
+            label->setTextColor(C4B_GRAY);
+        }
+    }
+    cw::scaleLabelToFitWidth(label, 26.0f);
 }
 
 void DatePicker::setupDayContainer() {
@@ -308,32 +313,49 @@ void DatePicker::setupDayContainer() {
     char str[32];
 
     // 本月的1号是星期几，那么前面的天数属于上个月
-    int weekday = CaculateWeekDay(_picked.year, _picked.month, 1);
+    int weekday = calendar::Gregorian_CaculateWeekDay(_picked.year, _picked.month, 1);
     for (int i = 0; i < weekday; ++i) {
         _dayBoxes[i]->setVisible(false);
     }
     _dayOffset = weekday;
 
-    Date date = { _picked.year, _picked.month, 1 };
-    int lastDay = DaysForMonth(_picked.year, _picked.month);
+    // 公历
+    calendar::GregorianDate dateGC = {_picked.year, _picked.month, 1};
+    int lastDayGC = calendar::Gregorian_LastDayOfMonth(dateGC.year, dateGC.month);
+
+    // 农历
+    calendar::ChineseDate dateCC = calendar::Gregorian2Chinese(dateGC);
+    int lastDayCC = dateCC.is_long ? 30 : 29;  // 农历月最后一天
+
+    // 本月的两个节气
+    std::pair<int, int> solarTerms = calendar::GetSolarTermsInGregorianMonth(dateGC.year, dateGC.month);
 
     // 本月的天数
-    for (int i = 0; i < lastDay; ++i) {
+    for (int i = 0; i < lastDayGC; ++i) {
         int idx = weekday + i;
         ui::CheckBox *checkBox = _dayBoxes[idx];
         checkBox->setVisible(true);
         checkBox->setSelected(false);
 
-        snprintf(str, sizeof(str), "%d", date.day);
+        snprintf(str, sizeof(str), "%d", dateGC.day);
         Label *label = _dayLabelsLarge[idx];
         label->setString(str);
         label->setTextColor(C4B_GRAY);
 
-        ++date.day;
+        label = _dayLabelsSmall[idx];
+        setupLabelSmall(label, solarTerms, dateGC, dateCC);
+
+        // 日期增加
+        ++dateGC.day;
+        ++dateCC.day;
+        if (dateCC.day > lastDayCC) {  // 超过农历月最后一天，重新计算
+            dateCC = calendar::Gregorian2Chinese(dateGC);
+            lastDayCC = dateCC.is_long ? 30 : 29;
+        }
     }
 
     // 超出的属于下个月
-    for (int i = weekday + lastDay; i < 42; ++i) {
+    for (int i = weekday + lastDayGC; i < 42; ++i) {
         _dayBoxes[i]->setVisible(false);
     }
 
@@ -342,6 +364,11 @@ void DatePicker::setupDayContainer() {
         int idx = weekday + _today.day - 1;
         Label *label = _dayLabelsLarge[idx];
         label->setTextColor(C4B_BLUE);
+
+        label = _dayLabelsSmall[idx];
+        if (label->getTextColor() == C4B_GRAY) {
+            label->setTextColor(C4B_BLUE);
+        }
     }
     _dayBoxes[_dayOffset + _picked.day - 1]->setSelected(true);
 }

@@ -5,15 +5,22 @@
 #include "ui/CocosGUI.h"
 #include "../cocos-wheels/CWCommon.h"
 
+namespace calendar {
+    struct GregorianDate {
+        int year, month, day;
+    };
+
+    struct ChineseDate {
+        int year, month, day;
+        bool is_leap, is_long;
+    };
+}
+
 #define DATE_PICKER_Z_ORDER 100
 
 class DatePicker : cocos2d::Layer {
 public:
-    struct Date {
-        int year;
-        int month;
-        int day;
-    };
+    typedef calendar::GregorianDate Date;
     typedef std::function<void (DatePicker *thiz, bool confirm)> Callback;
 
     CREATE_FUNC_WITH_PARAM_2(DatePicker, const Date *, date, Callback &&, callback);
