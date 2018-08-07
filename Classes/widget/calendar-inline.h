@@ -258,6 +258,15 @@ namespace calendar {
         __UTF8("立冬"), __UTF8("小雪"), __UTF8("大雪"), __UTF8("冬至")
     };
 
+    static const char *SexagesimalCycleName[60] = {
+        __UTF8("甲子"), __UTF8("乙丑"), __UTF8("丙寅"), __UTF8("丁卯"), __UTF8("戊辰"), __UTF8("己巳"), __UTF8("庚午"), __UTF8("辛未"), __UTF8("壬申"), __UTF8("癸酉"),
+        __UTF8("甲戌"), __UTF8("乙亥"), __UTF8("丙子"), __UTF8("丁丑"), __UTF8("戊寅"), __UTF8("己卯"), __UTF8("庚辰"), __UTF8("辛巳"), __UTF8("壬午"), __UTF8("癸未"),
+        __UTF8("甲申"), __UTF8("乙酉"), __UTF8("丙戌"), __UTF8("丁亥"), __UTF8("戊子"), __UTF8("己丑"), __UTF8("庚寅"), __UTF8("辛卯"), __UTF8("壬辰"), __UTF8("癸巳"),
+        __UTF8("甲午"), __UTF8("乙未"), __UTF8("丙申"), __UTF8("丁酉"), __UTF8("戊戌"), __UTF8("己亥"), __UTF8("庚子"), __UTF8("辛丑"), __UTF8("壬寅"), __UTF8("癸卯"),
+        __UTF8("甲辰"), __UTF8("乙巳"), __UTF8("丙午"), __UTF8("丁未"), __UTF8("戊申"), __UTF8("己酉"), __UTF8("庚戌"), __UTF8("辛亥"), __UTF8("壬子"), __UTF8("癸丑"),
+        __UTF8("甲寅"), __UTF8("乙卯"), __UTF8("丙辰"), __UTF8("丁巳"), __UTF8("戊午"), __UTF8("己未"), __UTF8("庚申"), __UTF8("辛酉"), __UTF8("壬戌"), __UTF8("癸亥")
+    };
+
     static const char *Chinese_MonthText[] = {
         __UTF8("正月"), __UTF8("二月"), __UTF8("三月"), __UTF8("四月"), __UTF8("五月"), __UTF8("六月"), __UTF8("七月"), __UTF8("八月"), __UTF8("九月"), __UTF8("十月"), __UTF8("十一月"), __UTF8("十二月")
     };
@@ -282,7 +291,8 @@ namespace calendar {
     }
 
     static std::string GetChineseDateTextLong(const calendar::ChineseDate &date) {
-        std::string str;
+        std::string str = SexagesimalCycleName[(date.year + 56) % 60];
+        str.append(__UTF8("年"));
         if (date.is_leap) str.append(__UTF8("闰"));
         str.append(Chinese_MonthText[date.month - 1]);
         str.append(Chinese_DayText[date.day - 1]);
