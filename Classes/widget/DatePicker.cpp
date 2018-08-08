@@ -465,6 +465,7 @@ void DatePicker::onSwitchButton(cocos2d::Ref *) {
     case PICK_STATE::YEAR:
         break;
     default:
+        UNREACHABLE();
         break;
     }
 }
@@ -495,6 +496,7 @@ void DatePicker::onUpButton(cocos2d::Ref *) {
         }
         break;
     default:
+        UNREACHABLE();
         break;
     }
 }
@@ -525,6 +527,7 @@ void DatePicker::onDownButton(cocos2d::Ref *) {
         }
         break;
     default:
+        UNREACHABLE();
         break;
     }
 }
