@@ -8,7 +8,7 @@
 USING_NS_CC;
 
 #define C4B_BLUE cocos2d::Color4B(44, 121, 178, 255)
-#define C4B_RED  cocos2d::Color4B(254,  87, 110, 255)
+#define C4B_RED  cocos2d::Color4B(254, 87, 110, 255)
 
 #define LOWER_BOUND 1900
 #define UPPER_BOUND 2099
@@ -95,7 +95,7 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
 
     for (int i = 0; i < 7; ++i) {
         Label *label = Label::createWithSystemFont(weekTexts[i], "Arial", 12);
-        label->setTextColor(C4B_GRAY);
+        label->setTextColor(i > 0 && i < 6 ? C4B_GRAY : C4B_RED);
         container->addChild(label);
         label->setPosition(Vec2(20.0f + i * 32.0f, containerHeight - 10.0f));
     }
