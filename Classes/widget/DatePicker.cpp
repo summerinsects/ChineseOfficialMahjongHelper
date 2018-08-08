@@ -8,7 +8,7 @@
 USING_NS_CC;
 
 #define C4B_BLUE cocos2d::Color4B(44, 121, 178, 255)
-#define C4B_RED  cocos2d::Color4B(254,  87, 110, 255)
+#define C4B_RED  cocos2d::Color4B(254, 87, 110, 255)
 
 #define LOWER_BOUND 1900
 #define UPPER_BOUND 2099
@@ -95,7 +95,7 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
 
     for (int i = 0; i < 7; ++i) {
         Label *label = Label::createWithSystemFont(weekTexts[i], "Arial", 12);
-        label->setTextColor(C4B_GRAY);
+        label->setTextColor(i > 0 && i < 6 ? C4B_GRAY : C4B_RED);
         container->addChild(label);
         label->setPosition(Vec2(20.0f + i * 32.0f, containerHeight - 10.0f));
     }
@@ -208,6 +208,16 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     background->addChild(button);
     button->setPosition(Vec2(45.0f, totalHeight + 15.0f));
     _switchButton = button;
+
+    // 返回今天按钮
+    button = UICommon::createButton();
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("返回今天"));
+    button->addClickEventListener(std::bind(&DatePicker::onTodayButton, this, std::placeholders::_1));
+    background->addChild(button);
+    button->setPosition(Vec2(117.5f, totalHeight + 15.0f));
 
     // 上下按钮
     button = ui::Button::create("icon/left-circle.png");
@@ -465,7 +475,24 @@ void DatePicker::onSwitchButton(cocos2d::Ref *) {
     case PICK_STATE::YEAR:
         break;
     default:
+        UNREACHABLE();
         break;
+    }
+}
+
+void DatePicker::onTodayButton(cocos2d::Ref *) {
+    if (_state == PICK_STATE::DAY && _picked.year == _today.year && _picked.month == _today.month) {
+        // 本月内直接跳转
+        if (_picked.day != _today.day) {
+            _dayBoxes[_dayOffset + _picked.day - 1]->setSelected(false);
+            _picked.day = _today.day;
+            _dayBoxes[_dayOffset + _today.day - 1]->setSelected(true);
+            refreshTitle();
+        }
+    }
+    else {
+        memcpy(&_picked, &_today, sizeof(_picked));
+        setupDayContainer();
     }
 }
 
@@ -495,6 +522,7 @@ void DatePicker::onUpButton(cocos2d::Ref *) {
         }
         break;
     default:
+        UNREACHABLE();
         break;
     }
 }
@@ -525,6 +553,7 @@ void DatePicker::onDownButton(cocos2d::Ref *) {
         }
         break;
     default:
+        UNREACHABLE();
         break;
     }
 }
