@@ -44,6 +44,7 @@ private:
     void setupYearContainer();
 
     void onSwitchButton(cocos2d::Ref *sender);
+    void onTodayButton(cocos2d::Ref *sender);
     void onUpButton(cocos2d::Ref *sender);
     void onDownButton(cocos2d::Ref *sender);
 

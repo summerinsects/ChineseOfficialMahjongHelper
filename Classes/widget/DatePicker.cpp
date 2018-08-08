@@ -209,6 +209,16 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     button->setPosition(Vec2(45.0f, totalHeight + 15.0f));
     _switchButton = button;
 
+    // 返回今天按钮
+    button = UICommon::createButton();
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("返回今天"));
+    button->addClickEventListener(std::bind(&DatePicker::onTodayButton, this, std::placeholders::_1));
+    background->addChild(button);
+    button->setPosition(Vec2(117.5f, totalHeight + 15.0f));
+
     // 上下按钮
     button = ui::Button::create("icon/left-circle.png");
     background->addChild(button);
@@ -467,6 +477,22 @@ void DatePicker::onSwitchButton(cocos2d::Ref *) {
     default:
         UNREACHABLE();
         break;
+    }
+}
+
+void DatePicker::onTodayButton(cocos2d::Ref *) {
+    if (_state == PICK_STATE::DAY && _picked.year == _today.year && _picked.month == _today.month) {
+        // 本月内直接跳转
+        if (_picked.day != _today.day) {
+            _dayBoxes[_dayOffset + _picked.day - 1]->setSelected(false);
+            _picked.day = _today.day;
+            _dayBoxes[_dayOffset + _today.day - 1]->setSelected(true);
+            refreshTitle();
+        }
+    }
+    else {
+        memcpy(&_picked, &_today, sizeof(_picked));
+        setupDayContainer();
     }
 }
 
