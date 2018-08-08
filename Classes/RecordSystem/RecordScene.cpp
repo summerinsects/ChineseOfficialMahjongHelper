@@ -1039,16 +1039,16 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     ui::CheckBox *checkBox = UICommon::createCheckBox();
     checkBox->setZoomScale(0.0f);
     checkBox->ignoreContentAdaptWithSize(false);
-    checkBox->setContentSize(Size(20.0f, 20.0f));
-    checkBox->setPosition(Vec2(12.0f, 10.0f));
+    checkBox->setContentSize(Size(15.0f, 15.0f));
+    checkBox->setPosition(Vec2(9.5f, 10.0f));
     rootNode->addChild(checkBox);
     checkBox->setSelected(UserDefault::getInstance()->getBoolForKey(NEVER_NOTIFY_LITTLE_FAN, false));
 
-    Label *label = Label::createWithSystemFont(__UTF8("不再提示标记小番"), "Arial", 12);
-    label->setTextColor(C4B_BLACK);
+    Label *label = Label::createWithSystemFont(__UTF8("不再提示标记小番"), "Arial", 10);
+    label->setTextColor(C4B_GRAY);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     rootNode->addChild(label);
-    label->setPosition(Vec2(27.0f, 10.0f));
+    label->setPosition(Vec2(22.0f, 10.0f));
 
     AlertDialog::Builder(this)
         .setTitle(__UTF8("标记小番"))
