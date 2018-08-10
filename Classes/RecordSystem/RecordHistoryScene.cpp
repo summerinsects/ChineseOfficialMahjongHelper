@@ -432,11 +432,12 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
             playerLabels[i] = label;
         }
 
-        delBtn = ui::Button::create("drawable/btn_trash_bin.png");
-        delBtn->setScale(Director::getInstance()->getContentScaleFactor() * 0.5f);
-        delBtn->addClickEventListener(std::bind(&RecordHistoryScene::onDeleteButton, this, std::placeholders::_1));
-        cell->addChild(delBtn);
-        delBtn->setPosition(Vec2(cellWidth - 15.0f, 40.0f));
+        ui::Button *button = ui::Button::create("drawable/btn_trash_bin.png");
+        button->setScale(20.0f / button->getContentSize().width);
+        button->addClickEventListener(std::bind(&RecordHistoryScene::onDeleteButton, this, std::placeholders::_1));
+        cell->addChild(button);
+        button->setPosition(Vec2(cellWidth - 15.0f, 40.0f));
+        delBtn = button;
 
         cell->setContentSize(Size(cellWidth, 65.0f));
         cell->setTouchEnabled(true);
