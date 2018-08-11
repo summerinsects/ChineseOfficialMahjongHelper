@@ -791,7 +791,7 @@ void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
 
     int idx = _winGroup->getSelectedButtonIndex();
     if (idx >= 0 && idx < 4) {
-        param.seat_wind = static_cast<mahjong::wind_t>(idx);
+        param.seat_wind = static_cast<mahjong::wind_t>((idx + 4 - (_handIdx & 0x3)) & 0x3);
     }
 
     showCalculator(param);
@@ -1425,7 +1425,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
             _editBox->setText(buf);
 
             // 根据记录和牌的门风确定和牌的是哪一家
-            int winIndex = static_cast<int>(temp.seat_wind);
+            int winIndex = (static_cast<int>(temp.seat_wind) + (_handIdx & 0x3)) & 0x3;
             _winGroup->setSelectedButton(winIndex);
 
             if (temp.win_flag & WIN_FLAG_SELF_DRAWN) {  // 自摸
