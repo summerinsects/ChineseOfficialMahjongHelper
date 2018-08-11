@@ -206,7 +206,7 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     button->setTitleFontSize(12);
     button->addClickEventListener(std::bind(&DatePicker::onSwitchButton, this, std::placeholders::_1));
     background->addChild(button);
-    button->setPosition(Vec2(45.0f, totalHeight + 15.0f));
+    button->setPosition(Vec2(70.0f, totalHeight + 15.0f));
     _switchButton = button;
 
     // 返回今天按钮
@@ -217,24 +217,22 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     button->setTitleText(__UTF8("返回今天"));
     button->addClickEventListener(std::bind(&DatePicker::onTodayButton, this, std::placeholders::_1));
     background->addChild(button);
-    button->setPosition(Vec2(117.5f, totalHeight + 15.0f));
+    button->setPosition(Vec2(totalWidth - 32.5f, totalHeight + 15.0f));
 
-    // 上下按钮
+    // 左右按钮
     button = ui::Button::create("icon/left-circle.png");
     background->addChild(button);
     button->setScale(20 / button->getContentSize().width);
-    button->setPosition(Vec2(totalWidth - 52.0f, totalHeight + 15.0f));
+    button->setPosition(Vec2(15.0f, totalHeight + 15.0f));
     button->setColor(Color3B(51, 204, 255));
-    button->setRotation(90.0f);
-    button->addClickEventListener(std::bind(&DatePicker::onUpButton, this, std::placeholders::_1));
+    button->addClickEventListener(std::bind(&DatePicker::onBackwardButton, this, std::placeholders::_1));
 
-    button = ui::Button::create("icon/left-circle.png");
+    button = ui::Button::create("icon/right-circle.png");
     background->addChild(button);
     button->setScale(20 / button->getContentSize().width);
-    button->setPosition(Vec2(totalWidth - 20.0f, totalHeight + 15.0f));
+    button->setPosition(Vec2(125.0f, totalHeight + 15.0f));
     button->setColor(Color3B(51, 204, 255));
-    button->setRotation(-90.0f);
-    button->addClickEventListener(std::bind(&DatePicker::onDownButton, this, std::placeholders::_1));
+    button->addClickEventListener(std::bind(&DatePicker::onForwardButton, this, std::placeholders::_1));
 
     totalHeight += 25.0f;
 
@@ -496,7 +494,7 @@ void DatePicker::onTodayButton(cocos2d::Ref *) {
     }
 }
 
-void DatePicker::onUpButton(cocos2d::Ref *) {
+void DatePicker::onBackwardButton(cocos2d::Ref *) {
     switch (_state) {
     case PICK_STATE::DAY:
         if (_picked.month > 1) {
@@ -527,7 +525,7 @@ void DatePicker::onUpButton(cocos2d::Ref *) {
     }
 }
 
-void DatePicker::onDownButton(cocos2d::Ref *) {
+void DatePicker::onForwardButton(cocos2d::Ref *) {
     switch (_state) {
     case PICK_STATE::DAY:
         if (_picked.month < 12) {

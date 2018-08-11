@@ -45,8 +45,8 @@ private:
 
     void onSwitchButton(cocos2d::Ref *sender);
     void onTodayButton(cocos2d::Ref *sender);
-    void onUpButton(cocos2d::Ref *sender);
-    void onDownButton(cocos2d::Ref *sender);
+    void onBackwardButton(cocos2d::Ref *sender);
+    void onForwardButton(cocos2d::Ref *sender);
 
     void onDayBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onMonthBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
