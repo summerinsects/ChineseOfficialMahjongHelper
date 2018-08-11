@@ -773,22 +773,18 @@ void ScoreSheetScene::editNameAndTitle() {
         editBox->setPosition(Vec2(editBoxPosX, yPos));
         editBoxes[i] = editBox;
 
-        ui::Button *button = UICommon::createButton();
+        ui::Button *button = ui::Button::create("icon/up-circle.png");
         rootNode->addChild(button);
-        button->setScale9Enabled(true);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setTitleFontSize(12);
-        button->setTitleText("\xE2\xAC\x86\xEF\xB8\x8E");
+        button->setScale(20 / button->getContentSize().width);
+        button->setColor(Color3B(51, 204, 255));
         button->setPosition(Vec2(upPosX, yPos));
         button->setEnabled(i != 0);
         upButtons[i] = button;
 
-        button = UICommon::createButton();
+        button = ui::Button::create("icon/down-circle.png");
         rootNode->addChild(button);
-        button->setScale9Enabled(true);
-        button->setContentSize(Size(20.0f, 20.0f));
-        button->setTitleFontSize(12);
-        button->setTitleText("\xE2\xAC\x87\xEF\xB8\x8E");
+        button->setScale(20 / button->getContentSize().width);
+        button->setColor(Color3B(51, 204, 255));
         button->setPosition(Vec2(downPosX, yPos));
         button->setEnabled(i != 3);
         downButtons[i] = button;
