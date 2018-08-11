@@ -869,13 +869,13 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *) {
     float maxWidth = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(maxWidth, 145.0f));
+    rootNode->setContentSize(Size(maxWidth, 150.0f));
 
     const float gap = (maxWidth - 4.0f) * 0.25f;
 
     static const int16_t value[4] = { -10, -5, +5, +10 };
     static const char *text[4] = { "-10", "-5", "+5", "+10" };
-    static const float buttonY[4] = { 110.0f, 85.0f, 35.0f, 10.0f };
+    static const float buttonY[4] = { 115.0f, 90.0f, 40.0f, 15.0f };
 
     std::shared_ptr<std::array<int16_t, 4> > penaltyScores = std::make_shared<std::array<int16_t, 4> >();
     memcpy(penaltyScores->data(), &_detail.penalty_scores, sizeof(_detail.penalty_scores));
@@ -887,18 +887,18 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *) {
         Label *label = Label::createWithSystemFont(_playerNames[PLAYER_TO_UI(i)], "Arial", 12.0f);
         label->setTextColor(C4B_ORANGE);
         rootNode->addChild(label);
-        label->setPosition(Vec2(x, 135.0f));
+        label->setPosition(Vec2(x, 140.0f));
         cw::scaleLabelToFitWidth(label, gap - 2.0f);
 
         ui::Scale9Sprite *sprite = ui::Scale9Sprite::create("source_material/btn_square_normal.png");
         rootNode->addChild(sprite);
         sprite->setContentSize(Size(30.0f, 20.0f));
-        sprite->setPosition(Vec2(x, 60.0f));
+        sprite->setPosition(Vec2(x, 65.0f));
 
         // 罚分
         label = Label::createWithSystemFont("", "Arial", 12);
         rootNode->addChild(label);
-        label->setPosition(Vec2(x, 60.0f));
+        label->setPosition(Vec2(x, 65.0f));
         updatePenaltyLabel(label, penaltyScores->at(PLAYER_TO_UI(i)));
 
         for (int n = 0; n < 4; ++n) {
@@ -1265,11 +1265,11 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
 
     // 布局在rootNode上
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(maxWidth, pickerSize.height + extraInfoSize.height + 5));
+    rootNode->setContentSize(Size(maxWidth, pickerSize.height + extraInfoSize.height + 10.0f));
     rootNode->addChild(tilePicker);
-    tilePicker->setPosition(Vec2(maxWidth * 0.5f, pickerSize.height * 0.5f + extraInfoSize.height + 5));
+    tilePicker->setPosition(Vec2(maxWidth * 0.5f, pickerSize.height * 0.5f + extraInfoSize.height + 10.0f));
     rootNode->addChild(extraInfo);
-    extraInfo->setPosition(Vec2(maxWidth * 0.5f, extraInfoSize.height * 0.5f));
+    extraInfo->setPosition(Vec2(maxWidth * 0.5f, extraInfoSize.height * 0.5f + 5.0f));
 
     tilePicker->setFixedPacksChangedCallback([tilePicker, extraInfo]() {
         extraInfo->refreshByKong(tilePicker->isFixedPacksContainsKong());

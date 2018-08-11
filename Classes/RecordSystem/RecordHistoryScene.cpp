@@ -962,7 +962,7 @@ namespace {
         Label *label = Label::createWithSystemFont("", "Arail", 8);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-        label->setPosition(Vec2(width, height + 5.0f));
+        label->setPosition(Vec2(width, height + 15.0f));
         this->addChild(label);
         _countLabel = label;
 
@@ -996,7 +996,7 @@ namespace {
 
     void SummaryTableNode::refreshCountLabel() {
         char str[128];
-        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
+        snprintf(str, sizeof(str), __UTF8("%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
             _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), -1),
             _currentFlags.size());
         _countLabel->setString(str);
@@ -1219,7 +1219,7 @@ namespace {
         Label *label = Label::createWithSystemFont("", "Arail", 8);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-        label->setPosition(Vec2(width, height + 5.0f));
+        label->setPosition(Vec2(width, height + 15.0f));
         this->addChild(label);
         _countLabel = label;
 
@@ -1245,7 +1245,7 @@ namespace {
 
     void BatchDeleteTableNode::refreshCountLabel() {
         char str[128];
-        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
+        snprintf(str, sizeof(str), __UTF8("%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
             _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), false),
             _currentFlags.size());
         _countLabel->setString(str);

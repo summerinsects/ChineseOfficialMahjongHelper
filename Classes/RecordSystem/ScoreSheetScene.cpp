@@ -725,7 +725,7 @@ void ScoreSheetScene::editNameAndTitle() {
     const float limitWidth = std::min(AlertDialog::maxWidth(), 180.0f);
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(limitWidth, 170.0f));
+    rootNode->setContentSize(Size(limitWidth, 175.0f));
 
     // 输入框及上下按钮
     const float editBoxWidth = limitWidth - 20 - 50;
@@ -1237,17 +1237,17 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender) {
     Node *container = Node::create();
     if (detail.win_hand.flower_count > 0) {
         const Size &flowerSize = flowerLabel->getContentSize();
-        container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height));
+        container->setContentSize(Size(maxWidth, labelSize.height + 5.0f + tilesNodeSize.height + 5.0f + flowerSize.height));
 
         container->addChild(flowerLabel);
-        flowerLabel->setPosition(Vec2(0, labelSize.height + 10 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
+        flowerLabel->setPosition(Vec2(0, labelSize.height + 5.0f + tilesNodeSize.height + 5.0f + flowerSize.height * 0.5f));
     }
     else {
-        container->setContentSize(Size(maxWidth, labelSize.height + 10 + tilesNodeSize.height));
+        container->setContentSize(Size(maxWidth, labelSize.height + 5.0f + tilesNodeSize.height));
     }
 
     container->addChild(tilesNode);
-    tilesNode->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 10 + tilesNodeSize.height * 0.5f));
+    tilesNode->setPosition(Vec2(maxWidth * 0.5f, labelSize.height + 5.0f + tilesNodeSize.height * 0.5f));
 
     container->addChild(label);
     label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f));
@@ -1281,7 +1281,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
     const float width = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(width, 100.0f));
+    rootNode->setContentSize(Size(width, 105.0f));
 
     std::array<ui::RadioButtonGroup *, 2> radioGroups;
 
@@ -1290,7 +1290,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
     label->setTextColor(C4B_BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 90.0f));
+    label->setPosition(Vec2(5.0f, 95.0f));
 
     ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
     rootNode->addChild(radioGroup);
@@ -1302,7 +1302,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
         radioButton->setZoomScale(0.0f);
         radioButton->ignoreContentAdaptWithSize(false);
         radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 65.0f));
+        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 70.0f));
         rootNode->addChild(radioButton);
         radioGroup->addRadioButton(radioButton);
 
@@ -1322,7 +1322,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
     label->setTextColor(C4B_BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(5.0f, 35.0f));
+    label->setPosition(Vec2(5.0f, 40.0f));
 
     radioGroup = ui::RadioButtonGroup::create();
     rootNode->addChild(radioGroup);
@@ -1334,7 +1334,7 @@ void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
         radioButton->setZoomScale(0.0f);
         radioButton->ignoreContentAdaptWithSize(false);
         radioButton->setContentSize(Size(20.0f, 20.0f));
-        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 10.0f));
+        radioButton->setPosition(Vec2(width * 0.5f * i + 20.0f, 15.0f));
         rootNode->addChild(radioButton);
         radioGroup->addRadioButton(radioButton);
 
@@ -1403,11 +1403,11 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     }
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(200.0f, 70.0f));
+    rootNode->setContentSize(Size(200.0f, 75.0f));
 
     Label *label = Label::createWithSystemFont(__UTF8("在清空表格之前，请选择「保存」或「丢弃」"), "Arail", 12);
     rootNode->addChild(label);
-    label->setPosition(Vec2(100.0f, 60.0f));
+    label->setPosition(Vec2(100.0f, 65.0f));
     label->setTextColor(C4B_GRAY);
     cw::scaleLabelToFitWidth(label, 200.0f);
 
@@ -1418,7 +1418,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     radioButton->setZoomScale(0.0f);
     radioButton->ignoreContentAdaptWithSize(false);
     radioButton->setContentSize(Size(20.0f, 20.0f));
-    radioButton->setPosition(Vec2(10.0f, 60.0f - 1 * 25.0f));
+    radioButton->setPosition(Vec2(10.0f, 65.0f - 1 * 25.0f));
     rootNode->addChild(radioButton);
     radioGroup->addRadioButton(radioButton);
 
@@ -1433,7 +1433,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     radioButton->setZoomScale(0.0f);
     radioButton->ignoreContentAdaptWithSize(false);
     radioButton->setContentSize(Size(20.0f, 20.0f));
-    radioButton->setPosition(Vec2(10.0f, 60.0f - 2 * 25.0f));
+    radioButton->setPosition(Vec2(10.0f, 65.0f - 2 * 25.0f));
     rootNode->addChild(radioButton);
     radioGroup->addRadioButton(radioButton);
 
@@ -1566,9 +1566,9 @@ static void showPursuit() {
 
     const Size &labelSize = label->getContentSize();
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(limitWidth, labelSize.height + 100.0f));
+    rootNode->setContentSize(Size(limitWidth, labelSize.height + 105.0f));
     rootNode->addChild(label);
-    label->setPosition(Vec2(limitWidth * 0.5f, 100.0f + labelSize.height * 0.5f));
+    label->setPosition(Vec2(limitWidth * 0.5f, 105.0f + labelSize.height * 0.5f));
 
     // 文本+输入框+按钮
     const float buttonPosX = limitWidth * 0.5f + 40.0f;
@@ -1578,7 +1578,7 @@ static void showPursuit() {
     std::array<ui::EditBox *, 4> editBoxes;
     ui::Button *buttons[4];
     for (int i = 0; i < 4; ++i) {
-        const float yPos = 85.0f - i * 25.0f;
+        const float yPos = 90.0f - i * 25.0f;
         label = Label::createWithSystemFont(titleText[i], "Arial", 12);
         label->setTextColor(C4B_BLACK);
         rootNode->addChild(label);
@@ -1658,7 +1658,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(drawNodeSize.width, drawNodeSize.height + 30.0f));
     rootNode->addChild(drawNode);
-    drawNode->setPosition(Vec2(0.0f, 30.0f));
+    drawNode->setPosition(Vec2(0.0f, 25.0f));
 
     // 更多追分
     ui::Button *button = UICommon::createButton();

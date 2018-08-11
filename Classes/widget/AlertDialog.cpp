@@ -122,7 +122,7 @@ bool AlertDialog::initWithBuilder(Builder &&builder) {
 
     Node *node = builder._contentNode;
     if (node != nullptr) {
-        totalHeight += 10.0f;
+        totalHeight += 5.0f;
 
         Size nodeSize = node->getContentSize();
         if (nodeSize.width > maxWidth1) {
@@ -155,10 +155,11 @@ bool AlertDialog::initWithBuilder(Builder &&builder) {
         label->setPosition(Vec2(totalWidth * 0.5f, totalHeight + labelSize.height * 0.5f));
 
         totalHeight += labelSize.height;
+        totalHeight += 5.0f;
     }
 
     if (!builder._title.empty()) {
-        totalHeight += 10.0f;
+        totalHeight += 5.0f;
 
         // 分隔线
         LayerColor *line = LayerColor::create(Color4B(227, 227, 227, 255), totalWidth, 2.0f);
