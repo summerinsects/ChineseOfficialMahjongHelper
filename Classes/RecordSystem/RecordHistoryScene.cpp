@@ -433,8 +433,9 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
             playerLabels[i] = label;
         }
 
-        ui::Button *button = ui::Button::create("drawable/btn_trash_bin.png");
+        ui::Button *button = ui::Button::create("icon/delete.png");
         button->setScale(20.0f / button->getContentSize().width);
+        button->setColor(C3B_GRAY);
         button->addClickEventListener(std::bind(&RecordHistoryScene::onDeleteButton, this, std::placeholders::_1));
         cell->addChild(button);
         button->setPosition(Vec2(cellWidth - 15.0f, 40.0f));
