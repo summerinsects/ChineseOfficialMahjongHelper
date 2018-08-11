@@ -25,6 +25,8 @@ public:
 
     virtual void onEnter() override;
 
+    typedef std::pair<size_t, uint8_t> FilterIndex;
+
 private:
     std::vector<RecordTexts> _recordTexts;
 
@@ -38,7 +40,7 @@ private:
         char title[128];
     };
     FilterCriteria _filterCriteria;
-    std::vector<std::pair<size_t, uint8_t> > _filterIndices;
+    std::vector<FilterIndex> _filterIndices;
 
     void filter();
     void refresh();
@@ -50,8 +52,8 @@ private:
 
     void onMoreButton(cocos2d::Ref *sender);
     void showFilterAlert();
-    void showSummaryAlert();
-    void showBatchDeleteAlert();
+    void switchToSummary();
+    void switchToBatchDelete();
 
     void onDeleteButton(cocos2d::Ref *sender);
     void onCellClicked(cocos2d::Ref *sender);
@@ -59,6 +61,7 @@ private:
     void saveRecordsAndRefresh();
 
     cocos2d::Label *_emptyLabel = nullptr;
+    cocos2d::ui::Button *_moreButton = nullptr;
     cw::TableView *_tableView = nullptr;
     ViewCallback _viewCallback;
 };

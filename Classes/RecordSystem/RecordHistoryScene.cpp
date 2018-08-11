@@ -113,6 +113,7 @@ bool RecordHistoryScene::init(ViewCallback &&viewCallback) {
     button->setScale(20.0f / button->getContentSize().width);
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
     button->addClickEventListener(std::bind(&RecordHistoryScene::onMoreButton, this, std::placeholders::_1));
+    _moreButton = button;
 
     Label *label = Label::createWithSystemFont(__UTF8("无历史记录"), "Arial", 12);
     this->addChild(label);
@@ -538,8 +539,8 @@ void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
 
         switch (idx) {
         case 0: showFilterAlert(); break;
-        case 1: showSummaryAlert(); break;
-        case 2: showBatchDeleteAlert(); break;
+        case 1: switchToSummary(); break;
+        case 2: switchToBatchDelete(); break;
         default: UNREACHABLE(); break;
         }
     });
@@ -915,19 +916,22 @@ namespace {
 
     class SummaryTableNode : public Node, cw::TableViewDelegate {
     private:
-        const std::vector<std::pair<size_t, uint8_t> > *_filterIndices;
+        const std::vector<RecordHistoryScene::FilterIndex> *_filterIndices;
         std::vector<std::string> _timeTexts;
         std::vector<int8_t> _currentFlags;
 
         Label *_countLabel = nullptr;
+        cocos2d::ui::Button *_positiveButton;
+        cocos2d::ui::Button *_negativeButton;
 
     public:
         const std::vector<int8_t> &getCurrentFlags() { return _currentFlags; }
 
-        typedef std::vector<std::pair<size_t, uint8_t> > FilterIndicesType;
-        CREATE_FUNC_WITH_PARAM_1(SummaryTableNode, const FilterIndicesType *, filterIndices);
+        CREATE_FUNC_WITH_PARAM_1(SummaryTableNode, const std::vector<RecordHistoryScene::FilterIndex> *, filterIndices);
 
-        bool init(const std::vector<std::pair<size_t, uint8_t> > *filterIndices);
+        bool init(const std::vector<RecordHistoryScene::FilterIndex> *filterIndices);
+        void setPositiveCallback(ui::Widget::ccWidgetClickCallback &&callback) { _positiveButton->addClickEventListener(callback); }
+        void setNegativeCallback(ui::Widget::ccWidgetClickCallback &&callback) { _negativeButton->addClickEventListener(callback); }
 
     private:
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
@@ -939,7 +943,7 @@ namespace {
         void refreshCountLabel();
     };
 
-    bool SummaryTableNode::init(const std::vector<std::pair<size_t, uint8_t> > *filterIndices) {
+    bool SummaryTableNode::init(const std::vector<RecordHistoryScene::FilterIndex> *filterIndices) {
         if (UNLIKELY(!Node::init())) {
             return false;
         }
@@ -954,17 +958,31 @@ namespace {
         });
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = AlertDialog::maxWidth();
-        const float height = visibleSize.height * 0.8f - 80.0f;
-        this->setContentSize(Size(width, height));
 
-        // 选择了几个的Label，位置在外面
-        Label *label = Label::createWithSystemFont("", "Arail", 8);
+        Label *label = Label::createWithSystemFont("", "Arail", 10);
         label->setTextColor(C4B_GRAY);
-        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-        label->setPosition(Vec2(width, height + 15.0f));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(5.0f, 15.0f));
         this->addChild(label);
         _countLabel = label;
+
+        ui::Button *button = ui::Button::create("source_material/btn_square_disabled.png", "source_material/btn_square_selected.png");
+        this->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(50.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText(__UTF8("取消"));
+        button->setPosition(Vec2(visibleSize.width - 85.0f, 15.0f));
+        _negativeButton = button;
+
+        button = UICommon::createButton();
+        this->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(50.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText(__UTF8("汇总"));
+        button->setPosition(Vec2(visibleSize.width - 30.0f, 15.0f));
+        _positiveButton = button;
 
         // 表格
         cw::TableView *tableView = cw::TableView::create();
@@ -972,12 +990,12 @@ namespace {
         tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
         tableView->setScrollBarWidth(4.0f);
         tableView->setScrollBarOpacity(0x99);
-        tableView->setContentSize(Size(width, height));
+        tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 65.0f));
         tableView->setDelegate(this);
         tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
         tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        tableView->setPosition(Vec2(width * 0.5f, height * 0.5f));
+        tableView->setPosition(Vec2(visibleSize.width * 0.5f, visibleSize.height * 0.5f));
         tableView->reloadData();
         this->addChild(tableView);
 
@@ -996,9 +1014,9 @@ namespace {
 
     void SummaryTableNode::refreshCountLabel() {
         char str[128];
-        snprintf(str, sizeof(str), __UTF8("%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
+        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
             _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), -1),
-            _currentFlags.size());
+            _filterIndices->size());
         _countLabel->setString(str);
     }
 
@@ -1014,7 +1032,8 @@ namespace {
         typedef cw::TableViewCellEx<Label *, Label *, ui::RadioButtonGroup *, std::array<ui::RadioButton *, 4>, std::array<Label *, 4>, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-        const float cellWidth = AlertDialog::maxWidth();
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        const float cellWidth = visibleSize.width - 5.0f;
 
         if (cell == nullptr) {
             cell = CustomCell::create();
@@ -1147,21 +1166,21 @@ namespace {
     }
 }
 
-void RecordHistoryScene::showSummaryAlert() {
+void RecordHistoryScene::switchToSummary() {
     SummaryTableNode *rootNode = SummaryTableNode::create(&_filterIndices);
-    AlertDialog::Builder(this)
-        .setTitle(__UTF8("选择要汇总的对局"))
-        .setContentNode(rootNode)
-        .setCloseOnTouchOutside(false)
-        .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [this, rootNode](AlertDialog *, int) {
+    rootNode->setNegativeCallback([this, rootNode](Ref *) {
+        _tableView->setVisible(true);
+        this->removeChild(rootNode);
+        _moreButton->setVisible(true);
+    });
+    rootNode->setPositiveCallback([this, rootNode](Ref *) {
         auto& currentFlags = rootNode->getCurrentFlags();
 
         RecordsStatistic rs;
         SummarizeRecords(currentFlags, g_records, &rs);
         if (rs.competition_count == 0) {
             Toast::makeText(this, __UTF8("请选择要汇总的对局"), Toast::Duration::LENGTH_LONG)->show();
-            return false;
+            return;
         }
 
         Node *node = createStatisticNode(rs);
@@ -1170,8 +1189,11 @@ void RecordHistoryScene::showSummaryAlert() {
             .setContentNode(node)
             .setPositiveButton(__UTF8("确定"), nullptr)
             .create()->show();
-        return true;
-    }).create()->show();
+    });
+    this->addChild(rootNode);
+    rootNode->setPosition(Director::getInstance()->getVisibleOrigin());
+    _tableView->setVisible(false);
+    _moreButton->setVisible(false);
 }
 
 namespace {
@@ -1183,6 +1205,8 @@ namespace {
         std::vector<bool> _currentFlags;
 
         Label *_countLabel = nullptr;
+        cocos2d::ui::Button *_positiveButton;
+        cocos2d::ui::Button *_negativeButton;
 
     public:
         const std::vector<bool> &getCurrentFlags() { return _currentFlags; }
@@ -1191,6 +1215,8 @@ namespace {
         CREATE_FUNC_WITH_PARAM_2(BatchDeleteTableNode, const std::vector<RecordTexts> *, texts, const FilterIndicesType *, filterIndices);
 
         bool init(const std::vector<RecordTexts> * texts, const std::vector<std::pair<size_t, uint8_t> > *filterIndices);
+        void setPositiveCallback(ui::Widget::ccWidgetClickCallback &&callback) { _positiveButton->addClickEventListener(callback); }
+        void setNegativeCallback(ui::Widget::ccWidgetClickCallback &&callback) { _negativeButton->addClickEventListener(callback); }
 
     private:
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
@@ -1211,17 +1237,31 @@ namespace {
         _filterIndices = filterIndices;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = AlertDialog::maxWidth();
-        const float height = visibleSize.height * 0.8f - 80.0f;
-        this->setContentSize(Size(width, height));
 
-        // 选择了几个的Label，位置在外面
-        Label *label = Label::createWithSystemFont("", "Arail", 8);
+        Label *label = Label::createWithSystemFont("", "Arail", 10);
         label->setTextColor(C4B_GRAY);
-        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-        label->setPosition(Vec2(width, height + 15.0f));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(5.0f, 15.0f));
         this->addChild(label);
         _countLabel = label;
+
+        ui::Button *button = ui::Button::create("source_material/btn_square_disabled.png", "source_material/btn_square_selected.png");
+        this->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(50.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText(__UTF8("取消"));
+        button->setPosition(Vec2(visibleSize.width - 85.0f, 15.0f));
+        _negativeButton = button;
+
+        button = UICommon::createButton();
+        this->addChild(button);
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(50.0f, 20.0f));
+        button->setTitleFontSize(12);
+        button->setTitleText(__UTF8("删除"));
+        button->setPosition(Vec2(visibleSize.width - 30.0f, 15.0f));
+        _positiveButton = button;
 
         // 表格
         cw::TableView *tableView = cw::TableView::create();
@@ -1229,12 +1269,12 @@ namespace {
         tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
         tableView->setScrollBarWidth(4.0f);
         tableView->setScrollBarOpacity(0x99);
-        tableView->setContentSize(Size(width, height));
+        tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 65.0f));
         tableView->setDelegate(this);
         tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
         tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        tableView->setPosition(Vec2(width * 0.5f, height * 0.5f));
+        tableView->setPosition(Vec2(visibleSize.width * 0.5f, visibleSize.height * 0.5f));
         tableView->reloadData();
         this->addChild(tableView);
 
@@ -1245,9 +1285,9 @@ namespace {
 
     void BatchDeleteTableNode::refreshCountLabel() {
         char str[128];
-        snprintf(str, sizeof(str), __UTF8("%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
+        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
             _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), false),
-            _currentFlags.size());
+            _filterIndices->size());
         _countLabel->setString(str);
     }
 
@@ -1263,7 +1303,8 @@ namespace {
         typedef cw::TableViewCellEx<Label *, Label *, std::array<Label *, 4>, ui::CheckBox *, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-        const float cellWidth = AlertDialog::maxWidth();
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        const float cellWidth = visibleSize.width - 5.0f;
 
         if (cell == nullptr) {
             cell = CustomCell::create();
@@ -1361,37 +1402,39 @@ namespace {
     }
 }
 
-void RecordHistoryScene::showBatchDeleteAlert() {
+void RecordHistoryScene::switchToBatchDelete() {
     BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(&_recordTexts, &_filterIndices);
-    AlertDialog::Builder(this)
-        .setTitle(__UTF8("选择要删除的对局"))
-        .setContentNode(rootNode)
-        .setCloseOnTouchOutside(false)
-        .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [this, rootNode](AlertDialog *dlg, int) {
+    rootNode->setNegativeCallback([this, rootNode](Ref *) {
+        _tableView->setVisible(true);
+        this->removeChild(rootNode);
+        _moreButton->setVisible(true);
+    });
+    rootNode->setPositiveCallback([this, rootNode](Ref *) {
         auto currentFlags = std::make_shared<std::vector<bool> >(rootNode->getCurrentFlags());
 
         if (std::none_of(currentFlags->begin(), currentFlags->end(), [](bool f) { return f; })) {
             Toast::makeText(this, __UTF8("请选择要删除的对局"), Toast::Duration::LENGTH_LONG)->show();
-            return false;
+            return;
         }
 
         AlertDialog::Builder(this)
             .setTitle(__UTF8("删除记录"))
             .setMessage(__UTF8("删除后无法找回，确认删除？"))
             .setNegativeButton(__UTF8("取消"), nullptr)
-            .setPositiveButton(__UTF8("确定"), [this, currentFlags, dlg](AlertDialog *, int) {
+            .setPositiveButton(__UTF8("确定"), [this, currentFlags](AlertDialog *, int) {
             for (size_t i = currentFlags->size(); i-- > 0; ) {
                 if (currentFlags->at(i)) {
                     g_records.erase(g_records.begin() + i);
                 }
             }
             saveRecordsAndRefresh();
-            dlg->dismiss();
             return true;
         }).create()->show();
-        return false;
-    }).create()->show();
+    });
+    this->addChild(rootNode);
+    rootNode->setPosition(Director::getInstance()->getVisibleOrigin());
+    _tableView->setVisible(false);
+    _moreButton->setVisible(false);
 }
 
 void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {
