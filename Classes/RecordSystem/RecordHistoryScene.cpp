@@ -350,7 +350,7 @@ void RecordHistoryScene::filter() {
     _filterIndices.clear();
     const Record *p = &g_records[0];
     std::transform(temp1.begin(), temp1.end(), std::back_inserter(_filterIndices), [p](const std::pair<const Record *, uint8_t> &d) {
-        return std::make_pair(static_cast<size_t>(d.first - p), d.second);  // first转换为下标
+        return FilterIndex({ static_cast<size_t>(d.first - p), d.second });  // first转换为下标
     });
 }
 
@@ -455,8 +455,8 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
     layerColors[0]->setVisible((idx & 1) == 0);
     layerColors[1]->setVisible((idx & 1) != 0);
 
-    const std::pair<size_t, uint8_t> &data = _filterIndices[idx];
-    size_t realIdx = data.first;
+    const FilterIndex &data = _filterIndices[idx];
+    size_t realIdx = data.real_index;
     delBtn->setUserData(reinterpret_cast<void *>(realIdx));
 
     const RecordTexts &texts = _recordTexts[realIdx];
@@ -466,7 +466,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
     timeLabel->setString(texts.time);
     cw::scaleLabelToFitWidth(timeLabel, cellWidth - 30.0f);
 
-    uint8_t flag = data.second;
+    uint8_t flag = data.player_flag;
     for (int i = 0; i < 4; ++i) {
         Label *label = playerLabels[i];
         label->setString(texts.players[i]);
@@ -916,7 +916,7 @@ namespace {
 
     class SummaryTableNode : public Node, cw::TableViewDelegate {
     private:
-        const std::vector<RecordHistoryScene::FilterIndex> *_filterIndices;
+        const std::vector<FilterIndex> *_filterIndices;
         std::vector<std::string> _timeTexts;
         std::vector<int8_t> _currentFlags;
 
@@ -927,9 +927,9 @@ namespace {
     public:
         const std::vector<int8_t> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_1(SummaryTableNode, const std::vector<RecordHistoryScene::FilterIndex> *, filterIndices);
+        CREATE_FUNC_WITH_PARAM_1(SummaryTableNode, const std::vector<FilterIndex> *, filterIndices);
 
-        bool init(const std::vector<RecordHistoryScene::FilterIndex> *filterIndices);
+        bool init(const std::vector<FilterIndex> *filterIndices);
         void setPositiveCallback(ui::Widget::ccWidgetClickCallback &&callback) { _positiveButton->addClickEventListener(callback); }
         void setNegativeCallback(ui::Widget::ccWidgetClickCallback &&callback) { _negativeButton->addClickEventListener(callback); }
 
@@ -943,7 +943,7 @@ namespace {
         void refreshCountLabel();
     };
 
-    bool SummaryTableNode::init(const std::vector<RecordHistoryScene::FilterIndex> *filterIndices) {
+    bool SummaryTableNode::init(const std::vector<FilterIndex> *filterIndices) {
         if (UNLIKELY(!Node::init())) {
             return false;
         }
@@ -952,8 +952,8 @@ namespace {
 
         _filterIndices = filterIndices;
         _timeTexts.reserve(filterIndices->size());
-        std::transform(filterIndices->begin(), filterIndices->end(), std::back_inserter(_timeTexts), [](const std::pair<size_t, uint8_t> &data) {
-            const Record &record = g_records[data.first];
+        std::transform(filterIndices->begin(), filterIndices->end(), std::back_inserter(_timeTexts), [](const FilterIndex &data) {
+            const Record &record = g_records[data.real_index];
             return formatTime(record.start_time, record.end_time);
         });
 
@@ -998,14 +998,6 @@ namespace {
         tableView->setPosition(Vec2(visibleSize.width * 0.5f, visibleSize.height * 0.5f));
         tableView->reloadData();
         this->addChild(tableView);
-
-        // 使表格跳到第一个未选择的选项处
-        for (size_t i = 0, cnt = _filterIndices->size(); i < cnt; ++i) {
-            if (_currentFlags[_filterIndices->at(i).first] == -1) {
-                tableView->jumpToCell(i);
-                break;
-            }
-        }
 
         refreshCountLabel();
 
@@ -1123,8 +1115,8 @@ namespace {
         layerColors[0]->setVisible((idx & 1) == 0);
         layerColors[1]->setVisible((idx & 1) != 0);
 
-        const std::pair<size_t, uint8_t> &data = _filterIndices->at(idx);
-        size_t realIdx = data.first;
+        const FilterIndex &data = _filterIndices->at(idx);
+        size_t realIdx = data.real_index;
 
         const Record &record = g_records[realIdx];
         bool finished = record.end_time != 0;
@@ -1144,7 +1136,7 @@ namespace {
             radioButton->setEnabled(finished);
             radioButton->setUserData(reinterpret_cast<void *>(realIdx));
             label->setString(record.name[i]);
-            label->setTextColor(((1U << i) & data.second) ? C4B_RED : C4B_GRAY);
+            label->setTextColor(((1U << i) & data.player_flag) ? C4B_RED : C4B_GRAY);
             cw::scaleLabelToFitWidth(label, cellWidth * 0.25f - 20.0f - 2.0f);
         }
 
@@ -1201,7 +1193,7 @@ namespace {
     class BatchDeleteTableNode : public Node, cw::TableViewDelegate {
     private:
         const std::vector<RecordTexts> *_texts;
-        const std::vector<std::pair<size_t, uint8_t> > *_filterIndices;
+        const std::vector<FilterIndex> *_filterIndices;
         std::vector<bool> _currentFlags;
 
         Label *_countLabel = nullptr;
@@ -1211,10 +1203,9 @@ namespace {
     public:
         const std::vector<bool> &getCurrentFlags() { return _currentFlags; }
 
-        typedef std::vector<std::pair<size_t, uint8_t> > FilterIndicesType;
-        CREATE_FUNC_WITH_PARAM_2(BatchDeleteTableNode, const std::vector<RecordTexts> *, texts, const FilterIndicesType *, filterIndices);
+        CREATE_FUNC_WITH_PARAM_2(BatchDeleteTableNode, const std::vector<RecordTexts> *, texts, const std::vector<FilterIndex> *, filterIndices);
 
-        bool init(const std::vector<RecordTexts> * texts, const std::vector<std::pair<size_t, uint8_t> > *filterIndices);
+        bool init(const std::vector<RecordTexts> * texts, const std::vector<FilterIndex> *filterIndices);
         void setPositiveCallback(ui::Widget::ccWidgetClickCallback &&callback) { _positiveButton->addClickEventListener(callback); }
         void setNegativeCallback(ui::Widget::ccWidgetClickCallback &&callback) { _negativeButton->addClickEventListener(callback); }
 
@@ -1226,7 +1217,7 @@ namespace {
         void refreshCountLabel();
     };
 
-    bool BatchDeleteTableNode::init(const std::vector<RecordTexts> * texts, const std::vector<std::pair<size_t, uint8_t> > *filterIndices) {
+    bool BatchDeleteTableNode::init(const std::vector<RecordTexts> * texts, const std::vector<FilterIndex> *filterIndices) {
         if (UNLIKELY(!Node::init())) {
             return false;
         }
@@ -1240,8 +1231,8 @@ namespace {
 
         Label *label = Label::createWithSystemFont("", "Arail", 10);
         label->setTextColor(C4B_GRAY);
-        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(5.0f, 15.0f));
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+        label->setPosition(Vec2(visibleSize.width - 115.0f, 15.0f));
         this->addChild(label);
         _countLabel = label;
 
@@ -1280,6 +1271,30 @@ namespace {
 
         refreshCountLabel();
 
+        ui::CheckBox *checkBox = UICommon::createCheckBox();
+        this->addChild(checkBox);
+        checkBox->setZoomScale(0.0f);
+        checkBox->ignoreContentAdaptWithSize(false);
+        checkBox->setContentSize(Size(15.0f, 15.0f));
+        checkBox->setPosition(Vec2(12.5f, 15.0f));
+        checkBox->addEventListener([this, tableView](Ref *sender, ui::CheckBox::EventType) {
+            ui::CheckBox *checkBox = (ui::CheckBox *)sender;
+            _currentFlags.assign(_currentFlags.size(), false);
+            if (checkBox->isSelected()) {
+                for (size_t i = 0, cnt = _filterIndices->size(); i < cnt; ++i) {
+                    _currentFlags[_filterIndices->at(i).real_index] = true;
+                }
+            }
+            tableView->reloadDataInplacement();
+            refreshCountLabel();
+        });
+
+        label = Label::createWithSystemFont(__UTF8("全选"), "Arail", 10);
+        label->setTextColor(C4B_GRAY);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        label->setPosition(Vec2(25.0f, 15.0f));
+        this->addChild(label);
+
         return true;
     }
 
@@ -1306,6 +1321,8 @@ namespace {
         Size visibleSize = Director::getInstance()->getVisibleSize();
         const float cellWidth = visibleSize.width - 5.0f;
 
+        const float nameWidth = (cellWidth - 25.0f) * 0.5f;
+
         if (cell == nullptr) {
             cell = CustomCell::create();
 
@@ -1327,7 +1344,7 @@ namespace {
             Label *label = Label::createWithSystemFont("", "Arail", 10);
             label->setTextColor(C4B_BLACK);
             cell->addChild(label);
-            label->setPosition(Vec2(2.0f, 55.0f));
+            label->setPosition(Vec2(25.0f, 55.0f));
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
             titleLabel = label;
 
@@ -1335,7 +1352,7 @@ namespace {
             label = Label::createWithSystemFont("", "Arail", 10);
             label->setTextColor(C4B_GRAY);
             cell->addChild(label);
-            label->setPosition(Vec2(2.0f, 40.0f));
+            label->setPosition(Vec2(25.0f, 40.0f));
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
             timeLabel = label;
 
@@ -1343,7 +1360,7 @@ namespace {
             for (int i = 0; i < 4; ++i) {
                 label = Label::createWithSystemFont("", "Arail", 10);
                 cell->addChild(label);
-                label->setPosition(Vec2(2.0f + (i & 1) * cellWidth * 0.5f, 23.0f - (i >> 1) * 15.0f));
+                label->setPosition(Vec2(25.0f + (i & 1) * nameWidth, 23.0f - (i >> 1) * 15.0f));
                 label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
                 playerLabels[i] = label;
             }
@@ -1353,7 +1370,7 @@ namespace {
             checkBox->setZoomScale(0.0f);
             checkBox->ignoreContentAdaptWithSize(false);
             checkBox->setContentSize(Size(15.0f, 15.0f));
-            checkBox->setPosition(Vec2(cellWidth - 15.0f, 40.0f));
+            checkBox->setPosition(Vec2(10.0f, 32.5f));
             checkBox->addEventListener([this](Ref *sender, ui::CheckBox::EventType) {
                 ui::CheckBox *checkBox = (ui::CheckBox *)sender;
                 ssize_t idx = reinterpret_cast<ssize_t>(checkBox->getUserData());
@@ -1372,22 +1389,22 @@ namespace {
         layerColors[0]->setVisible((idx & 1) == 0);
         layerColors[1]->setVisible((idx & 1) != 0);
 
-        const std::pair<size_t, uint8_t> &data = _filterIndices->at(idx);
-        size_t realIdx = data.first;
+        const FilterIndex &data = _filterIndices->at(idx);
+        size_t realIdx = data.real_index;
 
         const RecordTexts &texts = _texts->at(realIdx);
         titleLabel->setString(texts.title);
-        cw::scaleLabelToFitWidth(titleLabel, cellWidth - 4.0f);
+        cw::scaleLabelToFitWidth(titleLabel, cellWidth - 30.0f);
 
         timeLabel->setString(texts.time);
         cw::scaleLabelToFitWidth(timeLabel, cellWidth - 30.0f);
 
-        uint8_t flag = data.second;
+        uint8_t flag = data.player_flag;
         for (int i = 0; i < 4; ++i) {
             Label *label = playerLabels[i];
             label->setString(texts.players[i]);
             label->setTextColor(((1U << texts.seats[i]) & flag) ? C4B_RED : C4B_GRAY);
-            cw::scaleLabelToFitWidth(label, cellWidth * 0.5f - 4.0f);
+            cw::scaleLabelToFitWidth(label, nameWidth - 4.0f);
         }
 
         const Record &record = *texts.source;
@@ -1410,9 +1427,9 @@ void RecordHistoryScene::switchToBatchDelete() {
         _moreButton->setVisible(true);
     });
     rootNode->setPositiveCallback([this, rootNode](Ref *) {
-        auto currentFlags = std::make_shared<std::vector<bool> >(rootNode->getCurrentFlags());
+        const std::vector<bool> &currentFlags = rootNode->getCurrentFlags();
 
-        if (std::none_of(currentFlags->begin(), currentFlags->end(), [](bool f) { return f; })) {
+        if (std::none_of(currentFlags.begin(), currentFlags.end(), [](bool f) { return f; })) {
             Toast::makeText(this, __UTF8("请选择要删除的对局"), Toast::Duration::LENGTH_LONG)->show();
             return;
         }
@@ -1421,13 +1438,19 @@ void RecordHistoryScene::switchToBatchDelete() {
             .setTitle(__UTF8("删除记录"))
             .setMessage(__UTF8("删除后无法找回，确认删除？"))
             .setNegativeButton(__UTF8("取消"), nullptr)
-            .setPositiveButton(__UTF8("确定"), [this, currentFlags](AlertDialog *, int) {
-            for (size_t i = currentFlags->size(); i-- > 0; ) {
-                if (currentFlags->at(i)) {
+            .setPositiveButton(__UTF8("确定"), [this, rootNode](AlertDialog *, int) {
+            const std::vector<bool> &currentFlags = rootNode->getCurrentFlags();
+            for (size_t i = currentFlags.size(); i-- > 0; ) {
+                if (currentFlags[i]) {
                     g_records.erase(g_records.begin() + i);
                 }
             }
             saveRecordsAndRefresh();
+
+            _tableView->setVisible(true);
+            this->removeChild(rootNode);
+            _moreButton->setVisible(true);
+
             return true;
         }).create()->show();
     });

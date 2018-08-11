@@ -14,6 +14,11 @@ struct RecordTexts {
     int seats[4];
 };
 
+struct FilterIndex {
+    size_t real_index;
+    uint8_t player_flag;
+};
+
 class RecordHistoryScene : public BaseScene, cw::TableViewDelegate {
 public:
     typedef std::function<void (Record *)> ViewCallback;
@@ -24,8 +29,6 @@ public:
     static void modifyRecord(const Record *record);
 
     virtual void onEnter() override;
-
-    typedef std::pair<size_t, uint8_t> FilterIndex;
 
 private:
     std::vector<RecordTexts> _recordTexts;
