@@ -721,6 +721,24 @@ namespace {
     };
 }
 
+static std::string &fixString(std::string &str, size_t bytes) {
+    StringUtils::StringUTF8 utf8(str);
+    const StringUtils::StringUTF8::CharUTF8Store &chars = utf8.getString();
+
+    str.clear();
+    for (size_t i = 0, n = 0, cnt = chars.size(); n < bytes && i < cnt; ++i) {
+        const std::string &ch = chars[i]._char;
+        size_t l = ch.length();
+        if (n + l > bytes) {
+            break;
+        }
+        str.append(ch);
+        n += l;
+    }
+
+    return str;
+}
+
 void ScoreSheetScene::editNameAndTitle() {
     const float limitWidth = std::min(AlertDialog::maxWidth(), 180.0f);
 
@@ -876,7 +894,7 @@ void ScoreSheetScene::editNameAndTitle() {
                 Common::trim(name);
 
                 if (name.length() > NAME_SIZE - 1) {
-                    name.erase(NAME_SIZE - 1);
+                    fixString(name, NAME_SIZE - 1);
                 }
             }
         }
@@ -909,6 +927,9 @@ void ScoreSheetScene::editNameAndTitle() {
         else {
             std::string title = text;
             Common::trim(title);
+            if (title.length() > TITLE_SIZE - 1) {
+                fixString(title, TITLE_SIZE - 1);
+            }
             strncpy(_record.title, title.c_str(), TITLE_SIZE - 1);
         }
         refreshTitle();
