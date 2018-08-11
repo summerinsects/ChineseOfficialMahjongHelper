@@ -540,7 +540,7 @@ void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
         case 0: showFilterAlert(); break;
         case 1: showSummaryAlert(); break;
         case 2: showBatchDeleteAlert(); break;
-        default: break;
+        default: UNREACHABLE(); break;
         }
     });
     menu->show();
