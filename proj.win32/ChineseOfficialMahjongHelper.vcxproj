@@ -160,6 +160,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp" />
     <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp" />
+    <ClCompile Include="..\Classes\MainMenu\LeftSideMenu.cpp" />
     <ClCompile Include="..\Classes\Other\OtherScene.cpp" />
     <ClCompile Include="..\Classes\RecordSystem\Record.cpp" />
     <ClCompile Include="..\Classes\RecordSystem\RecordHistoryScene.cpp" />
@@ -193,6 +194,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\mahjong-algorithm\stringify.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h" />
     <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h" />
+    <ClInclude Include="..\Classes\MainMenu\LeftSideMenu.h" />
     <ClInclude Include="..\Classes\Other\OtherScene.h" />
     <ClInclude Include="..\Classes\RecordSystem\Record.h" />
     <ClInclude Include="..\Classes\RecordSystem\RecordHistoryScene.h" />

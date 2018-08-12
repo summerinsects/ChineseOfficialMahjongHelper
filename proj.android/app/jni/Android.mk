@@ -25,6 +25,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../../Classes/mahjong-algorithm/stringify.cpp \
                    ../../../Classes/mahjong-algorithm/shanten.cpp \
                    ../../../Classes/MahjongTheory/MahjongTheoryScene.cpp \
+                   ../../../Classes/MainMenu/LeftSideMenu.cpp \
                    ../../../Classes/Other/OtherScene.cpp \
                    ../../../Classes/RecordSystem/Record.cpp \
                    ../../../Classes/RecordSystem/RecordHistoryScene.cpp \

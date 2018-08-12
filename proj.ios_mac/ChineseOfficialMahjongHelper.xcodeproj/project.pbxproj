@@ -43,6 +43,8 @@
 		1FA6933B1E83552300E839CC /* ExtraInfoWidget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FA693381E83552300E839CC /* ExtraInfoWidget.cpp */; };
 		1FB8479B21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */; };
 		1FB8479C21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */; };
+		1FC2EBD321205F0F002572C7 /* LeftSideMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC2EBD021205F0F002572C7 /* LeftSideMenu.cpp */; };
+		1FC2EBD421205F0F002572C7 /* LeftSideMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC2EBD021205F0F002572C7 /* LeftSideMenu.cpp */; };
 		1FC34972210E963200616627 /* DatePicker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC3496F210E963200616627 /* DatePicker.cpp */; };
 		1FC34973210E963200616627 /* DatePicker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC3496F210E963200616627 /* DatePicker.cpp */; };
 		1FC616271FFB39C3005FC2F7 /* Toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FC616251FFB39C3005FC2F7 /* Toast.cpp */; };
@@ -194,6 +196,8 @@
 		1FA693391E83552300E839CC /* ExtraInfoWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtraInfoWidget.h; sourceTree = "<group>"; };
 		1FB8479921055D4A00261A9A /* CommonWebViewScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonWebViewScene.h; sourceTree = "<group>"; };
 		1FB8479A21055D4A00261A9A /* CommonWebViewScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommonWebViewScene.cpp; sourceTree = "<group>"; };
+		1FC2EBD021205F0F002572C7 /* LeftSideMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LeftSideMenu.cpp; sourceTree = "<group>"; };
+		1FC2EBD121205F0F002572C7 /* LeftSideMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LeftSideMenu.h; sourceTree = "<group>"; };
 		1FC3496F210E963200616627 /* DatePicker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DatePicker.cpp; sourceTree = "<group>"; };
 		1FC34971210E963200616627 /* DatePicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatePicker.h; sourceTree = "<group>"; };
 		1FC616251FFB39C3005FC2F7 /* Toast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Toast.cpp; sourceTree = "<group>"; };
@@ -358,6 +362,15 @@
 				1F764BEA1CC5DB1F00844DAF /* OtherScene.h */,
 			);
 			path = Other;
+			sourceTree = "<group>";
+		};
+		1FC2EBCF21205F0F002572C7 /* MainMenu */ = {
+			isa = PBXGroup;
+			children = (
+				1FC2EBD021205F0F002572C7 /* LeftSideMenu.cpp */,
+				1FC2EBD121205F0F002572C7 /* LeftSideMenu.h */,
+			);
+			path = MainMenu;
 			sourceTree = "<group>";
 		};
 		1FDCF7BB1F738E1C00D9C608 /* cocos-wheels */ = {
@@ -538,6 +551,7 @@
 				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
 				1FDD943B1C8337140031BC38 /* mahjong-algorithm */,
 				1F154E391E4409420083F8B3 /* MahjongTheory */,
+				1FC2EBCF21205F0F002572C7 /* MainMenu */,
 				1F764BE81CC5DB1F00844DAF /* Other */,
 				1FE04AD91C94682A008401EA /* RecordSystem */,
 				1FF8820B1F5E60BE009C3449 /* TilesImage.h */,
@@ -713,6 +727,7 @@
 				1FC34972210E963200616627 /* DatePicker.cpp in Sources */,
 				1F764BEB1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
 				1FD228F21E39837E00DF5C1D /* HandTilesWidget.cpp in Sources */,
+				1FC2EBD321205F0F002572C7 /* LeftSideMenu.cpp in Sources */,
 				1FDCF7BF1F738E1D00D9C608 /* CWTableView.cpp in Sources */,
 				1FE2A3ED1CBB30D1008C45C5 /* FanTableScene.cpp in Sources */,
 				1FE5CFDD1CAE029200A5C38B /* TilePickWidget.cpp in Sources */,
@@ -763,6 +778,7 @@
 				1FB8479C21055D4A00261A9A /* CommonWebViewScene.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,
 				1F11543D1FF8F586000EF358 /* CompetitionMainScene.cpp in Sources */,
+				1FC2EBD421205F0F002572C7 /* LeftSideMenu.cpp in Sources */,
 				1FE04ADF1C94682A008401EA /* FanCalculatorScene.cpp in Sources */,
 				1F154E421E440A160083F8B3 /* stringify.cpp in Sources */,
 				1F764BEC1CC5DB1F00844DAF /* OtherScene.cpp in Sources */,
