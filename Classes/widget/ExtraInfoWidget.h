@@ -44,7 +44,7 @@ private:
     cocos2d::ui::CheckBox *_replacementBox = nullptr;
     cocos2d::ui::CheckBox *_robKongBox = nullptr;
     cocos2d::ui::CheckBox *_lastTileBox = nullptr;
-    cocos2d::Label *_flowerLabel = nullptr;
+    cocos2d::ui::Button *_flowerButton = nullptr;
     cocos2d::ui::RadioButtonGroup *_windGroups[2];
 
     bool _maybeFourthTile = false;

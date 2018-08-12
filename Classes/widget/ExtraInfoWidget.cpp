@@ -158,51 +158,23 @@ bool ExtraInfoWidget::init(float maxWidth, const cocos2d::ui::Widget::ccWidgetCl
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
-    label = Label::createWithSystemFont("\xF0\x9F\x8C\xB8", "Arial", 12);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-    label->setColor(Color3B(224, 45, 45));
-#endif
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(contentSize.width - 72.5f, 40.0f));
-
-    label = Label::createWithSystemFont("\xC3\x97" "0", "Arial", 12);
-    label->setTextColor(C4B_BLACK);
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(contentSize.width - 72.5f, 40.0f));
-    label->setTag(0);
-    _flowerLabel = label;
-
     button = UICommon::createButton();
     button->setScale9Enabled(true);
-    button->setContentSize(Size(25.0f, 20.0f));
+    button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("-1");
+    button->setTitleText("\xF0\x9F\x8C\xB8 \xC3\x97 " "0");
     rootNode->addChild(button);
-    button->setPosition(Vec2(contentSize.width - 42.5f, 40.0f));
-    button->addClickEventListener([label](Ref *) {
-        int n = label->getTag();
-        if (n > 0) {
-            label->setTag(--n);
-            label->setString(Common::format("\xC3\x97%d", n));
-        }
+    button->setPosition(Vec2(contentSize.width - 27.5f, 40.0f));
+    button->setTag(0);
+    button->addClickEventListener([](Ref *sender) {
+        ui::Button *button = (ui::Button *)sender;
+        int n = button->getTag();
+        if (n < 8) ++n;
+        else n = 0;
+        button->setTag(n);
+        button->setTitleText(Common::format("\xF0\x9F\x8C\xB8 \xC3\x97 %d", n));
     });
-
-    button = UICommon::createButton();
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(25.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("+1");
-    rootNode->addChild(button);
-    button->setPosition(Vec2(contentSize.width - 12.5f, 40.0f));
-    button->addClickEventListener([label](Ref *) {
-        int n = label->getTag();
-        if (n < 8) {
-            label->setTag(++n);
-            label->setString(Common::format("\xC3\x97%d", n));
-        }
-    });
+    _flowerButton = button;
 
     if (callback != nullptr) {
         // 番算按钮
@@ -220,14 +192,14 @@ bool ExtraInfoWidget::init(float maxWidth, const cocos2d::ui::Widget::ccWidgetCl
 }
 
 int ExtraInfoWidget::getFlowerCount() const {
-    return _flowerLabel->getTag();
+    return _flowerButton->getTag();
 }
 
 void ExtraInfoWidget::setFlowerCount(int cnt) {
     if (cnt > 8) cnt = 8;
     if (cnt < 0) cnt = 0;
-    _flowerLabel->setTag(cnt);
-    _flowerLabel->setString(Common::format("\xC3\x97%d", cnt));
+    _flowerButton->setTag(cnt);
+    _flowerButton->setTitleText(Common::format("\xF0\x9F\x8C\xB8 \xC3\x97 %d", cnt));
 }
 
 mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
