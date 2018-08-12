@@ -181,6 +181,11 @@ const char *strcasestr(const char *haystack, const char *needle) {
 #endif
 
 void RecordHistoryScene::filter() {
+    if (g_records.empty()) {
+        _filterIndices.clear();
+        return;
+    }
+
     // first指向数据源，second存放匹配人名的位标记
     std::vector<std::pair<const Record *, uint8_t> > temp1;
     temp1.reserve(g_records.size());
