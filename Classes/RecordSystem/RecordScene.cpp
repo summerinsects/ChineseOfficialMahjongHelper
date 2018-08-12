@@ -972,8 +972,8 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         ui::Button *button = (ui::Button *)sender;
         int idx = button->getTag();
 
-        uint32_t prevCnt = (bits->first >> (idx << 1U)) & 0x3U;
-        uint32_t tempCnt = prevCnt + 1;
+        uint8_t prevCnt = COUNT_FAN2(bits->first, idx);
+        uint8_t tempCnt = prevCnt + 1;
         if (tempCnt > limitCounts[idx]) {
             tempCnt = 0;
         }
@@ -988,8 +988,8 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         ui::Button *button = (ui::Button *)sender;
         int idx = button->getTag();
 
-        uint64_t prevCnt = (bits->second >> (idx << 2U)) & 0xFU;
-        uint64_t tempCnt = prevCnt + 1;
+        uint8_t prevCnt = COUNT_FAN1(bits->second, idx);
+        uint8_t tempCnt = prevCnt + 1;
         if (tempCnt > limitCounts[10 + idx]) {
             tempCnt = 0;
         }
