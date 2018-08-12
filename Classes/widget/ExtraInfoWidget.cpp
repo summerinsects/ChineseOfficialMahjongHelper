@@ -166,7 +166,7 @@ bool ExtraInfoWidget::init(float maxWidth, const cocos2d::ui::Widget::ccWidgetCl
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
     label->setPosition(Vec2(contentSize.width - 72.5f, 40.0f));
 
-    label = Label::createWithSystemFont("x0", "Arial", 12);
+    label = Label::createWithSystemFont("\xC3\x97" "0", "Arial", 12);
     label->setTextColor(C4B_BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -185,7 +185,7 @@ bool ExtraInfoWidget::init(float maxWidth, const cocos2d::ui::Widget::ccWidgetCl
         int n = label->getTag();
         if (n > 0) {
             label->setTag(--n);
-            label->setString(Common::format("x%d", n));
+            label->setString(Common::format("\xC3\x97%d", n));
         }
     });
 
@@ -200,7 +200,7 @@ bool ExtraInfoWidget::init(float maxWidth, const cocos2d::ui::Widget::ccWidgetCl
         int n = label->getTag();
         if (n < 8) {
             label->setTag(++n);
-            label->setString(Common::format("x%d", n));
+            label->setString(Common::format("\xC3\x97%d", n));
         }
     });
 

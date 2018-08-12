@@ -1153,7 +1153,7 @@ static std::string GetLongFanText(const Record::Detail &detail) {
                 fanText.append(__UTF8("「"));
                 fanText.append(mahjong::fan_name[static_cast<int>(mahjong::DRAGON_PUNG) + i]);
                 if (cnt > 1) {
-                    fanText.append("x");
+                    fanText.append("\xC3\x97");
                     fanText.append(std::to_string(cnt));
                 }
                 fanText.append(__UTF8("」"));

@@ -85,7 +85,7 @@ extern cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         size_t len = strlen(str);
         len += snprintf(str + len, sizeof(str) - len, __UTF8(" %hu番"), f);
         if (n > 1) {
-            snprintf(str + len, sizeof(str) - len, __UTF8("x%hu"), n);
+            snprintf(str + len, sizeof(str) - len, "\xC3\x97%hu", n);
         }
 
         // 创建label，每行排2个
