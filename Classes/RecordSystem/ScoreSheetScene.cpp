@@ -1383,7 +1383,7 @@ void ScoreSheetScene::refreshScores() {
 
 void ScoreSheetScene::onHistoryButton(cocos2d::Ref *) {
     Director::getInstance()->pushScene(RecordHistoryScene::create([this](Record *record) {
-        if (UNLIKELY(g_currentRecord.start_time == record->start_time)) {  // 我们认为开始时间相同的为同一个记录
+        if (UNLIKELY(_record.start_time == record->start_time)) {  // 我们认为开始时间相同的为同一个记录
             Director::getInstance()->popScene();
         }
         else {
