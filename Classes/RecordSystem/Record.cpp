@@ -329,19 +329,18 @@ void WriteRecordToFile(const char *file, const Record &record) {
 }
 
 void UpgradeRecordInFile(const char *file) {
-    FILE *fp = fopen(file, "rb+");
+    std::string str = Common::getStringFromFile(file);
+    if (str.empty()) {
+        return;
+    }
+
+    FILE *fp = fopen(file, "wb");
     if (LIKELY(fp != nullptr)) {
         try {
-            std::vector<char> str;
-            fseek(fp, 0, SEEK_END);
-            long size = ftell(fp);
-            fseek(fp, 0, SEEK_SET);
-            str.resize(size + 1);
-            fread(&str[0], sizeof(char), size, fp);
-
             rapidjson::Document doc;
             doc.Parse<0>(str.data());
             if (doc.HasParseError()) {
+                fclose(fp);
                 return;
             }
 
@@ -355,9 +354,7 @@ void UpgradeRecordInFile(const char *file) {
 #endif
             doc.Accept(writer);
 
-            fseek(fp, 0, SEEK_SET);
             fwrite(buf.GetString(), 1, buf.GetSize(), fp);
-            fflush(fp);
         }
         catch (std::exception &e) {
             MYLOG("%s %s", __FUNCTION__, e.what());
@@ -421,19 +418,18 @@ void SaveHistoryRecords(const char *file, const std::vector<Record> &records) {
 }
 
 void UpgradeHistoryRecords(const char *file) {
-    FILE *fp = fopen(file, "rb+");
+    std::string str = Common::getStringFromFile(file);
+    if (str.empty()) {
+        return;
+    }
+
+    FILE *fp = fopen(file, "wb");
     if (LIKELY(fp != nullptr)) {
         try {
-            std::vector<char> str;
-            fseek(fp, 0, SEEK_END);
-            long size = ftell(fp);
-            fseek(fp, 0, SEEK_SET);
-            str.resize(size + 1);
-            fread(&str[0], sizeof(char), size, fp);
-
             rapidjson::Document doc;
             doc.Parse<0>(str.data());
             if (doc.HasParseError() || !doc.IsArray()) {
+                fclose(fp);
                 return;
             }
 
@@ -449,9 +445,7 @@ void UpgradeHistoryRecords(const char *file) {
 #endif
             doc.Accept(writer);
 
-            fseek(fp, 0, SEEK_SET);
             fwrite(buf.GetString(), 1, buf.GetSize(), fp);
-            fflush(fp);
         }
         catch (std::exception &e) {
             MYLOG("%s %s", __FUNCTION__, e.what());
