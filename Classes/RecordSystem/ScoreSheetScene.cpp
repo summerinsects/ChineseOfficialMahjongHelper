@@ -15,6 +15,9 @@ USING_NS_CC;
 
 static Record g_currentRecord;
 
+static char g_prevTitle[TITLE_SIZE];
+static char g_prevName[4][NAME_SIZE];
+
 static void readFromFile(Record &record) {
     std::string path = FileUtils::getInstance()->getWritablePath();
     path.append("record.json");
@@ -643,13 +646,11 @@ void ScoreSheetScene::recover() {
 void ScoreSheetScene::reset() {
     // 如果选手姓名不为空，则保存上次对局的姓名
     if (std::all_of(std::begin(_record.name), std::end(_record.name), [](const char (&s)[NAME_SIZE]) { return s[0] != '\0'; })) {
-        for (int i = 0; i < 4; ++i) {
-            _prevName[i] = _record.name[i];
-        }
+        memcpy(g_prevName, _record.name, sizeof(g_prevName));
     }
 
     // 保存上次对局名称
-    _prevTitle = _record.title;
+    memcpy(g_prevTitle, _record.title, sizeof(g_prevTitle));
 
     memset(&_record, 0, sizeof(_record));
     if (_isGlobal) {
@@ -823,7 +824,7 @@ void ScoreSheetScene::editNameAndTitle() {
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
     editBox->setFontColor(C4B_BLACK);
     editBox->setFontSize(12);
-    editBox->setText(_record.title[0] == '\0' ? _prevTitle.c_str() : _record.title);
+    editBox->setText(_record.title[0] == '\0' ? g_prevTitle : _record.title);
     editBox->setMaxLength(TITLE_SIZE - 1);
     editBox->setPlaceHolder(__UTF8("在此输入对局名称"));
     rootNode->addChild(editBox);
@@ -839,7 +840,7 @@ void ScoreSheetScene::editNameAndTitle() {
     // 如果选手姓名皆为空，则填入上次对局的姓名
     if (std::all_of(std::begin(_record.name), std::end(_record.name), [](const char (&s)[NAME_SIZE]) { return s[0] == '\0'; })) {
         for (size_t i = 0; i < 4; ++i) {
-            editBoxes[i]->setText(_prevName[i].c_str());
+            editBoxes[i]->setText(g_prevName[i]);
         }
     }
 

@@ -27,8 +27,6 @@ private:
     Record _record;
     bool _isGlobal = false;
     bool _isTotalMode = false;
-    std::string _prevTitle;
-    std::string _prevName[4];
 
     bool initWithRecord(Record *record);
 
