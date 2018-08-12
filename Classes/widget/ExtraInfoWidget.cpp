@@ -227,7 +227,7 @@ void ExtraInfoWidget::setFlowerCount(int cnt) {
     if (cnt > 8) cnt = 8;
     if (cnt < 0) cnt = 0;
     _flowerLabel->setTag(cnt);
-    _flowerLabel->setString(Common::format("x%d", cnt));
+    _flowerLabel->setString(Common::format("\xC3\x97%d", cnt));
 }
 
 mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
