@@ -14,7 +14,7 @@ USING_NS_CC;
 
 #define NO_NAME_TITLE __UTF8("(未命名对局)")
 
-#define C4B_RED cocos2d::Color4B(254,  87, 110, 255)
+#define C4B_RED cocos2d::Color4B(254, 87, 110, 255)
 
 #define SECONDS_PER_DAY 86400
 
