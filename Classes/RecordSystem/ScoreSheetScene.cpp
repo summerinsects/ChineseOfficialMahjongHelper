@@ -10,7 +10,6 @@
 #include "../widget/HandTilesWidget.h"
 #include "RecordScene.h"
 #include "RecordHistoryScene.h"
-#include "LittleFan.h"
 
 USING_NS_CC;
 
@@ -468,20 +467,20 @@ static std::string GetShortFanText(const Record::Detail &detail) {
         }
     }
 
-    uint16_t uniqueFan = detail.unique_fan;
-    uint64_t multipleFan = detail.multiple_fan;
-    if (uniqueFan != 0 || multipleFan != 0) {
-        if (TEST_UNIQUE_FAN(uniqueFan, UNIQUE_FAN_CONCEALED_HAND)
-            && TEST_UNIQUE_FAN(uniqueFan, UNIQUE_FAN_ALL_SIMPLES)
-            && TEST_UNIQUE_FAN(uniqueFan, UNIQUE_FAN_ALL_CHOWS)) {
+    uint32_t fan2Bits = detail.fan2_bits;
+    uint64_t fan1Bits = detail.fan1_bits;
+    if (fan2Bits != 0 || fan1Bits != 0) {
+        if (COUNT_FAN2(fan2Bits, mahjong::CONCEALED_HAND - mahjong::DRAGON_PUNG) > 0
+            && COUNT_FAN2(fan2Bits, mahjong::ALL_SIMPLES - mahjong::DRAGON_PUNG) > 0
+            && COUNT_FAN2(fan2Bits, mahjong::ALL_CHOWS - mahjong::DRAGON_PUNG) > 0) {
             return __UTF8("门断平");
         }
 
         std::string fanText;
         int fans = 0;
-        for (unsigned n = 0; n < 8; ++n) {
-            if (TEST_UNIQUE_FAN(uniqueFan, n)) {
-                fanText.append(fan_short_name[uniqueFanTable[n]]);
+        for (unsigned n = 0; n < 10; ++n) {
+            if (COUNT_FAN2(fan2Bits, n) > 0) {
+                fanText.append(fan_short_name[n + mahjong::DRAGON_PUNG]);
                 if (++fans > 1) {
                     break;
                 }
@@ -489,18 +488,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
         }
 
         if (fanText.empty()) {
-            for (unsigned n = 0; n < 2; ++n) {
-                if (MULTIPLE_FAN_COUNT(multipleFan, n) > 0) {
-                    fanText.append(fan_short_name[multipleFanTable[n]]);
-                    if (++fans > 1) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (fanText.empty()) {
-            if (MULTIPLE_FAN_COUNT(multipleFan, 6) == 2) {
+            if (COUNT_FAN1(fan1Bits, mahjong::PUNG_OF_TERMINALS_OR_HONORS - mahjong::PURE_DOUBLE_CHOW) == 2) {
                 fanText.append(__UTF8("双幺九"));
             }
         }
@@ -1114,8 +1102,8 @@ static std::string GetLongFanText(const Record::Detail &detail) {
     std::string fanText;
 
     uint64_t fanBits = detail.fan_bits;
-    uint16_t uniqueFan = detail.unique_fan;
-    uint64_t multipleFan = detail.multiple_fan;
+    uint32_t fan2Bits = detail.fan2_bits;
+    uint64_t fan1Bits = detail.fan1_bits;
 
     // 大番
     if (fanBits != 0) {
@@ -1129,35 +1117,30 @@ static std::string GetLongFanText(const Record::Detail &detail) {
     }
 
     // 小番
-    if (uniqueFan != 0 || multipleFan != 0) {
-        uint16_t littleFanTable[25] = { 0 };
-
-        for (unsigned n = 0; n < 14; ++n) {
-            if (TEST_UNIQUE_FAN(uniqueFan, n)) {
-                int idx = static_cast<int>(uniqueFanTable[n]) - static_cast<int>(mahjong::DRAGON_PUNG);
-                littleFanTable[idx] = 1;
-            }
-        }
-
-        for (unsigned n = 0; n < 9; ++n) {
-            uint16_t cnt = MULTIPLE_FAN_COUNT(multipleFan, n);
-            if (cnt > 0) {
-                int idx = static_cast<int>(multipleFanTable[n]) - static_cast<int>(mahjong::DRAGON_PUNG);
-                littleFanTable[idx] = cnt;
-            }
-        }
-
-        for (int i = 0; i < 25; ++i) {
-            uint16_t cnt = littleFanTable[i];
+    if (fan2Bits != 0) {
+        for (unsigned n = 0; n < 10; ++n) {
+            unsigned cnt = COUNT_FAN2(fan2Bits, n);
             if (cnt > 0) {
                 fanText.append(__UTF8("「"));
-                fanText.append(mahjong::fan_name[static_cast<int>(mahjong::DRAGON_PUNG) + i]);
+                fanText.append(mahjong::fan_name[static_cast<int>(mahjong::DRAGON_PUNG) + n]);
                 if (cnt > 1) {
                     fanText.append("\xC3\x97");
                     fanText.append(std::to_string(cnt));
                 }
                 fanText.append(__UTF8("」"));
+            }
+        }
 
+        for (unsigned n = 0; n < 13; ++n) {
+            unsigned cnt = COUNT_FAN1(fan1Bits, n);
+            if (cnt > 0) {
+                fanText.append(__UTF8("「"));
+                fanText.append(mahjong::fan_name[static_cast<int>(mahjong::PURE_DOUBLE_CHOW) + n]);
+                if (cnt > 1) {
+                    fanText.append("\xC3\x97");
+                    fanText.append(std::to_string(cnt));
+                }
+                fanText.append(__UTF8("」"));
             }
         }
     }

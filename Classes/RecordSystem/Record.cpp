@@ -11,6 +11,37 @@
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../utils/common.h"
 
+#define UNIQUE_FAN_DRAGON_PUNG          0
+#define UNIQUE_FAN_PREVALENT_WIND       1
+#define UNIQUE_FAN_SEAT_WIND            2
+#define UNIQUE_FAN_CONCEALED_HAND       3
+#define UNIQUE_FAN_ALL_CHOWS            4
+#define UNIQUE_FAN_TWO_CONCEALED_PUNGS  5
+#define UNIQUE_FAN_CONCEALED_KONG       6
+#define UNIQUE_FAN_ALL_SIMPLES          7
+#define UNIQUE_FAN_MELDED_KONG          8
+#define UNIQUE_FAN_NO_HONORS            9
+#define UNIQUE_FAN_EDGE_WAIT            10
+#define UNIQUE_FAN_CLOSED_WAIT          11
+#define UNIQUE_FAN_SINGLE_WAIT          12
+#define UNIQUE_FAN_SELF_DRAWN           13
+
+#define SET_UNIQUE_FAN(unique_, idx_) ((unique_) |= (1U << (idx_)))
+#define TEST_UNIQUE_FAN(unique_, idx_) !!((unique_) & (1U << (idx_)))
+
+#define MULTIPLE_FAN_TILE_HOG           0
+#define MULTIPLE_FAN_DOUBLE_PUNG        1
+#define MULTIPLE_FAN_PURE_DOUBLE_CHOW   2
+#define MULTIPLE_FAN_MIXED_DOUBLE_CHOW  3
+#define MULTIPLE_FAN_SHORT_STRAIGHT     4
+#define MULTIPLE_FAN_TWO_TERMINAL_CHOWS 5
+#define MULTIPLE_FAN_PUNG_OF_TERMINALS_OR_HONORS    6
+#define MULTIPLE_FAN_ONE_VOIDED_SUIT    7
+#define MULTIPLE_FAN_FLOWER_TILES       8
+
+#define SET_MULTIPLE_FAN(multiple_, idx_, cnt_) ((multiple_) |= (static_cast<uint64_t>(cnt_) << ((idx_) * 4)))
+#define MULTIPLE_FAN_COUNT(multiple_, idx_)  static_cast<uint8_t>(((multiple_) >> ((idx_) * 4)) & 0xF)
+
 namespace {
 
 void JsonToRecord(const rapidjson::Value &json, Record &record) {
@@ -57,14 +88,14 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 detail_data.fan_bits = it->value.GetUint64();
             }
 
-            it = detail_json.FindMember("unique_fan");
+            it = detail_json.FindMember("fan2_bits");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
-                detail_data.unique_fan = static_cast<uint16_t>(it->value.GetUint());
+                detail_data.fan2_bits = it->value.GetUint();
             }
 
-            it = detail_json.FindMember("multiple_fan");
+            it = detail_json.FindMember("fan1_bits");
             if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
-                detail_data.multiple_fan = it->value.GetUint64();
+                detail_data.fan1_bits = it->value.GetUint64();
             }
 
             it = detail_json.FindMember("penalty_scores");
@@ -138,8 +169,8 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
         detail_json.AddMember("claim_flag", rapidjson::Value(detail_data.claim_flag), alloc);
         detail_json.AddMember("fan", rapidjson::Value(detail_data.fan), alloc);
         detail_json.AddMember("fan_bits", rapidjson::Value(detail_data.fan_bits), alloc);
-        detail_json.AddMember("unique_fan", rapidjson::Value(detail_data.unique_fan), alloc);
-        detail_json.AddMember("multiple_fan", rapidjson::Value(detail_data.multiple_fan), alloc);
+        detail_json.AddMember("fan2_bits", rapidjson::Value(detail_data.fan2_bits), alloc);
+        detail_json.AddMember("fan1_bits", rapidjson::Value(detail_data.fan1_bits), alloc);
 
         rapidjson::Value penalty_scores(rapidjson::Type::kArrayType);
         penalty_scores.Reserve(4, alloc);
@@ -209,51 +240,137 @@ void UpgradeJson(rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc)
             }
 
             // 兼容旧的key until 2017.12.30 31cd281
+            uint32_t fan2_bits = 0;
+            uint64_t fan1_bits = 0;
             it = detail_json.FindMember("packed_fan");
             if (it != detail_json.MemberEnd() && it->value.IsUint()) {
                 uint32_t packed_fan = it->value.GetUint();
-                uint16_t unique_fan = 0;
-                uint64_t multiple_fan = 0;
                 switch (packed_fan) {
                 case 1:  // 门断平
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_SIMPLES);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS);
+                    SET_FAN2(fan2_bits, mahjong::CONCEALED_HAND - mahjong::DRAGON_PUNG, 1);
+                    SET_FAN2(fan2_bits, mahjong::ALL_SIMPLES - mahjong::DRAGON_PUNG, 1);
+                    SET_FAN2(fan2_bits, mahjong::ALL_CHOWS - mahjong::DRAGON_PUNG, 1);
                     break;
                 case 2:  // 门清平和
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS);
+                    SET_FAN2(fan2_bits, mahjong::CONCEALED_HAND - mahjong::DRAGON_PUNG, 1);
+                    SET_FAN2(fan2_bits, mahjong::ALL_CHOWS - mahjong::DRAGON_PUNG, 1);
                     break;
                 case 3:  // 断幺平和
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_SIMPLES);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS);
+                    SET_FAN2(fan2_bits, mahjong::ALL_SIMPLES - mahjong::DRAGON_PUNG, 1);
+                    SET_FAN2(fan2_bits, mahjong::ALL_CHOWS - mahjong::DRAGON_PUNG, 1);
                     break;
                 case 4:  // 连风刻
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_PREVALENT_WIND);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_SEAT_WIND);
+                    SET_FAN2(fan2_bits, mahjong::PREVALENT_WIND - mahjong::DRAGON_PUNG, 1);
+                    SET_FAN2(fan2_bits, mahjong::SEAT_WIND - mahjong::DRAGON_PUNG, 1);
                     break;
                 case 5:  // 番牌暗杠
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_KONG);
+                    SET_FAN2(fan2_bits, mahjong::CONCEALED_KONG - mahjong::DRAGON_PUNG, 1);
                     break;
                 case 6:  // 双同幺九
-                    SET_MULTIPLE_FAN(multiple_fan, MULTIPLE_FAN_DOUBLE_PUNG, 1);
-                    SET_MULTIPLE_FAN(multiple_fan, MULTIPLE_FAN_PUNG_OF_TERMINALS_OR_HONORS, 2);
+                    SET_FAN2(fan2_bits, mahjong::DOUBLE_PUNG - mahjong::DRAGON_PUNG, 1);
+                    SET_FAN1(fan1_bits, mahjong::PUNG_OF_TERMINALS_OR_HONORS - mahjong::PURE_DOUBLE_CHOW, 2);
                     break;
                 case 7:  // 门清双暗
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_TWO_CONCEALED_PUNGS);
+                    SET_FAN2(fan2_bits, mahjong::CONCEALED_HAND - mahjong::DRAGON_PUNG, 1);
+                    SET_FAN2(fan2_bits, mahjong::TWO_CONCEALED_PUNGS - mahjong::DRAGON_PUNG, 1);
                     break;
                 case 8:  // 双暗暗杠
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_KONG);
-                    SET_UNIQUE_FAN(unique_fan, UNIQUE_FAN_TWO_CONCEALED_PUNGS);
+                    SET_FAN2(fan2_bits, mahjong::TWO_CONCEALED_PUNGS - mahjong::DRAGON_PUNG, 1);
+                    SET_FAN2(fan2_bits, mahjong::CONCEALED_KONG - mahjong::DRAGON_PUNG, 1);
                     break;
                 default:
                     break;
                 }
 
                 detail_json.EraseMember(it);
-                detail_json.AddMember("unique_fan", rapidjson::Value(unique_fan), alloc);
-                detail_json.AddMember("multiple_fan", rapidjson::Value(multiple_fan), alloc);
+            }
+
+            // 兼容旧的key until 2018.08.12
+            it = detail_json.FindMember("unique_fan");
+            if (it != detail_json.MemberEnd() && it->value.IsUint()) {
+                uint16_t unique_fan = static_cast<uint16_t>(it->value.GetUint());
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_DRAGON_PUNG)) {
+                    SET_FAN2(fan2_bits, mahjong::DRAGON_PUNG - mahjong::DRAGON_PUNG, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_PREVALENT_WIND)) {
+                    SET_FAN2(fan2_bits, mahjong::PREVALENT_WIND - mahjong::DRAGON_PUNG, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_SEAT_WIND)) {
+                    SET_FAN2(fan2_bits, mahjong::SEAT_WIND - mahjong::DRAGON_PUNG, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_HAND)) {
+                    SET_FAN2(fan2_bits, mahjong::CONCEALED_HAND - mahjong::DRAGON_PUNG, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_CHOWS)) {
+                    SET_FAN2(fan2_bits, mahjong::ALL_CHOWS - mahjong::DRAGON_PUNG, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_TWO_CONCEALED_PUNGS)) {
+                    SET_FAN2(fan2_bits, mahjong::TWO_CONCEALED_PUNGS - mahjong::DRAGON_PUNG, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CONCEALED_KONG)) {
+                    SET_FAN2(fan2_bits, mahjong::CONCEALED_KONG - mahjong::DRAGON_PUNG, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_ALL_SIMPLES)) {
+                    SET_FAN2(fan2_bits, mahjong::ALL_SIMPLES - mahjong::DRAGON_PUNG, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_MELDED_KONG)) {
+                    SET_FAN1(fan1_bits, mahjong::MELDED_KONG - mahjong::PURE_DOUBLE_CHOW, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_NO_HONORS)) {
+                    SET_FAN1(fan1_bits, mahjong::NO_HONORS - mahjong::PURE_DOUBLE_CHOW, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_EDGE_WAIT)) {
+                    SET_FAN1(fan1_bits, mahjong::EDGE_WAIT - mahjong::PURE_DOUBLE_CHOW, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_CLOSED_WAIT)) {
+                    SET_FAN1(fan1_bits, mahjong::CLOSED_WAIT - mahjong::PURE_DOUBLE_CHOW, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_SINGLE_WAIT)) {
+                    SET_FAN1(fan1_bits, mahjong::SINGLE_WAIT - mahjong::PURE_DOUBLE_CHOW, 1);
+                }
+                if (TEST_UNIQUE_FAN(unique_fan, UNIQUE_FAN_SELF_DRAWN)) {
+                    SET_FAN1(fan1_bits, mahjong::SELF_DRAWN - mahjong::PURE_DOUBLE_CHOW, 1);
+                }
+                detail_json.EraseMember(it);
+            }
+            it = detail_json.FindMember("multiple_fan");
+            if (it != detail_json.MemberEnd() && it->value.IsUint64()) {
+                uint64_t multiple_fan = it->value.GetUint64();
+                if (uint32_t cnt = MULTIPLE_FAN_COUNT(multiple_fan, MULTIPLE_FAN_TILE_HOG)) {
+                    SET_FAN2(fan2_bits, mahjong::TILE_HOG - mahjong::DRAGON_PUNG, cnt);
+                }
+                if (uint32_t cnt = MULTIPLE_FAN_COUNT(multiple_fan, MULTIPLE_FAN_DOUBLE_PUNG)) {
+                    SET_FAN2(fan2_bits, mahjong::DOUBLE_PUNG - mahjong::DRAGON_PUNG, cnt);
+                }
+                if (uint32_t cnt = MULTIPLE_FAN_COUNT(multiple_fan, MULTIPLE_FAN_PURE_DOUBLE_CHOW)) {
+                    SET_FAN1(fan1_bits, mahjong::PURE_DOUBLE_CHOW - mahjong::PURE_DOUBLE_CHOW, cnt);
+                }
+                if (uint32_t cnt = MULTIPLE_FAN_COUNT(multiple_fan, MULTIPLE_FAN_MIXED_DOUBLE_CHOW)) {
+                    SET_FAN1(fan1_bits, mahjong::MIXED_DOUBLE_CHOW - mahjong::PURE_DOUBLE_CHOW, cnt);
+                }
+                if (uint32_t cnt = MULTIPLE_FAN_COUNT(multiple_fan, MULTIPLE_FAN_SHORT_STRAIGHT)) {
+                    SET_FAN1(fan1_bits, mahjong::SHORT_STRAIGHT - mahjong::PURE_DOUBLE_CHOW, cnt);
+                }
+                if (uint32_t cnt = MULTIPLE_FAN_COUNT(multiple_fan, MULTIPLE_FAN_TWO_TERMINAL_CHOWS)) {
+                    SET_FAN1(fan1_bits, mahjong::TWO_TERMINAL_CHOWS - mahjong::PURE_DOUBLE_CHOW, cnt);
+                }
+                if (uint32_t cnt = MULTIPLE_FAN_COUNT(multiple_fan, MULTIPLE_FAN_PUNG_OF_TERMINALS_OR_HONORS)) {
+                    SET_FAN1(fan1_bits, mahjong::PUNG_OF_TERMINALS_OR_HONORS - mahjong::PURE_DOUBLE_CHOW, cnt);
+                }
+                if (uint32_t cnt = MULTIPLE_FAN_COUNT(multiple_fan, MULTIPLE_FAN_ONE_VOIDED_SUIT)) {
+                    SET_FAN1(fan1_bits, mahjong::ONE_VOIDED_SUIT - mahjong::PURE_DOUBLE_CHOW, cnt);
+                }
+                if (uint32_t cnt = MULTIPLE_FAN_COUNT(multiple_fan, MULTIPLE_FAN_FLOWER_TILES)) {
+                    SET_FAN1(fan1_bits, mahjong::FLOWER_TILES - mahjong::PURE_DOUBLE_CHOW, cnt);
+                }
+                detail_json.EraseMember(it);
+            }
+
+            if (fan2_bits != 0) {
+                detail_json.AddMember("fan2_bits", rapidjson::Value(fan2_bits), alloc);
+            }
+            if (fan1_bits != 0) {
+                detail_json.AddMember("fan1_bits", rapidjson::Value(fan1_bits), alloc);
             }
 
             // 兼容旧的key until 2017.12.17 b2e18bc
