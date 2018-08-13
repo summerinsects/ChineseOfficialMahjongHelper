@@ -520,8 +520,8 @@ namespace {
 cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float gap = (visibleSize.width - 5.0f) * 0.25f;
+    const float cellWidth = table->getContentSize().width;
+    const float gap = cellWidth * 0.25f;
 
     if (cell == nullptr) {
         cell = CustomCell::create();
