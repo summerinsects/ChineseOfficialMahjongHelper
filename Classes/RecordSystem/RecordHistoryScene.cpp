@@ -393,8 +393,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
     typedef cw::TableViewCellEx<std::array<LayerColor *, 2>, Label *, Label *, std::array<Label *, 4>, ui::Button *> CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float cellWidth = visibleSize.width - 5.0f;
+    const float cellWidth = table->getContentSize().width;
 
     if (cell == nullptr) {
         cell = CustomCell::create();
@@ -1030,8 +1029,7 @@ namespace {
         typedef cw::TableViewCellEx<Label *, Label *, ui::RadioButtonGroup *, std::array<ui::RadioButton *, 4>, std::array<Label *, 4>, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-        Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float cellWidth = visibleSize.width - 5.0f;
+        const float cellWidth = table->getContentSize().width;
 
         if (cell == nullptr) {
             cell = CustomCell::create();
@@ -1324,8 +1322,7 @@ namespace {
         typedef cw::TableViewCellEx<Label *, Label *, std::array<Label *, 4>, ui::CheckBox *, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-        Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float cellWidth = visibleSize.width - 5.0f;
+        const float cellWidth = table->getContentSize().width;
 
         const float nameWidth = (cellWidth - 25.0f) * 0.5f;
 

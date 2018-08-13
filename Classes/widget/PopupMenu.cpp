@@ -4,6 +4,8 @@
 
 USING_NS_CC;
 
+#define ITEM_HEIGHT 30.0f
+
 bool PopupMenu::init(cocos2d::Scene *scene, const std::vector<std::string> &menuTexts, const cocos2d::Vec2 &basePos, const cocos2d::Vec2 &anchorPoint) {
     if (UNLIKELY(!Layer::init())) {
         return false;
@@ -41,17 +43,11 @@ bool PopupMenu::init(cocos2d::Scene *scene, const std::vector<std::string> &menu
     background->setAnchorPoint(anchorPoint);
 
     size_t buttonsCount = menuTexts.size();
-    background->setContentSize(Size(maxWidth, buttonsCount * 32.0f - 2.0f));
+    const float maxHeight = buttonsCount * ITEM_HEIGHT;
+    background->setContentSize(Size(maxWidth, maxHeight));
 
-    const Color4B lineColor(227, 227, 227, 255);
+    // 按钮
     for (size_t i = 0, cnt = buttonsCount; i < cnt; ++i) {
-        if (i > 0) {
-            // 分隔线
-            LayerColor *line = LayerColor::create(lineColor, maxWidth, 2.0f);
-            background->addChild(line);
-            line->setPosition(Vec2(0.0f, (buttonsCount - i) * 32.0f - 2.0f));
-        }
-
         // 按钮
         const std::string &title = menuTexts[i];
 
@@ -59,13 +55,21 @@ bool PopupMenu::init(cocos2d::Scene *scene, const std::vector<std::string> &menu
         button->loadTexturePressed("popmenu_item_pressed", ui::Widget::TextureResType::PLIST);
         background->addChild(button);
         button->setScale9Enabled(true);
-        button->setContentSize(Size(maxWidth, 30.0f));
+        button->setContentSize(Size(maxWidth, ITEM_HEIGHT));
         button->setTitleFontSize(12);
         button->setTitleColor(C3B_GRAY);
         button->setTitleText(title);
-        button->setPosition(Vec2(maxWidth * 0.5f, (buttonsCount - i) * 32.0f - 17.0f));
+        button->setPosition(Vec2(maxWidth * 0.5f, maxHeight - (i + 0.5f) * ITEM_HEIGHT));
         button->addClickEventListener(std::bind(&PopupMenu::onMenuButton, this, std::placeholders::_1));
         button->setUserData(reinterpret_cast<void *>(i));
+    }
+
+    // 分隔线
+    DrawNode *drawNode = DrawNode::create();
+    background->addChild(drawNode);
+    for (size_t i = 1, cnt = buttonsCount; i < cnt; ++i) {
+        const float yPos = maxHeight - i * ITEM_HEIGHT;
+        drawNode->drawLine(Vec2(0.0f, yPos), Vec2(maxWidth, yPos), Color4F::GRAY);
     }
 
     // 触摸监听，点击background以外的部分按按下取消键处理

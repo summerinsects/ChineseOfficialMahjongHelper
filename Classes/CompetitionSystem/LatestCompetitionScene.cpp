@@ -187,18 +187,17 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
     if (cell == nullptr) {
         cell = CustomCell::create();
 
-        Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = visibleSize.width - 5.0f;
+        const float cellWidth = table->getContentSize().width;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         LayerColor **layerColors = std::get<0>(ext).data();
         Label **label = std::get<1>(ext).data();
         ui::Button *&detailBtn = std::get<2>(ext);
 
-        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 50.0f);
+        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 50.0f);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 50.0f);
+        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 50.0f);
         cell->addChild(layerColors[1]);
 
         label[0] = Label::createWithSystemFont("", "Arail", 10);
@@ -220,7 +219,7 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         detailBtn->setTitleText(__UTF8("详情"));
         detailBtn->addClickEventListener(std::bind(&LatestCompetitionScene::onDetailButton, this, std::placeholders::_1));
         cell->addChild(detailBtn);
-        detailBtn->setPosition(Vec2(width - 25.0f, 25.0f));
+        detailBtn->setPosition(Vec2(cellWidth - 25.0f, 25.0f));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
