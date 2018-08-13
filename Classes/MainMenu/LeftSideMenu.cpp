@@ -22,7 +22,21 @@
 #define QR_CODE_URL "https://www.pgyer.com/app/qrcode/comh-android"
 #endif
 
+class SettingScene : public BaseScene {
+public:
+    CREATE_FUNC(SettingScene);
+    virtual bool init() override;
+};
+
 USING_NS_CC;
+
+bool SettingScene::init() {
+    if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("设置")))) {
+        return false;
+    }
+
+    return true;
+}
 
 bool LeftSideMenu::init(cocos2d::Scene *scene) {
     if (UNLIKELY(!Layer::init())) {
@@ -126,7 +140,7 @@ bool LeftSideMenu::init(cocos2d::Scene *scene) {
 }
 
 void LeftSideMenu::onSettingButton(cocos2d::Ref *) {
-
+    Director::getInstance()->pushScene(SettingScene::create());
 }
 
 static void showQRCodeAlertDialog(Scene *scene, Texture2D *texture) {
