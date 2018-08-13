@@ -3,18 +3,34 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
+#include "../cocos-wheels/CWCommon.h"
 
 class LeftSideMenu : public cocos2d::Layer {
 public:
-    CREATE_FUNC(LeftSideMenu);
-    virtual bool init() override;
+    CREATE_FUNC_WITH_PARAM_1(LeftSideMenu, cocos2d::Scene *, scene);
+    bool init(cocos2d::Scene *scene);
+
+    void show() {
+        _scene->addChild(this, 100);
+    }
 
     void dismiss() {
         this->removeFromParent();
     }
 
 private:
+    cocos2d::Scene *_scene = nullptr;
 
+    void onSettingButton(cocos2d::Ref *sender);
+    void onSharedButton(cocos2d::Ref *sender);
+    void onDonationButton(cocos2d::Ref *sender);
+    void onUpdateLogButton(cocos2d::Ref *sender);
+    void onVersionCheckButton(cocos2d::Ref *sender);
+    void onExitButton(cocos2d::Ref *sender);
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    bool checkVersion(const std::vector<char> *buffer);
+#endif
 };
 
 #endif

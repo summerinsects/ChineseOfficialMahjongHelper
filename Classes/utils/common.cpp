@@ -102,4 +102,37 @@ std::string getStringFromFile(const char *file) {
     return str;
 }
 
+bool compareVersion(const char *remote, const char *local) {
+    int major1, minor1, build1, revision1;
+    if (sscanf(remote, "%d.%d.%d.%d", &major1, &minor1, &build1, &revision1) != 4) {
+        return false;
+    }
+
+    int major2, minor2, build2, revision2;
+    if (sscanf(local, "%d.%d.%d.%d", &major2, &minor2, &build2, &revision2) != 4) {
+        return false;
+    }
+
+    if (major1 > major2) {
+        return true;
+    }
+    if (major1 == major2) {
+        if (minor1 > minor2) {
+            return true;
+        }
+        if (minor1 == minor2) {
+            if (build1 > build2) {
+                return true;
+            }
+            if (build1 == build2) {
+                if (revision1 > revision2) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 }

@@ -10,19 +10,7 @@ public:
     CREATE_FUNC(HelloWorld);
 
 private:
-    void onAboutButton(cocos2d::Ref *sender);
-
-    void requestQRCode();
-    void requestChangeLog();
     void upgradeDataIfNecessary();
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    bool needRequest() const;
-    void requestVersion(bool manual);
-    bool checkVersion(const std::vector<char> *buffer, bool manual);
-
-    cocos2d::Sprite *_redPointSprite = nullptr;
-#endif
-
 };
 
 #endif // __HELLOWORLD_SCENE_H__
