@@ -140,20 +140,12 @@ bool HelloWorld::init() {
         Director::getInstance()->pushScene(OtherScene::create());
     });
 
-    std::string version = Application::getInstance()->getVersion();
-    Label *label = Label::createWithSystemFont(
-        Common::format("v%s\n%s", version.c_str(), "Built  " __DATE__ "  " __TIME__), "Arial", 10);
-    label->setTextColor(C4B_BLACK);
-    this->addChild(label);
-    label->setAlignment(TextHAlignment::CENTER);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
-
 #if 0
     label = Label::createWithSystemFont(Common::format("{{%.2f, %.2f}, {%.2f, %.2f}}", origin.x, origin.y, visibleSize.width, visibleSize.height),
         "Arial", 10);
     label->setTextColor(C4B_BLACK);
     this->addChild(label);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 35.0f));
+    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + 15.0f));
 #endif
 
     upgradeDataIfNecessary();

@@ -70,6 +70,21 @@ bool LeftSideMenu::init(cocos2d::Scene *scene) {
         { __UTF8("退出"), &LeftSideMenu::onExitButton },
     };
 
+    Label *label = Label::createWithSystemFont(__UTF8("国标小助手"), "Arial", 14);
+    label->setTextColor(C4B_BLACK);
+    background->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
+    label->setPosition(Vec2(maxWidth * 0.5f, visibleSize.height - maxWidth * 0.5f + 5.0f));
+
+    std::string version = Application::getInstance()->getVersion();
+    label = Label::createWithSystemFont(version.insert(0, 1, 'v').append("\n" __DATE__ "  " __TIME__), "Arial", 10);
+    label->setTextColor(C4B_GRAY);
+    background->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
+    label->setAlignment(TextHAlignment::CENTER);
+    label->setPosition(Vec2(maxWidth * 0.5f, visibleSize.height - maxWidth * 0.5f));
+    cw::scaleLabelToFitWidth(label, maxWidth - 4.0f);
+
     const float yPosTop = visibleSize.height - maxWidth;  // 预留一个正方型区域
     for (size_t i = 0, cnt = _countof(menuItems); i < cnt; ++i) {
         ui::Button *button = ui::Button::create();
