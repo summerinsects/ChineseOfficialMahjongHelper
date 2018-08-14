@@ -69,10 +69,10 @@ bool LeftSideMenu::init(cocos2d::Scene *scene) {
 
     background->setContentSize(Size(maxWidth, visibleSize.height));
 
-    if (SpriteFrameCache::getInstance()->getSpriteFrameByName("popmenu_item_pressed") == nullptr) {
+    if (SpriteFrameCache::getInstance()->getSpriteFrameByName("#bfbfbf_80_3px") == nullptr) {
         // 3平方像素图片编码
         Sprite *sprite = utils::createSpriteFromBase64("iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mPYu3fvWRhmwMkBABCrGyXDqPNeAAAAAElFTkSuQmCC");
-        SpriteFrameCache::getInstance()->addSpriteFrame(sprite->getSpriteFrame(), "popmenu_item_pressed");
+        SpriteFrameCache::getInstance()->addSpriteFrame(sprite->getSpriteFrame(), "#bfbfbf_80_3px");
     }
 
     static const std::pair<const char *, void (LeftSideMenu::*)(Ref *)> menuItems[] = {
@@ -102,7 +102,7 @@ bool LeftSideMenu::init(cocos2d::Scene *scene) {
     const float yPosTop = visibleSize.height - maxWidth;  // 预留一个正方型区域
     for (size_t i = 0, cnt = _countof(menuItems); i < cnt; ++i) {
         ui::Button *button = ui::Button::create();
-        button->loadTexturePressed("popmenu_item_pressed", ui::Widget::TextureResType::PLIST);
+        button->loadTexturePressed("#bfbfbf_80_3px", ui::Widget::TextureResType::PLIST);
         background->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(maxWidth, 40.0f));
