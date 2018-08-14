@@ -46,7 +46,7 @@ bool SettingScene::init() {
     const float cellHeight = 30.0f;
 
     drawNode->drawLine(Vec2(0.0f, yPosTop), Vec2(visibleSize.width, yPosTop), Color4F::GRAY);
-    drawNode->drawSolidRect(Vec2(0.0f, yPosTop), Vec2(visibleSize.width, yPosTop - cellHeight), Color4F(1.0f, 1.0f, 1.0f, 0.96f));
+    drawNode->drawSolidRect(Vec2(0.0f, yPosTop), Vec2(visibleSize.width, yPosTop - cellHeight), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
 
     Label *label = Label::createWithSystemFont(__UTF8("显示FPS"), "Arail", 12);
     label->setTextColor(C4B_BLACK);
@@ -67,7 +67,7 @@ bool SettingScene::init() {
     });
 
     drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 1), Vec2(visibleSize.width, yPosTop - cellHeight * 1), Color4F::GRAY);
-    drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 1), Vec2(visibleSize.width, yPosTop - cellHeight * 2), Color4F(1.0f, 1.0f, 1.0f, 0.96f));
+    drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 1), Vec2(visibleSize.width, yPosTop - cellHeight * 2), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
 
     label = Label::createWithSystemFont(__UTF8("帧率"), "Arail", 12);
     label->setTextColor(C4B_BLACK);
@@ -125,7 +125,6 @@ bool SettingScene::init() {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 15.0f, origin.y + yPosTop - cellHeight * 2.0f - 10.0f));
 
-    //drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 3), Color4F::GRAY);
 
     return true;
 }
