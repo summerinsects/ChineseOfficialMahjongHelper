@@ -125,6 +125,29 @@ bool SettingScene::init() {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 15.0f, origin.y + yPosTop - cellHeight * 2.0f - 10.0f));
 
+#if 0
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 3), Color4F::GRAY);
+    drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 4), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
+
+    label = Label::createWithSystemFont(__UTF8("自动检测更新"), "Arail", 12);
+    label->setTextColor(C4B_BLACK);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 10.0f, origin.y + yPosTop - cellHeight * 3.5f));
+
+    checkBox = UICommon::createCheckBox();
+    this->addChild(checkBox);
+    checkBox->setZoomScale(0.0f);
+    checkBox->ignoreContentAdaptWithSize(false);
+    checkBox->setContentSize(Size(20.0f, 20.0f));
+    checkBox->setPosition(Vec2(origin.x + visibleSize.width - 20.0f, origin.y + yPosTop - cellHeight * 3.5f));
+    checkBox->setSelected(UserDefault::getInstance()->getBoolForKey("auto_check_version"));
+    checkBox->addEventListener([](Ref *, ui::CheckBox::EventType event) {
+        UserDefault::getInstance()->setBoolForKey("auto_check_version", event == ui::CheckBox::EventType::SELECTED);
+    });
+
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 4), Vec2(visibleSize.width, yPosTop - cellHeight * 4), Color4F::GRAY);
+#endif
 
     return true;
 }
