@@ -11,10 +11,10 @@ bool PopupMenu::init(cocos2d::Scene *scene, const std::vector<std::string> &menu
         return false;
     }
 
-    if (SpriteFrameCache::getInstance()->getSpriteFrameByName("popmenu_item_pressed") == nullptr) {
+    if (SpriteFrameCache::getInstance()->getSpriteFrameByName("#bfbfbf_80_3px") == nullptr) {
         // 3平方像素图片编码
         Sprite *sprite = utils::createSpriteFromBase64("iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mPYu3fvWRhmwMkBABCrGyXDqPNeAAAAAElFTkSuQmCC");
-        SpriteFrameCache::getInstance()->addSpriteFrame(sprite->getSpriteFrame(), "popmenu_item_pressed");
+        SpriteFrameCache::getInstance()->addSpriteFrame(sprite->getSpriteFrame(), "#bfbfbf_80_3px");
     }
 
     _scene = scene;
@@ -52,7 +52,7 @@ bool PopupMenu::init(cocos2d::Scene *scene, const std::vector<std::string> &menu
         const std::string &title = menuTexts[i];
 
         ui::Button *button = ui::Button::create();
-        button->loadTexturePressed("popmenu_item_pressed", ui::Widget::TextureResType::PLIST);
+        button->loadTexturePressed("#bfbfbf_80_3px", ui::Widget::TextureResType::PLIST);
         background->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(maxWidth, ITEM_HEIGHT));
