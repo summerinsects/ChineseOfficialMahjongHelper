@@ -35,6 +35,98 @@ bool SettingScene::init() {
         return false;
     }
 
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    DrawNode *drawNode = DrawNode::create();
+    this->addChild(drawNode);
+    drawNode->setPosition(origin);
+
+    const float yPosTop = visibleSize.height - 30.0f - 10.0f;
+    const float cellHeight = 30.0f;
+
+    drawNode->drawLine(Vec2(0.0f, yPosTop), Vec2(visibleSize.width, yPosTop), Color4F::GRAY);
+    drawNode->drawSolidRect(Vec2(0.0f, yPosTop), Vec2(visibleSize.width, yPosTop - cellHeight), Color4F(1.0f, 1.0f, 1.0f, 0.96f));
+
+    Label *label = Label::createWithSystemFont(__UTF8("显示FPS"), "Arail", 12);
+    label->setTextColor(C4B_BLACK);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 10.0f, origin.y + yPosTop - cellHeight * 0.5f));
+
+    ui::CheckBox *checkBox = UICommon::createCheckBox();
+    this->addChild(checkBox);
+    checkBox->setZoomScale(0.0f);
+    checkBox->ignoreContentAdaptWithSize(false);
+    checkBox->setContentSize(Size(20.0f, 20.0f));
+    checkBox->setPosition(Vec2(origin.x + visibleSize.width - 20.0f, origin.y + yPosTop - cellHeight * 0.5f));
+    checkBox->setSelected(Director::getInstance()->isDisplayStats());
+    checkBox->addEventListener([](Ref *, ui::CheckBox::EventType event) {
+        bool showFPS = event == ui::CheckBox::EventType::SELECTED;
+        Director::getInstance()->setDisplayStats(showFPS);
+    });
+
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 1), Vec2(visibleSize.width, yPosTop - cellHeight * 1), Color4F::GRAY);
+    drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 1), Vec2(visibleSize.width, yPosTop - cellHeight * 2), Color4F(1.0f, 1.0f, 1.0f, 0.96f));
+
+    label = Label::createWithSystemFont(__UTF8("帧率"), "Arail", 12);
+    label->setTextColor(C4B_BLACK);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 10.0f, origin.y + yPosTop - cellHeight * 1.5f));
+
+    label = Label::createWithSystemFont("10", "Arail", 12);
+    label->setTextColor(C4B_BLACK);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 40.0f, origin.y + yPosTop - cellHeight * 1.5f));
+
+    if (SpriteFrameCache::getInstance()->getSpriteFrameByName("#bfbfbf_80_3px") == nullptr) {
+        // 3平方像素图片编码
+        Sprite *sprite = utils::createSpriteFromBase64("iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mPYu3fvWRhmwMkBABCrGyXDqPNeAAAAAElFTkSuQmCC");
+        SpriteFrameCache::getInstance()->addSpriteFrame(sprite->getSpriteFrame(), "#bfbfbf_80%_3px");
+    }
+    if (SpriteFrameCache::getInstance()->getSpriteFrameByName("#33ccff_80_3px") == nullptr) {
+        // 3平方像素图片编码
+        Sprite *sprite = utils::createSpriteFromBase64("iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mMwPPn3NAwz4OQAANssGNOd+wrVAAAAAElFTkSuQmCC");
+        SpriteFrameCache::getInstance()->addSpriteFrame(sprite->getSpriteFrame(), "33ccff_80_3px");
+    }
+
+    ui::Slider *slider = ui::Slider::create();
+    slider->setScale9Enabled(true);
+    slider->setContentSize(Size(std::min(visibleSize.width - 70.0f, 150.0f), 2.0f));
+    slider->loadBarTexture("#bfbfbf_80_3px", ui::Widget::TextureResType::PLIST);
+    slider->loadProgressBarTexture("33ccff_80_3px", ui::Widget::TextureResType::PLIST);
+    slider->loadSlidBallTextures("source_material/btn_radio_cross.png");
+    slider->getSlidBallRenderer()->setScale(25.0f / slider->getSlidBallNormalRenderer()->getContentSize().width);
+    slider->setZoomScale(0.0f);
+    this->addChild(slider);
+    slider->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+    slider->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + yPosTop - cellHeight * 1.5f));
+    slider->addEventListener([label](Ref *sender, ui::Slider::EventType event) {
+        if (event == ui::Slider::EventType::ON_PERCENTAGE_CHANGED || event == ui::Slider::EventType::ON_SLIDEBALL_UP) {
+            int percent = ((ui::Slider *)sender)->getPercent();
+            int interval = percent / 2 + 10;
+            label->setString(std::to_string(interval));
+            if (event == ui::Slider::EventType::ON_SLIDEBALL_UP) {
+                Director::getInstance()->setAnimationInterval(1.0f / interval);
+            }
+        }
+    });
+    slider->setPercent((static_cast<int>(roundf(1.0f / Director::getInstance()->getAnimationInterval())) - 10) * 2);
+    label->setString(std::to_string(slider->getPercent() / 2 + 10));
+
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 2), Vec2(visibleSize.width, yPosTop - cellHeight * 2), Color4F::GRAY);
+
+    label = Label::createWithSystemFont(__UTF8("帧率越高越流畅，但会更耗电"),
+        "Arail", 10, Size(visibleSize.width - 30.0f, 0.0f));
+    label->setTextColor(C4B_GRAY);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 15.0f, origin.y + yPosTop - cellHeight * 2.0f - 10.0f));
+
+    //drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 3), Color4F::GRAY);
+
     return true;
 }
 
