@@ -64,6 +64,7 @@ bool SettingScene::init() {
     checkBox->addEventListener([](Ref *, ui::CheckBox::EventType event) {
         bool showFPS = event == ui::CheckBox::EventType::SELECTED;
         Director::getInstance()->setDisplayStats(showFPS);
+        UserDefault::getInstance()->setBoolForKey("show_fps", showFPS);
     });
 
     drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 1), Vec2(visibleSize.width, yPosTop - cellHeight * 1), Color4F::GRAY);
@@ -110,6 +111,7 @@ bool SettingScene::init() {
             label->setString(std::to_string(interval));
             if (event == ui::Slider::EventType::ON_SLIDEBALL_UP) {
                 Director::getInstance()->setAnimationInterval(1.0f / interval);
+                UserDefault::getInstance()->setIntegerForKey("animation_interval", interval);
             }
         }
     });
