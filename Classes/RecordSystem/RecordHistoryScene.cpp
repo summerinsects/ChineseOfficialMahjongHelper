@@ -165,7 +165,6 @@ bool RecordHistoryScene::init(ViewCallback &&viewCallback) {
 }
 
 #ifdef _MSC_VER
-#define strcasecmp _stricmp
 
 const char *strcasestr(const char *haystack, const char *needle) {
     size_t len = strlen(needle);

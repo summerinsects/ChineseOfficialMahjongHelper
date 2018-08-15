@@ -211,4 +211,11 @@
 #define PRIzx        _PFX_z "x"
 #define PRIzX        _PFX_z "X"
 
+
+#if (defined _MSC_VER)
+#ifndef strcasecmp
+#define strcasecmp _stricmp
+#endif
+#endif
+
 #endif
