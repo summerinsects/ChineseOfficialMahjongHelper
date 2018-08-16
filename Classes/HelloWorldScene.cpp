@@ -160,15 +160,14 @@ void HelloWorld::upgradeDataIfNecessary() {
         LoadingView *loadingView = LoadingView::create();
         loadingView->showInScene(this);
         auto thiz = makeRef(this);
-        std::thread([thiz, loadingView, version]() {
+
+        AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [thiz, loadingView, version](void *) {
+            loadingView->dismiss();
+            UserDefault::getInstance()->setStringForKey("data_version", version);
+        }, nullptr, [loadingView]() {
             const std::string path = FileUtils::getInstance()->getWritablePath();
             UpgradeRecordInFile((path + "record.json").c_str());
             UpgradeHistoryRecords((path + "history_record.json").c_str());
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([loadingView]() {
-                loadingView->dismiss();
-            });
-
-            UserDefault::getInstance()->setStringForKey("data_version", version);
-        }).detach();
+        });
     }
 }

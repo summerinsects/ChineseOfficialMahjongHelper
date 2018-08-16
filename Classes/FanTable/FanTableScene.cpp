@@ -226,9 +226,17 @@ void FanTableScene::asyncShowFanDefinition(size_t idx) {
     float scale = 0.5f;
 #endif
 
-    std::thread([runningScene, idx, scale, loadingView]() {
-        // 读文件
-        auto definitions = std::make_shared<std::vector<std::string> >();
+    auto definitions = std::make_shared<std::vector<std::string> >();
+    auto principles = std::make_shared<std::vector<std::string> >();
+    AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [runningScene, idx, loadingView, definitions, principles](void *) {
+        g_definitions.swap(*definitions);
+        g_principles.swap(*principles);
+
+        if (LIKELY(runningScene->isRunning())) {
+            loadingView->dismiss();
+            showFanDefinition(idx);
+        }
+    }, nullptr, [scale, definitions, principles]() {
         ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
         if (valueVec.size() == 82) {
             definitions->reserve(82);
@@ -239,7 +247,6 @@ void FanTableScene::asyncShowFanDefinition(size_t idx) {
             });
         }
 
-        auto principles = std::make_shared<std::vector<std::string> >();
         valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
         if (valueVec.size() == 5) {
             principles->reserve(5);
@@ -249,16 +256,5 @@ void FanTableScene::asyncShowFanDefinition(size_t idx) {
                 return std::move(ret);
             });
         }
-
-        // 切换到cocos线程
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread([runningScene, idx, loadingView, definitions, principles]() {
-            g_definitions.swap(*definitions);
-            g_principles.swap(*principles);
-
-            if (LIKELY(runningScene->isRunning())) {
-                loadingView->dismiss();
-                showFanDefinition(idx);
-            }
-        });
-    }).detach();
+    });
 }

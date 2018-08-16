@@ -20,11 +20,8 @@ USING_NS_CC;
 
 static bool g_hasLoaded = false;
 static std::vector<Record> g_records;
-static std::mutex g_mutex;
 
 static void loadRecords(std::vector<Record> &records) {
-    std::lock_guard<std::mutex> lg(g_mutex);
-
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
     LoadHistoryRecords(fileName.c_str(), records);
@@ -142,22 +139,18 @@ bool RecordHistoryScene::init(ViewCallback &&viewCallback) {
             loadingView->showInScene(this);
 
             auto thiz = makeRef(this);  // 保证线程回来之前不析构
-            std::thread([thiz, loadingView]() {
-                auto temp = std::make_shared<std::vector<Record> >();
-                loadRecords(*temp);
 
-                // 切换到cocos线程
-                Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, temp]() {
-                    g_records.swap(*temp);
-                    g_hasLoaded = true;
+            auto records = std::make_shared<std::vector<Record> >();
+            AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [records, thiz, loadingView](void *) {
+                g_records.swap(*records);
+                g_hasLoaded = true;
 
-                    if (LIKELY(thiz->isRunning())) {
-                        thiz->updateRecordTexts();
-                        thiz->refresh();
-                        loadingView->dismiss();
-                    }
-                });
-            }).detach();
+                if (LIKELY(thiz->isRunning())) {
+                    thiz->updateRecordTexts();
+                    thiz->refresh();
+                    loadingView->dismiss();
+                }
+            }, nullptr, [records]() { loadRecords(*records); });
         }, 0.0f, "load_records");
     }
 
@@ -511,19 +504,15 @@ void RecordHistoryScene::saveRecordsAndRefresh() {
     loadingView->showInScene(this);
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
-    auto temp = std::make_shared<std::vector<Record> >(g_records);
-    std::thread([thiz, temp, loadingView](){
-        saveRecords(*temp);
 
-        // 切换到cocos线程
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-            if (LIKELY(thiz->isRunning())) {
-                thiz->updateRecordTexts();
-                thiz->refresh();
-                loadingView->dismiss();
-            }
-        });
-    }).detach();
+    auto records = std::make_shared<std::vector<Record> >(g_records);
+    AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [thiz, loadingView](void *) {
+        if (LIKELY(thiz->isRunning())) {
+            thiz->updateRecordTexts();
+            thiz->refresh();
+            loadingView->dismiss();
+        }
+    }, nullptr, [records]() { saveRecords(*records); });
 }
 
 void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
@@ -1476,27 +1465,23 @@ void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {
 void RecordHistoryScene::modifyRecord(const Record *record) {
     if (UNLIKELY(!g_hasLoaded)) {  // 如果当前没有加载过历史记录
         auto r = std::make_shared<Record>(*record);  // 复制当前记录
-        // 子线程中加载、修改、保存
-        std::thread([r]() {
-            auto records = std::make_shared<std::vector<Record> >();
+        auto records = std::make_shared<std::vector<Record> >();
+
+        // 在子线程中加载、修改、保存，然后切换到主线程，覆盖整个历史记录
+        AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO,
+            [records](void *) { g_records.swap(*records); }, nullptr,
+            [r, records]() {
             loadRecords(*records);
             ModifyRecordInHistory(*records, r.get());
             saveRecords(*records);
-
-            // 切换到主线程，覆盖整个历史记录
-            Director::getInstance()->getScheduler()->performFunctionInCocosThread([records]() {
-                g_records.swap(*records);
-            });
-        }).detach();
+        });
     }
     else {  // 如果当前加载过历史记录
         // 直接修改
         ModifyRecordInHistory(g_records, record);
 
         // 子线程中保存
-        auto temp = std::make_shared<std::vector<Record> >(g_records);
-        std::thread([temp]() {
-            saveRecords(*temp);
-        }).detach();
+        auto records = std::make_shared<std::vector<Record> >(g_records);
+        AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [records]() { saveRecords(*records); });
     }
 }

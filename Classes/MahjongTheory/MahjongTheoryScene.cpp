@@ -516,7 +516,13 @@ void MahjongTheoryScene::calculate() {
     loadingView->showInScene(this);
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
-    std::thread([thiz, hand_tiles, serving_tile, loadingView]() {
+    AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_OTHER, [thiz, loadingView](void *) {
+        if (thiz->isRunning()) {
+            thiz->filterResultsByFlag(thiz->getFilterFlag());
+            thiz->_tableView->reloadData();
+            loadingView->dismiss();
+        }
+    }, nullptr, [thiz, hand_tiles, serving_tile]() {
         mahjong::enum_discard_tile(&hand_tiles, serving_tile, FORM_FLAG_ALL, thiz.get(),
             [](void *context, const mahjong::enum_result_t *result) {
             MahjongTheoryScene *thiz = (MahjongTheoryScene *)context;
@@ -525,16 +531,7 @@ void MahjongTheoryScene::calculate() {
             }
             return (thiz->isRunning());
         });
-
-        // 调回cocos线程
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView]() {
-            if (thiz->isRunning()) {
-                thiz->filterResultsByFlag(thiz->getFilterFlag());
-                thiz->_tableView->reloadData();
-                loadingView->dismiss();
-            }
-        });
-    }).detach();
+    });
 }
 
 static mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, mahjong::tile_t discardTile) {
