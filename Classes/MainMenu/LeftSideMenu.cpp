@@ -354,7 +354,7 @@ void LeftSideMenu::onDonationButton(cocos2d::Ref *) {
     Application::getInstance()->openURL("https://gitee.com/summerinsects/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
 }
 
-static void showChangeLog(Scene *scene, const std::string &str) {
+static void showChangeLog(const std::string &str) {
     Director::getInstance()->pushScene(
         CommonWebViewScene::create(__UTF8("更新日志"), str, CommonWebViewScene::ContentType::HTML));
 }
@@ -362,70 +362,32 @@ static void showChangeLog(Scene *scene, const std::string &str) {
 void LeftSideMenu::onUpdateLogButton(cocos2d::Ref *) {
     static std::string changelog;
     if (!changelog.empty()) {
-        showChangeLog(_scene, changelog);
+        showChangeLog(changelog);
         return;
     }
 
-    static bool isSending = false;
-    if (isSending) {
+    static bool isLoading = false;
+    if (isLoading) {
         return;
     }
-    isSending = true;
-
-    network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
-    request->setRequestType(network::HttpRequest::Type::GET);
-    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongHelper/master/CHANGELOG");
+    isLoading = true;
 
     LoadingView *loadingView = LoadingView::create();
     loadingView->showInScene(_scene);
     auto scene = makeRef(_scene);
-    request->setResponseCallback([scene, loadingView](network::HttpClient *client, network::HttpResponse *response) {
-        CC_UNUSED_PARAM(client);
-        network::HttpClient::destroyInstance();
-
-        isSending = false;
+    FileUtils::getInstance()->getStringFromFile("text/CHANGELOG", [loadingView, scene](std::string str) {
+        str.reserve(str.length() + 4 * std::count(str.cbegin(), str.cend(), '\n'));
+        std::string::size_type pos = str.find('\n');
+        while (pos != std::string::npos) {
+            str.replace(pos, 1, "<br/>");
+            pos = str.find('\n', pos + 5);
+        }
+        changelog.swap(str);
 
         loadingView->dismiss();
-        if (response == nullptr) {
-            return;
-        }
-
-        log("HTTP Status Code: %ld", response->getResponseCode());
-
-        if (!response->isSucceed()) {
-            log("response failed");
-            log("error buffer: %s", response->getErrorBuffer());
-            Toast::makeText(scene.get(), __UTF8("获取更新日志失败"), Toast::LENGTH_LONG)->show();
-            return;
-        }
-
-        std::vector<char> *buffer = response->getResponseData();
-        if (buffer == nullptr) {
-            Toast::makeText(scene.get(), __UTF8("获取更新日志失败"), Toast::LENGTH_LONG)->show();
-            return;
-        }
-
-        std::string temp;
-
-        temp.reserve(buffer->size() + 4 * std::count(buffer->cbegin(), buffer->cend(), '\n'));
-        std::vector<char>::const_iterator it1, it2;
-        it1 = buffer->cbegin();
-        do {
-            it2 = std::find(it1, buffer->cend(), '\n');
-            temp.append(it1, it2);
-
-            if (it2 == buffer->cend()) break;
-
-            temp.append("<br/>");
-            it1 = it2 + 1;
-        } while (1);
-
-        changelog.swap(temp);
-        showChangeLog(scene.get(), changelog);
+        showChangeLog(changelog);
+        isLoading = false;
     });
-
-    network::HttpClient::getInstance()->send(request);
-    request->release();
 }
 
 void LeftSideMenu::onVersionCheckButton(cocos2d::Ref *) {
