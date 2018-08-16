@@ -804,27 +804,33 @@ static void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector
             }
             ++result->hand_count;
 
+            uint16_t fan = detail.fan;
+            uint8_t wf = detail.win_flag;
+            uint8_t cf = detail.claim_flag;
+            if (fan == 0 || wf == 0 || cf == 0) {
+                continue;
+            }
+
             int scoreTable[4];
             TranslateDetailToScoreTable(detail, scoreTable);
             for (int n = 0; n < 4; ++n) {
                 totalScores[n] += scoreTable[n];
             }
 
-            uint8_t wf = detail.win_flag;
-            uint8_t cf = detail.claim_flag;
             int winIndex = WIN_CLAIM_INDEX(wf);
             int claimIndex = WIN_CLAIM_INDEX(cf);
+
             if (winIndex == idx) {
                 ++result->win;
                 if (claimIndex == idx) {
                     ++result->self_drawn;
                 }
-                result->win_fan += detail.fan;
-                result->max_fan = std::max<uint16_t>(result->max_fan, detail.fan);
+                result->win_fan += fan;
+                result->max_fan = std::max<uint16_t>(result->max_fan, fan);
             }
             else if (claimIndex == idx) {
                 ++result->claim;
-                result->claim_fan += detail.fan;
+                result->claim_fan += fan;
             }
         }
 
