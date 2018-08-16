@@ -506,7 +506,6 @@ const char *ExtraInfoWidget::parseInput(const char *input) {
             case PARSE_ERROR_TILE_COUNT_GREATER_THAN_4: return __UTF8("同一种牌最多只能使用4枚");
             default: return __UTF8("未知错误");
         }
-        return nullptr;
     }
     if (win_tile == 0) {
         return __UTF8("缺少和牌张");

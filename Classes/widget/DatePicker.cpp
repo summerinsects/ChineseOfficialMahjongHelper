@@ -23,10 +23,10 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     _callback.swap(callback);
 
     time_t now = time(nullptr);
-    struct tm ret = *localtime(&now);
-    _today.year = ret.tm_year + 1900;
-    _today.month = ret.tm_mon + 1;
-    _today.day = ret.tm_mday;
+    struct tm tmnow = *localtime(&now);
+    _today.year = tmnow.tm_year + 1900;
+    _today.month = tmnow.tm_mon + 1;
+    _today.day = tmnow.tm_mday;
     if (date == nullptr) {
         memcpy(&_picked, &_today, sizeof(_picked));
     }
@@ -263,7 +263,7 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     // 触摸监听
     EventListenerTouchOneByOne *touchListener = EventListenerTouchOneByOne::create();
     touchListener->setSwallowTouches(true);
-    touchListener->onTouchBegan = [this](Touch *touch, Event *event) {
+    touchListener->onTouchBegan = [this](Touch *, Event *) {
         return true;
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);

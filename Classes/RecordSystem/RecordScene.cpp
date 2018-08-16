@@ -1157,7 +1157,7 @@ void RecordScene::onFanNameBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::Even
     }
     else {
         // 点击「最近使用」，更新找到对应cell的番，更新
-        ssize_t cellIdx = standardFanToCellIdx[fan];  // 对应cell下标
+        cellIdx = standardFanToCellIdx[fan];  // 对应cell下标
         if (cellIdx != 0) {
             CustomCell *cell = (CustomCell *)_tableView->cellAtIndex(cellIdx);
             if (cell != nullptr) {  // 该cell在绘制

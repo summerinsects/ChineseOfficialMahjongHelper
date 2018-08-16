@@ -887,7 +887,7 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
 
     for (int i = 0; i < 4; ++i) {
         const float yPos = 105.0f - 15.0f * i;
-        Label *label = Label::createWithSystemFont(texts[i], "Arail", 10);
+        label = Label::createWithSystemFont(texts[i], "Arail", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(2.0f, yPos));
@@ -904,7 +904,7 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
 
     for (int i = 0; i < 3; ++i) {
         const float yPos = 40.0f - 15.0f * i;
-        Label *label = Label::createWithSystemFont(texts[8 + i], "Arail", 10);
+        label = Label::createWithSystemFont(texts[8 + i], "Arail", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(2.0f, yPos));
