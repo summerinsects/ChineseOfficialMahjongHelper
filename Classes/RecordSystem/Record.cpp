@@ -592,9 +592,9 @@ void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]) {
     memset(scoreTable, 0, sizeof(scoreTable));
     int fan = static_cast<int>(detail.fan);
-    if (fan >= 8 && detail.win_flag != 0) {
-        uint8_t wf = detail.win_flag;
-        uint8_t cf = detail.claim_flag;
+    uint8_t wf = detail.win_flag;
+    uint8_t cf = detail.claim_flag;
+    if (fan >= 8 && wf != 0 && cf != 0) {
         int winIndex = WIN_CLAIM_INDEX(wf);
         int claimIndex = WIN_CLAIM_INDEX(cf);
         if (winIndex == claimIndex) {  // 自摸

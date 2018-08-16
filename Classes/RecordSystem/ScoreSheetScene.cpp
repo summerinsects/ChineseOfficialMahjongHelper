@@ -1162,6 +1162,10 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
 
     int8_t wf = detail.win_flag;
     int8_t cf = detail.claim_flag;
+    if (wf == 0 || cf == 0) {
+        return __UTF8("数据错误");
+    }
+
     int winIndex = WIN_CLAIM_INDEX(wf);
     int claimIndex = WIN_CLAIM_INDEX(cf);
     if (winIndex == claimIndex) {
