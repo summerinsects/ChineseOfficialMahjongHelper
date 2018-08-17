@@ -62,9 +62,9 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
     it = json.FindMember("detail");
     if (it != json.MemberEnd() && it->value.IsArray()) {
         rapidjson::Value::ConstArray detail = it->value.GetArray();
-        record.current_index = std::min<size_t>(16, detail.Size());
+        record.current_index = std::min<uint16_t>(16, detail.Size());
 
-        for (size_t i = 0, cnt = record.current_index; i < cnt; ++i) {
+        for (unsigned i = 0, cnt = record.current_index; i < cnt; ++i) {
             Record::Detail &detail_data = record.detail[i];
             const rapidjson::Value &detail_json = detail[static_cast<rapidjson::SizeType>(i)];
 
@@ -162,7 +162,7 @@ void RecordToJson(const Record &record, rapidjson::Value &json, rapidjson::Value
 
     rapidjson::Value detail(rapidjson::Type::kArrayType);
     detail.Reserve(static_cast<rapidjson::SizeType>(record.current_index), alloc);
-    for (size_t i = 0, cnt = record.current_index; i < cnt; ++i) {
+    for (unsigned i = 0, cnt = record.current_index; i < cnt; ++i) {
         const Record::Detail &detail_data = record.detail[i];
         rapidjson::Value detail_json(rapidjson::Type::kObjectType);
         detail_json.AddMember("win_flag", rapidjson::Value(detail_data.win_flag), alloc);
@@ -201,9 +201,9 @@ void UpgradeJson(rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc)
     rapidjson::Value::MemberIterator it = json.FindMember("detail");
     if (it != json.MemberEnd() && it->value.IsArray()) {
         rapidjson::Value::Array detail = it->value.GetArray();
-        size_t count = std::min<size_t>(16, detail.Size());
+        unsigned count = std::min<unsigned>(16, detail.Size());
 
-        for (size_t i = 0; i < count; ++i) {
+        for (unsigned i = 0; i < count; ++i) {
             rapidjson::Value &detail_json = detail[static_cast<rapidjson::SizeType>(i)];
 
             // 兼容旧的key until 2017.12.29 7eed14a

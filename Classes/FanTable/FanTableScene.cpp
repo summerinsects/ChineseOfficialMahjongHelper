@@ -19,8 +19,8 @@ namespace {
     typedef struct {
         const char *const title;
         const char *const *fan_names;
-        const size_t count;
-        const size_t begin_index;
+        const unsigned count;
+        const unsigned begin_index;
     } CellDetail;
 }
 
@@ -40,7 +40,7 @@ static const CellDetail cellDetails[13] = {
     { __UTF8("88番"), &mahjong::fan_name[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
 };
 
-static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
+static FORCE_INLINE unsigned computeRowsAlign4(unsigned cnt) {
     return (cnt >> 2) + ((cnt & 0x3) != 0);
 }
 
@@ -74,7 +74,7 @@ ssize_t FanTableScene::numberOfCellsInTableView(cw::TableView *) {
 }
 
 float FanTableScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
-    size_t cnt = cellDetails[idx].count;
+    unsigned cnt = cellDetails[idx].count;
     float height = computeRowsAlign4(cnt) * 25.0f;
     return (height + 15.0f);
 }
@@ -98,7 +98,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         cell->addChild(label);
         label->setTextColor(C4B_BLACK);
 
-        for (size_t k = 0; k < 13; ++k) {
+        for (unsigned k = 0; k < 13; ++k) {
             ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png");
             button->setScale9Enabled(true);
             button->setContentSize(Size(gap - 4.0f, 20.0f));
@@ -112,8 +112,8 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     }
 
     const CellDetail &detail = cellDetails[idx];
-    const size_t currentLevelCount = detail.count;
-    size_t totalRows = computeRowsAlign4(currentLevelCount);
+    const unsigned currentLevelCount = detail.count;
+    unsigned totalRows = computeRowsAlign4(currentLevelCount);
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
@@ -122,22 +122,22 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     label->setString(detail.title);
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
-    size_t idx0 = detail.begin_index;
+    unsigned idx0 = detail.begin_index;
     const char *const *titleTexts = detail.fan_names;
 
-    for (size_t k = 0; k < currentLevelCount; ++k) {
+    for (unsigned k = 0; k < currentLevelCount; ++k) {
         ui::Button *button = buttons[k];
         button->setTitleText(titleTexts[k]);
-        button->setUserData(reinterpret_cast<void *>(idx0 + k));
+        button->setTag(static_cast<int>(idx0 + k));
         button->setVisible(true);
-        size_t col = k & 0x3;
-        size_t row = k >> 2;
+        unsigned col = k & 0x3;
+        unsigned row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
         cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
     }
 
-    for (size_t k = currentLevelCount; k < 13; ++k) {
+    for (unsigned k = currentLevelCount; k < 13; ++k) {
         buttons[k]->setVisible(false);
     }
 
@@ -146,7 +146,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
 
 void FanTableScene::onFanNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    size_t idx = reinterpret_cast<size_t>(button->getUserData());
+    unsigned idx = static_cast<unsigned>(button->getTag());
     asyncShowFanDefinition(idx);
 }
 
@@ -196,14 +196,14 @@ static void replaceTilesToImage(std::string &text, float scale) {
     }
 }
 
-static void showFanDefinition(size_t idx) {
+static void showFanDefinition(unsigned idx) {
     const char *title = idx < 100 ? mahjong::fan_name[idx] : principle_title[idx - 100];
     const std::string &text = idx < 100 ? g_definitions[idx] : g_principles[idx - 100];
     CommonWebViewScene *scene = CommonWebViewScene::create(title, text, CommonWebViewScene::ContentType::HTML);
     Director::getInstance()->pushScene(scene);
 }
 
-void FanTableScene::asyncShowFanDefinition(size_t idx) {
+void FanTableScene::asyncShowFanDefinition(unsigned idx) {
     if (LIKELY(g_definitions.size() == 82 && g_principles.size() == 5)) {
         showFanDefinition(idx);
         return;

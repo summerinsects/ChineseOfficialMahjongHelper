@@ -104,7 +104,7 @@ extern cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         widget->setContentSize(label->getContentSize());
         node->addChild(widget);
         widget->addClickEventListener([j](Ref *) {
-            FanTableScene::asyncShowFanDefinition(static_cast<size_t>(j));
+            FanTableScene::asyncShowFanDefinition(static_cast<unsigned>(j));
         });
     }
 

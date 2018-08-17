@@ -30,8 +30,8 @@ class RecordScene : public BaseScene, cocos2d::ui::EditBoxDelegate, cw::TableVie
 public:
     typedef std::function<void (const Record::Detail &)> SubmitCallback;
 
-    CREATE_FUNC_WITH_PARAM_4(RecordScene, size_t, handIdx, const char **, names, const Record::Detail *, detail, SubmitCallback &&, okCallback);
-    bool init(size_t handIdx, const char **names, const Record::Detail *detail, SubmitCallback &&callback);
+    CREATE_FUNC_WITH_PARAM_4(RecordScene, unsigned, handIdx, const char **, names, const Record::Detail *, detail, SubmitCallback &&, okCallback);
+    bool init(unsigned handIdx, const char **names, const Record::Detail *detail, SubmitCallback &&callback);
 
     virtual void editBoxEditingDidBegin(cocos2d::ui::EditBox* editBox) override;
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
@@ -54,7 +54,7 @@ private:
     cw::TableView *_tableView = nullptr;
     cocos2d::ui::Button *_submitButton = nullptr;
 
-    size_t _handIdx = 0;
+    unsigned _handIdx = 0;
     const char *_playerNames[4];
     int _winIndex = -1;
     Record::Detail _detail;

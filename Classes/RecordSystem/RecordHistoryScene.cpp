@@ -755,17 +755,17 @@ void RecordHistoryScene::showFilterAlert() {
 
 namespace {
     struct RecordsStatistic {
-        size_t competition_count;
-        size_t hand_count;
-        size_t rank[4];
+        unsigned competition_count;
+        unsigned hand_count;
+        unsigned rank[4];
         unsigned standard_score12;
         int competition_score;
         uint16_t max_fan;
-        size_t win;
-        size_t self_drawn;
-        size_t claim;
-        size_t win_fan;
-        size_t claim_fan;
+        unsigned win;
+        unsigned self_drawn;
+        unsigned claim;
+        unsigned win_fan;
+        unsigned claim_fan;
     };
 }
 
@@ -815,7 +815,7 @@ static void SummarizeRecords(const std::vector<int8_t> &flags, const std::vector
                     ++result->self_drawn;
                 }
                 result->win_fan += fan;
-                result->max_fan = std::max<uint16_t>(result->max_fan, fan);
+                result->max_fan = std::max(result->max_fan, fan);
             }
             else if (claimIndex == idx) {
                 ++result->claim;
@@ -843,7 +843,7 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
 
     std::string texts[16];
     for (int i = 0; i < 4; ++i) {
-        texts[i] = Common::format(__UTF8("%d位：%2") __UTF8(PRIzd) __UTF8(" (%.2f%%)"), i + 1, rs.rank[i], rs.competition_count > 0 ? rs.rank[i] * 100 / static_cast<float>(rs.competition_count) : 0.0f);
+        texts[i] = Common::format(__UTF8("%d位：%2u (%.2f%%)"), i + 1, rs.rank[i], rs.competition_count > 0 ? rs.rank[i] * 100 / static_cast<float>(rs.competition_count) : 0.0f);
     }
     texts[4] = Common::format(__UTF8("标准分：%.2f"), rs.standard_score12 / 12.0f);
     texts[5] = Common::format(__UTF8("比赛分：%d"), rs.competition_score);
@@ -855,8 +855,8 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
     texts[11] = Common::format(__UTF8("平均和牌番：%.2f"), rs.win > 0 ? rs.win_fan / static_cast<float>(rs.win) : 0.0f);
     texts[12] = Common::format(__UTF8("平均点炮番：%.2f"), rs.claim > 0 ? rs.claim_fan / static_cast<float>(rs.claim) : 0.0f);
     texts[13] = Common::format(__UTF8("和牌最大番：%hu"), rs.max_fan);
-    texts[14] = Common::format(__UTF8("统计局数：%") __UTF8(PRIzd), rs.competition_count);
-    texts[15] = Common::format(__UTF8("有效盘数：%") __UTF8(PRIzd), rs.hand_count);
+    texts[14] = Common::format(__UTF8("统计局数：%u"), rs.competition_count);
+    texts[15] = Common::format(__UTF8("有效盘数：%u"), rs.hand_count);
 
     const float labelWidth = width * 0.5f - 4.0f;
 

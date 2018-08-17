@@ -29,7 +29,7 @@ struct Record {
             uint8_t flower_count;   // 花牌数
         } win_hand;         // 和牌
     } detail[16];           // 每一盘的详情
-    size_t current_index;   // 当前打到第几盘
+    uint16_t current_index;  // 当前打到第几盘
     time_t start_time;      // 开始时间
     time_t end_time;        // 结束时间
     char title[TITLE_SIZE]; // 对局名称

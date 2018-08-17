@@ -30,11 +30,11 @@ private:
 
     bool initWithRecord(Record *record);
 
-    void addUpScores(size_t handIdx, int (&totalScores)[4]) const;
-    void fillScoresForSingleMode(size_t handIdx, int (&totalScores)[4]);
-    void fillScoresForTotalMode(size_t handIdx, int (&totalScores)[4]);
-    void fillDetail(size_t handIdx);
-    void cleanRow(size_t handIdx);
+    void addUpScores(unsigned handIdx, int (&totalScores)[4]) const;
+    void fillScoresForSingleMode(unsigned handIdx, int (&totalScores)[4]);
+    void fillScoresForTotalMode(unsigned handIdx, int (&totalScores)[4]);
+    void fillDetail(unsigned handIdx);
+    void cleanRow(unsigned handIdx);
     void refreshRank(const int (&totalScores)[4]);
     void refreshTitle();
     void refreshEndTime();
@@ -48,7 +48,7 @@ private:
     void onFinishButton(cocos2d::Ref *sender);
     void onRecordButton(cocos2d::Ref *sender);
     void onDetailButton(cocos2d::Ref *sender);
-    void editRecord(size_t handIdx, const Record::Detail *detail);
+    void editRecord(unsigned handIdx, const Record::Detail *detail);
     void onTimeScheduler(float dt);
     void onInstructionButton(cocos2d::Ref *sender);
     void onSettingButton(cocos2d::Ref *sender);

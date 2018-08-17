@@ -292,7 +292,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     return true;
 }
 
-void ScoreSheetScene::cleanRow(size_t handIdx) {
+void ScoreSheetScene::cleanRow(unsigned handIdx) {
     for (int i = 0; i < 4; ++i) {
         _scoreLabels[handIdx][i]->setString("");
     }
@@ -301,7 +301,7 @@ void ScoreSheetScene::cleanRow(size_t handIdx) {
     _detailWidget[handIdx]->setVisible(false);
 }
 
-void ScoreSheetScene::addUpScores(size_t handIdx, int (&totalScores)[4]) const {
+void ScoreSheetScene::addUpScores(unsigned handIdx, int (&totalScores)[4]) const {
     int scoreTable[4];
     const Record::Detail &detail = _record.detail[handIdx];
     TranslateDetailToScoreTable(detail, scoreTable);
@@ -311,7 +311,7 @@ void ScoreSheetScene::addUpScores(size_t handIdx, int (&totalScores)[4]) const {
     }
 }
 
-void ScoreSheetScene::fillScoresForSingleMode(size_t handIdx, int (&totalScores)[4]) {
+void ScoreSheetScene::fillScoresForSingleMode(unsigned handIdx, int (&totalScores)[4]) {
     int scoreTable[4];
     const Record::Detail &detail = _record.detail[handIdx];
     TranslateDetailToScoreTable(detail, scoreTable);
@@ -326,7 +326,7 @@ void ScoreSheetScene::fillScoresForSingleMode(size_t handIdx, int (&totalScores)
     RecordScene::SetScoreLabelColor(_scoreLabels[handIdx], scoreTable, detail.win_flag, detail.claim_flag, detail.penalty_scores);
 }
 
-void ScoreSheetScene::fillScoresForTotalMode(size_t handIdx, int (&totalScores)[4]) {
+void ScoreSheetScene::fillScoresForTotalMode(unsigned handIdx, int (&totalScores)[4]) {
     int scoreTable[4];
     const Record::Detail &detail = _record.detail[handIdx];
     TranslateDetailToScoreTable(detail, scoreTable);
@@ -507,7 +507,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
     return __UTF8("未标记番种");
 }
 
-void ScoreSheetScene::fillDetail(size_t handIdx) {
+void ScoreSheetScene::fillDetail(unsigned handIdx) {
     // 隐藏这一行的计分按钮
     _recordButton[handIdx]->setVisible(false);
     _detailWidget[handIdx]->setVisible(true);
@@ -597,23 +597,23 @@ void ScoreSheetScene::recover() {
     // 隐藏开始按钮
     _startButton->setVisible(false);
 
-    size_t currentIdx = _record.current_index;
+    unsigned currentIdx = _record.current_index;
     int totalScores[4] = { 0 };
 
     // 逐行填入数据
     if (_isTotalMode) {
-        for (size_t i = 0; i < currentIdx; ++i) {
+        for (unsigned i = 0; i < currentIdx; ++i) {
             fillScoresForTotalMode(i, totalScores);
             fillDetail(i);
         }
     }
     else {
-        for (size_t i = 0; i < currentIdx; ++i) {
+        for (unsigned i = 0; i < currentIdx; ++i) {
             fillScoresForSingleMode(i, totalScores);
             fillDetail(i);
         }
     }
-    for (size_t i = currentIdx; i < 16; ++i) {
+    for (unsigned i = currentIdx; i < 16; ++i) {
         cleanRow(i);
     }
 
@@ -670,7 +670,7 @@ void ScoreSheetScene::reset() {
     onTimeScheduler(0.0f);
     this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
 
-    for (size_t i = 0; i < 16; ++i) {
+    for (unsigned i = 0; i < 16; ++i) {
         cleanRow(i);
     }
 }
@@ -839,7 +839,7 @@ void ScoreSheetScene::editNameAndTitle() {
 
     // 如果选手姓名皆为空，则填入上次对局的姓名
     if (std::all_of(std::begin(_record.name), std::end(_record.name), [](const char (&s)[NAME_SIZE]) { return s[0] == '\0'; })) {
-        for (size_t i = 0; i < 4; ++i) {
+        for (unsigned i = 0; i < 4; ++i) {
             editBoxes[i]->setText(g_prevName[i]);
         }
     }
@@ -886,7 +886,7 @@ void ScoreSheetScene::editNameAndTitle() {
 
         if (_record.start_time != 0) {
             // 检查空输入
-            for (size_t i = 0; i < 4; ++i) {
+            for (unsigned i = 0; i < 4; ++i) {
                 if (names[i].empty()) {
                     Toast::makeText(this, __UTF8("对局开始后不允许清空选手姓名"), Toast::LENGTH_LONG)->show();
                     return false;
@@ -895,8 +895,8 @@ void ScoreSheetScene::editNameAndTitle() {
         }
 
         // 检查重名
-        for (size_t i = 0; i < 4; ++i) {
-            for (size_t k = i + 1; k < 4; ++k) {
+        for (unsigned i = 0; i < 4; ++i) {
+            for (unsigned k = i + 1; k < 4; ++k) {
                 if (!names[k].empty() && names[k].compare(names[i]) == 0) {
                     Toast::makeText(this, __UTF8("选手姓名不能相同"), Toast::LENGTH_LONG)->show();
                     return false;
@@ -1025,21 +1025,21 @@ void ScoreSheetScene::forceFinish() {
 }
 
 void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender) {
-    ssize_t handIdx = static_cast<ssize_t>(((ui::Button *)sender)->getTag());
+    unsigned handIdx = static_cast<unsigned>(((ui::Button *)sender)->getTag());
     editRecord(handIdx, nullptr);
 }
 
-void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
+void ScoreSheetScene::editRecord(unsigned handIdx, const Record::Detail *detail) {
     const char *name[4] = { _record.name[0], _record.name[1], _record.name[2], _record.name[3] };
     auto scene = RecordScene::create(handIdx, name, detail, [this, handIdx](const Record::Detail &detail) {
-        size_t currentIdx = _record.current_index;
+        unsigned currentIdx = _record.current_index;
         bool isModify = (handIdx != currentIdx);
 
         // 将计分面板的数据更新到当前数据中
         memcpy(&_record.detail[handIdx], &detail, sizeof(Record::Detail));
 
         int totalScores[4] = { 0 };
-        for (size_t i = 0, cnt = handIdx; i < cnt; ++i) {
+        for (unsigned i = 0, cnt = handIdx; i < cnt; ++i) {
             addUpScores(i, totalScores);
         }
 
@@ -1050,7 +1050,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
             fillScoresForSingleMode(handIdx, totalScores);
 
             // 单盘模式直接统计之后的行
-            for (size_t i = handIdx + 1; i < currentIdx; ++i) {
+            for (unsigned i = handIdx + 1; i < currentIdx; ++i) {
                 addUpScores(i, totalScores);
             }
         }
@@ -1058,7 +1058,7 @@ void ScoreSheetScene::editRecord(size_t handIdx, const Record::Detail *detail) {
             fillScoresForTotalMode(handIdx, totalScores);
 
             // 累计模式下还需要修改随后的所有行
-            for (size_t i = handIdx + 1; i < currentIdx; ++i) {
+            for (unsigned i = handIdx + 1; i < currentIdx; ++i) {
                 fillScoresForTotalMode(i, totalScores);
             }
         }
@@ -1153,7 +1153,7 @@ static std::string GetLongFanText(const Record::Detail &detail) {
     return fanText;
 }
 
-static std::string stringifyDetail(const Record *record, size_t handIdx) {
+static std::string stringifyDetail(const Record *record, unsigned handIdx) {
     const Record::Detail &detail = record->detail[handIdx];
 
     std::string fanText = GetLongFanText(detail);
@@ -1179,7 +1179,7 @@ static std::string stringifyDetail(const Record *record, size_t handIdx) {
 }
 
 void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender) {
-    ssize_t handIdx = static_cast<ssize_t>(((ui::Widget *)sender)->getTag());
+    unsigned handIdx = static_cast<unsigned>(((ui::Widget *)sender)->getTag());
     const Record::Detail &detail = _record.detail[handIdx];
     if (detail.fan == 0) {
         AlertDialog::Builder(this)
@@ -1375,12 +1375,12 @@ void ScoreSheetScene::refreshScores() {
     // 逐行填入数据
     int totalScores[4] = { 0 };
     if (!_isTotalMode) {
-        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+        for (unsigned i = 0, cnt = _record.current_index; i < cnt; ++i) {
             fillScoresForSingleMode(i, totalScores);
         }
     }
     else {
-        for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+        for (unsigned i = 0, cnt = _record.current_index; i < cnt; ++i) {
             fillScoresForTotalMode(i, totalScores);
         }
     }
@@ -1653,7 +1653,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     }
 
     int totalScores[4] = { 0 };
-    for (size_t i = 0, cnt = _record.current_index; i < cnt; ++i) {
+    for (unsigned i = 0, cnt = _record.current_index; i < cnt; ++i) {
         addUpScores(i, totalScores);
     }
 

@@ -104,7 +104,7 @@ namespace {
     typedef struct {
         const char *const title;
         const mahjong::fan_t *const fans;
-        size_t count;
+        unsigned count;
         const mahjong::fan_t first_fan;
     } CellDetail;
 }
@@ -143,7 +143,7 @@ static void saveRecentFans() {
         static_cast<int>(recentFans[4]), static_cast<int>(recentFans[5]), static_cast<int>(recentFans[6]), static_cast<int>(recentFans[7])));
 }
 
-static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
+static FORCE_INLINE unsigned computeRowsAlign4(unsigned cnt) {
     return (cnt >> 2) + ((cnt & 0x3) != 0);
 }
 
@@ -152,7 +152,7 @@ static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
 #define PLAYER_TO_UI(p_) ORDER(_seatFlag, (p_))
 #define UI_TO_PLAYER(u_) ORDER(_playerFlag, (u_))
 
-bool RecordScene::init(size_t handIdx, const char **names, const Record::Detail *detail, SubmitCallback &&callback) {
+bool RecordScene::init(unsigned handIdx, const char **names, const Record::Detail *detail, SubmitCallback &&callback) {
     if (UNLIKELY(!BaseScene::initWithTitle(handNameText[handIdx]))) {
         return false;
     }
@@ -474,7 +474,7 @@ bool RecordScene::init(size_t handIdx, const char **names, const Record::Detail 
     // 6 8 12 16 24
     const float labelPosX = label->getContentSize().width + 5.0f + 2.0f;
     static const char *text[] = { __UTF8("6番"), __UTF8("8番"), __UTF8("12番"), __UTF8("16番"), __UTF8("24番") };
-    for (size_t i = 0; i < 5; ++i) {
+    for (unsigned i = 0; i < 5; ++i) {
         button = UICommon::createButton();
         button->setScale9Enabled(true);
         button->setContentSize(Size(30.0f, 20.0f));
@@ -508,7 +508,7 @@ ssize_t RecordScene::numberOfCellsInTableView(cw::TableView *) {
 }
 
 float RecordScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
-    size_t cnt = cellDetails[idx].count;
+    unsigned cnt = cellDetails[idx].count;
     float height = computeRowsAlign4(cnt) * 25.0f;
     return (height + 15.0f);
 }
@@ -536,7 +536,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         cell->addChild(label);
         label->setTextColor(C4B_BLACK);
 
-        for (size_t k = 0; k < 9; ++k) {
+        for (unsigned k = 0; k < 9; ++k) {
             Size size(gap - 4.0f, 20.0f);
             Vec2 pos(size.width * 0.5f, size.height * 0.5f);
 
@@ -560,8 +560,8 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     }
 
     const CellDetail &detail = cellDetails[idx];
-    const size_t currentLevelCount = detail.count;
-    size_t totalRows = computeRowsAlign4(currentLevelCount);
+    const unsigned currentLevelCount = detail.count;
+    unsigned totalRows = computeRowsAlign4(currentLevelCount);
 
     CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
@@ -572,7 +572,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
     const mahjong::fan_t *fans = detail.fans;
-    for (size_t k = 0; k < currentLevelCount; ++k) {
+    for (unsigned k = 0; k < currentLevelCount; ++k) {
         mahjong::fan_t fan = fans[k];
 
         ui::CheckBox *checkBox = checkBoxes[k];
@@ -584,13 +584,13 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
         titleLabel->setString(mahjong::fan_name[fan]);
         cw::scaleLabelToFitWidth(titleLabel, gap - 8.0f);
 
-        size_t col = k & 0x3;
-        size_t row = k >> 2;
+        unsigned col = k & 0x3;
+        unsigned row = k >> 2;
         checkBox->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
         checkBox->setSelected(TEST_FAN(_detail.fan_bits, fan));
     }
 
-    for (size_t k = currentLevelCount; k < 9; ++k) {
+    for (unsigned k = currentLevelCount; k < 9; ++k) {
         ui::CheckBox *checkBox = checkBoxes[k];
         checkBox->setVisible(false);
         checkBox->setSelected(false);
