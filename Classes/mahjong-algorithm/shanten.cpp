@@ -61,6 +61,7 @@ intptr_t packs_to_tiles(const pack_t *packs, intptr_t pack_cnt, tile_t *tiles, i
             if (cnt < tile_cnt) tiles[cnt++] = tile;
             break;
         default:
+            UNREACHABLE();
             break;
         }
     }

@@ -766,6 +766,7 @@ static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_tab
         }
         break;
     default:
+        UNREACHABLE();
         break;
     }
 
@@ -1586,13 +1587,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
         case PACK_TYPE_PUNG:
         case PACK_TYPE_KONG: pung_packs[pung_cnt++] = packs[i]; break;
         case PACK_TYPE_PAIR: pair_pack = packs[i]; break;
-        default:
-#if defined(_MSC_VER) && (_MSC_VER >= 1300)
-            __assume(0);
-#else
-            assert(0);
-#endif
-            return;
+        default: UNREACHABLE(); return;
         }
     }
 
@@ -1693,6 +1688,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
         break;
     }
     default:
+        UNREACHABLE();
         break;
     }
 

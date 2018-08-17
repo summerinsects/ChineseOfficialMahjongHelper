@@ -173,6 +173,8 @@
 #ifndef UNREACHABLE
 #if defined(_MSC_VER) && (_MSC_VER >= 1300)
 #define UNREACHABLE() __assume(0)
+#elif defined(__clang__) || (defined(__GNUC__) && ((__GNUC__ << 8 | __GNUC_MINOR__) >= 0x405))
+#define UNREACHABLE() __builtin_unreachable()
 #else
 #define UNREACHABLE() assert(0)
 #endif
