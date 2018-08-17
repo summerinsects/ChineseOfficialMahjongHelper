@@ -229,32 +229,32 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
 //-------------------------------- 算番 --------------------------------
 
 // 4组递增1
-static forceinline bool is_four_shifted_1(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
+static FORCE_INLINE bool is_four_shifted_1(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
     return (r0 + 1 == r1 && r1 + 1 == r2 && r2 + 1 == r3);
 }
 
 // 4组递增2
-static forceinline bool is_four_shifted_2(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
+static FORCE_INLINE bool is_four_shifted_2(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
     return (r0 + 2 == r1 && r1 + 2 == r2 && r2 + 2 == r3);
 }
 
 // 3组递增1
-static forceinline bool is_shifted_1(rank_t r0, rank_t r1, rank_t r2) {
+static FORCE_INLINE bool is_shifted_1(rank_t r0, rank_t r1, rank_t r2) {
     return (r0 + 1 == r1 && r1 + 1 == r2);
 }
 
 // 3组递增2
-static forceinline bool is_shifted_2(rank_t r0, rank_t r1, rank_t r2) {
+static FORCE_INLINE bool is_shifted_2(rank_t r0, rank_t r1, rank_t r2) {
     return (r0 + 2 == r1 && r1 + 2 == r2);
 }
 
 // 三色
-static forceinline bool is_mixed(suit_t s0, suit_t s1, suit_t s2) {
+static FORCE_INLINE bool is_mixed(suit_t s0, suit_t s1, suit_t s2) {
     return (s0 != s1 && s0 != s2 && s1 != s2);
 }
 
 // 3组递增1无序
-static forceinline bool is_shifted_1_unordered(rank_t r0, rank_t r1, rank_t r2) {
+static FORCE_INLINE bool is_shifted_1_unordered(rank_t r0, rank_t r1, rank_t r2) {
     return is_shifted_1(r1, r0, r2) || is_shifted_1(r2, r0, r1) || is_shifted_1(r0, r1, r2)
         || is_shifted_1(r2, r1, r0) || is_shifted_1(r0, r2, r1) || is_shifted_1(r1, r2, r0);
 }
@@ -1870,7 +1870,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
 }
 
 // 十三幺
-static forceinline bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
+static FORCE_INLINE bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
     return std::all_of(std::begin(tiles), std::end(tiles), &is_terminal_or_honor)
         && std::includes(std::begin(tiles), std::end(tiles),
         std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans));

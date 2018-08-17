@@ -26,12 +26,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef _MSC_VER  // for MSVC
-#define forceinline __forceinline
-#elif defined __GNUC__  // for gcc on Linux/Apple OS X
-#define forceinline __inline__ __attribute__((always_inline))
+ // force inline
+#ifndef FORCE_INLINE
+#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+#define FORCE_INLINE __forceinline
+#elif defined(__GNUC__) && ((__GNUC__ << 8 | __GNUC_MINOR__) >= 0x301)
+#define FORCE_INLINE __inline__ __attribute__((__always_inline__))
 #else
-#define forceinline inline
+#define FORCE_INLINE inline
+#endif
 #endif
 
 namespace mahjong {
@@ -105,7 +108,7 @@ typedef uint8_t tile_t;
  * @param [in] rank 点数
  * @return tile_t 牌
  */
-static forceinline tile_t make_tile(suit_t suit, rank_t rank) {
+static FORCE_INLINE tile_t make_tile(suit_t suit, rank_t rank) {
     return (((suit & 0xF) << 4) | (rank & 0xF));
 }
 
@@ -115,7 +118,7 @@ static forceinline tile_t make_tile(suit_t suit, rank_t rank) {
  * @param [in] tile 牌
  * @return suit_t 花色
  */
-static forceinline suit_t tile_get_suit(tile_t tile) {
+static FORCE_INLINE suit_t tile_get_suit(tile_t tile) {
     return ((tile >> 4) & 0xF);
 }
 
@@ -125,7 +128,7 @@ static forceinline suit_t tile_get_suit(tile_t tile) {
  * @param [in] tile 牌
  * @return rank_t 点数
  */
-static forceinline rank_t tile_get_rank(tile_t tile) {
+static FORCE_INLINE rank_t tile_get_rank(tile_t tile) {
     return (tile & 0xF);
 }
 
@@ -187,7 +190,7 @@ typedef uint16_t pack_t;
  * @param [in] type 牌组类型
  * @param [in] tile 牌（对于顺子，为中间那张牌）
  */
-static forceinline pack_t make_pack(uint8_t offer, uint8_t type, tile_t tile) {
+static FORCE_INLINE pack_t make_pack(uint8_t offer, uint8_t type, tile_t tile) {
     return (offer << 12 | (type << 8) | tile);
 }
 
@@ -197,7 +200,7 @@ static forceinline pack_t make_pack(uint8_t offer, uint8_t type, tile_t tile) {
  * @param [in] pack 牌组
  * @return bool
  */
-static forceinline bool is_pack_melded(pack_t pack) {
+static FORCE_INLINE bool is_pack_melded(pack_t pack) {
     return !!((pack >> 12) & 0xF);
 }
 
@@ -207,7 +210,7 @@ static forceinline bool is_pack_melded(pack_t pack) {
  * @param [in] pack 牌组
  * @return uint8_t
  */
-static forceinline uint8_t pack_get_offer(pack_t pack) {
+static FORCE_INLINE uint8_t pack_get_offer(pack_t pack) {
     return ((pack >> 12) & 0xF);
 }
 
@@ -217,7 +220,7 @@ static forceinline uint8_t pack_get_offer(pack_t pack) {
  * @param [in] pack 牌组
  * @return uint8_t 牌组类型
  */
-static forceinline uint8_t pack_get_type(pack_t pack) {
+static FORCE_INLINE uint8_t pack_get_type(pack_t pack) {
     return ((pack >> 8) & 0xF);
 }
 
@@ -227,7 +230,7 @@ static forceinline uint8_t pack_get_type(pack_t pack) {
  * @param [in] pack 牌组
  * @return tile_t 牌（对于顺子，为中间那张牌）
  */
-static forceinline tile_t pack_get_tile(pack_t pack) {
+static FORCE_INLINE tile_t pack_get_tile(pack_t pack) {
     return (pack & 0xFF);
 }
 
@@ -249,7 +252,7 @@ struct hand_tiles_t {
  * @param [in] tile 牌
  * @return bool
  */
-static forceinline bool is_green(tile_t tile) {
+static FORCE_INLINE bool is_green(tile_t tile) {
     // 最基本的逐个判断，23468s及发财为绿一色构成牌
     //return (tile == TILE_2s || tile == TILE_3s || tile == TILE_4s || tile == TILE_6s || tile == TILE_8s || tile == TILE_F);
 
@@ -266,7 +269,7 @@ static forceinline bool is_green(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-static forceinline bool is_reversible(tile_t tile) {
+static FORCE_INLINE bool is_reversible(tile_t tile) {
     // 最基本的逐个判断：245689s、1234589p及白板为推不倒构成牌
     //return (tile == TILE_2s || tile == TILE_4s || tile == TILE_5s || tile == TILE_6s || tile == TILE_8s || tile == TILE_9s ||
     //    tile == TILE_1p || tile == TILE_2p || tile == TILE_3p || tile == TILE_4p || tile == TILE_5p || tile == TILE_8p || tile == TILE_9p ||
@@ -282,7 +285,7 @@ static forceinline bool is_reversible(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-static forceinline bool is_terminal(tile_t tile) {
+static FORCE_INLINE bool is_terminal(tile_t tile) {
     // 最基本的逐个判断
     //return (tile == TILE_1m || tile == TILE_9m || tile == TILE_1s || tile == TILE_9s || tile == TILE_1p || tile == TILE_9p);
 
@@ -305,7 +308,7 @@ static forceinline bool is_terminal(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-static forceinline bool is_winds(tile_t tile) {
+static FORCE_INLINE bool is_winds(tile_t tile) {
     return (tile > 0x40 && tile < 0x45);
 }
 
@@ -314,7 +317,7 @@ static forceinline bool is_winds(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-static forceinline bool is_dragons(tile_t tile) {
+static FORCE_INLINE bool is_dragons(tile_t tile) {
     return (tile > 0x44 && tile < 0x48);
 }
 
@@ -323,7 +326,7 @@ static forceinline bool is_dragons(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-static forceinline bool is_honor(tile_t tile) {
+static FORCE_INLINE bool is_honor(tile_t tile) {
     return (tile > 0x40 && tile < 0x48);
 }
 
@@ -332,7 +335,7 @@ static forceinline bool is_honor(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-static forceinline bool is_numbered_suit(tile_t tile) {
+static FORCE_INLINE bool is_numbered_suit(tile_t tile) {
     if (tile < 0x1A) return (tile > 0x10);
     if (tile < 0x2A) return (tile > 0x20);
     if (tile < 0x3A) return (tile > 0x30);
@@ -346,7 +349,7 @@ static forceinline bool is_numbered_suit(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-static forceinline bool is_numbered_suit_quick(tile_t tile) {
+static FORCE_INLINE bool is_numbered_suit_quick(tile_t tile) {
     // 算法原理：数牌为0x11-0x19，0x21-0x29，0x31-0x39，跟0xC0位与，结果为0
     return !(tile & 0xC0);
 }
@@ -356,7 +359,7 @@ static forceinline bool is_numbered_suit_quick(tile_t tile) {
  * @param [in] tile 牌
  * @return bool
  */
-static forceinline bool is_terminal_or_honor(tile_t tile) {
+static FORCE_INLINE bool is_terminal_or_honor(tile_t tile) {
     return is_terminal(tile) || is_honor(tile);
 }
 
@@ -367,7 +370,7 @@ static forceinline bool is_terminal_or_honor(tile_t tile) {
  * @param [in] tile1 牌1
  * @return bool
  */
-static forceinline bool is_suit_equal_quick(tile_t tile0, tile_t tile1) {
+static FORCE_INLINE bool is_suit_equal_quick(tile_t tile0, tile_t tile1) {
     // 算法原理：高4bit表示花色
     return ((tile0 & 0xF0) == (tile1 & 0xF0));
 }
@@ -379,7 +382,7 @@ static forceinline bool is_suit_equal_quick(tile_t tile0, tile_t tile1) {
  * @param [in] tile1 牌1
  * @return bool
  */
-static forceinline bool is_rank_equal_quick(tile_t tile0, tile_t tile1) {
+static FORCE_INLINE bool is_rank_equal_quick(tile_t tile0, tile_t tile1) {
     // 算法原理：低4bit表示花色。高4bit设置为C是为了过滤掉字牌
     return ((tile0 & 0xCF) == (tile1 & 0xCF));
 }
