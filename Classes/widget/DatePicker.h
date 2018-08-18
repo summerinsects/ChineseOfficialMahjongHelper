@@ -37,7 +37,7 @@ public:
     }
 
 private:
-    void refreshTitle();
+    void refreshTitle(const calendar::ChineseDate *date);
 
     void setupDayContainer();
     void setupMonthContainer();
@@ -77,6 +77,8 @@ private:
     Date _today;
     Date _picked;
     Callback _callback;
+
+    calendar::ChineseDate _chineseDate[42];
 };
 
 #endif

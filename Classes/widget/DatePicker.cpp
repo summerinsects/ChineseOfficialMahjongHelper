@@ -279,10 +279,10 @@ static void adjustDate(calendar::GregorianDate *date) {
     date->day = std::min(date->day, lastDay);
 }
 
-void DatePicker::refreshTitle() {
+void DatePicker::refreshTitle(const calendar::ChineseDate *date) {
     _titleLabel->setString(Common::format(__UTF8("%d年%d月%d日 星期%s"),
         _picked.year, _picked.month, _picked.day, weekTexts[calendar::Gregorian_CaculateWeekDay(_picked.year, _picked.month, _picked.day)]));
-    _chineseDateLabel->setString(calendar::GetChineseDateTextLong(calendar::Gregorian2Chinese(_picked)));
+    _chineseDateLabel->setString(calendar::GetChineseDateTextLong(date != nullptr ? *date : calendar::Gregorian2Chinese(_picked)));
 }
 
 static void setupLabelSmall(cocos2d::Label *label, int dayOffset, const std::pair<int, int> &solarTerms, const calendar::GregorianDate &dateGC, const calendar::ChineseDate &dateCC) {
@@ -333,7 +333,6 @@ static void setupLabelSmall(cocos2d::Label *label, int dayOffset, const std::pai
 
 void DatePicker::setupDayContainer() {
     adjustDate(&_picked);
-    refreshTitle();
 
     _state = PICK_STATE::DAY;
     _daysContainer->setVisible(true);
@@ -376,6 +375,8 @@ void DatePicker::setupDayContainer() {
         label = _dayLabelsSmall[idx];
         setupLabelSmall(label, weekday, solarTerms, dateGC, dateCC);
 
+        _chineseDate[idx] = dateCC;
+
         // 日期增加
         ++dateGC.day;
         ++dateCC.day;
@@ -402,11 +403,12 @@ void DatePicker::setupDayContainer() {
         }
     }
     _dayBoxes[_dayOffset + _picked.day - 1]->setSelected(true);
+
+    refreshTitle(&_chineseDate[_dayOffset + _picked.day - 1]);
 }
 
 void DatePicker::setupMonthContainer() {
     adjustDate(&_picked);
-    refreshTitle();
 
     _state = PICK_STATE::MONTH;
     _daysContainer->setVisible(false);
@@ -424,6 +426,8 @@ void DatePicker::setupMonthContainer() {
     for (int i = 0; i < 12; ++i) {
         _monthBoxes[i]->setSelected(_picked.month - 1 == i);
     }
+
+    refreshTitle(nullptr);
 }
 
 void DatePicker::setupYearContainer() {
@@ -485,7 +489,7 @@ void DatePicker::onTodayButton(cocos2d::Ref *) {
             _dayBoxes[_dayOffset + _picked.day - 1]->setSelected(false);
             _picked.day = _today.day;
             _dayBoxes[_dayOffset + _today.day - 1]->setSelected(true);
-            refreshTitle();
+            refreshTitle(&_chineseDate[_dayOffset + _picked.day - 1]);
         }
     }
     else {
@@ -566,7 +570,7 @@ void DatePicker::onDayBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType
         if (day != _picked.day) {
             _dayBoxes[_dayOffset + _picked.day - 1]->setSelected(false);
             _picked.day = day;
-            refreshTitle();
+            refreshTitle(&_chineseDate[_dayOffset + _picked.day - 1]);
         }
     }
 }
