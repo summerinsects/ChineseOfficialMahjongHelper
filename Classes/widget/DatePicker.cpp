@@ -379,8 +379,8 @@ void DatePicker::setupDayContainer() {
         // 日期增加
         ++dateGC.day;
         ++dateCC.day;
-        if (dateCC.day > lastDayCC) {  // 超过农历月最后一天，重新计算
-            dateCC = calendar::Gregorian2Chinese(dateGC);
+        if (dateCC.day > lastDayCC) {  // 超过农历月最后一天，农历到下一个月
+            calendar::ChineseDate_NextMonth(dateCC);
             lastDayCC = dateCC.is_long ? 30 : 29;
         }
     }

@@ -181,6 +181,25 @@ namespace calendar {
         return date;
     }
 
+    void ChineseDate_NextMonth(ChineseDate &date) {
+        int leapMonth = Chinese_GetLeapMonth(date.year); // 闰哪个月
+        if (leapMonth == date.month && !date.is_leap) {  // 进入闰月
+            date.day = 1;
+            date.is_leap = true;
+            date.is_long = Chinese_IsLeapMonthLong(date.year);
+        }
+        else {  // 下一个月
+            ++date.month;
+            if (date.month > 12) {  // 下一年
+                ++date.year;
+                date.month = 1;
+            }
+            date.day = 1;
+            date.is_leap = false;
+            date.is_long = Chinese_IsNormalMonthLong(date.year, date.month);
+        }
+    }
+
     /**
      * 24节气编码
      * 每4位表示一个月的两个节气，从高到低分别为1-12月
