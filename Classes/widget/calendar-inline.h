@@ -2,7 +2,7 @@
 namespace calendar {
 
     // ref: http://howardhinnant.github.io/date_algorithms.html
-    static bool Gregorian_IsLeapYear(int y) {
+    static FORCE_INLINE bool Gregorian_IsLeapYear(int y) {
         /**
         *  +------------+---------------------------------------------------
         *  | percentage | executed
@@ -15,7 +15,7 @@ namespace calendar {
         return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
     }
 
-    static int Gregorian_LastDayOfMonth(int y, int m) {
+    static FORCE_INLINE int Gregorian_LastDayOfMonth(int y, int m) {
         /**
         *  +------------+---------------------------------------------------
         *  | percentage | executed
@@ -30,7 +30,7 @@ namespace calendar {
         return ((m != 2 || !Gregorian_IsLeapYear(y)) ? table[m - 1] : 29);
     }
 
-    static int Gregorian_CaculateWeekDay(int y, int m, int d) {
+    static FORCE_INLINE int Gregorian_CaculateWeekDay(int y, int m, int d) {
         // 基姆拉尔森计算公式[0,6]->[Sun, Sat]
         if (m == 1 || m == 2) {
             m += 12;
@@ -78,19 +78,19 @@ namespace calendar {
         0x30d520  // 2100
     };
 
-    static int Chinese_GetLeapMonth(int y) {
+    static FORCE_INLINE int Chinese_GetLeapMonth(int y) {
         return (ChineseCalendarData[y - 1899] & 0xf);
     }
 
-    static int Chinese_LastDayOfLeapMonth(int y) {
-        return ((ChineseCalendarData[y - 1899] & 0x10000) ? 30 : 29);
+    static FORCE_INLINE bool Chinese_IsLeapMonthLong(int y) {
+        return (ChineseCalendarData[y - 1899] & 0x10000);
     }
 
-    static int Chinese_LastDayOfNormalMonth(int y, int m) {
-        return ((ChineseCalendarData[y - 1899] & (0x10000 >> m)) ? 30 : 29);
+    static FORCE_INLINE bool Chinese_IsNormalMonthLong(int y, int m) {
+        return (ChineseCalendarData[y - 1899] & (0x10000 >> m));
     }
 
-    static GregorianDate SpringFestervalInGregorian(int y) {
+    static FORCE_INLINE GregorianDate SpringFestervalInGregorian(int y) {
         int d = 16 + ((ChineseCalendarData[y - 1899] >> 17) & 0x3F);
         int m = 1;
         if (d > 31) d -= 31, ++m;
@@ -151,7 +151,7 @@ namespace calendar {
         int lastDay = 0;
         do {
             if (leapMonth > 0 && month == leapMonth + 1) {  // 插入闰月
-                lastDay = Chinese_LastDayOfLeapMonth(year);
+                lastDay = Chinese_IsLeapMonthLong(year) ? 30 : 29;
                 if (offset < lastDay) {
                     isInLeapMonth = true;
                     --month;
@@ -159,7 +159,7 @@ namespace calendar {
                 }
                 offset -= lastDay;
             }
-            lastDay = Chinese_LastDayOfNormalMonth(year, month);
+            lastDay = Chinese_IsNormalMonthLong(year, month) ? 30 : 29;
             if (offset < lastDay) {
                 break;
             }
