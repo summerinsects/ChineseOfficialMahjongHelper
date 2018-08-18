@@ -277,13 +277,16 @@ namespace calendar {
         __UTF8("立冬"), __UTF8("小雪"), __UTF8("大雪"), __UTF8("冬至")
     };
 
-    static const char *SexagesimalCycleName[60] = {
-        __UTF8("甲子"), __UTF8("乙丑"), __UTF8("丙寅"), __UTF8("丁卯"), __UTF8("戊辰"), __UTF8("己巳"), __UTF8("庚午"), __UTF8("辛未"), __UTF8("壬申"), __UTF8("癸酉"),
-        __UTF8("甲戌"), __UTF8("乙亥"), __UTF8("丙子"), __UTF8("丁丑"), __UTF8("戊寅"), __UTF8("己卯"), __UTF8("庚辰"), __UTF8("辛巳"), __UTF8("壬午"), __UTF8("癸未"),
-        __UTF8("甲申"), __UTF8("乙酉"), __UTF8("丙戌"), __UTF8("丁亥"), __UTF8("戊子"), __UTF8("己丑"), __UTF8("庚寅"), __UTF8("辛卯"), __UTF8("壬辰"), __UTF8("癸巳"),
-        __UTF8("甲午"), __UTF8("乙未"), __UTF8("丙申"), __UTF8("丁酉"), __UTF8("戊戌"), __UTF8("己亥"), __UTF8("庚子"), __UTF8("辛丑"), __UTF8("壬寅"), __UTF8("癸卯"),
-        __UTF8("甲辰"), __UTF8("乙巳"), __UTF8("丙午"), __UTF8("丁未"), __UTF8("戊申"), __UTF8("己酉"), __UTF8("庚戌"), __UTF8("辛亥"), __UTF8("壬子"), __UTF8("癸丑"),
-        __UTF8("甲寅"), __UTF8("乙卯"), __UTF8("丙辰"), __UTF8("丁巳"), __UTF8("戊午"), __UTF8("己未"), __UTF8("庚申"), __UTF8("辛酉"), __UTF8("壬戌"), __UTF8("癸亥")
+    static const char *CelestialStem[10] = {
+        __UTF8("甲"), __UTF8("乙"), __UTF8("丙"), __UTF8("丁"), __UTF8("戊"), __UTF8("己"), __UTF8("庚"), __UTF8("辛"), __UTF8("壬"), __UTF8("癸")
+    };
+
+    static const char *TerrestrialBranch[12] = {
+        __UTF8("子"), __UTF8("丑"), __UTF8("寅"), __UTF8("卯"), __UTF8("辰"), __UTF8("巳"), __UTF8("午"), __UTF8("未"), __UTF8("申"), __UTF8("酉"), __UTF8("戌"), __UTF8("亥")
+    };
+
+    static const char *ChineseZodiac[12] = {
+        __UTF8("鼠"), __UTF8("牛"), __UTF8("虎"), __UTF8("兔"), __UTF8("龙"), __UTF8("蛇"), __UTF8("马"), __UTF8("羊"), __UTF8("猴"), __UTF8("鸡"), __UTF8("狗"), __UTF8("猪")
     };
 
     static const char *Chinese_MonthText[] = {
@@ -310,8 +313,13 @@ namespace calendar {
     }
 
     static std::string GetChineseDateTextLong(const calendar::ChineseDate &date) {
-        std::string str = SexagesimalCycleName[(date.year + 56) % 60];
-        str.append(__UTF8("年"));
+        int cz = (date.year + 8) % 12;
+        std::string str;
+        str.append(CelestialStem[(date.year + 6) % 10]);
+        str.append(TerrestrialBranch[cz]);
+        str.append(__UTF8("（"));
+        str.append(ChineseZodiac[cz]);
+        str.append(__UTF8("）年"));
         if (date.is_leap) str.append(__UTF8("闰"));
         str.append(Chinese_MonthText[date.month - 1]);
         str.append(Chinese_DayText[date.day - 1]);
