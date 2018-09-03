@@ -626,7 +626,7 @@ bool HandTilesWidget::makeFixedChowPack(int meldedIdx) {
     // meldedIdx == 1: X_X 13吃2 tile+0
     // meldedIdx == 2: XX_ 12吃3 tile-1
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, static_cast<mahjong::tile_t>(tile + 1 - meldedIdx));
+    mahjong::pack_t pack = mahjong::make_pack(static_cast<uint8_t>(meldedIdx + 1), PACK_TYPE_CHOW, static_cast<mahjong::tile_t>(tile + 1 - meldedIdx));
     _fixedPacks.push_back(pack);
 
     // 这里迭代器不能连续使用，因为立牌不一定有序
