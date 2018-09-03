@@ -1274,6 +1274,7 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
         __UTF8("5. 「历史记录」里的内容只要不卸载程序就会一直保存。"),
         "Arial", 10, Size(AlertDialog::maxWidth(), 0.0f));
     label->setTextColor(C4B_BLACK);
+    label->setLineSpacing(2.0f);
 
     AlertDialog::Builder(this)
         .setTitle(__UTF8("使用说明"))
@@ -1568,6 +1569,7 @@ static void showPursuit() {
         __UTF8("输入自摸、对点、旁点的番数，可计算能追多少分（追平）。"),
         "Arial", 10, Size(limitWidth, 0.0f));
     label->setTextColor(C4B_BLACK);
+    label->setLineSpacing(2.0f);
 
     const Size &labelSize = label->getContentSize();
     Node *rootNode = Node::create();

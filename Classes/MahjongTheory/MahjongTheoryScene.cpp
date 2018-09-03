@@ -198,6 +198,7 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
         __UTF8("  (3) 356m18s1579pWNFF9p"),
         "Arial", 10, Size(maxWidth, 0.0f));
     label->setTextColor(C4B_BLACK);
+    label->setLineSpacing(2.0f);
 
     Node *node = nullptr;
 

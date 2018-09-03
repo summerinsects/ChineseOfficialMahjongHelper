@@ -755,6 +755,7 @@ void RecordScene::onInstructionButton(cocos2d::Ref *) {
         __UTF8("6. 「记录和牌」可根据当前和牌自动算番，自动标记番种。")
         , "Arial", 10, Size(width, 0.0f));
     label->setTextColor(C4B_BLACK);
+    label->setLineSpacing(2.0f);
 
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
         .setTitle(__UTF8("使用说明"))

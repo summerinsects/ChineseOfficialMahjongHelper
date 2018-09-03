@@ -149,6 +149,7 @@ bool AlertDialog::initWithBuilder(Builder &&builder) {
         label->setTextColor(C4B_BLACK);
         if (label->getContentSize().width > maxWidth1) {  // 当宽度超过时，设置范围，使文本换行
             label->setDimensions(maxWidth1, 0.0f);
+            label->setLineSpacing(2.0f);
         }
         Size labelSize = label->getContentSize();
         background->addChild(label);
