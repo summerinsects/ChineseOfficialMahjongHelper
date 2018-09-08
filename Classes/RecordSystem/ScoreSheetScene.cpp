@@ -11,6 +11,29 @@
 #include "RecordScene.h"
 #include "RecordHistoryScene.h"
 
+#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_IX64))
+#include <intrin.h>
+#ifdef _M_IX64
+#define popcount64(v) ((int)(__popcnt64(v)))
+#else
+__forceinline int __popcnt64_impl(uint64_t v) {
+    return (int)(__popcnt(v & 0xFFFFFFFFU) + __popcnt(v >> 32 & 0xFFFFFFFFU));
+}
+#define popcount64(v) __popcnt64_impl(v)
+#endif
+#elif defined(__GNUC__)
+#define popcount64(v) __builtin_popcountll(v)
+#else
+// from https://graphics.stanford.edu/~seander/bithacks.html
+inline int __popcnt64_impl(uint64_t v) {
+    v = v - ((v >> 1ULL) & ~0ULL / 3ULL);
+    v = (v & ~0ULL / 5ULL) + ((v >> 2ULL) & ~0ULL / 5ULL);
+    v = (v + (v >> 4ULL)) & ~0ULL / 17ULL;
+    return (int)((v * (~0ULL / 255ULL)) >> 56ULL);
+}
+#define popcount64(v) __popcnt64_impl(v)
+#endif
+
 USING_NS_CC;
 
 static Record g_currentRecord;
@@ -358,15 +381,6 @@ static const char *fan_short_name[] = {
     __UTF8("花牌")
 };
 
-static int __get1bitscount(uint64_t v) {
-    int cnt = 0;
-    while (v) {
-        v &= (v - 1);
-        ++cnt;
-    }
-    return cnt;
-}
-
 static std::string GetShortFanText(const Record::Detail &detail) {
     if (detail.fan == 0) {
         return detail.timeout ? __UTF8("超时") : __UTF8("荒庄");
@@ -374,7 +388,7 @@ static std::string GetShortFanText(const Record::Detail &detail) {
 
     uint64_t fanBits = detail.fan_bits;
     if (fanBits != 0) {
-        if (__get1bitscount(fanBits) > 1) {
+        if (popcount64(fanBits) > 1) {
             // 选取标记的最大的两个番种显示出来
             unsigned fan0 = 0, fan1 = 0;
             for (unsigned n = mahjong::BIG_FOUR_WINDS; n < mahjong::DRAGON_PUNG; ++n) {
