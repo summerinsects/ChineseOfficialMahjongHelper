@@ -1100,6 +1100,7 @@ void ScoreSheetScene::editRecord(unsigned handIdx, const Record::Detail *detail)
                 _recordButton[currentIdx + 1]->setVisible(true);
             }
             else {
+                _finishButton->setVisible(false);
                 _record.end_time = time(nullptr);
                 refreshEndTime();
                 RecordHistoryScene::modifyRecord(&_record);
