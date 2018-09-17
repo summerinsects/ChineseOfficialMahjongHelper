@@ -24,7 +24,8 @@ int count_useful_tile(const tile_table_t &used_table, const useful_table_t &usef
 
 void test_wait(const char *str) {
     hand_tiles_t hand_tiles;
-    string_to_tiles(str, &hand_tiles, nullptr);
+    tile_t serving_tile;
+    string_to_tiles(str, &hand_tiles, &serving_tile);
 
     std::cout << "----------------" << std::endl;
     puts(str);
@@ -184,6 +185,7 @@ int main(int argc, const char *argv[]) {
 
 #if 1
     // BUG测试
+    test_points("[234s][234s][234s][234s]6s6s", WIN_FLAG_4TH_TILE, wind_t::EAST, wind_t::EAST);
 
     test_points("1122233334444s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);  // 剪枝BUG 2018.4.18
 

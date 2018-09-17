@@ -17,16 +17,17 @@ bool TilePickWidget::init(float maxWidth) {
 #define GAP 5
 
     // 下方的手牌
-    _handTilesWidget = HandTilesWidget::create();
-    this->addChild(_handTilesWidget);
-    Size handTilesSize = _handTilesWidget->getContentSize();
+    HandTilesWidget *handTilesWidget = HandTilesWidget::create();
+    this->addChild(handTilesWidget);
+    Size handTilesSize = handTilesWidget->getContentSize();
     if (handTilesSize.width > maxWidth) {  // 缩放
         const float scale = maxWidth / handTilesSize.width;
-        _handTilesWidget->setScale(scale);
+        handTilesWidget->setScale(scale);
         handTilesSize.width = maxWidth;
         handTilesSize.height *= scale;
     }
-    _handTilesWidget->setPosition(Vec2(handTilesSize.width * 0.5f, handTilesSize.height * 0.5f));
+    handTilesWidget->setPosition(Vec2(handTilesSize.width * 0.5f, handTilesSize.height * 0.5f));
+    _handTilesWidget = handTilesWidget;
 
     // 上方左边的牌面板
     Size tableSize = Size(TILE_WIDTH * 9, TILE_HEIGHT * 4);
@@ -161,24 +162,23 @@ bool TilePickWidget::init(float maxWidth) {
     // 吃(X_X) 为13吃2这种类型
     // 吃(XX_) 为12吃3这种类型
     for (int i = 0; i < 3; ++i) {
-        buttons[i]->addClickEventListener(std::bind(&TilePickWidget::onChowButton, this, std::placeholders::_1));
+        buttons[i]->addClickEventListener([this, i](Ref *) { makeFixedSet(std::bind(&HandTilesWidget::makeFixedChowPack, _handTilesWidget, i)); });
         _chowButton[i] = buttons[i];
-        _chowButton[i]->setTag(i);
     }
 
     // 排序
     buttons[3]->addClickEventListener([this](Ref *) {  sort(); });
 
     // 碰
-    buttons[4]->addClickEventListener(std::bind(&TilePickWidget::onPungButton, this, std::placeholders::_1));
+    buttons[4]->addClickEventListener([this](Ref *) { makeFixedSet(std::bind(&HandTilesWidget::makeFixedPungPack, _handTilesWidget)); });
     _pungButton = buttons[4];
 
     // 明杠
-    buttons[5]->addClickEventListener(std::bind(&TilePickWidget::onMeldedKongButton, this, std::placeholders::_1));
+    buttons[5]->addClickEventListener([this](Ref *) { makeFixedSet(std::bind(&HandTilesWidget::makeFixedMeldedKongPack, _handTilesWidget)); });
     _meldedKongButton = buttons[5];
 
     // 暗杠
-    buttons[6]->addClickEventListener(std::bind(&TilePickWidget::onConcealedKongButton, this, std::placeholders::_1));
+    buttons[6]->addClickEventListener([this](Ref *) { makeFixedSet(std::bind(&HandTilesWidget::makeFixedConcealedKongPack, _handTilesWidget)); });
     _concealedKongButton = buttons[6];
 
     // 重置
@@ -305,36 +305,14 @@ void TilePickWidget::onTileTableButton(cocos2d::Ref *sender) {
     }
 }
 
-void TilePickWidget::onChowButton(cocos2d::Ref *sender) {
-    ui::Button *button = (ui::Button *)sender;
-    int pos = button->getTag();
-    if (LIKELY(_handTilesWidget->makeFixedChowPack(pos))) {
+void TilePickWidget::makeFixedSet(const std::function<bool ()> &makeFixedSetFunction) {
+    mahjong::tile_t servingTile = _handTilesWidget->getServingTile();
+    if (LIKELY(makeFixedSetFunction())) {
         if (LIKELY(_fixedPacksChangedCallback)) {
             _fixedPacksChangedCallback();
         }
-    }
-}
-
-void TilePickWidget::onPungButton(cocos2d::Ref *) {
-    if (LIKELY(_handTilesWidget->makeFixedPungPack())) {
-        if (LIKELY(_fixedPacksChangedCallback)) {
-            _fixedPacksChangedCallback();
-        }
-    }
-}
-
-void TilePickWidget::onMeldedKongButton(cocos2d::Ref *) {
-    if (LIKELY(_handTilesWidget->makeFixedMeldedKongPack())) {
-        if (LIKELY(_fixedPacksChangedCallback)) {
-            _fixedPacksChangedCallback();
-        }
-    }
-}
-
-void TilePickWidget::onConcealedKongButton(cocos2d::Ref *) {
-    if (LIKELY(_handTilesWidget->makeFixedConcealedKongPack())) {
-        if (LIKELY(_fixedPacksChangedCallback)) {
-            _fixedPacksChangedCallback();
+        if (servingTile != _handTilesWidget->getServingTile() && LIKELY(_winTileChangedCallback)) {
+            _winTileChangedCallback();
         }
     }
 }

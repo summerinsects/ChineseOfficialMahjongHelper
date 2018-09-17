@@ -1575,7 +1575,7 @@ static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
 }
 
 // 基本和型算番
-static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_param_t *calculate_param, fan_table_t &fan_table) {
+static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
     pack_t pair_pack = 0;
     pack_t chow_packs[4];
     pack_t pung_packs[4];
@@ -1596,7 +1596,6 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     }
 
     tile_t win_tile = calculate_param->win_tile;
-    win_flag_t win_flag = calculate_param->win_flag;
 
     // 根据和牌标记调整——涉及番种：和绝张、妙手回春、海底捞月、自摸
     adjust_by_win_flag(win_flag, fan_table);
@@ -1749,10 +1748,9 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
 }
 
 // “组合龙+面子+雀头”和型算番
-static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_param, fan_table_t &fan_table) {
+static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
     tile_t win_tile = calculate_param->win_tile;
-    win_flag_t win_flag = calculate_param->win_flag;
     wind_t prevalent_wind = calculate_param->prevalent_wind;
     wind_t seat_wind = calculate_param->seat_wind;
 
@@ -2086,7 +2084,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
 
     // 先判断各种特殊和型
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, special_fan_table)) {
+        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table)) {
             max_fan = get_fan_by_table(special_fan_table);
             selected_fan_table = &special_fan_table;
             LOG("fan = %d\n\n", max_fan);
@@ -2098,7 +2096,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
         }
     }
     else if (fixed_cnt == 1) {  // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, special_fan_table)) {
+        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table)) {
             max_fan = get_fan_by_table(special_fan_table);
             selected_fan_table = &special_fan_table;
             LOG("fan = %d\n\n", max_fan);
@@ -2120,7 +2118,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
                 packs_to_string(result.divisions[i].packs, 5, str, sizeof(str));
                 puts(str);
 #endif
-                calculate_basic_form_fan(result.divisions[i].packs, calculate_param, fan_tables[i]);
+                calculate_basic_form_fan(result.divisions[i].packs, calculate_param, win_flag, fan_tables[i]);
                 int current_fan = get_fan_by_table(fan_tables[i]);
                 if (current_fan > max_fan) {
                     max_fan = current_fan;

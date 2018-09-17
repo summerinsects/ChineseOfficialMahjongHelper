@@ -37,10 +37,7 @@ private:
     void refreshAllTilesTableButton();
     void refreshActionButtons();
     void onTileTableButton(cocos2d::Ref *sender);
-    void onChowButton(cocos2d::Ref *sender);
-    void onPungButton(cocos2d::Ref *sender);
-    void onMeldedKongButton(cocos2d::Ref *sender);
-    void onConcealedKongButton(cocos2d::Ref *sender);
+    void makeFixedSet(const std::function<bool ()> &makeFixedSetFunction);
 
 public:
     void getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *servingTile) const {
