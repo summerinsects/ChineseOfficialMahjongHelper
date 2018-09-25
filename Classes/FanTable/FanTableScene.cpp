@@ -218,12 +218,12 @@ void FanTableScene::asyncShowFanDefinition(unsigned idx) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
     float scale = 1.0f;
-    float maxWidth = (visibleSize.width - 10) / 18;
+    float maxWidth = (visibleSize.width - 4) / 18;
     if (maxWidth < 25) {
         scale = maxWidth / TILE_WIDTH;
     }
 #else
-    float scale = 0.5f;
+    float scale = 0.3f;
 #endif
 
     auto definitions = std::make_shared<std::vector<std::string> >();
