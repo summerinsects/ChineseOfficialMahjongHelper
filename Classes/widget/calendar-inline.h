@@ -336,7 +336,7 @@ namespace calendar {
         /*  6月 */ CHILDRENS_DAY, FATHERS_DAY,
         /*  7月 */ PARTYS_DAY,
         /*  8月 */ ARMY_DAY,
-        /*  9月 */ VICTORY_MEMORIAL_DAY, TEACHERS_DAY,
+        /*  9月 */ VICTORY_MEMORIAL_DAY, TEACHERS_DAY, MARTYRS_DAY,
         /* 10月 */ NATIONAL_DAY,
         /* 11月 */ THANKSGIVING_DAY,
         /* 12月 */ NATIONAL_MEMORIAL_DAY, CHRISTMAS_EVE, CHRISTMAS_DAY
@@ -351,7 +351,7 @@ namespace calendar {
         /*  6月 */ __UTF8("儿童节"), __UTF8("父亲节"),
         /*  7月 */ __UTF8("建党节"),
         /*  8月 */ __UTF8("建军节"),
-        /*  9月 */ __UTF8("抗战胜利"), __UTF8("教师节"),
+        /*  9月 */ __UTF8("抗战胜利"), __UTF8("教师节"), __UTF8("烈士纪念日"),
         /* 10月 */ __UTF8("国庆节"),
         /* 11月 */ __UTF8("感恩节"),
         /* 12月 */ __UTF8("国家公祭日"), __UTF8("平安夜"), __UTF8("圣诞节")
@@ -373,6 +373,7 @@ namespace calendar {
         case 0x0801: if (date.year >= 1933) return std::make_pair(ARMY_DAY, 2); break;
         case 0x0903: if (date.year >= 1945) return std::make_pair(VICTORY_MEMORIAL_DAY, 2); break;
         case 0x090A: if (date.year >= 1985) return std::make_pair(TEACHERS_DAY, 2); break;
+        case 0x091E: if (date.year >= 2014) return std::make_pair(MARTYRS_DAY, 2); break;
         case 0x0A01: if (date.year >= 1949) return std::make_pair(NATIONAL_DAY, 3); break;
         case 0x0C0D: if (date.year >= 2014) return std::make_pair(NATIONAL_MEMORIAL_DAY, 2); break;
         case 0x0C18: return std::make_pair(CHRISTMAS_EVE, 2);
