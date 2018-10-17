@@ -455,6 +455,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
     const FilterIndex &data = _filterIndices[idx];
     size_t realIdx = data.real_index;
     delBtn->setUserData(reinterpret_cast<void *>(realIdx));
+    cell->setUserData(reinterpret_cast<void *>(realIdx));
 
     const RecordTexts &texts = _recordTexts[realIdx];
     titleLabel->setString(texts.title);
@@ -1459,7 +1460,8 @@ void RecordHistoryScene::switchToBatchDelete() {
 
 void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {
     cw::TableViewCell *cell = (cw::TableViewCell *)sender;
-    _viewCallback(&g_records[cell->getIdx()]);
+    size_t idx = reinterpret_cast<size_t>(cell->getUserData());
+    _viewCallback(&g_records[idx]);
 }
 
 void RecordHistoryScene::modifyRecord(const Record *record) {
