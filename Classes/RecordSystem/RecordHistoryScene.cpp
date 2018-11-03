@@ -24,13 +24,13 @@ static std::vector<Record> g_records;
 static void loadRecords(std::vector<Record> &records) {
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
-    LoadHistoryRecords(fileName.c_str(), records);
+    LoadRecordsFromFile(fileName.c_str(), records);
 }
 
 static void saveRecords(const std::vector<Record> &records) {
     std::string fileName = FileUtils::getInstance()->getWritablePath();
     fileName.append("history_record.json");
-    SaveHistoryRecords(fileName.c_str(), records);
+    SaveRecordsToFile(fileName.c_str(), records);
 }
 
 #define BUF_SIZE 511
@@ -1474,13 +1474,13 @@ void RecordHistoryScene::modifyRecord(const Record *record) {
             [records](void *) { g_records.swap(*records); }, nullptr,
             [r, records]() {
             loadRecords(*records);
-            ModifyRecordInHistory(*records, r.get());
+            ModifyRecordInVector(*records, r.get());
             saveRecords(*records);
         });
     }
     else {  // 如果当前加载过历史记录
         // 直接修改
-        ModifyRecordInHistory(g_records, record);
+        ModifyRecordInVector(g_records, record);
 
         // 子线程中保存
         auto records = std::make_shared<std::vector<Record> >(g_records);

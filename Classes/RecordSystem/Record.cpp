@@ -388,6 +388,8 @@ void UpgradeJson(rapidjson::Value &json, rapidjson::Value::AllocatorType &alloc)
     }
 }
 
+}
+
 void SortRecords(std::vector<Record> &records) {
     // 用指针排序
     std::vector<Record *> ptrs(records.size());
@@ -400,8 +402,6 @@ void SortRecords(std::vector<Record> &records) {
         std::swap(temp.back(), *r);
     });
     records.swap(temp);
-}
-
 }
 
 void ReadRecordFromFile(const char *file, Record &record) {
@@ -480,12 +480,10 @@ void UpgradeRecordInFile(const char *file) {
     }
 }
 
-void LoadHistoryRecords(const char *file, std::vector<Record> &records) {
-    std::string str = Common::getStringFromFile(file);
-
+void LoadRecordsFromString(const char *str, std::vector<Record> &records) {
     try {
         rapidjson::Document doc;
-        doc.Parse<0>(str.c_str());
+        doc.Parse<0>(str);
         if (doc.HasParseError() || !doc.IsArray()) {
             return;
         }
@@ -505,26 +503,55 @@ void LoadHistoryRecords(const char *file, std::vector<Record> &records) {
     }
 }
 
-void SaveHistoryRecords(const char *file, const std::vector<Record> &records) {
+static bool SaveRecordsToStringBuffer(rapidjson::StringBuffer &buf, const std::vector<Record> &records) {
+    try {
+        rapidjson::Document doc(rapidjson::Type::kArrayType);
+        doc.Reserve(static_cast<rapidjson::SizeType>(records.size()), doc.GetAllocator());
+        std::for_each(records.begin(), records.end(), [&doc](const Record &record) {
+            rapidjson::Value json(rapidjson::Type::kObjectType);
+            RecordToJson(record, json, doc.GetAllocator());
+            doc.PushBack(std::move(json), doc.GetAllocator());
+        });
+
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+#else
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+#endif
+        doc.Accept(writer);
+
+        return true;
+    }
+    catch (std::exception &e) {
+        MYLOG("%s %s", __FUNCTION__, e.what());
+    }
+
+    return false;
+}
+
+void SaveRecordsToString(std::vector<char> &str, const std::vector<Record> &records) {
+    try {
+        rapidjson::StringBuffer buf;
+        SaveRecordsToStringBuffer(buf, records);
+        str.resize(buf.GetSize());
+        std::copy(buf.GetString(), buf.GetString() + buf.GetSize(), str.begin());
+    }
+    catch (std::exception &e) {
+        MYLOG("%s %s", __FUNCTION__, e.what());
+    }
+}
+
+void LoadRecordsFromFile(const char *file, std::vector<Record> &records) {
+    std::string str = Common::getStringFromFile(file);
+    LoadRecordsFromString(str.c_str(), records);
+}
+
+void SaveRecordsToFile(const char *file, const std::vector<Record> &records) {
     FILE *fp = fopen(file, "wb");
     if (LIKELY(fp != nullptr)) {
         try {
-            rapidjson::Document doc(rapidjson::Type::kArrayType);
-            doc.Reserve(static_cast<rapidjson::SizeType>(records.size()), doc.GetAllocator());
-            std::for_each(records.begin(), records.end(), [&doc](const Record &record) {
-                rapidjson::Value json(rapidjson::Type::kObjectType);
-                RecordToJson(record, json, doc.GetAllocator());
-                doc.PushBack(std::move(json), doc.GetAllocator());
-            });
-
             rapidjson::StringBuffer buf;
-#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
-            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
-#else
-            rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
-#endif
-            doc.Accept(writer);
-
+            SaveRecordsToStringBuffer(buf, records);
             fwrite(buf.GetString(), 1, buf.GetSize(), fp);
         }
         catch (std::exception &e) {
@@ -571,7 +598,7 @@ void UpgradeHistoryRecords(const char *file) {
     }
 }
 
-void ModifyRecordInHistory(std::vector<Record> &records, const Record *r) {
+void ModifyRecordInVector(std::vector<Record> &records, const Record *r) {
     // 我们认为开始时间相同的为同一个记录
     time_t start_time = r->start_time;
     auto it = std::find_if(records.begin(), records.end(), [start_time](const Record &rr) {

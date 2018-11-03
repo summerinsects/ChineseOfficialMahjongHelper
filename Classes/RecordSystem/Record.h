@@ -55,9 +55,14 @@ struct Record {
 void ReadRecordFromFile(const char *file, Record &record);
 void WriteRecordToFile(const char *file, const Record &record);
 
-void LoadHistoryRecords(const char *file, std::vector<Record> &records);
-void SaveHistoryRecords(const char *file, const std::vector<Record> &records);
-void ModifyRecordInHistory(std::vector<Record> &records, const Record *r);
+void SortRecords(std::vector<Record> &records);
+
+void LoadRecordsFromString(const char *str, std::vector<Record> &records);
+void SaveRecordsToString(std::vector<char> &str, const std::vector<Record> &records);
+
+void LoadRecordsFromFile(const char *file, std::vector<Record> &records);
+void SaveRecordsToFile(const char *file, const std::vector<Record> &records);
+void ModifyRecordInVector(std::vector<Record> &records, const Record *r);
 
 void TranslateDetailToScoreTable(const Record::Detail &detail, int (&scoreTable)[4]);
 void CalculateRankFromScore(const int (&scores)[4], unsigned (&ranks)[4]);
