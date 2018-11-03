@@ -404,12 +404,10 @@ void SortRecords(std::vector<Record> &records) {
     records.swap(temp);
 }
 
-void ReadRecordFromFile(const char *file, Record &record) {
-    std::string str = Common::getStringFromFile(file);
-
+void ParseRecord(const char *str, Record &record) {
     try {
         rapidjson::Document doc;
-        doc.Parse<0>(str.c_str());
+        doc.Parse<0>(str);
         if (doc.HasParseError()) {
             return;
         }
@@ -421,21 +419,49 @@ void ReadRecordFromFile(const char *file, Record &record) {
     }
 }
 
+static bool StringifyRecord(rapidjson::StringBuffer &buf, const Record &record) {
+    try {
+        rapidjson::Document doc(rapidjson::Type::kObjectType);
+        RecordToJson(record, doc, doc.GetAllocator());
+
+#ifdef COCOS2D_DEBUG
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
+#else
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
+#endif
+        doc.Accept(writer);
+
+        return true;
+    }
+    catch (std::exception &e) {
+        MYLOG("%s %s", __FUNCTION__, e.what());
+    }
+    return false;
+}
+
+void StringifyRecord(std::vector<char> &str, const Record &record) {
+    try {
+        rapidjson::StringBuffer buf;
+        StringifyRecord(buf, record);
+        str.resize(buf.GetSize());
+        std::copy(buf.GetString(), buf.GetString() + buf.GetSize(), str.begin());
+    }
+    catch (std::exception &e) {
+        MYLOG("%s %s", __FUNCTION__, e.what());
+    }
+}
+
+void ReadRecordFromFile(const char *file, Record &record) {
+    std::string str = Common::getStringFromFile(file);
+    ParseRecord(str.c_str(), record);
+}
+
 void WriteRecordToFile(const char *file, const Record &record) {
     FILE *fp = fopen(file, "wb");
     if (LIKELY(fp != nullptr)) {
         try {
-            rapidjson::Document doc(rapidjson::Type::kObjectType);
-            RecordToJson(record, doc, doc.GetAllocator());
-
             rapidjson::StringBuffer buf;
-#ifdef COCOS2D_DEBUG
-            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buf);
-#else
-            rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
-#endif
-            doc.Accept(writer);
-
+            StringifyRecord(buf, record);
             fwrite(buf.GetString(), 1, buf.GetSize(), fp);
         }
         catch (std::exception &e) {

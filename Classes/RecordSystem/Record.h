@@ -52,6 +52,9 @@ struct Record {
 #define RESET_FAN1(bits_, offset_) ((bits_) &= ~(0xFULL << (static_cast<uint64_t>(offset_) << 2U)))
 #define COUNT_FAN1(bits_, offset_) static_cast<uint8_t>(((bits_) >> (static_cast<uint64_t>(offset_) << 2U)) & 0xFULL)
 
+void ParseRecord(const char *str, Record &record);
+void StringifyRecord(std::vector<char> &str, const Record &record);
+
 void ReadRecordFromFile(const char *file, Record &record);
 void WriteRecordToFile(const char *file, const Record &record);
 
