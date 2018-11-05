@@ -56,10 +56,65 @@ include_directories(
 list(APPEND GAME_SOURCE
      Classes/AppDelegate.cpp
      Classes/HelloWorldScene.cpp
+     Classes/cocos-wheels/CWCommon.cpp
+     Classes/cocos-wheels/CWTableView.cpp
+     Classes/CompetitionSystem/CompetitionMainScene.cpp
+     Classes/CompetitionSystem/LatestCompetitionScene.cpp
+     Classes/FanCalculator/FanCalculatorScene.cpp
+     Classes/FanTable/FanTableScene.cpp
+     Classes/mahjong-algorithm/fan_calculator.cpp
+     Classes/mahjong-algorithm/shanten.cpp
+     Classes/mahjong-algorithm/stringify.cpp
+     Classes/MahjongTheory/MahjongTheoryScene.cpp
+     Classes/MainMenu/LeftSideMenu.cpp
+     Classes/Other/OtherScene.cpp
+     Classes/RecordSystem/Record.cpp
+     Classes/RecordSystem/RecordHistoryScene.cpp
+     Classes/RecordSystem/RecordScene.cpp
+     Classes/RecordSystem/ScoreSheetScene.cpp
+     Classes/utils/common.cpp
+     Classes/widget/AlertDialog.cpp
+     Classes/widget/CheckBoxScale9.cpp
+     Classes/widget/CommonWebViewScene.cpp
+     Classes/widget/DatePicker.cpp
+     Classes/widget/ExtraInfoWidget.cpp
+     Classes/widget/HandTilesWidget.cpp
+     Classes/widget/PopupMenu.cpp
+     Classes/widget/TilePickWidget.cpp
+     Classes/widget/Toast.cpp
      )
 list(APPEND GAME_HEADER
      Classes/AppDelegate.h
      Classes/HelloWorldScene.h
+     Classes/cocos-wheels/CWCommon.h
+     Classes/cocos-wheels/CWTableView.h
+     Classes/CompetitionSystem/CompetitionMainScene.h
+     Classes/CompetitionSystem/LatestCompetitionScene.h
+     Classes/FanCalculator/FanCalculatorScene.h
+     Classes/FanTable/FanTableScene.h
+     Classes/mahjong-algorithm/fan_calculator.h
+     Classes/mahjong-algorithm/shanten.h
+     Classes/mahjong-algorithm/stringify.h
+     Classes/mahjong-algorithm/tile.h
+     Classes/MahjongTheory/MahjongTheoryScene.h
+     Classes/MainMenu/LeftSideMenu.h
+     Classes/Other/OtherScene.h
+     Classes/RecordSystem/Record.h
+     Classes/RecordSystem/RecordHistoryScene.h
+     Classes/RecordSystem/RecordScene.h
+     Classes/RecordSystem/ScoreSheetScene.h
+     Classes/utils/common.h
+     Classes/utils/compiler.h
+     Classes/widget/AlertDialog.h
+     Classes/widget/calendar-inline.h
+     Classes/widget/CheckBoxScale9.h
+     Classes/widget/CommonWebViewScene.h
+     Classes/widget/DatePicker.h
+     Classes/widget/ExtraInfoWidget.h
+     Classes/widget/HandTilesWidget.h
+     Classes/widget/PopupMenu.h
+     Classes/widget/TilePickWidget.h
+     Classes/widget/Toast.h
      )
 
 if(ANDROID)
@@ -67,6 +122,7 @@ if(ANDROID)
     set(APP_NAME MyGame)
     list(APPEND GAME_SOURCE
          proj.android/app/jni/hellocpp/main.cpp
+         Classes/cocos-wheels/CWCommon-android.cpp
          )
 elseif(LINUX)
     list(APPEND GAME_SOURCE
@@ -78,6 +134,7 @@ elseif(WINDOWS)
          proj.win32/resource.h
          )
     list(APPEND GAME_SOURCE
+         Classes/cocos-wheels/CWCommon-win32.cpp
          proj.win32/main.cpp
          proj.win32/game.rc
          ${common_res_files}
@@ -94,6 +151,7 @@ elseif(APPLE)
             proj.ios_mac/ios/Images.xcassets
             )
         list(APPEND GAME_SOURCE
+             Classes/cocos-wheels/CWCommon-ios.mm
              proj.ios_mac/ios/main.m
              proj.ios_mac/ios/AppController.mm
              proj.ios_mac/ios/RootViewController.mm
@@ -106,6 +164,7 @@ elseif(APPLE)
             proj.ios_mac/mac/Info.plist
             )
         list(APPEND GAME_SOURCE
+             Classes/cocos-wheels/CWCommon-mac.mm
              proj.ios_mac/mac/main.cpp
              proj.ios_mac/mac/Prefix.pch
              ${APP_UI_RES}
