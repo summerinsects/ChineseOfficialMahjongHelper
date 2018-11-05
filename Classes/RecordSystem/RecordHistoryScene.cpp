@@ -1006,7 +1006,7 @@ namespace {
 
     void SummaryTableNode::refreshCountLabel() {
         char str[128];
-        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
+        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu),
             _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), -1),
             _filterIndices->size());
         _countLabel->setString(str);
@@ -1299,7 +1299,7 @@ namespace {
 
     void BatchDeleteTableNode::refreshCountLabel() {
         char str[128];
-        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzd) __UTF8("/%") __UTF8(PRIzd),
+        snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu),
             _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), false),
             _filterIndices->size());
         _countLabel->setString(str);
