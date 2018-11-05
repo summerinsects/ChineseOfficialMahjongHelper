@@ -56,7 +56,7 @@ void OtherScene::onTipsButton(cocos2d::Ref *) {
             Director::getInstance()->pushScene(
                 CommonWebViewScene::create(__UTF8("相关补充"), g_text, CommonWebViewScene::ContentType::HTML));
         }
-    }, nullptr, [thiz, text]() {
+    }, nullptr, [text]() {
         ValueMap valueMap = FileUtils::getInstance()->getValueMapFromFile("text/other.xml");
         if (LIKELY(!valueMap.empty())) {
             *text = valueMap.begin()->second.asString();

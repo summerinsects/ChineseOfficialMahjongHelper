@@ -164,7 +164,7 @@ void HelloWorld::upgradeDataIfNecessary() {
         AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [thiz, loadingView, version](void *) {
             loadingView->dismiss();
             UserDefault::getInstance()->setStringForKey("data_version", version);
-        }, nullptr, [loadingView]() {
+        }, nullptr, []() {
             const std::string path = FileUtils::getInstance()->getWritablePath();
             UpgradeRecordInFile((path + "record.json").c_str());
             UpgradeHistoryRecords((path + "history_record.json").c_str());
