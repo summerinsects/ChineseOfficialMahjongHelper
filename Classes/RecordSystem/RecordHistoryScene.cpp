@@ -914,24 +914,18 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
 
 namespace {
 
-    class SummaryTableNode : public Node, cw::TableViewDelegate {
+    class SummaryTableScene : public BaseScene, cw::TableViewDelegate {
     private:
         const std::vector<FilterIndex> *_filterIndices;
         std::vector<std::string> _timeTexts;
         std::vector<int8_t> _currentFlags;
 
         Label *_countLabel = nullptr;
-        cocos2d::ui::Button *_positiveButton;
-        cocos2d::ui::Button *_negativeButton;
 
     public:
-        const std::vector<int8_t> &getCurrentFlags() { return _currentFlags; }
-
-        CREATE_FUNC_WITH_PARAM_1(SummaryTableNode, const std::vector<FilterIndex> *, filterIndices);
+        CREATE_FUNC_WITH_PARAM_1(SummaryTableScene, const std::vector<FilterIndex> *, filterIndices);
 
         bool init(const std::vector<FilterIndex> *filterIndices);
-        void setPositiveCallback(ui::Widget::ccWidgetClickCallback &&callback) { _positiveButton->addClickEventListener(callback); }
-        void setNegativeCallback(ui::Widget::ccWidgetClickCallback &&callback) { _negativeButton->addClickEventListener(callback); }
 
     private:
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
@@ -941,10 +935,12 @@ namespace {
         void onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType event);
 
         void refreshCountLabel();
+
+        void onSummaryButton(cocos2d::Ref *sender);
     };
 
-    bool SummaryTableNode::init(const std::vector<FilterIndex> *filterIndices) {
-        if (UNLIKELY(!Node::init())) {
+    bool SummaryTableScene::init(const std::vector<FilterIndex> *filterIndices) {
+        if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("个人汇总")))) {
             return false;
         }
 
@@ -958,11 +954,12 @@ namespace {
         });
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
+        Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
         Label *label = Label::createWithSystemFont("", "Arail", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(5.0f, 15.0f));
+        label->setPosition(Vec2(origin.x + 5.0f, origin.y + 15.0f));
         this->addChild(label);
         _countLabel = label;
 
@@ -972,8 +969,8 @@ namespace {
         button->setContentSize(Size(50.0f, 20.0f));
         button->setTitleFontSize(12);
         button->setTitleText(__UTF8("取消"));
-        button->setPosition(Vec2(visibleSize.width - 85.0f, 15.0f));
-        _negativeButton = button;
+        button->setPosition(Vec2(origin.x + visibleSize.width - 85.0f, origin.y +15.0f));
+        button->addClickEventListener([](Ref *) { Director::getInstance()->popScene(); });
 
         button = UICommon::createButton();
         this->addChild(button);
@@ -981,8 +978,8 @@ namespace {
         button->setContentSize(Size(50.0f, 20.0f));
         button->setTitleFontSize(12);
         button->setTitleText(__UTF8("汇总"));
-        button->setPosition(Vec2(visibleSize.width - 30.0f, 15.0f));
-        _positiveButton = button;
+        button->setPosition(Vec2(origin.x + visibleSize.width - 30.0f, origin.y +15.0f));
+        button->addClickEventListener(std::bind(&SummaryTableScene::onSummaryButton, this, std::placeholders::_1));
 
         // 表格
         cw::TableView *tableView = cw::TableView::create();
@@ -995,7 +992,7 @@ namespace {
         tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
         tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        tableView->setPosition(Vec2(visibleSize.width * 0.5f, visibleSize.height * 0.5f));
+        tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
         tableView->reloadData();
         this->addChild(tableView);
 
@@ -1004,7 +1001,7 @@ namespace {
         return true;
     }
 
-    void SummaryTableNode::refreshCountLabel() {
+    void SummaryTableScene::refreshCountLabel() {
         char str[128];
         snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu),
             _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), -1),
@@ -1012,15 +1009,15 @@ namespace {
         _countLabel->setString(str);
     }
 
-    ssize_t SummaryTableNode::numberOfCellsInTableView(cw::TableView *) {
+    ssize_t SummaryTableScene::numberOfCellsInTableView(cw::TableView *) {
         return _filterIndices->size();
     }
 
-    float SummaryTableNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
+    float SummaryTableScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
         return 50.0f;
     }
 
-    cw::TableViewCell *SummaryTableNode::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
+    cw::TableViewCell *SummaryTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
         typedef cw::TableViewCellEx<Label *, Label *, ui::RadioButtonGroup *, std::array<ui::RadioButton *, 4>, std::array<Label *, 4>, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
@@ -1081,7 +1078,7 @@ namespace {
                 label->setPosition(Vec2(cellWidth * 0.25f * i + 20.0f, 10.0f));
                 labels[i] = label;
             }
-            radioGroup->addEventListener(std::bind(&SummaryTableNode::onRadioButtonGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            radioGroup->addEventListener(std::bind(&SummaryTableScene::onRadioButtonGroup, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
             // 清除按钮
             ui::Button *button = UICommon::createButton();
@@ -1146,7 +1143,7 @@ namespace {
         return cell;
     }
 
-    void SummaryTableNode::onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType) {
+    void SummaryTableScene::onRadioButtonGroup(ui::RadioButton *radioButton, int index, ui::RadioButtonGroup::EventType) {
         if (radioButton == nullptr) {
             return;
         }
@@ -1155,20 +1152,10 @@ namespace {
         _currentFlags[idx] = static_cast<int8_t>(index);
         refreshCountLabel();
     }
-}
 
-void RecordHistoryScene::switchToSummary() {
-    SummaryTableNode *rootNode = SummaryTableNode::create(&_filterIndices);
-    rootNode->setNegativeCallback([this, rootNode](Ref *) {
-        _tableView->setVisible(true);
-        this->removeChild(rootNode);
-        _moreButton->setVisible(true);
-    });
-    rootNode->setPositiveCallback([this, rootNode](Ref *) {
-        auto& currentFlags = rootNode->getCurrentFlags();
-
+    void SummaryTableScene::onSummaryButton(cocos2d::Ref *) {
         RecordsStatistic rs;
-        SummarizeRecords(currentFlags, g_records, &rs);
+        SummarizeRecords(_currentFlags, g_records, &rs);
         if (rs.competition_count == 0) {
             Toast::makeText(this, __UTF8("请选择要汇总的对局"), Toast::Duration::LENGTH_LONG)->show();
             return;
@@ -1180,33 +1167,33 @@ void RecordHistoryScene::switchToSummary() {
             .setContentNode(node)
             .setPositiveButton(__UTF8("确定"), nullptr)
             .create()->show();
-    });
-    this->addChild(rootNode);
-    rootNode->setPosition(Director::getInstance()->getVisibleOrigin());
-    _tableView->setVisible(false);
-    _moreButton->setVisible(false);
+    }
+}
+
+void RecordHistoryScene::switchToSummary() {
+    SummaryTableScene *scene = SummaryTableScene::create(&_filterIndices);
+    Director::getInstance()->pushScene(scene);
 }
 
 namespace {
 
-    class BatchDeleteTableNode : public Node, cw::TableViewDelegate {
+    class MultiSelectTableScene : public BaseScene, cw::TableViewDelegate {
     private:
         const std::vector<RecordTexts> *_texts;
         const std::vector<FilterIndex> *_filterIndices;
         std::vector<bool> _currentFlags;
 
         Label *_countLabel = nullptr;
-        cocos2d::ui::Button *_positiveButton;
-        cocos2d::ui::Button *_negativeButton;
 
     public:
         const std::vector<bool> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_2(BatchDeleteTableNode, const std::vector<RecordTexts> *, texts, const std::vector<FilterIndex> *, filterIndices);
+        CREATE_FUNC_WITH_PARAM_4(MultiSelectTableScene, const std::vector<RecordTexts> *, texts, const std::vector<FilterIndex> *, filterIndices, std::string &&, title, std::string &&, buttonTitle);
 
-        bool init(const std::vector<RecordTexts> * texts, const std::vector<FilterIndex> *filterIndices);
-        void setPositiveCallback(ui::Widget::ccWidgetClickCallback &&callback) { _positiveButton->addClickEventListener(callback); }
-        void setNegativeCallback(ui::Widget::ccWidgetClickCallback &&callback) { _negativeButton->addClickEventListener(callback); }
+        bool init(const std::vector<RecordTexts> * texts, const std::vector<FilterIndex> *filterIndices, std::string &&title, std::string &&buttonTitle);
+
+        typedef std::function<void (MultiSelectTableScene *)> PositiveCallback;
+        void setPositiveCallback(PositiveCallback &&callback) { _positiveCallback.swap(callback); }
 
     private:
         virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
@@ -1214,10 +1201,12 @@ namespace {
         virtual cw::TableViewCell *tableCellAtIndex(cw::TableView *table, ssize_t idx) override;
 
         void refreshCountLabel();
+
+        PositiveCallback _positiveCallback;
     };
 
-    bool BatchDeleteTableNode::init(const std::vector<RecordTexts> * texts, const std::vector<FilterIndex> *filterIndices) {
-        if (UNLIKELY(!Node::init())) {
+    bool MultiSelectTableScene::init(const std::vector<RecordTexts> * texts, const std::vector<FilterIndex> *filterIndices, std::string &&title, std::string &&buttonTitle) {
+        if (UNLIKELY(!BaseScene::initWithTitle(title))) {
             return false;
         }
 
@@ -1227,11 +1216,12 @@ namespace {
         _filterIndices = filterIndices;
 
         Size visibleSize = Director::getInstance()->getVisibleSize();
+        Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
         Label *label = Label::createWithSystemFont("", "Arail", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-        label->setPosition(Vec2(visibleSize.width - 115.0f, 15.0f));
+        label->setPosition(Vec2(origin.x + visibleSize.width - 115.0f, origin.y + 15.0f));
         this->addChild(label);
         _countLabel = label;
 
@@ -1241,17 +1231,17 @@ namespace {
         button->setContentSize(Size(50.0f, 20.0f));
         button->setTitleFontSize(12);
         button->setTitleText(__UTF8("取消"));
-        button->setPosition(Vec2(visibleSize.width - 85.0f, 15.0f));
-        _negativeButton = button;
+        button->setPosition(Vec2(origin.x + visibleSize.width - 85.0f, origin.y + 15.0f));
+        button->addClickEventListener([](Ref *) { Director::getInstance()->popScene(); });
 
         button = UICommon::createButton();
         this->addChild(button);
         button->setScale9Enabled(true);
         button->setContentSize(Size(50.0f, 20.0f));
         button->setTitleFontSize(12);
-        button->setTitleText(__UTF8("删除"));
-        button->setPosition(Vec2(visibleSize.width - 30.0f, 15.0f));
-        _positiveButton = button;
+        button->setTitleText(buttonTitle);
+        button->setPosition(Vec2(origin.x + visibleSize.width - 30.0f, origin.y + 15.0f));
+        button->addClickEventListener([this](Ref *) { if (_positiveCallback) _positiveCallback(this); });
 
         // 表格
         cw::TableView *tableView = cw::TableView::create();
@@ -1264,7 +1254,7 @@ namespace {
         tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
         tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        tableView->setPosition(Vec2(visibleSize.width * 0.5f, visibleSize.height * 0.5f));
+        tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
         tableView->reloadData();
         this->addChild(tableView);
 
@@ -1275,7 +1265,7 @@ namespace {
         checkBox->setZoomScale(0.0f);
         checkBox->ignoreContentAdaptWithSize(false);
         checkBox->setContentSize(Size(15.0f, 15.0f));
-        checkBox->setPosition(Vec2(12.5f, 15.0f));
+        checkBox->setPosition(Vec2(origin.x + 12.5f, origin.y + 15.0f));
         checkBox->addEventListener([this, tableView](Ref *sender, ui::CheckBox::EventType) {
             ui::CheckBox *checkBox = (ui::CheckBox *)sender;
             _currentFlags.assign(_currentFlags.size(), false);
@@ -1291,13 +1281,13 @@ namespace {
         label = Label::createWithSystemFont(__UTF8("全选"), "Arail", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-        label->setPosition(Vec2(25.0f, 15.0f));
+        label->setPosition(Vec2(origin.x + 25.0f, origin.y + 15.0f));
         this->addChild(label);
 
         return true;
     }
 
-    void BatchDeleteTableNode::refreshCountLabel() {
+    void MultiSelectTableScene::refreshCountLabel() {
         char str[128];
         snprintf(str, sizeof(str), __UTF8("已选择：%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu),
             _currentFlags.size() - std::count(_currentFlags.begin(), _currentFlags.end(), false),
@@ -1305,15 +1295,15 @@ namespace {
         _countLabel->setString(str);
     }
 
-    ssize_t BatchDeleteTableNode::numberOfCellsInTableView(cw::TableView *) {
+    ssize_t MultiSelectTableScene::numberOfCellsInTableView(cw::TableView *) {
         return _filterIndices->size();
     }
 
-    float BatchDeleteTableNode::tableCellSizeForIndex(cw::TableView *, ssize_t) {
+    float MultiSelectTableScene::tableCellSizeForIndex(cw::TableView *, ssize_t) {
         return 65.0f;
     }
 
-    cw::TableViewCell *BatchDeleteTableNode::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
+    cw::TableViewCell *MultiSelectTableScene::tableCellAtIndex(cw::TableView *table, ssize_t idx) {
         typedef cw::TableViewCellEx<Label *, Label *, std::array<Label *, 4>, ui::CheckBox *, std::array<LayerColor *, 2> > CustomCell;
         CustomCell *cell = (CustomCell *)table->dequeueCell();
 
@@ -1418,26 +1408,21 @@ namespace {
 }
 
 void RecordHistoryScene::switchToBatchDelete() {
-    BatchDeleteTableNode *rootNode = BatchDeleteTableNode::create(&_recordTexts, &_filterIndices);
-    rootNode->setNegativeCallback([this, rootNode](Ref *) {
-        _tableView->setVisible(true);
-        this->removeChild(rootNode);
-        _moreButton->setVisible(true);
-    });
-    rootNode->setPositiveCallback([this, rootNode](Ref *) {
-        const std::vector<bool> &currentFlags = rootNode->getCurrentFlags();
+    MultiSelectTableScene *scene = MultiSelectTableScene::create(&_recordTexts, &_filterIndices, __UTF8("批量删除"), __UTF8("删除"));
+    scene->setPositiveCallback([this](MultiSelectTableScene *scene) {
+        const std::vector<bool> &currentFlags = scene->getCurrentFlags();
 
         if (std::none_of(currentFlags.begin(), currentFlags.end(), [](bool f) { return f; })) {
-            Toast::makeText(this, __UTF8("请选择要删除的对局"), Toast::Duration::LENGTH_LONG)->show();
+            Toast::makeText(scene, __UTF8("请选择要删除的对局"), Toast::Duration::LENGTH_LONG)->show();
             return;
         }
 
-        AlertDialog::Builder(this)
+        AlertDialog::Builder(scene)
             .setTitle(__UTF8("删除记录"))
             .setMessage(__UTF8("删除后无法找回，确认删除？"))
             .setNegativeButton(__UTF8("取消"), nullptr)
-            .setPositiveButton(__UTF8("确定"), [this, rootNode](AlertDialog *, int) {
-            const std::vector<bool> &currentFlags = rootNode->getCurrentFlags();
+            .setPositiveButton(__UTF8("确定"), [this, scene](AlertDialog *, int) {
+            const std::vector<bool> &currentFlags = scene->getCurrentFlags();
             for (size_t i = currentFlags.size(); i-- > 0; ) {
                 if (currentFlags[i]) {
                     g_records.erase(g_records.begin() + i);
@@ -1445,17 +1430,13 @@ void RecordHistoryScene::switchToBatchDelete() {
             }
             saveRecordsAndRefresh();
 
-            _tableView->setVisible(true);
-            this->removeChild(rootNode);
-            _moreButton->setVisible(true);
+            Director::getInstance()->popScene();
 
             return true;
         }).create()->show();
     });
-    this->addChild(rootNode);
-    rootNode->setPosition(Director::getInstance()->getVisibleOrigin());
-    _tableView->setVisible(false);
-    _moreButton->setVisible(false);
+
+    Director::getInstance()->pushScene(scene);
 }
 
 void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {
