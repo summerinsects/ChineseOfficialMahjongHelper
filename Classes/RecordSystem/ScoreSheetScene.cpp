@@ -991,7 +991,7 @@ void ScoreSheetScene::onStartButton(cocos2d::Ref *) {
 void ScoreSheetScene::onFinishButton(cocos2d::Ref *) {
     AlertDialog::Builder(this)
         .setTitle(__UTF8("警告"))
-        .setMessage(__UTF8("强制结束会将未打完盘数标记为超时"))
+        .setMessage(__UTF8("强制结束会将未打完盘数标记为「超时」"))
         .setNegativeButton(__UTF8("取消"), nullptr)
         .setPositiveButton(__UTF8("结束"), [this](AlertDialog *, int) { forceFinish(); return true; })
         .create()->show();
