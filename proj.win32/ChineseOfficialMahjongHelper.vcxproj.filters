@@ -108,6 +108,9 @@
     <ClCompile Include="..\Classes\utils\common.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\utils\socket.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\widget\AlertDialog.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
@@ -216,6 +219,9 @@
       <Filter>src\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\utils\compiler.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\socket.h">
       <Filter>src\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\AlertDialog.h">

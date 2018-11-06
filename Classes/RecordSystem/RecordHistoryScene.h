@@ -57,6 +57,10 @@ private:
     void showFilterAlert();
     void switchToSummary();
     void switchToBatchDelete();
+    void showTransmissionAlert();
+
+    void showSendAlert(std::vector<bool> selectFlags);
+    void showRecvAlert();
 
     void onDeleteButton(cocos2d::Ref *sender);
     void onCellClicked(cocos2d::Ref *sender);

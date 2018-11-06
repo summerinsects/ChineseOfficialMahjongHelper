@@ -32,6 +32,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../../Classes/RecordSystem/RecordScene.cpp \
                    ../../../Classes/RecordSystem/ScoreSheetScene.cpp \
                    ../../../Classes/utils/common.cpp \
+                   ../../../Classes/utils/socket.cpp \
                    ../../../Classes/widget/AlertDialog.cpp \
                    ../../../Classes/widget/CheckBoxScale9.cpp \
                    ../../../Classes/widget/CommonWebViewScene.cpp \
