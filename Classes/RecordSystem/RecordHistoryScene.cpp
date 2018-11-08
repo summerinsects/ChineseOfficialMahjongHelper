@@ -9,6 +9,7 @@
 #include "../widget/LoadingView.h"
 #include "../widget/PopupMenu.h"
 #include "../widget/DatePicker.h"
+#include "../utils/socket.h"
 
 USING_NS_CC;
 
@@ -524,9 +525,9 @@ void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
 
     Vec2 pos = ((ui::Button *)sender)->getPosition();
     pos.y -= 15.0f;
-    PopupMenu *menu = PopupMenu::create(this, { __UTF8("筛选条件"), __UTF8("个人汇总"), __UTF8("批量删除") }, pos, Vec2::ANCHOR_TOP_RIGHT);
+    PopupMenu *menu = PopupMenu::create(this, { __UTF8("筛选条件"), __UTF8("个人汇总"), __UTF8("批量删除"), __UTF8("点对点传输") }, pos, Vec2::ANCHOR_TOP_RIGHT);
     menu->setMenuItemCallback([this](PopupMenu *, size_t idx) {
-        if (UNLIKELY(g_records.empty())) {
+        if (UNLIKELY(g_records.empty() && idx != 3)) {
             Toast::makeText(this, __UTF8("无历史记录"), Toast::Duration::LENGTH_LONG)->show();
             return;
         }
@@ -535,6 +536,7 @@ void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
         case 0: showFilterAlert(); break;
         case 1: switchToSummary(); break;
         case 2: switchToBatchDelete(); break;
+        case 3: showTransmissionAlert(); break;
         default: UNREACHABLE(); break;
         }
     });
@@ -1437,6 +1439,453 @@ void RecordHistoryScene::switchToBatchDelete() {
     });
 
     Director::getInstance()->pushScene(scene);
+}
+
+void RecordHistoryScene::showTransmissionAlert() {
+    const float limitWidth = AlertDialog::maxWidth();
+
+    Node *rootNode = Node::create();
+
+    Label *label = Label::createWithSystemFont(
+        __UTF8("说明：\n")
+        __UTF8("1. 点对点传输需两台设备连接同一WiFi或者两台设备通过热点连接，热点连接不耗费手机流量\n")
+        __UTF8("2. 传输前请确认是否开启了网络权限"),
+        "Arial", 10, Size(limitWidth - 4.0f, 0.0f));
+    label->setLineSpacing(2.0f);
+    rootNode->addChild(label);
+    label->setTextColor(C4B_BLACK);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
+    label->setPosition(Vec2(limitWidth * 0.5f, 50.0f));
+
+    rootNode->setContentSize(Size(limitWidth, label->getContentSize().height + 55.0f));
+
+    ui::Button *button1 = UICommon::createButton();
+    rootNode->addChild(button1);
+    button1->setScale9Enabled(true);
+    button1->setContentSize(Size(55.0f, 20.0f));
+    button1->setTitleFontSize(12);
+    button1->setTitleText(__UTF8("发送"));
+    button1->setPosition(Vec2((limitWidth - 110.0f) / 3.0f + 27.5f, 25.0f));
+    button1->setEnabled(g_hasLoaded && !g_records.empty());
+
+    ui::Button *button2 = UICommon::createButton();
+    rootNode->addChild(button2);
+    button2->setScale9Enabled(true);
+    button2->setContentSize(Size(55.0f, 20.0f));
+    button2->setTitleFontSize(12);
+    button2->setTitleText(__UTF8("接收"));
+    button2->setPosition(Vec2(limitWidth - button1->getPositionX(), 25.0f));
+
+    AlertDialog *dlg = AlertDialog::Builder(this)
+        .setTitle(__UTF8("点对点传输"))
+        .setContentNode(rootNode)
+        .create();
+    dlg->show();
+
+    button1->addClickEventListener([this, dlg](Ref *) {
+        AlertDialog::Builder(this)
+            .setTitle(__UTF8("点对点传输——发送"))
+            .setMessage(__UTF8("请选择需要传输的记录"))
+            .setNegativeButton(__UTF8("取消"), nullptr)
+            .setPositiveButton(__UTF8("确定"), [this](AlertDialog *, int) {
+
+            MultiSelectTableScene *scene = MultiSelectTableScene::create(&_recordTexts, &_filterIndices, __UTF8("点对点传输——发送"), __UTF8("确定"));
+            scene->setPositiveCallback([this](MultiSelectTableScene *scene) {
+                std::vector<bool> currentFlags = scene->getCurrentFlags();
+
+                if (std::none_of(currentFlags.begin(), currentFlags.end(), [](bool f) { return f; })) {
+                    Toast::makeText(scene, __UTF8("请选择要传输的对局"), Toast::Duration::LENGTH_LONG)->show();
+                    return;
+                }
+
+                Director::getInstance()->popScene();
+
+                showSendAlert(std::move(currentFlags));
+            });
+            Director::getInstance()->pushScene(scene);
+
+            return true;
+        }).create()->show();
+
+        dlg->dismiss();
+    });
+    button2->addClickEventListener([this, dlg](Ref *) {
+        showRecvAlert();
+        dlg->dismiss();
+    });
+}
+
+// 2^32^(1/6) = 40.317
+static const char VerificationCodeTable[] = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+static const int unit = sizeof(VerificationCodeTable) - 1;
+
+static void calculateVerificationCode(uint32_t address, char (&str)[7]) {
+    int64_t value = (int64_t)(uint64_t)address;
+    lldiv_t ret;
+    for (int i = 0; i < 6; ++i) {
+        ret = lldiv(value, unit);
+        str[i] = VerificationCodeTable[ret.rem];
+        value = ret.quot;
+    }
+    str[6] = '\0';
+}
+
+static uint32_t calculateAddress(const char *str) {
+    if (str == nullptr || strlen(str) != 6 || strspn(str, VerificationCodeTable) != 6) {
+        return 0;
+    }
+
+    uintptr_t address = 0;
+    for (int i = 0; i < 6; ++i) {
+        int k = 5 - i;
+        uintptr_t value = strchr(VerificationCodeTable, str[k]) - VerificationCodeTable;
+        address *= unit;
+        address += value;
+    }
+
+    return (uint32_t)address;
+}
+
+void RecordHistoryScene::showSendAlert(std::vector<bool> selectFlags) {
+    const float limitWidth = AlertDialog::maxWidth();
+
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(limitWidth, 100.0f));
+
+    Label *label = Label::createWithSystemFont(__UTF8("请在另一台设备上输入验证码，字母区分大小写"), "Arial", 10);
+    cw::scaleLabelToFitWidth(label, limitWidth - 4.0f);
+    rootNode->addChild(label);
+    label->setTextColor(C4B_BLACK);
+    label->setPosition(Vec2(limitWidth * 0.5f, 90.0f));
+
+    auto socketSender = std::make_shared<p2p::Sender>();
+    rootNode->setOnExitCallback([socketSender]() { socketSender->quit(); });
+
+    uint32_t ret = socketSender->prepare();
+    char code[7] = "";
+    calculateVerificationCode(ret, code);
+
+    label = Label::createWithSystemFont(code, "Arial", 16);
+    rootNode->addChild(label);
+    label->setTextColor(C4B_RED);
+    label->setPosition(Vec2(limitWidth * 0.5f, 70.0f));
+
+    ui::Button *button = UICommon::createButton();
+    rootNode->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("发送"));
+    button->setPosition(Vec2(limitWidth * 0.5f, 35.0f));
+    button->setEnabled(false);
+
+    size_t totalCnt = std::count(selectFlags.begin(), selectFlags.end(), true);
+
+    label = Label::createWithSystemFont(Common::format(__UTF8("等待连接，即将传输%") __UTF8(PRIzu) __UTF8("条记录"), totalCnt), "Arial", 10);
+    rootNode->addChild(label);
+    label->setTextColor(C4B_BLACK);
+    label->setPosition(Vec2(limitWidth * 0.5f, 10.0f));
+
+    auto isSending = std::make_shared<bool>();
+
+    AlertDialog *dialog = AlertDialog::Builder(this)
+        .setTitle(__UTF8("点对点传输——发送"))
+        .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
+        .setNegativeButton(__UTF8("退出"), [this, isSending, socketSender](AlertDialog *, int) {
+        if (*isSending) {
+            AlertDialog::Builder(this)
+                .setTitle(__UTF8("点对点传输——发送"))
+                .setMessage(__UTF8("确定要终止传输？"))
+                .setNegativeButton(__UTF8("继续"), nullptr)
+                .setPositiveButton(__UTF8("终止"), [socketSender](AlertDialog *, int) {
+                socketSender->quit();
+                return true;
+            }).create()->show();
+
+            return false;
+        }
+        return true;
+    }).create();
+    dialog->show();
+
+    auto dialogStrong = makeRef(dialog);
+    auto acceptRet = std::make_shared<bool>();
+
+    // 等待客户端连接
+    AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [dialogStrong, totalCnt, acceptRet, label, button](void *) {
+        if (UNLIKELY(!dialogStrong->isRunning())) {
+            return;
+        }
+
+        if (*acceptRet) {
+            label->setString(Common::format(__UTF8("连接成功，可传输%") __UTF8(PRIzu) __UTF8("条记录"), totalCnt));
+            button->setEnabled(true);
+        }
+        else {
+            label->setString(__UTF8("连接失败，请退出后重试"));
+        }
+    }, nullptr, [socketSender, acceptRet]() { *acceptRet = socketSender->accept(); });
+
+    auto selectFlagsPtr = std::make_shared<std::vector<bool> >(std::move(selectFlags));
+    button->addClickEventListener([this, socketSender, isSending, dialog, label, selectFlagsPtr, totalCnt](Ref *sender) {
+        ui::Button *button = (ui::Button *)sender;
+        button->setEnabled(false);
+        label->setString(__UTF8("数据传输中，请勿退出程序"));
+
+        auto thiz = makeRef(this);
+        auto dialogStrong = makeRef(dialog);
+        auto sendRet = std::make_shared<size_t>();
+
+        // 发送
+        AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [thiz, dialogStrong, sendRet, totalCnt, label, button](void *) {
+            if (LIKELY(dialogStrong->isRunning())) {
+                if (*sendRet == 0) {
+                    label->setString(__UTF8("数据传输失败，请退出后重试"));
+                    button->setEnabled(true);
+                }
+                else {
+                    dialogStrong->dismiss();
+                    if (LIKELY(thiz->isRunning())) {
+                        AlertDialog::Builder(thiz.get())
+                            .setTitle(__UTF8("提示"))
+                            .setMessage(Common::format(__UTF8("数据传输完毕，共%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu) __UTF8("条记录"), *sendRet, totalCnt))
+                            .setPositiveButton(__UTF8("确定"), nullptr)
+                            .create()->show();
+                    }
+                }
+            }
+        }, nullptr, [dialogStrong, socketSender, isSending, sendRet, selectFlagsPtr, totalCnt, label]() {
+            *isSending = true;
+
+            const std::vector<bool> &selectFlags = *selectFlagsPtr;
+
+            // 先发送个数
+            char str[16];
+            int len = 1 + snprintf(str, sizeof(str), "%" PRIzu, totalCnt);
+            ssize_t ret = socketSender->send(str, len);
+            if (ret != len) {
+                *sendRet = 0;
+                *isSending = false;
+                return;
+            }
+
+            // 再逐个记录发送
+            size_t currentCnt = 0;
+            std::vector<char> buf;
+            for (size_t i = 0, cnt = selectFlags.size(); i < cnt; ++i) {
+                if (!selectFlags[i]) {
+                    continue;
+                }
+
+                StringifyRecord(buf, g_records[i]);
+                if (buf.back() != '\0') buf.push_back('\0');  // 以'\0'作为一条记录的结束
+
+                ret = socketSender->send(buf.data(), static_cast<int>(buf.size()));
+                if (ret <= 0 || static_cast<size_t>(ret) != buf.size()) {
+                    break;
+                }
+                ++currentCnt;
+
+                Director::getInstance()->getScheduler()->performFunctionInCocosThread([dialogStrong, label, currentCnt, totalCnt]() {
+                    if (UNLIKELY(!dialogStrong->isRunning())) {
+                        return;
+                    }
+                    label->setString(Common::format(__UTF8("正在传输中，请勿退出程序。%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu), currentCnt, totalCnt));
+                });
+            }
+
+            socketSender->quit();
+            *sendRet = currentCnt;
+
+            *isSending = false;
+        });
+    });
+}
+
+void RecordHistoryScene::showRecvAlert() {
+    const float limitWidth = AlertDialog::maxWidth();
+
+    Node *rootNode = Node::create();
+    rootNode->setContentSize(Size(limitWidth, 100.0f));
+
+    Label *label = Label::createWithSystemFont(__UTF8("请输入6位验证码，字母区分大小写"), "Arial", 10);
+    cw::scaleLabelToFitWidth(label, limitWidth - 4.0f);
+    rootNode->addChild(label);
+    label->setTextColor(C4B_BLACK);
+    label->setPosition(Vec2(limitWidth * 0.5f, 90.0f));
+
+    ui::EditBox *editBox = UICommon::createEditBox(Size(100, 20));
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
+    editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
+    editBox->setFontColor(C4B_BLACK);
+    editBox->setFontSize(16);
+    editBox->setMaxLength(6);
+    rootNode->addChild(editBox);
+    editBox->setPosition(Vec2(limitWidth * 0.5f, 65.0f));
+
+    auto socketReceiver = std::make_shared<p2p::Reciever>();
+    rootNode->setOnExitCallback([socketReceiver]() { socketReceiver->quit(); });
+
+    ui::Button *button = UICommon::createButton();
+    rootNode->addChild(button);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(55.0f, 20.0f));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("连接"));
+    button->setPosition(Vec2(limitWidth * 0.5f, 35.0f));
+
+    label = Label::createWithSystemFont(__UTF8("等待连接，请从另一台设备上获取验证码"), "Arial", 10);
+    rootNode->addChild(label);
+    label->setTextColor(C4B_BLACK);
+    label->setPosition(Vec2(limitWidth * 0.5f, 10.0f));
+
+    auto isReceiving = std::make_shared<bool>();
+
+    AlertDialog *dialog = AlertDialog::Builder(this)
+        .setTitle(__UTF8("点对点传输——接收"))
+        .setContentNode(rootNode)
+        .setCloseOnTouchOutside(false)
+        .setNegativeButton(__UTF8("退出"), [this, socketReceiver, isReceiving](AlertDialog *, int) {
+        if (*isReceiving) {
+            AlertDialog::Builder(this)
+                .setTitle(__UTF8("点对点传输——接收"))
+                .setMessage(__UTF8("确定要终止传输？"))
+                .setNegativeButton(__UTF8("继续"), nullptr)
+                .setPositiveButton(__UTF8("终止"), [socketReceiver](AlertDialog *, int) {
+                socketReceiver->quit();
+                return true;
+            }).create()->show();
+
+            return false;
+        }
+
+        return true;
+    }).create();
+    dialog->show();
+
+    button->addClickEventListener([this, dialog, editBox, label, socketReceiver, isReceiving](Ref *sender) {
+        uint32_t address = calculateAddress(editBox->getText());
+        if (address == 0) {
+            return;
+        }
+
+        label->setString(__UTF8("正在连接，请勿退出程序"));
+        ui::Button *button = (ui::Button *)sender;
+        button->setEnabled(false);
+
+        auto thiz = makeRef(this);
+        auto dialogStrong = makeRef(dialog);
+
+        auto connectRet = std::make_shared<bool>();
+
+        // 连接服务器
+        AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [thiz, dialogStrong, isReceiving, connectRet, label, button, socketReceiver](void *) {
+            if (UNLIKELY(!dialogStrong->isRunning())) {
+                return;
+            }
+
+            if (!*connectRet) {
+                return;
+            }
+
+            label->setString(__UTF8("等待传输数据，请在另一设备上点击「发送」"));
+
+            auto recvRet = std::make_shared<size_t>();
+            auto destCnt = std::make_shared<size_t>();
+
+            // 接收数据
+            AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [thiz, dialogStrong, recvRet, label, button, destCnt](void *) {
+                if (*recvRet > 0) {
+                    if (LIKELY(dialogStrong->isRunning())) {
+                        dialogStrong->dismiss();
+                        if (LIKELY(thiz->isRunning())) {
+                            AlertDialog::Builder(thiz.get())
+                                .setTitle(__UTF8("提示"))
+                                .setMessage(Common::format(__UTF8("数据传输完毕，共%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu) __UTF8("条记录"), *recvRet, *destCnt))
+                                .setPositiveButton(__UTF8("确定"), nullptr)
+                                .create()->show();
+                        }
+                    }
+
+                    if (LIKELY(thiz->isRunning())) {
+                        thiz->updateRecordTexts();
+                        thiz->refresh();
+                    }
+                }
+                else {
+                    if (LIKELY(dialogStrong->isRunning())) {
+                        label->setString(__UTF8("正在传输失败，请退出后重试"));
+                        button->setEnabled(false);
+                    }
+                }
+            }, nullptr, [dialogStrong, label, socketReceiver, destCnt, recvRet, isReceiving]() {
+                std::vector<char> str;
+                char buf[1024];
+
+                size_t cnt = 0;
+
+                *isReceiving = true;
+
+                do {
+                    ssize_t ret = socketReceiver->recv(buf, sizeof(buf));
+                    if (ret <= 0) {
+                        break;
+                    }
+
+                    if (UNLIKELY(*destCnt == 0)) {  // 第一个是个数
+                        sscanf(buf, "%" PRIzu, &*destCnt);
+
+                        Director::getInstance()->getScheduler()->performFunctionInCocosThread([dialogStrong, label, destCnt]() {
+                            if (UNLIKELY(!dialogStrong->isRunning())) {
+                                return;
+                            }
+
+                            label->setString(Common::format(__UTF8("正在传输中，请勿退出程序。0/%") __UTF8(PRIzu), *destCnt));
+                        });
+
+                        char *p = std::find(buf, buf + ret, '\0');
+                        if (p != buf + ret) {
+                            str.reserve(str.size() + (buf + ret - p));
+                            std::copy(p + 1, buf + ret, std::back_inserter(str));
+                        }
+                    }
+                    else {  // 随后的是内容
+                        str.reserve(str.size() + ret);
+                        std::copy(buf, buf + ret, std::back_inserter(str));
+                    }
+
+                    // 遇到'\0'为一条记录结束
+                    for (std::vector<char>::iterator p = std::find(str.begin(), str.end(), '\0');
+                        p != str.end(); p = std::find(str.begin(), str.end(), '\0')) {
+                        Record record;
+                        ParseRecord(str.data(), record);
+                        ModifyRecordInVector(g_records, &record);  // 更新即可
+                        ++cnt;
+
+                        Director::getInstance()->getScheduler()->performFunctionInCocosThread([dialogStrong, label, destCnt, cnt]() {
+                            if (UNLIKELY(!dialogStrong->isRunning())) {
+                                return;
+                            }
+
+                            label->setString(Common::format(__UTF8("正在传输中，请勿退出程序。%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu), cnt, *destCnt));
+                        });
+
+                        str.erase(str.begin(), p + 1);
+                    }
+                } while (cnt < *destCnt);
+
+                socketReceiver->quit();
+                *recvRet = cnt;
+
+                *isReceiving = false;
+
+                // 保存
+                saveRecords(g_records);
+            });
+        }, nullptr, [socketReceiver, address, connectRet]() { *connectRet = socketReceiver->connect(address); });
+    });
 }
 
 void RecordHistoryScene::onCellClicked(cocos2d::Ref *sender) {
