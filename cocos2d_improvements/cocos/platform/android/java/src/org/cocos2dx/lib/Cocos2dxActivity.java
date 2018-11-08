@@ -68,7 +68,6 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     private Cocos2dxWebViewHelper mWebViewHelper = null;
     private Cocos2dxEditBoxHelper mEditBoxHelper = null;
     private boolean hasFocus = false;
-    private boolean showVirtualButton = false;
 
     public Cocos2dxGLSurfaceView getGLSurfaceView(){
         return  mGLSurfaceView;
@@ -86,10 +85,6 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
                 mGLSurfaceView.setKeepScreenOn(newValue);
             }
         });
-    }
-
-    public void setEnableVirtualButton(boolean value) {
-        this.showVirtualButton = value;
     }
 
     protected void onLoadNativeLibraries() {
