@@ -525,7 +525,7 @@ void RecordHistoryScene::onMoreButton(cocos2d::Ref *sender) {
 
     Vec2 pos = ((ui::Button *)sender)->getPosition();
     pos.y -= 15.0f;
-    PopupMenu *menu = PopupMenu::create(this, { __UTF8("筛选条件"), __UTF8("个人汇总"), __UTF8("批量删除"), __UTF8("P2P传输") }, pos, Vec2::ANCHOR_TOP_RIGHT);
+    PopupMenu *menu = PopupMenu::create(this, { __UTF8("筛选条件"), __UTF8("个人汇总"), __UTF8("批量删除"), __UTF8("点对点传输") }, pos, Vec2::ANCHOR_TOP_RIGHT);
     menu->setMenuItemCallback([this](PopupMenu *, size_t idx) {
         if (UNLIKELY(g_records.empty() && idx != 3)) {
             Toast::makeText(this, __UTF8("无历史记录"), Toast::Duration::LENGTH_LONG)->show();
@@ -1448,7 +1448,7 @@ void RecordHistoryScene::showTransmissionAlert() {
 
     Label *label = Label::createWithSystemFont(
         __UTF8("说明：\n")
-        __UTF8("1. P2P传输需两台设备连接同一WiFi或者两台设备通过热点连接，热点连接不耗费手机流量\n")
+        __UTF8("1. 点对点传输需两台设备连接同一WiFi或者两台设备通过热点连接，热点连接不耗费手机流量\n")
         __UTF8("2. 传输前请确认是否开启了网络权限"),
         "Arial", 10, Size(limitWidth - 4.0f, 0.0f));
     label->setLineSpacing(2.0f);
@@ -1477,19 +1477,19 @@ void RecordHistoryScene::showTransmissionAlert() {
     button2->setPosition(Vec2(limitWidth - button1->getPositionX(), 25.0f));
 
     AlertDialog *dlg = AlertDialog::Builder(this)
-        .setTitle(__UTF8("P2P传输"))
+        .setTitle(__UTF8("点对点传输"))
         .setContentNode(rootNode)
         .create();
     dlg->show();
 
     button1->addClickEventListener([this, dlg](Ref *) {
         AlertDialog::Builder(this)
-            .setTitle(__UTF8("P2P传输——发送数据"))
+            .setTitle(__UTF8("点对点传输——发送"))
             .setMessage(__UTF8("请选择需要传输的记录"))
             .setNegativeButton(__UTF8("取消"), nullptr)
             .setPositiveButton(__UTF8("确定"), [this](AlertDialog *, int) {
 
-            MultiSelectTableScene *scene = MultiSelectTableScene::create(&_recordTexts, &_filterIndices, __UTF8("P2P传输——发送"), __UTF8("确定"));
+            MultiSelectTableScene *scene = MultiSelectTableScene::create(&_recordTexts, &_filterIndices, __UTF8("点对点传输——发送"), __UTF8("确定"));
             scene->setPositiveCallback([this](MultiSelectTableScene *scene) {
                 std::vector<bool> currentFlags = scene->getCurrentFlags();
 
@@ -1589,13 +1589,13 @@ void RecordHistoryScene::showSendAlert(std::vector<bool> selectFlags) {
     auto isSending = std::make_shared<bool>();
 
     AlertDialog *dialog = AlertDialog::Builder(this)
-        .setTitle(__UTF8("P2P传输——发送数据"))
+        .setTitle(__UTF8("点对点传输——发送"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton(__UTF8("退出"), [this, isSending, socketSender](AlertDialog *, int) {
         if (*isSending) {
             AlertDialog::Builder(this)
-                .setTitle(__UTF8("P2P传输——发送数据"))
+                .setTitle(__UTF8("点对点传输——发送"))
                 .setMessage(__UTF8("确定要终止传输？"))
                 .setNegativeButton(__UTF8("继续"), nullptr)
                 .setPositiveButton(__UTF8("终止"), [socketSender](AlertDialog *, int) {
@@ -1744,13 +1744,13 @@ void RecordHistoryScene::showRecvAlert() {
     auto isReceiving = std::make_shared<bool>();
 
     AlertDialog *dialog = AlertDialog::Builder(this)
-        .setTitle(__UTF8("P2P传输——接收数据"))
+        .setTitle(__UTF8("点对点传输——接收"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton(__UTF8("退出"), [this, socketReceiver, isReceiving](AlertDialog *, int) {
         if (*isReceiving) {
             AlertDialog::Builder(this)
-                .setTitle(__UTF8("P2P传输——接收数据"))
+                .setTitle(__UTF8("点对点传输——接收"))
                 .setMessage(__UTF8("确定要终止传输？"))
                 .setNegativeButton(__UTF8("继续"), nullptr)
                 .setPositiveButton(__UTF8("终止"), [socketReceiver](AlertDialog *, int) {
