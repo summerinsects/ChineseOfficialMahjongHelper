@@ -1110,7 +1110,7 @@ static std::string GetLongFanText(const Record::Detail &detail) {
     }
 
     // 小番
-    if (fan2Bits != 0) {
+    if (fan2Bits != 0 || fan1Bits != 0) {
         for (unsigned n = 0; n < 10; ++n) {
             unsigned cnt = COUNT_FAN2(fan2Bits, n);
             if (cnt > 0) {
