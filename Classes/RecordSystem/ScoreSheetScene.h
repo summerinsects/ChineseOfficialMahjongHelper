@@ -17,6 +17,7 @@ private:
     cocos2d::ui::Button *_startButton = nullptr;
     cocos2d::ui::Button *_finishButton = nullptr;
     cocos2d::Label *_totalLabel[4];
+    cocos2d::Label *_checkLabel = nullptr;
     cocos2d::Label *_scoreLabels[16][4];
     cocos2d::ui::Button *_recordButton[16];
     cocos2d::ui::Widget *_detailWidget[16];

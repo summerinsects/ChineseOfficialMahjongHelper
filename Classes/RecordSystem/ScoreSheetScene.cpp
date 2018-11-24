@@ -172,6 +172,28 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
     }
 
+    button = UICommon::createButton();
+    drawNode->addChild(button, -1);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(gap, cellHeight));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("开始"));
+    button->setPosition(Vec2(colPosX[5], line3Y));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onStartButton, this, std::placeholders::_1));
+    _startButton = button;
+
+    button = UICommon::createButton();
+    drawNode->addChild(button, -1);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(gap, cellHeight));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("强制结束"));
+    button->setPosition(Vec2(colPosX[5], line3Y));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onFinishButton, this, std::placeholders::_1));
+    cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 6.0f);
+    button->setVisible(false);
+    _finishButton = button;
+
     // 第4栏：累计
     const float line4Y = tableHeight - cellHeight * 3.5f;
     label = Label::createWithSystemFont(__UTF8("累计"), "Arail", 12);
@@ -188,27 +210,11 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         _totalLabel[i] = label;
     }
 
-    button = UICommon::createButton();
-    drawNode->addChild(button, -1);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(gap, cellHeight));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("开始"));
-    button->setPosition(Vec2(colPosX[5], line4Y));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onStartButton, this, std::placeholders::_1));
-    _startButton = button;
-
-    button = UICommon::createButton();
-    drawNode->addChild(button, -1);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(gap, cellHeight));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("强制结束"));
-    button->setPosition(Vec2(colPosX[5], line4Y));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onFinishButton, this, std::placeholders::_1));
-    cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 6.0f);
-    button->setVisible(false);
-    _finishButton = button;
+    label = Label::createWithSystemFont("0", "Arail", 12);
+    label->setTextColor(C4B_GRAY);
+    label->setPosition(Vec2(colPosX[5], line4Y));
+    drawNode->addChild(label);
+    _checkLabel = label;
 
     // 第5栏：名次
     const float line5Y = tableHeight - cellHeight * 4.5f;
@@ -626,6 +632,8 @@ void ScoreSheetScene::recover() {
         _totalLabel[i]->setString(Common::format("%+d", totalScores[i]));
         _rankLabels[i]->setVisible(false);
     }
+    _checkLabel->setString(std::to_string(totalScores[0] + totalScores[1] + totalScores[2] + totalScores[3]));
+
     if (currentIdx > 0) {
         refreshRank(totalScores);
     }
@@ -668,6 +676,7 @@ void ScoreSheetScene::reset() {
         _totalLabel[i]->setString("+0");
         _rankLabels[i]->setVisible(false);
     }
+    _checkLabel->setString("0");
 
     _startButton->setVisible(true);
     _finishButton->setVisible(false);
@@ -1071,6 +1080,7 @@ void ScoreSheetScene::editRecord(unsigned handIdx, const Record::Detail *detail)
         for (int i = 0; i < 4; ++i) {
             _totalLabel[i]->setString(Common::format("%+d", totalScores[i]));
         }
+        _checkLabel->setString(std::to_string(totalScores[0] + totalScores[1] + totalScores[2] + totalScores[3]));
 
         // 更新名次
         refreshRank(totalScores);
