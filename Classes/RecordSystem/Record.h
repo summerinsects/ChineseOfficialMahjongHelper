@@ -20,7 +20,7 @@ struct Record {
         int16_t penalty_scores[4];  // 处罚分
         bool timeout;               // 是否超时
         uint64_t fan_bits;          // 标记番种
-        uint64_t fan1_bits;         // 1番13个，每个番占用4bit，共52bit
+        uint64_t fan1_bits;         // 1番13个，外加明暗杠共14个，每个番占用4bit，共56bit
         uint32_t fan2_bits;         // 2番10个，每个番占用2bit，共20bit
 
         struct WinHand {

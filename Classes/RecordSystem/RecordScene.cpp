@@ -959,11 +959,12 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     uint64_t fan1Bits = _detail.fan1_bits;
 
     const float maxWidth = AlertDialog::maxWidth();
+    const float maxHeight = Director::getInstance()->getVisibleSize().height * 0.8f - 80.0f;
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(maxWidth, 255.0f));
+    ui::Widget *containerWidget = ui::Widget::create();
 
-    static const uint8_t limitCounts[] = { 1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 2, 2, 2, 4, 1, 3, 1, 1, 1, 1, 1, 8 };
+    static const uint8_t limitCounts[] = { 1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 2, 2, 2, 4, 1, 3, 1, 1, 1, 1, 1, 8, 1 };
 
     const float width4 = maxWidth * 0.25f;
     auto bitsData = std::make_shared<std::pair<uint32_t, uint64_t> >(std::make_pair(fan2Bits, fan1Bits));
@@ -1000,16 +1001,22 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         refreshLittleFanButton(button, tempCnt, mahjong::PURE_DOUBLE_CHOW + idx);
     };
 
+#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
+    const float containerHeight = 255.0f;
+#else
+    const float containerHeight = 210.0f;
+#endif
+
     // 2番
     Label *label = Label::createWithSystemFont(__UTF8("2番"), "Arial", 12);
     label->setTextColor(C4B_BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    rootNode->addChild(label);
-    label->setPosition(Vec2(5.0f, 245.0f));
+    containerWidget->addChild(label);
+    label->setPosition(Vec2(5.0f, containerHeight - 10.0f));
 
     for (int i = 0; i < 10; ++i) {
         div_t ret = div(i, 4);
-        const float yPos = 225.0f - ret.quot * 25.0f;
+        const float yPos = containerHeight - 30.0f - ret.quot * 25.0f;
         const float xPos = width4 * (ret.rem + 0.5f);
 
         ui::Button *button = ui::Button::create();
@@ -1020,7 +1027,7 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         button->setTitleFontSize(12);
         button->setTag(i);
         button->addClickEventListener(on2FanButtonClick);
-        rootNode->addChild(button);
+        containerWidget->addChild(button);
         button->setPosition(Vec2(xPos, yPos));
 
         uint32_t cnt = COUNT_FAN2(fan2Bits, i);
@@ -1031,12 +1038,12 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     label = Label::createWithSystemFont(__UTF8("1番"), "Arial", 12);
     label->setTextColor(C4B_BLACK);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    rootNode->addChild(label);
-    label->setPosition(Vec2(5.0f, 150.0f));
+    containerWidget->addChild(label);
+    label->setPosition(Vec2(5.0f, containerHeight - 105.0f));
 
     for (int i = 0; i < 13; ++i) {
         div_t ret = div(i, 4);
-        const float yPos = 130.0f - ret.quot * 25.0f;
+        const float yPos = containerHeight - 125.0f - ret.quot * 25.0f;
         const float xPos = width4 * (ret.rem + 0.5f);
 
         ui::Button *button = ui::Button::create();
@@ -1047,12 +1054,61 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         button->setTitleFontSize(12);
         button->setTag(i);
         button->addClickEventListener(on1FanButtonClick);
-        rootNode->addChild(button);
+        containerWidget->addChild(button);
         button->setPosition(Vec2(xPos, yPos));
 
         uint32_t cnt = COUNT_FAN1(fan1Bits, i);
         refreshLittleFanButton(button, cnt, mahjong::PURE_DOUBLE_CHOW + i);
     }
+
+#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
+    label = Label::createWithSystemFont(__UTF8("5番"), "Arial", 12);
+    label->setTextColor(C4B_BLACK);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    containerWidget->addChild(label);
+    label->setPosition(Vec2(5.0f, 30.0f));
+
+    {
+        const int i = mahjong::CONCEALED_KONG_AND_MELDED_KONG - mahjong::PURE_DOUBLE_CHOW;
+
+        ui::Button *button = ui::Button::create();
+        button->loadTexturePressed("source_material/btn_square_selected.png");
+        button->setScale9Enabled(true);
+        button->setContentSize(Size(width4 - 5.0f, 20.0f));
+        button->setTitleColor(C3B_GRAY);
+        button->setTitleFontSize(12);
+        button->setTag(i);
+        button->addClickEventListener(on1FanButtonClick);
+        containerWidget->addChild(button);
+        button->setPosition(Vec2(width4 * 0.5f, 10.0f));
+
+        uint32_t cnt = COUNT_FAN1(fan1Bits, i);
+        refreshLittleFanButton(button, cnt, mahjong::CONCEALED_KONG_AND_MELDED_KONG);
+    }
+#endif
+
+    // 超出高度就使用ScrollView
+    if (maxHeight >= containerHeight + 45.0f) {
+        rootNode->setContentSize(Size(maxWidth, containerHeight + 45.0f));
+        containerWidget->setContentSize(Size(maxWidth, containerHeight));
+    }
+    else {
+        rootNode->setContentSize(Size(maxWidth, maxHeight));
+
+        ui::ScrollView *scrollView = ui::ScrollView::create();
+        scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
+        scrollView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+        scrollView->setScrollBarWidth(4.0f);
+        scrollView->setScrollBarOpacity(0x99);
+        scrollView->setContentSize(Size(maxWidth, maxHeight - 45.0f));
+        scrollView->setInnerContainerSize(Size(maxWidth, containerHeight));
+        scrollView->addChild(containerWidget);
+
+        containerWidget = scrollView;
+    }
+    rootNode->addChild(containerWidget);
+    containerWidget->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
+    containerWidget->setPosition(Vec2(maxWidth * 0.5f, 45.0f));
 
     label = Label::createWithSystemFont(__UTF8("点击按钮可叠加，超过上限时回到0"), "Arial", 10);
     label->setTextColor(C4B_BLACK);
@@ -1404,7 +1460,13 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
                 SET_FAN2(fan2Bits, n, cnt);
             }
         }
-        for (unsigned n = 0; n < 13; ++n) {
+        for (unsigned n = 0;
+#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
+            n < 14;
+#else
+            n < 13;
+#endif
+            ++n) {
             uint16_t cnt = fan_table[mahjong::PURE_DOUBLE_CHOW + n];
             if (cnt > 0) {
                 SET_FAN1(fan1Bits, n, cnt);
