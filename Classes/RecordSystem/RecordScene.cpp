@@ -870,37 +870,45 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *) {
     float maxWidth = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(maxWidth, 150.0f));
+    rootNode->setContentSize(Size(maxWidth, 170.0f));
 
     const float gap = (maxWidth - 4.0f) * 0.25f;
 
     static const int16_t value[4] = { -10, -5, +5, +10 };
     static const char *text[4] = { "-10", "-5", "+5", "+10" };
-    static const float buttonY[4] = { 115.0f, 90.0f, 40.0f, 15.0f };
+    static const float buttonY[4] = { 135.0f, 110.0f, 60.0f, 35.0f };
 
-    std::shared_ptr<std::array<int16_t, 4> > penaltyScores = std::make_shared<std::array<int16_t, 4> >();
-    memcpy(penaltyScores->data(), &_detail.penalty_scores, sizeof(_detail.penalty_scores));
+    std::shared_ptr<std::array<int16_t, 4> > penaltyScoresStrong = std::make_shared<std::array<int16_t, 4> >();
+    int16_t *penaltyScores = penaltyScoresStrong->data();
+    memcpy(penaltyScores, &_detail.penalty_scores, sizeof(_detail.penalty_scores));
+
+    int16_t sum = penaltyScores[0] + penaltyScores[1] + penaltyScores[2] + penaltyScores[3];
+    Label *label = Label::createWithSystemFont(Common::format(__UTF8("校验：%hd"), sum), "Arial", 12.0f);
+    label->setTextColor(sum == 0 ? C4B_GRAY : C4B_RED);
+    rootNode->addChild(label);
+    label->setPosition(Vec2(maxWidth * 0.5f, 10.0f));
+    Label *checkLabel = label;
 
     for (int i = 0; i < 4; ++i) {
         const float x = gap * (i + 0.5f);
 
         // 名字
-        Label *label = Label::createWithSystemFont(_playerNames[PLAYER_TO_UI(i)], "Arial", 12.0f);
+        label = Label::createWithSystemFont(_playerNames[PLAYER_TO_UI(i)], "Arial", 12.0f);
         label->setTextColor(C4B_ORANGE);
         rootNode->addChild(label);
-        label->setPosition(Vec2(x, 140.0f));
+        label->setPosition(Vec2(x, 160.0f));
         cw::scaleLabelToFitWidth(label, gap - 2.0f);
 
         ui::Scale9Sprite *sprite = ui::Scale9Sprite::create("source_material/btn_square_normal.png");
         rootNode->addChild(sprite);
         sprite->setContentSize(Size(30.0f, 20.0f));
-        sprite->setPosition(Vec2(x, 65.0f));
+        sprite->setPosition(Vec2(x, 85.0f));
 
         // 罚分
         label = Label::createWithSystemFont("", "Arial", 12);
         rootNode->addChild(label);
-        label->setPosition(Vec2(x, 65.0f));
-        updatePenaltyLabel(label, penaltyScores->at(PLAYER_TO_UI(i)));
+        label->setPosition(Vec2(x, 85.0f));
+        updatePenaltyLabel(label, penaltyScores[PLAYER_TO_UI(i)]);
 
         for (int n = 0; n < 4; ++n) {
             ui::Button *button = UICommon::createButton();
@@ -911,10 +919,14 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *) {
             rootNode->addChild(button);
             button->setPosition(Vec2(x, buttonY[n]));
             int v = value[n];
-            button->addClickEventListener([this, penaltyScores, label, i, v](Ref *) {
-                int16_t &ps = penaltyScores->at(PLAYER_TO_UI(i));
+            button->addClickEventListener([this, penaltyScores, label, checkLabel, i, v](Ref *) {
+                int16_t &ps = penaltyScores[PLAYER_TO_UI(i)];
                 ps += v;
                 updatePenaltyLabel(label, ps);
+
+                int16_t sum = penaltyScores[0] + penaltyScores[1] + penaltyScores[2] + penaltyScores[3];
+                checkLabel->setString(Common::format(__UTF8("校验：%hd"), sum));
+                checkLabel->setTextColor(sum == 0 ? C4B_GRAY : C4B_RED);
             });
         }
     }
@@ -924,8 +936,8 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *) {
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [this, penaltyScores](AlertDialog *, int) {
-        memcpy(&_detail.penalty_scores, penaltyScores->data(), sizeof(_detail.penalty_scores));
+        .setPositiveButton(__UTF8("确定"), [this, penaltyScoresStrong](AlertDialog *, int) {
+        memcpy(&_detail.penalty_scores, penaltyScoresStrong->data(), sizeof(_detail.penalty_scores));
         for (int i = 0; i < 4; ++i) {
             updatePenaltyText(_penaltyText[i], _detail.penalty_scores[PLAYER_TO_UI(i)]);
         }
