@@ -504,6 +504,8 @@ static std::string GetShortFanText(const Record::Detail &detail) {
             }
             return fanText;
         }
+
+        return __UTF8("其他凑番");
     }
 
     return __UTF8("未标记番种");
