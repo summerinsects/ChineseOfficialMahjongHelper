@@ -1312,7 +1312,7 @@ void RecordScene::finish() {
 }
 
 // in FanCalculatorScene.cpp
-extern cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth);
+extern cocos2d::ui::Widget *createFanResultWidget(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth);
 
 void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
     const float maxWidth = AlertDialog::maxWidth();
@@ -1409,8 +1409,8 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
 
         const float maxWidth = AlertDialog::maxWidth();
 
-        Node *innerNode = createFanResultNode(fan_table, 12, maxWidth);
-        const Size &fanResultSize = innerNode->getContentSize();
+        ui::Widget *innerWidget = createFanResultWidget(fan_table, 12, maxWidth);
+        const Size &fanResultSize = innerWidget->getContentSize();
 
         // 花（使用emoji代码）
         Label *flowerLabel = nullptr;
@@ -1431,18 +1431,18 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
             tilesNodeSize.width = maxWidth;
             tilesNodeSize.height *= scale;
         }
-        innerNode->addChild(tilesNode);
+        innerWidget->addChild(tilesNode);
         tilesNode->setPosition(Vec2(maxWidth * 0.5f, fanResultSize.height + 5 + tilesNodeSize.height * 0.5f));
 
         if (temp.flower_count > 0) {
-            innerNode->addChild(flowerLabel);
+            innerWidget->addChild(flowerLabel);
             const Size &flowerSize = flowerLabel->getContentSize();
             flowerLabel->setPosition(Vec2(0, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height * 0.5f));
 
-            innerNode->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height));
+            innerWidget->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height + 5 + flowerSize.height));
         }
         else {
-            innerNode->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height));
+            innerWidget->setContentSize(Size(maxWidth, fanResultSize.height + 5 + tilesNodeSize.height));
         }
 
         uint64_t fanBits = 0;
@@ -1475,7 +1475,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
 
         AlertDialog::Builder(this)
             .setTitle(__UTF8("记录和牌"))
-            .setContentNode(innerNode)
+            .setContentNode(innerWidget)
             .setCloseOnTouchOutside(false)
             .setPositiveButton(__UTF8("确定"), [this, temp, fan, fanBits, fan2Bits, fan1Bits, dlg](AlertDialog *, int) {
             _detail.fan = static_cast<uint16_t>(std::max(fan, 8));

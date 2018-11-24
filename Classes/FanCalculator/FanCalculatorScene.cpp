@@ -60,17 +60,17 @@ bool FanCalculatorScene::init() {
     return true;
 }
 
-extern cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth) {
+extern cocos2d::ui::Widget *createFanResultWidget(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth) {
     // 有n个番种，每行排2个
     ptrdiff_t fanCnt = mahjong::FAN_TABLE_SIZE - std::count(std::begin(fan_table), std::end(fan_table), 0);
     ptrdiff_t rows = (fanCnt >> 1) + (fanCnt & 1);  // 需要这么多行
 
     // 排列
-    Node *node = Node::create();
+    ui::Widget *rootWidget = ui::Widget::create();
     const int lineHeight = fontSize + 2;  // 每行间隔2像素
     ptrdiff_t resultAreaHeight = lineHeight * rows;
     resultAreaHeight += (5 + lineHeight) + 20;  // 总计+提示
-    node->setContentSize(Size(resultAreaWidth, static_cast<float>(resultAreaHeight)));
+    rootWidget->setContentSize(Size(resultAreaWidth, static_cast<float>(resultAreaHeight)));
 
     char str[64];
     uint16_t fan = 0;
@@ -91,7 +91,7 @@ extern cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         // 创建label，每行排2个
         Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
         label->setTextColor(C4B_GRAY);
-        node->addChild(label);
+        rootWidget->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         div_t ret = div(i, 2);
         label->setPosition(Vec2(ret.rem == 0 ? 0.0f : resultAreaWidth * 0.5f, static_cast<float>(resultAreaHeight - lineHeight * (ret.quot + 0.5f))));
@@ -102,7 +102,7 @@ extern cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
         widget->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         widget->setPosition(label->getPosition());
         widget->setContentSize(label->getContentSize());
-        node->addChild(widget);
+        rootWidget->addChild(widget);
         widget->addClickEventListener([j](Ref *) {
             FanTableScene::asyncShowFanDefinition(static_cast<unsigned>(j));
         });
@@ -111,17 +111,17 @@ extern cocos2d::Node *createFanResultNode(const mahjong::fan_table_t &fan_table,
     snprintf(str, sizeof(str), __UTF8("总计：%hu番"), fan);
     Label *label = Label::createWithSystemFont(str, "Arial", static_cast<float>(fontSize));
     label->setTextColor(C4B_BLACK);
-    node->addChild(label);
+    rootWidget->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(0.0f, lineHeight * 0.5f + 20.0f));
 
     label = Label::createWithSystemFont(__UTF8("点击番种名可查看番种介绍。"), "Arial", 10);
     label->setTextColor(C4B_BLUE_THEME);
-    node->addChild(label);
+    rootWidget->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(0.0f, 5.0f));
 
-    return node;
+    return rootWidget;
 }
 
 void FanCalculatorScene::calculate() {
@@ -174,13 +174,13 @@ void FanCalculatorScene::calculate() {
         return;
     }
 
-    Node *innerNode = createFanResultNode(fan_table, 14, fanAreaSize.width - 10.0f);
+    ui::Widget *innerWidget = createFanResultWidget(fan_table, 14, fanAreaSize.width - 10.0f);
 
     // 超出高度就使用ScrollView
-    if (innerNode->getContentSize().height <= fanAreaSize.height) {
-        _fanAreaNode->addChild(innerNode);
-        innerNode->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-        innerNode->setPosition(pos);
+    if (innerWidget->getContentSize().height <= fanAreaSize.height) {
+        _fanAreaNode->addChild(innerWidget);
+        innerWidget->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+        innerWidget->setPosition(pos);
     }
     else {
         ui::ScrollView *scrollView = ui::ScrollView::create();
@@ -189,8 +189,9 @@ void FanCalculatorScene::calculate() {
         scrollView->setScrollBarWidth(4.0f);
         scrollView->setScrollBarOpacity(0x99);
         scrollView->setContentSize(Size(fanAreaSize.width - 10.0f, fanAreaSize.height));
-        scrollView->setInnerContainerSize(innerNode->getContentSize());
-        scrollView->addChild(innerNode);
+        scrollView->setInnerContainerSize(innerWidget->getContentSize());
+        innerWidget->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+        scrollView->addChild(innerWidget);
 
         _fanAreaNode->addChild(scrollView);
         scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
