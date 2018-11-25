@@ -1165,7 +1165,7 @@ namespace {
 
         Node *node = createStatisticNode(rs);
         AlertDialog::Builder(this)
-            .setTitle(__UTF8("汇总"))
+            .setTitle(__UTF8("汇总结果"))
             .setContentNode(node)
             .setPositiveButton(__UTF8("确定"), nullptr)
             .create()->show();
