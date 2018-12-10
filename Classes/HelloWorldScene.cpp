@@ -150,6 +150,10 @@ bool HelloWorld::init() {
 
     upgradeDataIfNecessary();
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    LeftSideMenu::checkVersion(this, false);
+#endif
+
     return true;
 }
 

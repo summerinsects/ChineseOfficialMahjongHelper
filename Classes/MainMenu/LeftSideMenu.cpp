@@ -127,7 +127,6 @@ bool SettingScene::init() {
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 15.0f, origin.y + yPosTop - cellHeight * 2.0f - 10.0f));
 
-#if 0
     drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 3), Color4F::GRAY);
     drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 4), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
 
@@ -149,7 +148,6 @@ bool SettingScene::init() {
     });
 
     drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 4), Vec2(visibleSize.width, yPosTop - cellHeight * 4), Color4F::GRAY);
-#endif
 
     return true;
 }
@@ -392,44 +390,7 @@ void LeftSideMenu::onUpdateLogButton(cocos2d::Ref *) {
 
 void LeftSideMenu::onVersionCheckButton(cocos2d::Ref *) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-
-    static bool isSending = false;
-    if (isSending) {
-        return;
-    }
-    isSending = true;
-
-    network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
-    request->setRequestType(network::HttpRequest::Type::GET);
-    request->setUrl("https://api.github.com/repos/summerinsects/ChineseOfficialMahjongHelper/releases/latest");
-
-    request->setResponseCallback([this](network::HttpClient *client, network::HttpResponse *response) {
-        CC_UNUSED_PARAM(client);
-        network::HttpClient::destroyInstance();
-
-        isSending = false;
-
-        if (response == nullptr) {
-            return;
-        }
-
-        log("HTTP Status Code: %ld", response->getResponseCode());
-
-        if (!response->isSucceed()) {
-            log("response failed");
-            log("error buffer: %s", response->getErrorBuffer());
-            Toast::makeText(_scene, __UTF8("获取最新版本失败"), Toast::LENGTH_LONG)->show();
-            return;
-        }
-
-        std::vector<char> *buffer = response->getResponseData();
-        if (!checkVersion(buffer)) {
-            Toast::makeText(_scene, __UTF8("获取最新版本失败"), Toast::LENGTH_LONG)->show();
-        }
-    });
-
-    network::HttpClient::getInstance()->send(request);
-    request->release();
+    checkVersion(_scene, true);
 #else
     Toast::makeText(_scene, __UTF8("当前平台不支持该操作"), Toast::LENGTH_LONG)->show();
 #endif
@@ -450,7 +411,81 @@ void LeftSideMenu::onExitButton(cocos2d::Ref *) {
 }
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-bool LeftSideMenu::checkVersion(const std::vector<char> *buffer) {
+static bool needRequest() {
+    UserDefault *userDefault = UserDefault::getInstance();
+    userDefault->deleteValueForKey("not_notify");
+    if (!userDefault->getBoolForKey("auto_check_version")) {
+        return false;
+    }
+
+    // 有新版本
+    if (userDefault->getBoolForKey("has_new_version")) {
+        // 如果未选中明天提醒，则检测
+        // 如果选中明天提醒，超过一天时，检测
+        if (!userDefault->getBoolForKey("notify_tomorrow")) {
+            return true;
+        }
+    }
+
+    // 距离上次检测有间隔一天再检测
+    time_t lastTime = static_cast<time_t>(atoll(userDefault->getStringForKey("last_request_time").c_str()));
+    time_t now = time(nullptr);
+    struct tm tma = *localtime(&lastTime);
+    struct tm tmb = *localtime(&now);
+    return (tma.tm_year != tmb.tm_year || tma.tm_mon != tmb.tm_mon || tma.tm_mday != tmb.tm_mday);
+}
+
+void LeftSideMenu::checkVersion(cocos2d::Scene *scene, bool manual) {
+    if (!manual && !needRequest()) {
+        return;
+    }
+
+    static bool isSending = false;
+    if (isSending) {
+        return;
+    }
+    isSending = true;
+
+    network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
+    request->setRequestType(network::HttpRequest::Type::GET);
+    request->setUrl("https://api.github.com/repos/summerinsects/ChineseOfficialMahjongHelper/releases/latest");
+
+    auto sceneStrong = makeRef(scene);
+    request->setResponseCallback([sceneStrong, manual](network::HttpClient *client, network::HttpResponse *response) {
+        CC_UNUSED_PARAM(client);
+        network::HttpClient::destroyInstance();
+
+        isSending = false;
+
+        if (response == nullptr) {
+            return;
+        }
+
+        log("HTTP Status Code: %ld", response->getResponseCode());
+
+        Scene *scene = sceneStrong.get();
+        if (!response->isSucceed()) {
+            log("response failed");
+            log("error buffer: %s", response->getErrorBuffer());
+            if (manual && scene->isRunning()) {
+                Toast::makeText(scene, __UTF8("获取最新版本失败"), Toast::LENGTH_LONG)->show();
+            }
+            return;
+        }
+
+        std::vector<char> *buffer = response->getResponseData();
+        if (!_checkVersion(scene, manual, buffer)) {
+            if (manual && scene->isRunning()) {
+                Toast::makeText(scene, __UTF8("获取最新版本失败"), Toast::LENGTH_LONG)->show();
+            }
+        }
+    });
+
+    network::HttpClient::getInstance()->send(request);
+    request->release();
+}
+
+bool LeftSideMenu::_checkVersion(cocos2d::Scene *scene, bool manual, const std::vector<char> *buffer) {
     if (buffer == nullptr) {
         return false;
     }
@@ -475,8 +510,14 @@ bool LeftSideMenu::checkVersion(const std::vector<char> *buffer) {
         userDefault->setStringForKey("last_request_time", std::to_string(time(nullptr)));
         userDefault->setBoolForKey("notify_tomorrow", false);
 
+        if (UNLIKELY(!scene->isRunning())) {
+            return true;
+        }
+
         if (!hasNewVersion) {
-            Toast::makeText(_scene, __UTF8("已经是最新版本"), Toast::LENGTH_LONG)->show();
+            if (manual) {
+                Toast::makeText(scene, __UTF8("已经是最新版本"), Toast::LENGTH_LONG)->show();
+            }
             return true;
         }
 
@@ -486,7 +527,7 @@ bool LeftSideMenu::checkVersion(const std::vector<char> *buffer) {
             body = it->value.GetString();
         }
 
-        AlertDialog::Builder(_scene)
+        AlertDialog::Builder(scene)
             .setTitle(__UTF8("检测到新版本"))
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
             .setMessage(Common::format(__UTF8("%s，是否下载？\n\n%s"), tag.c_str(), body.c_str()))

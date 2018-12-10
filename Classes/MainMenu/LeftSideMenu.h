@@ -18,6 +18,10 @@ public:
         this->removeFromParent();
     }
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    static void checkVersion(cocos2d::Scene *scene, bool manual);
+#endif
+
 private:
     cocos2d::Scene *_scene = nullptr;
 
@@ -29,7 +33,7 @@ private:
     void onExitButton(cocos2d::Ref *sender);
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    bool checkVersion(const std::vector<char> *buffer);
+    static bool _checkVersion(cocos2d::Scene *scene, bool manual, const std::vector<char> *buffer);
 #endif
 };
 
