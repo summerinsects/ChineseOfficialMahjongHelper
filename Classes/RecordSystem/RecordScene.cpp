@@ -1013,11 +1013,8 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         refreshLittleFanButton(button, tempCnt, mahjong::PURE_DOUBLE_CHOW + idx);
     };
 
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
-    const float containerHeight = 255.0f;
-#else
-    const float containerHeight = 210.0f;
-#endif
+    const mahjong::rule_t rule = static_cast<mahjong::rule_t>(UserDefault::getInstance()->getIntegerForKey("rule_version", static_cast<int>(mahjong::rule_t::MIL_2015)));
+    const float containerHeight = (rule == mahjong::rule_t::MIL_2015) ? 255.0f : 210.0f;
 
     // 2番
     Label *label = Label::createWithSystemFont(__UTF8("2番"), "Arial", 12);
@@ -1073,14 +1070,13 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         refreshLittleFanButton(button, cnt, mahjong::PURE_DOUBLE_CHOW + i);
     }
 
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
-    label = Label::createWithSystemFont(__UTF8("5番"), "Arial", 12);
-    label->setTextColor(C4B_BLACK);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    containerWidget->addChild(label);
-    label->setPosition(Vec2(5.0f, 30.0f));
+    if (rule == mahjong::rule_t::MIL_2015) {
+        label = Label::createWithSystemFont(__UTF8("5番"), "Arial", 12);
+        label->setTextColor(C4B_BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        containerWidget->addChild(label);
+        label->setPosition(Vec2(5.0f, 30.0f));
 
-    {
         const int i = mahjong::CONCEALED_KONG_AND_MELDED_KONG - mahjong::PURE_DOUBLE_CHOW;
 
         ui::Button *button = ui::Button::create();
@@ -1097,7 +1093,6 @@ void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
         uint32_t cnt = COUNT_FAN1(fan1Bits, i);
         refreshLittleFanButton(button, cnt, mahjong::CONCEALED_KONG_AND_MELDED_KONG);
     }
-#endif
 
     // 超出高度就使用ScrollView
     if (maxHeight >= containerHeight + 45.0f) {
@@ -1404,7 +1399,8 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
         temp.seat_wind = extraInfo->getSeatWind();
 
         // 算番
-        int fan = mahjong::calculate_fan(&temp, &fan_table);
+        mahjong::rule_t rule = static_cast<mahjong::rule_t>(UserDefault::getInstance()->getIntegerForKey("rule_version", static_cast<int>(mahjong::rule_t::MIL_2015)));
+        int fan = mahjong::calculate_fan(&temp, &fan_table, rule);
 
         if (fan == ERROR_NOT_WIN) {
             Toast::makeText(this, __UTF8("诈和"), Toast::LENGTH_LONG)->show();
@@ -1472,13 +1468,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
                 SET_FAN2(fan2Bits, n, cnt);
             }
         }
-        for (unsigned n = 0;
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
-            n < 14;
-#else
-            n < 13;
-#endif
-            ++n) {
+        for (unsigned n = 0, max = (rule == mahjong::rule_t::MIL_2015) ? 14 : 13; n < max; ++n) {
             uint16_t cnt = fan_table[mahjong::PURE_DOUBLE_CHOW + n];
             if (cnt > 0) {
                 SET_FAN1(fan1Bits, n, cnt);

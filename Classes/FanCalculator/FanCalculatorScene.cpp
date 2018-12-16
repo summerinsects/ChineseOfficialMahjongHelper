@@ -159,7 +159,8 @@ void FanCalculatorScene::calculate() {
     param.win_flag = win_flag;
     param.prevalent_wind = prevalent_wind;
     param.seat_wind = seat_wind;
-    int fan = calculate_fan(&param, &fan_table);
+    mahjong::rule_t rule = static_cast<mahjong::rule_t>(UserDefault::getInstance()->getIntegerForKey("rule_version", static_cast<int>(mahjong::rule_t::MIL_2015)));
+    int fan = calculate_fan(&param, &fan_table, rule);
 
     if (fan == ERROR_NOT_WIN) {
         Toast::makeText(this, __UTF8("诈和"), Toast::LENGTH_LONG)->show();

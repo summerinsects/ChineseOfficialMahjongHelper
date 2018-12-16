@@ -354,9 +354,7 @@ static const char *fan_short_name[] = {
     __UTF8("箭刻"), __UTF8("圈风"), __UTF8("门风"), __UTF8("门清"), __UTF8("平和"), __UTF8("四归"), __UTF8("双同刻"), __UTF8("双暗"), __UTF8("暗杠"), __UTF8("断幺"),
     __UTF8("一般高"), __UTF8("喜相逢"), __UTF8("连六"), __UTF8("老少"), __UTF8("幺九"), __UTF8("明杠"), __UTF8("缺门"), __UTF8("无字"), __UTF8("边张"), __UTF8("嵌张"), __UTF8("单钓"), __UTF8("自摸"),
     __UTF8("花牌")
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     , __UTF8("明暗杠")
-#endif
 };
 
 static std::string GetShortFanText(const Record::Detail &detail) {
@@ -464,11 +462,10 @@ static std::string GetShortFanText(const Record::Detail &detail) {
 
     uint64_t fan1Bits = detail.fan1_bits;
 
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
-    if (COUNT_FAN1(fan1Bits, mahjong::CONCEALED_KONG_AND_MELDED_KONG - mahjong::PURE_DOUBLE_CHOW)) {
+    mahjong::rule_t rule = static_cast<mahjong::rule_t>(UserDefault::getInstance()->getIntegerForKey("rule_version", static_cast<int>(mahjong::rule_t::MIL_2015)));
+    if (rule == mahjong::rule_t::MIL_2015 && COUNT_FAN1(fan1Bits, mahjong::CONCEALED_KONG_AND_MELDED_KONG - mahjong::PURE_DOUBLE_CHOW)) {
         return mahjong::fan_name[mahjong::CONCEALED_KONG_AND_MELDED_KONG];
     }
-#endif
 
     uint32_t fan2Bits = detail.fan2_bits;
 
@@ -1141,13 +1138,8 @@ static std::string GetLongFanText(const Record::Detail &detail) {
             }
         }
 
-        for (unsigned n = 0;
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
-            n < 14;
-#else
-            n < 13;
-#endif
-            ++n) {
+        mahjong::rule_t rule = static_cast<mahjong::rule_t>(UserDefault::getInstance()->getIntegerForKey("rule_version", static_cast<int>(mahjong::rule_t::MIL_2015)));
+        for (unsigned n = 0, max = (rule == mahjong::rule_t::MIL_2015) ? 14 : 13; n < max; ++n) {
             unsigned cnt = COUNT_FAN1(fan1Bits, n);
             if (cnt > 0) {
                 fanText.append(__UTF8("「"));

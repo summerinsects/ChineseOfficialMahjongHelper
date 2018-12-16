@@ -66,8 +66,6 @@
 #define LOG(...) ((void)0)
 #endif
 
-//#define STRICT_98_RULE
-
 namespace mahjong {
 
 #if 0  // Debug
@@ -627,7 +625,7 @@ static void calculate_2_chows_unordered(const tile_t (&mid_tiles)[2], fan_table_
 }
 
 // 刻子（杠）算番
-static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_table_t &fan_table) {
+static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_table_t &fan_table, rule_t rule) {
     // 统计明杠 暗杠 明刻 暗刻
     int melded_kong_cnt = 0;
     int concealed_kong_cnt = 0;
@@ -650,15 +648,15 @@ static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_tab
 
     // 规则
     // 三杠
-    // 明杠 明杠 暗杠 暗刻 -> 三杠+双暗刻+碰碰和
-    // 明杠 暗杠 暗杠 明刻 -> 三杠+双暗刻+碰碰和
-    // 明杠 暗杠 暗杠 暗刻 -> 三杠+三暗刻+碰碰和
+    // 明杠 明杠 暗杠 暗刻 -> 三杠+双暗刻+碰碰和(MIL)/三杠+暗杠+双暗刻+碰碰和(98)
+    // 明杠 暗杠 暗杠 明刻 -> 三杠+双暗刻+碰碰和(MIL)/三杠+双暗杠+碰碰和(98)
+    // 明杠 暗杠 暗杠 暗刻 -> 三杠+三暗刻+碰碰和(MIL)/三杠+双暗杠+三暗刻+碰碰和(98)
     // 暗杠 暗杠 暗杠 明刻 -> 三杠+三暗刻+碰碰和
     // 暗杠 暗杠 暗杠 暗刻 -> 三杠+四暗刻
     //
     // 四杠
-    // 暗杠 明杠 明杠 明杠 -> 四杠
-    // 暗杠 暗杠 明杠 明杠 -> 四杠+双暗刻
+    // 暗杠 明杠 明杠 明杠 -> 四杠(MIL)/四杠+暗杠(98)
+    // 暗杠 暗杠 明杠 明杠 -> 四杠+双暗刻(MIL)/四杠+双暗杠(98)
     // 暗杠 暗杠 暗杠 明杠 -> 四杠+三暗刻
     // 暗杠 暗杠 暗杠 暗杠 -> 四杠+四暗刻
     //
@@ -702,12 +700,13 @@ static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_tab
             }
             break;
         case 1:  // 明暗杠
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
-            fan_table[CONCEALED_KONG_AND_MELDED_KONG] = 1;
-#else
-            fan_table[MELDED_KONG] = 1;
-            fan_table[CONCEALED_KONG] = 1;
-#endif
+            if (rule != rule_t::ORIGIN_1998) {
+                fan_table[CONCEALED_KONG_AND_MELDED_KONG] = 1;
+            }
+            else {
+                fan_table[MELDED_KONG] = 1;
+                fan_table[CONCEALED_KONG] = 1;
+            }
             switch (concealed_pung_cnt) {  // 暗刻的个数
             case 1: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
             case 2: fan_table[THREE_CONCEALED_PUNGS] = 1; break;
@@ -735,13 +734,24 @@ static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_tab
             if (concealed_pung_cnt > 0) {
                 fan_table[TWO_CONCEALED_PUNGS] = 1;
             }
+            if (rule != rule_t::MIL_2015) {
+                fan_table[CONCEALED_KONG] = 1;
+            }
             break;
         case 2:  // 2暗杠1明杠
             if (concealed_pung_cnt == 0) {
-                fan_table[TWO_CONCEALED_PUNGS] = 1;
+                if (rule == rule_t::MIL_2015) {
+                    fan_table[TWO_CONCEALED_PUNGS] = 1;
+                }
+                else {
+                    fan_table[TWO_CONCEALED_KONGS] = 1;
+                }
             }
             else {
                 fan_table[THREE_CONCEALED_PUNGS] = 1;
+                if (rule != rule_t::MIL_2015) {
+                    fan_table[TWO_CONCEALED_KONGS] = 1;
+                }
             }
             break;
         case 3:  // 3暗杠
@@ -759,7 +769,8 @@ static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_tab
     case 4:  // 4个杠
         fan_table[FOUR_KONGS] = 1;
         switch (concealed_kong_cnt) {
-        case 2: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
+        case 1: if (rule != rule_t::MIL_2015) fan_table[CONCEALED_KONG] = 1; break;
+        case 2: fan_table[rule == rule_t::MIL_2015 ? TWO_CONCEALED_PUNGS : TWO_CONCEALED_KONGS] = 1; break;
         case 3: fan_table[THREE_CONCEALED_PUNGS] = 1; break;
         case 4: fan_table[FOUR_CONCEALED_PUNGS] = 1; break;
         default: break;
@@ -1044,12 +1055,10 @@ static void adjust_by_suits(const tile_t *tiles, intptr_t tile_cnt, fan_table_t 
 }
 
 // 根据数牌的范围调整——涉及番种：大于五、小于五、全大、全中、全小
-static void adjust_by_rank_range(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
-#ifdef STRICT_98_RULE
-    if (fan_table[SEVEN_PAIRS]) {
+static void adjust_by_rank_range(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table, rule_t rule) {
+    if (fan_table[SEVEN_PAIRS] && rule == rule_t::ORIGIN_1998) {
         return;  // 严格98规则的七对不支持叠加这些
     }
-#endif
 
     // 打表标记有哪些数
     uint16_t rank_flag = 0;
@@ -1131,7 +1140,7 @@ static void adjust_by_packs_traits(const pack_t (&packs)[5], fan_table_t &fan_ta
 }
 
 // 根据牌特性调整——涉及番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
-static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
+static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table, rule_t rule) {
     // 断幺
     if (std::none_of(tiles, tiles + tile_cnt, &is_terminal_or_honor)) {
         fan_table[ALL_SIMPLES] = 1;
@@ -1142,11 +1151,9 @@ static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_t
         fan_table[REVERSIBLE_TILES] = 1;
     }
 
-#ifdef STRICT_98_RULE
-    if (fan_table[SEVEN_PAIRS]) {
+    if (fan_table[SEVEN_PAIRS] && rule == rule_t::ORIGIN_1998) {
         return;  // 严格98规则的七对不支持绿一色、字一色、清幺九、混幺九
     }
-#endif
 
     // 绿一色
     if (std::all_of(tiles, tiles + tile_cnt, &is_green)) {
@@ -1253,7 +1260,7 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, intptr_t pack_
 }
 
 // 统一调整一些不计的
-static void adjust_fan_table(fan_table_t &fan_table) {
+static void adjust_fan_table(fan_table_t &fan_table, rule_t rule) {
     // 大四喜不计三风刻、碰碰和、圈风刻、门风刻、幺九刻
     if (fan_table[BIG_FOUR_WINDS]) {
         fan_table[BIG_THREE_WINDS] = 0;
@@ -1264,9 +1271,10 @@ static void adjust_fan_table(fan_table_t &fan_table) {
     if (fan_table[BIG_THREE_DRAGONS]) {
         fan_table[TWO_DRAGONS_PUNGS] = 0;
         fan_table[DRAGON_PUNG] = 0;
-#ifdef STRICT_98_RULE
-        fan_table[ONE_VOIDED_SUIT] = 0;
-#endif
+
+        if (rule == rule_t::ORIGIN_1998) {
+            fan_table[ONE_VOIDED_SUIT] = 0;
+        }
     }
     // 绿一色不计混一色、缺一门
     if (fan_table[ALL_GREEN]) {
@@ -1280,6 +1288,7 @@ static void adjust_fan_table(fan_table_t &fan_table) {
         --fan_table[PUNG_OF_TERMINALS_OR_HONORS];
         fan_table[ONE_VOIDED_SUIT] = 0;
         fan_table[NO_HONORS] = 0;
+
         if (fan_table[FULLY_CONCEALED_HAND]) {
             fan_table[FULLY_CONCEALED_HAND] = 0;
             fan_table[SELF_DRAWN] = 1;
@@ -1311,11 +1320,15 @@ static void adjust_fan_table(fan_table_t &fan_table) {
         fan_table[OUTSIDE_HAND] = 0;
         fan_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
         fan_table[NO_HONORS] = 0;
-        fan_table[DOUBLE_PUNG] = 0;  // 通行计法不计双同刻
-#ifdef STRICT_98_RULE
-        fan_table[TRIPLE_PUNG] = 0;
-        fan_table[DOUBLE_PUNG] = 0;
-#endif
+
+        if (rule == rule_t::MIL_2015) {
+            fan_table[DOUBLE_PUNG] = 0;  // 通行计法不计双同刻
+        }
+
+        if (rule == rule_t::ORIGIN_1998) {
+            fan_table[TRIPLE_PUNG] = 0;
+            fan_table[DOUBLE_PUNG] = 0;
+        }
     }
 
     // 小四喜不计三风刻
@@ -1331,9 +1344,10 @@ static void adjust_fan_table(fan_table_t &fan_table) {
     if (fan_table[LITTLE_THREE_DRAGONS]) {
         fan_table[TWO_DRAGONS_PUNGS] = 0;
         fan_table[DRAGON_PUNG] = 0;
-#ifdef STRICT_98_RULE
-        fan_table[ONE_VOIDED_SUIT] = 0;
-#endif
+
+        if (rule == rule_t::ORIGIN_1998) {
+            fan_table[ONE_VOIDED_SUIT] = 0;
+        }
     }
 
     // 字一色不计混幺九、碰碰胡、全带幺、幺九刻、缺一门
@@ -1369,17 +1383,19 @@ static void adjust_fan_table(fan_table_t &fan_table) {
         fan_table[PURE_SHIFTED_PUNGS] = 0;
         fan_table[TILE_HOG] = 0;
         fan_table[PURE_DOUBLE_CHOW] = 0;
-#ifdef STRICT_98_RULE
-        fan_table[ONE_VOIDED_SUIT] = 0;
-#endif
+
+        if (rule == rule_t::ORIGIN_1998) {
+            fan_table[ONE_VOIDED_SUIT] = 0;
+        }
     }
     // 一色四节高不计一色三节高、碰碰和（严格98规则不计缺一门）
     if (fan_table[FOUR_PURE_SHIFTED_PUNGS]) {
         fan_table[PURE_TRIPLE_CHOW] = 0;
         fan_table[ALL_PUNGS] = 0;
-#ifdef STRICT_98_RULE
-        fan_table[ONE_VOIDED_SUIT] = 0;
-#endif
+
+        if (rule == rule_t::ORIGIN_1998) {
+            fan_table[ONE_VOIDED_SUIT] = 0;
+        }
     }
 
     // 一色四步高不计一色三步高、老少副、连六（严格98规则不计缺一门）
@@ -1387,9 +1403,10 @@ static void adjust_fan_table(fan_table_t &fan_table) {
         fan_table[PURE_SHIFTED_CHOWS] = 0;
         fan_table[TWO_TERMINAL_CHOWS] = 0;
         fan_table[SHORT_STRAIGHT] = 0;
-#ifdef STRICT_98_RULE
-        fan_table[ONE_VOIDED_SUIT] = 0;
-#endif
+
+        if (rule == rule_t::ORIGIN_1998) {
+            fan_table[ONE_VOIDED_SUIT] = 0;
+        }
     }
 
     // 混幺九不计碰碰和、全带幺、幺九刻
@@ -1478,9 +1495,10 @@ static void adjust_fan_table(fan_table_t &fan_table) {
             assert(fan_table[PUNG_OF_TERMINALS_OR_HONORS] >= 3);
             fan_table[PUNG_OF_TERMINALS_OR_HONORS] -= 3;
         }
-#ifdef STRICT_98_RULE
-        fan_table[ONE_VOIDED_SUIT] = 0;
-#endif
+
+        if (rule == rule_t::ORIGIN_1998) {
+            fan_table[ONE_VOIDED_SUIT] = 0;
+        }
     }
 
     // 推不倒不计缺一门
@@ -1575,7 +1593,7 @@ static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
 }
 
 // 基本和型算番
-static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
+static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table, rule_t rule) {
     pack_t pair_pack = 0;
     pack_t chow_packs[4];
     pack_t pung_packs[4];
@@ -1617,7 +1635,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     }
 
     if (pung_cnt > 0) { // 有刻子
-        calculate_kongs(pung_packs, pung_cnt, fan_table);
+        calculate_kongs(pung_packs, pung_cnt, fan_table, rule);
     }
 
     switch (chow_cnt) {
@@ -1720,16 +1738,16 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     // 根据花色调整——涉及番种：无字、缺一门、混一色、清一色、五门齐
     adjust_by_suits(tiles, tile_cnt, fan_table);
     // 根据牌特性调整——涉及番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
-    adjust_by_tiles_traits(tiles, tile_cnt, fan_table);
+    adjust_by_tiles_traits(tiles, tile_cnt, fan_table, rule);
     // 根据数牌的范围调整——涉及番种：大于五、小于五、全大、全中、全小
-    adjust_by_rank_range(tiles, tile_cnt, fan_table);
+    adjust_by_rank_range(tiles, tile_cnt, fan_table, rule);
     // 四归一调整
     adjust_by_tiles_hog(tiles, tile_cnt, fan_table);
     // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
     adjust_by_waiting_form(packs + fixed_cnt, 5 - fixed_cnt, standing_tiles, standing_cnt, win_tile, fan_table);
 
     // 统一调整一些不计的
-    adjust_fan_table(fan_table);
+    adjust_fan_table(fan_table, rule);
 
     // 调整圈风刻、门风刻（大四喜不计圈风刻、门风刻）
     if (fan_table[BIG_FOUR_WINDS] == 0) {
@@ -1748,7 +1766,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
 }
 
 // “组合龙+面子+雀头”和型算番
-static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
+static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table, rule_t rule) {
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
     tile_t win_tile = calculate_param->win_tile;
     wind_t prevalent_wind = calculate_param->prevalent_wind;
@@ -1808,7 +1826,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
         }
     }
     else {
-        calculate_kongs(&packs[3], 1, fan_table);
+        calculate_kongs(&packs[3], 1, fan_table, rule);
     }
 
     adjust_by_win_flag(win_flag, fan_table);
@@ -1852,7 +1870,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     }
 
     // 统一调整一些不计的
-    adjust_fan_table(fan_table);
+    adjust_fan_table(fan_table, rule);
 
     // 调整圈风刻、门风刻
     tile_t tile = pack_get_tile(packs[3]);
@@ -1905,7 +1923,7 @@ static bool calculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14
 }
 
 // 特殊和型算番
-static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_flag_t win_flag, fan_table_t &fan_table) {
+static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_flag_t win_flag, fan_table_t &fan_table, rule_t rule) {
     // 七对
     if (standing_tiles[0] == standing_tiles[1]
         && standing_tiles[2] == standing_tiles[3]
@@ -1924,7 +1942,7 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
             && standing_tiles[10] + 1 == standing_tiles[12]) {
             // 连七对
             fan_table[SEVEN_SHIFTED_PAIRS] = 1;
-            adjust_by_tiles_traits(standing_tiles, 14, fan_table);
+            adjust_by_tiles_traits(standing_tiles, 14, fan_table, rule);
         }
         else {
             // 普通七对
@@ -1933,9 +1951,9 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
             // 根据花色调整——涉及番种：无字、缺一门、混一色、清一色、五门齐
             adjust_by_suits(standing_tiles, 14, fan_table);
             // 根据牌特性调整——涉及番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
-            adjust_by_tiles_traits(standing_tiles, 14, fan_table);
+            adjust_by_tiles_traits(standing_tiles, 14, fan_table, rule);
             // 根据数牌的范围调整——涉及番种：大于五、小于五、全大、全中、全小
-            adjust_by_rank_range(standing_tiles, 14, fan_table);
+            adjust_by_rank_range(standing_tiles, 14, fan_table, rule);
             // 四归一调整
             adjust_by_tiles_hog(standing_tiles, 14, fan_table);
         }
@@ -1953,7 +1971,7 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
 
     adjust_by_win_flag(win_flag, fan_table);
     // 统一调整一些不计的，根据风调整就没必要了，这些特殊和型都没有面子，不存在圈风刻、门风刻
-    adjust_fan_table(fan_table);
+    adjust_fan_table(fan_table, rule);
 
     return true;
 }
@@ -2028,7 +2046,7 @@ int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 算番
 //
-int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table) {
+int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table, rule_t rule) {
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
     tile_t win_tile = calculate_param->win_tile;
     win_flag_t win_flag = calculate_param->win_flag;
@@ -2084,19 +2102,19 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
 
     // 先判断各种特殊和型
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table)) {
+        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table, rule)) {
             max_fan = get_fan_by_table(special_fan_table);
             selected_fan_table = &special_fan_table;
             LOG("fan = %d\n\n", max_fan);
         }
-        else if (calculate_special_form_fan(standing_tiles, win_flag, special_fan_table)) {
+        else if (calculate_special_form_fan(standing_tiles, win_flag, special_fan_table, rule)) {
             max_fan = get_fan_by_table(special_fan_table);
             selected_fan_table = &special_fan_table;
             LOG("fan = %d\n\n", max_fan);
         }
     }
     else if (fixed_cnt == 1) {  // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table)) {
+        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table, rule)) {
             max_fan = get_fan_by_table(special_fan_table);
             selected_fan_table = &special_fan_table;
             LOG("fan = %d\n\n", max_fan);
@@ -2118,7 +2136,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
                 packs_to_string(result.divisions[i].packs, 5, str, sizeof(str));
                 puts(str);
 #endif
-                calculate_basic_form_fan(result.divisions[i].packs, calculate_param, win_flag, fan_tables[i]);
+                calculate_basic_form_fan(result.divisions[i].packs, calculate_param, win_flag, fan_tables[i], rule);
                 int current_fan = get_fan_by_table(fan_tables[i]);
                 if (current_fan > max_fan) {
                     max_fan = current_fan;

@@ -25,8 +25,6 @@
 
 #include "tile.h"
 
-#define SUPPORT_CONCEALED_KONG_AND_MELDED_KONG 1  // 支持明暗杠
-
 namespace mahjong {
 
 /**
@@ -133,11 +131,16 @@ enum fan_t {
 
     FLOWER_TILES,                       ///< 花牌
 
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     CONCEALED_KONG_AND_MELDED_KONG,     ///< 明暗杠
-#endif
 
     FAN_TABLE_SIZE
+};
+
+/**
+ * @brief 规则
+ */
+enum class rule_t {
+    MIL_2015, ORIGIN_1998
 };
 
 /**
@@ -214,7 +217,7 @@ typedef uint16_t fan_table_t[FAN_TABLE_SIZE];
  * @retval ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
  * @retval ERROR_NOT_WIN 没和牌
  */
-int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table);
+int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table, rule_t rule);
 
 #if 0
 
@@ -237,9 +240,7 @@ static const char *fan_name[] = {
     "Two Concealed Pungs", "Concealed Kong", "All Simples",
     "Pure Double Chow", "Mixed Double Chow", "Short Straight", "Two Terminal Chows", "Pung of Terminals or Honors", "Melded Kong", "One Voided Suit", "No Honors", "Edge Wait", "Closed Wait", "Single Wait", "Self-Drawn",
     "Flower Tiles"
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     , "Concealed Kong and Melded Kong"
-#endif
 };
 
 #else
@@ -280,9 +281,7 @@ static const char *fan_name[] = {
     __UTF8("箭刻"), __UTF8("圈风刻"), __UTF8("门风刻"), __UTF8("门前清"), __UTF8("平和"), __UTF8("四归一"), __UTF8("双同刻"), __UTF8("双暗刻"), __UTF8("暗杠"), __UTF8("断幺"),
     __UTF8("一般高"), __UTF8("喜相逢"), __UTF8("连六"), __UTF8("老少副"), __UTF8("幺九刻"), __UTF8("明杠"), __UTF8("缺一门"), __UTF8("无字"), __UTF8("边张"), __UTF8("嵌张"), __UTF8("单钓将"), __UTF8("自摸"),
     __UTF8("花牌")
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     , __UTF8("明暗杠")
-#endif
 };
 
 #endif
@@ -305,9 +304,7 @@ static const uint16_t fan_value_table[FAN_TABLE_SIZE] = {
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1
-#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     , 5
-#endif
 };
 
 /**

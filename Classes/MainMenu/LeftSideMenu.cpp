@@ -22,6 +22,15 @@
 #define QR_CODE_URL "https://www.pgyer.com/app/qrcode/comh-android"
 #endif
 
+class RadioButtonScale9 : public cocos2d::ui::RadioButton {
+public:
+    CREATE_FUNC(RadioButtonScale9);
+
+protected:
+    virtual void initRenderer() override;
+    virtual void adaptRenderers() override;
+};
+
 class SettingScene : public BaseScene {
 public:
     CREATE_FUNC(SettingScene);
@@ -29,6 +38,59 @@ public:
 };
 
 USING_NS_CC;
+
+static const int BACKGROUNDBOX_RENDERER_Z = (-1);
+static const int BACKGROUNDSELECTEDBOX_RENDERER_Z = (-1);
+static const int FRONTCROSS_RENDERER_Z = (-1);
+static const int BACKGROUNDBOXDISABLED_RENDERER_Z = (-1);
+static const int FRONTCROSSDISABLED_RENDERER_Z = (-1);
+
+void RadioButtonScale9::initRenderer() {
+    _backGroundBoxRenderer = ui::Scale9Sprite::create();
+    _backGroundSelectedBoxRenderer = ui::Scale9Sprite::create();
+    _frontCrossRenderer = ui::Scale9Sprite::create();
+    _backGroundBoxDisabledRenderer = ui::Scale9Sprite::create();
+    _frontCrossDisabledRenderer = ui::Scale9Sprite::create();
+
+    addProtectedChild(_backGroundBoxRenderer, BACKGROUNDBOX_RENDERER_Z, -1);
+    addProtectedChild(_backGroundSelectedBoxRenderer, BACKGROUNDSELECTEDBOX_RENDERER_Z, -1);
+    addProtectedChild(_frontCrossRenderer, FRONTCROSS_RENDERER_Z, -1);
+    addProtectedChild(_backGroundBoxDisabledRenderer, BACKGROUNDBOXDISABLED_RENDERER_Z, -1);
+    addProtectedChild(_frontCrossDisabledRenderer, FRONTCROSSDISABLED_RENDERER_Z, -1);
+}
+
+void RadioButtonScale9::adaptRenderers() {
+    if (_backGroundBoxRendererAdaptDirty) {
+        ((ui::Scale9Sprite *)_backGroundBoxRenderer)->setCapInsets(Rect::ZERO);
+        _backGroundBoxRenderer->setContentSize(_contentSize);
+        _backGroundBoxRenderer->setPosition(_contentSize.width * 0.5f, _contentSize.height * 0.5f);
+        _backGroundBoxRendererAdaptDirty = false;
+    }
+    if (_backGroundSelectedBoxRendererAdaptDirty) {
+        ((ui::Scale9Sprite *)_backGroundSelectedBoxRenderer)->setCapInsets(Rect::ZERO);
+        _backGroundSelectedBoxRenderer->setContentSize(_contentSize);
+        _backGroundSelectedBoxRenderer->setPosition(_contentSize.width * 0.5f, _contentSize.height * 0.5f);
+        _backGroundSelectedBoxRendererAdaptDirty = false;
+    }
+    if (_frontCrossRendererAdaptDirty) {
+        ((ui::Scale9Sprite *)_frontCrossRenderer)->setCapInsets(Rect::ZERO);
+        _frontCrossRenderer->setContentSize(_contentSize);
+        _frontCrossRenderer->setPosition(_contentSize.width * 0.5f, _contentSize.height * 0.5f);
+        _frontCrossRendererAdaptDirty = false;
+    }
+    if (_backGroundBoxDisabledRendererAdaptDirty) {
+        ((ui::Scale9Sprite *)_backGroundBoxDisabledRenderer)->setCapInsets(Rect::ZERO);
+        _backGroundBoxDisabledRenderer->setContentSize(_contentSize);
+        _backGroundBoxDisabledRenderer->setPosition(_contentSize.width * 0.5f, _contentSize.height * 0.5f);
+        _backGroundBoxDisabledRendererAdaptDirty = false;
+    }
+    if (_frontCrossDisabledRendererAdaptDirty) {
+        ((ui::Scale9Sprite *)_frontCrossDisabledRenderer)->setCapInsets(Rect::ZERO);
+        _frontCrossDisabledRenderer->setContentSize(_contentSize);
+        _frontCrossDisabledRenderer->setPosition(_contentSize.width * 0.5f, _contentSize.height * 0.5f);
+        _frontCrossDisabledRendererAdaptDirty = false;
+    }
+}
 
 bool SettingScene::init() {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("设置")))) {
@@ -48,18 +110,63 @@ bool SettingScene::init() {
     drawNode->drawLine(Vec2(0.0f, yPosTop), Vec2(visibleSize.width, yPosTop), Color4F::GRAY);
     drawNode->drawSolidRect(Vec2(0.0f, yPosTop), Vec2(visibleSize.width, yPosTop - cellHeight), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
 
-    Label *label = Label::createWithSystemFont(__UTF8("显示FPS"), "Arail", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("算番规则"), "Arail", 12);
     label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(origin.x + 10.0f, origin.y + yPosTop - cellHeight * 0.5f));
+
+    const std::string backGround = "source_material/btn_square_normal.png";
+    const std::string backGroundSelected = "source_material/btn_square_selected.png";
+    const std::string cross = "source_material/btn_square_highlighted.png";
+    const std::string noImage = "";
+    static const char *text[] = { __UTF8("国际麻联"), __UTF8("原版98") };
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    this->addChild(radioGroup);
+    for (int i = 0; i < 2; ++i) {
+        RadioButtonScale9 *radioButton = RadioButtonScale9::create();
+        radioButton->loadTextures(backGround, backGroundSelected, cross, noImage, noImage);
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(50.0f, 20.0f));
+        radioButton->setPosition(Vec2(origin.x + visibleSize.width - 35.0f - 50.0f * i, origin.y + yPosTop - cellHeight * 0.5f));
+        this->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        label = Label::createWithSystemFont(text[i], "Arail", 12);
+        label->setTextColor(C4B_GRAY);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+    }
+    radioGroup->setSelectedButton(UserDefault::getInstance()->getIntegerForKey("rule_version", 0));
+    radioGroup->addEventListener([](ui::RadioButton *, int index, ui::RadioButtonGroup::EventType) {
+        UserDefault::getInstance()->setIntegerForKey("rule_version", index);
+    });
+
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 1), Vec2(visibleSize.width, yPosTop - cellHeight * 1), Color4F::GRAY);
+
+    label = Label::createWithSystemFont(__UTF8("有何区别？"),
+        "Arail", 10, Size(visibleSize.width - 30.0f, 0.0f));
+    label->setTextColor(C4B_GRAY);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 15.0f, origin.y + yPosTop - cellHeight * 1.0f - 10.0f));
+
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 2), Vec2(visibleSize.width, yPosTop - cellHeight * 2), Color4F::GRAY);
+    drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 2), Vec2(visibleSize.width, yPosTop - cellHeight * 3), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
+
+    label = Label::createWithSystemFont(__UTF8("显示FPS"), "Arail", 12);
+    label->setTextColor(C4B_BLACK);
+    this->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(origin.x + 10.0f, origin.y + yPosTop - cellHeight * 2.5f));
 
     ui::CheckBox *checkBox = UICommon::createCheckBox();
     this->addChild(checkBox);
     checkBox->setZoomScale(0.0f);
     checkBox->ignoreContentAdaptWithSize(false);
     checkBox->setContentSize(Size(20.0f, 20.0f));
-    checkBox->setPosition(Vec2(origin.x + visibleSize.width - 20.0f, origin.y + yPosTop - cellHeight * 0.5f));
+    checkBox->setPosition(Vec2(origin.x + visibleSize.width - 20.0f, origin.y + yPosTop - cellHeight * 2.5f));
     checkBox->setSelected(Director::getInstance()->isDisplayStats());
     checkBox->addEventListener([](Ref *, ui::CheckBox::EventType event) {
         bool showFPS = event == ui::CheckBox::EventType::SELECTED;
@@ -67,20 +174,20 @@ bool SettingScene::init() {
         UserDefault::getInstance()->setBoolForKey("show_fps", showFPS);
     });
 
-    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 1), Vec2(visibleSize.width, yPosTop - cellHeight * 1), Color4F::GRAY);
-    drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 1), Vec2(visibleSize.width, yPosTop - cellHeight * 2), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 3), Color4F::GRAY);
+    drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 4), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
 
     label = Label::createWithSystemFont(__UTF8("帧率"), "Arail", 12);
     label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 10.0f, origin.y + yPosTop - cellHeight * 1.5f));
+    label->setPosition(Vec2(origin.x + 10.0f, origin.y + yPosTop - cellHeight * 3.5f));
 
     label = Label::createWithSystemFont("10", "Arail", 12);
     label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 40.0f, origin.y + yPosTop - cellHeight * 1.5f));
+    label->setPosition(Vec2(origin.x + 40.0f, origin.y + yPosTop - cellHeight * 3.5f));
 
     if (SpriteFrameCache::getInstance()->getSpriteFrameByName("#bfbfbf_80_3px") == nullptr) {
         // 3平方像素图片编码
@@ -103,7 +210,7 @@ bool SettingScene::init() {
     slider->setZoomScale(0.0f);
     this->addChild(slider);
     slider->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    slider->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + yPosTop - cellHeight * 1.5f));
+    slider->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + yPosTop - cellHeight * 3.5f));
     slider->addEventListener([label](Ref *sender, ui::Slider::EventType event) {
         if (event == ui::Slider::EventType::ON_PERCENTAGE_CHANGED || event == ui::Slider::EventType::ON_SLIDEBALL_UP) {
             int percent = ((ui::Slider *)sender)->getPercent();
@@ -118,36 +225,36 @@ bool SettingScene::init() {
     slider->setPercent((static_cast<int>(roundf(1.0f / Director::getInstance()->getAnimationInterval())) - 10) * 2);
     label->setString(std::to_string(slider->getPercent() / 2 + 10));
 
-    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 2), Vec2(visibleSize.width, yPosTop - cellHeight * 2), Color4F::GRAY);
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 4), Vec2(visibleSize.width, yPosTop - cellHeight * 4), Color4F::GRAY);
 
     label = Label::createWithSystemFont(__UTF8("帧率越高越流畅，但会更耗电"),
         "Arail", 10, Size(visibleSize.width - 30.0f, 0.0f));
     label->setTextColor(C4B_GRAY);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 15.0f, origin.y + yPosTop - cellHeight * 2.0f - 10.0f));
+    label->setPosition(Vec2(origin.x + 15.0f, origin.y + yPosTop - cellHeight * 4.0f - 10.0f));
 
-    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 3), Color4F::GRAY);
-    drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 3), Vec2(visibleSize.width, yPosTop - cellHeight * 4), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 5), Vec2(visibleSize.width, yPosTop - cellHeight * 5), Color4F::GRAY);
+    drawNode->drawSolidRect(Vec2(0.0f, yPosTop - cellHeight * 5), Vec2(visibleSize.width, yPosTop - cellHeight * 6), Color4F(1.0f, 1.0f, 1.0f, 0.8f));
 
     label = Label::createWithSystemFont(__UTF8("自动检测更新"), "Arail", 12);
     label->setTextColor(C4B_BLACK);
     this->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(origin.x + 10.0f, origin.y + yPosTop - cellHeight * 3.5f));
+    label->setPosition(Vec2(origin.x + 10.0f, origin.y + yPosTop - cellHeight * 5.5f));
 
     checkBox = UICommon::createCheckBox();
     this->addChild(checkBox);
     checkBox->setZoomScale(0.0f);
     checkBox->ignoreContentAdaptWithSize(false);
     checkBox->setContentSize(Size(20.0f, 20.0f));
-    checkBox->setPosition(Vec2(origin.x + visibleSize.width - 20.0f, origin.y + yPosTop - cellHeight * 3.5f));
+    checkBox->setPosition(Vec2(origin.x + visibleSize.width - 20.0f, origin.y + yPosTop - cellHeight * 5.5f));
     checkBox->setSelected(UserDefault::getInstance()->getBoolForKey("auto_check_version"));
     checkBox->addEventListener([](Ref *, ui::CheckBox::EventType event) {
         UserDefault::getInstance()->setBoolForKey("auto_check_version", event == ui::CheckBox::EventType::SELECTED);
     });
 
-    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 4), Vec2(visibleSize.width, yPosTop - cellHeight * 4), Color4F::GRAY);
+    drawNode->drawLine(Vec2(0.0f, yPosTop - cellHeight * 6), Vec2(visibleSize.width, yPosTop - cellHeight * 6), Color4F::GRAY);
 
     return true;
 }
