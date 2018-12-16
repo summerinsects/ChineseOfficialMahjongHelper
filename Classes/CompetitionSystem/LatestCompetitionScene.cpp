@@ -21,26 +21,21 @@ bool LatestCompetitionScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Label *label = Label::createWithSystemFont(__UTF8("宣传赛事信息，请联系逍遥宫"), "Arial", 12);
-    this->addChild(label);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
-    label->setTextColor(Color4B::ORANGE);
-
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
-    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 65.0f));
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35.0f));
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 30.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     this->addChild(tableView);
     _tableView = tableView;
 
-    label = Label::createWithSystemFont(__UTF8("无近期赛事信息"), "Arial", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("无近期赛事信息"), "Arial", 12);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 75.0f));
     label->setTextColor(C4B_BLACK);
