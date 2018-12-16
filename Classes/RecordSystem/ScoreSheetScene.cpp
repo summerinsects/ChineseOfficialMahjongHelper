@@ -5,6 +5,7 @@
 #include "../mahjong-algorithm/stringify.h"
 #include "../UICommon.h"
 #include "../UIColors.h"
+#include "../widget/PopupMenu.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
 #include "../widget/HandTilesWidget.h"
@@ -55,12 +56,12 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         origin.y + visibleSize.height - 15));
     _titleLabel = label;
 
-    // 使用说明
-    ui::Button *button = cocos2d::ui::Button::create("icon/question-circle.png");
+    // 更多菜单
+    ui::Button *button = cocos2d::ui::Button::create("icon/menu.png");
     this->addChild(button);
     button->setScale(24.0f / button->getContentSize().width);
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onInstructionButton, this, std::placeholders::_1));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onMoreButton, this, std::placeholders::_1));
 
     // 用来绘制表格线的根结点
     DrawNode *drawNode = DrawNode::create();
@@ -81,9 +82,9 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     const float xPos = origin.x + 2.0f + 55.0f * 0.5f;
     const float yPos = origin.y + visibleSize.height * 0.5f - 15.0f + tableOffsetY * 0.5f + tableHeight * 0.5f;
-    static const char *titleText[4] = { __UTF8("追分策略"), __UTF8("清空表格"), __UTF8("历史记录"), __UTF8("更多设置") };
+    static const char *titleText[4] = { __UTF8("追分策略"), __UTF8("清空表格"), __UTF8("历史记录"), __UTF8("编辑信息") };
     static void (ScoreSheetScene::*callbacks[4])(Ref *) = {
-        &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onSettingButton
+        &ScoreSheetScene::onPursuitButton, &ScoreSheetScene::onResetButton, &ScoreSheetScene::onHistoryButton, &ScoreSheetScene::onEditButton
     };
 
     ui::Button *topButtons[4];
@@ -149,9 +150,22 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     button->setScale9Enabled(true);
     button->setContentSize(Size(gap, cellHeight));
     button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("编辑"));
+    button->setTitleText(__UTF8("开始"));
     button->setPosition(Vec2(colPosX[5], line1Y));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onEditButton, this, std::placeholders::_1));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onStartButton, this, std::placeholders::_1));
+    _startButton = button;
+
+    button = UICommon::createButton();
+    drawNode->addChild(button, -1);
+    button->setScale9Enabled(true);
+    button->setContentSize(Size(gap, cellHeight));
+    button->setTitleFontSize(12);
+    button->setTitleText(__UTF8("强制结束"));
+    button->setPosition(Vec2(colPosX[5], line1Y));
+    button->addClickEventListener(std::bind(&ScoreSheetScene::onFinishButton, this, std::placeholders::_1));
+    cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 6.0f);
+    button->setVisible(false);
+    _finishButton = button;
 
     // 第2、3栏：座位
     const float line2Y = tableHeight - cellHeight * 1.5f;
@@ -171,28 +185,6 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
     }
-
-    button = UICommon::createButton();
-    drawNode->addChild(button, -1);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(gap, cellHeight));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("开始"));
-    button->setPosition(Vec2(colPosX[5], line3Y));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onStartButton, this, std::placeholders::_1));
-    _startButton = button;
-
-    button = UICommon::createButton();
-    drawNode->addChild(button, -1);
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(gap, cellHeight));
-    button->setTitleFontSize(12);
-    button->setTitleText(__UTF8("强制结束"));
-    button->setPosition(Vec2(colPosX[5], line3Y));
-    button->addClickEventListener(std::bind(&ScoreSheetScene::onFinishButton, this, std::placeholders::_1));
-    cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 6.0f);
-    button->setVisible(false);
-    _finishButton = button;
 
     // 第4栏：累计
     const float line4Y = tableHeight - cellHeight * 3.5f;
@@ -1286,9 +1278,23 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender) {
         .create()->show();
 }
 
-void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
+void ScoreSheetScene::onMoreButton(cocos2d::Ref *sender) {
+    Vec2 pos = ((ui::Button *)sender)->getPosition();
+    pos.y -= 15.0f;
+    PopupMenu *menu = PopupMenu::create(this, { __UTF8("更多设置"), __UTF8("使用说明") }, pos, Vec2::ANCHOR_TOP_RIGHT);
+    menu->setMenuItemCallback([this](PopupMenu *, size_t idx) {
+        switch (idx) {
+        case 0: showSettingAlert(); break;
+        case 1: showInstructionAlert(); break;
+        default: UNREACHABLE(); break;
+        }
+    });
+    menu->show();
+}
+
+void ScoreSheetScene::showInstructionAlert() {
     Label *label = Label::createWithSystemFont(
-        __UTF8("1. 使用步骤：点击「编辑」，输入四名选手姓名及对局名称，点击「开始」，开始「计分」。\n")
+        __UTF8("1. 使用步骤：点击「编辑信息」，输入四名选手姓名及对局名称，点击「开始」，开始「计分」。\n")
         __UTF8("2. 计分时如果有标记番种，则「番种备注」一栏会选取一个最大的番种名予以显示。\n")
         __UTF8("3. 对于已经计分的，点击「番种备注」一栏可修改记录。\n")
         __UTF8("4. 「北风北」计分完成后，会自动添加入「历史记录」。\n")
@@ -1304,7 +1310,7 @@ void ScoreSheetScene::onInstructionButton(cocos2d::Ref *) {
         .create()->show();
 }
 
-void ScoreSheetScene::onSettingButton(cocos2d::Ref *) {
+void ScoreSheetScene::showSettingAlert() {
     const float width = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();

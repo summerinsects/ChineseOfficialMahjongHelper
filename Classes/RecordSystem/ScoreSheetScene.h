@@ -51,8 +51,9 @@ private:
     void onDetailButton(cocos2d::Ref *sender);
     void editRecord(unsigned handIdx, const Record::Detail *detail);
     void onTimeScheduler(float dt);
-    void onInstructionButton(cocos2d::Ref *sender);
-    void onSettingButton(cocos2d::Ref *sender);
+    void onMoreButton(cocos2d::Ref *sender);
+    void showInstructionAlert();
+    void showSettingAlert();
     void onHistoryButton(cocos2d::Ref *sender);
     void onResetButton(cocos2d::Ref *sender);
     void onPursuitButton(cocos2d::Ref *sender);
