@@ -705,7 +705,9 @@ namespace {
     public:
         NameEditBoxDelegate(ccEditBoxEditingDidEndWithAction &&callback) : _callback(callback) { }
 
+#if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
         virtual ~NameEditBoxDelegate() { CCLOG("%s", __FUNCTION__); }
+#endif
 
         virtual void editBoxReturn(cocos2d::ui::EditBox *) override { }
 
