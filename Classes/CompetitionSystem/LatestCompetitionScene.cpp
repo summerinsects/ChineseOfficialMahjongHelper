@@ -9,6 +9,7 @@
 #include "../UIColors.h"
 #include "../widget/LoadingView.h"
 #include "../widget/AlertDialog.h"
+#include "../widget/CommonWebViewScene.h"
 
 USING_NS_CC;
 
@@ -285,5 +286,9 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
 void LatestCompetitionScene::onDetailButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
-    Application::getInstance()->openURL(_competitions[idx].url);
+
+    const CompetitionInfo &competition = _competitions[idx];
+
+    CommonWebViewScene *scene = CommonWebViewScene::create(competition.name, competition.url, CommonWebViewScene::ContentType::URL);
+    Director::getInstance()->pushScene(scene);
 }

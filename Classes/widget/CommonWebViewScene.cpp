@@ -32,10 +32,12 @@ bool CommonWebViewScene::init(const char *title, const std::string &content, Com
     this->addChild(webView);
     webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f + 5.0f));
 #else
+    if (type == ContentType::URL) {
+        Application::getInstance()->openURL(content);
+        return true;
+    }
+
     if (type != ContentType::HTML) {
-        if (type == ContentType::URL) {
-            Application::getInstance()->openURL(content);
-        }
         return true;
     }
 
