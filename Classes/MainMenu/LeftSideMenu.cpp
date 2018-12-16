@@ -205,7 +205,7 @@ bool LeftSideMenu::init(cocos2d::Scene *scene) {
     label->setPosition(Vec2(maxWidth * 0.5f, visibleSize.height - maxWidth * 0.5f + 5.0f));
 
     std::string version = Application::getInstance()->getVersion();
-    label = Label::createWithSystemFont(version.insert(0, 1, 'v').append("\n" __DATE__ "  " __TIME__), "Arial", 10);
+    label = Label::createWithSystemFont(version.insert(0, 1, 'v'), "Arial", 10);
     label->setTextColor(C4B_GRAY);
     background->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
