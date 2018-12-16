@@ -61,7 +61,7 @@ void trimLabelStringWithEllipsisToFitWidth(cocos2d::Label *label, float width) {
 
         // 前半部分最后一个UTF8字符长度、后半部分第一个UTF8字符长度
         size_t charLength1 = utf8String[leftLength - 1]._char.size();
-        size_t charLength2 = utf8String[totalLength - leftLength - 1]._char.size();
+        size_t charLength2 = utf8String[totalLength - leftLength]._char.size();
 
         // 删除前半部分的最后一个UTF8字符
         partLength -= charLength1;
