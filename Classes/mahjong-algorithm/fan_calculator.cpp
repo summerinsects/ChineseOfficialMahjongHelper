@@ -1742,7 +1742,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     }
 
     // 如果什么番都没有，则计为无番和
-    if (std::all_of(std::begin(fan_table), std::end(fan_table), [](uint8_t p) { return p == 0; })) {
+    if (std::all_of(std::begin(fan_table), std::end(fan_table), [](uint16_t p) { return p == 0; })) {
         fan_table[CHICKEN_HAND] = 1;
     }
 }
