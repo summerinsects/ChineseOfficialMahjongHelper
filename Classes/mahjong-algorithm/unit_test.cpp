@@ -30,34 +30,34 @@ void test_wait(const char *str) {
     std::cout << "----------------" << std::endl;
     puts(str);
     bool is_wait = false;
-    useful_table_t table/* = { false }*/;
+    useful_table_t table_special, table_basic;
 
     if (hand_tiles.tile_count == 13) {
-        if (is_thirteen_orphans_wait(hand_tiles.standing_tiles, 13, &table)) {
+        if (is_thirteen_orphans_wait(hand_tiles.standing_tiles, 13, &table_special)) {
             is_wait = true;
             printf("thirteen orphans");
         }
-        else if (is_honors_and_knitted_tiles_wait(hand_tiles.standing_tiles, 13, &table)) {
+        else if (is_honors_and_knitted_tiles_wait(hand_tiles.standing_tiles, 13, &table_special)) {
             is_wait = true;
             printf("honors and knitted tiles");
         }
-        else if (is_seven_pairs_wait(hand_tiles.standing_tiles, 13, &table)) {
+        else if (is_seven_pairs_wait(hand_tiles.standing_tiles, 13, &table_special)) {
             is_wait = true;
             printf("seven pairs");
         }
-        else if (is_knitted_straight_wait(hand_tiles.standing_tiles, 13, &table)) {
+        else if (is_knitted_straight_wait(hand_tiles.standing_tiles, 13, &table_special)) {
             is_wait = true;
             printf("knitted straight in basic form");
         }
     }
     else if (hand_tiles.tile_count == 10) {
-        if (is_knitted_straight_wait(hand_tiles.standing_tiles, 10, &table)) {
+        if (is_knitted_straight_wait(hand_tiles.standing_tiles, 10, &table_special)) {
             is_wait = true;
             printf("knitted straight in basic form");
         }
     }
 
-    if (!is_wait && is_basic_form_wait(hand_tiles.standing_tiles, hand_tiles.tile_count, &table)) {
+    if (is_basic_form_wait(hand_tiles.standing_tiles, hand_tiles.tile_count, &table_basic)) {
         is_wait = true;
         printf("basic form");
     }
@@ -66,7 +66,7 @@ void test_wait(const char *str) {
         puts(" waiting:");
         char buf[64];
         for (tile_t t = TILE_1m; t < TILE_TABLE_SIZE; ++t) {
-            if (table[t]) {
+            if (table_basic[t] || table_special[t]) {
                 tiles_to_string(&t, 1, buf, sizeof(buf));
                 printf("%s ", buf);
             }
