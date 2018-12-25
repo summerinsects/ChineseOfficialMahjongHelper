@@ -197,7 +197,8 @@ typedef uint16_t tile_table_t[TILE_TABLE_SIZE];
  * 内存结构：
  * - 0-7 8bit tile 牌（对于顺子，则表示中间那张牌，比如234p，那么牌为3p）
  * - 8-11 4bit type 牌组类型，使用PACK_TYPE_xxx宏
- * - 12-15 4bit offer 供牌信息，取值范围为0123\n
+ * - 12-13 2bit offer 供牌信息，取值范围为0123\n
+ * - 14 1bit promoted 是否为加杠
  *       0表示暗手（暗顺、暗刻、暗杠），非0表示明手（明顺、明刻、明杠）
  *
  *       对于牌组是刻子和杠时，123分别来表示是上家/对家/下家供的\n
@@ -223,7 +224,29 @@ static FORCE_INLINE pack_t make_pack(uint8_t offer, uint8_t type, tile_t tile) {
  * @return bool
  */
 static FORCE_INLINE bool is_pack_melded(pack_t pack) {
-    return !!((pack >> 12) & 0xF);
+    return !!(pack & 0x3000);
+}
+
+/**
+ * @brief 牌组是否为加杠
+ *  当牌组不是PACK_TYPE_KONG时，结果是无意义的
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
+ * @param [in] pack 牌组
+ * @return bool
+ */
+static FORCE_INLINE bool is_promoted_kong(pack_t pack) {
+    return !!(pack & 0x4000);
+}
+
+/**
+ * @brief 碰的牌组转换为加杠
+ *  当牌组不是PACK_TYPE_PUNG时，结果是无意义的
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
+ * @param [in] pack 碰的牌组
+ * @return pack_t 加杠的牌组
+ */
+static FORCE_INLINE pack_t promote_pung_to_kong(pack_t pack) {
+    return pack | 0x4000;
 }
 
 /**
@@ -233,7 +256,7 @@ static FORCE_INLINE bool is_pack_melded(pack_t pack) {
  * @return uint8_t
  */
 static FORCE_INLINE uint8_t pack_get_offer(pack_t pack) {
-    return ((pack >> 12) & 0xF);
+    return ((pack >> 12) & 0x3);
 }
 
 /**

@@ -411,7 +411,7 @@ intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intp
             if (p >= end) break;
             *p++ = ',';
             if (p >= end) break;
-            *p++ = '0' + o;
+            *p++ = '0' + (is_promoted_kong(pack) ? o | 0x4 : o);
             if (p >= end) break;
             *p++ = ']';
             break;
