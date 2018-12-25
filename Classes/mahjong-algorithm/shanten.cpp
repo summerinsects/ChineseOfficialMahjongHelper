@@ -809,6 +809,10 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
         return false;
     }
 
+    if (waiting_table != nullptr) {
+        memset(*waiting_table, 0, sizeof(*waiting_table));
+    }
+
     // 剔除组合龙
     tile_table_t temp_table;
     memcpy(&temp_table, &cnt_table, sizeof(temp_table));
