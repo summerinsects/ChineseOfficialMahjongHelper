@@ -983,7 +983,7 @@ void ScoreSheetScene::editNameAndTitle() {
 void ScoreSheetScene::onStartButton(cocos2d::Ref *) {
     const char (&name)[4][NAME_SIZE] = _record.name;
     if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
-        Toast::makeText(this, __UTF8("请先输入四位参赛选手姓名"), Toast::LENGTH_LONG)->show();
+        editNameAndTitle();
         return;
     }
 
