@@ -8,7 +8,7 @@ Chinese Official Mahjong Helper 国标小助手
 
 ## 配置步骤
 
-1. 下载[cocos2dx v3.17](http://www.cocos2d-x.org/download)
+1. 下载[cocos2dx v3.17.1](http://www.cocos2d-x.org/download)
 2. 下载(download)本项目（clone随意）
 3. 随便创建一个c++工程，工程名任意（命令行：cocos new -l cpp --portrait 工程名）
 4. 将在上一步创建的工程目录下的cocos2d目录拷贝到本项目Classes的同一级目录下
