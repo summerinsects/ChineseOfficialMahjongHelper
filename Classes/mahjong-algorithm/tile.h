@@ -109,6 +109,7 @@ typedef uint8_t rank_t;
  * - 0x21 - 0x29 条子（BAMBOO）
  * - 0x31 - 0x39 饼子（DOTS）
  * - 0x41 - 0x47 字牌（HONORS）
+ * - 0x51 - 0x58 花牌（FLOWER）
  */
 typedef uint8_t tile_t;
 
@@ -134,6 +135,16 @@ static FORCE_INLINE suit_t tile_get_suit(tile_t tile) {
 }
 
 /**
+ * @brief 判断是否为花牌
+ *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
+ * @param [in] tile 牌
+ * @return bool
+ */
+static FORCE_INLINE bool is_flower(tile_t tile) {
+    return ((tile >> 4) & 0xF) == 5;
+}
+
+/**
  * @brief 获取牌的点数
  *  函数不检查输入的合法性。如果输入不合法的值，将无法保证合法返回值的合法性
  * @param [in] tile 牌
@@ -144,7 +155,7 @@ static FORCE_INLINE rank_t tile_get_rank(tile_t tile) {
 }
 
 /**
- * @brief 所有牌的值
+ * @brief 所有牌的值，不包括花牌
  */
 enum tile_value_t {
     TILE_1m = 0x11, TILE_2m, TILE_3m, TILE_4m, TILE_5m, TILE_6m, TILE_7m, TILE_8m, TILE_9m,
@@ -155,7 +166,7 @@ enum tile_value_t {
 };
 
 /**
- * @brief 所有合法的牌
+ * @brief 所有合法的牌，不包括花牌
  */
 static const tile_t all_tiles[] = {
     TILE_1m, TILE_2m, TILE_3m, TILE_4m, TILE_5m, TILE_6m, TILE_7m, TILE_8m, TILE_9m,
