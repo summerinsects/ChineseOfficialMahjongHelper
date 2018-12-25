@@ -277,6 +277,15 @@ bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, intptr_t stan
  */
 
 /**
+ * @brief 是否听牌
+ *
+ * @param [in] hand_tiles 手牌结构
+ * @param [out] useful_table 有效牌标记表（可为null）
+ * @return bool 是否听牌
+ */
+bool is_waiting(const hand_tiles_t &hand_tiles, useful_table_t *useful_table);
+
+/**
  * end group
  * @}
  */
