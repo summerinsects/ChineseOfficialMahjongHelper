@@ -87,8 +87,6 @@ cocos2d.cpp \
 2d/CCTransitionProgress.cpp \
 2d/CCTweenFunction.cpp \
 2d/CCAutoPolygon.cpp \
-3d/CCFrustum.cpp \
-3d/CCPlane.cpp \
 platform/CCFileUtils.cpp \
 platform/CCGLView.cpp \
 platform/CCImage.cpp \
@@ -297,7 +295,6 @@ $(call import-module,png/prebuilt/android)
 $(call import-module,zlib/prebuilt/android)
 $(call import-module,jpeg/prebuilt/android)
 $(call import-module,webp/prebuilt/android)
-$(call import-module,3d)
 $(call import-module,audio/android)
 $(call import-module,network)
 $(call import-module,ui)

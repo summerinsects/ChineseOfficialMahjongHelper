@@ -33,7 +33,6 @@ set(COCOS2D_X_VERSION 3.17.1)
 set(COCOS_CORE_LIB cocos2d)
 
 include(2d/CMakeLists.txt)
-include(3d/CMakeLists.txt)
 include(platform/CMakeLists.txt)
 include(math/CMakeLists.txt)
 include(renderer/CMakeLists.txt)
@@ -69,7 +68,6 @@ set(COCOS_HEADER cocos2d.h
 
 set(COCOS_SRC cocos2d.cpp
     ${COCOS_2D_SRC}
-    ${COCOS_3D_SRC}
     ${COCOS_PLATFORM_SRC}
     ${COCOS_MATH_SRC}
     ${COCOS_RENDERER_SRC}
