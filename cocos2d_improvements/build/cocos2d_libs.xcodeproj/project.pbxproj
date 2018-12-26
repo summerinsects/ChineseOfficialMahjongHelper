@@ -754,8 +754,6 @@
 		1A570364180BD1120088DEC7 /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A570363180BD1120088DEC7 /* libpng.a */; };
 		1A570378180BD1B40088DEC7 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A570377180BD1B40088DEC7 /* libjpeg.a */; };
 		1A57037B180BD1C90088DEC7 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A57037A180BD1C90088DEC7 /* libjpeg.a */; };
-		1A5703B8180BD2780088DEC7 /* libwebp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703B7180BD2780088DEC7 /* libwebp.a */; };
-		1A5703BB180BD2800088DEC7 /* libwebp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703BA180BD2800088DEC7 /* libwebp.a */; };
 		1A57052B180BD31F0088DEC7 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A57052A180BD31F0088DEC7 /* libfreetype.a */; };
 		1A57052E180BD3280088DEC7 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A57052D180BD3280088DEC7 /* libfreetype.a */; };
 		1A5FB7C41DF012D900C918C1 /* AudioMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A5FB7C31DF012D900C918C1 /* AudioMacros.h */; };
@@ -1348,7 +1346,6 @@
 		507B3D0A1C31BDD30067B53E /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A570363180BD1120088DEC7 /* libpng.a */; };
 		507B3D0B1C31BDD30067B53E /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A570377180BD1B40088DEC7 /* libjpeg.a */; };
 		507B3D0D1C31BDD30067B53E /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 292F1A5B1A5151CE00E479F8 /* libcrypto.a */; };
-		507B3D0F1C31BDD30067B53E /* libwebp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703BA180BD2800088DEC7 /* libwebp.a */; };
 		507B3D101C31BDD30067B53E /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A57052D180BD3280088DEC7 /* libfreetype.a */; };
 		507B3D121C31BDD30067B53E /* CCStdC-ios.h in Headers */ = {isa = PBXBuildFile; fileRef = 503DD8DE1926736A00CD74DD /* CCStdC-ios.h */; };
 		507B3D141C31BDD30067B53E /* CCUITextInput.h in Headers */ = {isa = PBXBuildFile; fileRef = 2980F01D1BA9A5550059E678 /* CCUITextInput.h */; };
@@ -2494,8 +2491,6 @@
 		1A570363180BD1120088DEC7 /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libpng.a; sourceTree = "<group>"; };
 		1A570377180BD1B40088DEC7 /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjpeg.a; sourceTree = "<group>"; };
 		1A57037A180BD1C90088DEC7 /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjpeg.a; sourceTree = "<group>"; };
-		1A5703B7180BD2780088DEC7 /* libwebp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libwebp.a; sourceTree = "<group>"; };
-		1A5703BA180BD2800088DEC7 /* libwebp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libwebp.a; sourceTree = "<group>"; };
 		1A57052A180BD31F0088DEC7 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfreetype.a; sourceTree = "<group>"; };
 		1A57052D180BD3280088DEC7 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfreetype.a; sourceTree = "<group>"; };
 		1A57FFF7180BC5160088DEC7 /* CHANGELOG */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = CHANGELOG; path = ../CHANGELOG; sourceTree = "<group>"; };
@@ -3130,7 +3125,6 @@
 				1A570347180BD0850088DEC7 /* libglfw3.a in Frameworks */,
 				1A570361180BD1080088DEC7 /* libpng.a in Frameworks */,
 				1A57037B180BD1C90088DEC7 /* libjpeg.a in Frameworks */,
-				1A5703B8180BD2780088DEC7 /* libwebp.a in Frameworks */,
 				1A57052B180BD31F0088DEC7 /* libfreetype.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3146,7 +3140,6 @@
 				507B3D0A1C31BDD30067B53E /* libpng.a in Frameworks */,
 				507B3D0B1C31BDD30067B53E /* libjpeg.a in Frameworks */,
 				507B3D0D1C31BDD30067B53E /* libcrypto.a in Frameworks */,
-				507B3D0F1C31BDD30067B53E /* libwebp.a in Frameworks */,
 				507B3D101C31BDD30067B53E /* libfreetype.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3162,7 +3155,6 @@
 				A07A4CAF1783777C0073F6A7 /* Foundation.framework in Frameworks */,
 				1A570364180BD1120088DEC7 /* libpng.a in Frameworks */,
 				1A570378180BD1B40088DEC7 /* libjpeg.a in Frameworks */,
-				1A5703BB180BD2800088DEC7 /* libwebp.a in Frameworks */,
 				1A57052E180BD3280088DEC7 /* libfreetype.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3721,7 +3713,6 @@
 				BA6249A41E77D2850096291C /* tinydir */,
 				1A570348180BD09B0088DEC7 /* tinyxml2 */,
 				1A57034F180BD0B00088DEC7 /* unzip */,
-				1A5703A5180BD2410088DEC7 /* webp */,
 				1AAF537A180E354D000584C8 /* websockets */,
 			);
 			name = external;
@@ -3836,41 +3827,6 @@
 			);
 			name = mac;
 			path = ../external/jpeg/prebuilt/mac;
-			sourceTree = "<group>";
-		};
-		1A5703A5180BD2410088DEC7 /* webp */ = {
-			isa = PBXGroup;
-			children = (
-				1A5703A6180BD2530088DEC7 /* prebuilt */,
-			);
-			name = webp;
-			sourceTree = "<group>";
-		};
-		1A5703A6180BD2530088DEC7 /* prebuilt */ = {
-			isa = PBXGroup;
-			children = (
-				1A5703B9180BD2800088DEC7 /* ios */,
-				1A5703B6180BD2780088DEC7 /* mac */,
-			);
-			name = prebuilt;
-			sourceTree = "<group>";
-		};
-		1A5703B6180BD2780088DEC7 /* mac */ = {
-			isa = PBXGroup;
-			children = (
-				1A5703B7180BD2780088DEC7 /* libwebp.a */,
-			);
-			name = mac;
-			path = ../external/webp/prebuilt/mac;
-			sourceTree = "<group>";
-		};
-		1A5703B9180BD2800088DEC7 /* ios */ = {
-			isa = PBXGroup;
-			children = (
-				1A5703BA180BD2800088DEC7 /* libwebp.a */,
-			);
-			name = ios;
-			path = ../external/webp/prebuilt/ios;
 			sourceTree = "<group>";
 		};
 		1A5703BC180BD2940088DEC7 /* freetype2 */ = {
