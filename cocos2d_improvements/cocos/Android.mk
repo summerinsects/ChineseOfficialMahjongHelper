@@ -220,8 +220,7 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) \
                     $(LOCAL_PATH)/../external/poly2tri \
                     $(LOCAL_PATH)/../external/poly2tri/common \
                     $(LOCAL_PATH)/../external/poly2tri/sweep \
-                    $(LOCAL_PATH)/../external/clipper \
-                    $(LOCAL_PATH)/../external/uv/include
+                    $(LOCAL_PATH)/../external/clipper
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
                     $(LOCAL_PATH)/../external \
@@ -234,8 +233,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH) \
                     $(LOCAL_PATH)/../external/poly2tri \
                     $(LOCAL_PATH)/../external/poly2tri/common \
                     $(LOCAL_PATH)/../external/poly2tri/sweep \
-                    $(LOCAL_PATH)/../external/clipper \
-                    $(LOCAL_PATH)/../external/uv/include
+                    $(LOCAL_PATH)/../external/clipper
 
 LOCAL_EXPORT_LDLIBS := -lGLESv2 \
                        -llog \
@@ -280,10 +278,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := cc_static
 LOCAL_MODULE_FILENAME := libcc
 
-LOCAL_STATIC_LIBRARIES := ccs
-LOCAL_STATIC_LIBRARIES += ccb
-LOCAL_STATIC_LIBRARIES += cc3d
-LOCAL_STATIC_LIBRARIES += ccnet
+LOCAL_STATIC_LIBRARIES := ccnet
 LOCAL_STATIC_LIBRARIES += audio
 
 include $(BUILD_STATIC_LIBRARY)
@@ -294,7 +289,6 @@ $(call import-module,platform/android)
 $(call import-module,png/prebuilt/android)
 $(call import-module,zlib/prebuilt/android)
 $(call import-module,jpeg/prebuilt/android)
-$(call import-module,webp/prebuilt/android)
 $(call import-module,audio/android)
 $(call import-module,network)
 $(call import-module,ui)
