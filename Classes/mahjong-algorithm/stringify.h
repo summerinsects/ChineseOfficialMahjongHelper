@@ -1,5 +1,5 @@
 ﻿/****************************************************************************
- Copyright (c) 2016-2018 Jeff Wang <summer_insects@163.com>
+ Copyright (c) 2016-2019 Jeff Wang <summer_insects@163.com>
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ namespace mahjong {
  * - 吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：
  *    - 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。
  *    - 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。
- *    - 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。
+ *    - 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示大明杠上家的8饼。当数字为5、6、7时，表示加杠。例如：[1111s,6]表示碰对家的1条后，又摸到1条加杠。
  * - 范例
  *    - [EEEE][CCCC][FFFF][PPPP]NN
  *    - 1112345678999s9s
@@ -60,9 +60,12 @@ namespace mahjong {
 #define PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK -3 ///< 副露包含错误的牌数目
 #define PARSE_ERROR_CANNOT_MAKE_FIXED_PACK -4           ///< 无法正确解析副露
 #define PARSE_ERROR_TOO_MANY_FIXED_PACKS -5             ///< 过多组副露（一副合法手牌最多4副露）
-/**
- * @}
- */
+#define PARSE_ERROR_TOO_MANY_TILES -6                   ///< 过多牌
+#define PARSE_ERROR_TILE_COUNT_GREATER_THAN_4 -7        ///< 某张牌出现超过4枚
+
+ /**
+  * @}
+  */
 
 /**
  * @brief 解析牌
@@ -85,6 +88,8 @@ intptr_t parse_tiles(const char *str, tile_t *tiles, intptr_t max_cnt);
  * @retval PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK 副露包含错误的牌数目
  * @retval PARSE_ERROR_CANNOT_MAKE_FIXED_PACK 无法正确解析副露
  * @retval PARSE_ERROR_TOO_MANY_FIXED_PACKS 过多组副露（一副合法手牌最多4副露）
+ * @retval PARSE_ERROR_TOO_MANY_TILES 过多牌
+ * @retval PARSE_ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
  */
 intptr_t string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile);
 

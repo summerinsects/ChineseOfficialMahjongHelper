@@ -48,12 +48,26 @@ static inline std::string &trim(std::string &str) {
 
 std::string getStringFromFile(const char *file);
 
+bool compareVersion(const char *remote, const char *local);
 }
 
 #if defined(COCOS2D_DEBUG) && (COCOS2D_DEBUG > 0)
 #define MYLOG(fmt, ...)      Common::__log(fmt, ##__VA_ARGS__)
 #else
 #define MYLOG(fmt, ...)      (void)0
+#endif
+
+
+#ifndef _MSC_VER
+#ifndef __cplusplus
+#define _countof(_Array) (sizeof(_Array) / sizeof(_Array[0]))
+#else
+extern "C++" {
+    template <typename _CountofType, size_t _SizeOfArray>
+    char (*__countof_helper(/*UNALIGNED*/ _CountofType (&_Array)[_SizeOfArray]))[_SizeOfArray];
+}
+#define _countof(_Array) sizeof(*__countof_helper(_Array))
+#endif
 #endif
 
 #endif

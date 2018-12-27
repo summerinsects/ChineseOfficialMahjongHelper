@@ -6,6 +6,7 @@
     <dependencies>
         <deployment version="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -39,6 +40,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchScreenBackground.png" width="1242" height="2208"/>
+        <image name="LaunchScreenBackground.png" width="2208" height="1242"/>
     </resources>
 </document>

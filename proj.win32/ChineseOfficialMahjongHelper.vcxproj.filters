@@ -28,6 +28,9 @@
     <Filter Include="src\MahjongTheory">
       <UniqueIdentifier>{0d3ab171-ddea-44a5-bacd-63f9043728ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\MainMenu">
+      <UniqueIdentifier>{cdad1d27-59af-47e1-b81b-e8cf6e06c09b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Other">
       <UniqueIdentifier>{70992fc8-7be4-4c25-907b-0ae6ce812762}</UniqueIdentifier>
     </Filter>
@@ -102,6 +105,9 @@
     <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp">
       <Filter>src\MahjongTheory</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\MainMenu\LeftSideMenu.cpp">
+      <Filter>src\MainMenu</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\Other\OtherScene.cpp">
       <Filter>src\Other</Filter>
     </ClCompile>
@@ -120,10 +126,19 @@
     <ClCompile Include="..\Classes\utils\common.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\utils\socket.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\widget\AlertDialog.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\widget\CheckBoxScale9.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\widget\CommonWebViewScene.cpp">
+      <Filter>src\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\widget\DatePicker.cpp">
       <Filter>src\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp">
@@ -212,11 +227,11 @@
     <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h">
       <Filter>src\MahjongTheory</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\MainMenu\LeftSideMenu.h">
+      <Filter>src\MainMenu</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\Other\OtherScene.h">
       <Filter>src\Other</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\RecordSystem\LittleFan.h">
-      <Filter>src\RecordSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\RecordSystem\Record.h">
       <Filter>src\RecordSystem</Filter>
@@ -233,6 +248,9 @@
     <ClInclude Include="..\Classes\TilesImage.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\UIColors.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\UICommon.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -242,10 +260,19 @@
     <ClInclude Include="..\Classes\utils\compiler.h">
       <Filter>src\utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\utils\socket.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\widget\AlertDialog.h">
       <Filter>src\widget</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\widget\CheckBoxScale9.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\widget\CommonWebViewScene.h">
+      <Filter>src\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\widget\DatePicker.h">
       <Filter>src\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h">

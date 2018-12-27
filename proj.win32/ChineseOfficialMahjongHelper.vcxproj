@@ -106,7 +106,7 @@
   <ItemDefinitionGroup>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)" mkdir "$(OutDir)"
-xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
+xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources\" /D /E /I /F /Y
       </Command>
       <Outputs>$(TargetName).cab</Outputs>
       <Inputs>$(TargetFileName)</Inputs>
@@ -166,14 +166,18 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\mahjong-algorithm\shanten.cpp" />
     <ClCompile Include="..\Classes\mahjong-algorithm\stringify.cpp" />
     <ClCompile Include="..\Classes\MahjongTheory\MahjongTheoryScene.cpp" />
+    <ClCompile Include="..\Classes\MainMenu\LeftSideMenu.cpp" />
     <ClCompile Include="..\Classes\Other\OtherScene.cpp" />
     <ClCompile Include="..\Classes\RecordSystem\Record.cpp" />
     <ClCompile Include="..\Classes\RecordSystem\RecordHistoryScene.cpp" />
     <ClCompile Include="..\Classes\RecordSystem\RecordScene.cpp" />
     <ClCompile Include="..\Classes\RecordSystem\ScoreSheetScene.cpp" />
     <ClCompile Include="..\Classes\utils\common.cpp" />
+    <ClCompile Include="..\Classes\utils\socket.cpp" />
     <ClCompile Include="..\Classes\widget\AlertDialog.cpp" />
+    <ClCompile Include="..\Classes\widget\CheckBoxScale9.cpp" />
     <ClCompile Include="..\Classes\widget\CommonWebViewScene.cpp" />
+    <ClCompile Include="..\Classes\widget\DatePicker.cpp" />
     <ClCompile Include="..\Classes\widget\ExtraInfoWidget.cpp" />
     <ClCompile Include="..\Classes\widget\HandTilesWidget.cpp" />
     <ClCompile Include="..\Classes\widget\PopupMenu.cpp" />
@@ -204,18 +208,22 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\mahjong-algorithm\stringify.h" />
     <ClInclude Include="..\Classes\mahjong-algorithm\tile.h" />
     <ClInclude Include="..\Classes\MahjongTheory\MahjongTheoryScene.h" />
+    <ClInclude Include="..\Classes\MainMenu\LeftSideMenu.h" />
     <ClInclude Include="..\Classes\Other\OtherScene.h" />
-    <ClInclude Include="..\Classes\RecordSystem\LittleFan.h" />
     <ClInclude Include="..\Classes\RecordSystem\Record.h" />
     <ClInclude Include="..\Classes\RecordSystem\RecordHistoryScene.h" />
     <ClInclude Include="..\Classes\RecordSystem\RecordScene.h" />
     <ClInclude Include="..\Classes\RecordSystem\ScoreSheetScene.h" />
     <ClInclude Include="..\Classes\TilesImage.h" />
+    <ClInclude Include="..\Classes\UIColors.h" />
     <ClInclude Include="..\Classes\UICommon.h" />
     <ClInclude Include="..\Classes\utils\common.h" />
     <ClInclude Include="..\Classes\utils\compiler.h" />
+    <ClInclude Include="..\Classes\utils\socket.h" />
     <ClInclude Include="..\Classes\widget\AlertDialog.h" />
+    <ClInclude Include="..\Classes\widget\CheckBoxScale9.h" />
     <ClInclude Include="..\Classes\widget\CommonWebViewScene.h" />
+    <ClInclude Include="..\Classes\widget\DatePicker.h" />
     <ClInclude Include="..\Classes\widget\ExtraInfoWidget.h" />
     <ClInclude Include="..\Classes\widget\HandTilesWidget.h" />
     <ClInclude Include="..\Classes\widget\LoadingView.h" />

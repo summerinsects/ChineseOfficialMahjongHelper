@@ -11,50 +11,31 @@
 
 using namespace mahjong;
 
+static int count_useful_tile(const tile_table_t &used_table, const useful_table_t &useful_table) {
+    int cnt = 0;
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (useful_table[t]) {
+            cnt += 4 - used_table[t];
+        }
+    }
+    return cnt;
+}
+
 void test_wait(const char *str) {
     hand_tiles_t hand_tiles;
-    string_to_tiles(str, &hand_tiles, nullptr);
+    tile_t serving_tile;
+    string_to_tiles(str, &hand_tiles, &serving_tile);
 
     std::cout << "----------------" << std::endl;
     puts(str);
-    bool is_wait = false;
-    useful_table_t table/* = { false }*/;
-
-    if (hand_tiles.tile_count == 13) {
-        if (is_thirteen_orphans_wait(hand_tiles.standing_tiles, 13, &table)) {
-            is_wait = true;
-            printf("thirteen orphans");
-        }
-        else if (is_honors_and_knitted_tiles_wait(hand_tiles.standing_tiles, 13, &table)) {
-            is_wait = true;
-            printf("honors and knitted tiles");
-        }
-        else if (is_seven_pairs_wait(hand_tiles.standing_tiles, 13, &table)) {
-            is_wait = true;
-            printf("seven pairs");
-        }
-        else if (is_knitted_straight_wait(hand_tiles.standing_tiles, 13, &table)) {
-            is_wait = true;
-            printf("knitted straight in basic form");
-        }
-    }
-    else if (hand_tiles.tile_count == 10) {
-        if (is_knitted_straight_wait(hand_tiles.standing_tiles, 10, &table)) {
-            is_wait = true;
-            printf("knitted straight in basic form");
-        }
-    }
-
-    if (!is_wait && is_basic_form_wait(hand_tiles.standing_tiles, hand_tiles.tile_count, &table)) {
-        is_wait = true;
-        printf("basic form");
-    }
-
+    useful_table_t useful_table;
+    bool is_wait = mahjong::is_waiting(hand_tiles, &useful_table);
     if (is_wait) {
         puts(" waiting:");
         char buf[64];
         for (tile_t t = TILE_1m; t < TILE_TABLE_SIZE; ++t) {
-            if (table[t]) {
+            if (useful_table[t]) {
                 tiles_to_string(&t, 1, buf, sizeof(buf));
                 printf("%s ", buf);
             }
@@ -106,7 +87,8 @@ void test_points(const char *str, win_flag_t win_flag, wind_t prevalent_wind, wi
 
 void test_shanten(const char *str) {
     hand_tiles_t hand_tiles;
-    long ret = string_to_tiles(str, &hand_tiles, nullptr);
+    tile_t serving_tile;
+    long ret = string_to_tiles(str, &hand_tiles, &serving_tile);
     if (ret != 0) {
         printf("error at line %d error = %ld\n", __LINE__, ret);
         return;
@@ -173,6 +155,7 @@ int main(int argc, const char *argv[]) {
 
 #if 1
     // BUG测试
+    test_points("[234s][234s][234s][234s]6s6s", WIN_FLAG_4TH_TILE, wind_t::EAST, wind_t::EAST);
 
     test_points("1122233334444s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);  // 剪枝BUG 2018.4.18
 
@@ -220,6 +203,7 @@ int main(int argc, const char *argv[]) {
     test_wait("258m369s1445677p");  // 组合龙听两面钓将，47p
     test_wait("2233445566778s");
     test_wait("2458m369s147p");  // 组合龙听单钓将，4m
+    test_wait("22334455p77779s");  // 基本形听8s、七对听9s
 
     test_points("445566m445566s5p5p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
 

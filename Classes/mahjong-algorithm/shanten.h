@@ -1,5 +1,5 @@
 ﻿/****************************************************************************
- Copyright (c) 2016-2018 Jeff Wang <summer_insects@163.com>
+ Copyright (c) 2016-2019 Jeff Wang <summer_insects@163.com>
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -70,15 +70,6 @@ intptr_t table_to_tiles(const tile_table_t &cnt_table, tile_t *tiles, intptr_t m
  * @brief 有效牌标记表类型
  */
 typedef bool useful_table_t[TILE_TABLE_SIZE];
-
-/**
- * @brief 计数有效牌枚数
- *
- * @param [in] used_table 已经的使用牌的数量表
- * @param [in] useful_table 有效牌标记表
- * @return int 有效牌枚数
- */
-int count_useful_tile(const tile_table_t &used_table, const useful_table_t &useful_table);
 
 /**
  * @addtogroup shanten
@@ -284,6 +275,15 @@ bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, intptr_t stan
  * end group
  * @}
  */
+
+/**
+ * @brief 是否听牌
+ *
+ * @param [in] hand_tiles 手牌结构
+ * @param [out] useful_table 有效牌标记表（可为null）
+ * @return bool 是否听牌
+ */
+bool is_waiting(const hand_tiles_t &hand_tiles, useful_table_t *useful_table);
 
 /**
  * end group

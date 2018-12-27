@@ -1,5 +1,5 @@
 ﻿/****************************************************************************
- Copyright (c) 2016-2018 Jeff Wang <summer_insects@163.com>
+ Copyright (c) 2016-2019 Jeff Wang <summer_insects@163.com>
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -53,8 +53,9 @@
  * 9. 根据数牌的范围调整——涉及：大于五、小于五、全大、全中、全小
  * 10. 计算四归一
  * 11. 根据听牌方式调整——涉及：边张、嵌张、单钓将
- * 12. 根据风调整——涉及：圈风刻、门风刻
- * 13. 最后统一调整规则中规定不计的，得到算番结果。如果为0番，则调整为无番和
+ * 12. 统一调整规则中规定不计的
+ * 13. 最后调整圈风门风
+ * 14. 以上流程走完，得到算番结果。如果为0番，则调整为无番和
  */
 
 #define MAX_DIVISION_CNT 20  // 一副牌最多也没有20种划分吧，够用了
@@ -62,7 +63,7 @@
 #if 0
 #define LOG(fmt_, ...) printf(fmt_, ##__VA_ARGS__)
 #else
-#define LOG(...) do { } while (0)
+#define LOG(...) ((void)0)
 #endif
 
 //#define STRICT_98_RULE
@@ -228,32 +229,32 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
 //-------------------------------- 算番 --------------------------------
 
 // 4组递增1
-static forceinline bool is_four_shifted_1(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
+static FORCE_INLINE bool is_four_shifted_1(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
     return (r0 + 1 == r1 && r1 + 1 == r2 && r2 + 1 == r3);
 }
 
 // 4组递增2
-static forceinline bool is_four_shifted_2(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
+static FORCE_INLINE bool is_four_shifted_2(rank_t r0, rank_t r1, rank_t r2, rank_t r3) {
     return (r0 + 2 == r1 && r1 + 2 == r2 && r2 + 2 == r3);
 }
 
 // 3组递增1
-static forceinline bool is_shifted_1(rank_t r0, rank_t r1, rank_t r2) {
+static FORCE_INLINE bool is_shifted_1(rank_t r0, rank_t r1, rank_t r2) {
     return (r0 + 1 == r1 && r1 + 1 == r2);
 }
 
 // 3组递增2
-static forceinline bool is_shifted_2(rank_t r0, rank_t r1, rank_t r2) {
+static FORCE_INLINE bool is_shifted_2(rank_t r0, rank_t r1, rank_t r2) {
     return (r0 + 2 == r1 && r1 + 2 == r2);
 }
 
 // 三色
-static forceinline bool is_mixed(suit_t s0, suit_t s1, suit_t s2) {
+static FORCE_INLINE bool is_mixed(suit_t s0, suit_t s1, suit_t s2) {
     return (s0 != s1 && s0 != s2 && s1 != s2);
 }
 
 // 3组递增1无序
-static forceinline bool is_shifted_1_unordered(rank_t r0, rank_t r1, rank_t r2) {
+static FORCE_INLINE bool is_shifted_1_unordered(rank_t r0, rank_t r1, rank_t r2) {
     return is_shifted_1(r1, r0, r2) || is_shifted_1(r2, r0, r1) || is_shifted_1(r0, r1, r2)
         || is_shifted_1(r2, r1, r0) || is_shifted_1(r0, r2, r1) || is_shifted_1(r1, r2, r0);
 }
@@ -765,6 +766,7 @@ static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_tab
         }
         break;
     default:
+        UNREACHABLE();
         break;
     }
 
@@ -1250,25 +1252,12 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, intptr_t pack_
     }
 }
 
-// 根据风调整——涉及番种：圈风刻、门风刻
-static void adjust_by_winds(tile_t tile, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
-    rank_t delta = tile - TILE_E;
-    if (delta == static_cast<int>(prevalent_wind) - static_cast<int>(wind_t::EAST)) {
-        fan_table[PREVALENT_WIND] = 1;
-    }
-    if (delta == static_cast<int>(seat_wind) - static_cast<int>(wind_t::EAST)) {
-        fan_table[SEAT_WIND] = 1;
-    }
-}
-
 // 统一调整一些不计的
-static void adjust_fan_table(fan_table_t &fan_table, bool prevalent_eq_seat) {
+static void adjust_fan_table(fan_table_t &fan_table) {
     // 大四喜不计三风刻、碰碰和、圈风刻、门风刻、幺九刻
     if (fan_table[BIG_FOUR_WINDS]) {
         fan_table[BIG_THREE_WINDS] = 0;
         fan_table[ALL_PUNGS] = 0;
-        fan_table[PREVALENT_WIND] = 0;
-        fan_table[SEAT_WIND] = 0;
         fan_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
     }
     // 大三元不计双箭刻、箭刻（严格98规则不计缺一门）
@@ -1537,24 +1526,6 @@ static void adjust_fan_table(fan_table_t &fan_table, bool prevalent_eq_seat) {
         fan_table[MELDED_KONG] = 0;
     }
 
-    // 圈风刻自己不计幺九刻
-    if (fan_table[PREVALENT_WIND]) {
-        // 如果不是三风刻、小四喜、字一色、混幺九，则要减去1个幺九刻
-        if (!fan_table[BIG_THREE_WINDS] && !fan_table[LITTLE_FOUR_WINDS]
-            && !fan_table[ALL_HONORS] && !fan_table[ALL_TERMINALS_AND_HONORS]) {
-            assert(fan_table[PUNG_OF_TERMINALS_OR_HONORS] > 0);
-            --fan_table[PUNG_OF_TERMINALS_OR_HONORS];
-        }
-    }
-    // 门风刻自己不计幺九刻
-    if (fan_table[SEAT_WIND]) {
-        // 如果圈风与门风不相同，并且不是三风刻、小四喜、字一色、混幺九，则要减去1个幺九刻
-        if (!prevalent_eq_seat && !fan_table[BIG_THREE_WINDS] && !fan_table[LITTLE_FOUR_WINDS]
-            && !fan_table[ALL_HONORS] && !fan_table[ALL_TERMINALS_AND_HONORS]) {
-            assert(fan_table[PUNG_OF_TERMINALS_OR_HONORS] > 0);
-            --fan_table[PUNG_OF_TERMINALS_OR_HONORS];
-        }
-    }
     // 平和不计无字
     if (fan_table[ALL_CHOWS]) {
         fan_table[NO_HONORS] = 0;
@@ -1562,6 +1533,28 @@ static void adjust_fan_table(fan_table_t &fan_table, bool prevalent_eq_seat) {
     // 断幺不计无字
     if (fan_table[ALL_SIMPLES]) {
         fan_table[NO_HONORS] = 0;
+    }
+}
+
+
+// 调整圈风刻、门风刻
+static void adjust_by_winds(tile_t tile, wind_t prevalent_wind, wind_t seat_wind, fan_table_t &fan_table) {
+    // 三风刻、混幺九、字一色、小四喜，这些番种已经扣除过幺九刻了
+    bool is_deducted = (fan_table[BIG_THREE_WINDS] || fan_table[ALL_TERMINALS_AND_HONORS] || fan_table[ALL_HONORS] || fan_table[LITTLE_FOUR_WINDS]);
+
+    rank_t delta = tile - TILE_E;
+    if (delta == static_cast<int>(prevalent_wind) - static_cast<int>(wind_t::EAST)) {
+        fan_table[PREVALENT_WIND] = 1;
+        if (!is_deducted) {
+            --fan_table[PUNG_OF_TERMINALS_OR_HONORS];
+        }
+    }
+    if (delta == static_cast<int>(seat_wind) - static_cast<int>(wind_t::EAST)) {
+        fan_table[SEAT_WIND] = 1;
+        // 当圈风门风相同时，已经扣除过幺九刻了
+        if (seat_wind != prevalent_wind && !is_deducted) {
+            --fan_table[PUNG_OF_TERMINALS_OR_HONORS];
+        }
     }
 }
 
@@ -1582,7 +1575,7 @@ static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
 }
 
 // 基本和型算番
-static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_param_t *calculate_param, fan_table_t &fan_table) {
+static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
     pack_t pair_pack = 0;
     pack_t chow_packs[4];
     pack_t pung_packs[4];
@@ -1594,7 +1587,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
         case PACK_TYPE_PUNG:
         case PACK_TYPE_KONG: pung_packs[pung_cnt++] = packs[i]; break;
         case PACK_TYPE_PAIR: pair_pack = packs[i]; break;
-        default: assert(0); return;
+        default: UNREACHABLE(); return;
         }
     }
 
@@ -1603,7 +1596,6 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     }
 
     tile_t win_tile = calculate_param->win_tile;
-    win_flag_t win_flag = calculate_param->win_flag;
 
     // 根据和牌标记调整——涉及番种：和绝张、妙手回春、海底捞月、自摸
     adjust_by_win_flag(win_flag, fan_table);
@@ -1695,6 +1687,7 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
         break;
     }
     default:
+        UNREACHABLE();
         break;
     }
 
@@ -1735,25 +1728,29 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
     adjust_by_waiting_form(packs + fixed_cnt, 5 - fixed_cnt, standing_tiles, standing_cnt, win_tile, fan_table);
 
-    // 根据风调整——涉及番种：圈风刻、门风刻
-    for (intptr_t i = 0; i < pung_cnt; ++i) {
-        adjust_by_winds(pack_get_tile(pung_packs[i]), prevalent_wind, seat_wind, fan_table);
+    // 统一调整一些不计的
+    adjust_fan_table(fan_table);
+
+    // 调整圈风刻、门风刻（大四喜不计圈风刻、门风刻）
+    if (fan_table[BIG_FOUR_WINDS] == 0) {
+        for (intptr_t i = 0; i < pung_cnt; ++i) {
+            tile_t tile = pack_get_tile(pung_packs[i]);
+            if (is_winds(tile)) {
+                adjust_by_winds(tile, prevalent_wind, seat_wind, fan_table);
+            }
+        }
     }
 
-    // 统一调整一些不计的
-    adjust_fan_table(fan_table, prevalent_wind == seat_wind);
-
     // 如果什么番都没有，则计为无番和
-    if (std::all_of(std::begin(fan_table), std::end(fan_table), [](uint8_t p) { return p == 0; })) {
+    if (std::all_of(std::begin(fan_table), std::end(fan_table), [](uint16_t p) { return p == 0; })) {
         fan_table[CHICKEN_HAND] = 1;
     }
 }
 
 // “组合龙+面子+雀头”和型算番
-static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_param, fan_table_t &fan_table) {
+static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
     tile_t win_tile = calculate_param->win_tile;
-    win_flag_t win_flag = calculate_param->win_flag;
     wind_t prevalent_wind = calculate_param->prevalent_wind;
     wind_t seat_wind = calculate_param->seat_wind;
 
@@ -1812,9 +1809,6 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     }
     else {
         calculate_kongs(&packs[3], 1, fan_table);
-
-        // 根据风调整——涉及番种：圈风刻、门风刻
-        adjust_by_winds(pack_get_tile(packs[3]), prevalent_wind, seat_wind, fan_table);
     }
 
     adjust_by_win_flag(win_flag, fan_table);
@@ -1858,12 +1852,19 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     }
 
     // 统一调整一些不计的
-    adjust_fan_table(fan_table, prevalent_wind == seat_wind);
+    adjust_fan_table(fan_table);
+
+    // 调整圈风刻、门风刻
+    tile_t tile = pack_get_tile(packs[3]);
+    if (is_winds(tile)) {
+        adjust_by_winds(tile, prevalent_wind, seat_wind, fan_table);
+    }
+
     return true;
 }
 
 // 十三幺
-static forceinline bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
+static FORCE_INLINE bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
     return std::all_of(std::begin(tiles), std::end(tiles), &is_terminal_or_honor)
         && std::includes(std::begin(tiles), std::end(tiles),
         std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans));
@@ -1951,9 +1952,9 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
     }
 
     adjust_by_win_flag(win_flag, fan_table);
-    // 根据风调整就没必要了，这些特殊和型都没有面子，不存在圈风刻、门风刻
-    // 统一调整一些不计的
-    adjust_fan_table(fan_table, false);
+    // 统一调整一些不计的，根据风调整就没必要了，这些特殊和型都没有面子，不存在圈风刻、门风刻
+    adjust_fan_table(fan_table);
+
     return true;
 }
 
@@ -2083,7 +2084,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
 
     // 先判断各种特殊和型
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, special_fan_table)) {
+        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table)) {
             max_fan = get_fan_by_table(special_fan_table);
             selected_fan_table = &special_fan_table;
             LOG("fan = %d\n\n", max_fan);
@@ -2095,7 +2096,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
         }
     }
     else if (fixed_cnt == 1) {  // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, special_fan_table)) {
+        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table)) {
             max_fan = get_fan_by_table(special_fan_table);
             selected_fan_table = &special_fan_table;
             LOG("fan = %d\n\n", max_fan);
@@ -2117,7 +2118,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
                 packs_to_string(result.divisions[i].packs, 5, str, sizeof(str));
                 puts(str);
 #endif
-                calculate_basic_form_fan(result.divisions[i].packs, calculate_param, fan_tables[i]);
+                calculate_basic_form_fan(result.divisions[i].packs, calculate_param, win_flag, fan_tables[i]);
                 int current_fan = get_fan_by_table(fan_tables[i]);
                 if (current_fan > max_fan) {
                     max_fan = current_fan;

@@ -39,8 +39,8 @@ AppDelegate::~AppDelegate() {
 // if you want a different context, modify the value of glContextAttrs
 // it will affect all platforms
 void AppDelegate::initGLContextAttrs() {
-    // set OpenGL context attributes: red,green,blue,alpha,depth,stencil
-    GLContextAttrs glContextAttrs = {8, 8, 8, 8, 24, 8};
+    // set OpenGL context attributes: red,green,blue,alpha,depth,stencil,multisamplesCount
+    GLContextAttrs glContextAttrs = {8, 8, 8, 8, 24, 8, 0};
 
     GLView::setGLContextAttrs(glContextAttrs);
 }
@@ -65,10 +65,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
     // turn on display FPS
-    director->setDisplayStats(false);
+    director->setDisplayStats(UserDefault::getInstance()->getBoolForKey("show_fps"));
 
     // set FPS. the default value is 1.0/60 if you don't call this
-    director->setAnimationInterval(1.0f / 10);
+    director->setAnimationInterval(1.0f / UserDefault::getInstance()->getIntegerForKey("animation_interval", 15));
 
     // Set the design resolution
     Size frameSize = glview->getFrameSize();

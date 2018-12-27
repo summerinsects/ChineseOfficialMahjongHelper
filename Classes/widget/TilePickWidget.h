@@ -6,15 +6,15 @@
 
 class TilePickWidget : public cocos2d::Node {
 public:
-    CREATE_FUNC_WITH_PARAM_1(TilePickWidget, initWithWidth, float, maxWidth);
+    CREATE_FUNC_WITH_PARAM_1(TilePickWidget, float, maxWidth);
 
     typedef std::function<void ()> TilePickCallback;
 
-    void setFixedPacksChangedCallback(const TilePickCallback &callback) { _fixedPacksChangedCallback = callback; }
-    void setWinTileChangedCallback(const TilePickCallback &callback) { _winTileChangedCallback = callback; }
+    void setFixedPacksChangedCallback(TilePickCallback &&callback) { _fixedPacksChangedCallback.swap(callback); }
+    void setWinTileChangedCallback(TilePickCallback &&callback) { _winTileChangedCallback.swap(callback); }
     void setData(const mahjong::hand_tiles_t &hand_tiles, mahjong::tile_t winTile);
 
-    bool initWithWidth(float maxWidth);
+    bool init(float maxWidth);
 
 private:
     HandTilesWidget *_handTilesWidget = nullptr;
@@ -36,11 +36,8 @@ private:
     void refreshTilesTableButton(mahjong::tile_t tile);
     void refreshAllTilesTableButton();
     void refreshActionButtons();
-    void onTileTableButton(cocos2d::Ref *sender, mahjong::tile_t tile);
-    void onChowButton(cocos2d::Ref *sender);
-    void onPungButton(cocos2d::Ref *sender);
-    void onMeldedKongButton(cocos2d::Ref *sender);
-    void onConcealedKongButton(cocos2d::Ref *sender);
+    void onTileTableButton(cocos2d::Ref *sender);
+    void makeFixedSet(const std::function<bool ()> &makeFixedSetFunction);
 
 public:
     void getData(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *servingTile) const {

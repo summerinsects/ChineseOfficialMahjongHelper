@@ -4,12 +4,11 @@
 #include "Toast.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 
 USING_NS_CC;
 
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
-
-bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback) {
+bool ExtraInfoWidget::init(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback) {
     if (UNLIKELY(!Node::init())) {
         return false;
     }
@@ -52,7 +51,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         radioGroup->addRadioButton(radioButton);
 
         Label *label = Label::createWithSystemFont(winTypeTexts[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(C4B_BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(25.0f + gapX * i, 100.0f));
@@ -71,7 +70,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     _fourthTileBox = checkBox;
 
     Label *label = Label::createWithSystemFont(__UTF8("绝张"), "Arial", 12);
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(C4B_BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(25.0f + gapX * 2, 100.0f));
@@ -88,7 +87,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         checkBoxes[i] = checkBox;
 
         label = Label::createWithSystemFont(extTexts[i], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(C4B_BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(25.0f + gapX * i, 70.0f));
@@ -111,7 +110,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         const float posY = 40.0f - k * 30.0f;
 
         label = Label::createWithSystemFont(windType[k], "Arial", 12);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(C4B_BLACK);
         rootNode->addChild(label);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(0.0f, posY));
@@ -119,7 +118,9 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
         radioGroup = ui::RadioButtonGroup::create();
         this->addChild(radioGroup);
         for (int i = 0; i < 4; ++i) {
-            ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+            ui::RadioButton *radioButton = ui::RadioButton::create("source_material/btn_square_normal.png",
+                "source_material/btn_square_selected.png", "source_material/btn_square_highlighted.png",
+                "source_material/btn_radio_disabled.png", "source_material/btn_radio_disabled.png");
             radioButton->setZoomScale(0.0f);
             radioButton->ignoreContentAdaptWithSize(false);
             radioButton->setContentSize(Size(20.0f, 20.0f));
@@ -127,7 +128,7 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
             rootNode->addChild(radioButton);
 
             label = Label::createWithSystemFont(windName[i], "Arial", 12);
-            label->setColor(C3B_GRAY);
+            label->setTextColor(C4B_GRAY);
             radioButton->addChild(label);
             label->setPosition(Vec2(10.0f, 10.0f));
 
@@ -157,51 +158,23 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
     button->addClickEventListener(std::bind(&ExtraInfoWidget::onInstructionButton, this, std::placeholders::_1));
 
     // 花牌数
-    label = Label::createWithSystemFont("\xF0\x9F\x8C\xB8", "Arial", 12);
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
-    label->setColor(Color3B(224, 45, 45));
-#endif
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(contentSize.width - 72.5f, 40.0f));
-
-    label = Label::createWithSystemFont("x0", "Arial", 12);
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
-    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    label->setPosition(Vec2(contentSize.width - 72.5f, 40.0f));
-    label->setTag(0);
-    _flowerLabel = label;
-
     button = UICommon::createButton();
     button->setScale9Enabled(true);
-    button->setContentSize(Size(25.0f, 20.0f));
+    button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
-    button->setTitleText("-1");
+    button->setTitleText("\xF0\x9F\x8C\xB8 \xC3\x97 " "0");
     rootNode->addChild(button);
-    button->setPosition(Vec2(contentSize.width - 42.5f, 40.0f));
-    button->addClickEventListener([label](Ref *) {
-        int n = label->getTag();
-        if (n > 0) {
-            label->setTag(--n);
-            label->setString(Common::format("x%d", n));
-        }
+    button->setPosition(Vec2(contentSize.width - 27.5f, 40.0f));
+    button->setTag(0);
+    button->addClickEventListener([](Ref *sender) {
+        ui::Button *button = (ui::Button *)sender;
+        int n = button->getTag();
+        if (n < 8) ++n;
+        else n = 0;
+        button->setTag(n);
+        button->setTitleText(Common::format("\xF0\x9F\x8C\xB8 \xC3\x97 %d", n));
     });
-
-    button = UICommon::createButton();
-    button->setScale9Enabled(true);
-    button->setContentSize(Size(25.0f, 20.0f));
-    button->setTitleFontSize(12);
-    button->setTitleText("+1");
-    rootNode->addChild(button);
-    button->setPosition(Vec2(contentSize.width - 12.5f, 40.0f));
-    button->addClickEventListener([label](Ref *) {
-        int n = label->getTag();
-        if (n < 8) {
-            label->setTag(++n);
-            label->setString(Common::format("x%d", n));
-        }
-    });
+    _flowerButton = button;
 
     if (callback != nullptr) {
         // 番算按钮
@@ -219,14 +192,14 @@ bool ExtraInfoWidget::initWithWidth(float maxWidth, const cocos2d::ui::Widget::c
 }
 
 int ExtraInfoWidget::getFlowerCount() const {
-    return _flowerLabel->getTag();
+    return _flowerButton->getTag();
 }
 
 void ExtraInfoWidget::setFlowerCount(int cnt) {
     if (cnt > 8) cnt = 8;
     if (cnt < 0) cnt = 0;
-    _flowerLabel->setTag(cnt);
-    _flowerLabel->setString(Common::format("x%d", cnt));
+    _flowerButton->setTag(cnt);
+    _flowerButton->setTitleText(Common::format("\xF0\x9F\x8C\xB8 \xC3\x97 %d", cnt));
 }
 
 mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
@@ -425,7 +398,8 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
         __UTF8("12. 不重复原则特指单个番种与其他番种的必然包含关系，不适用某几个番种同时出现时与其他番种的包含关系。例如，绿一色+清一色，必然断幺，但要计断幺。\n")
         __UTF8("13. 双暗杠6番，一明杠一暗杠5番，双明杠4番。暗杠的加计遵循国际麻将联盟（MIL）的规则，即杠系列和暗刻系列最多各计一个。"),
         "Arail", 10, Size(maxWidth, 0.0f));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(C4B_BLACK);
+    label->setLineSpacing(2.0f);
 
     Node *node = nullptr;
 
@@ -457,7 +431,7 @@ void ExtraInfoWidget::onInstructionButton(cocos2d::Ref *) {
 }
 
 void ExtraInfoWidget::showInputAlert(const char *prevInput) {
-    const float width = AlertDialog::maxWidth();
+    const float maxWidth = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
 
@@ -467,19 +441,48 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
         __UTF8("3. 吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n")
         __UTF8("  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n")
         __UTF8("  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n")
-        __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示明杠上家的8饼。\n")
-        __UTF8("  输入范例1：[EEEE][CCCC][FFFF][PPPP]NN\n")
-        __UTF8("  输入范例2：1112345678999s9s\n")
-        __UTF8("  输入范例3：[WWWW,1][444s]45m678pFF6m"), "Arial", 10, Size(width, 0.0f));
-    label->setColor(Color3B::BLACK);
-    rootNode->addChild(label);
+        __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示大明杠上家的8饼。当数字为5、6、7时，表示加杠。例如：[1111s,6]表示碰对家的1条后，又摸到1条加杠。\n")
+        __UTF8("输入范例：\n")
+        __UTF8("  (1) [EEEE][CCCC][FFFF][PPPP]NN\n")
+        __UTF8("  (2) 1112345678999s9s\n")
+        __UTF8("  (3) [WWWW,1][444s]45m678pFF6m"),
+        "Arial", 10, Size(maxWidth, 0.0f));
+    label->setTextColor(C4B_BLACK);
+    label->setLineSpacing(2.0f);
+
+    // 超出高度就使用ScrollView
+    const Size &labelSize = label->getContentSize();
+    const float maxHeight = cocos2d::Director::getInstance()->getVisibleSize().height * 0.8f - 80.0f - 30.0f;
+    if (labelSize.height <= maxHeight) {
+        rootNode->addChild(label);
+        label->setPosition(Vec2(maxWidth * 0.5f, labelSize.height * 0.5f + 30.0f));
+        rootNode->setContentSize(Size(maxWidth, labelSize.height + 30.0f));
+    }
+    else {
+        Size textSize(maxWidth, maxHeight);
+
+        ui::ScrollView *scrollView = ui::ScrollView::create();
+        scrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
+        scrollView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
+        scrollView->setScrollBarWidth(4.0f);
+        scrollView->setScrollBarOpacity(0x99);
+        scrollView->setContentSize(textSize);
+        scrollView->setInnerContainerSize(labelSize);
+        scrollView->addChild(label);
+        label->setPosition(Vec2(labelSize.width * 0.5f, labelSize.height * 0.5f));
+
+        rootNode->addChild(scrollView);
+        scrollView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+        scrollView->setPosition(Vec2(maxWidth * 0.5f, textSize.height * 0.5f + 30.0f));
+        rootNode->setContentSize(Size(maxWidth, textSize.height + 30.0f));
+    }
 
     // 输入手牌
-    ui::EditBox *editBox = UICommon::createEditBox(Size(width - 10.0f, 20.0f));
+    ui::EditBox *editBox = UICommon::createEditBox(Size(maxWidth, 20.0f));
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
-    editBox->setFontColor(Color4B::BLACK);
+    editBox->setFontColor(C4B_BLACK);
     editBox->setFontSize(12);
     editBox->setPlaceholderFontColor(Color4B::GRAY);
     editBox->setPlaceHolder(__UTF8("输入手牌"));
@@ -489,11 +492,7 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     }
 
     rootNode->addChild(editBox);
-
-    const Size &labelSize = label->getContentSize();
-    rootNode->setContentSize(Size(width, labelSize.height + 25.0f));
-    editBox->setPosition(Vec2(width * 0.5f, 10.0f));
-    label->setPosition(Vec2(width * 0.5f, labelSize.height * 0.5f + 25.0f));
+    editBox->setPosition(Vec2(maxWidth * 0.5f, 15.0f));
 
     AlertDialog::Builder(Director::getInstance()->getRunningScene())
         .setTitle(__UTF8("直接输入"))
@@ -525,9 +524,11 @@ const char *ExtraInfoWidget::parseInput(const char *input) {
             case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: return __UTF8("数字后面需有后缀");
             case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: return __UTF8("一组副露包含了错误的牌数目");
             case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: return __UTF8("无法正确解析副露");
-            default: break;
+            case PARSE_ERROR_TOO_MANY_FIXED_PACKS: return __UTF8("副露最多4组");
+            case PARSE_ERROR_TOO_MANY_TILES: return __UTF8("手牌过多");
+            case PARSE_ERROR_TILE_COUNT_GREATER_THAN_4: return __UTF8("同一种牌最多只能使用4枚");
+            default: return __UTF8("未知错误");
         }
-        return nullptr;
     }
     if (win_tile == 0) {
         return __UTF8("缺少和牌张");

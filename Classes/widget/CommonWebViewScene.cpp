@@ -2,7 +2,7 @@
 
 USING_NS_CC;
 
-bool CommonWebViewScene::initWithTitle(const char *title, const std::string &content, CommonWebViewScene::ContentType type) {
+bool CommonWebViewScene::init(const char *title, const std::string &content, CommonWebViewScene::ContentType type) {
     if (UNLIKELY(!BaseScene::initWithTitle(title))) {
         return false;
     }
@@ -32,10 +32,12 @@ bool CommonWebViewScene::initWithTitle(const char *title, const std::string &con
     this->addChild(webView);
     webView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + height * 0.5f + 5.0f));
 #else
+    if (type == ContentType::URL) {
+        Application::getInstance()->openURL(content);
+        return true;
+    }
+
     if (type != ContentType::HTML) {
-        if (type == ContentType::URL) {
-            Application::getInstance()->openURL(content);
-        }
         return true;
     }
 

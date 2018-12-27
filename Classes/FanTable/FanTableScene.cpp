@@ -4,12 +4,11 @@
 #include "../mahjong-algorithm/fan_calculator.h"
 #include "../mahjong-algorithm/stringify.h"
 #include "../TilesImage.h"
+#include "../UIColors.h"
 #include "../widget/CommonWebViewScene.h"
 #include "../widget/LoadingView.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 static const char *principle_title[] = { __UTF8("不重复原则"), __UTF8("不拆移原则"), __UTF8("不得相同原则"), __UTF8("就高不就低"), __UTF8("套算一次原则") };
 
@@ -20,8 +19,8 @@ namespace {
     typedef struct {
         const char *const title;
         const char *const *fan_names;
-        const size_t count;
-        const size_t begin_index;
+        const unsigned count;
+        const unsigned begin_index;
     } CellDetail;
 }
 
@@ -41,7 +40,7 @@ static const CellDetail cellDetails[13] = {
     { __UTF8("88番"), &mahjong::fan_name[mahjong::BIG_FOUR_WINDS], 7, mahjong::BIG_FOUR_WINDS }
 };
 
-static FORCE_INLINE size_t computeRowsAlign4(size_t cnt) {
+static FORCE_INLINE unsigned computeRowsAlign4(unsigned cnt) {
     return (cnt >> 2) + ((cnt & 0x3) != 0);
 }
 
@@ -75,7 +74,7 @@ ssize_t FanTableScene::numberOfCellsInTableView(cw::TableView *) {
 }
 
 float FanTableScene::tableCellSizeForIndex(cw::TableView *, ssize_t idx) {
-    size_t cnt = cellDetails[idx].count;
+    unsigned cnt = cellDetails[idx].count;
     float height = computeRowsAlign4(cnt) * 25.0f;
     return (height + 15.0f);
 }
@@ -84,8 +83,8 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     typedef cw::TableViewCellEx<Label *, std::array<ui::Button *, 13> > CustomCell;
     CustomCell *cell = (CustomCell *)table->dequeueCell();
 
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    const float gap = (visibleSize.width - 5.0f) * 0.25f;
+    const float cellWidth = table->getContentSize().width;
+    const float gap = (cellWidth - 5.0f) * 0.25f;
 
     if (cell == nullptr) {
         cell = CustomCell::create();
@@ -97,10 +96,10 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
         label = Label::createWithSystemFont(__UTF8("1番"), "Arial", 12);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         cell->addChild(label);
-        label->setColor(Color3B::BLACK);
+        label->setTextColor(C4B_BLACK);
 
-        for (size_t k = 0; k < 13; ++k) {
-            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_highlighted.png");
+        for (unsigned k = 0; k < 13; ++k) {
+            ui::Button *button = ui::Button::create("source_material/btn_square_normal.png", "source_material/btn_square_selected.png");
             button->setScale9Enabled(true);
             button->setContentSize(Size(gap - 4.0f, 20.0f));
             button->setTitleColor(C3B_GRAY);
@@ -113,8 +112,8 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     }
 
     const CellDetail &detail = cellDetails[idx];
-    const size_t currentLevelCount = detail.count;
-    size_t totalRows = computeRowsAlign4(currentLevelCount);
+    const unsigned currentLevelCount = detail.count;
+    unsigned totalRows = computeRowsAlign4(currentLevelCount);
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
     Label *label = std::get<0>(ext);
@@ -123,25 +122,23 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
     label->setString(detail.title);
     label->setPosition(Vec2(5.0f, totalRows * 25.0f + 7.0f));
 
-    size_t idx0 = detail.begin_index;
+    unsigned idx0 = detail.begin_index;
     const char *const *titleTexts = detail.fan_names;
 
-    for (size_t k = 0; k < currentLevelCount; ++k) {
+    for (unsigned k = 0; k < currentLevelCount; ++k) {
         ui::Button *button = buttons[k];
         button->setTitleText(titleTexts[k]);
-        button->setUserData(reinterpret_cast<void *>(idx0 + k));
+        button->setTag(static_cast<int>(idx0 + k));
         button->setVisible(true);
-        button->setEnabled(true);
-        size_t col = k & 0x3;
-        size_t row = k >> 2;
+        unsigned col = k & 0x3;
+        unsigned row = k >> 2;
         button->setPosition(Vec2(gap * (col + 0.5f), (totalRows - row - 0.5f) * 25.0f));
 
         cw::scaleLabelToFitWidth(button->getTitleLabel(), gap - 8.0f);
     }
 
-    for (size_t k = currentLevelCount; k < 13; ++k) {
+    for (unsigned k = currentLevelCount; k < 13; ++k) {
         buttons[k]->setVisible(false);
-        buttons[k]->setEnabled(false);
     }
 
     return cell;
@@ -149,7 +146,7 @@ cw::TableViewCell *FanTableScene::tableCellAtIndex(cw::TableView *table, ssize_t
 
 void FanTableScene::onFanNameButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
-    size_t idx = reinterpret_cast<size_t>(button->getUserData());
+    unsigned idx = static_cast<unsigned>(button->getTag());
     asyncShowFanDefinition(idx);
 }
 
@@ -199,14 +196,19 @@ static void replaceTilesToImage(std::string &text, float scale) {
     }
 }
 
-static void showFanDefinition(size_t idx) {
+static void showFanDefinition(unsigned idx) {
+#if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
+    if (idx == mahjong::CONCEALED_KONG_AND_MELDED_KONG) {
+        idx = mahjong::TWO_MELDED_KONGS;
+    }
+#endif
     const char *title = idx < 100 ? mahjong::fan_name[idx] : principle_title[idx - 100];
     const std::string &text = idx < 100 ? g_definitions[idx] : g_principles[idx - 100];
     CommonWebViewScene *scene = CommonWebViewScene::create(title, text, CommonWebViewScene::ContentType::HTML);
     Director::getInstance()->pushScene(scene);
 }
 
-void FanTableScene::asyncShowFanDefinition(size_t idx) {
+void FanTableScene::asyncShowFanDefinition(unsigned idx) {
     if (LIKELY(g_definitions.size() == 82 && g_principles.size() == 5)) {
         showFanDefinition(idx);
         return;
@@ -221,17 +223,25 @@ void FanTableScene::asyncShowFanDefinition(size_t idx) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
     float scale = 1.0f;
-    float maxWidth = (visibleSize.width - 10) / 18;
+    float maxWidth = (visibleSize.width - 4) / 18;
     if (maxWidth < 25) {
         scale = maxWidth / TILE_WIDTH;
     }
 #else
-    float scale = 0.5f;
+    float scale = 0.3f;
 #endif
 
-    std::thread([runningScene, idx, scale, loadingView]() {
-        // 读文件
-        auto definitions = std::make_shared<std::vector<std::string> >();
+    auto definitions = std::make_shared<std::vector<std::string> >();
+    auto principles = std::make_shared<std::vector<std::string> >();
+    AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [runningScene, idx, loadingView, definitions, principles](void *) {
+        g_definitions.swap(*definitions);
+        g_principles.swap(*principles);
+
+        if (LIKELY(runningScene->isRunning())) {
+            loadingView->dismiss();
+            showFanDefinition(idx);
+        }
+    }, nullptr, [scale, definitions, principles]() {
         ValueVector valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_definition.xml");
         if (valueVec.size() == 82) {
             definitions->reserve(82);
@@ -242,7 +252,6 @@ void FanTableScene::asyncShowFanDefinition(size_t idx) {
             });
         }
 
-        auto principles = std::make_shared<std::vector<std::string> >();
         valueVec = FileUtils::getInstance()->getValueVectorFromFile("text/score_principles.xml");
         if (valueVec.size() == 5) {
             principles->reserve(5);
@@ -252,16 +261,5 @@ void FanTableScene::asyncShowFanDefinition(size_t idx) {
                 return std::move(ret);
             });
         }
-
-        // 切换到cocos线程
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread([runningScene, idx, loadingView, definitions, principles]() {
-            g_definitions.swap(*definitions);
-            g_principles.swap(*principles);
-
-            if (LIKELY(runningScene->isRunning())) {
-                loadingView->dismiss();
-                showFanDefinition(idx);
-            }
-        });
-    }).detach();
+    });
 }

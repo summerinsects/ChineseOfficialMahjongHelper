@@ -17,6 +17,7 @@ public:
 private:
     cocos2d::ui::EditBox *_editBox = nullptr;
     HandTilesWidget *_handTilesWidget = nullptr;
+    cocos2d::Label *_stepLabel = nullptr;
     cocos2d::ui::Button *_undoButton = nullptr;
     cocos2d::ui::Button *_redoButton = nullptr;
     cocos2d::ui::CheckBox *_checkBoxes[4];
@@ -27,6 +28,7 @@ private:
     struct ResultEx : mahjong::enum_result_t {
         int count_in_tiles;
         int count_total;
+        bool imaginary_table[34];
     };
     std::vector<mahjong::enum_result_t> _allResults;
     std::vector<ResultEx> _resultSources;
@@ -40,11 +42,13 @@ private:
     std::vector<StateData> _undoCache;
     std::vector<StateData> _redoCache;
 
+    char _tileString[64];
+
     virtual void editBoxReturn(cocos2d::ui::EditBox *editBox) override;
     void setRandomInput();
     void onGuideButton(cocos2d::Ref *sender);
     void showInputAlert();
-    bool parseInput(const char *input);
+    void parseInput(const char *input);
     void calculate();
     void filterResultsByFlag(uint8_t flag);
     uint8_t getFilterFlag() const;
@@ -53,6 +57,8 @@ private:
     void recoverFromState(StateData &state);
     void onUndoButton(cocos2d::Ref *sender);
     void onRedoButton(cocos2d::Ref *sender);
+    void refreshStepLabel();
+    bool updateTileString(const mahjong::hand_tiles_t &handTiles, mahjong::tile_t servingTile);
     void deduce(mahjong::tile_t discardTile, mahjong::tile_t servingTile);
 
     float _cellWidth = 0.0f;

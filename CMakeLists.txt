@@ -23,9 +23,9 @@
 # THE SOFTWARE.
 # ****************************************************************************/
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.6)
 
-set(APP_NAME TemplateCpp)
+set(APP_NAME ChineseOfficialMahjongHelper)
 
 project(${APP_NAME})
 
@@ -33,9 +33,7 @@ set(COCOS2DX_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cocos2d)
 set(CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
 
 include(CocosBuildSet)
-if(NOT USE_COCOS_PREBUILT)
-    add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
-endif()
+add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
 
 # record sources, headers, resources...
 set(GAME_SOURCE)
@@ -48,18 +46,71 @@ if(APPLE OR WINDOWS)
     cocos_mark_multi_resources(common_res_files RES_TO "Resources" FOLDERS ${GAME_RES_FOLDER})
 endif()
 
-include_directories(
-        Classes
-        ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
-)
 # add cross-platforms source files and header files 
 list(APPEND GAME_SOURCE
      Classes/AppDelegate.cpp
      Classes/HelloWorldScene.cpp
+     Classes/cocos-wheels/CWCommon.cpp
+     Classes/cocos-wheels/CWTableView.cpp
+     Classes/CompetitionSystem/CompetitionMainScene.cpp
+     Classes/CompetitionSystem/LatestCompetitionScene.cpp
+     Classes/FanCalculator/FanCalculatorScene.cpp
+     Classes/FanTable/FanTableScene.cpp
+     Classes/mahjong-algorithm/fan_calculator.cpp
+     Classes/mahjong-algorithm/shanten.cpp
+     Classes/mahjong-algorithm/stringify.cpp
+     Classes/MahjongTheory/MahjongTheoryScene.cpp
+     Classes/MainMenu/LeftSideMenu.cpp
+     Classes/Other/OtherScene.cpp
+     Classes/RecordSystem/Record.cpp
+     Classes/RecordSystem/RecordHistoryScene.cpp
+     Classes/RecordSystem/RecordScene.cpp
+     Classes/RecordSystem/ScoreSheetScene.cpp
+     Classes/utils/common.cpp
+     Classes/utils/socket.cpp
+     Classes/widget/AlertDialog.cpp
+     Classes/widget/CheckBoxScale9.cpp
+     Classes/widget/CommonWebViewScene.cpp
+     Classes/widget/DatePicker.cpp
+     Classes/widget/ExtraInfoWidget.cpp
+     Classes/widget/HandTilesWidget.cpp
+     Classes/widget/PopupMenu.cpp
+     Classes/widget/TilePickWidget.cpp
+     Classes/widget/Toast.cpp
      )
 list(APPEND GAME_HEADER
      Classes/AppDelegate.h
      Classes/HelloWorldScene.h
+     Classes/cocos-wheels/CWCommon.h
+     Classes/cocos-wheels/CWTableView.h
+     Classes/CompetitionSystem/CompetitionMainScene.h
+     Classes/CompetitionSystem/LatestCompetitionScene.h
+     Classes/FanCalculator/FanCalculatorScene.h
+     Classes/FanTable/FanTableScene.h
+     Classes/mahjong-algorithm/fan_calculator.h
+     Classes/mahjong-algorithm/shanten.h
+     Classes/mahjong-algorithm/stringify.h
+     Classes/mahjong-algorithm/tile.h
+     Classes/MahjongTheory/MahjongTheoryScene.h
+     Classes/MainMenu/LeftSideMenu.h
+     Classes/Other/OtherScene.h
+     Classes/RecordSystem/Record.h
+     Classes/RecordSystem/RecordHistoryScene.h
+     Classes/RecordSystem/RecordScene.h
+     Classes/RecordSystem/ScoreSheetScene.h
+     Classes/utils/common.h
+     Classes/utils/compiler.h
+     Classes/utils/socket.h
+     Classes/widget/AlertDialog.h
+     Classes/widget/calendar-inline.h
+     Classes/widget/CheckBoxScale9.h
+     Classes/widget/CommonWebViewScene.h
+     Classes/widget/DatePicker.h
+     Classes/widget/ExtraInfoWidget.h
+     Classes/widget/HandTilesWidget.h
+     Classes/widget/PopupMenu.h
+     Classes/widget/TilePickWidget.h
+     Classes/widget/Toast.h
      )
 
 if(ANDROID)
@@ -67,6 +118,7 @@ if(ANDROID)
     set(APP_NAME MyGame)
     list(APPEND GAME_SOURCE
          proj.android/app/jni/hellocpp/main.cpp
+         Classes/cocos-wheels/CWCommon-android.cpp
          )
 elseif(LINUX)
     list(APPEND GAME_SOURCE
@@ -78,6 +130,7 @@ elseif(WINDOWS)
          proj.win32/resource.h
          )
     list(APPEND GAME_SOURCE
+         Classes/cocos-wheels/CWCommon-win32.cpp
          proj.win32/main.cpp
          proj.win32/game.rc
          ${common_res_files}
@@ -94,6 +147,7 @@ elseif(APPLE)
             proj.ios_mac/ios/Images.xcassets
             )
         list(APPEND GAME_SOURCE
+             Classes/cocos-wheels/CWCommon-ios.mm
              proj.ios_mac/ios/main.m
              proj.ios_mac/ios/AppController.mm
              proj.ios_mac/ios/RootViewController.mm
@@ -106,6 +160,7 @@ elseif(APPLE)
             proj.ios_mac/mac/Info.plist
             )
         list(APPEND GAME_SOURCE
+             Classes/cocos-wheels/CWCommon-mac.mm
              proj.ios_mac/mac/main.cpp
              proj.ios_mac/mac/Prefix.pch
              ${APP_UI_RES}
@@ -115,16 +170,26 @@ elseif(APPLE)
 endif()
 
 # mark app complie info and libs info
-set(APP_SRC
-    ${GAME_SOURCE}
+set(all_code_files
     ${GAME_HEADER}
+    ${GAME_SOURCE}
     )
-cocos_build_app(${APP_NAME}
-                APP_SRC "${APP_SRC}"
-                DEPEND_COMMON_LIBS "cocos2d"
-                DEPEND_ANDROID_LIBS "cocos2d_android"
-                )
+if(NOT ANDROID)
+    add_executable(${APP_NAME} ${all_code_files})
+else()
+    add_library(${APP_NAME} SHARED ${all_code_files})
+    add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos/platform/android ${ENGINE_BINARY_PATH}/cocos/platform)
+    target_link_libraries(${APP_NAME} -Wl,--whole-archive cpp_android_spec -Wl,--no-whole-archive)
+endif()
 
+target_link_libraries(${APP_NAME} cocos2d)
+target_include_directories(${APP_NAME}
+        PRIVATE Classes
+        PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
+)
+
+# mark app resources
+setup_cocos_app_config(${APP_NAME})
 if(APPLE)
     set_target_properties(${APP_NAME} PROPERTIES RESOURCE "${APP_UI_RES}")
     if(MACOSX)
@@ -136,9 +201,9 @@ if(APPLE)
         set_xcode_property(${APP_NAME} ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon")
     endif()
 elseif(WINDOWS)
-    cocos_copy_target_dll(${APP_NAME} COPY_TO ${APP_BIN_DIR})
+    cocos_copy_target_dll(${APP_NAME} COPY_TO ${APP_RES_DIR}/..)
 endif()
 
 if(LINUX OR WINDOWS)
-    cocos_copy_target_res(${APP_NAME} COPY_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
+    cocos_copy_res(COPY_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
 endif()

@@ -47,24 +47,21 @@ void OtherScene::onTipsButton(cocos2d::Ref *) {
     loadingView->showInScene(this);
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
-    std::thread([thiz, loadingView]() {
-        // 读文件
+
+    auto text = std::make_shared<std::string>();
+    AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_IO, [thiz, loadingView, text](void *) {
+        g_text.swap(*text);
+        if (LIKELY(thiz->isRunning())) {
+            loadingView->dismiss();
+            Director::getInstance()->pushScene(
+                CommonWebViewScene::create(__UTF8("相关补充"), g_text, CommonWebViewScene::ContentType::HTML));
+        }
+    }, nullptr, [text]() {
         ValueMap valueMap = FileUtils::getInstance()->getValueMapFromFile("text/other.xml");
-        auto text = std::make_shared<std::string>();
         if (LIKELY(!valueMap.empty())) {
             *text = valueMap.begin()->second.asString();
         }
-
-        // 切换到cocos线程
-        Director::getInstance()->getScheduler()->performFunctionInCocosThread([thiz, loadingView, text]() {
-            g_text.swap(*text);
-            if (LIKELY(thiz->isRunning())) {
-                loadingView->dismiss();
-                Director::getInstance()->pushScene(
-                    CommonWebViewScene::create(__UTF8("相关补充"), g_text, CommonWebViewScene::ContentType::HTML));
-            }
-        });
-    }).detach();
+    });
 }
 
 void OtherScene::onRecreationsButton(cocos2d::Ref *) {

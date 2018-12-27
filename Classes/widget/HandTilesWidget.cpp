@@ -47,7 +47,7 @@ bool HandTilesWidget::init() {
     _standingContainer->addChild(drawNode, 2);
     _highlightBox = drawNode;
 
-    const float fixedHeight = TILE_HEIGHT;  // NOTE: 如果将来支持加杠，则应为std::max(TILE_HEIGHT, TILE_WIDTH * 2)
+    const float fixedHeight = std::max(TILE_HEIGHT, TILE_WIDTH * 2);
     node = Node::create();
     node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     node->setIgnoreAnchorPointForPosition(false);
@@ -117,11 +117,21 @@ void HandTilesWidget::setData(const mahjong::hand_tiles_t &handTiles, mahjong::t
             _usedTilesTable[tile] += 3;
             break;
         case PACK_TYPE_KONG:
-            switch (mahjong::pack_get_offer(pack)) {
-            case 0: addFixedConcealedKongPack(tile); break;
-            default: addFixedMeldedKongPack(tile, 0); break;
-            case 2: addFixedMeldedKongPack(tile, 1); break;
-            case 3: addFixedMeldedKongPack(tile, 3); break;
+            if (!mahjong::is_promoted_kong(pack)) {
+                switch (mahjong::pack_get_offer(pack)) {
+                case 0: addFixedConcealedKongPack(tile); break;
+                default: addFixedMeldedKongPack(tile, 0); break;
+                case 2: addFixedMeldedKongPack(tile, 1); break;
+                case 3: addFixedMeldedKongPack(tile, 3); break;
+                }
+            }
+            else {
+                switch (mahjong::pack_get_offer(pack)) {
+                case 0: addFixedConcealedKongPack(tile); break;
+                default: addFixedPungPack(tile, 0); promoteFixedPungPackToKongPack(tile, i); break;
+                case 2: addFixedPungPack(tile, 1); promoteFixedPungPackToKongPack(tile, i); break;
+                case 3: addFixedPungPack(tile, 2); promoteFixedPungPackToKongPack(tile, i); break;
+                }
             }
             _usedTilesTable[tile] += 4;
             break;
@@ -569,6 +579,42 @@ void HandTilesWidget::addFixedConcealedKongPack(mahjong::tile_t tile) {
     }
 }
 
+// 加杠
+void HandTilesWidget::promoteFixedPungPackToKongPack(mahjong::tile_t tile, size_t idx) {
+    float startX = 0.0f;
+    for (size_t i = 0; i < idx; ++i) {
+        mahjong::pack_t pack = _fixedPacks[i];
+        switch (mahjong::pack_get_type(pack)) {
+        case PACK_TYPE_CHOW:
+        case PACK_TYPE_PUNG:
+            startX += TILE_HEIGHT + TILE_WIDTH * 2;
+            break;
+        case PACK_TYPE_KONG:
+            if (mahjong::is_pack_melded(pack)) {
+                startX += TILE_HEIGHT + TILE_WIDTH * (mahjong::is_promoted_kong(pack) ? 2 : 3);
+            }
+            else {
+                startX += TILE_WIDTH * 4;
+            }
+            break;
+        default:
+            break;
+        }
+
+        startX += GAP;
+    }
+
+    uint8_t meldedIdx = mahjong::pack_get_offer(_fixedPacks[idx]) - 1;
+    startX += meldedIdx * TILE_WIDTH;
+
+    const float contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
+    Sprite *sprite = Sprite::create(tilesImageName[tile]);
+    sprite->setScale(contentScaleFactor);
+    _fixedContainer->addChild(sprite);
+    sprite->setPosition(Vec2(startX + TILE_HEIGHT * 0.5f, TILE_WIDTH * 1.5f));
+    sprite->setRotation(-90);
+}
+
 bool HandTilesWidget::canChow(int meldedIdx) const {
     if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
         return false;
@@ -603,7 +649,7 @@ bool HandTilesWidget::canPung() const {
     return (_standingTilesTable[tile] >= 3);
 }
 
-bool HandTilesWidget::canKong() const {
+bool HandTilesWidget::canDirectKong() const {
     if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
         return false;
     }
@@ -617,6 +663,22 @@ bool HandTilesWidget::canKong() const {
     return (_standingTilesTable[tile] >= 4);
 }
 
+bool HandTilesWidget::canPromotedKong() const {
+    if (_currentIdx >= _standingTiles.size()) {  // 当前位置没有牌
+        return false;
+    }
+
+    size_t maxCnt = MAX_STANDING_TILES_COUNT(_fixedPacks.size());  // 立牌数最大值（不包括和牌）
+    if (_currentIdx == maxCnt) {  // 不允许对和牌张进行副露
+        return false;
+    }
+
+    mahjong::tile_t tile = _standingTiles[_currentIdx];
+    return std::any_of(_fixedPacks.begin(), _fixedPacks.end(), [tile](mahjong::pack_t pack) {
+        return (mahjong::pack_get_type(pack) == PACK_TYPE_PUNG && mahjong::pack_get_tile(pack) == tile);
+    });
+}
+
 bool HandTilesWidget::makeFixedChowPack(int meldedIdx) {
     if (UNLIKELY(!canChow(meldedIdx))) {
         return false;
@@ -626,7 +688,7 @@ bool HandTilesWidget::makeFixedChowPack(int meldedIdx) {
     // meldedIdx == 1: X_X 13吃2 tile+0
     // meldedIdx == 2: XX_ 12吃3 tile-1
     mahjong::tile_t tile = _standingTiles[_currentIdx];
-    mahjong::pack_t pack = mahjong::make_pack(1, PACK_TYPE_CHOW, static_cast<mahjong::tile_t>(tile + 1 - meldedIdx));
+    mahjong::pack_t pack = mahjong::make_pack(static_cast<uint8_t>(meldedIdx + 1), PACK_TYPE_CHOW, static_cast<mahjong::tile_t>(tile + 1 - meldedIdx));
     _fixedPacks.push_back(pack);
 
     // 这里迭代器不能连续使用，因为立牌不一定有序
@@ -686,7 +748,11 @@ bool HandTilesWidget::makeFixedPungPack() {
 }
 
 bool HandTilesWidget::makeFixedMeldedKongPack() {
-    if (UNLIKELY(!canKong())) {
+    return makeFixedDircetMeldedKongPack() || promoteFixedPungPack();
+}
+
+bool HandTilesWidget::makeFixedDircetMeldedKongPack() {
+    if (UNLIKELY(!canDirectKong())) {
         return false;
     }
 
@@ -704,12 +770,33 @@ bool HandTilesWidget::makeFixedMeldedKongPack() {
     _standingTilesTable[tile] -= 4;
 
     addFixedMeldedKongPack(tile, meldedIdx);
+
+    refreshStandingTiles();
+    return true;
+}
+
+bool HandTilesWidget::promoteFixedPungPack() {
+    if (UNLIKELY(!canPromotedKong())) {
+        return false;
+    }
+
+    mahjong::tile_t tile = _standingTiles[_currentIdx];
+    auto it = std::find_if(_fixedPacks.begin(), _fixedPacks.end(), [tile](mahjong::pack_t pack) {
+        return (mahjong::pack_get_type(pack) == PACK_TYPE_PUNG && mahjong::pack_get_tile(pack) == tile);
+    });
+    *it = mahjong::promote_pung_to_kong(*it);
+
+    _standingTiles.erase(std::find(_standingTiles.begin(), _standingTiles.end(), tile));
+    _standingTilesTable[tile] -= 1;
+
+    promoteFixedPungPackToKongPack(tile, it - _fixedPacks.begin());
+
     refreshStandingTiles();
     return true;
 }
 
 bool HandTilesWidget::makeFixedConcealedKongPack() {
-    if (UNLIKELY(!canKong())) {
+    if (UNLIKELY(!canDirectKong())) {
         return false;
     }
 
@@ -821,33 +908,73 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
                 totalWidth += (TILE_WIDTH * 4 + GAP);
                 break;
             default:
-                rotated[tile_cnt + 0] = true;
+                if (mahjong::is_promoted_kong(pack)) {
+                    rotated[tile_cnt + 0] = true;
+                    rotated[tile_cnt + 1] = true;
 
-                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
-                pos[tile_cnt + 3] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 0] = Vec2(totalWidth + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                    pos[tile_cnt + 1] = Vec2(totalWidth + TILE_HEIGHT * 0.5f, TILE_WIDTH * 1.5f);
+                    pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 3] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
 
-                totalWidth += (TILE_WIDTH * 3 + TILE_HEIGHT + GAP);
+                    totalWidth += (TILE_WIDTH * 2 + TILE_HEIGHT + GAP);
+                }
+                else {
+                    rotated[tile_cnt + 0] = true;
+
+                    pos[tile_cnt + 0] = Vec2(totalWidth + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                    pos[tile_cnt + 1] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 3] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
+
+                    totalWidth += (TILE_WIDTH * 3 + TILE_HEIGHT + GAP);
+                }
                 break;
             case 2:
-                rotated[tile_cnt + 1] = true;
+                if (mahjong::is_promoted_kong(pack)) {
+                    rotated[tile_cnt + 1] = true;
+                    rotated[tile_cnt + 2] = true;
 
-                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
-                pos[tile_cnt + 3] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                    pos[tile_cnt + 2] = Vec2(totalWidth + TILE_WIDTH + TILE_HEIGHT * 0.5f, TILE_WIDTH * 1.5f);
+                    pos[tile_cnt + 3] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
 
-                totalWidth += (TILE_WIDTH * 3 + TILE_HEIGHT + GAP);
+                    totalWidth += (TILE_WIDTH * 2 + TILE_HEIGHT + GAP);
+                }
+                else {
+                    rotated[tile_cnt + 1] = true;
+
+                    pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                    pos[tile_cnt + 2] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 3] = Vec2(totalWidth + TILE_HEIGHT + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
+
+                    totalWidth += (TILE_WIDTH * 3 + TILE_HEIGHT + GAP);
+                }
                 break;
             case 3:
-                rotated[tile_cnt + 3] = true;
-                pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
-                pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
-                pos[tile_cnt + 2] = Vec2(totalWidth + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
-                pos[tile_cnt + 3] = Vec2(totalWidth + TILE_WIDTH * 3 + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                if (mahjong::is_promoted_kong(pack)) {
+                    rotated[tile_cnt + 2] = true;
+                    rotated[tile_cnt + 3] = true;
 
-                totalWidth += (TILE_WIDTH * 3 + TILE_HEIGHT + GAP);
+                    pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 2] = Vec2(totalWidth + TILE_WIDTH * 2 + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+                    pos[tile_cnt + 3] = Vec2(totalWidth + TILE_WIDTH * 2 + TILE_HEIGHT * 0.5f, TILE_WIDTH * 1.5f);
+
+                    totalWidth += (TILE_WIDTH * 2 + TILE_HEIGHT + GAP);
+                }
+                else {
+                    rotated[tile_cnt + 3] = true;
+
+                    pos[tile_cnt + 0] = Vec2(totalWidth + TILE_WIDTH * 0.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 1] = Vec2(totalWidth + TILE_WIDTH * 1.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 2] = Vec2(totalWidth + TILE_WIDTH * 2.5f, TILE_HEIGHT * 0.5f);
+                    pos[tile_cnt + 3] = Vec2(totalWidth + TILE_WIDTH * 3 + TILE_HEIGHT * 0.5f, TILE_WIDTH * 0.5f);
+
+                    totalWidth += (TILE_WIDTH * 3 + TILE_HEIGHT + GAP);
+                }
                 break;
             }
             tile_cnt += 4;
@@ -878,7 +1005,7 @@ cocos2d::Node *HandTilesWidget::createStaticNode(const mahjong::hand_tiles_t &ha
     }
 
     Node *node = Node::create();
-    node->setContentSize(Size(static_cast<float>(totalWidth), TILE_HEIGHT));
+    node->setContentSize(Size(static_cast<float>(totalWidth), static_cast<float>(std::max(TILE_HEIGHT, TILE_WIDTH * 2))));
     node->setIgnoreAnchorPointForPosition(false);
     node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 

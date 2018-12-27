@@ -7,8 +7,8 @@
 
 class PopupMenu : public cocos2d::Layer {
 public:
-    CREATE_FUNC_WITH_PARAM_4(PopupMenu, initWithScene, cocos2d::Scene *, scene, const std::vector<std::string> &, menuTexts, const cocos2d::Vec2 &, basePos, const cocos2d::Vec2 &, anchorPoint);
-    bool initWithScene(cocos2d::Scene *scene, const std::vector<std::string> &menuTexts, const cocos2d::Vec2 &basePos, const cocos2d::Vec2 &anchorPoint);
+    CREATE_FUNC_WITH_PARAM_4(PopupMenu, cocos2d::Scene *, scene, const std::vector<std::string> &, menuTexts, const cocos2d::Vec2 &, basePos, const cocos2d::Vec2 &, anchorPoint);
+    bool init(cocos2d::Scene *scene, const std::vector<std::string> &menuTexts, const cocos2d::Vec2 &basePos, const cocos2d::Vec2 &anchorPoint);
 
     void setMenuItemCallback(std::function<void (PopupMenu *, size_t)> &&onMenuItemCallback) { _onMenuItemCallback.swap(onMenuItemCallback); }
 

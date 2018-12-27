@@ -8,7 +8,7 @@
 
 class ExtraInfoWidget : public cocos2d::Node {
 public:
-    CREATE_FUNC_WITH_PARAM_2(ExtraInfoWidget, initWithWidth, float, maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &, callback);
+    CREATE_FUNC_WITH_PARAM_2(ExtraInfoWidget, float, maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &, callback);
 
     int getFlowerCount() const;
     void setFlowerCount(int cnt);
@@ -25,9 +25,9 @@ public:
     void refreshByKong(bool hasKong);
     void refreshByWinTile(mahjong::tile_t winTile, bool maybeFourthTile, size_t winTileCountInFixedPacks, bool hasKong);
 
-    void setInputCallback(const std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> &inputCallback) { _inputCallback = inputCallback; }
+    void setInputCallback(std::function<void (const mahjong::hand_tiles_t &, mahjong::tile_t)> &&inputCallback) { _inputCallback.swap(inputCallback); }
 
-    bool initWithWidth(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback);
+    bool init(float maxWidth, const cocos2d::ui::Widget::ccWidgetClickCallback &callback);
 
 private:
     void onWinTypeGroup(cocos2d::ui::RadioButton *radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType event);
@@ -44,7 +44,7 @@ private:
     cocos2d::ui::CheckBox *_replacementBox = nullptr;
     cocos2d::ui::CheckBox *_robKongBox = nullptr;
     cocos2d::ui::CheckBox *_lastTileBox = nullptr;
-    cocos2d::Label *_flowerLabel = nullptr;
+    cocos2d::ui::Button *_flowerButton = nullptr;
     cocos2d::ui::RadioButtonGroup *_windGroups[2];
 
     bool _maybeFourthTile = false;

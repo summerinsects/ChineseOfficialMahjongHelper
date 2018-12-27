@@ -4,10 +4,11 @@ Chinese Official Mahjong Helper 国标小助手
 - 本程序以cocos2dx引擎为UI写成
 - 算番、判断听牌、听牌计算、上听数计算、有效牌计算等相关算法在mahjong-algorithm文件夹下，并配有unit_test，可提取出来单独使用
 - 由于cocos2dx引擎自身的源码较为庞大，这里就不上传了，请按如下步骤配置
+- 直接下载可执行文件，请点击[这里](https://www.pgyer.com/comh-android)
 
 ## 配置步骤
 
-1. 下载[cocos2dx v3.17](http://www.cocos2d-x.org/download)
+1. 下载[cocos2dx v3.17.1](http://www.cocos2d-x.org/download)
 2. 下载(download)本项目（clone随意）
 3. 随便创建一个c++工程，工程名任意（命令行：cocos new -l cpp --portrait 工程名）
 4. 将在上一步创建的工程目录下的cocos2d目录拷贝到本项目Classes的同一级目录下
@@ -65,7 +66,6 @@ Chinese Official Mahjong Helper 国标小助手
 
 ---
 
-## 特别鸣谢
-1. 牌画来源：[日语维基——中国麻雀](https://ja.wikipedia.org/wiki/%E4%B8%AD%E5%9B%BD%E9%BA%BB%E9%9B%80)
-2. Ant Design 官方图标库
-3. Android自带素材
+## 图片来源
+1. Ant Design 官方图标库
+2. Android自带素材

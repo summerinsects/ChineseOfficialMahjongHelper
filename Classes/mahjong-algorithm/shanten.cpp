@@ -1,5 +1,5 @@
 ﻿/****************************************************************************
- Copyright (c) 2016-2018 Jeff Wang <summer_insects@163.com>
+ Copyright (c) 2016-2019 Jeff Wang <summer_insects@163.com>
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,7 @@ intptr_t packs_to_tiles(const pack_t *packs, intptr_t pack_cnt, tile_t *tiles, i
             if (cnt < tile_cnt) tiles[cnt++] = tile;
             break;
         default:
+            UNREACHABLE();
             break;
         }
     }
@@ -112,18 +113,6 @@ intptr_t table_to_tiles(const tile_table_t &cnt_table, tile_t *tiles, intptr_t m
             if (cnt == max_cnt) {
                 return max_cnt;
             }
-        }
-    }
-    return cnt;
-}
-
-// 计数有效牌枚数
-int count_useful_tile(const tile_table_t &used_table, const useful_table_t &useful_table) {
-    int cnt = 0;
-    for (int i = 0; i < 34; ++i) {
-        tile_t t = all_tiles[i];
-        if (useful_table[t]) {
-            cnt += 4 - used_table[t];
         }
     }
     return cnt;
@@ -186,16 +175,25 @@ static bool is_basic_form_branch_exist(const intptr_t fixed_cnt, const work_path
 
 // 保存路径
 static void save_work_path(const intptr_t fixed_cnt, const work_path_t *work_path, work_state_t *work_state) {
-    if (work_state->count < MAX_STATE) {
-        work_path_t &path = work_state->paths[work_state->count++];
-        path.depth = work_path->depth;
-        std::copy(&work_path->units[fixed_cnt], &work_path->units[work_path->depth], &path.units[fixed_cnt]);
+    // 复制一份数据，不破坏当前数据
+    work_path_t temp;
+    temp.depth = work_path->depth;
+    std::copy(&work_path->units[fixed_cnt], &work_path->units[temp.depth + 1], &temp.units[fixed_cnt]);
+    std::sort(&temp.units[fixed_cnt], &temp.units[temp.depth + 1]);
 
-        // 检测是否重复路径时，std::includes要求有序，所以这里将它排序
-        std::sort(&path.units[fixed_cnt], &path.units[path.depth]);
-    }
-    else {
-        assert(0 && "too many state!");
+    // 判断是否重复
+    if (std::none_of(&work_state->paths[0], &work_state->paths[work_state->count],
+        [&temp, fixed_cnt](const work_path_t &path) {
+        return (path.depth == temp.depth && std::equal(&path.units[fixed_cnt], &path.units[path.depth + 1], &temp.units[fixed_cnt]));
+    })) {
+        if (work_state->count < MAX_STATE) {
+            work_path_t &path = work_state->paths[work_state->count++];
+            path.depth = temp.depth;
+            std::copy(&temp.units[fixed_cnt], &temp.units[temp.depth + 1], &path.units[fixed_cnt]);
+        }
+        else {
+            assert(0 && "too many state!");
+        }
     }
 }
 
@@ -811,6 +809,10 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
         return false;
     }
 
+    if (waiting_table != nullptr) {
+        memset(*waiting_table, 0, sizeof(*waiting_table));
+    }
+
     // 剔除组合龙
     tile_table_t temp_table;
     memcpy(&temp_table, &cnt_table, sizeof(temp_table));
@@ -1072,6 +1074,52 @@ bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, intptr_t stan
         return useful_table[test_tile];
     }
     return false;
+}
+
+//-------------------------------- 所有情况综合 --------------------------------
+
+bool is_waiting(const hand_tiles_t &hand_tiles, useful_table_t *useful_table) {
+    bool spcial_waiting = false, basic_waiting = false;
+    useful_table_t table_special, table_basic;
+
+    if (hand_tiles.tile_count == 13) {
+        if (is_thirteen_orphans_wait(hand_tiles.standing_tiles, 13, &table_special)) {
+            spcial_waiting = true;
+        }
+        else if (is_honors_and_knitted_tiles_wait(hand_tiles.standing_tiles, 13, &table_special)) {
+            spcial_waiting = true;
+        }
+        else if (is_seven_pairs_wait(hand_tiles.standing_tiles, 13, &table_special)) {
+            spcial_waiting = true;
+        }
+        else if (is_knitted_straight_wait(hand_tiles.standing_tiles, 13, &table_special)) {
+            spcial_waiting = true;
+        }
+    }
+    else if (hand_tiles.tile_count == 10) {
+        if (is_knitted_straight_wait(hand_tiles.standing_tiles, 10, &table_special)) {
+            spcial_waiting = true;
+        }
+    }
+
+    if (is_basic_form_wait(hand_tiles.standing_tiles, hand_tiles.tile_count, &table_basic)) {
+        basic_waiting = true;
+    }
+
+    if (useful_table != nullptr) {
+        if (spcial_waiting && basic_waiting) {
+            std::transform(std::begin(table_special), std::end(table_special), std::begin(table_basic), std::begin(*useful_table),
+                [](bool a, bool b) { return a || b; });
+        }
+        else if (basic_waiting) {
+            memcpy(*useful_table, table_basic, sizeof(table_basic));
+        }
+        else if (spcial_waiting) {
+            memcpy(*useful_table, table_special, sizeof(table_special));
+        }
+    }
+
+    return (spcial_waiting || basic_waiting);
 }
 
 //-------------------------------- 枚举打牌 --------------------------------
