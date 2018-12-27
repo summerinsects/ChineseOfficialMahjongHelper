@@ -8,8 +8,8 @@ class CompetitionData;
 
 class CompetitionEnrollScene : public BaseScene, cw::TableViewDelegate {
 public:
-    CREATE_FUNC_WITH_PARAM_1(CompetitionEnrollScene, initWithData, const std::shared_ptr<CompetitionData> &, competitionData);
-    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData);
+    CREATE_FUNC_WITH_PARAM_1(CompetitionEnrollScene, const std::shared_ptr<CompetitionData> &, competitionData);
+    bool init(const std::shared_ptr<CompetitionData> &competitionData);
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;

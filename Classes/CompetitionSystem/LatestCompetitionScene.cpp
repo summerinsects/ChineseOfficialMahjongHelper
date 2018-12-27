@@ -6,12 +6,12 @@
 #include "json/document.h"
 #include "json/stringbuffer.h"
 #include "../UICommon.h"
+#include "../UIColors.h"
 #include "../widget/LoadingView.h"
 #include "../widget/AlertDialog.h"
+#include "../widget/CommonWebViewScene.h"
 
 USING_NS_CC;
-
-static const Color3B C3B_GRAY = Color3B(96, 96, 96);
 
 bool LatestCompetitionScene::init() {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("近期赛事")))) {
@@ -21,29 +21,24 @@ bool LatestCompetitionScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Label *label = Label::createWithSystemFont(__UTF8("宣传赛事信息，请联系逍遥宫"), "Arial", 12);
-    this->addChild(label);
-    label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 45.0f));
-    label->setColor(Color3B::ORANGE);
-
     cw::TableView *tableView = cw::TableView::create();
     tableView->setDirection(ui::ScrollView::Direction::VERTICAL);
     tableView->setScrollBarPositionFromCorner(Vec2(2.0f, 2.0f));
     tableView->setScrollBarWidth(4.0f);
     tableView->setScrollBarOpacity(0x99);
-    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 65.0f));
+    tableView->setContentSize(Size(visibleSize.width - 5.0f, visibleSize.height - 35.0f));
     tableView->setDelegate(this);
     tableView->setVerticalFillOrder(cw::TableView::VerticalFillOrder::TOP_DOWN);
 
     tableView->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 30.0f));
+    tableView->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f - 15.0f));
     this->addChild(tableView);
     _tableView = tableView;
 
-    label = Label::createWithSystemFont(__UTF8("无近期赛事信息"), "Arial", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("无近期赛事信息"), "Arial", 12);
     this->addChild(label);
     label->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height - 75.0f));
-    label->setColor(Color3B::BLACK);
+    label->setTextColor(C4B_BLACK);
     label->setVisible(false);
     _emptyLabel = label;
 
@@ -188,28 +183,27 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
     if (cell == nullptr) {
         cell = CustomCell::create();
 
-        Size visibleSize = Director::getInstance()->getVisibleSize();
-        const float width = visibleSize.width - 5.0f;
+        const float cellWidth = table->getContentSize().width;
 
         CustomCell::ExtDataType &ext = cell->getExtData();
         LayerColor **layerColors = std::get<0>(ext).data();
         Label **label = std::get<1>(ext).data();
         ui::Button *&detailBtn = std::get<2>(ext);
 
-        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), width, 50.0f);
+        layerColors[0] = LayerColor::create(Color4B(0x10, 0x10, 0x10, 0x10), cellWidth, 50.0f);
         cell->addChild(layerColors[0]);
 
-        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), width, 50.0f);
+        layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 50.0f);
         cell->addChild(layerColors[1]);
 
         label[0] = Label::createWithSystemFont("", "Arail", 10);
-        label[0]->setColor(Color3B::BLACK);
+        label[0]->setTextColor(C4B_BLACK);
         cell->addChild(label[0]);
         label[0]->setPosition(Vec2(5.0f, 35.0f));
         label[0]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
         label[1] = Label::createWithSystemFont("", "Arail", 10);
-        label[1]->setColor(C3B_GRAY);
+        label[1]->setTextColor(C4B_GRAY);
         cell->addChild(label[1]);
         label[1]->setPosition(Vec2(5.0f, 15.0f));
         label[1]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -221,7 +215,7 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         detailBtn->setTitleText(__UTF8("详情"));
         detailBtn->addClickEventListener(std::bind(&LatestCompetitionScene::onDetailButton, this, std::placeholders::_1));
         cell->addChild(detailBtn);
-        detailBtn->setPosition(Vec2(width - 25.0f, 25.0f));
+        detailBtn->setPosition(Vec2(cellWidth - 25.0f, 25.0f));
     }
 
     const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -287,5 +281,9 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
 void LatestCompetitionScene::onDetailButton(cocos2d::Ref *sender) {
     ui::Button *button = (ui::Button *)sender;
     size_t idx = reinterpret_cast<size_t>(button->getUserData());
-    Application::getInstance()->openURL(_competitions[idx].url);
+
+    const CompetitionInfo &competition = _competitions[idx];
+
+    CommonWebViewScene *scene = CommonWebViewScene::create(competition.name, competition.url, CommonWebViewScene::ContentType::URL);
+    Director::getInstance()->pushScene(scene);
 }

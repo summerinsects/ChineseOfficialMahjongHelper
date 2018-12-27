@@ -8,7 +8,7 @@ USING_NS_CC;
 
 static const char *seatText[] = { __UTF8("东"), __UTF8("南"), __UTF8("西"), __UTF8("北") };
 
-bool CompetitionRankCustomScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
+bool CompetitionRankCustomScene::init(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("自定义排座位")))) {
         return false;
     }
@@ -319,8 +319,8 @@ namespace {
     public:
         const std::vector<uint8_t> &getCurrentFlags() { return _currentFlags; }
 
-        CREATE_FUNC_WITH_PARAM_3(AlertInnerNode, initWithPlayers, const std::vector<CompetitionPlayer> *, players, const std::vector<uint8_t> *, playerFlags, const std::vector<ptrdiff_t> *, playerIndices);
-        bool initWithPlayers(const std::vector<CompetitionPlayer> *players, const std::vector<uint8_t> *playerFlags, const std::vector<ptrdiff_t> *playerIndices) {
+        CREATE_FUNC_WITH_PARAM_3(AlertInnerNode, const std::vector<CompetitionPlayer> *, players, const std::vector<uint8_t> *, playerFlags, const std::vector<ptrdiff_t> *, playerIndices);
+        bool init(const std::vector<CompetitionPlayer> *players, const std::vector<uint8_t> *playerFlags, const std::vector<ptrdiff_t> *playerIndices) {
             if (UNLIKELY(!Node::init())) {
                 return false;
             }

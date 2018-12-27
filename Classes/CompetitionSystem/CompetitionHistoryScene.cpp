@@ -54,7 +54,7 @@ void CompetitionHistoryScene::updateDataTexts() {
     });
 }
 
-bool CompetitionHistoryScene::initWithCallback(const ViewCallback &viewCallback) {
+bool CompetitionHistoryScene::init(const ViewCallback &viewCallback) {
     if (UNLIKELY(!BaseScene::initWithTitle(__UTF8("历史记录")))) {
         return false;
     }

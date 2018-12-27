@@ -29,7 +29,7 @@ namespace {
                 if (it != _editBoxes.end() && ++it != _editBoxes.end()) {
                     editBox = *it;
                     editBox->scheduleOnce([editBox](float) {
-                        editBox->touchDownAction(editBox, cocos2d::ui::Widget::TouchEventType::ENDED);
+                        editBox->openKeyboard();
                     }, 0.0f, "open_keyboard");
                 }
             }

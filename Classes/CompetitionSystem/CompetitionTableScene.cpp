@@ -15,7 +15,7 @@ extern "C++" void RankToStandardScore(const unsigned (&ranks)[4], unsigned (&ss1
 
 static const char *seatText[] = { __UTF8("东"), __UTF8("南"), __UTF8("西"), __UTF8("北") };
 
-bool CompetitionTableScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
+bool CompetitionTableScene::init(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound) {
     if (UNLIKELY(!BaseScene::initWithTitle(Common::format(__UTF8("%s第%") __UTF8(PRIzu) __UTF8("/%") __UTF8(PRIzu) __UTF8("轮"),
         competitionData->name.c_str(), currentRound + 1, competitionData->round_count)))) {
         return false;
@@ -329,10 +329,10 @@ namespace {
         const CompetitionResult (&getResults())[4] { return _results; }
 
         typedef CompetitionResult CompetitionResultArray[4];
-        CREATE_FUNC_WITH_PARAM_3(AlertInnerNode, initWithPrevResult, const CompetitionResultArray &, prevResults,
+        CREATE_FUNC_WITH_PARAM_3(AlertInnerNode, const CompetitionResultArray &, prevResults,
             const std::vector<CompetitionPlayer> &, players, const CompetitionTable &, currentTable);
 
-        bool initWithPrevResult(const CompetitionResult (&prevResults)[4], const std::vector<CompetitionPlayer> &players, const CompetitionTable &currentTable) {
+        bool init(const CompetitionResult (&prevResults)[4], const std::vector<CompetitionPlayer> &players, const CompetitionTable &currentTable) {
             if (UNLIKELY(!Node::init())) {
                 return false;
             }

@@ -8,7 +8,7 @@
 
 USING_NS_CC;
 
-bool CompetitionEnrollScene::initWithData(const std::shared_ptr<CompetitionData> &competitionData) {
+bool CompetitionEnrollScene::init(const std::shared_ptr<CompetitionData> &competitionData) {
     if (UNLIKELY(!BaseScene::initWithTitle(std::string(competitionData->name).append(__UTF8("报名表"))))) {
         return false;
     }
@@ -224,6 +224,6 @@ void CompetitionEnrollScene::onNameWidget(cocos2d::Ref *sender) {
 
     auto editBoxStrong = makeRef(editBox);
     Director::getInstance()->getScheduler()->schedule([editBoxStrong](float) {
-        editBoxStrong->touchDownAction(editBoxStrong.get(), ui::Widget::TouchEventType::ENDED);
+        editBoxStrong->openKeyboard();
     }, this, 0.0f, 0, 0.0f, false, "open_keyboard");
 }

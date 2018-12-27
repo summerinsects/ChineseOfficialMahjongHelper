@@ -10,8 +10,8 @@ class CompetitionHistoryScene : public BaseScene, cw::TableViewDelegate {
 public:
     typedef std::function<void (CompetitionData *)> ViewCallback;
 
-    CREATE_FUNC_WITH_PARAM_1(CompetitionHistoryScene, initWithCallback, const ViewCallback &, viewCallback);
-    bool initWithCallback(const ViewCallback &viewCallback);
+    CREATE_FUNC_WITH_PARAM_1(CompetitionHistoryScene, const ViewCallback &, viewCallback);
+    bool init(const ViewCallback &viewCallback);
 
     static void modifyData(const CompetitionData *data);
 

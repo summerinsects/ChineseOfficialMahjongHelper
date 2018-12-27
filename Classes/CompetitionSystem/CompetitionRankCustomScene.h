@@ -9,8 +9,8 @@ struct CompetitionTable;
 
 class CompetitionRankCustomScene : public BaseScene, cw::TableViewDelegate {
 public:
-    CREATE_FUNC_WITH_PARAM_2(CompetitionRankCustomScene, initWithData, const std::shared_ptr<CompetitionData> &, competitionData, size_t, currentRound);
-    bool initWithData(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
+    CREATE_FUNC_WITH_PARAM_2(CompetitionRankCustomScene, const std::shared_ptr<CompetitionData> &, competitionData, size_t, currentRound);
+    bool init(const std::shared_ptr<CompetitionData> &competitionData, size_t currentRound);
 
 private:
     virtual ssize_t numberOfCellsInTableView(cw::TableView *table) override;
