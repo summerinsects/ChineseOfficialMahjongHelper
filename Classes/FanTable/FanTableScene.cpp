@@ -197,13 +197,12 @@ static void replaceTilesToImage(std::string &text, float scale) {
 }
 
 static void showFanDefinition(unsigned idx) {
-    const char *title = idx < 100 ? mahjong::fan_name[idx] : principle_title[idx - 100];
 #if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     if (idx == mahjong::CONCEALED_KONG_AND_MELDED_KONG) {
         idx = mahjong::TWO_MELDED_KONGS;
     }
-    title = mahjong::fan_name[idx];
 #endif
+    const char *title = idx < 100 ? mahjong::fan_name[idx] : principle_title[idx - 100];
     const std::string &text = idx < 100 ? g_definitions[idx] : g_principles[idx - 100];
     CommonWebViewScene *scene = CommonWebViewScene::create(title, text, CommonWebViewScene::ContentType::HTML);
     Director::getInstance()->pushScene(scene);
