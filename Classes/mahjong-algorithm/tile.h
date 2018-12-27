@@ -235,7 +235,7 @@ static FORCE_INLINE bool is_pack_melded(pack_t pack) {
  * @return bool
  */
 static FORCE_INLINE bool is_promoted_kong(pack_t pack) {
-    return !!(pack & 0x4300);
+    return !!(pack & 0x4000);
 }
 
 /**
