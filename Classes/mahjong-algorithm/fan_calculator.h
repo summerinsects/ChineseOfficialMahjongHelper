@@ -105,7 +105,7 @@ enum fan_t {
     OUTSIDE_HAND,                       ///< 全带幺
     FULLY_CONCEALED_HAND,               ///< 不求人
     TWO_MELDED_KONGS,                   ///< 双明杠
-    LAST_TILE,                          ///< 和牌张
+    LAST_TILE,                          ///< 和绝张
 
     DRAGON_PUNG,                        ///< 箭刻
     PREVALENT_WIND,                     ///< 圈风刻
