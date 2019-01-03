@@ -1,5 +1,5 @@
 ﻿/****************************************************************************
- Copyright (c) 2016-2018 Jeff Wang <summer_insects@163.com>
+ Copyright (c) 2016-2019 Jeff Wang <summer_insects@163.com>
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -275,6 +275,15 @@ bool is_honors_and_knitted_tiles_win(const tile_t *standing_tiles, intptr_t stan
  * end group
  * @}
  */
+
+/**
+ * @brief 是否听牌
+ *
+ * @param [in] hand_tiles 手牌结构
+ * @param [out] useful_table 有效牌标记表（可为null）
+ * @return bool 是否听牌
+ */
+bool is_waiting(const hand_tiles_t &hand_tiles, useful_table_t *useful_table);
 
 /**
  * end group

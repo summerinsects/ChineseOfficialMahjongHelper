@@ -289,8 +289,9 @@ void TilePickWidget::refreshActionButtons() {
         _chowButton[i]->setEnabled(_handTilesWidget->canChow(i));
     }
     _pungButton->setEnabled(_handTilesWidget->canPung());
-    _meldedKongButton->setEnabled(_handTilesWidget->canKong());
-    _concealedKongButton->setEnabled(_meldedKongButton->isEnabled());
+
+    _concealedKongButton->setEnabled(_handTilesWidget->canDirectKong());
+    _meldedKongButton->setEnabled(_concealedKongButton->isEnabled() || _handTilesWidget->canPromotedKong());
 }
 
 void TilePickWidget::onTileTableButton(cocos2d::Ref *sender) {

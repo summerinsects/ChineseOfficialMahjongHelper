@@ -59,7 +59,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     // 更多菜单
     ui::Button *button = cocos2d::ui::Button::create("icon/menu.png");
     this->addChild(button);
-    button->setScale(24.0f / button->getContentSize().width);
+    button->setScale(20.0f / button->getContentSize().width);
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
     button->addClickEventListener(std::bind(&ScoreSheetScene::onMoreButton, this, std::placeholders::_1));
 
@@ -980,7 +980,7 @@ void ScoreSheetScene::editNameAndTitle() {
 void ScoreSheetScene::onStartButton(cocos2d::Ref *) {
     const char (&name)[4][NAME_SIZE] = _record.name;
     if (std::any_of(std::begin(name), std::end(name), &Common::isCStringEmpty)) {
-        Toast::makeText(this, __UTF8("请先输入四位参赛选手姓名"), Toast::LENGTH_LONG)->show();
+        editNameAndTitle();
         return;
     }
 

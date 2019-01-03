@@ -34,7 +34,8 @@ public:
 
     bool canChow(int meldedIdx) const;
     bool canPung() const;
-    bool canKong() const;
+    bool canDirectKong() const;
+    bool canPromotedKong() const;
 
     bool makeFixedChowPack(int meldedIdx);
     bool makeFixedPungPack();
@@ -73,6 +74,10 @@ private:
     void addFixedPungPack(mahjong::tile_t tile, int meldedIdx);
     void addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx);
     void addFixedConcealedKongPack(mahjong::tile_t tile);
+    void promoteFixedPungPackToKongPack(mahjong::tile_t tile, size_t idx);
+
+    bool makeFixedDircetMeldedKongPack();
+    bool promoteFixedPungPack();
 };
 
 #endif

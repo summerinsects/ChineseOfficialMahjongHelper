@@ -1,5 +1,6 @@
 ﻿#include "common.h"
 #include <stdarg.h>
+#include <fstream>
 
 // android
 #if defined(ANDROID)
@@ -85,21 +86,11 @@ void __log(const char *fmt, ...) {
 }
 
 std::string getStringFromFile(const char *file) {
-    std::string str;
-    FILE *fp = fopen(file, "rb");
-    if (LIKELY(fp != nullptr)) {
-        fseek(fp, 0, SEEK_END);
-        long size = ftell(fp);
-        fseek(fp, 0, SEEK_SET);
-        try {
-            str.resize(size + 1);
-            fread(&str[0], sizeof(char), size, fp);
-        }
-        catch (...) {
-        }
-        fclose(fp);
+    std::ifstream is(file, std::ios::binary);
+    if (is.good()) {
+        return std::string({ std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>() });
     }
-    return str;
+    return "";
 }
 
 bool compareVersion(const char *remote, const char *local) {

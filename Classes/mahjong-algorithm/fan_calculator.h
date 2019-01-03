@@ -1,5 +1,5 @@
 ﻿/****************************************************************************
- Copyright (c) 2016-2018 Jeff Wang <summer_insects@163.com>
+ Copyright (c) 2016-2019 Jeff Wang <summer_insects@163.com>
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -103,7 +103,7 @@ enum fan_t {
     OUTSIDE_HAND,                       ///< 全带幺
     FULLY_CONCEALED_HAND,               ///< 不求人
     TWO_MELDED_KONGS,                   ///< 双明杠
-    LAST_TILE,                          ///< 和牌张
+    LAST_TILE,                          ///< 和绝张
 
     DRAGON_PUNG,                        ///< 箭刻
     PREVALENT_WIND,                     ///< 圈风刻
