@@ -1,4 +1,7 @@
 ﻿#include "HelloWorldScene.h"
+#include "network/HttpClient.h"
+#include "json/document.h"
+#include "json/stringbuffer.h"
 #include "UICommon.h"
 #include "UIColors.h"
 #include "utils/common.h"
@@ -186,6 +189,42 @@ void HelloWorld::upgradeDataIfNecessary() {
     }
 }
 
+void HelloWorld::requestTips() {
+    network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
+    request->setRequestType(network::HttpRequest::Type::GET);
+    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongHelperDataSource/master/tips.json");
+
+    auto thiz = makeRef(this);  // 保证线程回来之前不析构
+    request->setResponseCallback([thiz](network::HttpClient *client, network::HttpResponse *response) {
+        CC_UNUSED_PARAM(client);
+
+        network::HttpClient::destroyInstance();
+
+        if (UNLIKELY(!thiz->isRunning())) {
+            return;
+        }
+
+        HelloWorld *pthis = thiz.get();
+        if (response == nullptr) {
+            return;
+        }
+
+        log("HTTP Status Code: %ld", response->getResponseCode());
+
+        if (!response->isSucceed()) {
+            return;
+        }
+
+        std::vector<char> *buffer = response->getResponseData();
+        if (buffer != nullptr) {
+            thiz->parseTips(buffer);
+        }
+    });
+
+    network::HttpClient::getInstance()->send(request);
+    request->release();
+}
+
 static void scrollText(const std::shared_ptr<std::vector<ui::RichText *> > &richTexts, size_t i) {
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -196,13 +235,32 @@ static void scrollText(const std::shared_ptr<std::vector<ui::RichText *> > &rich
     richText->runAction(Sequence::create(
         MoveBy::create(dt, Vec2(-scrollWidth, 0)),
         CallFunc::create([richTexts, visibleSize, i] {
-        richTexts->at(i)->setPosition(Vec2(visibleSize.width, 10));
-        scrollText(richTexts, (i + 1 < richTexts->size()) ? i + 1 : 0);
-    }),
+            richTexts->at(i)->setPosition(Vec2(visibleSize.width, 10));
+            scrollText(richTexts, (i + 1 < richTexts->size()) ? i + 1 : 0);
+        }),
         nullptr));
 }
 
-void HelloWorld::requestTips() {
+void HelloWorld::parseTips(std::vector<char> *buffer) {
+    std::vector<std::string> texts;
+
+    try {
+        std::string str(buffer->begin(), buffer->end());
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError() || !doc.IsArray()) {
+            return;
+        }
+
+        texts.reserve(doc.Size());
+        std::transform(doc.Begin(), doc.End(), std::back_inserter(texts), [](const rapidjson::Value &json) {
+            return json.GetString();
+        });
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+    }
+
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -213,14 +271,9 @@ void HelloWorld::requestTips() {
     ValueMap defaults;
     defaults.insert(std::make_pair(ui::RichText::KEY_FONT_COLOR_STRING, Value("#000000")));
 
-    std::string texts[] = {
-        __UTF8("第20届中国麻将牌王赛和大师赛将于2019年3月22日-27日在西安举办，详情见比赛-近期赛事"),
-        __UTF8("苹果用户请升级新版")
-    };
-
     auto richTexts = std::make_shared<std::vector<ui::RichText *> >();
-    for (size_t i = 0; i < 2; ++i) {
-        ui::RichText *richText = ui::RichText::createWithXML(texts[i], defaults);
+    for (std::string &str : texts) {
+        ui::RichText *richText = ui::RichText::createWithXML(str, defaults);
         richText->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         richText->formatText();
         tipBg->addChild(richText);
