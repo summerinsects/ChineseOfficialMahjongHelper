@@ -11,6 +11,7 @@ public:
 
 private:
     void upgradeDataIfNecessary();
+    void requestTips();
 };
 
 #endif // __HELLOWORLD_SCENE_H__

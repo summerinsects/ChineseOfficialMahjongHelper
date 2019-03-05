@@ -162,6 +162,8 @@ bool HelloWorld::init() {
     LeftSideMenu::checkVersion(this, false);
 #endif
 
+    requestTips();
+
     return true;
 }
 
@@ -182,4 +184,49 @@ void HelloWorld::upgradeDataIfNecessary() {
             UpgradeHistoryRecords((path + "history_record.json").c_str());
         });
     }
+}
+
+static void scrollText(const std::shared_ptr<std::vector<ui::RichText *> > &richTexts, size_t i) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+
+    ui::RichText *richText = richTexts->at(i);
+    const float scrollWidth = visibleSize.width + richText->getContentSize().width;
+    const float dt = scrollWidth / 20;
+
+    richText->runAction(Sequence::create(
+        MoveBy::create(dt, Vec2(-scrollWidth, 0)),
+        CallFunc::create([richTexts, visibleSize, i] {
+        richTexts->at(i)->setPosition(Vec2(visibleSize.width, 10));
+        scrollText(richTexts, (i + 1 < richTexts->size()) ? i + 1 : 0);
+    }),
+        nullptr));
+}
+
+void HelloWorld::requestTips() {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    LayerColor *tipBg = LayerColor::create(Color4B(166, 166, 166, 128), visibleSize.width, 20);
+    this->addChild(tipBg);
+    tipBg->setPosition(Vec2(origin.x, origin.y + visibleSize.height - 45.0f));
+
+    ValueMap defaults;
+    defaults.insert(std::make_pair(ui::RichText::KEY_FONT_COLOR_STRING, Value("#000000")));
+
+    std::string texts[] = {
+        __UTF8("第20届中国麻将牌王赛和大师赛将于2019年3月22日-27日在西安举办，详情见比赛-近期赛事"),
+        __UTF8("苹果用户请升级新版")
+    };
+
+    auto richTexts = std::make_shared<std::vector<ui::RichText *> >();
+    for (size_t i = 0; i < 2; ++i) {
+        ui::RichText *richText = ui::RichText::createWithXML(texts[i], defaults);
+        richText->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        richText->formatText();
+        tipBg->addChild(richText);
+        richText->setPosition(Vec2(visibleSize.width, 10));
+        richTexts->push_back(richText);
+    }
+
+    scrollText(richTexts, 0);
 }
