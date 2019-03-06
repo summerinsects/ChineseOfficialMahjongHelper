@@ -53,7 +53,7 @@ void LatestCompetitionScene::requestCompetitions() {
 
     network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
     request->setRequestType(network::HttpRequest::Type::GET);
-    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongLatestCompetition/master/LatestCompetition.json");
+    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongHelperDataSource/master/LatestCompetition.json");
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
@@ -97,7 +97,9 @@ void LatestCompetitionScene::requestCompetitions() {
         }
 
         std::vector<char> *buffer = response->getResponseData();
-        thiz->parseResponse(buffer);
+        if (buffer != nullptr) {
+            thiz->parseResponse(buffer);
+        }
     });
 
     network::HttpClient::getInstance()->send(request);
@@ -105,10 +107,6 @@ void LatestCompetitionScene::requestCompetitions() {
 }
 
 bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
-    if (buffer == nullptr) {
-        return false;
-    }
-
     try {
         std::string str(buffer->begin(), buffer->end());
         rapidjson::Document doc;
