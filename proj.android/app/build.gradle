@@ -9,8 +9,8 @@ android {
         applicationId "org.cocos2dx.ChineseOfficialMahjongHelper"
         minSdkVersion PROP_MIN_SDK_VERSION
         targetSdkVersion PROP_TARGET_SDK_VERSION
-        versionCode 32
-        versionName "1.4.0.3"
+        versionCode 33
+        versionName "1.4.0.5"
 
         externalNativeBuild {
             if (PROP_BUILD_TYPE == 'ndk-build') {
