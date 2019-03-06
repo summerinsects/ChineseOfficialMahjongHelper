@@ -1,4 +1,7 @@
 ﻿#include "HelloWorldScene.h"
+#include "network/HttpClient.h"
+#include "json/document.h"
+#include "json/stringbuffer.h"
 #include "UICommon.h"
 #include "UIColors.h"
 #include "utils/common.h"
@@ -162,6 +165,8 @@ bool HelloWorld::init() {
     LeftSideMenu::checkVersion(this, false);
 #endif
 
+    requestTips();
+
     return true;
 }
 
@@ -182,4 +187,98 @@ void HelloWorld::upgradeDataIfNecessary() {
             UpgradeHistoryRecords((path + "history_record.json").c_str());
         });
     }
+}
+
+void HelloWorld::requestTips() {
+    network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
+    request->setRequestType(network::HttpRequest::Type::GET);
+    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongHelperDataSource/master/tips.json");
+
+    auto thiz = makeRef(this);  // 保证线程回来之前不析构
+    request->setResponseCallback([thiz](network::HttpClient *client, network::HttpResponse *response) {
+        CC_UNUSED_PARAM(client);
+
+        network::HttpClient::destroyInstance();
+
+        if (response == nullptr) {
+            return;
+        }
+
+        log("HTTP Status Code: %ld", response->getResponseCode());
+
+        if (!response->isSucceed()) {
+            return;
+        }
+
+        std::vector<char> *buffer = response->getResponseData();
+        if (buffer != nullptr) {
+            thiz->parseTips(buffer);
+        }
+    });
+
+    network::HttpClient::getInstance()->send(request);
+    request->release();
+}
+
+static void scrollText(const std::shared_ptr<std::vector<ui::RichText *> > &richTexts, size_t i) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+
+    ui::RichText *richText = richTexts->at(i);
+    const float scrollWidth = visibleSize.width + richText->getContentSize().width;
+    const float dt = scrollWidth / 20;
+
+    richText->runAction(Sequence::create(
+        MoveBy::create(dt, Vec2(-scrollWidth, 0)),
+        CallFunc::create([richTexts, visibleSize, i] {
+            richTexts->at(i)->setPosition(Vec2(visibleSize.width, 10));
+            scrollText(richTexts, (i + 1 < richTexts->size()) ? i + 1 : 0);
+        }),
+        nullptr));
+}
+
+void HelloWorld::parseTips(std::vector<char> *buffer) {
+    std::vector<std::string> texts;
+
+    try {
+        std::string str(buffer->begin(), buffer->end());
+        rapidjson::Document doc;
+        doc.Parse<0>(str.c_str());
+        if (doc.HasParseError() || !doc.IsArray()) {
+            return;
+        }
+
+        if (doc.Empty()) {
+            return;
+        }
+
+        texts.reserve(doc.Size());
+        std::transform(doc.Begin(), doc.End(), std::back_inserter(texts), [](const rapidjson::Value &json) {
+            return json.GetString();
+        });
+    }
+    catch (std::exception &e) {
+        CCLOG("%s %s", __FUNCTION__, e.what());
+    }
+
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    LayerColor *tipBg = LayerColor::create(Color4B(166, 166, 166, 128), visibleSize.width, 20);
+    this->addChild(tipBg);
+    tipBg->setPosition(Vec2(origin.x, origin.y + visibleSize.height - 55.0f));
+
+    ValueMap defaults;
+    defaults.insert(std::make_pair(ui::RichText::KEY_FONT_COLOR_STRING, Value("#000000")));
+
+    auto richTexts = std::make_shared<std::vector<ui::RichText *> >();
+    for (std::string &str : texts) {
+        ui::RichText *richText = ui::RichText::createWithXML(str, defaults);
+        richText->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        richText->formatText();
+        tipBg->addChild(richText);
+        richText->setPosition(Vec2(visibleSize.width, 10));
+        richTexts->push_back(richText);
+    }
+
+    scrollText(richTexts, 0);
 }
