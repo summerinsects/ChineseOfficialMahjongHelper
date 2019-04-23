@@ -1697,8 +1697,10 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     wind_t prevalent_wind = calculate_param->prevalent_wind;
     wind_t seat_wind = calculate_param->seat_wind;
 
+    bool heaven_win = (win_flag & (WIN_FLAG_INIT | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_INIT | WIN_FLAG_SELF_DRAWN);
+
     // 九莲宝灯
-    if (standing_cnt == 13) {
+    if (!heaven_win && standing_cnt == 13) {
         if (is_nine_gates(standing_tiles)) {
             fan_table[NINE_GATES] = 1;
         }
@@ -1725,8 +1727,11 @@ static void calculate_basic_form_fan(const pack_t (&packs)[5], const calculate_p
     adjust_by_rank_range(tiles, tile_cnt, fan_table);
     // 四归一调整
     adjust_by_tiles_hog(tiles, tile_cnt, fan_table);
-    // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
-    adjust_by_waiting_form(packs + fixed_cnt, 5 - fixed_cnt, standing_tiles, standing_cnt, win_tile, fan_table);
+
+    if (!heaven_win) {
+        // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
+        adjust_by_waiting_form(packs + fixed_cnt, 5 - fixed_cnt, standing_tiles, standing_cnt, win_tile, fan_table);
+    }
 
     // 统一调整一些不计的
     adjust_fan_table(fan_table);

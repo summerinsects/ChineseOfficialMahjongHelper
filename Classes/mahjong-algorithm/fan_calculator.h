@@ -161,6 +161,8 @@ typedef uint8_t win_flag_t;
 #define WIN_FLAG_4TH_TILE   2   ///< 绝张
 #define WIN_FLAG_ABOUT_KONG 4   ///< 关于杠，复合点和时为枪杠和，复合自摸则为杠上开花
 #define WIN_FLAG_WALL_LAST  8   ///< 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
+#define WIN_FLAG_INIT       16  ///< 起手，复合点和时为地和，复合自摸则为天和
+
 /**
  * @}
  */

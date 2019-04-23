@@ -154,6 +154,13 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+    test_points("1112345678999p9p", WIN_FLAG_INIT | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("1112345678999p9p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("1112345678999p9p", WIN_FLAG_INIT, wind_t::EAST, wind_t::EAST);
+    test_points("123456m45679p66s8p", WIN_FLAG_INIT | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("123456m45679p66s8p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("123456m45679p66s8p", WIN_FLAG_INIT, wind_t::EAST, wind_t::EAST);
+
     // BUG测试
     test_points("[234s][234s][234s][234s]6s6s", WIN_FLAG_4TH_TILE, wind_t::EAST, wind_t::EAST);
 
