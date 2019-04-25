@@ -10,7 +10,7 @@ android {
         minSdkVersion PROP_MIN_SDK_VERSION
         targetSdkVersion PROP_TARGET_SDK_VERSION
         versionCode 33
-        versionName "1.4.0.5"
+        versionName "1.4.0.6"
 
         externalNativeBuild {
             if (PROP_BUILD_TYPE == 'ndk-build') {
