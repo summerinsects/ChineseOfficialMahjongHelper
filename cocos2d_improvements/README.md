@@ -20,7 +20,7 @@ cocos2dx为游戏引擎，默认是全屏，用来写应用一般需要非全屏
 ```
 
 ### iOS的WebView如何禁止数字链接
-- 同样是cocos2d/cocos/ui/UIWebViewImpl-ios.mm
+- cocos2d/cocos/ui/UIWebViewImpl-ios.mm
 - 找到函数`-(void)setupWebView`（141行），在`self.uiWebView.delegate = self;`后增加如下代码
 ```obj-c
     self.uiWebView.dataDetectorTypes = UIDataDetectorTypeNone;

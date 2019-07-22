@@ -281,7 +281,6 @@ static void showQRCodeAlertDialog(Scene *scene, Texture2D *texture) {
 
     AlertDialog::Builder(scene)
         .setTitle(__UTF8("分享二维码"))
-        .setMessage(__UTF8("二维码iOS与Android通用"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setPositiveButton(__UTF8("确定"), nullptr)
