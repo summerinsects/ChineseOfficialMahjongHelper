@@ -2,6 +2,7 @@
 #define __UTILS_SOCKET_H__
 
 #if (defined _WIN32) || (defined WIN32)
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include <winsock2.h>
 #ifndef __SSIZE_T
