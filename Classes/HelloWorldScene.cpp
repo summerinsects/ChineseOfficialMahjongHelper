@@ -165,7 +165,7 @@ bool HelloWorld::init() {
     LeftSideMenu::checkVersion(this, false);
 #endif
 
-    requestTips();
+    this->scheduleOnce([this](float) { requestTips(); }, 0.0f, "reqest_tips");
 
     return true;
 }
