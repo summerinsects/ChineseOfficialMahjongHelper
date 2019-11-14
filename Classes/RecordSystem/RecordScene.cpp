@@ -1327,11 +1327,11 @@ void RecordScene::finish() {
 extern cocos2d::ui::Widget *createFanResultWidget(const mahjong::fan_table_t &fan_table, int fontSize, float resultAreaWidth);
 
 void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
-    const float maxWidth = AlertDialog::maxWidth();
+    const float maxWidth = Director::getInstance()->getVisibleSize().width;
 
     // 选牌面板和其他信息的相关控件
-    TilePickWidget *tilePicker = TilePickWidget::create(maxWidth);
-    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create(maxWidth, nullptr);
+    TilePickWidget *tilePicker = TilePickWidget::create(maxWidth - 10.0f);
+    ExtraInfoWidget *extraInfo = ExtraInfoWidget::create(maxWidth - 10.0f, nullptr);
 
     extraInfo->setFlowerCount(param.flower_count);
     extraInfo->setPrevalentWind(static_cast<mahjong::wind_t>(_handIdx / 4));
@@ -1363,7 +1363,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
     }
 
     // 通过AlertDialog显示出来
-    AlertDialog::Builder(this)
+    AlertDialog::Builder(this, maxWidth)
         .setTitle(__UTF8("记录和牌"))
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)

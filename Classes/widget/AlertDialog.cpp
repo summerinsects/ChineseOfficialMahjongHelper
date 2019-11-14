@@ -48,7 +48,7 @@ bool AlertDialog::initWithBuilder(Builder &&builder) {
     // 遮罩
     this->addChild(LayerColor::create(Color4B(0, 0, 0, 127)));
 
-    const float maxWidth1 = AlertDialog::maxWidth();
+    const float maxWidth1 = builder._maxWidth;
     const float totalWidth = maxWidth1 + 10.0f;
 
     // 背景

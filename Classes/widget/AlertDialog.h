@@ -21,6 +21,7 @@ public:
         friend class AlertDialog;
 
         cocos2d::RefPtr<cocos2d::Scene> _scene;
+        float _maxWidth;
         std::string _title;
         std::string _message;
         cocos2d::RefPtr<cocos2d::Node> _contentNode;
@@ -32,7 +33,8 @@ public:
         bool _isCloseOnTouchOutside = true;
 
     public:
-        explicit Builder(cocos2d::Scene *scene) : _scene(scene) { }
+        explicit Builder(cocos2d::Scene *scene) : _scene(scene), _maxWidth(maxWidth()) { }
+        explicit Builder(cocos2d::Scene *scene, float maxWidth) : _scene(scene), _maxWidth(maxWidth) { }
 
         Builder &setTitle(std::string &&title) { _title.swap(title); return *this; }
         Builder &setMessage(std::string &&message) { _message.swap(message); return *this; }

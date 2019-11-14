@@ -237,16 +237,16 @@ void MahjongTheoryScene::showInputAlert() {
         return;
     }
 
-    const float maxWidth = AlertDialog::maxWidth();
+    const float maxWidth = Director::getInstance()->getVisibleSize().width;
 
     // 选牌面板
-    TilePickWidget *tilePicker = TilePickWidget::create(maxWidth);
+    TilePickWidget *tilePicker = TilePickWidget::create(maxWidth - 10.0f);
     if (handTiles.tile_count != 0 && servingTile != 0) {
         tilePicker->setData(handTiles, servingTile);
     }
 
     // 通过AlertDialog显示出来
-    AlertDialog::Builder(this)
+    AlertDialog::Builder(this, maxWidth)
         .setTitle(__UTF8("输入手牌"))
         .setContentNode(tilePicker)
         .setCloseOnTouchOutside(false)
