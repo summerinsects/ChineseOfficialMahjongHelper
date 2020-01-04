@@ -1367,6 +1367,15 @@ namespace {
                 _currentFlags[idx] = checkBox->isSelected();
                 refreshCountLabel();
             });
+
+            cell->setContentSize(Size(cellWidth, 65.0f));
+            cell->addClickEventListener([this](Ref *sender) {
+                CustomCell *cell = (CustomCell *)sender;
+                ui::CheckBox *checkBox = std::get<3>(cell->getExtData());
+                ssize_t idx = reinterpret_cast<ssize_t>(checkBox->getUserData());
+                checkBox->setSelected(_currentFlags[idx] = !checkBox->isSelected());
+                refreshCountLabel();
+            });
         }
 
         const CustomCell::ExtDataType &ext = cell->getExtData();
@@ -1404,6 +1413,8 @@ namespace {
         checkBox->setUserData(reinterpret_cast<void *>(realIdx));
         checkBox->setSelected(_currentFlags[realIdx]);
         checkBox->setEnabled(finished);
+
+        cell->setTouchEnabled(finished);
 
         return cell;
     }
@@ -1787,6 +1798,7 @@ void RecordHistoryScene::showRecvAlert() {
             }
 
             if (!*connectRet) {
+                label->setString(__UTF8("连接失败"));
                 return;
             }
 
