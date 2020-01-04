@@ -1526,44 +1526,13 @@ void RecordHistoryScene::showTransmissionAlert() {
     });
 }
 
-// 2^32^(1/6) = 40.317
-static const char VerificationCodeTable[] = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-static const int unit = sizeof(VerificationCodeTable) - 1;
-
-static void calculateVerificationCode(uint32_t address, char (&str)[7]) {
-    int64_t value = (int64_t)(uint64_t)address;
-    lldiv_t ret;
-    for (int i = 0; i < 6; ++i) {
-        ret = lldiv(value, unit);
-        str[i] = VerificationCodeTable[ret.rem];
-        value = ret.quot;
-    }
-    str[6] = '\0';
-}
-
-static uint32_t calculateAddress(const char *str) {
-    if (str == nullptr || strlen(str) != 6 || strspn(str, VerificationCodeTable) != 6) {
-        return 0;
-    }
-
-    uintptr_t address = 0;
-    for (int i = 0; i < 6; ++i) {
-        int k = 5 - i;
-        uintptr_t value = strchr(VerificationCodeTable, str[k]) - VerificationCodeTable;
-        address *= unit;
-        address += value;
-    }
-
-    return (uint32_t)address;
-}
-
 void RecordHistoryScene::showSendAlert(std::vector<bool> selectFlags) {
     const float limitWidth = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(limitWidth, 100.0f));
 
-    Label *label = Label::createWithSystemFont(__UTF8("请在另一台设备上输入验证码，字母区分大小写"), "Arial", 10);
+    Label *label = Label::createWithSystemFont(__UTF8("请在另一台设备上输入以下IP地址"), "Arial", 10);
     cw::scaleLabelToFitWidth(label, limitWidth - 4.0f);
     rootNode->addChild(label);
     label->setTextColor(C4B_BLACK);
@@ -1572,11 +1541,9 @@ void RecordHistoryScene::showSendAlert(std::vector<bool> selectFlags) {
     auto socketSender = std::make_shared<p2p::Sender>();
     rootNode->setOnExitCallback([socketSender]() { socketSender->quit(); });
 
-    uint32_t ret = socketSender->prepare();
-    char code[7] = "";
-    calculateVerificationCode(ret, code);
+    std::string addr = socketSender->prepare();
 
-    label = Label::createWithSystemFont(code, "Arial", 16);
+    label = Label::createWithSystemFont(addr, "Arial", 16);
     rootNode->addChild(label);
     label->setTextColor(C4B_RED);
     label->setPosition(Vec2(limitWidth * 0.5f, 70.0f));
@@ -1720,19 +1687,19 @@ void RecordHistoryScene::showRecvAlert() {
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(limitWidth, 100.0f));
 
-    Label *label = Label::createWithSystemFont(__UTF8("请输入6位验证码，字母区分大小写"), "Arial", 10);
+    Label *label = Label::createWithSystemFont(__UTF8("请输入另一台设备的IP地址"), "Arial", 10);
     cw::scaleLabelToFitWidth(label, limitWidth - 4.0f);
     rootNode->addChild(label);
     label->setTextColor(C4B_BLACK);
     label->setPosition(Vec2(limitWidth * 0.5f, 90.0f));
 
-    ui::EditBox *editBox = UICommon::createEditBox(Size(100, 20));
+    ui::EditBox *editBox = UICommon::createEditBox(Size(200, 20));
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setInputFlag(ui::EditBox::InputFlag::SENSITIVE);
     editBox->setReturnType(ui::EditBox::KeyboardReturnType::NEXT);
     editBox->setFontColor(C4B_BLACK);
     editBox->setFontSize(16);
-    editBox->setMaxLength(6);
+    editBox->setMaxLength(22);
     rootNode->addChild(editBox);
     editBox->setPosition(Vec2(limitWidth * 0.5f, 65.0f));
 
@@ -1747,7 +1714,7 @@ void RecordHistoryScene::showRecvAlert() {
     button->setTitleText(__UTF8("连接"));
     button->setPosition(Vec2(limitWidth * 0.5f, 35.0f));
 
-    label = Label::createWithSystemFont(__UTF8("等待连接，请从另一台设备上获取验证码"), "Arial", 10);
+    label = Label::createWithSystemFont(__UTF8("等待连接，请从另一台设备上获取IP地址"), "Arial", 10);
     rootNode->addChild(label);
     label->setTextColor(C4B_BLACK);
     label->setPosition(Vec2(limitWidth * 0.5f, 10.0f));
@@ -1777,10 +1744,12 @@ void RecordHistoryScene::showRecvAlert() {
     dialog->show();
 
     button->addClickEventListener([this, dialog, editBox, label, socketReceiver, isReceiving](Ref *sender) {
-        uint32_t address = calculateAddress(editBox->getText());
-        if (address == 0) {
+        const char *text = editBox->getText();
+        if (text == nullptr || *text == '\0') {
             return;
         }
+
+        std::string address = text;
 
         label->setString(__UTF8("正在连接，请勿退出程序"));
         ui::Button *button = (ui::Button *)sender;
@@ -1896,7 +1865,7 @@ void RecordHistoryScene::showRecvAlert() {
                 // 保存
                 saveRecords(g_records);
             });
-        }, nullptr, [socketReceiver, address, connectRet]() { *connectRet = socketReceiver->connect(address); });
+        }, nullptr, [socketReceiver, address, connectRet]() { *connectRet = socketReceiver->connect(address.c_str()); });
     });
 }
 

@@ -20,6 +20,7 @@ typedef int SOCKET;
 #endif
 
 #include <stdint.h>
+#include <string>
 #include "compiler.h"
 
 namespace p2p {
@@ -42,7 +43,7 @@ namespace p2p {
         Sender();
 
         virtual void quit() override;
-        uint32_t prepare();
+        std::string prepare();
         bool accept();
 
     private:
@@ -51,7 +52,7 @@ namespace p2p {
 
     class Reciever : public Socket {
     public:
-        bool connect(uint32_t address);
+        bool connect(const char *address);
     };
 }
 

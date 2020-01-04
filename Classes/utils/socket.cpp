@@ -21,7 +21,6 @@ static FORCE_INLINE int closesocket(int s) {
 #endif
 
 #include <stdio.h>
-#include <string>
 
 namespace p2p {
 
@@ -101,7 +100,7 @@ namespace p2p {
         Socket::quit();
     }
 
-    uint32_t Sender::prepare() {
+    std::string Sender::prepare() {
         _socketLoc = ::socket(AF_INET, SOCK_STREAM, 0);
         if (_socketLoc == INVALID_SOCKET) {
             return 0;
@@ -125,9 +124,7 @@ namespace p2p {
             return 0;
         }
 
-        unsigned a, b, c, d;
-        sscanf(ip.c_str(), "%u.%u.%u.%u", &a, &b, &c, &d);
-        return ((c << 8) | d) | ((uint32_t)ntohs(addrLoc.sin_port) << 16);
+        return ip + ":" + std::to_string(ntohs(addrLoc.sin_port));
     }
 
     bool Sender::accept() {
@@ -137,18 +134,22 @@ namespace p2p {
         return (_socket != INVALID_SOCKET);
     }
 
-    bool Reciever::connect(uint32_t address) {
+    bool Reciever::connect(const char *address) {
         _socket = ::socket(AF_INET, SOCK_STREAM, 0);
         if (_socket == INVALID_SOCKET) {
             return false;
         }
 
-        std::string ip = getLocalIP();
-        unsigned a, b, c, d;
-        sscanf(ip.c_str(), "%u.%u.%u.%u", &a, &b, &c, &d);
+        const char *p = strchr(address, ':');
+        if (p == nullptr) {
+            return false;
+        }
+
         char serverIp[64];
-        snprintf(serverIp, sizeof(serverIp), "%u.%u.%u.%u", a, b, (address >> 8) & 0xFF, address & 0xFF);
-        uint16_t port = static_cast<uint16_t>((address >> 16) & 0xFFFFU);
+        memcpy(serverIp, address, p - address);
+        serverIp[p - address] = '\0';
+
+        uint16_t port = static_cast<uint16_t>(atoi(p + 1));
 
         struct sockaddr_in serverAddr = { 0 };
         serverAddr.sin_family = AF_INET;
