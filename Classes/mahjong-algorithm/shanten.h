@@ -25,6 +25,8 @@
 
 #include "tile.h"
 
+#define MAHJONG_ALGORITHM_ENABLE_SHANTEN
+
 namespace mahjong {
 
 /**
@@ -81,6 +83,8 @@ typedef bool useful_table_t[TILE_TABLE_SIZE];
  * @{
  */
 
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
+
 /**
  * @brief 基本和型上听数
  *
@@ -90,6 +94,8 @@ typedef bool useful_table_t[TILE_TABLE_SIZE];
  * @return int 上听数
  */
 int basic_form_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table);
+
+#endif
 
 /**
  * @brief 基本和型是否听牌
@@ -121,6 +127,8 @@ bool is_basic_form_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile
  * @{
  */
 
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
+
 /**
  * @brief 七对上听数
  *
@@ -130,6 +138,8 @@ bool is_basic_form_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile
  * @return int 上听数
  */
 int seven_pairs_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table);
+
+#endif
 
 /**
  * @brief 七对是否听牌
@@ -161,6 +171,8 @@ bool is_seven_pairs_win(const tile_t *standing_tiles, intptr_t standing_cnt, til
  * @{
  */
 
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
+
 /**
  * @brief 十三幺上听数
  *
@@ -170,6 +182,8 @@ bool is_seven_pairs_win(const tile_t *standing_tiles, intptr_t standing_cnt, til
  * @return int 上听数
  */
 int thirteen_orphans_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table);
+
+#endif
 
 /**
  * @brief 十三幺是否听牌
@@ -201,6 +215,8 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, intptr_t standing_cnt
  * @{
  */
 
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
+
 /**
  * @brief 组合龙上听数
  *
@@ -210,6 +226,8 @@ bool is_thirteen_orphans_win(const tile_t *standing_tiles, intptr_t standing_cnt
  * @return int 上听数
  */
 int knitted_straight_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table);
+
+#endif
 
 /**
  * @brief 组合龙是否听牌
@@ -241,6 +259,8 @@ bool is_knitted_straight_win(const tile_t *standing_tiles, intptr_t standing_cnt
  * @{
  */
 
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
+
 /**
  * @brief 全不靠上听数
  *
@@ -250,6 +270,8 @@ bool is_knitted_straight_win(const tile_t *standing_tiles, intptr_t standing_cnt
  * @return int 上听数
  */
 int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table);
+
+#endif
 
 /**
  * @brief 全不靠是否听牌
@@ -289,6 +311,8 @@ bool is_waiting(const hand_tiles_t &hand_tiles, useful_table_t *useful_table);
  * end group
  * @}
  */
+
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
 
 /**
  * @name form flags
@@ -336,6 +360,8 @@ typedef bool (*enum_callback_t)(void *context, const enum_result_t *result);
  */
 void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint8_t form_flag,
     void *context, enum_callback_t enum_callback);
+
+#endif
 
 }
 

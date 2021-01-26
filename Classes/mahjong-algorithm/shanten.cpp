@@ -28,6 +28,12 @@
 #include <iterator>
 #include "standard_tiles.h"
 
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
+#define STATIC_IF_NECESSARY
+#else
+#define STATIC_IF_NECESSARY static
+#endif
+
 namespace mahjong {
 
 // 牌组转换成牌
@@ -196,6 +202,8 @@ static void save_work_path(const intptr_t fixed_cnt, const work_path_t *work_pat
         }
     }
 }
+
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
 
 // 递归计算基本和型上听数
 // 参数说明：
@@ -433,6 +441,8 @@ int basic_form_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, usef
     }
     return basic_form_shanten_from_table(cnt_table, (13 - standing_cnt) / 3, useful_table);
 }
+
+#endif
 
 // 基本和型判断1张是否听牌
 static bool is_basic_form_wait_1(tile_table_t &cnt_table, useful_table_t *waiting_table) {
@@ -674,7 +684,7 @@ bool is_basic_form_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile
 //-------------------------------- 七对 --------------------------------
 
 // 七对上听数
-int seven_pairs_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
+STATIC_IF_NECESSARY int seven_pairs_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -723,7 +733,7 @@ bool is_seven_pairs_win(const tile_t *standing_tiles, intptr_t standing_cnt, til
 //-------------------------------- 十三幺 --------------------------------
 
 // 十三幺上听数
-int thirteen_orphans_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
+STATIC_IF_NECESSARY int thirteen_orphans_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
     if (standing_tiles == nullptr || standing_cnt != 13) {
         return std::numeric_limits<int>::max();
     }
@@ -863,6 +873,8 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
     return false;
 }
 
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
+
 // 基本和型包含主番的上听数，可用于计算三步高 三同顺 龙等三组面子的番种整个立牌的上听数
 static int basic_form_shanten_specified(const tile_table_t &cnt_table, const tile_t *main_tiles, int main_cnt,
     intptr_t fixed_cnt, useful_table_t *useful_table) {
@@ -948,6 +960,8 @@ int knitted_straight_shanten(const tile_t *standing_tiles, intptr_t standing_cnt
     return ret;
 }
 
+#endif
+
 // 组合龙是否听牌
 bool is_knitted_straight_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *waiting_table) {
     if (standing_tiles == nullptr || (standing_cnt != 13 && standing_cnt != 10)) {
@@ -1028,7 +1042,7 @@ static int honors_and_knitted_tiles_shanten_1(const tile_t *standing_tiles, intp
 }
 
 // 全不靠上听数
-int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
+STATIC_IF_NECESSARY int honors_and_knitted_tiles_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
     int ret = std::numeric_limits<int>::max();
 
     // 需要获取有效牌时，计算上听数的同时就获取有效牌了
@@ -1131,6 +1145,8 @@ bool is_waiting(const hand_tiles_t &hand_tiles, useful_table_t *useful_table) {
 
     return (spcial_waiting || basic_waiting);
 }
+
+#ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
 
 //-------------------------------- 枚举打牌 --------------------------------
 
@@ -1242,5 +1258,7 @@ void enum_discard_tile(const hand_tiles_t *hand_tiles, tile_t serving_tile, uint
         }
     }
 }
+
+#endif
 
 }
