@@ -79,7 +79,7 @@ typedef bool useful_table_t[TILE_TABLE_SIZE];
  */
 
 /**
- * @addtogroup basic_form
+ * @addtogroup regular
  * @{
  */
 
@@ -93,7 +93,7 @@ typedef bool useful_table_t[TILE_TABLE_SIZE];
  * @param [out] useful_table 有效牌标记表（可为null）
  * @return int 上听数
  */
-int basic_form_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table);
+int regular_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table);
 
 #endif
 
@@ -105,7 +105,7 @@ int basic_form_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, usef
  * @param [out] waiting_table 听牌标记表（可为null）
  * @return bool 是否听牌
  */
-bool is_basic_form_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *waiting_table);
+bool is_regular_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *waiting_table);
 
 /**
  * @brief 基本和型是否和牌
@@ -115,7 +115,7 @@ bool is_basic_form_wait(const tile_t *standing_tiles, intptr_t standing_cnt, use
  * @param [in] test_tile 测试的牌
  * @return bool 是否和牌
  */
-bool is_basic_form_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile_t test_tile);
+bool is_regular_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile_t test_tile);
 
 /**
  * end group
@@ -319,7 +319,7 @@ bool is_waiting(const hand_tiles_t &hand_tiles, useful_table_t *useful_table);
  * @{
  *  和型
  */
-#define FORM_FLAG_BASIC_FORM                0x01  ///< 基本和型
+#define FORM_FLAG_REGULAR                   0x01  ///< 基本和型
 #define FORM_FLAG_SEVEN_PAIRS               0x02  ///< 七对
 #define FORM_FLAG_THIRTEEN_ORPHANS          0x04  ///< 十三幺
 #define FORM_FLAG_HONORS_AND_KNITTED_TILES  0x08  ///< 全不靠

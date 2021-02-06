@@ -127,17 +127,17 @@ void test_shanten(const char *str) {
     puts("\n");
 
     ret0 = honors_and_knitted_tiles_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
-    printf("honors and knitted tiles  %d shanten\n", ret0);
+    printf("honors and knitted tiles %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
     ret0 = knitted_straight_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
-    printf("knitted straight in basic form %d shanten\n", ret0);
+    printf("knitted straight in regular form %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 
-    ret0 = basic_form_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
-    printf("basic form %d shanten\n", ret0);
+    ret0 = regular_shanten(hand_tiles.standing_tiles, hand_tiles.tile_count, &useful_table);
+    printf("regular form %d shanten\n", ret0);
     if (ret0 != std::numeric_limits<int>::max()) display(&hand_tiles, useful_table);
     puts("\n");
 }
@@ -154,15 +154,15 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
-    test_points("1112345678999p9p", WIN_FLAG_INIT | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("1112345678999p9p", WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("1112345678999p9p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
-    test_points("1112345678999p9p", WIN_FLAG_INIT, wind_t::EAST, wind_t::EAST);
-    test_points("123456m45679p66s8p", WIN_FLAG_INIT | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("1112345678999p9p", WIN_FLAG_DEAL, wind_t::EAST, wind_t::EAST);
+    test_points("123456m45679p66s8p", WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("123456m45679p66s8p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
-    test_points("123456m45679p66s8p", WIN_FLAG_INIT, wind_t::EAST, wind_t::EAST);
+    test_points("123456m45679p66s8p", WIN_FLAG_DEAL, wind_t::EAST, wind_t::EAST);
 
     // BUG测试
-    test_points("[234s][234s][234s][234s]6s6s", WIN_FLAG_4TH_TILE, wind_t::EAST, wind_t::EAST);
+    test_points("[234s][234s][234s][234s]6s6s", WIN_FLAG_LAST_TILE, wind_t::EAST, wind_t::EAST);
 
     test_points("1122233334444s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);  // 剪枝BUG 2018.4.18
 
@@ -241,11 +241,11 @@ int main(int argc, const char *argv[]) {
     test_points("2223344555667m4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_points("2223344555667m4m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     // 理论最高番
-    test_points("[EEEE][CCCC][FFFF][PPPP]NN", WIN_FLAG_SELF_DRAWN | WIN_FLAG_ABOUT_KONG | WIN_FLAG_WALL_LAST, wind_t::EAST, wind_t::EAST);
+    test_points("[EEEE][CCCC][FFFF][PPPP]NN", WIN_FLAG_SELF_DRAWN | WIN_FLAG_KONG_INVOLVED | WIN_FLAG_WALL_LAST, wind_t::EAST, wind_t::EAST);
     test_points("[1111p][2222p][3333p]111s1m1m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("445566m5566p556s6s", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("1111222233334s4s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
-    test_points("12378m123pCCPPP9m", WIN_FLAG_DISCARD | WIN_FLAG_4TH_TILE, wind_t::EAST, wind_t::EAST);
+    test_points("12378m123pCCPPP9m", WIN_FLAG_DISCARD | WIN_FLAG_LAST_TILE, wind_t::EAST, wind_t::EAST);
     //return 0;
 
     // 以下测试用例来自于规则书上

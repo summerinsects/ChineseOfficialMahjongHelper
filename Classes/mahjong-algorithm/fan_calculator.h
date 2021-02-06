@@ -156,12 +156,12 @@ typedef uint8_t win_flag_t;
  * @name win flag
  * @{
  */
-#define WIN_FLAG_DISCARD    0   ///< 点和
-#define WIN_FLAG_SELF_DRAWN 1   ///< 自摸
-#define WIN_FLAG_4TH_TILE   2   ///< 绝张
-#define WIN_FLAG_ABOUT_KONG 4   ///< 关于杠，复合点和时为枪杠和，复合自摸则为杠上开花
-#define WIN_FLAG_WALL_LAST  8   ///< 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
-#define WIN_FLAG_INIT       16  ///< 起手，复合点和时为地和，复合自摸则为天和
+#define WIN_FLAG_DISCARD        0   ///< 点和
+#define WIN_FLAG_SELF_DRAWN     1   ///< 自摸
+#define WIN_FLAG_LAST_TILE      2   ///< 绝张
+#define WIN_FLAG_KONG_INVOLVED  4   ///< 关于杠，复合点和时为抢杠和，复合自摸则为杠上开花
+#define WIN_FLAG_WALL_LAST      8   ///< 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
+#define WIN_FLAG_DEAL           16  ///< 起手，复合点和时为地和，复合自摸则为天和
 
 /**
  * @}

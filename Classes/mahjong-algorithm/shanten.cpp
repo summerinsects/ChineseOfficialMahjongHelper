@@ -160,7 +160,7 @@ namespace {
 }
 
 // 路径是否来过了
-static bool is_basic_form_branch_exist(const intptr_t fixed_cnt, const work_path_t *work_path, const work_state_t *work_state) {
+static bool is_regular_branch_exist(const intptr_t fixed_cnt, const work_path_t *work_path, const work_state_t *work_state) {
     if (work_state->count <= 0 || work_path->depth == 0) {
         return false;
     }
@@ -215,7 +215,7 @@ static void save_work_path(const intptr_t fixed_cnt, const work_path_t *work_pat
 // work_path保存当前正在计算的路径，
 // work_state保存了所有已经计算过的路径，
 // 从0到fixed_cnt的数据是不使用的，这些保留给了副露的面子
-static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool has_pair, const unsigned pack_cnt, const unsigned incomplete_cnt,
+static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_pair, const unsigned pack_cnt, const unsigned incomplete_cnt,
     const intptr_t fixed_cnt, work_path_t *work_path, work_state_t *work_state) {
     if (fixed_cnt == 4) {  // 4副露
         for (int i = 0; i < 34; ++i) {
@@ -269,10 +269,10 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
         // 雀头
         if (!has_pair && cnt_table[t] > 1) {
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PAIR, t);  // 记录雀头
-            if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
+            if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
                 // 削减雀头，递归
                 cnt_table[t] -= 2;
-                int ret = basic_form_shanten_recursively(cnt_table, true, pack_cnt, incomplete_cnt,
+                int ret = regular_shanten_recursively(cnt_table, true, pack_cnt, incomplete_cnt,
                     fixed_cnt, work_path, work_state);
                 result = std::min(ret, result);
                 // 还原
@@ -283,10 +283,10 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
         // 刻子
         if (cnt_table[t] > 2) {
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PUNG, t);  // 记录刻子
-            if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
+            if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
                 // 削减这组刻子，递归
                 cnt_table[t] -= 3;
-                int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
+                int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
                     fixed_cnt, work_path, work_state);
                 result = std::min(ret, result);
                 // 还原
@@ -299,12 +299,12 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
         // 顺子t t+1 t+2，显然t不能是8点以上的数牌
         if (is_numbered && tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW, t);  // 记录顺子
-            if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
+            if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
                 // 削减这组顺子，递归
                 --cnt_table[t];
                 --cnt_table[t + 1];
                 --cnt_table[t + 2];
-                int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
+                int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
                     fixed_cnt, work_path, work_state);
                 result = std::min(ret, result);
                 // 还原
@@ -322,10 +322,10 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
         // 刻子搭子
         if (cnt_table[t] > 1) {
             work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_INCOMPLETE_PUNG, t);  // 记录刻子搭子
-            if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
+            if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
                 // 削减刻子搭子，递归
                 cnt_table[t] -= 2;
-                int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
+                int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
                     fixed_cnt, work_path, work_state);
                 result = std::min(ret, result);
                 // 还原
@@ -338,11 +338,11 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
             // 两面或者边张搭子t t+1，显然t不能是9点以上的数牌
             if (tile_get_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
                 work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_OPEN_END, t);  // 记录两面或者边张搭子
-                if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
+                if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
                     // 削减搭子，递归
                     --cnt_table[t];
                     --cnt_table[t + 1];
-                    int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
+                    int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
                         fixed_cnt, work_path, work_state);
                     result = std::min(ret, result);
                     // 还原
@@ -353,11 +353,11 @@ static int basic_form_shanten_recursively(tile_table_t &cnt_table, const bool ha
             // 嵌张搭子t t+2，显然t不能是8点以上的数牌
             if (tile_get_rank(t) < 8 && cnt_table[t + 2]) {  // 嵌张
                 work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_CLOSED, t);  // 记录嵌张搭子
-                if (!is_basic_form_branch_exist(fixed_cnt, work_path, work_state)) {
+                if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
                     // 削减搭子，递归
                     --cnt_table[t];
                     --cnt_table[t + 2];
-                    int ret = basic_form_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
+                    int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
                         fixed_cnt, work_path, work_state);
                     result = std::min(ret, result);
                     // 还原
@@ -386,12 +386,12 @@ static bool numbered_tile_has_neighbor(const tile_table_t &cnt_table, tile_t t) 
 }
 
 // 以表格为参数计算基本和型上听数
-static int basic_form_shanten_from_table(tile_table_t &cnt_table, intptr_t fixed_cnt, useful_table_t *useful_table) {
+static int regular_shanten_from_table(tile_table_t &cnt_table, intptr_t fixed_cnt, useful_table_t *useful_table) {
     // 计算上听数
     work_path_t work_path;
     work_state_t work_state;
     work_state.count = 0;
-    int result = basic_form_shanten_recursively(cnt_table, false, static_cast<uint16_t>(fixed_cnt), 0,
+    int result = regular_shanten_recursively(cnt_table, false, static_cast<uint16_t>(fixed_cnt), 0,
         fixed_cnt, &work_path, &work_state);
 
     if (useful_table == nullptr) {
@@ -414,7 +414,7 @@ static int basic_form_shanten_from_table(tile_table_t &cnt_table, intptr_t fixed
 
         ++cnt_table[t];
         work_state.count = 0;
-        int temp = basic_form_shanten_recursively(cnt_table, false, static_cast<uint16_t>(fixed_cnt), 0,
+        int temp = regular_shanten_recursively(cnt_table, false, static_cast<uint16_t>(fixed_cnt), 0,
             fixed_cnt, &work_path, &work_state);
         if (temp < result) {
             (*useful_table)[t] = true;  // 标记为有效牌
@@ -426,7 +426,7 @@ static int basic_form_shanten_from_table(tile_table_t &cnt_table, intptr_t fixed
 }
 
 // 基本和型上听数
-int basic_form_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
+int regular_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *useful_table) {
     if (standing_tiles == nullptr || (standing_cnt != 13
         && standing_cnt != 10 && standing_cnt != 7 && standing_cnt != 4 && standing_cnt != 1)) {
         return std::numeric_limits<int>::max();
@@ -439,13 +439,13 @@ int basic_form_shanten(const tile_t *standing_tiles, intptr_t standing_cnt, usef
     if (useful_table != nullptr) {
         memset(*useful_table, 0, sizeof(*useful_table));
     }
-    return basic_form_shanten_from_table(cnt_table, (13 - standing_cnt) / 3, useful_table);
+    return regular_shanten_from_table(cnt_table, (13 - standing_cnt) / 3, useful_table);
 }
 
 #endif
 
 // 基本和型判断1张是否听牌
-static bool is_basic_form_wait_1(tile_table_t &cnt_table, useful_table_t *waiting_table) {
+static bool is_regular_wait_1(tile_table_t &cnt_table, useful_table_t *waiting_table) {
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
         if (cnt_table[t] != 1) {
@@ -468,7 +468,7 @@ static bool is_basic_form_wait_1(tile_table_t &cnt_table, useful_table_t *waitin
 }
 
 // 基本和型判断2张是否听牌
-static bool is_basic_form_wait_2(const tile_table_t &cnt_table, useful_table_t *waiting_table) {
+static bool is_regular_wait_2(const tile_table_t &cnt_table, useful_table_t *waiting_table) {
     bool ret = false;
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
@@ -514,7 +514,7 @@ static bool is_basic_form_wait_2(const tile_table_t &cnt_table, useful_table_t *
 }
 
 // 基本和型判断4张是否听牌
-static bool is_basic_form_wait_4(tile_table_t &cnt_table, useful_table_t *waiting_table) {
+static bool is_regular_wait_4(tile_table_t &cnt_table, useful_table_t *waiting_table) {
     bool ret = false;
     // 削减雀头
     for (int i = 0; i < 34; ++i) {
@@ -524,7 +524,7 @@ static bool is_basic_form_wait_4(tile_table_t &cnt_table, useful_table_t *waitin
         }
         // 削减雀头，递归
         cnt_table[t] -= 2;
-        if (is_basic_form_wait_2(cnt_table, waiting_table)) {
+        if (is_regular_wait_2(cnt_table, waiting_table)) {
             ret = true;
         }
         // 还原
@@ -538,14 +538,14 @@ static bool is_basic_form_wait_4(tile_table_t &cnt_table, useful_table_t *waitin
 }
 
 // 递归计算基本和型是否听牌
-static bool is_basic_form_wait_recursively(tile_table_t &cnt_table, intptr_t left_cnt, useful_table_t *waiting_table) {
+static bool is_regular_wait_recursively(tile_table_t &cnt_table, intptr_t left_cnt, useful_table_t *waiting_table) {
     if (left_cnt == 1) {
-        return is_basic_form_wait_1(cnt_table, waiting_table);
+        return is_regular_wait_1(cnt_table, waiting_table);
     }
 
     bool ret = false;
     if (left_cnt == 4) {
-        ret = is_basic_form_wait_4(cnt_table, waiting_table);
+        ret = is_regular_wait_4(cnt_table, waiting_table);
         if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
             return true;
         }
@@ -561,7 +561,7 @@ static bool is_basic_form_wait_recursively(tile_table_t &cnt_table, intptr_t lef
         if (cnt_table[t] > 2) {
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
-            if (is_basic_form_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
+            if (is_regular_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
                 ret = true;
             }
             // 还原
@@ -579,7 +579,7 @@ static bool is_basic_form_wait_recursively(tile_table_t &cnt_table, intptr_t lef
                 --cnt_table[t];
                 --cnt_table[t + 1];
                 --cnt_table[t + 2];
-                if (is_basic_form_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
+                if (is_regular_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
                     ret = true;
                 }
                 // 还原
@@ -599,7 +599,7 @@ static bool is_basic_form_wait_recursively(tile_table_t &cnt_table, intptr_t lef
 // 基本和型是否听牌
 // 这里之所以不用直接调用上听数计算函数，判断其返回值为0的方式
 // 是因为前者会削减搭子，这个操作在和牌判断中是没必要的，所以单独写一套更快逻辑
-bool is_basic_form_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *waiting_table) {
+bool is_regular_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful_table_t *waiting_table) {
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, &cnt_table);
@@ -607,11 +607,11 @@ bool is_basic_form_wait(const tile_t *standing_tiles, intptr_t standing_cnt, use
     if (waiting_table != nullptr) {
         memset(*waiting_table, 0, sizeof(*waiting_table));
     }
-    return is_basic_form_wait_recursively(cnt_table, standing_cnt, waiting_table);
+    return is_regular_wait_recursively(cnt_table, standing_cnt, waiting_table);
 }
 
 // 基本和型2张能否和牌
-static bool is_basic_form_win_2(const tile_table_t &cnt_table) {
+static bool is_regular_win_2(const tile_table_t &cnt_table) {
     // 找到未使用的牌
     typedef std::remove_all_extents<tile_table_t>::type table_elem_t;
     const table_elem_t *it = std::find_if(std::begin(cnt_table), std::end(cnt_table), [](table_elem_t n) { return n > 0; });
@@ -626,9 +626,9 @@ static bool is_basic_form_win_2(const tile_table_t &cnt_table) {
 // 递归计算基本和型是否和牌
 // 这里之所以不用直接调用上听数计算函数，判断其返回值为-1的方式，
 // 是因为前者会削减搭子，这个操作在和牌判断中是没必要的，所以单独写一套更快逻辑
-static bool is_basic_form_win_recursively(tile_table_t &cnt_table, intptr_t left_cnt) {
+static bool is_regular_win_recursively(tile_table_t &cnt_table, intptr_t left_cnt) {
     if (left_cnt == 2) {
-        return is_basic_form_win_2(cnt_table);
+        return is_regular_win_2(cnt_table);
     }
 
     for (int i = 0; i < 34; ++i) {
@@ -641,7 +641,7 @@ static bool is_basic_form_win_recursively(tile_table_t &cnt_table, intptr_t left
         if (cnt_table[t] > 2) {
             // 削减这组刻子，递归
             cnt_table[t] -= 3;
-            bool ret = is_basic_form_win_recursively(cnt_table, left_cnt - 3);
+            bool ret = is_regular_win_recursively(cnt_table, left_cnt - 3);
             // 还原
             cnt_table[t] += 3;
             if (ret) {
@@ -657,7 +657,7 @@ static bool is_basic_form_win_recursively(tile_table_t &cnt_table, intptr_t left
                 --cnt_table[t];
                 --cnt_table[t + 1];
                 --cnt_table[t + 2];
-                bool ret = is_basic_form_win_recursively(cnt_table, left_cnt - 3);
+                bool ret = is_regular_win_recursively(cnt_table, left_cnt - 3);
                 // 还原
                 ++cnt_table[t];
                 ++cnt_table[t + 1];
@@ -673,12 +673,12 @@ static bool is_basic_form_win_recursively(tile_table_t &cnt_table, intptr_t left
 }
 
 // 基本和型是否和牌
-bool is_basic_form_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile_t test_tile) {
+bool is_regular_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile_t test_tile) {
     // 对立牌的种类进行打表
     tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, &cnt_table);
     ++cnt_table[test_tile];  // 添加测试的牌
-    return is_basic_form_win_recursively(cnt_table, standing_cnt + 1);
+    return is_regular_win_recursively(cnt_table, standing_cnt + 1);
 }
 
 //-------------------------------- 七对 --------------------------------
@@ -845,7 +845,7 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
 
     if (missing_cnt == 1) {  // 如果缺一张，那么除去组合龙之后的牌应该是完成状态才能听牌
         if (left_cnt == 10) {
-            if (is_basic_form_win_recursively(temp_table, 2)) {
+            if (is_regular_win_recursively(temp_table, 2)) {
                 if (waiting_table != nullptr) {  // 获取听牌张，听组合龙缺的一张
                     (*waiting_table)[missing_tiles[0]] = true;
                 }
@@ -853,7 +853,7 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
             }
         }
         else {
-            if (is_basic_form_win_recursively(temp_table, 5)) {
+            if (is_regular_win_recursively(temp_table, 5)) {
                 if (waiting_table != nullptr) {  // 获取听牌张，听组合龙缺的一张
                     (*waiting_table)[missing_tiles[0]] = true;
                 }
@@ -863,10 +863,10 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
     }
     else if (missing_cnt == 0) {  // 如果组合龙齐了，那么除去组合龙之后的牌要能听，整手牌才能听
         if (left_cnt == 10) {
-            return is_basic_form_wait_1(temp_table, waiting_table);
+            return is_regular_wait_1(temp_table, waiting_table);
         }
         else {
-            return is_basic_form_wait_recursively(temp_table, 4, waiting_table);
+            return is_regular_wait_recursively(temp_table, 4, waiting_table);
         }
     }
 
@@ -876,7 +876,7 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
 #ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
 
 // 基本和型包含主番的上听数，可用于计算三步高 三同顺 龙等三组面子的番种整个立牌的上听数
-static int basic_form_shanten_specified(const tile_table_t &cnt_table, const tile_t *main_tiles, int main_cnt,
+static int regular_shanten_specified(const tile_table_t &cnt_table, const tile_t *main_tiles, int main_cnt,
     intptr_t fixed_cnt, useful_table_t *useful_table) {
 
     tile_table_t temp_table;
@@ -908,7 +908,7 @@ static int basic_form_shanten_specified(const tile_table_t &cnt_table, const til
     }
 
     // 余下牌的上听数
-    int result = basic_form_shanten_from_table(temp_table, fixed_cnt + main_cnt / 3, useful_table);
+    int result = regular_shanten_from_table(temp_table, fixed_cnt + main_cnt / 3, useful_table);
 
     // 上听数=主番缺少的张数+余下牌的上听数
     return (main_cnt - exist_cnt) + result;
@@ -935,7 +935,7 @@ int knitted_straight_shanten(const tile_t *standing_tiles, intptr_t standing_cnt
         // 6种组合龙分别计算
         for (int i = 0; i < 6; ++i) {
             int fixed_cnt = (13 - static_cast<int>(standing_cnt)) / 3;
-            int st = basic_form_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt, &temp_table);
+            int st = regular_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt, &temp_table);
             if (st < ret) {  // 上听数小的，直接覆盖数据
                 ret = st;
                 memcpy(*useful_table, temp_table, sizeof(*useful_table));  // 直接覆盖原来的有效牌数据
@@ -950,7 +950,7 @@ int knitted_straight_shanten(const tile_t *standing_tiles, intptr_t standing_cnt
         // 6种组合龙分别计算
         for (int i = 0; i < 6; ++i) {
             int fixed_cnt = (13 - static_cast<int>(standing_cnt)) / 3;
-            int st = basic_form_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt, nullptr);
+            int st = regular_shanten_specified(cnt_table, standard_knitted_straight[i], 9, fixed_cnt, nullptr);
             if (st < ret) {
                 ret = st;
             }
@@ -1126,7 +1126,7 @@ bool is_waiting(const hand_tiles_t &hand_tiles, useful_table_t *useful_table) {
         }
     }
 
-    if (is_basic_form_wait(hand_tiles.standing_tiles, hand_tiles.tile_count, &table_basic)) {
+    if (is_regular_wait(hand_tiles.standing_tiles, hand_tiles.tile_count, &table_basic)) {
         basic_waiting = true;
     }
 
@@ -1155,8 +1155,8 @@ static bool enum_discard_tile_1(const hand_tiles_t *hand_tiles, tile_t discard_t
     void *context, enum_callback_t enum_callback) {
     enum_result_t result;
     result.discard_tile = discard_tile;
-    result.form_flag = FORM_FLAG_BASIC_FORM;
-    result.shanten = basic_form_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
+    result.form_flag = FORM_FLAG_REGULAR;
+    result.shanten = regular_shanten(hand_tiles->standing_tiles, hand_tiles->tile_count, &result.useful_table);
     if (result.shanten == 0 && result.useful_table[discard_tile]) {  // 0上听，并且打出的牌是有效牌，则修正为和了
         result.shanten = -1;
     }

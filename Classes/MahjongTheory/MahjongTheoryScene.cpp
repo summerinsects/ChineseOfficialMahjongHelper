@@ -396,7 +396,7 @@ void MahjongTheoryScene::parseInput(const char *input) {
 }
 
 void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
-    flag |= FORM_FLAG_BASIC_FORM;  // 基本和型不能被过滤掉
+    flag |= FORM_FLAG_REGULAR;  // 基本和型不能被过滤掉
 
     _resultSources.clear();
     _orderedIndices.clear();
@@ -485,7 +485,7 @@ void MahjongTheoryScene::filterResultsByFlag(uint8_t flag) {
 
 // 获取过滤标记
 uint8_t MahjongTheoryScene::getFilterFlag() const {
-    uint8_t flag = FORM_FLAG_BASIC_FORM;
+    uint8_t flag = FORM_FLAG_REGULAR;
     for (int i = 0; i < 4; ++i) {
         if (_checkBoxes[i]->isSelected()) {
             flag |= 1 << (i + 1);
@@ -729,7 +729,7 @@ static std::string getResultTypeString(uint8_t flag, int step) {
 #define APPEND_CAESURA_SIGN_IF_NECESSARY() \
     if (LIKELY(needCaesuraSign)) { str.append(__UTF8("、")); } needCaesuraSign = true
 
-    if (flag & FORM_FLAG_BASIC_FORM) {
+    if (flag & FORM_FLAG_REGULAR) {
         needCaesuraSign = true;
         str.append(__UTF8("基本和型"));
     }

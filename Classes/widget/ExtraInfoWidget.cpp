@@ -205,9 +205,9 @@ void ExtraInfoWidget::setFlowerCount(int cnt) {
 mahjong::win_flag_t ExtraInfoWidget::getWinFlag() const {
     mahjong::win_flag_t ret = WIN_FLAG_DISCARD;
     if (_winTypeGroup->getSelectedButtonIndex() == 1) ret |= WIN_FLAG_SELF_DRAWN;
-    if (_fourthTileBox->isEnabled() && _fourthTileBox->isSelected()) ret |= WIN_FLAG_4TH_TILE;
-    if (_robKongBox->isEnabled() && _robKongBox->isSelected()) ret |= WIN_FLAG_ABOUT_KONG;
-    if (_replacementBox->isEnabled() && _replacementBox->isSelected()) ret |= (WIN_FLAG_ABOUT_KONG | WIN_FLAG_SELF_DRAWN);
+    if (_fourthTileBox->isEnabled() && _fourthTileBox->isSelected()) ret |= WIN_FLAG_LAST_TILE;
+    if (_robKongBox->isEnabled() && _robKongBox->isSelected()) ret |= WIN_FLAG_KONG_INVOLVED;
+    if (_replacementBox->isEnabled() && _replacementBox->isSelected()) ret |= (WIN_FLAG_KONG_INVOLVED | WIN_FLAG_SELF_DRAWN);
     if (_lastTileBox->isEnabled() && _lastTileBox->isSelected()) ret |= WIN_FLAG_WALL_LAST;
     return ret;
 }
@@ -222,7 +222,7 @@ void ExtraInfoWidget::setWinFlag(mahjong::win_flag_t flag) {
         onLastTileBox(_lastTileBox, ui::CheckBox::EventType::SELECTED);
     }
 
-    if (flag & WIN_FLAG_ABOUT_KONG) {
+    if (flag & WIN_FLAG_KONG_INVOLVED) {
         if (flag & WIN_FLAG_SELF_DRAWN) {
             _replacementBox->setSelected(_hasKong);
         }
