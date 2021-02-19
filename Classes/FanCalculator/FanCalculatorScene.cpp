@@ -169,7 +169,7 @@ void FanCalculatorScene::calculate() {
         Toast::makeText(this, __UTF8("牌张数错误"), Toast::LENGTH_LONG)->show();
         return;
     }
-    if (fan == ERROR_TILE_COUNT_GREATER_THAN_4) {
+    if (fan == ERROR_TILE_MORE_THAN_4) {
         Toast::makeText(this, __UTF8("同一种牌最多只能使用4枚"), Toast::LENGTH_LONG)->show();
         return;
     }

@@ -538,7 +538,7 @@ const char *ExtraInfoWidget::parseInput(const char *input) {
     if (ret != 0) {
         switch (ret) {
             case ERROR_WRONG_TILES_COUNT: return __UTF8("牌张数错误");
-            case ERROR_TILE_COUNT_GREATER_THAN_4: return __UTF8("同一种牌最多只能使用4枚");
+            case ERROR_TILE_MORE_THAN_4: return __UTF8("同一种牌最多只能使用4枚");
             default: break;
         }
         return nullptr;

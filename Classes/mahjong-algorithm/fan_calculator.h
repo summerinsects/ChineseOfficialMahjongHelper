@@ -172,7 +172,7 @@ typedef uint8_t win_flag_t;
  * @{
  */
 #define ERROR_WRONG_TILES_COUNT -1              ///< 错误的张数
-#define ERROR_TILE_COUNT_GREATER_THAN_4 -2      ///< 某张牌出现超过4枚
+#define ERROR_TILE_MORE_THAN_4 -2               ///< 某张牌出现超过4枚
 #define ERROR_NOT_WIN -3                        ///< 没和牌
 /**
  * @}
