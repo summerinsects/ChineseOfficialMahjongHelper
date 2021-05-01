@@ -124,85 +124,6 @@ intptr_t table_to_tiles(const tile_table_t &cnt_table, tile_t *tiles, intptr_t m
     return cnt;
 }
 
-namespace {
-
-    // 路径单元，单元有面子、雀头、搭子等种类，见下面的宏
-    // 高8位表示类型，低8位表示牌
-    // 对于顺子和顺子搭子，牌指的是最小的一张牌，
-    // 例如在顺子123万中，牌为1万，在两面搭子45条中，牌为4条等等
-    typedef uint16_t path_unit_t;
-
-#define UNIT_TYPE_CHOW 1                // 顺子
-#define UNIT_TYPE_PUNG 2                // 刻子
-#define UNIT_TYPE_PAIR 4                // 雀头
-#define UNIT_TYPE_CHOW_OPEN_END 5       // 两面或者边张搭子
-#define UNIT_TYPE_CHOW_CLOSED 6         // 嵌张搭子
-#define UNIT_TYPE_INCOMPLETE_PUNG 7     // 刻子搭子
-
-#define MAKE_UNIT(type_, tile_) static_cast<path_unit_t>(((type_) << 8) | (tile_))
-#define UNIT_TYPE(unit_) (((unit_) >> 8) & 0xFF)
-#define UNIT_TILE(unit_) ((unit_) & 0xFF)
-
-#define MAX_STATE 512
-#define UNIT_SIZE 7
-
-    // 一条路径
-    struct work_path_t {
-        path_unit_t units[UNIT_SIZE];  // 14/2=7最多7个搭子
-        uint16_t depth;  // 当前路径深度
-    };
-
-    // 当前工作状态
-    struct work_state_t {
-        work_path_t paths[MAX_STATE];  // 所有路径
-        intptr_t count;  // 路径数量
-    };
-}
-
-// 路径是否来过了
-static bool is_regular_branch_exist(const intptr_t fixed_cnt, const work_path_t *work_path, const work_state_t *work_state) {
-    if (work_state->count <= 0 || work_path->depth == 0) {
-        return false;
-    }
-
-    // depth处有信息，所以按stl风格的end应该要+1
-    const uint16_t depth = static_cast<uint16_t>(work_path->depth + 1);
-
-    // std::includes要求有序，但又不能破坏当前数据
-    work_path_t temp;
-    std::copy(&work_path->units[fixed_cnt], &work_path->units[depth], &temp.units[fixed_cnt]);
-    std::sort(&temp.units[fixed_cnt], &temp.units[depth]);
-
-    return std::any_of(&work_state->paths[0], &work_state->paths[work_state->count],
-        [&temp, fixed_cnt, depth](const work_path_t &path) {
-        return std::includes(&path.units[fixed_cnt], &path.units[path.depth], &temp.units[fixed_cnt], &temp.units[depth]);
-    });
-}
-
-// 保存路径
-static void save_work_path(const intptr_t fixed_cnt, const work_path_t *work_path, work_state_t *work_state) {
-    // 复制一份数据，不破坏当前数据
-    work_path_t temp;
-    temp.depth = work_path->depth;
-    std::copy(&work_path->units[fixed_cnt], &work_path->units[temp.depth + 1], &temp.units[fixed_cnt]);
-    std::sort(&temp.units[fixed_cnt], &temp.units[temp.depth + 1]);
-
-    // 判断是否重复
-    if (std::none_of(&work_state->paths[0], &work_state->paths[work_state->count],
-        [&temp, fixed_cnt](const work_path_t &path) {
-        return (path.depth == temp.depth && std::equal(&path.units[fixed_cnt], &path.units[path.depth + 1], &temp.units[fixed_cnt]));
-    })) {
-        if (work_state->count < MAX_STATE) {
-            work_path_t &path = work_state->paths[work_state->count++];
-            path.depth = temp.depth;
-            std::copy(&temp.units[fixed_cnt], &temp.units[temp.depth + 1], &path.units[fixed_cnt]);
-        }
-        else {
-            assert(0 && "too many state!");
-        }
-    }
-}
-
 #ifdef MAHJONG_ALGORITHM_ENABLE_SHANTEN
 
 // 递归计算基本和型上听数
@@ -210,13 +131,10 @@ static void save_work_path(const intptr_t fixed_cnt, const work_path_t *work_pat
 //   cnt_table牌表
 //   has_pair是否有雀头
 //   pack_cnt完成的面子数
-//   incomplete_cnt搭子数
-// 最后三个参数为优化性能用的，
-// work_path保存当前正在计算的路径，
-// work_state保存了所有已经计算过的路径，
+//   partner_cnt搭子数
 // 从0到fixed_cnt的数据是不使用的，这些保留给了副露的面子
-static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_pair, const unsigned pack_cnt, const unsigned incomplete_cnt,
-    const intptr_t fixed_cnt, work_path_t *work_path, work_state_t *work_state) {
+static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_pair, const unsigned pack_cnt, const unsigned partner_cnt,
+    const intptr_t fixed_cnt, eigen_t pack_eigen, eigen_t partner_eigen) {
     if (fixed_cnt == 4) {  // 4副露
         for (int i = 0; i < 34; ++i) {
             tile_t t = all_tiles[i];
@@ -237,11 +155,11 @@ static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_p
     // 缺少的面子数=4-完成的面子数
     // 缺少的搭子数=缺少的面子数-已有的搭子数
     // 两式合并：缺少的搭子数=4-完成的面子数-已有的搭子数
-    int incomplete_need = 4 - pack_cnt - incomplete_cnt;
-    if (incomplete_need > 0) {  // 还需要搭子的情况
+    int partner_need = 4 - pack_cnt - partner_cnt;
+    if (partner_need > 0) {  // 还需要搭子的情况
         // 有雀头时，上听数=已有的搭子数+缺少的搭子数*2-1
         // 无雀头时，上听数=已有的搭子数+缺少的搭子数*2
-        max_ret = incomplete_cnt + incomplete_need * 2 - (has_pair ? 1 : 0);
+        max_ret = partner_cnt + partner_need * 2 - (has_pair ? 1 : 0);
     }
     else {  // 搭子齐了的情况
         // 有雀头时，上听数=3-完成的面子数
@@ -249,14 +167,9 @@ static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_p
         max_ret = (has_pair ? 3 : 4) - pack_cnt;
     }
 
-    // 当前路径深度
-    const unsigned depth = pack_cnt + incomplete_cnt + has_pair;
-    work_path->depth = static_cast<uint16_t>(depth);
-
     int result = max_ret;
 
-    if (pack_cnt + incomplete_cnt > 4) {  // 搭子超载
-        save_work_path(fixed_cnt, work_path, work_state);
+    if (pack_cnt + partner_cnt > 4) {  // 搭子超载
         return max_ret;
     }
 
@@ -268,26 +181,24 @@ static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_p
 
         // 雀头
         if (!has_pair && cnt_table[t] > 1) {
-            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PAIR, t);  // 记录雀头
-            if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
-                // 削减雀头，递归
-                cnt_table[t] -= 2;
-                int ret = regular_shanten_recursively(cnt_table, true, pack_cnt, incomplete_cnt,
-                    fixed_cnt, work_path, work_state);
-                result = std::min(ret, result);
-                // 还原
-                cnt_table[t] += 2;
-            }
+            // 削减雀头，递归
+            cnt_table[t] -= 2;
+            int ret = regular_shanten_recursively(cnt_table, true, pack_cnt, partner_cnt,
+                fixed_cnt, pack_eigen, partner_eigen);
+            result = std::min(ret, result);
+            // 还原
+            cnt_table[t] += 2;
         }
 
         // 刻子
         if (cnt_table[t] > 2) {
-            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_PUNG, t);  // 记录刻子
-            if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
+            // 如果当前刻子特征值小于上一组，说明这条路径已经来过了
+            eigen_t eigen = make_eigen(t, t, t);
+            if (eigen > pack_eigen) {
                 // 削减这组刻子，递归
                 cnt_table[t] -= 3;
-                int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
-                    fixed_cnt, work_path, work_state);
+                int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, partner_cnt,
+                    fixed_cnt, eigen, partner_eigen);
                 result = std::min(ret, result);
                 // 还原
                 cnt_table[t] += 3;
@@ -298,14 +209,15 @@ static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_p
         bool is_numbered = is_numbered_suit(t);
         // 顺子t t+1 t+2，显然t不能是8点以上的数牌
         if (is_numbered && tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW, t);  // 记录顺子
-            if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
+            // 如果当前顺子特征值小于上一组，说明这条路径已经来过了
+            eigen_t eigen = make_eigen(t, t + 1, t + 2);
+            if (eigen >= pack_eigen) {
                 // 削减这组顺子，递归
                 --cnt_table[t];
                 --cnt_table[t + 1];
                 --cnt_table[t + 2];
-                int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, incomplete_cnt,
-                    fixed_cnt, work_path, work_state);
+                int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt + 1, partner_cnt,
+                    fixed_cnt, eigen, partner_eigen);
                 result = std::min(ret, result);
                 // 还原
                 ++cnt_table[t];
@@ -321,12 +233,13 @@ static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_p
 
         // 刻子搭子
         if (cnt_table[t] > 1) {
-            work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_INCOMPLETE_PUNG, t);  // 记录刻子搭子
-            if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
+            // 如果当前刻子搭子特征值小于上一组，说明这条路径已经来过了
+            eigen_t eigen = make_eigen(t, t, 0);
+            if (eigen > partner_eigen) {
                 // 削减刻子搭子，递归
                 cnt_table[t] -= 2;
-                int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
-                    fixed_cnt, work_path, work_state);
+                int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt, partner_cnt + 1,
+                    fixed_cnt, pack_eigen, eigen);
                 result = std::min(ret, result);
                 // 还原
                 cnt_table[t] += 2;
@@ -337,13 +250,14 @@ static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_p
         if (is_numbered) {
             // 两面或者边张搭子t t+1，显然t不能是9点以上的数牌
             if (tile_get_rank(t) < 9 && cnt_table[t + 1]) {  // 两面或者边张
-                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_OPEN_END, t);  // 记录两面或者边张搭子
-                if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
+                // 如果当前顺子搭子特征值小于上一组，说明这条路径已经来过了
+                eigen_t eigen = make_eigen(t, t + 1, 0);
+                if (eigen >= partner_eigen) {
                     // 削减搭子，递归
                     --cnt_table[t];
                     --cnt_table[t + 1];
-                    int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
-                        fixed_cnt, work_path, work_state);
+                    int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt, partner_cnt + 1,
+                        fixed_cnt, pack_eigen, eigen);
                     result = std::min(ret, result);
                     // 还原
                     ++cnt_table[t];
@@ -352,13 +266,14 @@ static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_p
             }
             // 嵌张搭子t t+2，显然t不能是8点以上的数牌
             if (tile_get_rank(t) < 8 && cnt_table[t + 2]) {  // 嵌张
-                work_path->units[depth] = MAKE_UNIT(UNIT_TYPE_CHOW_CLOSED, t);  // 记录嵌张搭子
-                if (!is_regular_branch_exist(fixed_cnt, work_path, work_state)) {
+                // 如果当前顺子搭子特征值小于上一组，说明这条路径已经来过了
+                eigen_t eigen = make_eigen(t, t + 2, 0);
+                if (eigen >= partner_eigen) {
                     // 削减搭子，递归
                     --cnt_table[t];
                     --cnt_table[t + 2];
-                    int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt, incomplete_cnt + 1,
-                        fixed_cnt, work_path, work_state);
+                    int ret = regular_shanten_recursively(cnt_table, has_pair, pack_cnt, partner_cnt + 1,
+                        fixed_cnt, pack_eigen, eigen);
                     result = std::min(ret, result);
                     // 还原
                     ++cnt_table[t];
@@ -368,15 +283,11 @@ static int regular_shanten_recursively(tile_table_t &cnt_table, const bool has_p
         }
     }
 
-    if (result == max_ret) {
-        save_work_path(fixed_cnt, work_path, work_state);
-    }
-
     return result;
 }
 
 // 数牌是否有搭子
-static bool numbered_tile_has_neighbor(const tile_table_t &cnt_table, tile_t t) {
+static bool numbered_tile_has_partner(const tile_table_t &cnt_table, tile_t t) {
     rank_t r = tile_get_rank(t);
     if (r < 9) { if (cnt_table[t + 1]) return true; }
     if (r < 8) { if (cnt_table[t + 2]) return true; }
@@ -388,11 +299,8 @@ static bool numbered_tile_has_neighbor(const tile_table_t &cnt_table, tile_t t) 
 // 以表格为参数计算基本和型上听数
 static int regular_shanten_from_table(tile_table_t &cnt_table, intptr_t fixed_cnt, useful_table_t *useful_table) {
     // 计算上听数
-    work_path_t work_path;
-    work_state_t work_state;
-    work_state.count = 0;
     int result = regular_shanten_recursively(cnt_table, false, static_cast<uint16_t>(fixed_cnt), 0,
-        fixed_cnt, &work_path, &work_state);
+        fixed_cnt, 0, 0);
 
     if (useful_table == nullptr) {
         return result;
@@ -407,15 +315,14 @@ static int regular_shanten_from_table(tile_table_t &cnt_table, intptr_t fixed_cn
 
         if (cnt_table[t] == 0) {
             // 跳过孤张字牌和不靠张的数牌，这些牌都无法减少上听数
-            if (is_honor(t) || !numbered_tile_has_neighbor(cnt_table, t)) {
+            if (is_honor(t) || !numbered_tile_has_partner(cnt_table, t)) {
                 continue;
             }
         }
 
         ++cnt_table[t];
-        work_state.count = 0;
         int temp = regular_shanten_recursively(cnt_table, false, static_cast<uint16_t>(fixed_cnt), 0,
-            fixed_cnt, &work_path, &work_state);
+            fixed_cnt, 0, 0);
         if (temp < result) {
             (*useful_table)[t] = true;  // 标记为有效牌
         }
@@ -538,7 +445,7 @@ static bool is_regular_wait_4(tile_table_t &cnt_table, useful_table_t *waiting_t
 }
 
 // 递归计算基本和型是否听牌
-static bool is_regular_wait_recursively(tile_table_t &cnt_table, intptr_t left_cnt, useful_table_t *waiting_table) {
+static bool is_regular_wait_recursively(tile_table_t &cnt_table, intptr_t left_cnt, eigen_t prev_eigen, useful_table_t *waiting_table) {
     if (left_cnt == 1) {
         return is_regular_wait_1(cnt_table, waiting_table);
     }
@@ -559,15 +466,19 @@ static bool is_regular_wait_recursively(tile_table_t &cnt_table, intptr_t left_c
 
         // 刻子
         if (cnt_table[t] > 2) {
-            // 削减这组刻子，递归
-            cnt_table[t] -= 3;
-            if (is_regular_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
-                ret = true;
-            }
-            // 还原
-            cnt_table[t] += 3;
-            if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
-                return true;
+            // 如果当前刻子特征值小于上一组，说明这条路径已经来过了
+            eigen_t eigen = make_eigen(t, t, t);
+            if (eigen > prev_eigen) {
+                // 削减这组刻子，递归
+                cnt_table[t] -= 3;
+                if (is_regular_wait_recursively(cnt_table, left_cnt - 3, eigen, waiting_table)) {
+                    ret = true;
+                }
+                // 还原
+                cnt_table[t] += 3;
+                if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
+                    return true;
+                }
             }
         }
 
@@ -575,19 +486,23 @@ static bool is_regular_wait_recursively(tile_table_t &cnt_table, intptr_t left_c
         if (is_numbered_suit(t)) {
             // 顺子t t+1 t+2，显然t不能是8点以上的数牌
             if (tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-                // 削减这组顺子，递归
-                --cnt_table[t];
-                --cnt_table[t + 1];
-                --cnt_table[t + 2];
-                if (is_regular_wait_recursively(cnt_table, left_cnt - 3, waiting_table)) {
-                    ret = true;
-                }
-                // 还原
-                ++cnt_table[t];
-                ++cnt_table[t + 1];
-                ++cnt_table[t + 2];
-                if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
-                    return true;
+                // 如果当前顺子特征值小于上一组，说明这条路径已经来过了
+                eigen_t eigen = make_eigen(t, t + 1, t + 2);
+                if (eigen >= prev_eigen) {
+                    // 削减这组顺子，递归
+                    --cnt_table[t];
+                    --cnt_table[t + 1];
+                    --cnt_table[t + 2];
+                    if (is_regular_wait_recursively(cnt_table, left_cnt - 3, eigen, waiting_table)) {
+                        ret = true;
+                    }
+                    // 还原
+                    ++cnt_table[t];
+                    ++cnt_table[t + 1];
+                    ++cnt_table[t + 2];
+                    if (ret && waiting_table == nullptr) {  // 不需要获取听牌张，则可以直接结束递归
+                        return true;
+                    }
                 }
             }
         }
@@ -607,7 +522,7 @@ bool is_regular_wait(const tile_t *standing_tiles, intptr_t standing_cnt, useful
     if (waiting_table != nullptr) {
         memset(*waiting_table, 0, sizeof(*waiting_table));
     }
-    return is_regular_wait_recursively(cnt_table, standing_cnt, waiting_table);
+    return is_regular_wait_recursively(cnt_table, standing_cnt, 0, waiting_table);
 }
 
 // 基本和型2张能否和牌
@@ -626,7 +541,7 @@ static bool is_regular_win_2(const tile_table_t &cnt_table) {
 // 递归计算基本和型是否和牌
 // 这里之所以不用直接调用上听数计算函数，判断其返回值为-1的方式，
 // 是因为前者会削减搭子，这个操作在和牌判断中是没必要的，所以单独写一套更快逻辑
-static bool is_regular_win_recursively(tile_table_t &cnt_table, intptr_t left_cnt) {
+static bool is_regular_win_recursively(tile_table_t &cnt_table, intptr_t left_cnt, eigen_t prev_eigen) {
     if (left_cnt == 2) {
         return is_regular_win_2(cnt_table);
     }
@@ -639,13 +554,17 @@ static bool is_regular_win_recursively(tile_table_t &cnt_table, intptr_t left_cn
 
         // 刻子
         if (cnt_table[t] > 2) {
-            // 削减这组刻子，递归
-            cnt_table[t] -= 3;
-            bool ret = is_regular_win_recursively(cnt_table, left_cnt - 3);
-            // 还原
-            cnt_table[t] += 3;
-            if (ret) {
-                return true;
+            // 如果当前刻子特征值小于上一组，说明这条路径已经来过了
+            eigen_t eigen = make_eigen(t, t, t);
+                if (eigen > prev_eigen) {
+                // 削减这组刻子，递归
+                cnt_table[t] -= 3;
+                bool ret = is_regular_win_recursively(cnt_table, left_cnt - 3, eigen);
+                // 还原
+                cnt_table[t] += 3;
+                if (ret) {
+                    return true;
+                }
             }
         }
 
@@ -653,17 +572,21 @@ static bool is_regular_win_recursively(tile_table_t &cnt_table, intptr_t left_cn
         if (is_numbered_suit(t)) {
             // 顺子t t+1 t+2，显然t不能是8点以上的数牌
             if (tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-                // 削减这组顺子，递归
-                --cnt_table[t];
-                --cnt_table[t + 1];
-                --cnt_table[t + 2];
-                bool ret = is_regular_win_recursively(cnt_table, left_cnt - 3);
-                // 还原
-                ++cnt_table[t];
-                ++cnt_table[t + 1];
-                ++cnt_table[t + 2];
-                if (ret) {
-                    return true;
+                // 如果当前顺子特征值小于上一组，说明这条路径已经来过了
+                eigen_t eigen = make_eigen(t, t + 1, t + 2);
+                if (eigen >= prev_eigen) {
+                    // 削减这组顺子，递归
+                    --cnt_table[t];
+                    --cnt_table[t + 1];
+                    --cnt_table[t + 2];
+                    bool ret = is_regular_win_recursively(cnt_table, left_cnt - 3, eigen);
+                    // 还原
+                    ++cnt_table[t];
+                    ++cnt_table[t + 1];
+                    ++cnt_table[t + 2];
+                    if (ret) {
+                        return true;
+                    }
                 }
             }
         }
@@ -678,7 +601,7 @@ bool is_regular_win(const tile_t *standing_tiles, intptr_t standing_cnt, tile_t 
     tile_table_t cnt_table;
     map_tiles(standing_tiles, standing_cnt, &cnt_table);
     ++cnt_table[test_tile];  // 添加测试的牌
-    return is_regular_win_recursively(cnt_table, standing_cnt + 1);
+    return is_regular_win_recursively(cnt_table, standing_cnt + 1, 0);
 }
 
 //-------------------------------- 七对 --------------------------------
@@ -845,7 +768,7 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
 
     if (missing_cnt == 1) {  // 如果缺一张，那么除去组合龙之后的牌应该是完成状态才能听牌
         if (left_cnt == 10) {
-            if (is_regular_win_recursively(temp_table, 2)) {
+            if (is_regular_win_recursively(temp_table, 2, 0)) {
                 if (waiting_table != nullptr) {  // 获取听牌张，听组合龙缺的一张
                     (*waiting_table)[missing_tiles[0]] = true;
                 }
@@ -853,7 +776,7 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
             }
         }
         else {
-            if (is_regular_win_recursively(temp_table, 5)) {
+            if (is_regular_win_recursively(temp_table, 5, 0)) {
                 if (waiting_table != nullptr) {  // 获取听牌张，听组合龙缺的一张
                     (*waiting_table)[missing_tiles[0]] = true;
                 }
@@ -866,7 +789,7 @@ static bool is_knitted_straight_wait_from_table(const tile_table_t &cnt_table, i
             return is_regular_wait_1(temp_table, waiting_table);
         }
         else {
-            return is_regular_wait_recursively(temp_table, 4, waiting_table);
+            return is_regular_wait_recursively(temp_table, 4, 0, waiting_table);
         }
     }
 

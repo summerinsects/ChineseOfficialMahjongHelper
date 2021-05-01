@@ -136,28 +136,8 @@ static bool divide_tail(tile_table_t &cnt_table, intptr_t fixed_cnt, division_t 
     return false;
 }
 
-// 判断一条划分分支是否来过
-static bool is_division_branch_exist(intptr_t fixed_cnt, intptr_t step, const division_t *work_division, const division_result_t *result) {
-    // 没有划分时，以及划分步骤小于3时，不检测，因为至少要有3步递归才会产生不同划分
-    if (result->count <= 0 || step < 3) {
-        return false;
-    }
-
-    // std::includes要求有序
-    // 这里不能直接在work_division->packs上排序，否则会破坏递归外层的数据
-    division_t temp;
-    memcpy(&temp.packs[fixed_cnt], &work_division->packs[fixed_cnt], step * sizeof(pack_t));
-    std::sort(&temp.packs[fixed_cnt], &temp.packs[fixed_cnt + step]);
-
-    // 只需要比较面子是否重复分支，雀头不参与比较，所以下标是4
-    return std::any_of(&result->divisions[0], &result->divisions[result->count],
-        [&temp, fixed_cnt, step](const division_t &od) {
-        return std::includes(&od.packs[fixed_cnt], &od.packs[4], &temp.packs[fixed_cnt], &temp.packs[fixed_cnt + step]);
-    });
-}
-
 // 递归划分
-static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intptr_t step, division_t *work_division, division_result_t *result) {
+static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intptr_t step, eigen_t prev_eigen, division_t *work_division, division_result_t *result) {
     const intptr_t idx = step + fixed_cnt;
     if (idx == 4) {  // 4组面子都有了
         return divide_tail(cnt_table, fixed_cnt, work_division, result);
@@ -174,11 +154,13 @@ static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intp
 
         // 刻子
         if (cnt_table[t] > 2) {
-            work_division->packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);  // 记录刻子
-            if (!is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
+            // 如果当前刻子特征值小于上一组，说明这条路径已经来过了
+            eigen_t eigen = make_eigen(t, t, t);
+            if (eigen > prev_eigen) {
+                work_division->packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);  // 记录刻子
                 // 削减这组刻子，递归
                 cnt_table[t] -= 3;
-                if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
+                if (divide_recursively(cnt_table, fixed_cnt, step + 1, eigen, work_division, result)) {
                     ret = true;
                 }
                 // 还原
@@ -189,13 +171,15 @@ static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intp
         // 顺子（只能是数牌）
         if (is_numbered_suit(t)) {
             if (tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
-                work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, static_cast<tile_t>(t + 1));  // 记录顺子
-                if (!is_division_branch_exist(fixed_cnt, step + 1, work_division, result)) {
+                // 如果当前顺子特征值小于上一组，说明这条路径已经来过了
+                eigen_t eigen = make_eigen(t, t + 1, t + 2);
+                if (eigen >= prev_eigen) {
+                    work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, static_cast<tile_t>(t + 1));  // 记录顺子
                     // 削减这组顺子，递归
                     --cnt_table[t];
                     --cnt_table[t + 1];
                     --cnt_table[t + 2];
-                    if (divide_recursively(cnt_table, fixed_cnt, step + 1, work_division, result)) {
+                    if (divide_recursively(cnt_table, fixed_cnt, step + 1, eigen, work_division, result)) {
                         ret = true;
                     }
                     // 还原
@@ -223,7 +207,7 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
     // 复制副露的面子
     division_t work_division;
     memcpy(work_division.packs, fixed_packs, fixed_cnt * sizeof(pack_t));
-    return divide_recursively(cnt_table, fixed_cnt, 0, &work_division, result);
+    return divide_recursively(cnt_table, fixed_cnt, 0, 0, &work_division, result);
 }
 
 //-------------------------------- 算番 --------------------------------
@@ -1798,7 +1782,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     if (fixed_cnt == 1) {
         work_division.packs[3] = fixed_packs[0];
     }
-    divide_recursively(cnt_table, fixed_cnt + 3, 0, &work_division, &result);
+    divide_recursively(cnt_table, fixed_cnt + 3, 0, 0, &work_division, &result);
     if (result.count != 1) {
         return false;
     }

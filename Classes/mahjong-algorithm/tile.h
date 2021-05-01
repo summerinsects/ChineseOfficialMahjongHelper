@@ -290,6 +290,12 @@ struct hand_tiles_t {
     intptr_t tile_count;        ///< 立牌数
 };
 
+// 牌组的特征值，用该值判断一种划分是否已经来过
+typedef uint32_t eigen_t;
+
+static FORCE_INLINE eigen_t make_eigen(tile_t t1, tile_t t2, tile_t t3) {
+    return (static_cast<eigen_t>(t1) << 16 | static_cast<eigen_t>(t2) << 8 | t3);
+}
 
 /**
  * @brief 判断是否为绿一色构成牌
