@@ -25,10 +25,6 @@ bool HelloWorld::init() {
         return false;
     }
 
-    UserDefault::getInstance()->deleteValueForKey("night_mode");
-    UserDefault::getInstance()->deleteValueForKey("notify_tomorrow");
-    UserDefault::getInstance()->deleteValueForKey("has_new_version");
-
     LayerColor *background = LayerColor::create(COLOR4B_BG);
     this->addChild(background, -100);
 
