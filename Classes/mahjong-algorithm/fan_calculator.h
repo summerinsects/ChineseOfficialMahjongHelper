@@ -218,12 +218,25 @@ typedef uint16_t fan_table_t[FAN_TABLE_SIZE];
  */
 int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table);
 
+// unused
+#ifndef UNUSED
+#if __cplusplus >= 201703L
+#define UNUSED [[maybe_unused]]
+#else
+#if defined(__GNUC__)
+#define UNUSED __attribute__((__unused__))
+#else
+#define UNUSED
+#endif
+#endif
+#endif
+
 #if 0
 
 /**
  * @brief 番名（英文）
  */
-static const char *fan_name[] = {
+UNUSED static const char *fan_name[] = {
     "None",
     "Big Four Winds", "Big Three Dragons", "All Green", "Nine Gates", "Four Kongs", "Seven Shifted Pairs", "Thirteen Orphans",
     "All Terminals", "Little Four Winds", "Little Three Dragons", "All Honors", "Four Concealed Pungs", "Pure Terminal Chows",
@@ -267,7 +280,7 @@ static const char *fan_name[] = {
 /**
  * @brief 番名（简体中文）
  */
-static const char *fan_name[] = {
+UNUSED static const char *fan_name[] = {
     __UTF8("无"),
     __UTF8("大四喜"), __UTF8("大三元"), __UTF8("绿一色"), __UTF8("九莲宝灯"), __UTF8("四杠"), __UTF8("连七对"), __UTF8("十三幺"),
     __UTF8("清幺九"), __UTF8("小四喜"), __UTF8("小三元"), __UTF8("字一色"), __UTF8("四暗刻"), __UTF8("一色双龙会"),
