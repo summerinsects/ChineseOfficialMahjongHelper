@@ -191,8 +191,10 @@ bool LeftSideMenu::init(cocos2d::Scene *scene) {
 
     static const std::pair<const char *, void (LeftSideMenu::*)(Ref *)> menuItems[] = {
         { __UTF8("设置"), &LeftSideMenu::onSettingButton },
+#if 0
         { __UTF8("分享下载"), &LeftSideMenu::onSharedButton },
         { __UTF8("捐赠"), &LeftSideMenu::onDonationButton },
+#endif
         { __UTF8("更新日志"), &LeftSideMenu::onUpdateLogButton },
         { __UTF8("版本检测"), &LeftSideMenu::onVersionCheckButton },
         { __UTF8("退出"), &LeftSideMenu::onExitButton },
@@ -257,6 +259,7 @@ void LeftSideMenu::onSettingButton(cocos2d::Ref *) {
     Director::getInstance()->pushScene(SettingScene::create());
 }
 
+#if 0
 static void showQRCodeAlertDialog(Scene *scene, Texture2D *texture) {
     Node *rootNode = Node::create();
 
@@ -350,6 +353,7 @@ void LeftSideMenu::onSharedButton(cocos2d::Ref *) {
 void LeftSideMenu::onDonationButton(cocos2d::Ref *) {
     Application::getInstance()->openURL("https://gitee.com/summerinsects/ChineseOfficialMahjongHelper?donate=true&&skip_mobile=true");
 }
+#endif
 
 static void showChangeLog(const std::string &str) {
     Director::getInstance()->pushScene(

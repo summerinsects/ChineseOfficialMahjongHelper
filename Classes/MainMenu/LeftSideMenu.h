@@ -26,8 +26,10 @@ private:
     cocos2d::Scene *_scene = nullptr;
 
     void onSettingButton(cocos2d::Ref *sender);
+#if 0
     void onSharedButton(cocos2d::Ref *sender);
     void onDonationButton(cocos2d::Ref *sender);
+#endif
     void onUpdateLogButton(cocos2d::Ref *sender);
     void onVersionCheckButton(cocos2d::Ref *sender);
     void onExitButton(cocos2d::Ref *sender);
