@@ -107,15 +107,8 @@
 }
 
 // Controls the application's preferred home indicator auto-hiding when this view controller is shown.
-// (better use preferredScreenEdgesDeferringSystemGestures for controlling the home indicator)
 - (BOOL)prefersHomeIndicatorAutoHidden {
     return NO;
-}
-
-// HOME Indicator need to be tapped twice 
--(UIRectEdge)preferredScreenEdgesDeferringSystemGestures
-{
-    return UIRectEdgeBottom; 
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
