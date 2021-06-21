@@ -13,7 +13,7 @@ bool CommonWebViewScene::init(const char *title, const std::string &content, Com
     const float height = visibleSize.height - 40.0f;
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS) && !defined(CC_PLATFORM_OS_TVOS)
-    experimental::ui::WebView *webView = experimental::ui::WebView::create();
+    ui::WebView *webView = ui::WebView::create();
     webView->setContentSize(Size(visibleSize.width, height));
     webView->setBackgroundTransparent();
     switch (type) {

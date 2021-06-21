@@ -266,7 +266,6 @@ namespace cw {
         using cocos2d::ui::ScrollView::removeAllChildrenWithCleanup;
         using cocos2d::ui::ScrollView::removeChild;
 
-        using cocos2d::ui::ScrollView::addEventListenerScrollView;
         using cocos2d::ui::ScrollView::addEventListener;
     };
 }

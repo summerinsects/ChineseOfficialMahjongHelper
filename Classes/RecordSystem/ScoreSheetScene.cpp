@@ -567,7 +567,7 @@ void ScoreSheetScene::refreshEndTime() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     cw::scaleLabelToFitWidth(_timeLabel, visibleSize.width - 10.0f);
 
-    this->unschedule(schedule_selector(ScoreSheetScene::onTimeScheduler));
+    this->unschedule(CC_SCHEDULE_SELECTOR(ScoreSheetScene::onTimeScheduler));
 }
 
 void ScoreSheetScene::recover() {
@@ -592,7 +592,7 @@ void ScoreSheetScene::recover() {
         memcpy(_record.name, name, sizeof(name)); // 恢复名字
         strncpy(_record.title, title, TITLE_SIZE - 1);  // 恢复标题
         onTimeScheduler(0.0f);
-        this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
+        this->schedule(CC_SCHEDULE_SELECTOR(ScoreSheetScene::onTimeScheduler), 1.0f);
         return;
     }
 
@@ -639,7 +639,7 @@ void ScoreSheetScene::recover() {
         _recordButton[currentIdx]->setVisible(true);
 
         onTimeScheduler(0.0f);
-        this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
+        this->schedule(CC_SCHEDULE_SELECTOR(ScoreSheetScene::onTimeScheduler), 1.0f);
     }
     else {
         _finishButton->setVisible(false);
@@ -673,7 +673,7 @@ void ScoreSheetScene::reset() {
     _startButton->setVisible(true);
     _finishButton->setVisible(false);
     onTimeScheduler(0.0f);
-    this->schedule(schedule_selector(ScoreSheetScene::onTimeScheduler), 1.0f);
+    this->schedule(CC_SCHEDULE_SELECTOR(ScoreSheetScene::onTimeScheduler), 1.0f);
 
     for (unsigned i = 0; i < 16; ++i) {
         cleanRow(i);

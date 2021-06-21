@@ -205,3 +205,5 @@ project.properties
 /proj.android/app/build.xml
 /proj.android/app/proguard-project.txt
 *.apk
+win32-build/
+ios-build/

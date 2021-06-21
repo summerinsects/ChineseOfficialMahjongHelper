@@ -2,6 +2,8 @@
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 
+#include <UIKit/UIKit.h>
+
 namespace cw {
 
 std::string getClipboardText() {
