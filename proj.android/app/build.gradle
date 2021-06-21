@@ -6,11 +6,11 @@ android {
     compileSdkVersion PROP_COMPILE_SDK_VERSION.toInteger()
 
     defaultConfig {
-        applicationId "org.cocos2dx.ChineseOfficialMahjongHelper"
+        applicationId "xyz.tziakcha.ChineseOfficialMahjongHelper"
         minSdkVersion PROP_MIN_SDK_VERSION
         targetSdkVersion PROP_TARGET_SDK_VERSION
-        versionCode 34
-        versionName "1.4.1.1"
+        versionCode 35
+        versionName "1.5.0.0"
 
         externalNativeBuild {
             cmake {

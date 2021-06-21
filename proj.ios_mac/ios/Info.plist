@@ -11,19 +11,19 @@
     <key>CFBundleIconFile</key>
     <string>Icon-57.png</string>
     <key>CFBundleIdentifier</key>
-    <string>com.cocos2dx.${PRODUCT_NAME}</string>
+    <string>xyz.tziakcha.${PRODUCT_NAME}</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
     <string>${PRODUCT_NAME}</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.4.1.1</string>
+    <string>1.5.0.0</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleVersion</key>
-    <string>1.4.1.1</string>
+    <string>1.5.0.0</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>UIAppFonts</key>
