@@ -540,7 +540,9 @@ bool LeftSideMenu::_checkVersion(cocos2d::Scene *scene, bool manual, const std::
             .setCloseOnTouchOutside(false)
             .setNegativeButton(__UTF8("取消"), nullptr)
             .setPositiveButton(__UTF8("更新"), [](AlertDialog *, int) {
+#if 0
                 Application::getInstance()->openURL(DOWNLOAD_URL);
+#endif
                 return true;
             })
             .create()->show();

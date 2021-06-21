@@ -66,5 +66,5 @@ void OtherScene::onTipsButton(cocos2d::Ref *) {
 
 void OtherScene::onRecreationsButton(cocos2d::Ref *) {
     Director::getInstance()->pushScene(
-        CommonWebViewScene::create(__UTF8("娱乐消遣"), "http://47.106.11.65/recreations/almanac.html", CommonWebViewScene::ContentType::URL));
+        CommonWebViewScene::create(__UTF8("娱乐消遣"), "http://www.tziakcha.xyz/almanac.html", CommonWebViewScene::ContentType::URL));
 }
