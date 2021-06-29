@@ -111,7 +111,6 @@ bool RecordHistoryScene::init(ViewCallback &&viewCallback) {
     button->setScale(20.0f / button->getContentSize().width);
     button->setPosition(Vec2(origin.x + visibleSize.width - 15.0f, origin.y + visibleSize.height - 15.0f));
     button->addClickEventListener(std::bind(&RecordHistoryScene::onMoreButton, this, std::placeholders::_1));
-    _moreButton = button;
 
     Label *label = Label::createWithSystemFont(__UTF8("无历史记录"), "Arial", 12);
     this->addChild(label);

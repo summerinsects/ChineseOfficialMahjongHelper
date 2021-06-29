@@ -116,6 +116,7 @@ list(APPEND GAME_HEADER
      Classes/widget/DatePicker.h
      Classes/widget/ExtraInfoWidget.h
      Classes/widget/HandTilesWidget.h
+     Classes/widget/LoadingView.h
      Classes/widget/PopupMenu.h
      Classes/widget/TilePickWidget.h
      Classes/widget/Toast.h

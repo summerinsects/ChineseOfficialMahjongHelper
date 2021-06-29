@@ -16,7 +16,7 @@ public:
         }
 
         cocos2d::Size visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
-        float height = visibleSize.height - 30;
+        const float height = visibleSize.height - 30;
 
         this->setContentSize(cocos2d::Size(visibleSize.width, height));
         this->setAnchorPoint(cocos2d::Vec2::ANCHOR_BOTTOM_LEFT);

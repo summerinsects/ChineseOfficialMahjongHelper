@@ -47,7 +47,7 @@ bool HandTilesWidget::init() {
     _standingContainer->addChild(drawNode, 2);
     _highlightBox = drawNode;
 
-    const float fixedHeight = std::max(TILE_HEIGHT, TILE_WIDTH * 2);
+    const float fixedHeight = std::max<float>(TILE_HEIGHT, TILE_WIDTH * 2);
     node = Node::create();
     node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     node->setIgnoreAnchorPointForPosition(false);

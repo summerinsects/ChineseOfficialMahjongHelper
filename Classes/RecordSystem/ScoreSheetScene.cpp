@@ -547,7 +547,7 @@ void ScoreSheetScene::onTimeScheduler(float) {
     }
     else {
         time_t diff = now - _record.start_time;
-        ldiv_t dv = ldiv(diff / 60L, 60L);
+        ldiv_t dv = ldiv(static_cast<long>(diff) / 60L, 60L);
         struct tm ret = *localtime(&_record.start_time);
         _timeLabel->setString(Common::format(__UTF8("开始时间：%d年%d月%d日%.2d:%.2d（已用时：%ld小时%ld分）"),
             ret.tm_year + 1900, ret.tm_mon + 1, ret.tm_mday, ret.tm_hour, ret.tm_min, dv.quot, dv.rem));
