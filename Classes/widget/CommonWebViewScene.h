@@ -11,8 +11,8 @@ public:
         FILE
     };
 
-    bool init(const char *title, const std::string &content, ContentType type);
-    CREATE_FUNC_WITH_PARAM_3(CommonWebViewScene, const char *, title, const std::string &, content, ContentType, type);
+    bool init(const std::string &title, const std::string &content, ContentType type);
+    CREATE_FUNC_WITH_PARAM_3(CommonWebViewScene, const std::string &, title, const std::string &, content, ContentType, type);
 };
 
 #endif
