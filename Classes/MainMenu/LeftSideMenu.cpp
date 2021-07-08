@@ -532,11 +532,7 @@ bool LeftSideMenu::_checkVersion(cocos2d::Scene *scene, bool manual, const std::
 
         AlertDialog::Builder(scene)
             .setTitle(__UTF8("检测到新版本"))
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
             .setMessage(Common::format(__UTF8("%s，是否下载？\n\n%s"), tag.c_str(), body.c_str()))
-#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-            .setMessage(Common::format(__UTF8("%s，是否下载？\n提取密码xyg\n\n%s"), tag.c_str(), body.c_str()))
-#endif
             .setCloseOnTouchOutside(false)
             .setNegativeButton(__UTF8("取消"), nullptr)
             .setPositiveButton(__UTF8("更新"), [](AlertDialog *, int) {
