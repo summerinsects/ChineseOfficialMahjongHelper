@@ -18,7 +18,7 @@ private:
     void onDetailButton(cocos2d::Ref *sender);
 
     void requestCompetitions();
-    bool parseResponse(const std::vector<char> *buffer);
+    bool parseResponse(const char *buffer, size_t size);
 
     cw::TableView *_tableView = nullptr;
     cocos2d::Label *_emptyLabel = nullptr;
@@ -28,10 +28,10 @@ private:
     };
 
     struct CompetitionInfo {
-        char name[256];
+        std::string name;
         time_t startTime;
         time_t endTime;
-        char url[1024];
+        std::string url;
         TIME_ACCURACY timeAccuracy;
     };
 

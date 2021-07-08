@@ -188,7 +188,7 @@ void HelloWorld::upgradeDataIfNecessary() {
 void HelloWorld::requestTips() {
     network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
     request->setRequestType(network::HttpRequest::Type::GET);
-    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongHelperDataSource/master/tips.json");
+    request->setUrl("https://gitee.com/summerinsects/ChineseOfficialMahjongHelperDataSource/raw/master/other/tips.json");
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     request->setResponseCallback([thiz](network::HttpClient *client, network::HttpResponse *response) {
@@ -208,7 +208,7 @@ void HelloWorld::requestTips() {
 
         std::vector<char> *buffer = response->getResponseData();
         if (buffer != nullptr) {
-            thiz->parseTips(buffer);
+            thiz->parseTips(buffer->data(), buffer->size());
         }
     });
 
@@ -232,13 +232,12 @@ static void scrollText(const std::shared_ptr<std::vector<ui::RichText *> > &rich
         nullptr));
 }
 
-void HelloWorld::parseTips(std::vector<char> *buffer) {
+void HelloWorld::parseTips(const char *buffer, size_t size) {
     std::vector<std::string> texts;
 
     try {
-        std::string str(buffer->begin(), buffer->end());
         rapidjson::Document doc;
-        doc.Parse<0>(str.c_str());
+        doc.Parse<0>(buffer, size);
         if (doc.HasParseError() || !doc.IsArray()) {
             return;
         }
@@ -247,13 +246,28 @@ void HelloWorld::parseTips(std::vector<char> *buffer) {
             return;
         }
 
+        int64_t now = std::chrono::system_clock::now().time_since_epoch().count();
+
         texts.reserve(doc.Size());
-        std::transform(doc.Begin(), doc.End(), std::back_inserter(texts), [](const rapidjson::Value &json) {
-            return json.GetString();
-        });
+        for (auto it = doc.Begin(); it != doc.End(); ++it) {
+            if (it->IsObject()) {
+                auto jt = it->FindMember("expires");
+                if (jt == it->MemberEnd() || (jt->value.IsInt64() && jt->value.GetInt64() > now)) {
+                    jt = it->FindMember("detail");
+                    if (jt != it->MemberEnd() && jt->value.IsString()) {
+                        auto &value = jt->value;
+                        texts.emplace_back(std::string(value.GetString(), value.GetStringLength()));
+                    }
+                }
+            }
+        }
     }
     catch (std::exception &e) {
         CCLOG("%s %s", __FUNCTION__, e.what());
+    }
+
+    if (texts.empty()) {
+        return;
     }
 
     Size visibleSize = Director::getInstance()->getVisibleSize();

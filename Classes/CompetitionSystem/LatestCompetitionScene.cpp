@@ -53,7 +53,7 @@ void LatestCompetitionScene::requestCompetitions() {
 
     network::HttpRequest *request = new (std::nothrow) network::HttpRequest();
     request->setRequestType(network::HttpRequest::Type::GET);
-    request->setUrl("https://raw.githubusercontent.com/summerinsects/ChineseOfficialMahjongHelperDataSource/master/LatestCompetition.json");
+    request->setUrl("https://gitee.com/summerinsects/ChineseOfficialMahjongHelperDataSource/raw/master/competition/latest.json");
 
     auto thiz = makeRef(this);  // 保证线程回来之前不析构
     request->setResponseCallback([thiz, loadingView](network::HttpClient *client, network::HttpResponse *response) {
@@ -98,7 +98,7 @@ void LatestCompetitionScene::requestCompetitions() {
 
         std::vector<char> *buffer = response->getResponseData();
         if (buffer != nullptr) {
-            thiz->parseResponse(buffer);
+            thiz->parseResponse(buffer->data(), buffer->size());
         }
     });
 
@@ -106,26 +106,23 @@ void LatestCompetitionScene::requestCompetitions() {
     request->release();
 }
 
-bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
+bool LatestCompetitionScene::parseResponse(const char *buffer, size_t size) {
     try {
-        std::string str(buffer->begin(), buffer->end());
         rapidjson::Document doc;
-        doc.Parse<0>(str.c_str());
+        doc.Parse<0>(buffer, size);
         if (doc.HasParseError() || !doc.IsArray()) {
             return false;
         }
 
         _competitions.clear();
         _competitions.reserve(doc.Size());
-        std::transform(doc.Begin(), doc.End(), std::back_inserter(_competitions), [](const rapidjson::Value &json) {
-            CompetitionInfo info = { 0 };
 
-            rapidjson::Value::ConstMemberIterator it = json.FindMember("name");
-            if (it != json.MemberEnd() && it->value.IsString()) {
-                Common::strncpy(info.name, { it->value.GetString(), it->value.GetStringLength() });
-            }
+        int64_t now = std::chrono::system_clock::now().time_since_epoch().count();
+        for (auto jt = doc.Begin(); jt != doc.End(); ++jt) {
+            CompetitionInfo info{};
 
-            it = json.FindMember("start_time");
+            auto &json = *jt;
+            rapidjson::Value::ConstMemberIterator it = json.FindMember("start_time");
             if (it != json.MemberEnd() && it->value.IsInt64()) {
                 info.startTime = static_cast<time_t>(it->value.GetInt64());
             }
@@ -135,24 +132,27 @@ bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
                 info.endTime = static_cast<time_t>(it->value.GetInt64());
             }
 
-            it = json.FindMember("url");
-            if (it != json.MemberEnd() && it->value.IsString()) {
-                Common::strncpy(info.url, { it->value.GetString(), it->value.GetStringLength() });
-            }
-
             it = json.FindMember("time_accuracy");
             if (it != json.MemberEnd() && it->value.IsInt()) {
                 info.timeAccuracy = static_cast<TIME_ACCURACY>(it->value.GetInt());
             }
-            return info;
-        });
 
-        time_t now = time(nullptr);
-        std::vector<CompetitionInfo>::iterator it = std::remove_if(_competitions.begin(), _competitions.end(),
-            [now](const CompetitionInfo &info) {
-            return (info.timeAccuracy != TIME_ACCURACY::UNDETERMINED && info.startTime < now);
-        });
-        _competitions.erase(it, _competitions.end());
+            if (info.timeAccuracy != TIME_ACCURACY::UNDETERMINED && info.startTime < now) {
+                continue;
+            }
+
+            it = json.FindMember("name");
+            if (it != json.MemberEnd() && it->value.IsString()) {
+                info.name.assign(it->value.GetString(), it->value.GetStringLength());
+            }
+
+            it = json.FindMember("url");
+            if (it != json.MemberEnd() && it->value.IsString()) {
+                info.url.assign(it->value.GetString(), it->value.GetStringLength());
+            }
+
+            _competitions.emplace_back(std::move(info));
+        }
 
         _tableView->reloadDataInplacement();
         _emptyLabel->setVisible(_competitions.empty());

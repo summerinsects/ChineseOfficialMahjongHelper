@@ -12,7 +12,7 @@ public:
 private:
     void upgradeDataIfNecessary();
     void requestTips();
-    void parseTips(std::vector<char> *buffer);
+    void parseTips(const char *buffer, size_t size);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
