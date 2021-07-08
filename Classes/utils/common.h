@@ -46,6 +46,39 @@ static inline std::string &trim(std::string &str) {
     return rtrim(ltrim(str));
 }
 
+template <size_t N1, size_t N2>
+inline char *strncpy(char (&dst)[N1], const char (&src)[N2]) {
+    static_assert(N1 > 0 && N2 > 0, "");
+    size_t len = std::min(N1, N2) - 1;
+    memcpy(dst, src, len);
+    dst[len] = '\0';
+    return dst;
+}
+
+class StringView {
+public:
+    StringView() {}
+    StringView(const char *str) : _data(str), _size(strlen(str)) {}
+    StringView(const char *str, size_t len) : _data(str), _size(len) {}
+    StringView(const std::string &str) : _data(str.data()), _size(str.size()) {}
+
+    const char *data() const { return _data; }
+    size_t size() const { return _size; }
+
+private:
+    const char *_data{};
+    size_t _size{};
+};
+
+template <size_t N>
+inline char *strncpy(char (&dst)[N], StringView src) {
+    static_assert(N > 0, "");
+    size_t len = std::min(N - 1, src.size());
+    memcpy(dst, src.data(), len);
+    dst[len] = '\0';
+    return dst;
+}
+
 std::string getStringFromFile(const char *file);
 
 bool compareVersion(const char *remote, const char *local);

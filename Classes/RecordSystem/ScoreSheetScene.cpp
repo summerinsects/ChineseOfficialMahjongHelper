@@ -577,7 +577,7 @@ void ScoreSheetScene::recover() {
     char name[4][NAME_SIZE];
     char title[TITLE_SIZE];
     memcpy(name, _record.name, sizeof(name));
-    strncpy(title, _record.title, TITLE_SIZE - 1);
+    Common::strncpy(title, _record.title);
 
     // 显示名字的label
     for (int i = 0; i < 4; ++i) {
@@ -590,7 +590,7 @@ void ScoreSheetScene::recover() {
     if (_record.start_time == 0) {
         memset(&_record, 0, sizeof(_record));
         memcpy(_record.name, name, sizeof(name)); // 恢复名字
-        strncpy(_record.title, title, TITLE_SIZE - 1);  // 恢复标题
+        Common::strncpy(_record.title, title);  // 恢复标题
         onTimeScheduler(0.0f);
         this->schedule(CC_SCHEDULE_SELECTOR(ScoreSheetScene::onTimeScheduler), 1.0f);
         return;
@@ -922,13 +922,13 @@ void ScoreSheetScene::editNameAndTitle() {
             if (title.length() > TITLE_SIZE - 1) {
                 fixString(title, TITLE_SIZE - 1);
             }
-            strncpy(_record.title, title.c_str(), TITLE_SIZE - 1);
+            Common::strncpy(_record.title, title);
         }
         refreshTitle();
 
         // 提交名字
         for (int i = 0; i < 4; ++i) {
-            strncpy(_record.name[i], names[i].c_str(), NAME_SIZE - 1);
+            Common::strncpy(_record.name[i], names[i]);
             _nameLabel[i]->setVisible(true);
             _nameLabel[i]->setString(names[i]);
             cw::scaleLabelToFitWidth(_nameLabel[i], _cellWidth - 4.0f);

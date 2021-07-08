@@ -53,7 +53,7 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
         if (name.Size() == 4) {
             for (int i = 0; i < 4; ++i) {
                 if (name[i].IsString()) {
-                    strncpy(record.name[i], name[i].GetString(), NAME_SIZE - 1);
+                    Common::strncpy(record.name[i], { name[i].GetString(), name[i].GetStringLength() });
                 }
             }
         }
@@ -120,7 +120,7 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
                 const rapidjson::Value::ConstObject &win_hand_json = it->value.GetObject();
                 it = win_hand_json.FindMember("tiles");
                 if (it != win_hand_json.MemberEnd() && it->value.IsString()) {
-                    strncpy(win_hand_data.tiles, it->value.GetString(), sizeof(win_hand_data.tiles) - 1);
+                    Common::strncpy(win_hand_data.tiles, { it->value.GetString(), it->value.GetStringLength() });
                 }
 
                 it = win_hand_json.FindMember("win_flag");
@@ -148,7 +148,7 @@ void JsonToRecord(const rapidjson::Value &json, Record &record) {
 
     it = json.FindMember("title");
     if (it != json.MemberEnd() && it->value.IsString()) {
-        strncpy(record.title, it->value.GetString(), sizeof(record.title) - 1);
+        Common::strncpy(record.title, { it->value.GetString(), it->value.GetStringLength() });
     }
 }
 

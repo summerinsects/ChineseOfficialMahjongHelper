@@ -81,7 +81,7 @@ extern cocos2d::ui::Widget *createFanResultWidget(const mahjong::fan_table_t &fa
         uint16_t n = fan_table[j];
         fan += f * n;
 
-        strncpy(str, mahjong::fan_name[j], sizeof(str) - 1);
+        Common::strncpy(str, mahjong::fan_name[j]);
         size_t len = strlen(str);
         len += snprintf(str + len, sizeof(str) - len, __UTF8(" %hu番"), f);
         if (n > 1) {

@@ -730,8 +730,8 @@ void RecordHistoryScene::showFilterAlert() {
             temp.start_time = reinterpret_cast<time_t>(buttons[0]->getUserData());
             temp.finish_time = reinterpret_cast<time_t>(buttons[1]->getUserData());
         }
-        strncpy(temp.name, editBoxes[0]->getText(), sizeof(temp.name) - 1);
-        strncpy(temp.title, editBoxes[1]->getText(), sizeof(temp.title) - 1);
+        Common::strncpy(temp.name, editBoxes[0]->getText());
+        Common::strncpy(temp.title, editBoxes[1]->getText());
         temp.ignore_case = checkBoxes[1]->isSelected();
         temp.whole_word = checkBoxes[2]->isSelected();
         temp.regular_enabled = checkBoxes[3]->isSelected();

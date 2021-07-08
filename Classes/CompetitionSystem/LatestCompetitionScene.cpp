@@ -122,7 +122,7 @@ bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
 
             rapidjson::Value::ConstMemberIterator it = json.FindMember("name");
             if (it != json.MemberEnd() && it->value.IsString()) {
-                strncpy(info.name, it->value.GetString(), sizeof(info.name) - 1);
+                Common::strncpy(info.name, { it->value.GetString(), it->value.GetStringLength() });
             }
 
             it = json.FindMember("start_time");
@@ -137,7 +137,7 @@ bool LatestCompetitionScene::parseResponse(const std::vector<char> *buffer) {
 
             it = json.FindMember("url");
             if (it != json.MemberEnd() && it->value.IsString()) {
-                strncpy(info.url, it->value.GetString(), sizeof(info.url) - 1);
+                Common::strncpy(info.url, { it->value.GetString(), it->value.GetStringLength() });
             }
 
             it = json.FindMember("time_accuracy");

@@ -366,7 +366,7 @@ void MahjongTheoryScene::parseInput(const char *input) {
         serving_tile = serveRandomTile(cnt_table, 0);
 
         memset(_tileString, 0, sizeof(_tileString));
-        strncpy(_tileString, input, sizeof(_tileString));
+        Common::strncpy(_tileString, input);
         size_t len = strlen(_tileString);
         mahjong::tiles_to_string(&serving_tile, 1, &_tileString[len], sizeof(_tileString) - len);
 
@@ -374,7 +374,7 @@ void MahjongTheoryScene::parseInput(const char *input) {
     }
     else {
         memset(_tileString, 0, sizeof(_tileString));
-        strncpy(_tileString, input, sizeof(_tileString));
+        Common::strncpy(_tileString, input);
     }
 
     // 设置UI
