@@ -5,7 +5,6 @@ Chinese Official Mahjong Helper 国标小助手
 - 本程序以cocos2dx引擎为UI写成
 - Classes/mahjong-algorithm文件夹下的算番、判断听牌、听牌计算、上听数计算、有效牌计算等相关算法已经独立成[仓库](https://github.com/summerinsects/ChineseOfficialMahjongFanCalculator)，可单独Star、Fork。
 - 由于cocos2dx引擎自身的源码较为庞大，这里就不上传了，请按如下步骤配置
-- 直接下载可执行文件，请点击[这里](https://www.pgyer.com/comh-android)
 
 ## 配置步骤
 
