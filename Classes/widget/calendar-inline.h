@@ -82,15 +82,15 @@ namespace calendar {
         return (ChineseCalendarData[y - 1899] & 0xf);
     }
 
-    static FORCE_INLINE bool Chinese_IsLeapMonthLong(int y) {
+    static FORCE_INLINE bool Chinese_IsLeapMonthMajor(int y) {
         return (ChineseCalendarData[y - 1899] & 0x10000);
     }
 
-    static FORCE_INLINE bool Chinese_IsNormalMonthLong(int y, int m) {
+    static FORCE_INLINE bool Chinese_IsNormalMonthMajor(int y, int m) {
         return (ChineseCalendarData[y - 1899] & (0x10000 >> m));
     }
 
-    static FORCE_INLINE GregorianDate SpringFestervalInGregorian(int y) {
+    static FORCE_INLINE GregorianDate SpringFestivalInGregorian(int y) {
         int d = 16 + ((ChineseCalendarData[y - 1899] >> 17) & 0x3F);
         int m = 1;
         if (d > 31) d -= 31, ++m;
@@ -108,7 +108,7 @@ namespace calendar {
         // 年
         int year = gd.year;
         int offset = 0;
-        GregorianDate sf = SpringFestervalInGregorian(year);  // 春节所在公历的日期
+        GregorianDate sf = SpringFestivalInGregorian(year);  // 春节所在公历的日期
         if (gd.month > sf.month) {  // 春节所在的月份已过
             offset = GregorianDaysTable[sf.month] - sf.day;  // 春节之后的天数
             if (Gregorian_IsLeapYear(year)) ++offset;  // 公历闰年
@@ -128,7 +128,7 @@ namespace calendar {
         }
 
         if (year != gd.year) {  // 倒退一年的情况
-            sf = SpringFestervalInGregorian(year);  // 春节所在公历的日期
+            sf = SpringFestivalInGregorian(year);  // 春节所在公历的日期
 
             // 当前日期与去年元旦的间隔天数
             offset = (Gregorian_IsLeapYear(year) ? 366 : 365);  // 去年一整年的天数
@@ -151,7 +151,7 @@ namespace calendar {
         int lastDay = 0;
         do {
             if (leapMonth > 0 && month == leapMonth + 1) {  // 插入闰月
-                lastDay = Chinese_IsLeapMonthLong(year) ? 30 : 29;
+                lastDay = Chinese_IsLeapMonthMajor(year) ? 30 : 29;
                 if (offset < lastDay) {
                     isInLeapMonth = true;
                     --month;
@@ -159,7 +159,7 @@ namespace calendar {
                 }
                 offset -= lastDay;
             }
-            lastDay = Chinese_IsNormalMonthLong(year, month) ? 30 : 29;
+            lastDay = Chinese_IsNormalMonthMajor(year, month) ? 30 : 29;
             if (offset < lastDay) {
                 break;
             }
@@ -176,17 +176,17 @@ namespace calendar {
         date.year = year;
         date.month = month;
         date.day = day;
-        date.is_leap = isInLeapMonth;
-        date.is_long = (lastDay == 30);
+        date.leap = isInLeapMonth;
+        date.major = (lastDay == 30);
         return date;
     }
 
     void ChineseDate_NextMonth(ChineseDate &date) {
         int leapMonth = Chinese_GetLeapMonth(date.year); // 闰哪个月
-        if (leapMonth == date.month && !date.is_leap) {  // 进入闰月
+        if (leapMonth == date.month && !date.leap) {  // 进入闰月
             date.day = 1;
-            date.is_leap = true;
-            date.is_long = Chinese_IsLeapMonthLong(date.year);
+            date.leap = true;
+            date.major = Chinese_IsLeapMonthMajor(date.year);
         }
         else {  // 下一个月
             ++date.month;
@@ -195,8 +195,8 @@ namespace calendar {
                 date.month = 1;
             }
             date.day = 1;
-            date.is_leap = false;
-            date.is_long = Chinese_IsNormalMonthLong(date.year, date.month);
+            date.leap = false;
+            date.major = Chinese_IsNormalMonthMajor(date.year, date.month);
         }
     }
 
@@ -305,9 +305,9 @@ namespace calendar {
         }
         else {
             std::string str;
-            if (date.is_leap) str.append(__UTF8("闰"));
+            if (date.leap) str.append(__UTF8("闰"));
             str.append(Chinese_MonthText[date.month - 1]);
-            str.append(date.is_long ? __UTF8("大") : __UTF8("小"));
+            str.append(date.major ? __UTF8("大") : __UTF8("小"));
             return str;
         }
     }
@@ -320,7 +320,7 @@ namespace calendar {
         str.append(__UTF8("（"));
         str.append(ChineseZodiac[cz]);
         str.append(__UTF8("）年"));
-        if (date.is_leap) str.append(__UTF8("闰"));
+        if (date.leap) str.append(__UTF8("闰"));
         str.append(Chinese_MonthText[date.month - 1]);
         str.append(Chinese_DayText[date.day - 1]);
         return str;
@@ -422,7 +422,7 @@ namespace calendar {
         /* 十二月 */ __UTF8("腊八节"), __UTF8("北方小年"), __UTF8("南方小年"), __UTF8("除夕")
     };
     static std::pair<ChineseDateFestival, int> GetChineseFestival(const calendar::ChineseDate &date) {
-        if (date.is_leap) return std::make_pair(CHINESE_FESTIVAL_NONE, 0);
+        if (date.leap) return std::make_pair(CHINESE_FESTIVAL_NONE, 0);
         int md = date.month << 8 | date.day;
         switch (md) {
         case 0x0101: return std::make_pair(SPRING_FESTIVAL, 3);
@@ -440,7 +440,7 @@ namespace calendar {
         case 0x0C08: return std::make_pair(LABA_FESTIVAL, 1);
         case 0x0C17: return std::make_pair(NORTHERN_OFF_YEAR, 1);
         case 0x0C18: return std::make_pair(SOUTHERN_OFF_YEAR, 1);
-        case 0x0C1D: if (!date.is_long) return std::make_pair(SPRING_FESTIVAL_EVE, 3); break;
+        case 0x0C1D: if (!date.major) return std::make_pair(SPRING_FESTIVAL_EVE, 3); break;
         case 0x0C1E: return std::make_pair(SPRING_FESTIVAL_EVE, 3);
         default: break;
         }

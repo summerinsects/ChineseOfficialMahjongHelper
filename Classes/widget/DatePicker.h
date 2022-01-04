@@ -12,7 +12,7 @@ namespace calendar {
 
     struct ChineseDate {
         int year, month, day;
-        bool is_leap, is_long;
+        bool leap, major;
     };
 }
 

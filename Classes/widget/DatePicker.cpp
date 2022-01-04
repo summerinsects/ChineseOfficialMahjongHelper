@@ -355,7 +355,7 @@ void DatePicker::setupDayContainer() {
 
     // 农历
     calendar::ChineseDate dateCC = calendar::Gregorian2Chinese(dateGC);
-    int lastDayCC = dateCC.is_long ? 30 : 29;  // 农历月最后一天
+    int lastDayCC = dateCC.major ? 30 : 29;  // 农历月最后一天
 
     // 本月的两个节气
     std::pair<int, int> solarTerms = calendar::GetSolarTermsInGregorianMonth(dateGC.year, dateGC.month);
@@ -382,7 +382,7 @@ void DatePicker::setupDayContainer() {
         ++dateCC.day;
         if (dateCC.day > lastDayCC) {  // 超过农历月最后一天，农历到下一个月
             calendar::ChineseDate_NextMonth(dateCC);
-            lastDayCC = dateCC.is_long ? 30 : 29;
+            lastDayCC = dateCC.major ? 30 : 29;
         }
     }
 
