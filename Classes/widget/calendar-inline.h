@@ -39,234 +39,355 @@ namespace calendar {
         return (1 + d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) % 7;
     }
 
+#define CALENDAR_YEAR_START 1839
+
     /**
      * 农历数据
      * 编码结构：
-     *           +------16---12---8---4----0+
-     *           |DDDDDD|L|NNNNNNNNNNNN|LLLL|
-     *           +------+-+------------+----+
-     *    春节偏移-16 闰月大小 常规月大小 闰几月
+     *           +-+----17---13------------0+
+     *           |O|OOOOO|LLLL|MMMMMMMMMMMMM|
+     *           +-+-----+----+-------------+
+     *            春节偏移  闰月    每月大小
      *
-     * 例如2033年数据为0x1e4afb，即‭0001 1110 0100 1010 1111 1011
-     *    这年闰十一月小（最后4位的1011，及第17位的0）
-     *    ‬二、五、七、九、十、十一、十二月为大月（从16-4位的0100 1010 1111）
-     *    春节偏移（01111）=15，15+16=31，在公历1月31号
+     * 例如2017年数据为0x38dd4a，即 0b0'011100'0110'1110101001010
+     *    这年闰六月(0110)，闰六月的信息在第7位上；七月至十二月的信息依次后移了1位，分布在第8~13位上
+     *    具体信息：二、四、闰六、八、十、十一、十二月为大月
+     *    春节偏移(0|11100)，在公历1月28日
+     *
+     * 再如2018年数据为0x600d4a，即 0b0'110000'0000'0110101001010
+     *    这年无闰月(0000)，正月至十二月的信息分布在第1~12位上；第13位数据为0，不作处理
+     *    具体信息：二、四、七、九、十一、十二月为大月
+     *    春节偏移(1|10000)，在公历2月16日
      */
-    static const int ChineseCalendarData[] = {
 
-        0x32ab50,  // 1899
-        0x1e4bd8, 0x444ae0, 0x2ea570, 0x1a54d5, 0x3ed260, 0x26d950, 0x136554, 0x3856a0, 0x229ad0, 0x0c55d2,  // 1900-1909
-        0x324ae0, 0x1ca5b6, 0x42a4d0, 0x2ad250, 0x15d255, 0x3ab540, 0x24d6a0, 0x0eada2, 0x3495b0, 0x214977,  // 1910-1919
-        0x464970, 0x2ea4b0, 0x18b4b5, 0x3e6a50, 0x286d40, 0x11ab54, 0x382b60, 0x229570, 0x0e52f2, 0x324970,  // 1920-1929
-        0x1c6566, 0x40d4a0, 0x2aea50, 0x146e95, 0x3a5ad0, 0x262b60, 0x1186e3, 0x3492e0, 0x1fc8d7, 0x44c950,  // 1930-1939
-        0x2ed4a0, 0x17d8a6, 0x3cb550, 0x2856a0, 0x13a5b4, 0x3825d0, 0x2292d0, 0x0cd2b2, 0x32a950, 0x1ab557,  // 1940-1949
-        0x406ca0, 0x2ab550, 0x175355, 0x3a4da0, 0x24a5b0, 0x114573, 0x3652b0, 0x1ea9a8, 0x42e950, 0x2e6aa0,  // 1950-1959
-        0x18aea6, 0x3cab50, 0x284b60, 0x12aae4, 0x38a570, 0x225260, 0x0af263, 0x30d950, 0x1c5b57, 0x4056a0,  // 1960-1969
-        0x2a96d0, 0x164dd5, 0x3c4ad0, 0x24a4d0, 0x0ed4d4, 0x34d250, 0x1ed558, 0x42b540, 0x2cb6a0, 0x1995a6,  // 1970-1979
-        0x3e95b0, 0x2849b0, 0x12a974, 0x38a4b0, 0x22b27a, 0x466a50, 0x306d40, 0x1aaf46, 0x40ab60, 0x2a9570,  // 1980-1989
-        0x164af5, 0x3c4970, 0x2664b0, 0x0e74a3, 0x32ea50, 0x1e6b58, 0x4455c0, 0x2cab60, 0x1896d5, 0x3e92e0,  // 1990-1999
-        0x28c960, 0x10d954, 0x36d4a0, 0x20da50, 0x0c7552, 0x3056a0, 0x1aabb7, 0x4225d0, 0x2c92d0, 0x14cab5,  // 2000-2009
-        0x3aa950, 0x24b4a0, 0x0ebaa4, 0x32ad50, 0x1e55d9, 0x444ba0, 0x2ea5b0, 0x195176, 0x3e52b0, 0x28a930,  // 2010-2019
-        0x127954, 0x366aa0, 0x20ad50, 0x0c5b52, 0x324b60, 0x1aa6e6, 0x40a4e0, 0x2ad260, 0x14ea65, 0x38d530,  // 2020-2029
-        0x245aa0, 0x0e76a3, 0x3496d0, 0x1e4afb, 0x444ad0, 0x2ea4d0, 0x19d0b6, 0x3cd250, 0x26d520, 0x10dd45,  // 2030-2039
-        0x36b5a0, 0x2056d0, 0x0c55b2, 0x3249b0, 0x1ca577, 0x40a4b0, 0x2aaa50, 0x15b255, 0x3a6d20, 0x22ada0,  // 2040-2049
-        0x0f4b63, 0x349370, 0x2049f8, 0x444970, 0x2e64b0, 0x1968a6, 0x3cea50, 0x266b20, 0x11a6c4, 0x36aae0,  // 2050-2059
-        0x22a2e0, 0x0ad2e3, 0x30c960, 0x1ad557, 0x40d4a0, 0x28da50, 0x145d55, 0x3a56a0, 0x24a6d0, 0x0e55d4,  // 2060-2069
-        0x3452d0, 0x1ea9b8, 0x44a950, 0x2cb4a0, 0x16b6a6, 0x3cad50, 0x2855a0, 0x10aba4, 0x36a5b0, 0x2252b0,  // 2070-2079
-        0x0cb273, 0x306930, 0x1a7337, 0x406aa0, 0x2aad50, 0x154b55, 0x3a4b60, 0x24a570, 0x1054e4, 0x32d160,  // 2080-2089
-        0x1ce968, 0x42d520, 0x2cdaa0, 0x176aa6, 0x3c56d0, 0x284ae0, 0x12a9d4, 0x36a2d0, 0x20d150, 0x0af252,  // 2090-2099
-        0x30d520  // 2100
+    static const uint32_t ChineseCalendarData[] = {
+        0x5c0752,
+        0x460ea5, 0x2e754a, 0x54054b, 0x3cea97, 0x640aab, 0x4e055a, 0x36ab55, 0x5e0ba9, 0x4a0752, 0x309aa5,  // 1840~1849
+        0x580b25, 0x431a4b, 0x68094d, 0x500aad, 0x3af56a, 0x6205b4, 0x4c0ba9, 0x34bd52, 0x5c0d92, 0x460d25,  // 1850~1859
+        0x2e7a4d, 0x540956, 0x3d12b5, 0x640ad6, 0x5006d4, 0x36ada9, 0x5e0ec9, 0x4a0e92, 0x328d26, 0x560527,  // 1860~1869
+        0x3f4a57, 0x66095b, 0x520b5a, 0x3ad6d4, 0x620754, 0x4c0749, 0x34b693, 0x5a0a93, 0x44052b, 0x2c6a5b,  // 1870~1879
+        0x54096d, 0x3ceb6a, 0x640daa, 0x500ba4, 0x38bb49, 0x5e0d49, 0x480a95, 0x30952b, 0x58052d, 0x3e0aad,  // 1880~1889
+        0x2a556a, 0x520daa, 0x3cdda4, 0x620ea4, 0x4c0d4a, 0x34aa95, 0x5a0a97, 0x440556, 0x2c6ab5, 0x540ad5,  // 1890~1899
+        0x3f16d2, 0x660752, 0x500ea5, 0x3ab64a, 0x60064b, 0x480a9b, 0x329556, 0x5a056a, 0x440b59, 0x2c5752,  // 1900~1909
+        0x540752, 0x3cdb25, 0x640b25, 0x4c0a4b, 0x34b4ab, 0x5c02ad, 0x46056b, 0x2e4b69, 0x560da9, 0x42fd92,  // 1910~1919
+        0x680e92, 0x500d25, 0x38ba4d, 0x600a56, 0x4a02b6, 0x3095b5, 0x5a06d4, 0x440ea9, 0x2e5e92, 0x540e92,  // 1920~1929
+        0x3ccd26, 0x62052b, 0x4c0a57, 0x34b2b6, 0x5c0b5a, 0x4806d4, 0x306ec9, 0x560749, 0x3ef693, 0x660a93,  // 1930~1939
+        0x50052b, 0x36ca5b, 0x5e0aad, 0x4a056a, 0x329b55, 0x5a0ba4, 0x440b49, 0x2c5a93, 0x540a95, 0x3af52d,  // 1940~1949
+        0x620536, 0x4c0aad, 0x36b5aa, 0x5c05b2, 0x460da5, 0x307d4a, 0x580d4a, 0x3f0a95, 0x640a97, 0x500556,  // 1950~1959
+        0x38cab5, 0x5e0ad5, 0x4a06d2, 0x328ea5, 0x5a0ea5, 0x44064a, 0x2a6c97, 0x520a9b, 0x3cf55a, 0x62056a,  // 1960~1969
+        0x4c0b69, 0x36b752, 0x5e0b52, 0x460b25, 0x2e964b, 0x560a4b, 0x3f14ab, 0x6402ad, 0x4e056d, 0x38cb69,  // 1970~1979
+        0x600da9, 0x4a0d92, 0x329d25, 0x5a0d25, 0x455a4d, 0x680a56, 0x5202b6, 0x3ac5b5, 0x6206d5, 0x4c0ea9,  // 1980~1989
+        0x36be92, 0x5e0e92, 0x480d26, 0x2e6a56, 0x540a57, 0x3f14d6, 0x66035a, 0x4e06d5, 0x38b6c9, 0x600749,  // 1990~1999
+        0x4a0693, 0x30952b, 0x58052b, 0x420a5b, 0x2c555a, 0x52056a, 0x3afb55, 0x640ba4, 0x4e0b49, 0x34ba93,  // 2000~2009
+        0x5c0a95, 0x46052d, 0x2e8aad, 0x540ab5, 0x3f35aa, 0x6605d2, 0x500da5, 0x38dd4a, 0x600d4a, 0x4a0c95,  // 2010~2019
+        0x32952e, 0x580556, 0x420ab5, 0x2c55b2, 0x5406d2, 0x3acea5, 0x620725, 0x4c064b, 0x34ac97, 0x5a0cab,  // 2020~2029
+        0x46055a, 0x2e6ad6, 0x560b69, 0x3f7752, 0x660b52, 0x500b25, 0x38da4b, 0x5e0a4b, 0x4804ab, 0x30a55b,  // 2030~2039
+        0x5805ad, 0x420b6a, 0x2c5b52, 0x540d92, 0x3cfd25, 0x620d25, 0x4c0a55, 0x34b4ad, 0x5c04b6, 0x4405b5,  // 2040~2049
+        0x2e6daa, 0x560ec9, 0x431e92, 0x660e92, 0x500d26, 0x38ca56, 0x5e0a57, 0x480556, 0x3086d5, 0x580755,  // 2050~2059
+        0x440749, 0x2a6e93, 0x520693, 0x3af52b, 0x62052b, 0x4a0a5b, 0x34b55a, 0x5c056a, 0x460b65, 0x2e974a,  // 2060~2069
+        0x560b4a, 0x3f1a95, 0x660a95, 0x4e052d, 0x36caad, 0x5e0ab5, 0x4a05aa, 0x308ba5, 0x580da5, 0x440d4a,  // 2070~2079
+        0x2c7c95, 0x520c96, 0x3af94e, 0x620556, 0x4c0ab5, 0x34b5b2, 0x5c06d2, 0x460ea5, 0x308e4a, 0x54068b,  // 2080~2089
+        0x3d0c97, 0x6404ab, 0x4e055b, 0x36cad6, 0x5e0b6a, 0x4a0752, 0x329725, 0x580b45, 0x420a8b, 0x2a549b,  // 2090~2099
+        0x5204ab
     };
 
-    static FORCE_INLINE int Chinese_GetLeapMonth(int y) {
-        return (ChineseCalendarData[y - 1899] & 0xf);
+    static FORCE_INLINE uint8_t Chinese_GetLeapMonth(uint32_t v) {
+        return static_cast<uint8_t>((v >> 13) & 0xf);
     }
 
-    static FORCE_INLINE bool Chinese_IsLeapMonthMajor(int y) {
-        return (ChineseCalendarData[y - 1899] & 0x10000);
+    static FORCE_INLINE bool Chinese_IsMajorMonth(uint32_t v, uint8_t m) {
+        return v & (1 << m);
     }
 
-    static FORCE_INLINE bool Chinese_IsNormalMonthMajor(int y, int m) {
-        return (ChineseCalendarData[y - 1899] & (0x10000 >> m));
+    static FORCE_INLINE void SpringFestivalInGregorian(uint32_t v, uint8_t &m, uint8_t &d) {
+        m = ((v >> 22) & 1) + 1;
+        d = (v >> 17) & 0x1f;
     }
 
-    static FORCE_INLINE GregorianDate SpringFestivalInGregorian(int y) {
-        int d = 16 + ((ChineseCalendarData[y - 1899] >> 17) & 0x3F);
-        int m = 1;
-        if (d > 31) d -= 31, ++m;
-        return GregorianDate{ y, m, d };
-    }
-
-    static ChineseDate Gregorian2Chinese(const GregorianDate &gd) {
-        // 年份限定、上限
-        if (gd.year < 1900 || gd.year > 2100) {
-            return ChineseDate();
+    static ChineseDate Gregorian2Chinese(const GregorianDate &date) {
+        int year = date.year;
+        int month = date.month;
+        int day = date.day;
+        if (year < 1840 || year > 2100 || month < 1 || month > 12 || day < 1 || day > 31) {
+            return ChineseDate{};
         }
 
-        static const int8_t GregorianDaysTable[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        bool ly = Gregorian_IsLeapYear(year);
+        uint32_t v = ChineseCalendarData[year - CALENDAR_YEAR_START];  // 当年的信息
 
-        // 年
-        int year = gd.year;
-        int offset = 0;
-        GregorianDate sf = SpringFestivalInGregorian(year);  // 春节所在公历的日期
-        if (gd.month > sf.month) {  // 春节所在的月份已过
-            offset = GregorianDaysTable[sf.month] - sf.day;  // 春节之后的天数
-            if (Gregorian_IsLeapYear(year)) ++offset;  // 公历闰年
-            for (int m = sf.month + 1; m < gd.month; ++m) offset += GregorianDaysTable[m];  // 随后完整的月天数
-            offset += gd.day;  // 当前月已过的天数
-        }
-        else if (gd.month == sf.month) {  // 与春节同月份
-            if (gd.day >= sf.day) {  // 日期已过
-                offset = gd.day - sf.day;
+        uint8_t sfm, sfd;
+        SpringFestivalInGregorian(v, sfm, sfd);  // 春节所在的公历日期
+
+        uint8_t rem, mx = 1, lm = 0;
+        bool mm;
+        if (month > sfm) {  // 春节所在的公历月份已过
+            if (sfm == 2) {
+                // 春节在公历2月（概率较大），公历2月剩余天数
+                rem = (ly ? 29 : 28) - sfd;
             }
-            else {  // 日期未过，说明春节未过，农历倒退一年
-                --year;
-            }
-        }
-        else {  // 春节所在的月份未过，农历倒退一年
-            --year;
-        }
+            else {
+                // 春节在公历1月（概率较小），公历1月剩余天数
+                rem = 31 - sfd;
 
-        if (year != gd.year) {  // 倒退一年的情况
-            sf = SpringFestivalInGregorian(year);  // 春节所在公历的日期
-
-            // 当前日期与去年元旦的间隔天数
-            offset = (Gregorian_IsLeapYear(year) ? 366 : 365);  // 去年一整年的天数
-            for (int m = 1; m < gd.month; ++m) {
-                offset += GregorianDaysTable[m];
-            }
-            offset += gd.day;
-
-            // 去年春节与去年元旦的间隔天数
-            for (int m = 1; m < sf.month; ++m) {
-                offset -= GregorianDaysTable[m];
-            }
-            offset -= sf.day;
-        }
-
-        // 月
-        int month = 1;
-        bool isInLeapMonth = false;
-        int leapMonth = Chinese_GetLeapMonth(year); // 闰哪个月
-        int lastDay = 0;
-        do {
-            if (leapMonth > 0 && month == leapMonth + 1) {  // 插入闰月
-                lastDay = Chinese_IsLeapMonthMajor(year) ? 30 : 29;
-                if (offset < lastDay) {
-                    isInLeapMonth = true;
-                    --month;
-                    break;
+                // 如果公历2月已经过完，累加
+                if (month > 2) {
+                    rem += (ly ? 29 : 28);
                 }
-                offset -= lastDay;
             }
-            lastDay = Chinese_IsNormalMonthMajor(year, month) ? 30 : 29;
-            if (offset < lastDay) {
-                break;
+
+            // 农历先按每月30天算，每经过一个公历的大月，农历就要增加1日
+            // 公历3~7月逢奇数是大月
+            uint8_t i = 3;
+            while (i < month && i < 8) {
+                ++mx;
+                if ((i++) & 1) {
+                    ++rem;
+                }
             }
-            offset -= lastDay;
-            ++month;
-        } while (month < 13);
 
-        assert(month < 13);
+            // 公历8~12月逢偶数是大月
+            while (i < month && i < 13) {
+                ++mx;
+                if ((++i) & 1) {
+                    ++rem;
+                }
+            }
 
-        // 日
-        int day = offset + 1;
+            rem += day;  // 当前月剩余天数
 
-        ChineseDate date;
-        date.year = year;
-        date.month = month;
-        date.day = day;
-        date.leap = isInLeapMonth;
-        date.major = (lastDay == 30);
-        return date;
+            // 全部剩余天数凑农历整月
+            while (rem >= 30) {
+                ++mx;
+                rem -= 30;
+            }
+
+            // 每经过一个农历小月，增加1日
+            for (i = 1; i < mx; ++i) {
+                mm = Chinese_IsMajorMonth(v, i - 1);
+                if (!mm) {
+                    ++rem;
+                    if (rem >= 30) {
+                        ++mx;
+                        rem -= 30;
+                    }
+                }
+            }
+
+            mm = Chinese_IsMajorMonth(v, mx - 1);
+
+            // 当前月是农历小月，并且仍然剩余29天，进位月份
+            // 农历历法规定冬至必须在农历十一月里，
+            // 即便是冬至（非常早）在公历12月21号，农历（非常晚）十一月三十，公历12月31号最多也只是农历十二月十几
+            // 不会出现农历从十二月进位到次年正月的情况
+            if (!mm && rem == 29) {
+                mm = Chinese_IsMajorMonth(v, mx);
+                ++mx;
+                rem = 0;
+            }
+
+            lm = Chinese_GetLeapMonth(v);
+        }
+        else if (month == sfm) {
+            // 与春节同月份
+            if (day >= sfd) {
+                // 无论春节在1月还是2月，当前月不可能再次进入新的农历月
+                // 1月的春节最早也要在大寒附近，此时已经没有足够的天数过完整个农历正月，不会产生进位
+                // 2月的春节即便在1日，逢公历闰年的29日也只能到农历的正月廿九，不能进入二月初一
+                rem = day - sfd;
+                mm = Chinese_IsMajorMonth(v, 0);
+                lm = Chinese_GetLeapMonth(v);
+            }
+            else {
+                // 春节之前，农历倒退一年
+                --year;
+                rem = sfd - day;
+            }
+        }
+        else {
+            // 春节所在的月份未到，农历倒退一年，这种情况仅当春节在公历2月时出现
+            --year;
+            rem = sfd + (31 - day);
+        }
+
+        // 倒退的情况
+        if (year != date.year) {
+            v = ChineseCalendarData[year - CALENDAR_YEAR_START];  // 上一年的信息
+
+            // 根据是否有闰月，从第12或第13个农历月起倒退
+            lm = Chinese_GetLeapMonth(v);
+            mx = (lm == 0) ? 12 : 13;
+            do {
+                mm = Chinese_IsMajorMonth(v, mx - 1);
+                if (mm) {
+                    // 大月可退30天
+                    if (rem <= 30) {
+                        rem = 30 - rem;
+                        break;
+                    }
+                    // 倒退整个农历月
+                    rem -= 30;
+                    --mx;
+                }
+                else {
+                    // 小月可退29天
+                    if (rem <= 29) {
+                        rem = 29 - rem;
+                        break;
+                    }
+                    // 倒退整个农历月
+                    rem -= 29;
+                    --mx;
+                }
+            } while (1);
+        }
+
+        ChineseDate res{};
+        res.year = year;
+        res.month = mx;
+        res.day = rem + 1;
+        res.major = mm;
+        if (lm != 0) {  // 闰月序号校正
+            if (mx > lm) {
+                --res.month;
+                if (mx == lm + 1) {
+                    res.leap = true;
+                }
+            }
+        }
+        return res;
     }
 
     void ChineseDate_NextMonth(ChineseDate &date) {
-        int leapMonth = Chinese_GetLeapMonth(date.year); // 闰哪个月
-        if (leapMonth == date.month && !date.leap) {  // 进入闰月
-            date.day = 1;
-            date.leap = true;
-            date.major = Chinese_IsLeapMonthMajor(date.year);
-        }
-        else {  // 下一个月
-            ++date.month;
-            if (date.month > 12) {  // 下一年
-                ++date.year;
-                date.month = 1;
+        uint32_t v = ChineseCalendarData[date.year - CALENDAR_YEAR_START];
+        uint8_t lm = Chinese_GetLeapMonth(v);
+        uint8_t mx = date.month, num = 12;
+        if (lm != 0) {
+            num = 13;
+            if (mx > lm || (mx == lm && date.leap)) {
+                ++mx;
             }
-            date.day = 1;
-            date.leap = false;
-            date.major = Chinese_IsNormalMonthMajor(date.year, date.month);
         }
+
+        ++mx;
+        if (mx <= num) {
+            date.month = mx;
+            date.leap = false;
+            if (lm != 0) {  // 闰月序号校正
+                if (mx > lm) {
+                    --date.month;
+                    if (mx == lm + 1) {
+                        date.leap = true;
+                    }
+                }
+            }
+            date.major = Chinese_IsMajorMonth(v, mx - 1);
+        }
+        else {
+            // 下一年
+            ++date.year;
+            date.month = 1;
+            v = ChineseCalendarData[date.year - CALENDAR_YEAR_START];
+            date.leap = false;
+            date.major = Chinese_IsMajorMonth(v, 0);
+        }
+        date.day = 1;
     }
 
     /**
      * 24节气编码
-     * 每4位表示一个月的两个节气，从高到低分别为1-12月
-     * 在每个月的4位中，高两位表示本月第1个节气，低两位表示本月第1个节气
-     * 每月前一个节气偏移：1-6月+3，7-12月+6
-     * 每月后一个节气偏移：1-5月+18，6月+19，7-12月+21
-     * 特别的：1975年及以前的年份，偏移在上一步基础上再+1
+     * 由于24节气在几十年范围均在2日内波动，每1位表示一个节气，再配合校正参数得到具体日期
+     * 以4年为一个周期，可发现大致如下规律：
+     * 对于3~12月的节气：
+     *   开始时都为n号(持续约36年一致)
+     *   闰年首先退到n-1(持续约9个周期36年)
+     *   闰年+1也退到n-1(持续约9个周期36年)
+     *   闰年+2也退到n-1(持续约9个周期36年)
+     *   闰年+3也退到n-1，至此统一为n-1(持续约36年一致，直到再遇闰年首先退一天)
+     * 对于1~2月的节气：
+     *   闰年+1退
+     *   闰年+2退
+     *   闰年+3退
+     *   闰年退
+     * 维持以上规律直到遇整百年不闰，会向后延一天
      *
-     * 例如：2018年数据为0xa5babe66aa55
-     *   0xa为1月，(0xa>>2)&0x3=2，2+3=5，那么5号为小寒，0xa&0x3=2，2+18=20，20号为大寒
+     * 例如：2018年数据为0xc3b6ec，即0b0'1100'001110'110110'111011'00
+     *   第1位为小寒值0，具体日期为：(基数5)+0+(1900年起偏移1)-(小寒第一次总体偏移1931年起1)=5日
+     *   第3位为立春值1，具体日期为：(基数4)+1+(1900年起偏移1)-(立春第一次总体偏移1859年起1)-(立春第二次总体偏移1999年起1)=4日
      */
-    static const uint64_t SolarTermsData[] = {
-        0x90a5aa155a50, 0xa0a6ba566a54, 0xa4aabe666a55, 0xa5fafe6aaa55, 0xe5a5aa155a50,  // 1900-1904
-        0xa0a6ba566a54, 0xa4aaba666a55, 0xa5fafe6aaa55, 0xe5a5aa155a50, 0xa0a6ba566a54,  // 1905-1909
-        0xa4aaba666a55, 0xa5fafe6aaa55, 0xe5a5aa155a50, 0x90a6ba566a54, 0xa0a6ba666a55,  // 1910-1914
-        0xa5babe66aa55, 0xa5a5aa155640, 0x90a6aa565a50, 0xa0a6ba666a54, 0xa5babe66aa55,  // 1915-1919
-        0xa5a5aa155640, 0x90a5aa565a50, 0xa0a6ba666a54, 0xa4aabe66aa55, 0xa5a5aa155640,  // 1920-1924
-        0x90a5aa565a50, 0xa0a6ba566a54, 0xa4aabe666a55, 0xa5a5a9155500, 0x90a5aa155a50,  // 1925-1929
-        0xa0a6ba566a54, 0xa4aabe666a55, 0xa5a5a9155500, 0x90a5aa155a50, 0xa0a6ba566a54,  // 1930-1934
-        0xa4aaba666a55, 0xa5a5a9155500, 0x90a5aa155a50, 0xa0a6ba566a54, 0xa4aaba666a55,  // 1935-1939
-        0xa5a5a9155500, 0x90a5aa155a50, 0xa0a6ba566a54, 0xa4aaba666a55, 0xa5a569155500,  // 1940-1944
-        0x90a5aa155640, 0x90a6ba565a54, 0xa0a6ba666a55, 0xa56569115500, 0x50a5aa155640,  // 1945-1949
-        0x90a5aa565a54, 0xa0a6ba666a55, 0xa56569115500, 0x50a5aa155640, 0x90a5aa565a50,  // 1950-1954
-        0xa0a6ba566a54, 0xa55569115500, 0x50a5aa155640, 0x90a5aa155a50, 0xa0a6ba566a54,  // 1955-1959
-        0xa45569111500, 0x50a5a9155500, 0x90a5aa155a50, 0xa0a6ba566a54, 0xa45569111500,  // 1960-1964
-        0x50a5a9155500, 0x90a5aa155a50, 0xa0a6ba566a54, 0xa45565111500, 0x50a5a9155500,  // 1965-1969
-        0x90a5aa155a50, 0xa0a6ba566a54, 0xa45565111500, 0x50a569155500, 0x90a5aa155a50,  // 1970-1974
-        0xa0a6ba565a54, 0xf9a6ba666a55, 0xa5fabe66aa55, 0xe5faff6aaba5, 0xf5fbffabafa9,  // 1975-1979
-        0xf9a6ba666a55, 0xa5fabe66aa55, 0xe5faff6aab95, 0xe5faffabafa9, 0xf5a6ba566a55,  // 1980-1984
-        0xa5babe66aa55, 0xa5faff6aab95, 0xe5faff6bafa5, 0xf5a6ba566a54, 0xa5aabe666a55,  // 1985-1989
-        0xa5fafe6aab95, 0xe5faff6aafa5, 0xf5a6ba566a54, 0xa4aabe666a55, 0xa5fafe6aaa55,  // 1990-1994
-        0xe5faff6aafa5, 0xf5a6ba566a54, 0xa4aaba666a55, 0xa5fafe6aaa55, 0xe5faff6aafa5,  // 1995-1999
-        0xf5a6ba566a54, 0xa4aaba666a55, 0xa5fafe6aaa55, 0xe5faff6aafa5, 0xf5a6ba566a54,  // 2000-2004
-        0xa4aaba666a55, 0xa5fabe66aa55, 0xe5faff6aafa5, 0xf5a6ba565a54, 0xa4a6ba666a55,  // 2005-2009
-        0xa5fabe66aa55, 0xe5faff6aaba5, 0xf5a6aa565a54, 0xa4a6ba566a55, 0xa5fabe66aa55,  // 2010-2014
-        0xe5faff6aab95, 0xe5a5aa565a54, 0xa0a6ba566a55, 0xa5babe66aa55, 0xa5fafe6aab95,  // 2015-2019
-        0xe5a5aa155a54, 0xa0a6ba566a54, 0xa5aabe666a55, 0xa5fafe6aab95, 0xe5a5aa155a50,  // 2020-2024
-        0xa0a6ba566a54, 0xa4aaba666a55, 0xa5fafe6aaa55, 0xe5a5aa155a50, 0xa0a6ba566a54,  // 2025-2029
-        0xa4aaba666a55, 0xa5fafe6aaa55, 0xe5a5aa155a50, 0xa0a6ba566a54, 0xa4aaba666a55,  // 2030-2034
-        0xa5fabe66aa55, 0xe5a5aa155a50, 0xa0a6ba566a54, 0xa4aaba666a55, 0xa5fabe66aa55,  // 2035-2039
-        0xe5a5aa155a50, 0xa0a6aa565a54, 0xa4a6ba666a55, 0xa5fabe66aa55, 0xe5a5aa155650,  // 2040-2044
-        0xa0a5aa565a54, 0xa4a6ba566a55, 0xa5fabe66aa55, 0xe5a5a9155640, 0x90a5aa155a54,  // 2045-2049
-        0xa0a6ba566a55, 0xa5aabe666a55, 0xa5a5a9155640, 0x90a5aa155a54, 0xa0a6ba566a55,  // 2050-2054
-        0xa5aaba666a55, 0xa5a5a9155640, 0x90a5aa155a50, 0xa0a6ba566a54, 0xa5aaba666a55,  // 2055-2059
-        0xa5a5a9155500, 0x90a5aa155a50, 0xa0a6ba566a54, 0xa4aaba666a55, 0xa5a5a9155500,  // 2060-2064
-        0x90a5aa155a50, 0xa0a6ba566a54, 0xa4aaba666a55, 0xa5a569115500, 0x90a5aa155a50,  // 2065-2069
-        0xa0a6aa565a54, 0xa4aaba666a55, 0xa5a569115500, 0x90a5aa155650, 0xa0a6aa565a54,  // 2070-2074
-        0xa4a6ba566a55, 0xa5a569115500, 0x90a5aa155650, 0xa0a5aa165a54, 0xa4a6ba566a55,  // 2075-2079
-        0xa5a569115500, 0x90a5a9155640, 0xa0a5aa155a54, 0xa0a6ba566a55, 0xa55569111500,  // 2080-2084
-        0x50a5a9155640, 0x90a5aa155a54, 0xa0a6ba566a55, 0xa55565111500, 0x50a5a9155640,  // 2085-2089
-        0x90a5aa155a50, 0xa0a6ba566a54, 0xa55565111500, 0x50a5a9155500, 0x90a5aa155a50,  // 2090-2094
-        0xa0a6ba566a54, 0xa45565111500, 0x50a5a9115500, 0x90a5aa155a50, 0xa0a6ba566a54,  // 2095-2099
-        0xa4aaba666a55  // 2100
+    static const uint32_t SolarTermsData[] = {
+        0xfffffb,
+        0x80244f, 0x816578, 0xbd6d79, 0xfffff9, 0x80244b, 0x816578, 0xbd6d78, 0xfffff9, 0x80200b, 0x816468,  // 1840~1849
+        0x9d6d78, 0xfffff9, 0x00200b, 0x816468, 0x996d78, 0xbdff79, 0x00200b, 0x812440, 0x996d78, 0xbdfd7d,  // 1850~1859
+        0x00200f, 0x812444, 0x996d7c, 0xbdfd7d, 0x00200f, 0x812444, 0x896d7c, 0xbdfd7d, 0x00000f, 0x802444,  // 1860~1869
+        0x8365fc, 0xbf6dfd, 0x02028f, 0x8226c4, 0xc367fc, 0xff6ffd, 0x42028d, 0xc222c0, 0xc367fc, 0xff6ffd,  // 1870~1879
+        0x42028d, 0xc22280, 0xc366ec, 0xdf6ffc, 0x42028d, 0x422280, 0xc366ec, 0xdb6ffc, 0x00000d, 0x422280,  // 1880~1889
+        0xc326c4, 0xdb6ffc, 0x00000d, 0x422280, 0xc326c4, 0xdb6ffc, 0x00000d, 0x420280, 0xc326c4, 0xcb6ffc,  // 1890~1899
+        0x3c0804, 0x7e9a82, 0xfebec6, 0xfffffe, 0x3c080f, 0x7e9a82, 0xfebac6, 0xfffffe, 0x3c080f, 0x7e9a82,  // 1900~1909
+        0xfebac6, 0xfffffe, 0x3c080f, 0x7e9a80, 0xfeba82, 0xffbeee, 0x18080e, 0x3c9880, 0x7eba82, 0xffbeee,  // 1910~1919
+        0x18080e, 0x3c9800, 0x7eba82, 0xffbec6, 0x18080e, 0x3c9800, 0x7e9a82, 0xfebec6, 0x00010e, 0x3c0900,  // 1920~1929
+        0x7edb92, 0xfeffd7, 0x00411f, 0x3c4911, 0x7edb93, 0xfefbd7, 0x00411f, 0x3c4911, 0x7edbb3, 0xfefbf7,  // 1930~1939
+        0x00413f, 0x3c4931, 0x7fdbb3, 0xfffbf7, 0x01403f, 0x194931, 0x7ddbb1, 0xfffbb3, 0x01002f, 0x194930,  // 1940~1949
+        0x7ddd31, 0xffffb3, 0x01042f, 0x194d30, 0x3ddd31, 0x7fdfb3, 0x01040f, 0x194d30, 0x3d4d31, 0x7fdfb3,  // 1950~1959
+        0x000447, 0x014570, 0x3d4d71, 0x7fdff3, 0x000447, 0x014570, 0x3d4d71, 0x7fdff3, 0x002047, 0x016570,  // 1960~1969
+        0xbd6d71, 0xfffff3, 0x802047, 0x816470, 0xbd6d71, 0xfdfffb, 0x80200f, 0x812478, 0xb96d79, 0xfdfdfb,  // 1970~1979
+        0x80200f, 0x812478, 0x996d79, 0xfdfd79, 0x80000b, 0x812468, 0x996d78, 0xbded79, 0x00000b, 0x802448,  // 1980~1989
+        0x9b6578, 0xbf6d79, 0x02000b, 0x822440, 0x836778, 0xbf6f79, 0x02020b, 0x822240, 0x8367f8, 0xbf6ffd,  // 1990~1999
+        0x02028f, 0x8222c4, 0x8377fc, 0xbf7ffd, 0x42928f, 0xc2b2c4, 0xc3b6fc, 0xfffffd, 0x40928f, 0xc2b284,  // 2000~2009
+        0xc3b6fc, 0xfbfffd, 0x40908f, 0xc29284, 0xc3b6fc, 0xdbfffd, 0x40900d, 0xc29280, 0xc3b6ec, 0xdbf7fc,  // 2010~2019
+        0x40000d, 0x429280, 0xc2b6cc, 0xdbf7fc, 0x00000d, 0x429280, 0xc6b2c4, 0xc7f7fc, 0x04000d, 0x469280,  // 2020~2029
+        0xe6b2c4, 0xe7f7fe, 0x24080f, 0x669a82, 0xe6bac6, 0xe7befe, 0x24080f, 0x669a82, 0xe6bac6, 0xe7befe,  // 2030~2039
+        0x24080f, 0x649882, 0xfeba86, 0xffbefe, 0x38080f, 0x7c9802, 0xfe9a86, 0xffbefe, 0x18000f, 0x7c0800,  // 2040~2049
+        0xfedb82, 0xfeffce, 0x18410e, 0x7c4900, 0xfedb82, 0xfefbce, 0x18410e, 0x3c4900, 0x7edb82, 0xfefbce,  // 2050~2059
+        0x00410e, 0x3c4900, 0x7edb82, 0xfefbc6, 0x00410e, 0x3c4900, 0x7fdbb2, 0xfffbf7, 0x01003f, 0x3d4931,  // 2060~2069
+        0x7dddb3, 0xfffff7, 0x01043f, 0x394d31, 0x7dddb3, 0xffdfb7, 0x01043f, 0x394d31, 0x7dcd33, 0xffdfb7,  // 2070~2079
+        0x01043f, 0x194531, 0x7d4d33, 0xffdfb3, 0x00040f, 0x194530, 0x7d4d31, 0xffdfb3, 0x00000f, 0x194530,  // 2080~2089
+        0x3d4d31, 0x7fdfb3, 0x00000f, 0x014530, 0x3d4d31, 0x7fdfb3, 0x000007, 0x010530, 0x3d4d31, 0x7fdfb3,  // 2090~2099
+        0xfffff7
     };
 
     // 校正参数
-    static const int8_t SolarTermsOffset1[] = { 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6 };
-    static const int8_t SolarTermsOffset2[] = { 18, 18, 18, 18, 18, 19, 21, 21, 21, 21, 21, 21 };
+    // 日期基数
+    static const uint8_t SolarTermsBaseDay[] = {
+        5, 20,
+        4, 18, 5, 20, 4, 20,
+        5, 21, 5, 21, 7, 22,
+        7, 23, 7, 23, 8, 23,
+        7, 22, 7, 21
+    };
+
+    // 1900年起偏移，每位表示一个节气，值为1时日期需要+1
+    static const uint32_t SolarTermsOffset = 0xc367fd;
+
+    // 总体第一次偏移，年份大于或等于相应值时日期需要-1
+    static const int16_t SolarTermsOffsetY0[] = {
+        1931, 2031,
+        1859, 1975, 1930, 1938, 1960, 1870,
+        1928, 1872, 1950, 2032, 2002, 1968,
+        1930, 2004, 1942, 1870, 2026, 2042,
+        2042, 2030, 1874, 1970
+    };
+
+    // 总体第二次偏移，年份大于或等于相应值时日期需要-1
+    static const int16_t SolarTermsOffsetY1[] = {
+        2067, 0x00,
+        1999, 0x00, 2066, 2066, 0x00, 1998,
+        2050, 1994, 2070, 0x00, 0x00, 0x00,
+        2050, 0x00, 2066, 1990, 0x00, 0x00,
+        0x00, 0x00, 2004, 0x00
+    };
+
+    static uint8_t GetSolarTerm(int y, uint8_t i) {
+        const uint32_t v = SolarTermsData[y - CALENDAR_YEAR_START];
+        uint8_t st = SolarTermsBaseDay[i] + ((v >> i) & 1);
+        if (y >= 1900) st += ((SolarTermsOffset >> i) & 1);
+        if (y >= SolarTermsOffsetY0[i]) --st;
+        if (SolarTermsOffsetY1[i] != 0 && y >= SolarTermsOffsetY1[i]) --st;
+        return st;
+    }
 
     static std::pair<int, int> GetSolarTermsInGregorianMonth(int y, int m) {
-        uint64_t data = (SolarTermsData[y - 1900] >> ((12 - m) * 4)) & 0xF;
-        int st1 = ((data >> 2) & 0x3) + SolarTermsOffset1[m - 1];
-        int st2 = (data & 0x3) + SolarTermsOffset2[m - 1];
-        if (y <= 1975) {
-            ++st1, ++st2;
-        }
-        return std::make_pair(st1, st2);
+        uint8_t idx = ((m - 1) << 1);
+        return std::make_pair(GetSolarTerm(y, idx), GetSolarTerm(y, idx + 1));
     }
 
     static const char *SolarTermsText[] = {
