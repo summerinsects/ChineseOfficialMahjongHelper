@@ -117,7 +117,7 @@ bool LatestCompetitionScene::parseResponse(const char *buffer, size_t size) {
         _competitions.clear();
         _competitions.reserve(doc.Size());
 
-        int64_t now = std::chrono::system_clock::now().time_since_epoch().count();
+        int64_t now = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now()).time_since_epoch().count();
         for (auto jt = doc.Begin(); jt != doc.End(); ++jt) {
             CompetitionInfo info{};
 
@@ -127,7 +127,7 @@ bool LatestCompetitionScene::parseResponse(const char *buffer, size_t size) {
                 info.startTime = static_cast<time_t>(it->value.GetInt64());
             }
 
-            it = json.FindMember("end_time");
+            it = json.FindMember("finish_time");
             if (it != json.MemberEnd() && it->value.IsInt64()) {
                 info.endTime = static_cast<time_t>(it->value.GetInt64());
             }

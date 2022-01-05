@@ -246,7 +246,7 @@ void HelloWorld::parseTips(const char *buffer, size_t size) {
             return;
         }
 
-        int64_t now = std::chrono::system_clock::now().time_since_epoch().count();
+        int64_t now = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now()).time_since_epoch().count();
 
         texts.reserve(doc.Size());
         for (auto it = doc.Begin(); it != doc.End(); ++it) {
