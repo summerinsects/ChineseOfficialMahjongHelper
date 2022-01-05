@@ -249,7 +249,7 @@ bool DatePicker::init(const Date *date, Callback &&callback) {
     label = Label::createWithSystemFont("", "Arial", 10);
     background->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-    label->setPosition(Vec2(totalWidth - 2.0f, totalHeight + 12.0f));
+    label->setPosition(Vec2(totalWidth - 5.0f, totalHeight + 12.0f));
     _chineseDateLabel = label;
 
     totalHeight += 45.0f;
