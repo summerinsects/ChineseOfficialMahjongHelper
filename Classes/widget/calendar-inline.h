@@ -226,7 +226,6 @@ namespace calendar {
                     }
                     // 倒退整个农历月
                     rem -= 30;
-                    --mx;
                 }
                 else {
                     // 小月可退29天
@@ -236,8 +235,8 @@ namespace calendar {
                     }
                     // 倒退整个农历月
                     rem -= 29;
-                    --mx;
                 }
+                --mx;
             } while (1);
         }
 
@@ -246,12 +245,10 @@ namespace calendar {
         res.month = mx;
         res.day = rem + 1;
         res.major = mm;
-        if (lm != 0) {  // 闰月序号校正
-            if (mx > lm) {
-                --res.month;
-                if (mx == lm + 1) {
-                    res.leap = true;
-                }
+        if (lm != 0 && mx > lm) {  // 闰月序号校正
+            --res.month;
+            if (mx == lm + 1) {
+                res.leap = true;
             }
         }
         return res;
@@ -272,12 +269,10 @@ namespace calendar {
         if (mx <= num) {
             date.month = mx;
             date.leap = false;
-            if (lm != 0) {  // 闰月序号校正
-                if (mx > lm) {
-                    --date.month;
-                    if (mx == lm + 1) {
-                        date.leap = true;
-                    }
+            if (lm != 0 && mx > lm) {  // 闰月序号校正
+                --date.month;
+                if (mx == lm + 1) {
+                    date.leap = true;
                 }
             }
             date.major = Chinese_IsMajorMonth(v, mx - 1);
