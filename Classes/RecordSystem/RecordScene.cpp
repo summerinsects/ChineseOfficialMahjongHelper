@@ -786,7 +786,7 @@ void RecordScene::onRecordTilesButton(cocos2d::Ref *) {
 
     mahjong::calculate_param_t param;
 
-    mahjong::string_to_tiles(_detail.win_hand.tiles, &param.hand_tiles, &param.win_tile);
+    mahjong::string_to_tiles(_detail.win_hand.tiles, strlen(_detail.win_hand.tiles), &param.hand_tiles, &param.win_tile);
     param.win_flag = _detail.win_hand.win_flag;
     param.flower_count = _detail.win_hand.flower_count;
 

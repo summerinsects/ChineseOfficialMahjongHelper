@@ -180,11 +180,11 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
     Label *label = Label::createWithSystemFont(
         __UTF8("牌理功能未经严格测试，可能存在bug。\n\n")
         __UTF8("1. 数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n")
-        __UTF8("2. 字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n")
-        __UTF8("3. 吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n")
-        __UTF8("  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n")
-        __UTF8("  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n")
-        __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示大明杠上家的8饼。当数字为5、6、7时，表示加杠。例如：[1111s,6]表示碰对家的1条后，又摸到1条加杠。\n")
+        __UTF8("2. 字牌：东南西北=ESWN，中发白=CFP。使用大写字母。\n")
+        __UTF8("3. 吃、碰、杠用英文[]，可选用数字表示供牌来源。数字的具体规则如下：\n")
+        __UTF8("  (1) 吃：表示第几张牌是由上家打出，如[567m2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n")
+        __UTF8("  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n")
+        __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p1]表示大明杠上家的8饼。当数字为5、6、7时，表示加杠。例如：[1111s6]表示碰对家的1条后，又摸到1条加杠。\n")
         __UTF8("4. 输入牌的总数不能超过14张。\n")
         __UTF8("5. 当输入牌的数量为(n*3+2)时，最后一张牌作为摸上来的牌。\n")
         __UTF8("6. 当输入牌的数量为(n*3+1)时，系统会随机补一张摸上来的牌。\n")
@@ -194,7 +194,7 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
         __UTF8("10. 点击手牌可切出对应牌，随机上牌。\n")
         __UTF8("输入范例：\n")
         __UTF8("  (1) [EEEE]288s349pSCFF2p\n")
-        __UTF8("  (2) [123p,1][345s,2][999s,3]6m6pEW1m\n")
+        __UTF8("  (2) [123p1][345s2][999s3]6m6pEW1m\n")
         __UTF8("  (3) 356m18s1579pWNFF9p"),
         "Arial", 10, Size(maxWidth, 0.0f));
     label->setTextColor(C4B_BLACK);
@@ -232,7 +232,8 @@ void MahjongTheoryScene::onGuideButton(cocos2d::Ref *) {
 void MahjongTheoryScene::showInputAlert() {
     mahjong::hand_tiles_t handTiles;
     mahjong::tile_t servingTile;
-    if (PARSE_NO_ERROR != mahjong::string_to_tiles(_editBox->getText(), &handTiles, &servingTile)) {
+    const char *text = _editBox->getText();
+    if (PARSE_NO_ERROR != mahjong::string_to_tiles(text, strlen(text), &handTiles, &servingTile)) {
         _editBox->openKeyboard();
         return;
     }
@@ -326,7 +327,7 @@ void MahjongTheoryScene::parseInput(const char *input) {
 
     mahjong::hand_tiles_t hand_tiles = { 0 };
     mahjong::tile_t serving_tile = 0;
-    intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &serving_tile);
+    intptr_t ret = mahjong::string_to_tiles(input, strlen(input), &hand_tiles, &serving_tile);
     if (ret != PARSE_NO_ERROR) {
         const char *errorStr = nullptr;
         switch (ret) {

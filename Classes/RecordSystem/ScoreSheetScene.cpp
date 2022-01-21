@@ -1222,7 +1222,7 @@ void ScoreSheetScene::onDetailButton(cocos2d::Ref *sender) {
     const Record::Detail::WinHand &win_hand = detail.win_hand;
     mahjong::hand_tiles_t hand_tiles;
     mahjong::tile_t win_tile;
-    mahjong::string_to_tiles(detail.win_hand.tiles, &hand_tiles, &win_tile);
+    mahjong::string_to_tiles(detail.win_hand.tiles, strlen(detail.win_hand.tiles), &hand_tiles, &win_tile);
 
     const float maxWidth = AlertDialog::maxWidth();
 

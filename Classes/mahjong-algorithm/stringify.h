@@ -30,17 +30,17 @@ namespace mahjong {
 /**
  * @brief 字符串格式：
  * - 数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。
- * - 字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。
- * - 吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：
- *    - 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。
- *    - 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。
- *    - 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示大明杠上家的8饼。当数字为5、6、7时，表示加杠。例如：[1111s,6]表示碰对家的1条后，又摸到1条加杠。
+ * - 字牌：东南西北=ESWN，中发白=CFP。使用大写字母。
+ * - 吃、碰、杠用英文[]，可选用数字表示供牌来源。数字的具体规则如下：
+ *    - 吃：表示第几张牌是由上家打出，如[567m2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。
+ *    - 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s3]表示碰下家的9条。对于不指定数字的，默认为碰上家。
+ *    - 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p1]表示大明杠上家的8饼。当数字为5、6、7时，表示加杠。例如：[1111s6]表示碰对家的1条后，又摸到1条加杠。
  * - 范例
  *    - [EEEE][CCCC][FFFF][PPPP]NN
  *    - 1112345678999s9s
- *    - [WWWW,1][444s]45m678pFF6m
+ *    - [WWWW1][444s]45m678pFF6m
  *    - [EEEE]288s349pSCFF2p
- *    - [123p,1][345s,2][999s,3]6m6pEW1m
+ *    - [123p1][345s2][999s3]6m6pEW1m
  *    - 356m18s1579pWNFF9p
  */
 
@@ -70,16 +70,18 @@ namespace mahjong {
 /**
  * @brief 解析牌
  * @param [in] str 字符串
+ * @param [in] len 字符串长度
  * @param [out] tiles 牌
  * @param [in] max_cnt 牌的最大数量
  * @retval > 0 实际牌的数量
  * @retval == 0 失败
  */
-intptr_t parse_tiles(const char *str, tile_t *tiles, intptr_t max_cnt);
+intptr_t parse_tiles(const char *str, size_t len, tile_t *tiles, intptr_t max_cnt);
 
 /**
  * @brief 字符串转换为手牌结构和上牌
  * @param [in] str 字符串
+ * @param [in] len 字符串长度
  * @param [out] hand_tiles 手牌结构
  * @param [out] serving_tile 上的牌
  * @retval PARSE_NO_ERROR 无错误
@@ -91,7 +93,7 @@ intptr_t parse_tiles(const char *str, tile_t *tiles, intptr_t max_cnt);
  * @retval PARSE_ERROR_TOO_MANY_TILES 过多牌
  * @retval PARSE_ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
  */
-intptr_t string_to_tiles(const char *str, hand_tiles_t *hand_tiles, tile_t *serving_tile);
+intptr_t string_to_tiles(const char *str, size_t len, hand_tiles_t *hand_tiles, tile_t *serving_tile);
 
 /**
  * @brief 牌转换为字符串

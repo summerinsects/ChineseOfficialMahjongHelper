@@ -437,15 +437,15 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
 
     Label *label = Label::createWithSystemFont(__UTF8("使用说明：\n")
         __UTF8("1. 数牌：万=m 条=s 饼=p。后缀使用小写字母，一连串同花色的数牌可合并使用用一个后缀，如123m、678s等等。\n")
-        __UTF8("2. 字牌：东南西北=ESWN，中发白=CFP。使用大写字母。亦兼容天凤风格的后缀z，但按中国习惯顺序567z为中发白。\n")
-        __UTF8("3. 吃、碰、杠用英文[]，可选用逗号+数字表示供牌来源。数字的具体规则如下：\n")
-        __UTF8("  (1) 吃：表示第几张牌是由上家打出，如[567m,2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n")
-        __UTF8("  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s,3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n")
-        __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p,1]表示大明杠上家的8饼。当数字为5、6、7时，表示加杠。例如：[1111s,6]表示碰对家的1条后，又摸到1条加杠。\n")
+        __UTF8("2. 字牌：东南西北=ESWN，中发白=CFP。使用大写字母。\n")
+        __UTF8("3. 吃、碰、杠用英文[]，可选用数字表示供牌来源。数字的具体规则如下：\n")
+        __UTF8("  (1) 吃：表示第几张牌是由上家打出，如[567m2]表示57万吃6万（第2张）。对于不指定数字的，默认为吃第1张。\n")
+        __UTF8("  (2) 碰：表示由哪家打出，1为上家，2为对家，3为下家，如[999s3]表示碰下家的9条。对于不指定数字的，默认为碰上家。\n")
+        __UTF8("  (3) 杠：与碰类似，但对于不指定数字的，则认为是暗杠。例如：[SSSS]表示暗杠南；[8888p1]表示大明杠上家的8饼。当数字为5、6、7时，表示加杠。例如：[1111s6]表示碰对家的1条后，又摸到1条加杠。\n")
         __UTF8("输入范例：\n")
         __UTF8("  (1) [EEEE][CCCC][FFFF][PPPP]NN\n")
         __UTF8("  (2) 1112345678999s9s\n")
-        __UTF8("  (3) [WWWW,1][444s]45m678pFF6m"),
+        __UTF8("  (3) [WWWW1][444s]45m678pFF6m"),
         "Arial", 10, Size(maxWidth, 0.0f));
     label->setTextColor(C4B_BLACK);
     label->setLineSpacing(2.0f);
@@ -517,7 +517,7 @@ const char *ExtraInfoWidget::parseInput(const char *input) {
 
     mahjong::hand_tiles_t hand_tiles;
     mahjong::tile_t win_tile;
-    intptr_t ret = mahjong::string_to_tiles(input, &hand_tiles, &win_tile);
+    intptr_t ret = mahjong::string_to_tiles(input, strlen(input), &hand_tiles, &win_tile);
     if (ret != PARSE_NO_ERROR) {
         switch (ret) {
             case PARSE_ERROR_ILLEGAL_CHARACTER: return __UTF8("无法解析的字符");
