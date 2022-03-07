@@ -2066,39 +2066,34 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
 
     // 最大番标记
     int max_fan = 0;
-    const fan_table_t *selected_fan_table = nullptr;
-
-    // 特殊和型的番
-    fan_table_t special_fan_table = { 0 };
+    fan_table_t tmp_table = { 0 };
 
     // 先判断各种特殊和型
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table)) {
-            max_fan = get_fan_by_table(special_fan_table);
-            selected_fan_table = &special_fan_table;
+        if (calculate_knitted_straight_fan(calculate_param, win_flag, tmp_table)) {
+            max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }
-        else if (calculate_special_form_fan(standing_tiles, win_flag, special_fan_table)) {
-            max_fan = get_fan_by_table(special_fan_table);
-            selected_fan_table = &special_fan_table;
+        else if (calculate_special_form_fan(standing_tiles, win_flag, tmp_table)) {
+            max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }
     }
     else if (fixed_cnt == 1) {  // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, win_flag, special_fan_table)) {
-            max_fan = get_fan_by_table(special_fan_table);
-            selected_fan_table = &special_fan_table;
+        if (calculate_knitted_straight_fan(calculate_param, win_flag, tmp_table)) {
+            max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }
     }
 
     // 无法构成特殊和型或者为七对
     // 七对也要按基本和型划分，因为极端情况下，基本和型的番会超过七对的番
-    if (selected_fan_table == nullptr || special_fan_table[SEVEN_PAIRS] == 1) {
+    if (max_fan == 0 || tmp_table[SEVEN_PAIRS] == 1) {
         // 划分
         division_result_t result;
         if (divide_win_hand(standing_tiles, hand_tiles->fixed_packs, fixed_cnt, &result)) {
             fan_table_t fan_tables[MAX_DIVISION_CNT] = { { 0 } };
+            const fan_table_t *selected_fan_table = nullptr;
 
             // 遍历各种划分方式，分别算番，找出最大的番的划分方式
             for (intptr_t i = 0; i < result.count; ++i) {
@@ -2107,18 +2102,23 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
                 packs_to_string(result.divisions[i].packs, 5, str, sizeof(str));
                 puts(str);
 #endif
-                calculate_regular_fan(result.divisions[i].packs, calculate_param, win_flag, fan_tables[i]);
-                int current_fan = get_fan_by_table(fan_tables[i]);
+                fan_table_t &current_table = fan_tables[i];
+                calculate_regular_fan(result.divisions[i].packs, calculate_param, win_flag, current_table);
+                int current_fan = get_fan_by_table(current_table);
                 if (current_fan > max_fan) {
                     max_fan = current_fan;
-                    selected_fan_table = &fan_tables[i];
+                    selected_fan_table = &current_table;
                 }
                 LOG("fan = %d\n\n", current_fan);
+            }
+
+            if (fan_table != nullptr && selected_fan_table != nullptr) {
+                memcpy(tmp_table, *selected_fan_table, sizeof(tmp_table));
             }
         }
     }
 
-    if (selected_fan_table == nullptr) {
+    if (max_fan == 0) {
         return ERROR_NOT_WIN;
     }
 
@@ -2126,7 +2126,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
     max_fan += calculate_param->flower_count;
 
     if (fan_table != nullptr) {
-        memcpy(*fan_table, *selected_fan_table, sizeof(*fan_table));
+        memcpy(*fan_table, tmp_table, sizeof(*fan_table));
         (*fan_table)[FLOWER_TILES] = calculate_param->flower_count;
     }
 
