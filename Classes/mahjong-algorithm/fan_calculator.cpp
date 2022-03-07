@@ -2109,6 +2109,12 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
                     max_fan = current_fan;
                     selected_fan_table = &current_table;
                 }
+                else if (current_fan == max_fan) {
+                    // 2022.3.7 优先选择一色三同顺、全中全带五
+                    if (fan_tables[i][PURE_TRIPLE_CHOW] == 1 || tmp_table[SEVEN_PAIRS] == 1) {
+                        selected_fan_table = &current_table;
+                    }
+                }
                 LOG("fan = %d\n\n", current_fan);
             }
 
