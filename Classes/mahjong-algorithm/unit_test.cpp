@@ -154,6 +154,18 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+    // 多种拆法番数一样时，优先选择问题 2022.3.7
+    test_points("44556m445566s55p6m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("445566m5s445566p5s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[678p]55s222333444p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC]11123444789p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC]11123444456p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC]12366678999p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[CCC]45666678999p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("PPP11123444p231m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("PPP66678999p789m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+
+    // 天和相关问题 2019.4.23
     test_points("1112345678999p9p", WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("1112345678999p9p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("1112345678999p9p", WIN_FLAG_DEAL, wind_t::EAST, wind_t::EAST);
