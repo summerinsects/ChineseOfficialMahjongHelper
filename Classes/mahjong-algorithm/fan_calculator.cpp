@@ -194,6 +194,15 @@ static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intp
     return ret;
 }
 
+static bool has_pair(const tile_table_t &cnt_table) {
+    for (int i = 0; i < 34; ++i) {
+        if (cnt_table[all_tiles[i]] > 1) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // 划分一手牌
 static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_packs, intptr_t fixed_cnt, division_result_t *result) {
     intptr_t standing_cnt = 14 - fixed_cnt * 3;
@@ -203,6 +212,10 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
     map_tiles(standing_tiles, standing_cnt, &cnt_table);
 
     result->count = 0;
+
+    if (!has_pair(cnt_table)) {
+        return false;
+    }
 
     // 复制副露的面子
     division_t work_division;
@@ -1755,6 +1768,10 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     tile_table_t cnt_table;
     map_tiles(hand_tiles->standing_tiles, standing_cnt, &cnt_table);
     ++cnt_table[win_tile];
+
+    if (!has_pair(cnt_table)) {
+        return false;
+    }
 
     // 匹配组合龙
     const tile_t (*matched_seq)[9] = std::find_if(&standard_knitted_straight[0], &standard_knitted_straight[6],
