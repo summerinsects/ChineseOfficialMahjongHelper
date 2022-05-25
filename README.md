@@ -3,7 +3,7 @@ Chinese Official Mahjong Helper 国标小助手
 - 这是与国标麻将相关的应用，包含算番器、线下实麻计分器、番种详细说明、牌理等内容
 - 本项目主要在[GitHub](https://github.com/summerinsects/ChineseOfficialMahjongHelper)上提交，码云（gitee）这边不定期手动同步代码
 - 本程序以cocos2dx引擎为UI写成
-- Classes/mahjong-algorithm文件夹下的算番、判断听牌、听牌计算、上听数计算、有效牌计算等相关算法已经独立成[仓库](https://github.com/summerinsects/ChineseOfficialMahjongFanCalculator)，可单独Star、Fork。
+- Classes/mahjong-algorithm文件夹下为算番、判断听牌、听牌计算、上听数计算、有效牌计算等相关算法，可独立使用。
 - 由于cocos2dx引擎自身的源码较为庞大，这里就不上传了，请按如下步骤配置
 
 ## 配置步骤
