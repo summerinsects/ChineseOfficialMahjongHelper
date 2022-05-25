@@ -329,9 +329,9 @@ bool TrainingScene::init() {
     }
 
     // 牌和控件的高度(widgetSize.height + 50.0f)
-    // 剩余高度(visibleSize.height - widgetSize.height - 50.0f)
-    // 4/6分配
-    const float y0 = (visibleSize.height - widgetSize.height - 50.0f) * 0.6f;
+    // 导航30.0f 留空10.0f
+    // 剩余高度(visibleSize.height - widgetSize.height - 50.0f - 30.0f - 10.0f)
+    const float y0 = visibleSize.height - widgetSize.height - 90.0f;
 
     handTilesWidget->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + y0 + 50.0f + widgetSize.height * 0.5f));
     _handTilesWidget = handTilesWidget;
