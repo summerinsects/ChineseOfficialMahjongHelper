@@ -4,6 +4,7 @@
 #include "../UICommon.h"
 #include "../UIColors.h"
 #include "../TilesImage.h"
+#include "../utils/fsstring.h"
 #include "../widget/LoadingView.h"
 #include "../widget/HandTilesWidget.h"
 #include "../widget/PopupMenu.h"
@@ -13,14 +14,16 @@
 USING_NS_CC;
 
 struct PuzzleTemplate {
-    std::string question[3];
-    std::string answer[3];
-    std::string meldable[3];
+    string_utils::fsstring<10> question[3];
+    string_utils::fsstring<3> solution[3];
+    string_utils::fsstring<3> meldable[3];
+    uint8_t shanten;
 };
 
 static std::vector<PuzzleTemplate> s_puzzles;
 
-static void parseField(const char *str, ptrdiff_t size, std::string (&arr)[3]) {
+template <size_t N>
+static void parseField(const char *str, ptrdiff_t size, string_utils::fsstring<N> (&arr)[3]) {
     while (size > 0 && Common::__isspace(*str)) {
         ++str;
         --size;
@@ -32,7 +35,10 @@ static void parseField(const char *str, ptrdiff_t size, std::string (&arr)[3]) {
     size_t cnt = 0;
     for (auto n = std::find(str, str + size, ',') - str; n != size; n = std::find(str, str + size, ',') - str) {
         if (n != 1 || str[0] != '0') {
-            arr[cnt] = std::string(str, n);
+            arr[cnt].assign(str, n);
+        }
+        else {
+            arr[cnt].clear();
         }
         if (++cnt == 3) {
             return;
@@ -43,7 +49,10 @@ static void parseField(const char *str, ptrdiff_t size, std::string (&arr)[3]) {
     }
 
     if (cnt < 3 && size > 0 && (size != 1 || str[0] != '0')) {
-        arr[cnt] = std::string(str, size);
+        arr[cnt].assign(str, size);
+    }
+    else {
+        arr[cnt].clear();
     }
 }
 
@@ -65,13 +74,24 @@ static bool parseLine(const char *str, ptrdiff_t size, PuzzleTemplate &tmp) {
 
         n = std::find(str, str + size, '|') - str;
         if (n < size) {
-            parseField(str, n, tmp.answer);
+            parseField(str, n, tmp.solution);
             ++n;
             str += n;
             size -= n;
 
             n = std::find(str, str + size, '|') - str;
             parseField(str, std::min(n, size), tmp.meldable);
+
+            if (n != std::string::npos) {
+                ++n;
+                str += n;
+                size -= n;
+
+                unsigned val = 255;
+                if (1 == sscanf(str, "%u", &val)) {
+                    tmp.shanten = static_cast<uint8_t>(val);
+                }
+            }
 
             return true;
         }
@@ -107,140 +127,123 @@ static const uint8_t OrderTable[][3] = {
     { 1, 2, 3 }, { 1, 3, 2 }, { 2, 1, 3 }, { 2, 3, 1 }, { 3, 1, 2 }, { 3, 2, 1 }
 };
 
-static uint64_t generatePuzzle(mahjong::hand_tiles_t *handTiles, mahjong::tile_t *servingTile) {
-    std::mt19937_64 engine(std::chrono::system_clock::now().time_since_epoch().count());
 
-    // 选择一个题目模板
-    const PuzzleTemplate &tpl = s_puzzles.at(std::uniform_int_distribution<size_t>(0, s_puzzles.size() - 1)(engine));
+static void distanceFromTable(const mahjong::tile_table_t &table, uint8_t (&dist)[6]) {
+    for (uint8_t s = 0; s < 3; ++s) {
+        uint8_t i, d1, d9;
 
-    memset(handTiles, 0, sizeof(*handTiles));
-    *servingTile = 0;
-    uint64_t answer = 0;
-
-    auto &order = OrderTable[std::uniform_int_distribution<>(0, 5)(engine)];  // 分配花色
-
-    // 牌表
-    mahjong::tile_table_t table = { 0 };
-    uint8_t cnt = 0, i;
-    for (i = 0; i < 3; ++i) {
-        uint8_t s = order[i % 3];
-        for (char c : tpl.question[i]) {
-            ++table[mahjong::make_tile(s, c - '0')];
-            ++cnt;
+        // 1的距离
+        for (i = 0, d1 = 0; i < 9; ++i, ++d1) {
+            if (table[mahjong::make_tile(s + 1, i + 1)]) break;
         }
-        for (char c : tpl.answer[i]) {
-            answer |= (1ULL << mahjong::make_tile(s, c - '0'));
+        dist[s << 1] = d1;
+
+        // 9的距离
+        for (i = 0, d9 = 0; i < 9; ++i, ++d9) {
+            if (table[mahjong::make_tile(s + 1, 9 - i)]) break;
+        }
+        dist[(s << 1) + 1] = d9;
+    }
+}
+
+static uint8_t maxDistanceIndex(std::mt19937_64 &engine, const uint8_t (&dist)[6]) {
+    uint8_t k = 0, max_dist = dist[0];
+    for (uint8_t i = 1; i < 6; ++i) {
+        // 如果相同，则一半概率选择后面的
+        if (dist[i] > max_dist || (dist[i] == max_dist && static_cast<uint8_t>(std::uniform_int_distribution<>(0, 99)(engine)) < 50)) {
+            k = i;
+            max_dist = dist[i];
         }
     }
+    return k;
+}
 
-    // 添加雀头
-    auto fill_pair = [&engine, &table, handTiles](bool terminal){
-        // 每门花色的19与其他牌的最小距离
-        uint8_t dist[6] = { 0 };
-        for (uint8_t s = 0; s < 3; ++s) {
-            auto &d1 = dist[s << 1];
-            for (uint8_t i = 0; i < 9; ++i, ++d1) {
-                if (table[mahjong::make_tile(s + 1, i + 1)]) break;
-            }
-            auto &d9 = dist[(s << 1) + 1];
-            for (uint8_t i = 0; i < 9; ++i, ++d9) {
-                if (table[mahjong::make_tile(s + 1, 9 - i)]) break;
-            }
-        }
+static mahjong::tile_t pickRandomTerminal(std::mt19937_64 &engine, const mahjong::tile_table_t &table) {
+    uint8_t dist[6] = { 0 };
+    distanceFromTable(table, dist);
+    uint8_t k = maxDistanceIndex(engine, dist);
+    return mahjong::make_tile((k >> 1) + 1, (k & 1) * 8 + 1);  // 0 2 4为1；1 3 5为9
+}
 
-        // 选择最大距离的牌作为雀头
-        uint8_t k = 0, max_dist = dist[0];
-        for (uint8_t i = 1; i < 6; ++i) {
-            // 如果相同，则一半概率选择后面的
-            if (dist[i] > max_dist || (dist[i] == max_dist && static_cast<uint8_t>(std::uniform_int_distribution<>(0, 99)(engine)) < 50)) {
-                k = i;
-                max_dist = dist[i];
-            }
-        }
+static mahjong::tile_t pickRandomSimple(std::mt19937_64 &engine, const mahjong::tile_table_t &table) {
+    uint8_t dist[6] = { 0 };
+    distanceFromTable(table, dist);
+    uint8_t k = maxDistanceIndex(engine, dist);
+    uint8_t max_dist = dist[k], rank;
 
-        uint8_t suit = (k >> 1) + 1, rank;
-        if (terminal) {
-            rank = (k & 1) * 8 + 1;
-        }
-        else {
-            int a, b;
-            if (k & 1) {
-                a = 12 - max_dist;
-                b = max_dist < 6 ? 9 : 8;  // 避免全带幺
-            }
-            else {
-                a = max_dist < 6 ? 1 : 2;  // 避免全带幺
-                b = max_dist - 2;
-            }
-            if (a < b) {
-                rank = static_cast<uint8_t>(std::uniform_int_distribution<>(a, b)(engine));
-            }
-            else {
-                rank = (k & 1) * 8 + 1;
-            }
-        }
-        table[mahjong::make_tile(suit, rank)] += 2;
-    };
-
-    if (cnt < 12) {
-        // 用明箭刻补齐无关第四组
-        mahjong::tile_t t = static_cast<mahjong::tile_t>(std::uniform_int_distribution<>(mahjong::TILE_C, mahjong::TILE_P)(engine));
-        handTiles->fixed_packs[0] = mahjong::make_pack(static_cast<uint8_t>(std::uniform_int_distribution<>(0, 2)(engine)), PACK_TYPE_PUNG, t);
-        ++handTiles->pack_count;
-
-        if (cnt == 9) {
-            fill_pair(false);
-        }
+    // 先尝试避免全带幺，需生成一个断幺的雀头
+    int a, b;
+    if (k & 1) {
+        // 对于9而言，最远情况是有23距离6，最近距离0
+        // 下界=10-(距离-2)=12-距离 上界=9或者8
+        a = 12 - max_dist;
+        b = max_dist < 6 ? 9 : 8;
     }
-    else if (cnt == 12) {
-        fill_pair(true);
+    else {
+        // 对于1而言，最远情况是有78距离6，最近距离0
+        // 下界=1或者2 上界=距离-2
+        a = max_dist < 6 ? 1 : 2;
+        b = max_dist - 2;
+    }
+    if (a < b) {
+        rank = static_cast<uint8_t>(std::uniform_int_distribution<>(a, b)(engine));
+    }
+    else {
+        // 实在没法就这么办吧
+        rank = (k & 1) * 8 + 1;
     }
 
-    // 添加副露
-    auto make_fixed_pack = [&engine, &table](const std::string &fixed, uint8_t suit)->uint16_t {
-        char c;
-        if (fixed.size() < 2) {
-            c = fixed[0];
-        }
-        else {
-            // 50% 概率
-            if (std::uniform_int_distribution<>(0, 1)(engine)) {
-                c = fixed[0];
-            } else {
-                c = fixed[1];
-            }
-        }
-        mahjong::tile_t t = mahjong::make_tile(suit, c - '0');
-        --table[t - 1];
-        --table[t];
-        --table[t + 1];
+    return mahjong::make_tile((k >> 1) + 1, rank);
+}
 
-        return mahjong::make_pack(static_cast<uint8_t>(std::uniform_int_distribution<>(0, 2)(engine)), PACK_TYPE_CHOW, t);
-    };
+static FORCE_INLINE mahjong::tile_t pickRandomHonor(std::mt19937_64 &engine) {
+    return static_cast<mahjong::tile_t>(std::uniform_int_distribution<>(mahjong::TILE_E, mahjong::TILE_P)(engine));
+}
 
-    // 副露几组
-    // 断幺或独幺的14张牌强制副露一组，避免门断平听牌型
-    i = 0;
-    if (cnt == 14
-        && table[mahjong::TILE_1m] + table[mahjong::TILE_9m] + table[mahjong::TILE_1s] + table[mahjong::TILE_9s] + table[mahjong::TILE_1p] + table[mahjong::TILE_9p] < 2) {
-        for (; i < 3; ++i) {
-            if (tpl.meldable[i].size()) {
-                handTiles->fixed_packs[handTiles->pack_count++] = make_fixed_pack(tpl.meldable[i], order[i % 3]);
-            }
-        }
-    }
+static FORCE_INLINE mahjong::tile_t pickRandomDragon(std::mt19937_64 &engine) {
+    return static_cast<mahjong::tile_t>(std::uniform_int_distribution<>(mahjong::TILE_C, mahjong::TILE_P)(engine));
+}
 
-    for (; i < 3; ++i) {
-        // 40%概率
-        if (tpl.meldable[i].size() && std::uniform_int_distribution<>(0, 9)(engine) < 4) {
-            handTiles->fixed_packs[handTiles->pack_count++] = make_fixed_pack(tpl.meldable[i], order[i % 3]);
+static FORCE_INLINE mahjong::pack_t makeUninvolvedPack(std::mt19937_64 &engine, mahjong::tile_t t) {
+    return mahjong::make_pack(static_cast<uint8_t>(std::uniform_int_distribution<>(1, 3)(engine)), PACK_TYPE_PUNG, t);
+}
+
+// 添加副露
+static uint16_t makeFixedPack(std::mt19937_64 &engine, mahjong::tile_table_t &table, uint8_t suit, char rank) {
+    mahjong::tile_t t = mahjong::make_tile(suit, rank - '0');
+    --table[t - 1];
+    --table[t];
+    --table[t + 1];
+
+    return mahjong::make_pack(static_cast<uint8_t>(std::uniform_int_distribution<>(1, 3)(engine)), PACK_TYPE_CHOW, t);
+};
+
+static void makeFixedPackWith3(std::mt19937_64 &engine, mahjong::tile_table_t &table, const PuzzleTemplate &tpl, mahjong::hand_tiles_t *hand_tiles, const uint8_t (&order)[3]) {
+    for (uint8_t i = 0; i < 3; ++i) {
+        const auto &meldable = tpl.meldable[i];
+        if (meldable.size() && tpl.question[i].size() == 3) {
+            hand_tiles->fixed_packs[hand_tiles->pack_count++] = makeFixedPack(engine, table, order[i], meldable[0]);
+            break;
         }
     }
+}
 
+static void makeFixedPackWith6(std::mt19937_64 &engine, mahjong::tile_table_t &table, const PuzzleTemplate &tpl, mahjong::hand_tiles_t *hand_tiles, const uint8_t (&order)[3]) {
+    for (uint8_t i = 0; i < 3; ++i) {
+        const auto &meldable = tpl.meldable[i];
+        if (meldable.size() == 2 && tpl.question[i].size() == 6) {
+            hand_tiles->fixed_packs[hand_tiles->pack_count++] = makeFixedPack(engine, table, order[i], meldable[0]);
+            hand_tiles->fixed_packs[hand_tiles->pack_count++] = makeFixedPack(engine, table, order[i], meldable[1]);
+            break;
+        }
+    }
+}
+
+static uint8_t convertTable(std::mt19937_64 &engine, const mahjong::tile_table_t &table, mahjong::tile_t *standing_tiles, mahjong::tile_t *serving_tile, mahjong::tile_t random_pair) {
     // 收集立牌
     mahjong::tile_t tmp[14];
-    cnt = 0;
-    for (i = 0; i < mahjong::TILE_TABLE_SIZE; ++i) {
+    uint8_t cnt = 0;
+    for (uint8_t i = mahjong::TILE_1m; i < mahjong::TILE_TABLE_SIZE; ++i) {
         for (auto k = table[i]; k > 0; --k) {
             tmp[cnt++] = i;
         }
@@ -248,16 +251,126 @@ static uint64_t generatePuzzle(mahjong::hand_tiles_t *handTiles, mahjong::tile_t
 
     // 随机选一张作为摸上来的牌
     uint8_t k = static_cast<uint8_t>(std::uniform_int_distribution<>(0, cnt - 1)(engine));
-    for (i = 0; i < k; ++i) {
-        handTiles->standing_tiles[i] = tmp[i];
-    }
-    *servingTile = tmp[k];
-    for (i = k + 1; i < cnt; ++i) {
-        handTiles->standing_tiles[i - 1] = tmp[i];
-    }
-    handTiles->tile_count = cnt - 1;
 
-    return answer;
+    // 之前的牌
+    for (uint8_t i = 0; i < k; ++i) {
+        standing_tiles[i] = tmp[i];
+    }
+
+    // 选中的牌
+    *serving_tile = tmp[k];
+
+    // 之后的牌
+    for (uint8_t i = k + 1; i < cnt; ++i) {
+        standing_tiles[i - 1] = tmp[i];
+    }
+
+    --cnt;
+
+    // 插入雀头
+    if (random_pair != 0) {
+        uint8_t s = 0;
+
+        // 找到位置
+        while (s < cnt && standing_tiles[s] < random_pair) {
+            ++s;
+        }
+
+        // 后移
+        for (uint8_t i = cnt; i > s; --i) {
+            standing_tiles[i + 1] = standing_tiles[i - 1];
+        }
+
+        // 插入
+        standing_tiles[s] = random_pair;
+        standing_tiles[s + 1] = random_pair;
+
+        cnt += 2;
+    }
+
+    return cnt;
+}
+
+static uint64_t generatePuzzle(mahjong::hand_tiles_t *hand_tiles, mahjong::tile_t *serving_tile) {
+    std::mt19937_64 engine(std::chrono::system_clock::now().time_since_epoch().count());
+
+    // 选择一个题目模板
+    const PuzzleTemplate &tpl = s_puzzles.at(std::uniform_int_distribution<size_t>(0, s_puzzles.size() - 1)(engine));
+
+    memset(hand_tiles, 0, sizeof(*hand_tiles));
+    *serving_tile = 0;
+    uint64_t solution = 0;
+    mahjong::tile_t random_pair = 0, random_pack = 0;
+    auto &order = OrderTable[std::uniform_int_distribution<>(0, 5)(engine)];  // 分配花色
+
+    // 牌表
+    mahjong::tile_table_t table = { 0 };
+    uint8_t cnt = 0;
+    for (uint8_t i = 0; i < 3; ++i) {
+        uint8_t s = order[i];
+        for (char c : tpl.question[i]) {
+            ++table[mahjong::make_tile(s, c - '0')];
+            ++cnt;
+        }
+        for (char c : tpl.solution[i]) {
+            solution |= (1ULL << mahjong::make_tile(s, c - '0'));
+        }
+    }
+
+    if (cnt < 12) {
+        // 用副露补齐无关第四组
+        random_pack = pickRandomDragon(engine);
+        hand_tiles->fixed_packs[0] = makeUninvolvedPack(engine, random_pack);
+        ++hand_tiles->pack_count;
+    }
+
+    // 副露几组
+    if (cnt == 14) {
+        // 1. 副露仅三张的那门
+        makeFixedPackWith3(engine, table, tpl, hand_tiles, order);
+
+        // 2. 副露仅六张的那门，断幺或独幺时避免门断平听牌型，其他情况20%概率
+        if (hand_tiles->pack_count == 0 &&
+            (table[mahjong::TILE_1m] + table[mahjong::TILE_9m] + table[mahjong::TILE_1s] + table[mahjong::TILE_9s] + table[mahjong::TILE_1p] + table[mahjong::TILE_9p] < 2
+                || std::uniform_int_distribution<>(0, 9)(engine) < 2)) {
+            makeFixedPackWith6(engine, table, tpl, hand_tiles, order);
+        }
+    }
+    else if (cnt == 12) {
+        // 补上随机雀头
+        random_pair = pickRandomTerminal(engine, table);
+
+        // 1. 副露仅三张的那门
+        makeFixedPackWith3(engine, table, tpl, hand_tiles, order);
+
+        // 2. 副露仅六张的那门，20%概率
+        if (hand_tiles->pack_count == 0 && std::uniform_int_distribution<>(0, 9)(engine) < 2) {
+            makeFixedPackWith6(engine, table, tpl, hand_tiles, order);
+        }
+
+        // 门清的听牌可以用字牌作雀头（50%概率）
+        if (tpl.shanten == 0 && hand_tiles->pack_count == 0 && std::uniform_int_distribution<>(0, 9)(engine) < 5) {
+            random_pair = pickRandomHonor(engine);
+        }
+    }
+    else if (cnt == 9) {
+        // 补上随机雀头
+        random_pair = pickRandomSimple(engine, table);
+
+        // 20%概率再增加一组副露
+        if (std::uniform_int_distribution<>(0, 9)(engine) < 2) {
+            makeFixedPackWith3(engine, table, tpl, hand_tiles, order);
+        }
+    }
+
+    // 副露随机排序
+    if (hand_tiles->pack_count >= 2) {
+        std::shuffle(&hand_tiles->fixed_packs[0], &hand_tiles->fixed_packs[hand_tiles->pack_count], engine);
+    }
+
+    hand_tiles->tile_count = convertTable(engine, table, hand_tiles->standing_tiles, serving_tile, random_pair);
+
+    return solution;
 }
 
 class ShaderLayer : public Layer {
