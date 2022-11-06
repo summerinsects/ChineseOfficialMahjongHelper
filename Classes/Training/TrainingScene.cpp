@@ -9,6 +9,9 @@
 #include "../widget/PopupMenu.h"
 #include "../widget/AlertDialog.h"
 #include "../widget/Toast.h"
+#ifndef _WIN32
+#include <sys/stat.h>
+#endif
 
 USING_NS_CC;
 
@@ -545,6 +548,50 @@ bool TrainingScene::init() {
     return true;
 }
 
+static int64_t getFileLastWriteTime(const std::string &path) {
+#ifdef _WIN32
+    if (path.length() >= (size_t)std::numeric_limits<int>::max()) {
+        return -1;
+    }
+
+    int len = static_cast<int>(path.length());
+    int size = ::MultiByteToWideChar(CP_UTF8, 0, path.c_str(), len, nullptr, 0);
+    std::vector<wchar_t> wpath;
+    if (size > 0) {
+        wpath.resize(size + 1);
+        ::MultiByteToWideChar(CP_UTF8, 0, path.c_str(), len, wpath.data(), size);
+    }
+    else {
+        return -1;
+    }
+
+    WIN32_FILE_ATTRIBUTE_DATA attrs;
+    if (!::GetFileAttributesExW(wpath.data(), GetFileExInfoStandard, &attrs)) {
+        return -1;
+    }
+
+    const FILETIME &ft = attrs.ftLastWriteTime;
+    ULARGE_INTEGER ui;
+    ui.LowPart = ft.dwLowDateTime;
+    ui.HighPart = ft.dwHighDateTime;
+    return static_cast<int64_t>(ui.QuadPart / 10000000ULL - 11644473600ULL);
+#else
+
+#if ((defined __ANDROID__) && (__ANDROID_API__ < 21)) || (defined __APPLE__)
+    struct stat file_info;
+    int result = stat(path.c_str(), &file_info);
+#else
+    struct stat64 file_info;
+    int result = stat64(path.c_str(), &file_info);
+#endif
+    if (result < 0) {
+        return -1;
+    }
+
+    return file_info.st_mtime;
+#endif
+}
+
 void TrainingScene::loadPuzzle() {
     LoadingView *loadingView = LoadingView::create();
     loadingView->showInScene(this);
@@ -562,9 +609,17 @@ void TrainingScene::loadPuzzle() {
         std::string path = FileUtils::getInstance()->getWritablePath();
         path.append("puzzles.txt");
         if (!FileUtils::getInstance()->isFileExist(path)) {
-            path = "text/puzzles.txt";
+            path = FileUtils::getInstance()->fullPathForFilename("text/puzzles.txt");
             CCLOG("use default puzzles");
         }
+        else {
+            std::string path1 = FileUtils::getInstance()->fullPathForFilename("text/puzzles.txt");
+            if (getFileLastWriteTime(path) < getFileLastWriteTime(path1)) {
+                path.swap(path1);
+                CCLOG("use default puzzles");
+            }
+        }
+
         std::string content = FileUtils::getInstance()->getStringFromFile(path);
         loadTemplates(content.data(), content.size(), *puzzles);
     });
