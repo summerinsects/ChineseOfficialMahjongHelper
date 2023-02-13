@@ -32,7 +32,7 @@
 /**
  * 算番流程概述：
  * 1. 判断特殊和型
- *   (1) 门清状态——七对、十三幺、组合龙、全不靠
+ *   (1) 门清状态——七对、十三幺、组合龙、全不靠、九莲宝灯
  *   (2) 1副露状态——组合龙
  * 2. 按基本和型划分（留意七对）
  * 3. 对第2步中的划分结果进行算番，取最大值
@@ -44,18 +44,17 @@
  *   (2) 3顺1刻——计算3顺的番
  *   (3) 2顺2刻——计算2顺的番，计算2刻的番
  *   (4) 1顺3刻——计算3刻的番
- * 3. 九莲宝灯判断
- * 4. 根据和牌方式调整——涉及：不求人、全求人
- * 5. 根据雀头调整——涉及：平和、小三元、小四喜
- * 6. 根据牌组特征调整——涉及：全带幺、全带五、全双刻
- * 7. 根据花色调整——涉及：无字、缺一门、混一色、清一色、五门齐
- * 8. 根据牌特性调整——涉及：断幺、推不倒、绿一色、字一色、清幺九、混幺九
- * 9. 根据数牌的范围调整——涉及：大于五、小于五、全大、全中、全小
- * 10. 计算四归一
- * 11. 根据听牌方式调整——涉及：边张、嵌张、单钓将
- * 12. 统一调整规则中规定不计的
- * 13. 最后调整圈风门风
- * 14. 以上流程走完，得到算番结果。如果为0番，则调整为无番和
+ * 3. 根据和牌方式调整——涉及：不求人、全求人
+ * 4. 根据雀头调整——涉及：平和、小三元、小四喜
+ * 5. 根据牌组特征调整——涉及：全带幺、全带五、全双刻
+ * 6. 根据花色调整——涉及：无字、缺一门、混一色、清一色、五门齐
+ * 7. 根据牌特性调整——涉及：断幺、推不倒、绿一色、字一色、清幺九、混幺九
+ * 8. 根据数牌的范围调整——涉及：大于五、小于五、全大、全中、全小
+ * 9. 计算四归一
+ * 10. 根据听牌方式调整——涉及：边张、嵌张、单钓将
+ * 11. 统一调整规则中规定不计的
+ * 12. 最后调整圈风门风
+ * 13. 以上流程走完，得到算番结果。如果为0番，则调整为无番和
  */
 
 #define MAX_DIVISION_CNT 20  // 一副牌最多也没有20种划分吧，够用了
@@ -1270,18 +1269,6 @@ static void adjust_fan_table(fan_table_t &fan_table) {
         fan_table[HALF_FLUSH] = 0;
         fan_table[ONE_VOIDED_SUIT] = 0;
     }
-    // 九莲宝灯不计清一色、门前清、缺一门、无字，减计1个幺九刻，把不求人修正为自摸
-    if (fan_table[NINE_GATES]) {
-        fan_table[FULL_FLUSH] = 0;
-        fan_table[CONCEALED_HAND] = 0;
-        --fan_table[PUNG_OF_TERMINALS_OR_HONORS];
-        fan_table[ONE_VOIDED_SUIT] = 0;
-        fan_table[NO_HONORS] = 0;
-        if (fan_table[FULLY_CONCEALED_HAND]) {
-            fan_table[FULLY_CONCEALED_HAND] = 0;
-            fan_table[SELF_DRAWN] = 1;
-        }
-    }
     // 四杠不计单钓将
     if (fan_table[FOUR_KONGS]) {
         fan_table[SINGLE_WAIT] = 0;
@@ -1707,13 +1694,6 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_para
 
     bool heaven_win = (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
 
-    // 九莲宝灯
-    if (!heaven_win && standing_cnt == 13) {
-        if (is_nine_gates(standing_tiles)) {
-            fan_table[NINE_GATES] = 1;
-        }
-    }
-
     // 根据和牌方式调整——涉及番种：不求人、全求人
     adjust_by_self_drawn(packs, fixed_cnt, (win_flag & WIN_FLAG_SELF_DRAWN) != 0, fan_table);
     // 根据雀头调整——涉及番种：平和、小三元、小四喜
@@ -1988,6 +1968,45 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
     return false;
 }
 
+// 九莲宝灯算番
+static bool calculate_nine_gates_fan(const tile_t (&standing_tiles)[13], tile_t win_tile, win_flag_t win_flag, fan_table_t &fan_table) {
+    bool heaven_win = (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
+    if (heaven_win
+        || tile_get_suit(win_tile) != tile_get_suit(standing_tiles[0])
+        || !is_nine_gates(standing_tiles)) {
+        return false;
+    }
+
+    fan_table[NINE_GATES] = 1;
+
+    // 和1、9加计清龙、四归一
+    // 和2、5、8加计双暗刻、幺九刻
+    // 和2、3、4、6、7、8加计连六
+    rank_t r = tile_get_rank(win_tile);
+    switch (r) {
+    case 1: case 9:
+        fan_table[PURE_STRAIGHT] = 1;
+        fan_table[TILE_HOG] = 1;
+        break;
+    case 2: case 8:
+        fan_table[TWO_CONCEALED_PUNGS] = 1;
+        fan_table[SHORT_STRAIGHT] = 1;
+        fan_table[PUNG_OF_TERMINALS_OR_HONORS] = 1;
+        break;
+    case 5:
+        fan_table[TWO_CONCEALED_PUNGS] = 1;
+        fan_table[PUNG_OF_TERMINALS_OR_HONORS] = 1;
+        break;
+    case 4: case 7: case 3: case 6:
+        fan_table[SHORT_STRAIGHT] = 1;
+        break;
+    }
+
+    adjust_by_win_flag(win_flag, fan_table);
+
+    return true;
+}
+
 // 从番表计算番数
 static int get_fan_by_table(const fan_table_t &fan_table) {
     int fan = 0;
@@ -2111,11 +2130,10 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
 
     // 先判断各种特殊和型
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, win_flag, tmp_table)) {
-            max_fan = get_fan_by_table(tmp_table);
-            LOG("fan = %d\n\n", max_fan);
-        }
-        else if (calculate_special_form_fan(standing_tiles, win_flag, tmp_table)) {
+        // 出现频率：七对>组合龙>九莲宝灯
+        if (calculate_special_form_fan(standing_tiles, win_flag, tmp_table)
+            || calculate_knitted_straight_fan(calculate_param, win_flag, tmp_table)
+            || calculate_nine_gates_fan(hand_tiles->standing_tiles, win_tile, win_flag, tmp_table)) {
             max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }
