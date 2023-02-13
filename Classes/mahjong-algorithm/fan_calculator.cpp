@@ -1560,14 +1560,25 @@ static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
     if (win_flag & WIN_FLAG_LAST_TILE) {
         fan_table[LAST_TILE] = 1;
     }
-    if (win_flag & WIN_FLAG_WALL_LAST) {
-        fan_table[win_flag & WIN_FLAG_SELF_DRAWN ? LAST_TILE_DRAW : LAST_TILE_CLAIM] = 1;
-    }
-    if (win_flag & WIN_FLAG_KONG_INVOLVED) {
-        fan_table[win_flag & WIN_FLAG_SELF_DRAWN ? OUT_WITH_REPLACEMENT_TILE : ROBBING_THE_KONG] = 1;
-    }
     if (win_flag & WIN_FLAG_SELF_DRAWN) {
         fan_table[SELF_DRAWN] = 1;
+        if (win_flag & WIN_FLAG_WALL_LAST) {
+            fan_table[LAST_TILE_DRAW] = 1;
+            fan_table[SELF_DRAWN] = 0;
+        }
+        if (win_flag & WIN_FLAG_KONG_INVOLVED) {
+            fan_table[OUT_WITH_REPLACEMENT_TILE] = 1;
+            fan_table[SELF_DRAWN] = 0;
+        }
+    }
+    else {
+        if (win_flag & WIN_FLAG_WALL_LAST) {
+            fan_table[LAST_TILE_CLAIM] = 1;
+        }
+        if (win_flag & WIN_FLAG_KONG_INVOLVED) {
+            fan_table[ROBBING_THE_KONG] = 1;
+            fan_table[LAST_TILE] = 0;
+        }
     }
 }
 
@@ -1912,6 +1923,8 @@ static bool calculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14
 
 // 特殊和型算番
 static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_flag_t win_flag, fan_table_t &fan_table) {
+    // 按出现频率顺序
+
     // 七对
     if (standing_tiles[0] == standing_tiles[1]
         && standing_tiles[2] == standing_tiles[3]
@@ -1930,7 +1943,13 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
             && standing_tiles[10] + 1 == standing_tiles[12]) {
             // 连七对
             fan_table[SEVEN_SHIFTED_PAIRS] = 1;
-            adjust_by_tiles_traits(standing_tiles, 14, fan_table);
+
+            // 2~8的连七对加计断幺
+            if (tile_get_rank(standing_tiles[0]) == 2) {
+                fan_table[ALL_SIMPLES] = 1;
+            }
+
+            adjust_by_win_flag(win_flag, fan_table);
         }
         else {
             // 普通七对
@@ -1944,24 +1963,29 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
             adjust_by_rank_range(standing_tiles, 14, fan_table);
             // 四归一调整
             adjust_by_tiles_hog(standing_tiles, 14, fan_table);
+
+            adjust_by_win_flag(win_flag, fan_table);
+            // 统一调整一些不计的
+            adjust_fan_table(fan_table);
         }
+
+        return true;
     }
-    // 十三幺
-    else if (is_thirteen_orphans(standing_tiles)) {
-        fan_table[THIRTEEN_ORPHANS] = 1;
-    }
+
     // 全不靠/七星不靠
-    else if (calculate_honors_and_knitted_tiles(standing_tiles, fan_table)) {
-    }
-    else {
-        return false;
+    if (calculate_honors_and_knitted_tiles(standing_tiles, fan_table)) {
+        adjust_by_win_flag(win_flag, fan_table);
+        return true;
     }
 
-    adjust_by_win_flag(win_flag, fan_table);
-    // 统一调整一些不计的，根据风调整就没必要了，这些特殊和型都没有面子，不存在圈风刻、门风刻
-    adjust_fan_table(fan_table);
+    // 十三幺
+    if (is_thirteen_orphans(standing_tiles)) {
+        fan_table[THIRTEEN_ORPHANS] = 1;
+        adjust_by_win_flag(win_flag, fan_table);
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 // 从番表计算番数
