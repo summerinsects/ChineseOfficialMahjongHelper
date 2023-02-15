@@ -1249,7 +1249,7 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, intptr_t pack_
 }
 
 // 统一调整一些不计的
-static void adjust_fan_table(fan_table_t &fan_table) {
+static void final_adjust(fan_table_t &fan_table) {
     // 大四喜不计三风刻、碰碰和、圈风刻、门风刻、幺九刻
     if (fan_table[BIG_FOUR_WINDS]) {
         fan_table[BIG_THREE_WINDS] = 0;
@@ -1722,7 +1722,7 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_para
     }
 
     // 统一调整一些不计的
-    adjust_fan_table(fan_table);
+    final_adjust(fan_table);
 
     // 调整圈风刻、门风刻（大四喜不计圈风刻、门风刻）
     if (fan_table[BIG_FOUR_WINDS] == 0) {
@@ -1849,7 +1849,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     }
 
     // 统一调整一些不计的
-    adjust_fan_table(fan_table);
+    final_adjust(fan_table);
 
     // 调整圈风刻、门风刻
     tile_t tile = pack_get_tile(packs[3]);
@@ -1946,7 +1946,7 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
 
             adjust_by_win_flag(win_flag, fan_table);
             // 统一调整一些不计的
-            adjust_fan_table(fan_table);
+            final_adjust(fan_table);
         }
 
         return true;
