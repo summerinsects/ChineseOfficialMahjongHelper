@@ -8,6 +8,7 @@
 #include <limits>
 #include <assert.h>
 #include <time.h>
+#include <string.h>
 
 using namespace mahjong;
 
