@@ -1805,13 +1805,17 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     // 和牌张是组合龙范围的牌，不计边张、嵌张、单钓将
     if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; })) {
         if (fixed_cnt == 0) {  // 门清的牌有可能存在边张、嵌张、单钓将
-            // 将除去组合龙的部分恢复成牌
-            --cnt_table[win_tile];
-            tile_t temp[4];
-            intptr_t cnt = table_to_tiles(cnt_table, temp, 4);
+            // 天和不计边张、嵌张、单钓将
+            bool heaven_win = (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
+            if (!heaven_win) {
+                // 将除去组合龙的部分恢复成牌
+                --cnt_table[win_tile];
+                tile_t temp[4];
+                intptr_t cnt = table_to_tiles(cnt_table, temp, 4);
 
-            // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
-            adjust_by_waiting_form(packs + 3, 2, temp, cnt, win_tile, fan_table);
+                // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
+                adjust_by_waiting_form(packs + 3, 2, temp, cnt, win_tile, fan_table);
+            }
         }
         else {
             // 非门清状态如果听牌不在组合龙范围内，必然是单钓将
