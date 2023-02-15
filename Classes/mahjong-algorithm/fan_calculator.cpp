@@ -1273,20 +1273,6 @@ static void final_adjust(fan_table_t &fan_table) {
     if (fan_table[FOUR_KONGS]) {
         fan_table[SINGLE_WAIT] = 0;
     }
-    // 连七对不计七对、清一色、门前清、缺一门、无字
-    if (fan_table[SEVEN_SHIFTED_PAIRS]) {
-        fan_table[SEVEN_PAIRS] = 0;
-        fan_table[FULL_FLUSH] = 0;
-        fan_table[CONCEALED_HAND] = 0;
-        fan_table[ONE_VOIDED_SUIT] = 0;
-        fan_table[NO_HONORS] = 0;
-    }
-    // 十三幺不计五门齐、门前清、单钓将
-    if (fan_table[THIRTEEN_ORPHANS]) {
-        fan_table[ALL_TYPES] = 0;
-        fan_table[CONCEALED_HAND] = 0;
-        fan_table[SINGLE_WAIT] = 0;
-    }
 
     // 清幺九不计混幺九、碰碰胡、全带幺、幺九刻、无字（严格98规则不计双同刻、不计三同刻）
     if (fan_table[ALL_TERMINALS]) {
@@ -1383,16 +1369,6 @@ static void final_adjust(fan_table_t &fan_table) {
         fan_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
     }
 
-    // 七对不计门前清、单钓将
-    if (fan_table[SEVEN_PAIRS]) {
-        fan_table[CONCEALED_HAND] = 0;
-        fan_table[SINGLE_WAIT] = 0;
-    }
-    // 七星不靠不计五门齐、门前清
-    if (fan_table[GREATER_HONORS_AND_KNITTED_TILES]) {
-        fan_table[ALL_TYPES] = 0;
-        fan_table[CONCEALED_HAND] = 0;
-    }
     // 全双刻不计碰碰胡、断幺、无字
     if (fan_table[ALL_EVEN_PUNGS]) {
         fan_table[ALL_PUNGS] = 0;
@@ -1442,11 +1418,6 @@ static void final_adjust(fan_table_t &fan_table) {
         fan_table[NO_HONORS] = 0;
     }
 
-    // 七星不靠不计五门齐、门前清
-    if (fan_table[LESSER_HONORS_AND_KNITTED_TILES]) {
-        fan_table[ALL_TYPES] = 0;
-        fan_table[CONCEALED_HAND] = 0;
-    }
     // 大于五不计无字
     if (fan_table[UPPER_FOUR]) {
         fan_table[NO_HONORS] = 0;
