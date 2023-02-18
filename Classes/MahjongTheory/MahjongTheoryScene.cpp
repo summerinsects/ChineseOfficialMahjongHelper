@@ -362,9 +362,9 @@ void MahjongTheoryScene::parseInput(const char *input) {
 
     // 随机上牌
     if (serving_tile == 0) {
-        mahjong::tile_table_t cnt_table;
-        mahjong::map_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count, &cnt_table);
-        serving_tile = serveRandomTile(cnt_table, 0);
+        mahjong::tile_table_t tile_table;
+        mahjong::map_tiles(hand_tiles.standing_tiles, hand_tiles.tile_count, &tile_table);
+        serving_tile = serveRandomTile(tile_table, 0);
 
         memset(_tileString, 0, sizeof(_tileString));
         Common::strncpy(_tileString, input);
