@@ -45,28 +45,28 @@ intptr_t packs_to_tiles(const pack_t *packs, intptr_t pack_cnt, tile_t *tiles, i
  *
  * @param [in] tiles 牌
  * @param [in] cnt 牌的数量
- * @param [out] cnt_table 牌的数量表
+ * @param [out] tile_table 牌的数量表
  */
-void map_tiles(const tile_t *tiles, intptr_t cnt, tile_table_t *cnt_table);
+void map_tiles(const tile_t *tiles, intptr_t cnt, tile_table_t *tile_table);
 
 /**
  * @brief 将手牌打表
  *
  * @param [in] hand_tiles 手牌
- * @param [out] cnt_table 牌的数量表
+ * @param [out] tile_table 牌的数量表
  * @return bool 手牌结构是否正确。即是否符合：副露组数*3+立牌数=13
  */
-bool map_hand_tiles(const hand_tiles_t *hand_tiles, tile_table_t *cnt_table);
+bool map_hand_tiles(const hand_tiles_t *hand_tiles, tile_table_t *tile_table);
 
 /**
  * @brief 将表转换成牌
  *
- * @param [in] cnt_table 牌的数量表
+ * @param [in] tile_table 牌的数量表
  * @param [out] tiles 牌
  * @param [in] max_cnt 牌的最大数量
  * @return intptr_t 牌的实际数量
  */
-intptr_t table_to_tiles(const tile_table_t &cnt_table, tile_t *tiles, intptr_t max_cnt);
+intptr_t table_to_tiles(const tile_table_t &tile_table, tile_t *tiles, intptr_t max_cnt);
 
 /**
  * @brief 有效牌标记表类型

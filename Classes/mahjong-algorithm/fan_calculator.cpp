@@ -112,34 +112,34 @@ static void divide_tail_add_division(intptr_t fixed_cnt, const division_t *work_
 }
 
 // 递归划分的最后一步
-static bool divide_tail(tile_table_t &cnt_table, intptr_t fixed_cnt, division_t *work_division, division_result_t *result) {
+static bool divide_tail(tile_table_t &tile_table, intptr_t fixed_cnt, division_t *work_division, division_result_t *result) {
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
-        if (cnt_table[t] < 2) {
+        if (tile_table[t] < 2) {
             continue;
         }
 
-        cnt_table[t] -= 2;  // 削减
+        tile_table[t] -= 2;  // 削减
         // 所有牌全部使用完毕
-        if (std::all_of(std::begin(cnt_table), std::end(cnt_table), [](int n) { return n == 0; })) {
-            cnt_table[t] += 2;  // 还原
+        if (std::all_of(std::begin(tile_table), std::end(tile_table), [](int n) { return n == 0; })) {
+            tile_table[t] += 2;  // 还原
 
             // 这2张作为雀头
             work_division->packs[4] = make_pack(0, PACK_TYPE_PAIR, t);
             divide_tail_add_division(fixed_cnt, work_division, result);  // 记录
             return true;
         }
-        cnt_table[t] += 2;  // 还原
+        tile_table[t] += 2;  // 还原
     }
 
     return false;
 }
 
 // 递归划分
-static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intptr_t step, eigen_t prev_eigen, division_t *work_division, division_result_t *result) {
+static bool divide_recursively(tile_table_t &tile_table, intptr_t fixed_cnt, intptr_t step, eigen_t prev_eigen, division_t *work_division, division_result_t *result) {
     const intptr_t idx = step + fixed_cnt;
     if (idx == 4) {  // 4组面子都有了
-        return divide_tail(cnt_table, fixed_cnt, work_division, result);
+        return divide_tail(tile_table, fixed_cnt, work_division, result);
     }
 
     bool ret = false;
@@ -147,44 +147,44 @@ static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intp
     // 按牌表张遍历牌
     for (int i = 0; i < 34; ++i) {
         tile_t t = all_tiles[i];
-        if (cnt_table[t] < 1) {
+        if (tile_table[t] < 1) {
             continue;
         }
 
         // 刻子
-        if (cnt_table[t] > 2) {
+        if (tile_table[t] > 2) {
             // 如果当前刻子特征值小于上一组，说明这条路径已经来过了
             eigen_t eigen = make_eigen(t, t, t);
             if (eigen > prev_eigen) {
                 work_division->packs[idx] = make_pack(0, PACK_TYPE_PUNG, t);  // 记录刻子
                 // 削减这组刻子，递归
-                cnt_table[t] -= 3;
-                if (divide_recursively(cnt_table, fixed_cnt, step + 1, eigen, work_division, result)) {
+                tile_table[t] -= 3;
+                if (divide_recursively(tile_table, fixed_cnt, step + 1, eigen, work_division, result)) {
                     ret = true;
                 }
                 // 还原
-                cnt_table[t] += 3;
+                tile_table[t] += 3;
             }
         }
 
         // 顺子（只能是数牌）
         if (is_numbered_suit(t)) {
-            if (tile_get_rank(t) < 8 && cnt_table[t + 1] && cnt_table[t + 2]) {
+            if (tile_get_rank(t) < 8 && tile_table[t + 1] && tile_table[t + 2]) {
                 // 如果当前顺子特征值小于上一组，说明这条路径已经来过了
                 eigen_t eigen = make_eigen(t, t + 1, t + 2);
                 if (eigen >= prev_eigen) {
                     work_division->packs[idx] = make_pack(0, PACK_TYPE_CHOW, static_cast<tile_t>(t + 1));  // 记录顺子
                     // 削减这组顺子，递归
-                    --cnt_table[t];
-                    --cnt_table[t + 1];
-                    --cnt_table[t + 2];
-                    if (divide_recursively(cnt_table, fixed_cnt, step + 1, eigen, work_division, result)) {
+                    --tile_table[t];
+                    --tile_table[t + 1];
+                    --tile_table[t + 2];
+                    if (divide_recursively(tile_table, fixed_cnt, step + 1, eigen, work_division, result)) {
                         ret = true;
                     }
                     // 还原
-                    ++cnt_table[t];
-                    ++cnt_table[t + 1];
-                    ++cnt_table[t + 2];
+                    ++tile_table[t];
+                    ++tile_table[t + 1];
+                    ++tile_table[t + 2];
                 }
             }
         }
@@ -193,9 +193,9 @@ static bool divide_recursively(tile_table_t &cnt_table, intptr_t fixed_cnt, intp
     return ret;
 }
 
-static bool has_pair(const tile_table_t &cnt_table) {
+static bool has_pair(const tile_table_t &tile_table) {
     for (int i = 0; i < 34; ++i) {
-        if (cnt_table[all_tiles[i]] > 1) {
+        if (tile_table[all_tiles[i]] > 1) {
             return true;
         }
     }
@@ -207,19 +207,19 @@ static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_pa
     intptr_t standing_cnt = 14 - fixed_cnt * 3;
 
     // 对立牌的种类进行打表
-    tile_table_t cnt_table;
-    map_tiles(standing_tiles, standing_cnt, &cnt_table);
+    tile_table_t tile_table;
+    map_tiles(standing_tiles, standing_cnt, &tile_table);
 
     result->count = 0;
 
-    if (!has_pair(cnt_table)) {
+    if (!has_pair(tile_table)) {
         return false;
     }
 
     // 复制副露的面子
     division_t work_division;
     memcpy(work_division.packs, fixed_packs, fixed_cnt * sizeof(pack_t));
-    return divide_recursively(cnt_table, fixed_cnt, 0, 0, &work_division, result);
+    return divide_recursively(tile_table, fixed_cnt, 0, 0, &work_division, result);
 }
 
 //-------------------------------- 算番 --------------------------------
@@ -888,13 +888,13 @@ static void calculate_2_pungs_unordered(const tile_t (&mid_tiles)[2], fan_table_
 // 九莲宝灯
 static bool is_nine_gates(const tile_t *tiles) {
     // 对立牌的种类进行打表
-    tile_table_t cnt_table;
-    map_tiles(tiles, 13, &cnt_table);
+    tile_table_t tile_table;
+    map_tiles(tiles, 13, &tile_table);
 
     // 1、9各三枚，2~8各一枚
-    return (cnt_table[0x11] == 3 && cnt_table[0x19] == 3 && std::all_of(cnt_table + 0x12, cnt_table + 0x19, [](int n) { return n == 1; }))
-        || (cnt_table[0x21] == 3 && cnt_table[0x29] == 3 && std::all_of(cnt_table + 0x22, cnt_table + 0x29, [](int n) { return n == 1; }))
-        || (cnt_table[0x31] == 3 && cnt_table[0x39] == 3 && std::all_of(cnt_table + 0x32, cnt_table + 0x39, [](int n) { return n == 1; }));
+    return (tile_table[0x11] == 3 && tile_table[0x19] == 3 && std::all_of(tile_table + 0x12, tile_table + 0x19, [](int n) { return n == 1; }))
+        || (tile_table[0x21] == 3 && tile_table[0x29] == 3 && std::all_of(tile_table + 0x22, tile_table + 0x29, [](int n) { return n == 1; }))
+        || (tile_table[0x31] == 3 && tile_table[0x39] == 3 && std::all_of(tile_table + 0x32, tile_table + 0x39, [](int n) { return n == 1; }));
 }
 
 // 一色双龙会
@@ -1173,10 +1173,10 @@ static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_t
 // 四归一调整
 static void adjust_by_tiles_hog(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
     intptr_t kong_cnt = tile_cnt - 14;  // 标准和牌14张，多出几张就说明有几个杠
-    tile_table_t cnt_table;
-    map_tiles(tiles, tile_cnt, &cnt_table);
+    tile_table_t tile_table;
+    map_tiles(tiles, tile_cnt, &tile_table);
     // 有多少种已经用去4张的牌减去杠的数量，即为四归一的数量
-    intptr_t _4_cnt = std::count(std::begin(cnt_table), std::end(cnt_table), 4);
+    intptr_t _4_cnt = std::count(std::begin(tile_table), std::end(tile_table), 4);
     fan_table[TILE_HOG] = static_cast<uint8_t>(_4_cnt - kong_cnt);
 }
 
@@ -1727,18 +1727,18 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     intptr_t standing_cnt = hand_tiles->tile_count;
 
     // 对立牌与和牌的种类进行打表
-    tile_table_t cnt_table;
-    map_tiles(hand_tiles->standing_tiles, standing_cnt, &cnt_table);
-    ++cnt_table[win_tile];
+    tile_table_t tile_table;
+    map_tiles(hand_tiles->standing_tiles, standing_cnt, &tile_table);
+    ++tile_table[win_tile];
 
-    if (!has_pair(cnt_table)) {
+    if (!has_pair(tile_table)) {
         return false;
     }
 
     // 匹配组合龙
     const tile_t (*matched_seq)[9] = std::find_if(&standard_knitted_straight[0], &standard_knitted_straight[6],
-        [&cnt_table](const tile_t (&seq)[9]) {
-        return std::all_of(std::begin(seq), std::end(seq), [&cnt_table](tile_t t) { return cnt_table[t] > 0; });
+        [&tile_table](const tile_t (&seq)[9]) {
+        return std::all_of(std::begin(seq), std::end(seq), [&tile_table](tile_t t) { return tile_table[t] > 0; });
     });
 
     if (matched_seq == &standard_knitted_straight[6]) {
@@ -1746,7 +1746,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     }
 
     // 剔除组合龙
-    std::for_each(std::begin(*matched_seq), std::end(*matched_seq), [&cnt_table](tile_t t) { --cnt_table[t]; });
+    std::for_each(std::begin(*matched_seq), std::end(*matched_seq), [&tile_table](tile_t t) { --tile_table[t]; });
 
     // 按基本和型划分
     division_result_t result;
@@ -1761,7 +1761,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     if (fixed_cnt == 1) {
         work_division.packs[3] = fixed_packs[0];
     }
-    divide_recursively(cnt_table, fixed_cnt + 3, 0, 0, &work_division, &result);
+    divide_recursively(tile_table, fixed_cnt + 3, 0, 0, &work_division, &result);
     if (result.count != 1) {
         return false;
     }
@@ -1781,7 +1781,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
         }
 
         // 只有雀头可能形成四归一
-        if (cnt_table[pair_tile] == 3
+        if (tile_table[pair_tile] == 3
             && std::end(*matched_seq) != std::find(std::begin(*matched_seq), std::end(*matched_seq), pair_tile)) {
             fan_table[TILE_HOG] = 1;
         }
@@ -1820,7 +1820,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
         }
 
         // 只有刻子可能形成四归一
-        if (cnt_table[involved_tile] == 3
+        if (tile_table[involved_tile] == 3
             && std::end(*matched_seq) != std::find(std::begin(*matched_seq), std::end(*matched_seq), involved_tile)) {
             fan_table[TILE_HOG] = 1;
         }
@@ -1862,9 +1862,9 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
             bool heaven_win = (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
             if (!heaven_win) {
                 // 将除去组合龙的部分恢复成牌
-                --cnt_table[win_tile];
+                --tile_table[win_tile];
                 tile_t temp[4];
-                intptr_t cnt = table_to_tiles(cnt_table, temp, 4);
+                intptr_t cnt = table_to_tiles(tile_table, temp, 4);
 
                 // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
                 adjust_by_waiting_form(packs + 3, 2, temp, cnt, win_tile, fan_table);
@@ -2057,18 +2057,18 @@ bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, intptr_t 
 
 // 统计和牌在副露牌组中出现的张数
 size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, intptr_t fixed_cnt, tile_t win_tile) {
-    tile_table_t cnt_table = { 0 };
+    tile_table_t tile_table = { 0 };
     for (intptr_t i = 0; i < fixed_cnt; ++i) {
         pack_t pack = fixed_packs[i];
         tile_t tile = pack_get_tile(pack);
         switch (pack_get_type(pack)) {
-        case PACK_TYPE_CHOW: ++cnt_table[tile - 1]; ++cnt_table[tile]; ++cnt_table[tile + 1]; break;
-        case PACK_TYPE_PUNG: cnt_table[tile] += 3; break;
-        case PACK_TYPE_KONG: cnt_table[tile] += 4; break;
+        case PACK_TYPE_CHOW: ++tile_table[tile - 1]; ++tile_table[tile]; ++tile_table[tile + 1]; break;
+        case PACK_TYPE_PUNG: tile_table[tile] += 3; break;
+        case PACK_TYPE_KONG: tile_table[tile] += 4; break;
         default: break;
         }
     }
-    return cnt_table[win_tile];
+    return tile_table[win_tile];
 }
 
 // 判断副露牌组是否包含杠
@@ -2080,16 +2080,16 @@ bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, intptr_t fixed_cnt)
 // 检查算番的输入是否合法
 int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
     // 打表
-    tile_table_t cnt_table;
-    if (!map_hand_tiles(hand_tiles, &cnt_table)) {
+    tile_table_t tile_table;
+    if (!map_hand_tiles(hand_tiles, &tile_table)) {
         return ERROR_WRONG_TILES_COUNT;
     }
     if (win_tile != 0) {
-        ++cnt_table[win_tile];
+        ++tile_table[win_tile];
     }
 
     // 如果某张牌超过4
-    if (std::any_of(std::begin(cnt_table), std::end(cnt_table), [](int cnt) { return cnt > 4; })) {
+    if (std::any_of(std::begin(tile_table), std::end(tile_table), [](int cnt) { return cnt > 4; })) {
         return ERROR_TILE_MORE_THAN_4;
     }
 

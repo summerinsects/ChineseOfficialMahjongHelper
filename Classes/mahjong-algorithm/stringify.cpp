@@ -177,7 +177,7 @@ intptr_t string_to_tiles(const char *str, size_t len, hand_tiles_t *hand_tiles, 
     intptr_t temp_cnt = 0;
     intptr_t max_cnt = 14;
 
-    tile_table_t cnt_table = { 0 };
+    tile_table_t tile_table = { 0 };
 
 #define NO_SUFFIX_AFTER_DIGIT() (temp_cnt > 0 && !(temp_tiles[temp_cnt - 1] & 0xF0))
 #define CHECK_SUFFIX() if (NO_SUFFIX_AFTER_DIGIT()) return PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT
@@ -218,7 +218,7 @@ intptr_t string_to_tiles(const char *str, size_t len, hand_tiles_t *hand_tiles, 
 
                 // 对牌打表
                 for (intptr_t i = 0; i < temp_cnt; ++i) {
-                    ++cnt_table[temp_tiles[i]];
+                    ++tile_table[temp_tiles[i]];
                 }
 
                 // 放到立牌中
@@ -245,7 +245,7 @@ intptr_t string_to_tiles(const char *str, size_t len, hand_tiles_t *hand_tiles, 
 
                 // 对牌打表
                 for (intptr_t i = 0; i < temp_cnt; ++i) {
-                    ++cnt_table[temp_tiles[i]];
+                    ++tile_table[temp_tiles[i]];
                 }
 
                 ret = make_fixed_pack(temp_tiles, temp_cnt, &packs[pack_cnt], offer);
@@ -274,7 +274,7 @@ intptr_t string_to_tiles(const char *str, size_t len, hand_tiles_t *hand_tiles, 
 
         // 对牌打表
         for (intptr_t i = 0; i < temp_cnt; ++i) {
-            ++cnt_table[temp_tiles[i]];
+            ++tile_table[temp_tiles[i]];
         }
 
         // 放到立牌中
@@ -287,7 +287,7 @@ intptr_t string_to_tiles(const char *str, size_t len, hand_tiles_t *hand_tiles, 
     }
 
     // 如果某张牌超过4
-    if (std::any_of(std::begin(cnt_table), std::end(cnt_table), [](int cnt) { return cnt > 4; })) {
+    if (std::any_of(std::begin(tile_table), std::end(tile_table), [](int cnt) { return cnt > 4; })) {
         return PARSE_ERROR_TILE_COUNT_GREATER_THAN_4;
     }
 
