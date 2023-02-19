@@ -3,6 +3,7 @@
 #include "AlertDialog.h"
 #include "Toast.h"
 #include "../mahjong-algorithm/stringify.h"
+#include "../mahjong-algorithm/shanten.h"
 #include "../UICommon.h"
 #include "../UIColors.h"
 
@@ -510,6 +511,24 @@ void ExtraInfoWidget::showInputAlert(const char *prevInput) {
     }).create()->show();
 }
 
+static int checkCalculatorInput(const mahjong::hand_tiles_t *hand_tiles, mahjong::tile_t win_tile) {
+    // 打表
+    mahjong::tile_table_t tile_table;
+    if (!mahjong::map_hand_tiles(hand_tiles, &tile_table)) {
+        return ERROR_WRONG_TILES_COUNT;
+    }
+    if (win_tile != 0) {
+        ++tile_table[win_tile];
+    }
+
+    // 如果某张牌超过4
+    if (std::any_of(std::begin(tile_table), std::end(tile_table), [](int cnt) { return cnt > 4; })) {
+        return ERROR_TILE_MORE_THAN_4;
+    }
+
+    return 0;
+}
+
 const char *ExtraInfoWidget::parseInput(const char *input) {
     if (*input == '\0') {
         return nullptr;
@@ -534,7 +553,7 @@ const char *ExtraInfoWidget::parseInput(const char *input) {
         return __UTF8("缺少和牌张");
     }
 
-    ret = mahjong::check_calculator_input(&hand_tiles, win_tile);
+    ret = checkCalculatorInput(&hand_tiles, win_tile);
     if (ret != 0) {
         switch (ret) {
             case ERROR_WRONG_TILES_COUNT: return __UTF8("牌张数错误");

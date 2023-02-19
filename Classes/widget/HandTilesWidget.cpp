@@ -183,7 +183,8 @@ mahjong::tile_t HandTilesWidget::getServingTile() const {
 }
 
 bool HandTilesWidget::isFixedPacksContainsKong() const {
-    return mahjong::is_fixed_packs_contains_kong(_fixedPacks.data(), _fixedPacks.size());
+    return std::any_of(_fixedPacks.data(), _fixedPacks.data() + _fixedPacks.size(),
+        [](mahjong::pack_t pack) { return mahjong::pack_get_type(pack) == PACK_TYPE_KONG; });
 }
 
 bool HandTilesWidget::isStandingTilesContainsServingTile() const {
@@ -191,8 +192,8 @@ bool HandTilesWidget::isStandingTilesContainsServingTile() const {
     if (servingTile == 0) {
         return false;
     }
-    return mahjong::is_standing_tiles_contains_win_tile(
-        _standingTiles.data(), _standingTiles.size() - 1, servingTile);
+    return std::any_of(_standingTiles.data(), _standingTiles.data() + _standingTiles.size() - 1,
+        [servingTile](mahjong::tile_t tile) { return tile == servingTile; });
 }
 
 size_t HandTilesWidget::countServingTileInFixedPacks() const {
@@ -201,8 +202,18 @@ size_t HandTilesWidget::countServingTileInFixedPacks() const {
         return 0;
     }
 
-    return mahjong::count_win_tile_in_fixed_packs(
-        _fixedPacks.data(), _fixedPacks.size(), servingTile);
+    mahjong::tile_table_t tile_table = { 0 };
+    for (auto &pack : _fixedPacks) {
+        mahjong::tile_t tile = mahjong::pack_get_tile(pack);
+        switch (mahjong::pack_get_type(pack)) {
+        case PACK_TYPE_CHOW: ++tile_table[tile - 1]; ++tile_table[tile]; ++tile_table[tile + 1]; break;
+        case PACK_TYPE_PUNG: tile_table[tile] += 3; break;
+        case PACK_TYPE_KONG: tile_table[tile] += 4; break;
+        default: break;
+        }
+    }
+
+    return tile_table[servingTile];
 }
 
 void HandTilesWidget::onEmptyWidget(cocos2d::Ref *) {
