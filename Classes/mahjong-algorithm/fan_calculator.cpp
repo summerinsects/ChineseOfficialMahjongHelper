@@ -1258,13 +1258,11 @@ static void adjust_by_waiting_form(const pack_t *concealed_packs, intptr_t pack_
 static void final_adjust(fan_table_t &fan_table) {
     // 大四喜不计三风刻、碰碰和、圈风刻、门风刻、幺九刻
     if (fan_table[BIG_FOUR_WINDS]) {
-        fan_table[BIG_THREE_WINDS] = 0;
         fan_table[ALL_PUNGS] = 0;
         fan_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
     }
     // 大三元不计双箭刻、箭刻（严格98规则不计缺一门）
     if (fan_table[BIG_THREE_DRAGONS]) {
-        fan_table[TWO_DRAGONS_PUNGS] = 0;
         fan_table[DRAGON_PUNG] = 0;
 #ifdef STRICT_98_RULE
         fan_table[ONE_VOIDED_SUIT] = 0;
@@ -1282,7 +1280,6 @@ static void final_adjust(fan_table_t &fan_table) {
 
     // 清幺九不计混幺九、碰碰胡、全带幺、幺九刻、无字（严格98规则不计双同刻、不计三同刻）
     if (fan_table[ALL_TERMINALS]) {
-        fan_table[ALL_TERMINALS_AND_HONORS] = 0;
         fan_table[ALL_PUNGS] = 0;
         fan_table[OUTSIDE_HAND] = 0;
         fan_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
@@ -1290,13 +1287,11 @@ static void final_adjust(fan_table_t &fan_table) {
         fan_table[DOUBLE_PUNG] = 0;  // 通行计法不计双同刻
 #ifdef STRICT_98_RULE
         fan_table[TRIPLE_PUNG] = 0;
-        fan_table[DOUBLE_PUNG] = 0;
 #endif
     }
 
     // 小四喜不计三风刻
     if (fan_table[LITTLE_FOUR_WINDS]) {
-        fan_table[BIG_THREE_WINDS] = 0;
         // 小四喜的第四组牌如果是19的刻子，则是混幺九；如果是箭刻则是字一色；这两种都是不计幺九刻的
         // 如果是顺子或者2-8的刻子，则不存在多余的幺九刻
         // 所以这里将幺九刻置为0
@@ -1305,7 +1300,6 @@ static void final_adjust(fan_table_t &fan_table) {
 
     // 小三元不计双箭刻、箭刻（严格98规则不计缺一门）
     if (fan_table[LITTLE_THREE_DRAGONS]) {
-        fan_table[TWO_DRAGONS_PUNGS] = 0;
         fan_table[DRAGON_PUNG] = 0;
 #ifdef STRICT_98_RULE
         fan_table[ONE_VOIDED_SUIT] = 0;
@@ -1314,7 +1308,6 @@ static void final_adjust(fan_table_t &fan_table) {
 
     // 字一色不计混幺九、碰碰胡、全带幺、幺九刻、缺一门
     if (fan_table[ALL_HONORS]) {
-        fan_table[ALL_TERMINALS_AND_HONORS] = 0;
         fan_table[ALL_PUNGS] = 0;
         fan_table[OUTSIDE_HAND] = 0;
         fan_table[PUNG_OF_TERMINALS_OR_HONORS] = 0;
@@ -1331,42 +1324,30 @@ static void final_adjust(fan_table_t &fan_table) {
     }
     // 一色双龙会不计七对、清一色、平和、一般高、老少副、缺一门、无字
     if (fan_table[PURE_TERMINAL_CHOWS]) {
-        fan_table[SEVEN_PAIRS] = 0;
         fan_table[FULL_FLUSH] = 0;
         fan_table[ALL_CHOWS] = 0;
-        fan_table[PURE_DOUBLE_CHOW] = 0;
-        fan_table[TWO_TERMINAL_CHOWS] = 0;
-        fan_table[ONE_VOIDED_SUIT] = 0;
         fan_table[NO_HONORS] = 0;
     }
-
+#ifdef STRICT_98_RULE
     // 一色四同顺不计一色三同顺、一般高、四归一（严格98规则不计缺一门）
     if (fan_table[QUADRUPLE_CHOW]) {
-        fan_table[PURE_SHIFTED_PUNGS] = 0;
-        fan_table[TILE_HOG] = 0;
-        fan_table[PURE_DOUBLE_CHOW] = 0;
-#ifdef STRICT_98_RULE
         fan_table[ONE_VOIDED_SUIT] = 0;
-#endif
     }
+#endif
     // 一色四节高不计一色三节高、碰碰和（严格98规则不计缺一门）
     if (fan_table[FOUR_PURE_SHIFTED_PUNGS]) {
-        fan_table[PURE_TRIPLE_CHOW] = 0;
         fan_table[ALL_PUNGS] = 0;
 #ifdef STRICT_98_RULE
         fan_table[ONE_VOIDED_SUIT] = 0;
 #endif
     }
 
+#ifdef STRICT_98_RULE
     // 一色四步高不计一色三步高、老少副、连六（严格98规则不计缺一门）
     if (fan_table[FOUR_PURE_SHIFTED_CHOWS]) {
-        fan_table[PURE_SHIFTED_CHOWS] = 0;
-        fan_table[TWO_TERMINAL_CHOWS] = 0;
-        fan_table[SHORT_STRAIGHT] = 0;
-#ifdef STRICT_98_RULE
         fan_table[ONE_VOIDED_SUIT] = 0;
-#endif
     }
+#endif
 
     // 混幺九不计碰碰和、全带幺、幺九刻
     if (fan_table[ALL_TERMINALS_AND_HONORS]) {
@@ -1381,23 +1362,8 @@ static void final_adjust(fan_table_t &fan_table) {
         fan_table[ALL_SIMPLES] = 0;
         fan_table[NO_HONORS] = 0;
     }
-    // 清一色不计缺一门、无字
-    if (fan_table[FULL_FLUSH]) {
-        fan_table[ONE_VOIDED_SUIT] = 0;
-        fan_table[NO_HONORS] = 0;
-    }
-    // 一色三同顺不计一色三节高、一般高
-    if (fan_table[PURE_TRIPLE_CHOW]) {
-        fan_table[PURE_SHIFTED_PUNGS] = 0;
-        fan_table[PURE_DOUBLE_CHOW] = 0;
-    }
-    // 一色三节高不计一色三同顺
-    if (fan_table[PURE_SHIFTED_PUNGS]) {
-        fan_table[PURE_TRIPLE_CHOW] = 0;
-    }
     // 全大不计大于五、无字
     if (fan_table[UPPER_TILES]) {
-        fan_table[UPPER_FOUR] = 0;
         fan_table[NO_HONORS] = 0;
     }
     // 全中不计断幺
@@ -1407,7 +1373,6 @@ static void final_adjust(fan_table_t &fan_table) {
     }
     // 全小不计小于五、无字
     if (fan_table[LOWER_TILES]) {
-        fan_table[LOWER_FOUR] = 0;
         fan_table[NO_HONORS] = 0;
     }
 
@@ -1415,8 +1380,6 @@ static void final_adjust(fan_table_t &fan_table) {
     if (fan_table[THREE_SUITED_TERMINAL_CHOWS]) {
         fan_table[ALL_CHOWS] = 0;
         fan_table[NO_HONORS] = 0;
-        fan_table[MIXED_DOUBLE_CHOW] = 0;
-        fan_table[TWO_TERMINAL_CHOWS] = 0;
     }
     // 全带五不计断幺、无字
     if (fan_table[ALL_FIVE]) {
@@ -1456,19 +1419,7 @@ static void final_adjust(fan_table_t &fan_table) {
     if (fan_table[OUT_WITH_REPLACEMENT_TILE]) {
         fan_table[SELF_DRAWN] = 0;
     }
-    // 抢杠和不计和绝张
-    if (fan_table[ROBBING_THE_KONG]) {
-        fan_table[LAST_TILE] = 0;
-    }
-    // 双暗杠不计暗杠
-    if (fan_table[TWO_CONCEALED_KONGS]) {
-        fan_table[CONCEALED_KONG] = 0;
-    }
 
-    // 混一色不计缺一门
-    if (fan_table[HALF_FLUSH]) {
-        fan_table[ONE_VOIDED_SUIT] = 0;
-    }
     // 全求人不计单钓将
     if (fan_table[MELDED_HAND]) {
         fan_table[SINGLE_WAIT] = 0;
@@ -1481,10 +1432,6 @@ static void final_adjust(fan_table_t &fan_table) {
     // 不求人不计自摸
     if (fan_table[FULLY_CONCEALED_HAND]) {
         fan_table[SELF_DRAWN] = 0;
-    }
-    // 双明杠不计明杠
-    if (fan_table[TWO_MELDED_KONGS]) {
-        fan_table[MELDED_KONG] = 0;
     }
 
     // 平和不计无字
@@ -1690,8 +1637,11 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_para
     adjust_by_tiles_traits(tiles, tile_cnt, fan_table);
     // 根据数牌的范围调整——涉及番种：大于五、小于五、全大、全中、全小
     adjust_by_rank_range(tiles, tile_cnt, fan_table);
-    // 四归一调整
-    adjust_by_tiles_hog(tiles, tile_cnt, fan_table);
+
+    // 四归一调整（一色四同顺不计四归一）
+    if (fan_table[QUADRUPLE_CHOW] == 0) {
+        adjust_by_tiles_hog(tiles, tile_cnt, fan_table);
+    }
 
     if (!heaven_win) {
         // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
