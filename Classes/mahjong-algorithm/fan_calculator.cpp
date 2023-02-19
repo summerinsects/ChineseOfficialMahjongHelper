@@ -1027,7 +1027,13 @@ static void adjust_by_suits(const tile_t *tiles, intptr_t tile_cnt, fan_table_t 
     // 当缺2门时，根据有字和无字，修正为混一色和清一色
     if (fan_table[ONE_VOIDED_SUIT] == 2) {
         fan_table[ONE_VOIDED_SUIT] = 0;
-        fan_table[suit_flag & 0xF1U ? HALF_FLUSH : FULL_FLUSH] = 1;
+        if (fan_table[NO_HONORS] == 0) {
+            fan_table[HALF_FLUSH] = 1;
+        }
+        else {
+            fan_table[FULL_FLUSH] = 1;
+            fan_table[NO_HONORS] = 0;
+        }
     }
 
     // 0001 1110
