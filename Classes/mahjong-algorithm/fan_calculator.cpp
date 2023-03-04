@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <iterator>
 #include "standard_tiles.h"
-#include "shanten.h"
 
 /**
  * 算番流程概述：
@@ -72,6 +71,51 @@ namespace mahjong {
 #if 0  // Debug
 extern intptr_t packs_to_string(const pack_t *packs, intptr_t pack_cnt, char *str, intptr_t max_size);
 #endif
+
+// 对牌进行打表
+static void map_tiles(const tile_t *tiles, intptr_t cnt, tile_table_t &tile_table) {
+    for (intptr_t i = 0; i < cnt; ++i) {
+        ++tile_table[tiles[i]];
+    }
+}
+
+// 对牌组进行打表
+static void map_packs(const pack_t *packs, intptr_t cnt, tile_table_t &tile_table) {
+    for (intptr_t i = 0; i < cnt; ++i) {
+        tile_t tile = pack_get_tile(packs[i]);
+        switch (pack_get_type(packs[i])) {
+        case PACK_TYPE_CHOW:
+            ++tile_table[tile - 1];
+            ++tile_table[tile];
+            ++tile_table[tile + 1];
+            break;
+        case PACK_TYPE_PUNG:
+            tile_table[tile] += 3;
+            break;
+        case PACK_TYPE_KONG:
+            tile_table[tile] += 4;
+            break;
+        case PACK_TYPE_PAIR:
+            tile_table[tile] += 2;
+            break;
+        default:
+            UNREACHABLE();
+            break;
+        }
+    }
+}
+
+// 获取本手的唯一牌（用来快速检测花色、范围等相关番种）
+static intptr_t table_unique(const tile_table_t &fixed_table, const tile_table_t &standing_table, tile_t *tile) {
+    tile_t *p = tile;
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (fixed_table[t] || standing_table[t]) {
+            *p++ = t;
+        }
+    }
+    return p - tile;
+}
 
 //-------------------------------- 划分 --------------------------------
 
@@ -203,23 +247,17 @@ static bool has_pair(const tile_table_t &tile_table) {
 }
 
 // 划分一手牌
-static bool divide_win_hand(const tile_t *standing_tiles, const pack_t *fixed_packs, intptr_t fixed_cnt, division_result_t *result) {
-    intptr_t standing_cnt = 14 - fixed_cnt * 3;
-
-    // 对立牌的种类进行打表
-    tile_table_t tile_table;
-    map_tiles(standing_tiles, standing_cnt, &tile_table);
-
+static bool divide_win_hand(tile_table_t &standing_table, const pack_t *fixed_packs, intptr_t fixed_cnt, division_result_t *result) {
     result->count = 0;
 
-    if (!has_pair(tile_table)) {
+    if (!has_pair(standing_table)) {
         return false;
     }
 
     // 复制副露的面子
     division_t work_division;
     memcpy(work_division.packs, fixed_packs, fixed_cnt * sizeof(pack_t));
-    return divide_recursively(tile_table, fixed_cnt, 0, 0, &work_division, result);
+    return divide_recursively(standing_table, fixed_cnt, 0, 0, &work_division, result);
 }
 
 //-------------------------------- 算番 --------------------------------
@@ -622,28 +660,8 @@ static void calculate_2_chows_unordered(const tile_t (&mid_tiles)[2], fan_table_
     }
 }
 
-// 刻子（杠）算番
-static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_table_t &fan_table) {
-    // 统计明杠 暗杠 明刻 暗刻
-    int melded_kong_cnt = 0;
-    int concealed_kong_cnt = 0;
-    int concealed_pung_cnt = 0;
-    for (intptr_t i = 0; i < pung_cnt; ++i) {
-        if (is_pack_melded(pung_packs[i])) {
-            if (pack_get_type(pung_packs[i]) == PACK_TYPE_KONG) {
-                ++melded_kong_cnt;
-            }
-        }
-        else {
-            if (pack_get_type(pung_packs[i]) == PACK_TYPE_KONG) {
-                ++concealed_kong_cnt;
-            }
-            else {
-                ++concealed_pung_cnt;
-            }
-        }
-    }
-
+// 杠与暗刻算番
+static void calculate_kongs(int concealed_pung_cnt, int melded_kong_cnt, int concealed_kong_cnt, fan_table_t &fan_table) {
     // 规则
     // 三杠
     // 明杠 明杠 暗杠 暗刻 -> 三杠+双暗刻+碰碰和
@@ -765,21 +783,6 @@ static void calculate_kongs(const pack_t *pung_packs, intptr_t pung_cnt, fan_tab
         UNREACHABLE();
         break;
     }
-
-    // 四杠和四暗刻不计碰碰和，其他先加上碰碰和的番
-    if (pung_cnt == 4) {
-        if (fan_table[FOUR_KONGS] == 0 && fan_table[FOUR_CONCEALED_PUNGS] == 0) {
-            fan_table[ALL_PUNGS] = 1;
-        }
-    }
-
-    // 逐组刻子的番（箭刻、幺九刻）
-    for (intptr_t i = 0; i < pung_cnt; ++i) {
-        fan_t fan = get_1_pung_fan(pack_get_tile(pung_packs[i]));
-        if (fan != FAN_NONE) {
-            ++fan_table[fan];
-        }
-    }
 }
 
 // 4组刻子算番
@@ -885,18 +888,6 @@ static void calculate_2_pungs_unordered(const tile_t (&mid_tiles)[2], fan_table_
     }
 }
 
-// 九莲宝灯
-static bool is_nine_gates(const tile_t *tiles) {
-    // 对立牌的种类进行打表
-    tile_table_t tile_table;
-    map_tiles(tiles, 13, &tile_table);
-
-    // 1、9各三枚，2~8各一枚
-    return (tile_table[0x11] == 3 && tile_table[0x19] == 3 && std::all_of(tile_table + 0x12, tile_table + 0x19, [](int n) { return n == 1; }))
-        || (tile_table[0x21] == 3 && tile_table[0x29] == 3 && std::all_of(tile_table + 0x22, tile_table + 0x29, [](int n) { return n == 1; }))
-        || (tile_table[0x31] == 3 && tile_table[0x39] == 3 && std::all_of(tile_table + 0x32, tile_table + 0x39, [](int n) { return n == 1; }));
-}
-
 // 一色双龙会
 static bool is_pure_terminal_chows(const pack_t (&chow_packs)[4], pack_t pair_pack) {
     if (tile_get_rank(pack_get_tile(pair_pack)) != 5) {  // 5作雀头
@@ -949,6 +940,159 @@ static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t
     case 3: return (_123_suit_table[1] && _123_suit_table[2] && _789_suit_table[1] && _789_suit_table[2]);
     default: return false;
     }
+}
+
+// 检查七对听牌
+static void check_seven_pairs_waiting(const tile_table_t &standing_table, tile_table_t &waiting_table) {
+    int pairs = 0;
+    for (int i = 0; i < 34; ++i) {
+        uint16_t cnt = standing_table[all_tiles[i]];
+        // 成对的牌
+        if (cnt == 2) ++pairs;
+        else if (cnt == 4) pairs += 2;
+    }
+
+    if (pairs == 6) {
+        for (int i = 0; i < 34; ++i) {
+            tile_t t = all_tiles[i];
+            uint16_t cnt = standing_table[t];
+            if (cnt == 1 || cnt == 3) {
+                waiting_table[t] = 1;  // 听此张
+                break;
+            }
+        }
+    }
+}
+
+// 获取搭子听牌
+static void get_ragular_pack_waiting(const tile_table_t &tile_table, tile_table_t &waiting_table) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (tile_table[t] < 1) {
+            continue;
+        }
+        if (tile_table[t] > 1) {
+            waiting_table[t] = 1;  // 对倒
+            return;
+        }
+        if (is_numbered_suit_quick(t)) {  // 数牌搭子
+            rank_t r = tile_get_rank(t);
+            if (r > 1 && tile_table[t - 1]) {  // 两面或者边张
+                if (r < 9) waiting_table[t + 1] = 1;
+                if (r > 2) waiting_table[t - 2] = 1;
+                return;
+            }
+            if (r > 2 && tile_table[t - 2]) {  // 嵌张
+                waiting_table[t - 1] = 1;
+                return;
+            }
+        }
+    }
+}
+
+// 检查基本和型听牌
+static void check_regular_waiting(tile_table_t &tile_table, intptr_t tile_cnt, eigen_t prev_eigen, tile_table_t &waiting_table) {
+    // 1张牌必然听雀头
+    if (tile_cnt == 1) {
+        for (int i = 0; i < 34; ++i) {
+            tile_t t = all_tiles[i];
+            uint16_t cnt = tile_table[t];
+            if (cnt == 1) {
+                waiting_table[t] = 1;
+                break;
+            }
+        }
+        return;
+    }
+
+    // 4张牌可能是有雀头听搭子
+    if (tile_cnt == 4) {
+        // 削减雀头
+        for (int i = 0; i < 34; ++i) {
+            tile_t t = all_tiles[i];
+            if (tile_table[t] < 2) {
+                continue;
+            }
+
+            // 削减雀头，获取搭子的听牌
+            tile_table[t] -= 2;
+            get_ragular_pack_waiting(tile_table, waiting_table);
+            // 还原
+            tile_table[t] += 2;
+        }
+    }
+
+    // 递归削减面子
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (tile_table[t] < 1) {
+            continue;
+        }
+
+        // 刻子
+        if (tile_table[t] > 2) {
+            // 如果当前刻子特征值小于上一组，说明这条路径已经来过了
+            eigen_t eigen = make_eigen(t, t, t);
+            if (eigen > prev_eigen) {
+                // 削减这组刻子，递归
+                tile_table[t] -= 3;
+                check_regular_waiting(tile_table, tile_cnt - 3, eigen, waiting_table);
+                // 还原
+                tile_table[t] += 3;
+            }
+        }
+
+        // 顺子（只能是数牌）
+        if (is_numbered_suit(t)) {
+            // 顺子t t+1 t+2，显然t不能是8点以上的数牌
+            if (tile_get_rank(t) < 8 && tile_table[t + 1] && tile_table[t + 2]) {
+                // 如果当前顺子特征值小于上一组，说明这条路径已经来过了
+                eigen_t eigen = make_eigen(t, t + 1, t + 2);
+                if (eigen >= prev_eigen) {
+                    // 削减这组顺子，递归
+                    --tile_table[t];
+                    --tile_table[t + 1];
+                    --tile_table[t + 2];
+                    check_regular_waiting(tile_table, tile_cnt - 3, eigen, waiting_table);
+                    // 还原
+                    ++tile_table[t];
+                    ++tile_table[t + 1];
+                    ++tile_table[t + 2];
+                }
+            }
+        }
+    }
+}
+
+// 是否独听
+static bool is_unique_waiting(tile_table_t &standing_table, intptr_t tile_cnt, tile_t win_tile) {
+    tile_table_t waiting_table{};
+
+    // 削减和牌张
+    --standing_table[win_tile];
+
+    // 13张的情况下，要判断七对
+    if (tile_cnt == 13) {
+        check_seven_pairs_waiting(standing_table, waiting_table);
+    }
+
+    // 基本和牌型
+    check_regular_waiting(standing_table, tile_cnt, 0, waiting_table);
+
+    // 恢复和牌张
+    ++standing_table[win_tile];
+
+    bool waiting = false;
+    for (int i = 0; i < 34; ++i) {
+        if (waiting_table[all_tiles[i]]) {
+            if (waiting) {
+                // 如果已经有听面了，说明不是独听
+                return false;
+            }
+            waiting = true;
+        }
+    }
+    return waiting;
 }
 
 // 根据和牌方式调整——涉及番种：不求人、全求人
@@ -1177,40 +1321,16 @@ static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_t
 }
 
 // 四归一调整
-static void adjust_by_tiles_hog(const tile_t *tiles, intptr_t tile_cnt, fan_table_t &fan_table) {
-    intptr_t kong_cnt = tile_cnt - 14;  // 标准和牌14张，多出几张就说明有几个杠
-    tile_table_t tile_table;
-    map_tiles(tiles, tile_cnt, &tile_table);
+static void adjust_by_tiles_hog(const tile_table_t &tile_table, intptr_t kong_cnt, fan_table_t &fan_table) {
     // 有多少种已经用去4张的牌减去杠的数量，即为四归一的数量
     intptr_t _4_cnt = std::count(std::begin(tile_table), std::end(tile_table), 4);
     fan_table[TILE_HOG] = static_cast<uint8_t>(_4_cnt - kong_cnt);
 }
 
 // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
-static void adjust_by_waiting_form(const pack_t *concealed_packs, intptr_t pack_cnt, const tile_t *standing_tiles, intptr_t standing_cnt,
-    tile_t win_tile, fan_table_t &fan_table) {
+static void adjust_by_waiting_form(const pack_t *concealed_packs, intptr_t pack_cnt, tile_t win_tile, fan_table_t &fan_table) {
     // 全求人和四杠不计单钓将，也不可能有边张、嵌张
     if (fan_table[MELDED_HAND] || fan_table[FOUR_KONGS]) {
-        return;
-    }
-
-    useful_table_t waiting_table;  // 听牌标记表
-    if (!is_regular_wait(standing_tiles, standing_cnt, &waiting_table)) {
-        return;
-    }
-
-    if (pack_cnt == 5) {  // 门清状态
-        // 判断是否为七对听牌
-        useful_table_t temp_table;
-        if (is_seven_pairs_wait(standing_tiles, standing_cnt, &temp_table)) {
-            // 合并听牌标记表
-            std::transform(std::begin(temp_table), std::end(temp_table), std::begin(waiting_table),
-                std::begin(waiting_table), [](bool w, bool t) { return w || t; });
-        }
-    }
-
-    // 统计听牌张数，听牌数大于1张，不计边张、嵌张、单钓将
-    if (1 != std::count(std::begin(waiting_table), std::end(waiting_table), true)) {
         return;
     }
 
@@ -1494,19 +1614,34 @@ static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
 }
 
 // 基本和型算番
-static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
-    pack_t pair_pack = 0;
-    pack_t chow_packs[4];
-    pack_t pung_packs[4];
-    intptr_t chow_cnt = 0;
-    intptr_t pung_cnt = 0;
+static void calculate_regular_fan(const pack_t (&packs)[5], const tile_table_t &fixed_table, tile_table_t &standing_table,
+    const tile_t *unique_tiles, intptr_t unique_cnt,
+    const calculate_param_t *calculate_param, bool unique_waiting, win_flag_t win_flag, fan_table_t &fan_table) {
+
+    pack_t pair_pack = 0, chow_packs[4], pung_packs[4];
+    int chow_cnt = 0, pung_cnt = 0, concealed_pung_cnt = 0, melded_kong_cnt = 0, concealed_kong_cnt = 0;
     for (int i = 0; i < 5; ++i) {
-        switch (pack_get_type(packs[i])) {
-        case PACK_TYPE_CHOW: chow_packs[chow_cnt++] = packs[i]; break;
+        pack_t pack = packs[i];
+        switch (pack_get_type(pack)) {
+        case PACK_TYPE_CHOW:
+            chow_packs[chow_cnt++] = pack;
+            break;
         case PACK_TYPE_PUNG:
-        case PACK_TYPE_KONG: pung_packs[pung_cnt++] = packs[i]; break;
-        case PACK_TYPE_PAIR: pair_pack = packs[i]; break;
-        default: UNREACHABLE(); return;
+            pung_packs[pung_cnt++] = pack;
+            if (!is_pack_melded(pack)) {
+                ++concealed_pung_cnt;
+            }
+            break;
+        case PACK_TYPE_KONG:
+            pung_packs[pung_cnt++] = pack;
+            ++(is_pack_melded(pack) ? melded_kong_cnt : concealed_kong_cnt);
+            break;
+        case PACK_TYPE_PAIR:
+            pair_pack = packs[i];
+            break;
+        default:
+            UNREACHABLE();
+            return;
         }
     }
 
@@ -1514,7 +1649,7 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_para
         return;
     }
 
-    tile_t win_tile = calculate_param->win_tile;
+    const tile_t win_tile = calculate_param->win_tile;
 
     // 根据和牌标记调整——涉及番种：和绝张、妙手回春、海底捞月、自摸
     adjust_by_win_flag(win_flag, fan_table);
@@ -1529,14 +1664,29 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_para
         })) {
             for (intptr_t i = 0; i < pung_cnt; ++i) {
                 if (pack_get_tile(pung_packs[i]) == win_tile && !is_pack_melded(pung_packs[i])) {
-                    pung_packs[i] |= (1 << 12);  // 标记为明副露
+                    --concealed_pung_cnt;
                 }
             }
         }
     }
 
-    if (pung_cnt > 0) { // 有刻子
-        calculate_kongs(pung_packs, pung_cnt, fan_table);
+    if (pung_cnt != 0) { // 有刻子
+        calculate_kongs(concealed_pung_cnt, melded_kong_cnt, concealed_kong_cnt, fan_table);
+
+        // 四杠和四暗刻不计碰碰和，其他先加上碰碰和的番
+        if (pung_cnt == 4) {
+            if (fan_table[FOUR_KONGS] == 0 && fan_table[FOUR_CONCEALED_PUNGS] == 0) {
+                fan_table[ALL_PUNGS] = 1;
+            }
+        }
+
+        // 逐组刻子的番（箭刻、幺九刻）
+        for (intptr_t i = 0; i < pung_cnt; ++i) {
+            fan_t fan = get_1_pung_fan(pack_get_tile(pung_packs[i]));
+            if (fan != FAN_NONE) {
+                ++fan_table[fan];
+            }
+        }
     }
 
     switch (chow_cnt) {
@@ -1611,12 +1761,6 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_para
     }
 
     intptr_t fixed_cnt = calculate_param->hand_tiles.pack_count;
-    const tile_t *standing_tiles = calculate_param->hand_tiles.standing_tiles;
-    intptr_t standing_cnt = calculate_param->hand_tiles.tile_count;
-    wind_t prevalent_wind = calculate_param->prevalent_wind;
-    wind_t seat_wind = calculate_param->seat_wind;
-
-    bool heaven_win = (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
 
     // 根据和牌方式调整——涉及番种：不求人、全求人
     adjust_by_self_drawn(packs, fixed_cnt, (win_flag & WIN_FLAG_SELF_DRAWN) != 0, fan_table);
@@ -1625,27 +1769,24 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_para
     // 根据牌组特征调整——涉及番种：全带幺、全带五、全双刻
     adjust_by_packs_traits(packs, fan_table);
 
-    tile_t tiles[18];
-    memcpy(tiles, standing_tiles, standing_cnt * sizeof(tile_t));
-    intptr_t tile_cnt = packs_to_tiles(packs, fixed_cnt, &tiles[standing_cnt], 18 - standing_cnt);
-    tile_cnt += standing_cnt;
-    tiles[tile_cnt++] = win_tile;
+    tile_table_t merged_table{};
+    std::transform(std::begin(standing_table), std::end(standing_table), std::begin(fixed_table), std::begin(merged_table),
+        [](uint16_t a, uint16_t b) { return a + b; });
 
     // 根据花色调整——涉及番种：无字、缺一门、混一色、清一色、五门齐
-    adjust_by_suits(tiles, tile_cnt, fan_table);
+    adjust_by_suits(unique_tiles, unique_cnt, fan_table);
     // 根据牌特性调整——涉及番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
-    adjust_by_tiles_traits(tiles, tile_cnt, fan_table);
+    adjust_by_tiles_traits(unique_tiles, unique_cnt, fan_table);
     // 根据数牌的范围调整——涉及番种：大于五、小于五、全大、全中、全小
-    adjust_by_rank_range(tiles, tile_cnt, fan_table);
-
+    adjust_by_rank_range(unique_tiles, unique_cnt, fan_table);
     // 四归一调整（一色四同顺不计四归一）
     if (fan_table[QUADRUPLE_CHOW] == 0) {
-        adjust_by_tiles_hog(tiles, tile_cnt, fan_table);
+        adjust_by_tiles_hog(merged_table, melded_kong_cnt + concealed_kong_cnt, fan_table);
     }
 
-    if (!heaven_win) {
+    if (unique_waiting) {
         // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
-        adjust_by_waiting_form(packs + fixed_cnt, 5 - fixed_cnt, standing_tiles, standing_cnt, win_tile, fan_table);
+        adjust_by_waiting_form(packs + fixed_cnt, 5 - fixed_cnt, win_tile, fan_table);
     }
 
     // 统一调整一些不计的
@@ -1653,6 +1794,9 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_para
 
     // 调整圈风刻、门风刻（大四喜不计圈风刻、门风刻）
     if (fan_table[BIG_FOUR_WINDS] == 0) {
+        wind_t prevalent_wind = calculate_param->prevalent_wind;
+        wind_t seat_wind = calculate_param->seat_wind;
+
         for (intptr_t i = 0; i < pung_cnt; ++i) {
             tile_t tile = pack_get_tile(pung_packs[i]);
             if (is_winds(tile)) {
@@ -1668,33 +1812,21 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const calculate_para
 }
 
 // “组合龙+面子+雀头”和型算番
-static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
+static bool calculate_knitted_straight_fan(const tile_table_t &standing_table, bool heaven_win,
+    const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
+
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
-    tile_t win_tile = calculate_param->win_tile;
-    wind_t prevalent_wind = calculate_param->prevalent_wind;
-    wind_t seat_wind = calculate_param->seat_wind;
-
-    intptr_t fixed_cnt = hand_tiles->pack_count;
-    if (fixed_cnt > 1) {
-        return false;
-    }
-
     const pack_t *fixed_packs = hand_tiles->fixed_packs;
-    intptr_t standing_cnt = hand_tiles->tile_count;
+    const tile_t win_tile = calculate_param->win_tile;
 
-    // 对立牌与和牌的种类进行打表
-    tile_table_t tile_table;
-    map_tiles(hand_tiles->standing_tiles, standing_cnt, &tile_table);
-    ++tile_table[win_tile];
-
-    if (!has_pair(tile_table)) {
+    if (!has_pair(standing_table)) {
         return false;
     }
 
     // 匹配组合龙
     const tile_t (*matched_seq)[9] = std::find_if(&standard_knitted_straight[0], &standard_knitted_straight[6],
-        [&tile_table](const tile_t (&seq)[9]) {
-        return std::all_of(std::begin(seq), std::end(seq), [&tile_table](tile_t t) { return tile_table[t] > 0; });
+        [&standing_table](const tile_t (&seq)[9]) {
+        return std::all_of(std::begin(seq), std::end(seq), [&standing_table](tile_t t) { return standing_table[t] > 0; });
     });
 
     if (matched_seq == &standard_knitted_straight[6]) {
@@ -1702,6 +1834,8 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     }
 
     // 剔除组合龙
+    tile_table_t tile_table;
+    memcpy(tile_table, standing_table, sizeof(tile_table));
     std::for_each(std::begin(*matched_seq), std::end(*matched_seq), [&tile_table](tile_t t) { --tile_table[t]; });
 
     // 按基本和型划分
@@ -1714,6 +1848,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     // 如果第4组是副露的，将其放在下标3处
     // 然后按基本和型从从fixed_cnt + 3开始递归
     // 划分后的结果，下标3处为第四组面子，下标4处为雀头
+    const intptr_t fixed_cnt = hand_tiles->pack_count;
     if (fixed_cnt == 1) {
         work_division.packs[3] = fixed_packs[0];
     }
@@ -1748,7 +1883,7 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
             if (is_winds(involved_tile)) {
                 // 先标记为幺九刻，再根据圈风、门风调整
                 fan_table[PUNG_OF_TERMINALS_OR_HONORS] = 1;
-                adjust_by_winds(involved_tile, prevalent_wind, seat_wind, fan_table);
+                adjust_by_winds(involved_tile, calculate_param->prevalent_wind, calculate_param->seat_wind, fan_table);
 
                 // 风牌刻子+箭牌雀头时，为五门齐
                 if (is_dragons(pair_tile)) {
@@ -1805,25 +1940,15 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
         }
     }
 
-    // 还原牌
-    tile_t tiles[15];  // 第四组可能为杠，所以最多为15张
-    memcpy(tiles, matched_seq, sizeof(*matched_seq));  // 组合龙的部分
-    intptr_t tile_cnt = packs_to_tiles(&packs[3], 2, tiles + 9, 6);  // 一组面子+一对雀头 最多6张牌
-    tile_cnt += 9;
-
     // 和牌张是组合龙范围的牌，不计边张、嵌张、单钓将
     if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; })) {
         if (fixed_cnt == 0) {  // 门清的牌有可能存在边张、嵌张、单钓将
             // 天和不计边张、嵌张、单钓将
-            bool heaven_win = (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
             if (!heaven_win) {
-                // 将除去组合龙的部分恢复成牌
-                --tile_table[win_tile];
-                tile_t temp[4];
-                intptr_t cnt = table_to_tiles(tile_table, temp, 4);
-
-                // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
-                adjust_by_waiting_form(packs + 3, 2, temp, cnt, win_tile, fan_table);
+                if (is_unique_waiting(tile_table, 4, win_tile)) {
+                    // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
+                    adjust_by_waiting_form(packs + 3, 2, win_tile, fan_table);
+                }
             }
         }
         else {
@@ -1838,17 +1963,50 @@ static bool calculate_knitted_straight_fan(const calculate_param_t *calculate_pa
     return true;
 }
 
+// 七对
+static bool is_seven_pairs(const tile_table_t &tile_table) {
+    for (int i = 0; i < 34; ++i) {
+        tile_t t = all_tiles[i];
+        if (tile_table[t] & 1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// 连七对
+static bool is_seven_shifted_pairs(const tile_table_t &tile_table, suit_t suit) {
+    if (suit == TILE_SUIT_HONORS) {
+        return false;
+    }
+
+    // 连七对只有三种，1~7、2~8、3~9，无论哪种，3~7都是有一对的
+    tile_t t3 = make_tile(suit, 3);
+    if (tile_table[t3] == 2 && tile_table[t3 + 1] == 2 && tile_table[t3 + 2] == 2 && tile_table[t3 + 3] == 2 && tile_table[t3 + 4] == 2) {
+        if (tile_table[t3 - 1] == 2) {
+            // 有2，可能是1~7或者2~8
+            return (tile_table[t3 - 2] == 2 || tile_table[t3 + 5] == 2);
+        }
+
+        // 无2，只能是3~9
+        return (tile_table[t3 + 5] == 2 && tile_table[t3 + 6] == 2);
+    }
+    return false;
+}
+
 // 十三幺
-static FORCE_INLINE bool is_thirteen_orphans(const tile_t (&tiles)[14]) {
-    return std::all_of(std::begin(tiles), std::end(tiles), &is_terminal_or_honor)
-        && std::includes(std::begin(tiles), std::end(tiles),
-        std::begin(standard_thirteen_orphans), std::end(standard_thirteen_orphans));
+static FORCE_INLINE bool is_thirteen_orphans(const tile_t *unique_tiles, intptr_t unique_cnt) {
+    return unique_cnt == 13 && std::equal(standard_thirteen_orphans, standard_thirteen_orphans + 13, unique_tiles);
 }
 
 // 全不靠/七星不靠算番
-static bool calculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14], fan_table_t &fan_table) {
-    const tile_t *honor_begin = std::find_if(std::begin(standing_tiles), std::end(standing_tiles), &is_honor);
-    int numbered_cnt = static_cast<int>(honor_begin - standing_tiles);
+static bool calculate_honors_and_knitted_tiles(const tile_t *unique_tiles, intptr_t unique_cnt, fan_table_t &fan_table) {
+    if (unique_cnt != 14) {
+        return false;
+    }
+
+    const tile_t *honor_begin = std::find_if(unique_tiles, unique_tiles + 14, &is_honor);
+    int numbered_cnt = static_cast<int>(honor_begin - unique_tiles);
     // 数牌张数大于9或者小于7必然不可能是全不靠
     if (numbered_cnt > 9 || numbered_cnt < 7) {
         return false;
@@ -1856,18 +2014,18 @@ static bool calculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14
 
     // 匹配组合龙
     if (std::none_of(&standard_knitted_straight[0], &standard_knitted_straight[6],
-        [&standing_tiles, honor_begin](const tile_t (&seq)[9]) {
-        return std::includes(std::begin(seq), std::end(seq), std::begin(standing_tiles), honor_begin);
+        [&unique_tiles, honor_begin](const tile_t (&seq)[9]) {
+        return std::includes(std::begin(seq), std::end(seq), unique_tiles, honor_begin);
     })) {
         return false;
     }
 
-    if (numbered_cnt == 7 && std::equal(std::begin(standard_thirteen_orphans) + 6, std::end(standard_thirteen_orphans), standing_tiles + 7)) {
+    if (numbered_cnt == 7 && std::equal(std::begin(standard_thirteen_orphans) + 6, std::end(standard_thirteen_orphans), unique_tiles + 7)) {
         // 七种字牌齐，为七星不靠
         fan_table[GREATER_HONORS_AND_KNITTED_TILES] = 1;
         return true;
     }
-    else if (std::includes(std::begin(standard_thirteen_orphans) + 6, std::end(standard_thirteen_orphans), honor_begin, std::end(standing_tiles))) {
+    else if (std::includes(std::begin(standard_thirteen_orphans) + 6, std::end(standard_thirteen_orphans), honor_begin, unique_tiles + 14)) {
         // 全不靠
         fan_table[LESSER_HONORS_AND_KNITTED_TILES] = 1;
         if (numbered_cnt == 9) {  // 有9张数牌，为带组合龙的全不靠
@@ -1880,30 +2038,20 @@ static bool calculate_honors_and_knitted_tiles(const tile_t (&standing_tiles)[14
 }
 
 // 特殊和型算番
-static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_flag_t win_flag, fan_table_t &fan_table) {
+static bool calculate_special_form_fan(const tile_table_t &standing_table, tile_t win_tile,
+    const tile_t *unique_tiles, intptr_t unique_cnt, win_flag_t win_flag, fan_table_t &fan_table) {
+
     // 按出现频率顺序
 
     // 七对
-    if (standing_tiles[0] == standing_tiles[1]
-        && standing_tiles[2] == standing_tiles[3]
-        && standing_tiles[4] == standing_tiles[5]
-        && standing_tiles[6] == standing_tiles[7]
-        && standing_tiles[8] == standing_tiles[9]
-        && standing_tiles[10] == standing_tiles[11]
-        && standing_tiles[12] == standing_tiles[13]) {
-
-        if (is_numbered_suit_quick(standing_tiles[0])
-            && standing_tiles[0] + 1 == standing_tiles[2]
-            && standing_tiles[2] + 1 == standing_tiles[4]
-            && standing_tiles[4] + 1 == standing_tiles[6]
-            && standing_tiles[6] + 1 == standing_tiles[8]
-            && standing_tiles[8] + 1 == standing_tiles[10]
-            && standing_tiles[10] + 1 == standing_tiles[12]) {
+    if (is_seven_pairs(standing_table)) {
+        suit_t s = tile_get_suit(win_tile);
+        if (is_seven_shifted_pairs(standing_table, s)) {
             // 连七对
             fan_table[SEVEN_SHIFTED_PAIRS] = 1;
 
             // 2~8的连七对加计断幺
-            if (tile_get_rank(standing_tiles[0]) == 2) {
+            if (standing_table[make_tile(s, 1)] == 0 && standing_table[make_tile(s, 9)] == 0) {
                 fan_table[ALL_SIMPLES] = 1;
             }
 
@@ -1914,13 +2062,13 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
             fan_table[SEVEN_PAIRS] = 1;
 
             // 根据花色调整——涉及番种：无字、缺一门、混一色、清一色、五门齐
-            adjust_by_suits(standing_tiles, 14, fan_table);
+            adjust_by_suits(unique_tiles, unique_cnt, fan_table);
             // 根据牌特性调整——涉及番种：断幺、推不倒、绿一色、字一色、清幺九、混幺九
-            adjust_by_tiles_traits(standing_tiles, 14, fan_table);
+            adjust_by_tiles_traits(unique_tiles, unique_cnt, fan_table);
             // 根据数牌的范围调整——涉及番种：大于五、小于五、全大、全中、全小
-            adjust_by_rank_range(standing_tiles, 14, fan_table);
+            adjust_by_rank_range(unique_tiles, unique_cnt, fan_table);
             // 四归一调整
-            adjust_by_tiles_hog(standing_tiles, 14, fan_table);
+            adjust_by_tiles_hog(standing_table, 0, fan_table);
 
             adjust_by_win_flag(win_flag, fan_table);
             // 统一调整一些不计的
@@ -1931,13 +2079,13 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
     }
 
     // 全不靠/七星不靠
-    if (calculate_honors_and_knitted_tiles(standing_tiles, fan_table)) {
+    if (calculate_honors_and_knitted_tiles(unique_tiles, unique_cnt, fan_table)) {
         adjust_by_win_flag(win_flag, fan_table);
         return true;
     }
 
     // 十三幺
-    if (is_thirteen_orphans(standing_tiles)) {
+    if (is_thirteen_orphans(unique_tiles, unique_cnt)) {
         fan_table[THIRTEEN_ORPHANS] = 1;
         adjust_by_win_flag(win_flag, fan_table);
         return true;
@@ -1947,12 +2095,31 @@ static bool calculate_special_form_fan(const tile_t (&standing_tiles)[14], win_f
 }
 
 // 九莲宝灯算番
-static bool calculate_nine_gates_fan(const tile_t (&standing_tiles)[13], tile_t win_tile, win_flag_t win_flag, fan_table_t &fan_table) {
-    bool heaven_win = (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
-    if (heaven_win
-        || tile_get_suit(win_tile) != tile_get_suit(standing_tiles[0])
-        || !is_nine_gates(standing_tiles)) {
-        return false;
+static bool calculate_nine_gates_fan(const tile_table_t &standing_table, tile_t win_tile, win_flag_t win_flag, fan_table_t &fan_table) {
+    suit_t s = tile_get_suit(win_tile);
+    rank_t r = tile_get_rank(win_tile);
+    if (r == 1) {
+        if (standing_table[win_tile] != 4
+            || standing_table[make_tile(s, 9)] != 3
+            || std::any_of(standing_table + make_tile(s, 2), standing_table + make_tile(s, 9), [](int n) { return n != 1; })) {
+            return false;
+        }
+    }
+    else if (r == 9) {
+        if (standing_table[win_tile] != 4
+            || standing_table[make_tile(s, 1)] != 3
+            || std::any_of(standing_table + make_tile(s, 2), standing_table + make_tile(s, 9), [](int n) { return n != 1; })) {
+            return false;
+        }
+    }
+    else {
+        if (standing_table[win_tile] != 2
+            || standing_table[make_tile(s, 1)] != 3
+            || standing_table[make_tile(s, 9)] != 3
+            || std::any_of(standing_table + make_tile(s, 2), standing_table + make_tile(s, r), [](int n) { return n != 1; })
+            || std::any_of(standing_table + make_tile(s, r + 1), standing_table + make_tile(s, 9), [](int n) { return n != 1; })) {
+            return false;
+        }
     }
 
     fan_table[NINE_GATES] = 1;
@@ -1960,7 +2127,6 @@ static bool calculate_nine_gates_fan(const tile_t (&standing_tiles)[13], tile_t 
     // 和1、9加计清龙、四归一
     // 和2、5、8加计双暗刻、幺九刻
     // 和2、3、4、6、7、8加计连六
-    rank_t r = tile_get_rank(win_tile);
     switch (r) {
     case 1: case 9:
         fan_table[PURE_STRAIGHT] = 1;
@@ -2005,78 +2171,39 @@ static int get_fan_by_table(const fan_table_t &fan_table) {
     return fan;
 }
 
-// 判断立牌是否包含和牌
-bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, intptr_t standing_cnt, tile_t win_tile) {
-    return std::any_of(standing_tiles, standing_tiles + standing_cnt,
-        [win_tile](tile_t tile) { return tile == win_tile; });
-}
-
-// 统计和牌在副露牌组中出现的张数
-size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, intptr_t fixed_cnt, tile_t win_tile) {
-    tile_table_t tile_table = { 0 };
-    for (intptr_t i = 0; i < fixed_cnt; ++i) {
-        pack_t pack = fixed_packs[i];
-        tile_t tile = pack_get_tile(pack);
-        switch (pack_get_type(pack)) {
-        case PACK_TYPE_CHOW: ++tile_table[tile - 1]; ++tile_table[tile]; ++tile_table[tile + 1]; break;
-        case PACK_TYPE_PUNG: tile_table[tile] += 3; break;
-        case PACK_TYPE_KONG: tile_table[tile] += 4; break;
-        default: break;
-        }
-    }
-    return tile_table[win_tile];
-}
-
-// 判断副露牌组是否包含杠
-bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, intptr_t fixed_cnt) {
-    return std::any_of(fixed_packs, fixed_packs + fixed_cnt,
-        [](pack_t pack) { return pack_get_type(pack) == PACK_TYPE_KONG; });
-}
-
-// 检查算番的输入是否合法
-int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile) {
-    // 打表
-    tile_table_t tile_table;
-    if (!map_hand_tiles(hand_tiles, &tile_table)) {
-        return ERROR_WRONG_TILES_COUNT;
-    }
-    if (win_tile != 0) {
-        ++tile_table[win_tile];
-    }
-
-    // 如果某张牌超过4
-    if (std::any_of(std::begin(tile_table), std::end(tile_table), [](int cnt) { return cnt > 4; })) {
-        return ERROR_TILE_MORE_THAN_4;
-    }
-
-    return 0;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 算番
 //
 int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table) {
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
-    tile_t win_tile = calculate_param->win_tile;
-    win_flag_t win_flag = calculate_param->win_flag;
+    const intptr_t fixed_cnt = hand_tiles->pack_count;
+    const intptr_t standing_cnt = hand_tiles->tile_count;
 
-    if (int ret = check_calculator_input(hand_tiles, win_tile)) {
-        return ret;
+    // 将每一组副露当作3张牌来算，那么总张数=13
+    if (standing_cnt <= 0 || fixed_cnt < 0 || fixed_cnt > 4 || fixed_cnt * 3 + standing_cnt != 13) {
+        return ERROR_WRONG_TILES_COUNT;
     }
 
-    intptr_t fixed_cnt = hand_tiles->pack_count;
-    intptr_t standing_cnt = hand_tiles->tile_count;
+    const tile_t win_tile = calculate_param->win_tile;
+
+    tile_table_t fixed_table{}, standing_table{};
+    map_packs(hand_tiles->fixed_packs, fixed_cnt, fixed_table);
+    map_tiles(hand_tiles->standing_tiles, standing_cnt, standing_table);
+    ++standing_table[win_tile];  // 把和牌张也加入手牌
+
+    tile_t unique_tiles[18];
+    const intptr_t unique_cnt = table_unique(fixed_table, standing_table, unique_tiles);
+
+    win_flag_t win_flag = calculate_param->win_flag;
 
     // 校正和牌标记
     // 如果立牌包含和牌，则必然不是和绝张
-    const bool standing_tiles_contains_win_tile = is_standing_tiles_contains_win_tile(hand_tiles->standing_tiles, standing_cnt, win_tile);
-    if (standing_tiles_contains_win_tile) {
+    if (standing_table[win_tile] != 1) {
         win_flag &= ~WIN_FLAG_LAST_TILE;
     }
 
     // 如果和牌在副露中出现3张，则必然为和绝张
-    const size_t win_tile_in_fixed_packs = count_win_tile_in_fixed_packs(hand_tiles->fixed_packs, fixed_cnt, win_tile);
-    if (3 == win_tile_in_fixed_packs) {
+    if (3 == fixed_table[win_tile]) {
         win_flag |= WIN_FLAG_LAST_TILE;
     }
 
@@ -2084,23 +2211,20 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
     if (win_flag & WIN_FLAG_KONG_INVOLVED) {
         if (win_flag & WIN_FLAG_SELF_DRAWN) {  // 自摸
             // 如果手牌没有杠，则必然不是杠上开花
-            if (!is_fixed_packs_contains_kong(hand_tiles->fixed_packs, fixed_cnt)) {
+            if (std::none_of(hand_tiles->fixed_packs, hand_tiles->fixed_packs + fixed_cnt,
+                [](pack_t pack) { return pack_get_type(pack) == PACK_TYPE_KONG; })) {
                 win_flag &= ~WIN_FLAG_KONG_INVOLVED;
             }
         }
         else {  // 点和
             // 如果和牌在手牌范围内出现过，则必然不是抢杠和
-            if (win_tile_in_fixed_packs > 0 || standing_tiles_contains_win_tile) {
+            if (fixed_table[win_tile] != 0 || standing_table[win_tile] != 1) {
                 win_flag &= ~WIN_FLAG_KONG_INVOLVED;
             }
         }
     }
 
-    // 合并立牌与和牌，并排序，最多为14张
-    tile_t standing_tiles[14];
-    memcpy(standing_tiles, hand_tiles->standing_tiles, standing_cnt * sizeof(tile_t));
-    standing_tiles[standing_cnt] = win_tile;
-    std::sort(standing_tiles, standing_tiles + standing_cnt + 1);
+    const bool heaven_win = (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
 
     // 最大番标记
     int max_fan = 0;
@@ -2109,15 +2233,15 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
     // 先判断各种特殊和型
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
         // 出现频率：七对>组合龙>九莲宝灯
-        if (calculate_special_form_fan(standing_tiles, win_flag, tmp_table)
-            || calculate_knitted_straight_fan(calculate_param, win_flag, tmp_table)
-            || calculate_nine_gates_fan(hand_tiles->standing_tiles, win_tile, win_flag, tmp_table)) {
+        if (calculate_special_form_fan(standing_table, win_tile, unique_tiles, unique_cnt, win_flag, tmp_table)
+            || calculate_knitted_straight_fan(standing_table, heaven_win, calculate_param, win_flag, tmp_table)
+            || (!heaven_win && calculate_nine_gates_fan(standing_table, win_tile, win_flag, tmp_table))) {
             max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }
     }
     else if (fixed_cnt == 1) {  // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(calculate_param, win_flag, tmp_table)) {
+        if (calculate_knitted_straight_fan(standing_table, heaven_win, calculate_param, win_flag, tmp_table)) {
             max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }
@@ -2126,9 +2250,11 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
     // 无法构成特殊和型或者为七对
     // 七对也要按基本和型划分，因为极端情况下，基本和型的番会超过七对的番
     if (max_fan == 0 || tmp_table[SEVEN_PAIRS] == 1) {
+        const bool unique_waiting = !heaven_win && is_unique_waiting(standing_table, standing_cnt, win_tile);
+
         // 划分
         division_result_t result;
-        if (divide_win_hand(standing_tiles, hand_tiles->fixed_packs, fixed_cnt, &result)) {
+        if (divide_win_hand(standing_table, hand_tiles->fixed_packs, fixed_cnt, &result)) {
             fan_table_t fan_tables[MAX_DIVISION_CNT] = { { 0 } };
             const fan_table_t *selected_fan_table = nullptr;
 
@@ -2140,7 +2266,8 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
                 puts(str);
 #endif
                 fan_table_t &current_table = fan_tables[i];
-                calculate_regular_fan(result.divisions[i].packs, calculate_param, win_flag, current_table);
+                calculate_regular_fan(result.divisions[i].packs, fixed_table, standing_table, unique_tiles, unique_cnt,
+                    calculate_param, unique_waiting, win_flag, current_table);
                 int current_fan = get_fan_by_table(current_table);
                 if (current_fan > max_fan) {
                     max_fan = current_fan;

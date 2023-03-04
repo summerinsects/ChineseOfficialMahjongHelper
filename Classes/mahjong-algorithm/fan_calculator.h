@@ -179,17 +179,6 @@ typedef uint8_t win_flag_t;
  */
 
 /**
- * @brief 检查算番的输入是否合法
- *
- * @param [in] hand_tiles 手牌
- * @param [in] win_tile 和牌张
- * @retval 0 成功
- * @retval ERROR_WRONG_TILES_COUNT 错误的张数
- * @retval ERROR_TILE_COUNT_GREATER_THAN_4 某张牌出现超过4枚
- */
-int check_calculator_input(const hand_tiles_t *hand_tiles, tile_t win_tile);
-
-/**
  * @brief 算番参数
  */
 struct calculate_param_t {
@@ -324,37 +313,6 @@ static const uint16_t fan_value_table[FAN_TABLE_SIZE] = {
     , 5
 #endif
 };
-
-/**
- * @brief 判断立牌是否包含和牌
- * 如果是，则必然不是和绝张
- *
- * @param [in] standing_tiles 立牌
- * @param [in] standing_cnt 立牌数
- * @param [in] win_tile 和牌张
- * @return bool
- */
-bool is_standing_tiles_contains_win_tile(const tile_t *standing_tiles, intptr_t standing_cnt, tile_t win_tile);
-
-/**
- * @brief 统计和牌在副露牌组中出现的张数
- * 如果出现3张，则必然和绝张
- *
- * @param [in] fixed_packs 副露牌组
- * @param [in] fixed_cnt 副露牌组数
- * @param [in] win_tile 和牌张
- * @return size_t
- */
-size_t count_win_tile_in_fixed_packs(const pack_t *fixed_packs, intptr_t fixed_cnt, tile_t win_tile);
-
-/**
- * @brief 判断副露牌组是否包含杠
- *
- * @param [in] fixed_packs 副露牌组
- * @param [in] fixed_cnt 副露牌组数
- * @return bool
- */
-bool is_fixed_packs_contains_kong(const pack_t *fixed_packs, intptr_t fixed_cnt);
 
 /**
  * end group
