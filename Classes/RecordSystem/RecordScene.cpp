@@ -870,13 +870,13 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *) {
     float maxWidth = AlertDialog::maxWidth();
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(maxWidth, 170.0f));
+    rootNode->setContentSize(Size(maxWidth, 220.0f));
 
     const float gap = (maxWidth - 4.0f) * 0.25f;
 
-    static const int16_t value[4] = { -10, -5, +5, +10 };
-    static const char *text[4] = { "-10", "-5", "+5", "+10" };
-    static const float buttonY[4] = { 135.0f, 110.0f, 60.0f, 35.0f };
+    static const int16_t value[6] = { -10, -5, -1, +1, +5, +10 };
+    static const char *text[6] = { "-10", "-5", "-1", "+1", "+5", "+10" };
+    static const float buttonY[6] = { 185.0f, 160.0f, 135.0f, 85.0f, 60.0f, 35.0f };
 
     std::shared_ptr<std::array<int16_t, 4> > penaltyScoresStrong = std::make_shared<std::array<int16_t, 4> >();
     int16_t *penaltyScores = penaltyScoresStrong->data();
@@ -896,7 +896,7 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *) {
         label = Label::createWithSystemFont(_playerNames[PLAYER_TO_UI(i)], "Arial", 12.0f);
         label->setTextColor(C4B_ORANGE);
         rootNode->addChild(label);
-        label->setPosition(Vec2(x, 160.0f));
+        label->setPosition(Vec2(x, 210.0f));
         cw::scaleLabelToFitWidth(label, gap - 2.0f);
 
         ui::Scale9Sprite *sprite = ui::Scale9Sprite::create("source_material/btn_square_normal.png");
@@ -907,10 +907,10 @@ void RecordScene::onPenaltyButton(cocos2d::Ref *) {
         // 罚分
         label = Label::createWithSystemFont("", "Arial", 12);
         rootNode->addChild(label);
-        label->setPosition(Vec2(x, 85.0f));
+        label->setPosition(Vec2(x, 110.0f));
         updatePenaltyLabel(label, penaltyScores[PLAYER_TO_UI(i)]);
 
-        for (int n = 0; n < 4; ++n) {
+        for (int n = 0; n < 6; ++n) {
             ui::Button *button = UICommon::createButton();
             button->setScale9Enabled(true);
             button->setContentSize(Size(30.0f, 20.0f));
