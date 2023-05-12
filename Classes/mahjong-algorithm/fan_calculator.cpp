@@ -549,6 +549,19 @@ static void exclusionary_rule(const fan_t *all_fans, long fan_cnt, long max_cnt,
     fan_table[TWO_TERMINAL_CHOWS] = table[3];
 }
 
+// 4组顺子算番（3+1）结构
+static bool calculate_3_of_4_chows(tile_t tile0, tile_t tile1, tile_t tile2, tile_t tile_extra, fan_table_t &fan_table) {
+    fan_t fan;
+    if ((fan = get_3_chows_fan(tile0, tile1, tile2)) != FAN_NONE) {
+        fan_table[fan] = 1;
+        if ((fan = get_1_chow_extra_fan(tile0, tile1, tile2, tile_extra)) != FAN_NONE) {
+            fan_table[fan] = 1;
+        }
+        return true;
+    }
+    return false;
+}
+
 // 4组顺子算番
 static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_table) {
     fan_t fan;
@@ -560,39 +573,19 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
 
     // 3组顺子判断
     // 012构成3组顺子的番种
-    if ((fan = get_3_chows_fan(mid_tiles[0], mid_tiles[1], mid_tiles[2])) != FAN_NONE) {
-        fan_table[fan] = 1;
-        // 计算与第4组顺子构成的番
-        if ((fan = get_1_chow_extra_fan(mid_tiles[0], mid_tiles[1], mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
-            fan_table[fan] = 1;
-        }
+    if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[1], mid_tiles[2], mid_tiles[3], fan_table)) {
         return;
     }
     // 013构成3组顺子的番种
-    else if ((fan = get_3_chows_fan(mid_tiles[0], mid_tiles[1], mid_tiles[3])) != FAN_NONE) {
-        fan_table[fan] = 1;
-        // 计算与第4组顺子构成的番
-        if ((fan = get_1_chow_extra_fan(mid_tiles[0], mid_tiles[1], mid_tiles[3], mid_tiles[2])) != FAN_NONE) {
-            fan_table[fan] = 1;
-        }
+    else if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[1], mid_tiles[3], mid_tiles[2], fan_table)) {
         return;
     }
     // 023构成3组顺子的番种
-    else if ((fan = get_3_chows_fan(mid_tiles[0], mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
-        fan_table[fan] = 1;
-        // 计算与第4组顺子构成的番
-        if ((fan = get_1_chow_extra_fan(mid_tiles[0], mid_tiles[2], mid_tiles[3], mid_tiles[1])) != FAN_NONE) {
-            fan_table[fan] = 1;
-        }
+    else if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[2], mid_tiles[3], mid_tiles[1], fan_table)) {
         return;
     }
     // 123构成3组顺子的番种
-    else if ((fan = get_3_chows_fan(mid_tiles[1], mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
-        fan_table[fan] = 1;
-        // 计算与第4组顺子构成的番
-        if ((fan = get_1_chow_extra_fan(mid_tiles[1], mid_tiles[2], mid_tiles[3], mid_tiles[0])) != FAN_NONE) {
-            fan_table[fan] = 1;
-        }
+    else if (calculate_3_of_4_chows(mid_tiles[1], mid_tiles[2], mid_tiles[3], mid_tiles[0], fan_table)) {
         return;
     }
 
