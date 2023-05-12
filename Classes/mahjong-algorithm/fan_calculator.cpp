@@ -795,35 +795,35 @@ static void calculate_4_pungs(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
     }
 
     // 3组刻子判断
-    bool _3_pungs_has_fan = false;
+    bool has_3_pungs_fan = false;
     int free_pack_idx = -1;  // 未使用的1组刻子
     // 012构成3组刻子的番种
     if ((fan = get_3_pungs_fan(mid_tiles[0], mid_tiles[1], mid_tiles[2])) != FAN_NONE) {
         fan_table[fan] = 1;
         free_pack_idx = 3;
-        _3_pungs_has_fan = true;
+        has_3_pungs_fan = true;
     }
     // 013构成3组刻子的番种
     else if ((fan = get_3_pungs_fan(mid_tiles[0], mid_tiles[1], mid_tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
         free_pack_idx = 2;
-        _3_pungs_has_fan = true;
+        has_3_pungs_fan = true;
     }
     // 023构成3组刻子的番种
     else if ((fan = get_3_pungs_fan(mid_tiles[0], mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
         free_pack_idx = 1;
-        _3_pungs_has_fan = true;
+        has_3_pungs_fan = true;
     }
     // 123构成3组刻子的番种
     else if ((fan = get_3_pungs_fan(mid_tiles[1], mid_tiles[2], mid_tiles[3])) != FAN_NONE) {
         fan_table[fan] = 1;
         free_pack_idx = 0;
-        _3_pungs_has_fan = true;
+        has_3_pungs_fan = true;
     }
 
     // 存在3组刻子的番种时，余下的第4组刻子只能组合一次
-    if (_3_pungs_has_fan) {
+    if (has_3_pungs_fan) {
         for (int i = 0; i < 4; ++i) {
             if (i == free_pack_idx) {
                 continue;
@@ -894,7 +894,7 @@ static bool is_pure_terminal_chows(const pack_t (&chow_packs)[4], pack_t pair_pa
         return false;
     }
 
-    int _123_cnt = 0, _789_cnt = 0;
+    int cnt_123 = 0, cnt_789 = 0;
     suit_t pair_suit = tile_get_suit(pack_get_tile(pair_pack));
     for (int i = 0; i < 4; ++i) {
         suit_t suit = tile_get_suit(pack_get_tile(chow_packs[i]));
@@ -903,12 +903,12 @@ static bool is_pure_terminal_chows(const pack_t (&chow_packs)[4], pack_t pair_pa
         }
         rank_t rank = tile_get_rank(pack_get_tile(chow_packs[i]));
         switch (rank) {
-        case 2: ++_123_cnt; break;
-        case 8: ++_789_cnt; break;
+        case 2: ++cnt_123; break;
+        case 8: ++cnt_789; break;
         default: return false;
         }
     }
-    return (_123_cnt == 2 && _789_cnt == 2);  // 123和789各2组
+    return (cnt_123 == 2 && cnt_789 == 2);  // 123和789各2组
 }
 
 // 三色双龙会
@@ -917,8 +917,8 @@ static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t
         return false;
     }
 
-    int _123_suit_table[4] = { 0 };
-    int _789_suit_table[4] = { 0 };
+    int suit_table_123[4] = { 0 };
+    int suit_table_789[4] = { 0 };
     suit_t pair_suit = tile_get_suit(pack_get_tile(pair_pack));
     for (int i = 0; i < 4; ++i) {
         suit_t suit = tile_get_suit(pack_get_tile(chow_packs[i]));
@@ -927,17 +927,17 @@ static bool is_three_suited_terminal_chows(const pack_t (&chow_packs)[4], pack_t
         }
         rank_t rank = tile_get_rank(pack_get_tile(chow_packs[i]));
         switch (rank) {
-        case 2: ++_123_suit_table[suit]; break;
-        case 8: ++_789_suit_table[suit]; break;
+        case 2: ++suit_table_123[suit]; break;
+        case 8: ++suit_table_789[suit]; break;
         default: return false;
         }
     }
 
     // 与雀头花色不同的两色123和789各一组
     switch (pair_suit) {
-    case 1: return (_123_suit_table[2] && _123_suit_table[3] && _789_suit_table[2] && _789_suit_table[3]);
-    case 2: return (_123_suit_table[1] && _123_suit_table[3] && _789_suit_table[1] && _789_suit_table[3]);
-    case 3: return (_123_suit_table[1] && _123_suit_table[2] && _789_suit_table[1] && _789_suit_table[2]);
+    case 1: return (suit_table_123[2] && suit_table_123[3] && suit_table_789[2] && suit_table_789[3]);
+    case 2: return (suit_table_123[1] && suit_table_123[3] && suit_table_789[1] && suit_table_789[3]);
+    case 3: return (suit_table_123[1] && suit_table_123[2] && suit_table_789[1] && suit_table_789[2]);
     default: return false;
     }
 }
@@ -1233,7 +1233,7 @@ static void adjust_by_packs_traits(const pack_t (&packs)[5], fan_table_t &fan_ta
     // 统计包含数牌19、字牌、5、双数牌的组数
     int terminal_pack = 0;
     int honor_pack = 0;
-    int _5_pack = 0;
+    int five_pack = 0;
     int even_pack = 0;
     for (int i = 0; i < 5; ++i) {
         tile_t tile = pack_get_tile(packs[i]);
@@ -1242,14 +1242,14 @@ static void adjust_by_packs_traits(const pack_t (&packs)[5], fan_table_t &fan_ta
             if (pack_get_type(packs[i]) == PACK_TYPE_CHOW) {  // 顺子
                 switch (rank) {
                 case 2: case 8: ++terminal_pack; break;  // 数牌19
-                case 4: case 5: case 6: ++_5_pack; break;  // 带五
+                case 4: case 5: case 6: ++five_pack; break;  // 带五
                 default: break;
                 }
             }
             else {  // 刻子或雀头
                 switch (rank) {
                 case 1: case 9: ++terminal_pack; break;  // 数牌19
-                case 5: ++_5_pack; break;  // 带五
+                case 5: ++five_pack; break;  // 带五
                 case 2: case 4: case 6: case 8: ++even_pack; break;  // 双刻
                 default: break;
                 }
@@ -1266,7 +1266,7 @@ static void adjust_by_packs_traits(const pack_t (&packs)[5], fan_table_t &fan_ta
         return;
     }
     // 全带五
-    if (_5_pack == 5) {
+    if (five_pack == 5) {
         fan_table[ALL_FIVE] = 1;
         return;
     }
@@ -1323,8 +1323,8 @@ static void adjust_by_tiles_traits(const tile_t *tiles, intptr_t tile_cnt, fan_t
 // 四归一调整
 static void adjust_by_tiles_hog(const tile_table_t &tile_table, intptr_t kong_cnt, fan_table_t &fan_table) {
     // 有多少种已经用去4张的牌减去杠的数量，即为四归一的数量
-    intptr_t _4_cnt = std::count(std::begin(tile_table), std::end(tile_table), 4);
-    fan_table[TILE_HOG] = static_cast<uint8_t>(_4_cnt - kong_cnt);
+    intptr_t cnt = std::count(std::begin(tile_table), std::end(tile_table), 4);
+    fan_table[TILE_HOG] = static_cast<uint8_t>(cnt - kong_cnt);
 }
 
 // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
