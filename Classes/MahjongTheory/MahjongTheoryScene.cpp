@@ -1,5 +1,6 @@
 ﻿#include "MahjongTheoryScene.h"
 #include <array>
+#include <random>
 #include "../mahjong-algorithm/stringify.h"
 #include "../UICommon.h"
 #include "../UIColors.h"
@@ -167,8 +168,6 @@ bool MahjongTheoryScene::init() {
     this->addChild(tableView);
     _tableView = tableView;
 
-    srand(static_cast<unsigned>(time(nullptr)));
-
     // 下一帧设置随机输入
     this->scheduleOnce([this](float) { setRandomInput(); }, 0.0f, "set_random_input");
 
@@ -276,10 +275,13 @@ void MahjongTheoryScene::setRandomInput() {
 
     int table[34] = {0};
 
+    std::mt19937_64 eng(std::chrono::system_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<int> uid{ 0, 33 };
+
     // 立牌
     int cnt = 0;
     do {
-        int n = rand() % 34;
+        int n = uid(eng);
         if (table[n] < 4) {
             ++table[n];
             handTiles.standing_tiles[cnt++] = mahjong::all_tiles[n];
@@ -290,7 +292,7 @@ void MahjongTheoryScene::setRandomInput() {
     // 上牌
     mahjong::tile_t servingTile = 0;
     do {
-        int n = rand() % 34;
+        int n = uid(eng);
         if (table[n] < 4) {
             ++table[n];
             servingTile = mahjong::all_tiles[n];
@@ -547,10 +549,13 @@ static mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, m
     mahjong::tile_t remainTiles[136];
     intptr_t remainCnt = mahjong::table_to_tiles(remainTable, remainTiles, 136);
 
+    std::mt19937_64 eng(std::chrono::system_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<int> uid{ 0, remainCnt - 1 };
+
     // 随机给一张牌
     mahjong::tile_t servingTile;
     do {
-        servingTile = remainTiles[rand() % remainCnt];
+        servingTile = remainTiles[uid(eng)];
     } while (servingTile == discardTile);
 
     return servingTile;
