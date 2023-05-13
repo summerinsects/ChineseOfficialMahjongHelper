@@ -1845,7 +1845,7 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const tile_table_t &
 }
 
 // “组合龙+面子+雀头”和型算番
-static bool calculate_knitted_straight_fan(const tile_table_t &standing_table, bool heaven_win,
+static bool calculate_knitted_straight_fan(const tile_table_t &standing_table,
     const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
 
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
@@ -1973,6 +1973,10 @@ static bool calculate_knitted_straight_fan(const tile_table_t &standing_table, b
         }
     }
 
+    const bool heavenly = calculate_param->seat_wind == wind_t::EAST
+        && fixed_cnt == 0
+        && (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
+
     // 和牌张是组合龙范围的牌，不计边张、嵌张、单钓将
     if (
 #if KNITTED_STRAIGHT_BODY_WITH_ECS == 0
@@ -1983,7 +1987,7 @@ static bool calculate_knitted_straight_fan(const tile_table_t &standing_table, b
         ) {
         if (fixed_cnt == 0) {  // 门清的牌有可能存在边张、嵌张、单钓将
             // 天和不计边张、嵌张、单钓将
-            if (!heaven_win) {
+            if (!heavenly) {
                 if (is_unique_waiting(tile_table, 4, win_tile)) {
                     // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
                     adjust_by_waiting_form(packs + 3, 2, win_tile, fan_table);
@@ -2078,7 +2082,7 @@ static bool calculate_honors_and_knitted_tiles(const tile_t *unique_tiles, intpt
 
 // 特殊和型算番
 static bool calculate_special_form_fan(const tile_table_t &standing_table, tile_t win_tile,
-    const tile_t *unique_tiles, intptr_t unique_cnt, win_flag_t win_flag, fan_table_t &fan_table) {
+    const tile_t *unique_tiles, intptr_t unique_cnt, wind_t seat_wind, win_flag_t win_flag, fan_table_t &fan_table) {
 
     // 按出现频率顺序
 
@@ -2134,7 +2138,14 @@ static bool calculate_special_form_fan(const tile_table_t &standing_table, tile_
 }
 
 // 九莲宝灯算番
-static bool calculate_nine_gates_fan(const tile_table_t &standing_table, tile_t win_tile, win_flag_t win_flag, fan_table_t &fan_table) {
+static bool calculate_nine_gates_fan(const tile_table_t &standing_table, tile_t win_tile, wind_t seat_wind, win_flag_t win_flag, fan_table_t &fan_table) {
+    const bool heavenly = seat_wind == wind_t::EAST
+        && (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
+    if (heavenly) {
+        // NOTE: 天和不计九莲宝灯
+        return false;
+    }
+
     suit_t s = tile_get_suit(win_tile);
     rank_t r = tile_get_rank(win_tile);
     if (r == 1) {
@@ -2263,8 +2274,6 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
         }
     }
 
-    const bool heaven_win = (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
-
     // 最大番标记
     int max_fan = 0;
     fan_table_t tmp_table = { 0 };
@@ -2272,15 +2281,15 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
     // 先判断各种特殊和型
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
         // 出现频率：七对>组合龙>九莲宝灯
-        if (calculate_special_form_fan(standing_table, win_tile, unique_tiles, unique_cnt, win_flag, tmp_table)
-            || calculate_knitted_straight_fan(standing_table, heaven_win, calculate_param, win_flag, tmp_table)
-            || (!heaven_win && calculate_nine_gates_fan(standing_table, win_tile, win_flag, tmp_table))) {
+        if (calculate_special_form_fan(standing_table, win_tile, unique_tiles, unique_cnt, calculate_param->seat_wind, win_flag, tmp_table)
+            || calculate_knitted_straight_fan(standing_table, calculate_param, win_flag, tmp_table)
+            || calculate_nine_gates_fan(standing_table, win_tile, calculate_param->seat_wind, win_flag, tmp_table)) {
             max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }
     }
     else if (fixed_cnt == 1) {  // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(standing_table, heaven_win, calculate_param, win_flag, tmp_table)) {
+        if (calculate_knitted_straight_fan(standing_table, calculate_param, win_flag, tmp_table)) {
             max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }
@@ -2289,7 +2298,10 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
     // 无法构成特殊和型或者为七对
     // 七对也要按基本和型划分，因为极端情况下，基本和型的番会超过七对的番
     if (max_fan == 0 || tmp_table[SEVEN_PAIRS] == 1) {
-        const bool unique_waiting = !heaven_win && is_unique_waiting(standing_table, standing_cnt, win_tile);
+        const bool heavenly = calculate_param->seat_wind == wind_t::EAST
+            && fixed_cnt == 0
+            && (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
+        const bool unique_waiting = !heavenly && is_unique_waiting(standing_table, standing_cnt, win_tile);
 
         // 划分
         division_result_t result;
