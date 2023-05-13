@@ -25,7 +25,8 @@
 
 #include "tile.h"
 
-#define SUPPORT_CONCEALED_KONG_AND_MELDED_KONG 1  // 支持明暗杠
+#define SUPPORT_CONCEALED_KONG_AND_MELDED_KONG      1  // 支持明暗杠
+#define DISTINGUISH_PURE_SHIFTED_CHOWS              0  // 区分一色三（四）步的宽窄
 
 namespace mahjong {
 
@@ -57,7 +58,12 @@ enum fan_t {
     QUADRUPLE_CHOW,                     ///< 一色四同顺
     FOUR_PURE_SHIFTED_PUNGS,            ///< 一色四节高
 
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+    FOUR_PURE_SHIFTED_CHOWS_1,          ///< 一色四步高Ⅰ
+    FOUR_PURE_SHIFTED_CHOWS_2,          ///< 一色四步高Ⅱ
+#else
     FOUR_PURE_SHIFTED_CHOWS,            ///< 一色四步高
+#endif
     THREE_KONGS,                        ///< 三杠
     ALL_TERMINALS_AND_HONORS,           ///< 混幺九
 
@@ -73,7 +79,12 @@ enum fan_t {
 
     PURE_STRAIGHT,                      ///< 清龙
     THREE_SUITED_TERMINAL_CHOWS,        ///< 三色双龙会
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+    PURE_SHIFTED_CHOWS_1,               ///< 一色三步高Ⅰ
+    PURE_SHIFTED_CHOWS_2,               ///< 一色三步高Ⅱ
+#else
     PURE_SHIFTED_CHOWS,                 ///< 一色三步高
+#endif
     ALL_FIVE,                           ///< 全带五
     TRIPLE_PUNG,                        ///< 三同刻
     THREE_CONCEALED_PUNGS,              ///< 三暗刻
@@ -230,9 +241,20 @@ UNUSED static const char *fan_name[] = {
     "Big Four Winds", "Big Three Dragons", "All Green", "Nine Gates", "Four Kongs", "Seven Shifted Pairs", "Thirteen Orphans",
     "All Terminals", "Little Four Winds", "Little Three Dragons", "All Honors", "Four Concealed Pungs", "Pure Terminal Chows",
     "Quadruple Chow", "Four Pure Shifted Pungs",
-    "Four Pure Shifted Chows", "Three Kongs", "All Terminals and Honors",
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+    "Four Pure Shifted Chows I", "Four Pure Shifted Chows II",
+#else
+    "Four Pure Shifted Chows",
+#endif
+    "Three Kongs", "All Terminals and Honors",
     "Seven Pairs", "Greater Honors and Knitted Tiles", "All Even Pungs", "Full Flush", "Pure Triple Chow", "Pure Shifted Pungs", "Upper Tiles", "Middle Tiles", "Lower Tiles",
-    "Pure Straight", "Three-Suited Terminal Chows", "Pure Shifted Chows", "All Five", "Triple Pung", "Three Concealed Pungs",
+    "Pure Straight", "Three-Suited Terminal Chows",
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+    "Pure Shifted Chows I", "Pure Shifted Chows II",
+#else
+    "Pure Shifted Chows",
+#endif
+    "All Five", "Triple Pung", "Three Concealed Pungs",
     "Lesser Honors and Knitted Tiles", "Knitted Straight", "Upper Four", "Lower Four", "Big Three Winds",
     "Mixed Straight", "Reversible Tiles", "Mixed Triple Chow", "Mixed Shifted Pungs", "Chicken Hand", "Last Tile Draw", "Last Tile Claim", "Out with Replacement Tile", "Robbing The Kong",
     "All Pungs", "Half Flush", "Mixed Shifted Chows", "All Types", "Melded Hand", "Two Concealed Kongs", "Two Dragons Pungs",
@@ -274,9 +296,20 @@ UNUSED static const char *fan_name[] = {
     __UTF8("大四喜"), __UTF8("大三元"), __UTF8("绿一色"), __UTF8("九莲宝灯"), __UTF8("四杠"), __UTF8("连七对"), __UTF8("十三幺"),
     __UTF8("清幺九"), __UTF8("小四喜"), __UTF8("小三元"), __UTF8("字一色"), __UTF8("四暗刻"), __UTF8("一色双龙会"),
     __UTF8("一色四同顺"), __UTF8("一色四节高"),
-    __UTF8("一色四步高"), __UTF8("三杠"), __UTF8("混幺九"),
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+    __UTF8("一色四步高Ⅰ"), __UTF8("一色四步高Ⅱ"),
+#else
+    __UTF8("一色四步高"),
+#endif
+    __UTF8("三杠"), __UTF8("混幺九"),
     __UTF8("七对"), __UTF8("七星不靠"), __UTF8("全双刻"), __UTF8("清一色"), __UTF8("一色三同顺"), __UTF8("一色三节高"), __UTF8("全大"), __UTF8("全中"), __UTF8("全小"),
-    __UTF8("清龙"), __UTF8("三色双龙会"), __UTF8("一色三步高"), __UTF8("全带五"), __UTF8("三同刻"), __UTF8("三暗刻"),
+    __UTF8("清龙"), __UTF8("三色双龙会"),
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+    __UTF8("一色三步高Ⅰ"), __UTF8("一色三步高Ⅱ"),
+#else
+    __UTF8("一色三步高"),
+#endif
+    __UTF8("全带五"), __UTF8("三同刻"), __UTF8("三暗刻"),
     __UTF8("全不靠"), __UTF8("组合龙"), __UTF8("大于五"), __UTF8("小于五"), __UTF8("三风刻"),
     __UTF8("花龙"), __UTF8("推不倒"), __UTF8("三色三同顺"), __UTF8("三色三节高"), __UTF8("无番和"), __UTF8("妙手回春"), __UTF8("海底捞月"), __UTF8("杠上开花"), __UTF8("抢杠和"),
     __UTF8("碰碰和"), __UTF8("混一色"), __UTF8("三色三步高"), __UTF8("五门齐"), __UTF8("全求人"), __UTF8("双暗杠"), __UTF8("双箭刻"),
@@ -299,8 +332,14 @@ static const uint16_t fan_value_table[FAN_TABLE_SIZE] = {
     88, 88, 88, 88, 88, 88, 88,
     64, 64, 64, 64, 64, 64,
     48, 48,
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+    32,
+#endif
     32, 32, 32,
     24, 24, 24, 24, 24, 24, 24, 24, 24,
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+    16,
+#endif
     16, 16, 16, 16, 16, 16,
     12, 12, 12, 12, 12,
     8, 8, 8, 8, 8, 8, 8, 8, 8,

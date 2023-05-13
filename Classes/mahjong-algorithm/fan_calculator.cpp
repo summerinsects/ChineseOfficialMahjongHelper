@@ -298,8 +298,19 @@ static fan_t get_4_chows_fan(tile_t t0, tile_t t1, tile_t t2, tile_t t3) {
     // 按出现频率顺序
 
     // 一色四步高
-    if (is_four_shifted_2(t0, t1, t2, t3) || is_four_shifted_1(t0, t1, t2, t3)) {
+    if (is_four_shifted_2(t0, t1, t2, t3)) {
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+        return FOUR_PURE_SHIFTED_CHOWS_2;
+#else
         return FOUR_PURE_SHIFTED_CHOWS;
+#endif
+    }
+    if (is_four_shifted_1(t0, t1, t2, t3)) {
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+        return FOUR_PURE_SHIFTED_CHOWS_1;
+#else
+        return FOUR_PURE_SHIFTED_CHOWS;
+#endif
     }
     // 一色四同顺
     if (t0 == t1 && t0 == t2 && t0 == t3) {
@@ -343,8 +354,19 @@ static fan_t get_3_chows_fan(tile_t t0, tile_t t1, tile_t t2) {
             return PURE_STRAIGHT;
         }
         // 一色三步高
-        if (is_shifted_2(t0, t1, t2) || is_shifted_1(t0, t1, t2)) {
+        if (is_shifted_2(t0, t1, t2)) {
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+            return PURE_SHIFTED_CHOWS_2;
+#else
             return PURE_SHIFTED_CHOWS;
+#endif
+        }
+        if (is_shifted_1(t0, t1, t2)) {
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+            return PURE_SHIFTED_CHOWS_1;
+#else
+            return PURE_SHIFTED_CHOWS;
+#endif
         }
         // 一色三同顺
         if (t0 == t1 && t0 == t2) {
@@ -572,20 +594,38 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
     }
 
     // 3组顺子判断
+    bool has_3_chows_fan = false;
+
     // 012构成3组顺子的番种
     if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[1], mid_tiles[2], mid_tiles[3], fan_table)) {
-        return;
+        has_3_chows_fan = true;
     }
     // 013构成3组顺子的番种
     else if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[1], mid_tiles[3], mid_tiles[2], fan_table)) {
-        return;
+        has_3_chows_fan = true;
     }
     // 023构成3组顺子的番种
     else if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[2], mid_tiles[3], mid_tiles[1], fan_table)) {
-        return;
+        has_3_chows_fan = true;
     }
     // 123构成3组顺子的番种
     else if (calculate_3_of_4_chows(mid_tiles[1], mid_tiles[2], mid_tiles[3], mid_tiles[0], fan_table)) {
+        has_3_chows_fan = true;
+    }
+
+    if (has_3_chows_fan) {
+#if DISTINGUISH_PURE_SHIFTED_CHOWS
+        // 一色三步高（宽）+连六，有可能是窄三步
+        if (fan_table[PURE_SHIFTED_CHOWS_2] && fan_table[SHORT_STRAIGHT]) {
+            if (is_shifted_1(mid_tiles[0], mid_tiles[1], mid_tiles[2])
+                || is_shifted_1(mid_tiles[0], mid_tiles[1], mid_tiles[3])
+                || is_shifted_1(mid_tiles[0], mid_tiles[2], mid_tiles[3])
+                || is_shifted_1(mid_tiles[1], mid_tiles[2], mid_tiles[3])) {
+                fan_table[PURE_SHIFTED_CHOWS_2] = 0;
+                fan_table[PURE_SHIFTED_CHOWS_1] = 1;
+            }
+        }
+#endif
         return;
     }
 
