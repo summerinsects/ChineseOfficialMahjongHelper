@@ -1646,6 +1646,26 @@ static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
     }
 }
 
+#if SUPPORT_INITIAL_HANDS
+static void adjust_by_initial_hands(bool east, win_flag_t win_flag, fan_table_t &fan_table) {
+    // 自摸时，庄家为天和、闲家为人和
+    if (win_flag & WIN_FLAG_SELF_DRAWN) {
+        fan_table[east ? HEAVENLY_HAND : HUMANLY_HAND_2] = 1;
+        fan_table[FULLY_CONCEALED_HAND] = 0;
+        fan_table[SELF_DRAWN] = 0;
+    }
+    // 点炮时，庄家点的为地和、闲家点的为人和
+    // NOTE: 这里统一当作地和，需要外部再区分
+    else {
+        // 庄家没有地和、人和
+        if (!east) {
+            fan_table[EARTHLY_HAND] = 1;
+            fan_table[CONCEALED_HAND] = 0;
+        }
+    }
+}
+#endif
+
 // 基本和型算番
 static void calculate_regular_fan(const pack_t (&packs)[5], const tile_table_t &fixed_table, tile_table_t &standing_table,
     const tile_t *unique_tiles, intptr_t unique_cnt,
@@ -1797,6 +1817,14 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const tile_table_t &
 
     // 根据和牌方式调整——涉及番种：不求人、全求人
     adjust_by_self_drawn(packs, fixed_cnt, (win_flag & WIN_FLAG_SELF_DRAWN) != 0, fan_table);
+
+#if SUPPORT_INITIAL_HANDS
+    // 天和、地和、人和
+    if (fixed_cnt == 0 && (win_flag & WIN_FLAG_INITIAL)) {
+        adjust_by_initial_hands(calculate_param->seat_wind == wind_t::EAST, win_flag, fan_table);
+    }
+#endif
+
     // 根据雀头调整——涉及番种：平和、小三元、小四喜
     adjust_by_pair_tile(pack_get_tile(pair_pack), chow_cnt, fan_table);
     // 根据牌组特征调整——涉及番种：全带幺、全带五、全双刻
@@ -1973,9 +2001,16 @@ static bool calculate_knitted_straight_fan(const tile_table_t &standing_table,
         }
     }
 
+#if SUPPORT_INITIAL_HANDS
+    // 天和、地和、人和
+    if (fixed_cnt == 0 && (win_flag & WIN_FLAG_INITIAL)) {
+        adjust_by_initial_hands(calculate_param->seat_wind == wind_t::EAST, win_flag, fan_table);
+    }
+#endif
+
     const bool heavenly = calculate_param->seat_wind == wind_t::EAST
         && fixed_cnt == 0
-        && (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
+        && (win_flag & (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN);
 
     // 和牌张是组合龙范围的牌，不计边张、嵌张、单钓将
     if (
@@ -2080,6 +2115,20 @@ static bool calculate_honors_and_knitted_tiles(const tile_t *unique_tiles, intpt
     return false;
 }
 
+static void adjust_by_win_flag_4_special_form(wind_t
+#if SUPPORT_INITIAL_HANDS
+    seat_wind
+#endif
+    , win_flag_t win_flag, fan_table_t &fan_table) {
+    adjust_by_win_flag(win_flag, fan_table);
+#if SUPPORT_INITIAL_HANDS
+    // 天和、地和、人和
+    if (win_flag & WIN_FLAG_INITIAL) {
+        adjust_by_initial_hands(seat_wind == wind_t::EAST, win_flag, fan_table);
+    }
+#endif
+}
+
 // 特殊和型算番
 static bool calculate_special_form_fan(const tile_table_t &standing_table, tile_t win_tile,
     const tile_t *unique_tiles, intptr_t unique_cnt, wind_t seat_wind, win_flag_t win_flag, fan_table_t &fan_table) {
@@ -2098,7 +2147,7 @@ static bool calculate_special_form_fan(const tile_table_t &standing_table, tile_
                 fan_table[ALL_SIMPLES] = 1;
             }
 
-            adjust_by_win_flag(win_flag, fan_table);
+            adjust_by_win_flag_4_special_form(seat_wind, win_flag, fan_table);
         }
         else {
             // 普通七对
@@ -2113,7 +2162,8 @@ static bool calculate_special_form_fan(const tile_table_t &standing_table, tile_
             // 四归一调整
             adjust_by_tiles_hog(standing_table, 0, fan_table);
 
-            adjust_by_win_flag(win_flag, fan_table);
+            adjust_by_win_flag_4_special_form(seat_wind, win_flag, fan_table);
+
             // 统一调整一些不计的
             final_adjust(fan_table);
         }
@@ -2123,14 +2173,14 @@ static bool calculate_special_form_fan(const tile_table_t &standing_table, tile_
 
     // 全不靠/七星不靠
     if (calculate_honors_and_knitted_tiles(unique_tiles, unique_cnt, fan_table)) {
-        adjust_by_win_flag(win_flag, fan_table);
+        adjust_by_win_flag_4_special_form(seat_wind, win_flag, fan_table);
         return true;
     }
 
     // 十三幺
     if (is_thirteen_orphans(unique_tiles, unique_cnt)) {
         fan_table[THIRTEEN_ORPHANS] = 1;
-        adjust_by_win_flag(win_flag, fan_table);
+        adjust_by_win_flag_4_special_form(seat_wind, win_flag, fan_table);
         return true;
     }
 
@@ -2140,7 +2190,7 @@ static bool calculate_special_form_fan(const tile_table_t &standing_table, tile_
 // 九莲宝灯算番
 static bool calculate_nine_gates_fan(const tile_table_t &standing_table, tile_t win_tile, wind_t seat_wind, win_flag_t win_flag, fan_table_t &fan_table) {
     const bool heavenly = seat_wind == wind_t::EAST
-        && (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
+        && (win_flag & (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN);
     if (heavenly) {
         // NOTE: 天和不计九莲宝灯
         return false;
@@ -2196,7 +2246,7 @@ static bool calculate_nine_gates_fan(const tile_table_t &standing_table, tile_t 
         break;
     }
 
-    adjust_by_win_flag(win_flag, fan_table);
+    adjust_by_win_flag_4_special_form(seat_wind, win_flag, fan_table);
 
     return true;
 }
@@ -2300,7 +2350,7 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
     if (max_fan == 0 || tmp_table[SEVEN_PAIRS] == 1) {
         const bool heavenly = calculate_param->seat_wind == wind_t::EAST
             && fixed_cnt == 0
-            && (win_flag & (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN);
+            && (win_flag & (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN);
         const bool unique_waiting = !heavenly && is_unique_waiting(standing_table, standing_cnt, win_tile);
 
         // 划分

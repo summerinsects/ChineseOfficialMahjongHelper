@@ -155,6 +155,23 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+
+    // 私货 天和、地和、人和 2023.5.13
+    test_points("EEESSCCCFFFPPP", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("EEESSCCCFFFPPP", WIN_FLAG_INITIAL, wind_t::EAST, wind_t::EAST);
+    test_points("EESSSCCCFFFPPP", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::SOUTH, wind_t::SOUTH);
+    test_points("EESSSCCCFFFPPP", WIN_FLAG_INITIAL, wind_t::SOUTH, wind_t::SOUTH);
+    test_points("67m44678s345678p5m", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::NORTH);
+    test_points("456789m456s4568p8p", WIN_FLAG_INITIAL, wind_t::EAST, wind_t::WEST);
+    test_points("24m345567s22456p3m", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::SOUTH, wind_t::SOUTH);
+    test_points("78m123456s12399p9m", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::WEST, wind_t::NORTH);
+    test_points("234m23344599s123p", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::WEST, wind_t::EAST);
+    test_points("337788s5566pNNNN", WIN_FLAG_INITIAL, wind_t::EAST, wind_t::SOUTH);
+    test_points("33469m258s147pWW2m", WIN_FLAG_INITIAL, wind_t::EAST, wind_t::SOUTH);
+    test_points("23358m14447s369p4s", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("147m3669s122358p6s", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::SOUTH);
+    test_points("369m258s147pEEPPE", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+
     // 组合龙的边嵌钓兼容 2023.5.13
     test_points("1233369m147s258p3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_points("2333469m147s258p3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
@@ -188,12 +205,12 @@ int main(int argc, const char *argv[]) {
     test_points("PPP66678999p789m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     // 天和相关问题 2019.4.23
-    test_points("1112345678999p9p", WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("1112345678999p9p", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("1112345678999p9p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
-    test_points("1112345678999p9p", WIN_FLAG_DEAL, wind_t::EAST, wind_t::EAST);
-    test_points("123456m45679p66s8p", WIN_FLAG_DEAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("1112345678999p9p", WIN_FLAG_INITIAL, wind_t::EAST, wind_t::EAST);
+    test_points("123456m45679p66s8p", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("123456m45679p66s8p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
-    test_points("123456m45679p66s8p", WIN_FLAG_DEAL, wind_t::EAST, wind_t::EAST);
+    test_points("123456m45679p66s8p", WIN_FLAG_INITIAL, wind_t::EAST, wind_t::EAST);
 
     // BUG测试
     test_points("[234s][234s][234s][234s]6s6s", WIN_FLAG_LAST_TILE, wind_t::EAST, wind_t::EAST);

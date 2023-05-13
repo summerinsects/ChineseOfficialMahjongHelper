@@ -28,6 +28,7 @@
 #define SUPPORT_CONCEALED_KONG_AND_MELDED_KONG      1  // 支持明暗杠
 #define KNITTED_STRAIGHT_BODY_WITH_ECS              0  // 组合龙龙身的边嵌钓
 #define DISTINGUISH_PURE_SHIFTED_CHOWS              0  // 区分一色三（四）步的宽窄
+#define SUPPORT_INITIAL_HANDS                       0  // 支持天和、地和、人和
 
 namespace mahjong {
 
@@ -105,6 +106,12 @@ enum fan_t {
     LAST_TILE_CLAIM,                    ///< 海底捞月
     OUT_WITH_REPLACEMENT_TILE,          ///< 杠上开花
     ROBBING_THE_KONG,                   ///< 抢杠和
+#if SUPPORT_INITIAL_HANDS
+    HEAVENLY_HAND,                      ///< 天和
+    EARTHLY_HAND,                       ///< 地和
+    HUMANLY_HAND_1,                     ///< 人和Ⅰ
+    HUMANLY_HAND_2,                     ///< 人和Ⅱ
+#endif
 
     ALL_PUNGS,                          ///< 碰碰和
     HALF_FLUSH,                         ///< 混一色
@@ -173,7 +180,7 @@ typedef uint8_t win_flag_t;
 #define WIN_FLAG_LAST_TILE      2   ///< 绝张
 #define WIN_FLAG_KONG_INVOLVED  4   ///< 关于杠，复合点和时为抢杠和，复合自摸则为杠上开花
 #define WIN_FLAG_WALL_LAST      8   ///< 牌墙最后一张，复合点和时为海底捞月，复合自摸则为妙手回春
-#define WIN_FLAG_DEAL           16  ///< 起手，复合点和时为地和，复合自摸则为天和
+#define WIN_FLAG_INITIAL        16  ///< 起手，复合点和时为地和（庄家点）或人和（闲家点），复合自摸则为天和（庄家）或人和（闲家）
 
 /**
  * @}
@@ -258,6 +265,9 @@ UNUSED static const char *fan_name[] = {
     "All Five", "Triple Pung", "Three Concealed Pungs",
     "Lesser Honors and Knitted Tiles", "Knitted Straight", "Upper Four", "Lower Four", "Big Three Winds",
     "Mixed Straight", "Reversible Tiles", "Mixed Triple Chow", "Mixed Shifted Pungs", "Chicken Hand", "Last Tile Draw", "Last Tile Claim", "Out with Replacement Tile", "Robbing The Kong",
+#if SUPPORT_INITIAL_HANDS
+    "Heavenly Hand", "Earthly Hand", "Humanly Hand I", "Humanly Hand II",
+#endif
     "All Pungs", "Half Flush", "Mixed Shifted Chows", "All Types", "Melded Hand", "Two Concealed Kongs", "Two Dragons Pungs",
     "Outside Hand", "Fully Concealed Hand", "Two Melded Kongs", "Last Tile",
     "Dragon Pung", "Prevalent Wind", "Seat Wind", "Concealed Hand", "All Chows", "Tile Hog", "Double Pung",
@@ -313,6 +323,9 @@ UNUSED static const char *fan_name[] = {
     __UTF8("全带五"), __UTF8("三同刻"), __UTF8("三暗刻"),
     __UTF8("全不靠"), __UTF8("组合龙"), __UTF8("大于五"), __UTF8("小于五"), __UTF8("三风刻"),
     __UTF8("花龙"), __UTF8("推不倒"), __UTF8("三色三同顺"), __UTF8("三色三节高"), __UTF8("无番和"), __UTF8("妙手回春"), __UTF8("海底捞月"), __UTF8("杠上开花"), __UTF8("抢杠和"),
+#if SUPPORT_INITIAL_HANDS
+    __UTF8("天和"), __UTF8("地和"), __UTF8("人和Ⅰ"), __UTF8("人和Ⅱ"),
+#endif
     __UTF8("碰碰和"), __UTF8("混一色"), __UTF8("三色三步高"), __UTF8("五门齐"), __UTF8("全求人"), __UTF8("双暗杠"), __UTF8("双箭刻"),
     __UTF8("全带幺"), __UTF8("不求人"), __UTF8("双明杠"), __UTF8("和绝张"),
     __UTF8("箭刻"), __UTF8("圈风刻"), __UTF8("门风刻"), __UTF8("门前清"), __UTF8("平和"), __UTF8("四归一"), __UTF8("双同刻"), __UTF8("双暗刻"), __UTF8("暗杠"), __UTF8("断幺"),
@@ -344,6 +357,9 @@ static const uint16_t fan_value_table[FAN_TABLE_SIZE] = {
     16, 16, 16, 16, 16, 16,
     12, 12, 12, 12, 12,
     8, 8, 8, 8, 8, 8, 8, 8, 8,
+#if SUPPORT_INITIAL_HANDS
+    8, 8, 8, 8,
+#endif
     6, 6, 6, 6, 6, 6, 6,
     4, 4, 4, 4,
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
