@@ -155,6 +155,19 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+    // 拆分一色三步高 2023.5.12
+    test_points("12233445667pWW8p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("[456s2][234s3]1223678s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[789s3]33m34566778s5s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);  //
+    test_points("[234p3]1134557789p6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[345m2][456m]1123468m7m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);  //
+    test_points("[678p3][234p3]1145678p9p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[567m]2333445667m8m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);  //
+    test_points("1123445567789p3p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("[789p3][678p2][567p]1134p2p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);  //
+    test_points("12333445678sFF2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);  //
+    test_points("[678p]34556778pNN9p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);  //
+
     // 多种拆法番数一样时，优先选择问题 2022.3.7
     test_points("44556m445566s55p6m", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("445566m5s445566p5s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
