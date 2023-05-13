@@ -26,6 +26,7 @@
 #include "tile.h"
 
 #define SUPPORT_CONCEALED_KONG_AND_MELDED_KONG      1  // 支持明暗杠
+#define KNITTED_STRAIGHT_BODY_WITH_ECS              0  // 组合龙龙身的边嵌钓
 #define DISTINGUISH_PURE_SHIFTED_CHOWS              0  // 区分一色三（四）步的宽窄
 
 namespace mahjong {

@@ -155,6 +155,14 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+    // 组合龙的边嵌钓兼容 2023.5.13
+    test_points("1233369m147s258p3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("2333469m147s258p3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("3369m147s258pEEE3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("1223358m147s369p3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("2233458m147s369p3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("2358m147s369pEEE3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+
     // 拆分一色三步高 2023.5.12
     test_points("12233445667pWW8p", WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
     test_points("[456s2][234s3]1223678s2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
