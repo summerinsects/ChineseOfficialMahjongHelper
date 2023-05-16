@@ -506,7 +506,7 @@ void HandTilesWidget::addFixedPungPack(mahjong::tile_t tile, int meldedIdx) {
         _fixedContainer->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == meldedIdx) {
-            sprite->setRotation(-90);
+            sprite->setRotation(meldedIdx != 2 ? -90.0f : 90.0f);
         }
     }
 }
@@ -553,7 +553,7 @@ void HandTilesWidget::addFixedMeldedKongPack(mahjong::tile_t tile, int meldedIdx
         _fixedContainer->addChild(sprite);
         sprite->setPosition(pos[i]);
         if (i == meldedIdx) {
-            sprite->setRotation(-90);
+            sprite->setRotation(meldedIdx != 3 ? -90.0f : 90.0f);
         }
     }
 }
@@ -624,7 +624,7 @@ void HandTilesWidget::promoteFixedPungPackToKongPack(mahjong::tile_t tile, size_
     sprite->setScale(contentScaleFactor);
     _fixedContainer->addChild(sprite);
     sprite->setPosition(Vec2(startX + TILE_HEIGHT * 0.5f, TILE_WIDTH * 1.5f));
-    sprite->setRotation(-90);
+    sprite->setRotation(meldedIdx != 2 ? -90.0f : 90.0f);
 }
 
 bool HandTilesWidget::canChow(int meldedIdx) const {
