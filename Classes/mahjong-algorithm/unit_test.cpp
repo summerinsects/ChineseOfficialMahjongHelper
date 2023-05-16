@@ -73,7 +73,7 @@ void test_points(const char *str, win_flag_t win_flag, wind_t prevalent_wind, wi
         return;
     }
 
-    for (int i = 1; i < FLOWER_TILES; ++i) {
+    for (int i = 1; i < FAN_TABLE_SIZE; ++i) {
         if (fan_table[i] == 0) {
             continue;
         }
