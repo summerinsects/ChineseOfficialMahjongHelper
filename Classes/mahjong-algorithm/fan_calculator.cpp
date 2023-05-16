@@ -2115,17 +2115,15 @@ static bool calculate_honors_and_knitted_tiles(const tile_t *unique_tiles, intpt
     return false;
 }
 
-static void adjust_by_win_flag_4_special_form(wind_t
-#if SUPPORT_INITIAL_HANDS
-    seat_wind
-#endif
-    , win_flag_t win_flag, fan_table_t &fan_table) {
+static void adjust_by_win_flag_4_special_form(wind_t seat_wind, win_flag_t win_flag, fan_table_t &fan_table) {
     adjust_by_win_flag(win_flag, fan_table);
 #if SUPPORT_INITIAL_HANDS
     // 天和、地和、人和
     if (win_flag & WIN_FLAG_INITIAL) {
         adjust_by_initial_hands(seat_wind == wind_t::EAST, win_flag, fan_table);
     }
+#else
+    (void)seat_wind;
 #endif
 }
 
