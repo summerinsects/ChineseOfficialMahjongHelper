@@ -981,7 +981,7 @@ static void check_seven_pairs_waiting(const tile_table_t &standing_table, tile_t
     for (int i = 0; i < 34; ++i) {
         uint16_t cnt = standing_table[all_tiles[i]];
         // 成对的牌
-        if (cnt == 2) ++pairs;
+        if (cnt == 2 || cnt == 3) ++pairs;
         else if (cnt == 4) pairs += 2;
     }
 

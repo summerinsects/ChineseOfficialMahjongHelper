@@ -155,6 +155,8 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+    // 依然是边嵌钓问题
+    test_points("2222444466688m3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     // 私货 天和、地和、人和 2023.5.13
     test_points("EEESSCCCFFFPPP", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
