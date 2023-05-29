@@ -1667,7 +1667,7 @@ static void adjust_by_initial_hands(bool east, win_flag_t win_flag, fan_table_t 
 #endif
 
 // 基本和型算番
-static void calculate_regular_fan(const pack_t (&packs)[5], const tile_table_t &fixed_table, tile_table_t &standing_table,
+static void calculate_regular_fan(const pack_t (&packs)[5], const tile_table_t &fixed_table, const tile_table_t &standing_table,
     const tile_t *unique_tiles, intptr_t unique_cnt,
     const calculate_param_t *calculate_param, bool unique_waiting, win_flag_t win_flag, fan_table_t &fan_table) {
 
