@@ -1873,7 +1873,7 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const tile_table_t &
 }
 
 // “组合龙+面子+雀头”和型算番
-static bool calculate_knitted_straight_fan(const tile_table_t &standing_table,
+static bool calculate_knitted_straight_fan(const tile_table_t &fixed_table, const tile_table_t &standing_table,
     const calculate_param_t *calculate_param, win_flag_t win_flag, fan_table_t &fan_table) {
 
     const hand_tiles_t *hand_tiles = &calculate_param->hand_tiles;
@@ -1926,15 +1926,15 @@ static bool calculate_knitted_straight_fan(const tile_table_t &standing_table,
     fan_table[KNITTED_STRAIGHT] = 1;  // 组合龙
 
     // 根据第4组做一些调整
-    if (pack_get_type(involved_pack) == PACK_TYPE_CHOW) {  // 第4组是顺子
+    const uint8_t involved_type = pack_get_type(involved_pack);
+    if (involved_type == PACK_TYPE_CHOW) {  // 第4组是顺子
         // 雀头是数牌时，为平和
         if (is_numbered_suit_quick(pair_tile)) {
             fan_table[ALL_CHOWS] = 1;
         }
 
         // 只有雀头可能形成四归一
-        if (tile_table[pair_tile] == 3
-            && std::end(*matched_seq) != std::find(std::begin(*matched_seq), std::end(*matched_seq), pair_tile)) {
+        if (fixed_table[pair_tile] + standing_table[pair_tile] == 4) {
             fan_table[TILE_HOG] = 1;
         }
     }
@@ -1969,12 +1969,11 @@ static bool calculate_knitted_straight_fan(const tile_table_t &standing_table,
             if (!is_honor(pair_tile)) {
                 fan_table[NO_HONORS] = 1;
             }
-        }
 
-        // 只有刻子可能形成四归一
-        if (tile_table[involved_tile] == 3
-            && std::end(*matched_seq) != std::find(std::begin(*matched_seq), std::end(*matched_seq), involved_tile)) {
-            fan_table[TILE_HOG] = 1;
+            // 只数牌刻子可能形成四归一
+            if (involved_type != PACK_TYPE_KONG && fixed_table[involved_tile] + standing_table[involved_tile] == 4) {
+                fan_table[TILE_HOG] = 1;
+            }
         }
     }
 
@@ -1982,12 +1981,12 @@ static bool calculate_knitted_straight_fan(const tile_table_t &standing_table,
 
     // 根据第4组的明暗调整
     if (is_pack_melded(involved_pack)) {
-        if (pack_get_type(involved_pack) == PACK_TYPE_KONG) {
+        if (involved_type == PACK_TYPE_KONG) {
             fan_table[MELDED_KONG] = 1;
         }
     }
     else {
-        if (pack_get_type(involved_pack) == PACK_TYPE_KONG) {
+        if (involved_type == PACK_TYPE_KONG) {
             fan_table[CONCEALED_KONG] = 1;
         }
 
@@ -2330,14 +2329,14 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
     if (fixed_cnt == 0) {  // 门清状态，有可能是基本和型组合龙
         // 出现频率：七对>组合龙>九莲宝灯
         if (calculate_special_form_fan(standing_table, win_tile, unique_tiles, unique_cnt, calculate_param->seat_wind, win_flag, tmp_table)
-            || calculate_knitted_straight_fan(standing_table, calculate_param, win_flag, tmp_table)
+            || calculate_knitted_straight_fan(fixed_table, standing_table, calculate_param, win_flag, tmp_table)
             || calculate_nine_gates_fan(standing_table, win_tile, calculate_param->seat_wind, win_flag, tmp_table)) {
             max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }
     }
     else if (fixed_cnt == 1) {  // 1副露状态，有可能是基本和型组合龙
-        if (calculate_knitted_straight_fan(standing_table, calculate_param, win_flag, tmp_table)) {
+        if (calculate_knitted_straight_fan(fixed_table, standing_table, calculate_param, win_flag, tmp_table)) {
             max_fan = get_fan_by_table(tmp_table);
             LOG("fan = %d\n\n", max_fan);
         }

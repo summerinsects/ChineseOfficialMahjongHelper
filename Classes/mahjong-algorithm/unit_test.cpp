@@ -155,7 +155,14 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
-    // 依然是边嵌钓问题
+    // 组合龙的四归一问题 2023.5.30
+    test_points("[678s3]147m5888s369p2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("147m258s3666789p6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[666p]147m258s3779p6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[666m]3556m147s258p9m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("3569m258s122247p5m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+
+    // 依然是边嵌钓问题 2023.5.20
     test_points("2222444466688m3m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
 
     // 私货 天和、地和、人和 2023.5.13
