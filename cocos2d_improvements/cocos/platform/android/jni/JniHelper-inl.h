@@ -314,8 +314,8 @@ namespace JniHelperDetail {
     template <> struct TypeConverter<unsigned int> : IntegralConverter<sizeof(unsigned int), false> { };
     template <> struct TypeConverter<signed long> : IntegralConverter<sizeof(signed long), true> { };
     template <> struct TypeConverter<unsigned long> : IntegralConverter<sizeof(unsigned int), false> { };
-    template <> struct TypeConverter<int64_t> : IntegralConverter<sizeof(int64_t), true> { };
-    template <> struct TypeConverter<uint64_t> : IntegralConverter<sizeof(uint64_t), false>{};
+    template <> struct TypeConverter<signed long long> : IntegralConverter<sizeof(signed long long), true> { };
+    template <> struct TypeConverter<unsigned long long> : IntegralConverter<sizeof(unsigned long long), false> { };
     template <> struct TypeConverter<float> : FloatConverter<sizeof(float)> { };
     template <> struct TypeConverter<double> : FloatConverter<sizeof(double)> { };
 

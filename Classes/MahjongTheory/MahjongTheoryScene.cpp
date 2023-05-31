@@ -550,7 +550,7 @@ static mahjong::tile_t serveRandomTile(const mahjong::tile_table_t &usedTable, m
     intptr_t remainCnt = mahjong::table_to_tiles(remainTable, remainTiles, 136);
 
     std::mt19937_64 eng(std::chrono::system_clock::now().time_since_epoch().count());
-    std::uniform_int_distribution<int> uid{ 0, remainCnt - 1 };
+    std::uniform_int_distribution<int> uid{ 0, static_cast<int>(remainCnt - 1) };
 
     // 随机给一张牌
     mahjong::tile_t servingTile;
