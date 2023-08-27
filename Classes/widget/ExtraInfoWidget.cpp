@@ -540,7 +540,7 @@ const char *ExtraInfoWidget::parseInput(const char *input) {
     if (ret != PARSE_NO_ERROR) {
         switch (ret) {
             case PARSE_ERROR_ILLEGAL_CHARACTER: return __UTF8("无法解析的字符");
-            case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: return __UTF8("数字后面需有后缀");
+            case PARSE_ERROR_SUFFIX: return __UTF8("后缀错误");
             case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: return __UTF8("一组副露包含了错误的牌数目");
             case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: return __UTF8("无法正确解析副露");
             case PARSE_ERROR_TOO_MANY_FIXED_PACKS: return __UTF8("副露最多4组");

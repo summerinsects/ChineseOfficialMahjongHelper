@@ -334,7 +334,7 @@ void MahjongTheoryScene::parseInput(const char *input) {
         const char *errorStr = nullptr;
         switch (ret) {
         case PARSE_ERROR_ILLEGAL_CHARACTER: errorStr = __UTF8("无法解析的字符"); break;
-        case PARSE_ERROR_NO_SUFFIX_AFTER_DIGIT: errorStr = __UTF8("数字后面需有后缀"); break;
+        case PARSE_ERROR_SUFFIX: errorStr = __UTF8("后缀错误"); break;
         case PARSE_ERROR_WRONG_TILES_COUNT_FOR_FIXED_PACK: errorStr = __UTF8("一组副露包含了错误的牌数目"); break;
         case PARSE_ERROR_CANNOT_MAKE_FIXED_PACK: errorStr = __UTF8("无法正确解析副露"); break;
         case PARSE_ERROR_TOO_MANY_FIXED_PACKS: errorStr = __UTF8("副露最多4组"); break;
