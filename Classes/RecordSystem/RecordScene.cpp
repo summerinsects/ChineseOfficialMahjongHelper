@@ -1336,6 +1336,7 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
     extraInfo->setFlowerCount(param.flower_count);
     extraInfo->setPrevalentWind(static_cast<mahjong::wind_t>(_handIdx / 4));
     extraInfo->setSeatWind(param.seat_wind);
+    extraInfo->setInputCallback(std::bind(&TilePickWidget::setData, tilePicker, std::placeholders::_1, std::placeholders::_2));
 
     const Size &pickerSize = tilePicker->getContentSize();
     const Size &extraInfoSize = extraInfo->getContentSize();
