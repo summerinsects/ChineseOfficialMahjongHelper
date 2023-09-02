@@ -2012,13 +2012,10 @@ static bool calculate_knitted_straight_fan(const tile_table_t &fixed_table, cons
         && (win_flag & (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN);
 
     // 和牌张是组合龙范围的牌，不计边张、嵌张、单钓将
-    if (
 #if KNITTED_STRAIGHT_BODY_WITH_ECS == 0
-        std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; })
-#else
-        1
+    if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; }))
 #endif
-        ) {
+    {
         if (fixed_cnt == 0) {  // 门清的牌有可能存在边张、嵌张、单钓将
             // 天和不计边张、嵌张、单钓将
             if (!heavenly) {
