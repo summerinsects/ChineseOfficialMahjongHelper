@@ -155,6 +155,10 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+    // 优先选择三同刻 2023.9.2
+    test_points("4445677m777s777p7m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("4456777m444s444p4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+
     // 组合龙的四归一问题 2023.5.30
     test_points("[678s3]147m5888s369p2s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_points("147m258s3666789p6p", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
