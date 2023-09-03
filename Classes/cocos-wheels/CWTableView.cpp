@@ -22,7 +22,7 @@ namespace cw {
             return table;
         }
         CC_SAFE_DELETE(table);
-        return NULL;
+        return nullptr;
     }
 
     bool TableView::init() {
