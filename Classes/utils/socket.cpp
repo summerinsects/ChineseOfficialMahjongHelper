@@ -103,7 +103,7 @@ namespace p2p {
     std::string Sender::prepare() {
         _socketLoc = ::socket(AF_INET, SOCK_STREAM, 0);
         if (_socketLoc == INVALID_SOCKET) {
-            return 0;
+            return "";
         }
 
         std::string ip = getLocalIP();
@@ -113,7 +113,7 @@ namespace p2p {
         sin.sin_addr.s_addr = ::inet_addr(ip.c_str()); //INADDR_ANY;
 
         if (SOCKET_ERROR == ::bind(_socketLoc, (struct sockaddr *)&sin, sizeof(sin))) {
-            return 0;
+            return "";
         }
 
         struct sockaddr_in addrLoc; 
@@ -121,7 +121,7 @@ namespace p2p {
         ::getsockname(_socketLoc, (struct sockaddr *)&addrLoc, &addrLen);
 
         if (SOCKET_ERROR == ::listen(_socketLoc, 1)) {
-            return 0;
+            return "";
         }
 
         return ip + ":" + std::to_string(ntohs(addrLoc.sin_port));
