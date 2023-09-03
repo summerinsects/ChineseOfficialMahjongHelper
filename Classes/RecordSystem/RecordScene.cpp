@@ -964,7 +964,7 @@ static void refreshLittleFanButton(ui::Button *button, unsigned cnt, int idx) {
         button->setTitleText(Common::format("%s\xC3\x97%u", mahjong::fan_name[idx], cnt));
     }
     cw::scaleLabelToFitWidth(button->getTitleLabel(), button->getContentSize().width - 4.0f);
-};
+}
 
 void RecordScene::showLittleFanAlert(bool callFromSubmitting) {
     uint32_t fan2Bits = _detail.fan2_bits;
