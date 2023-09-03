@@ -743,9 +743,8 @@ static void calculate_kongs(int concealed_pung_cnt, int melded_kong_cnt, int con
         switch (concealed_kong_cnt) {
         case 0:  // 双明杠
             fan_table[TWO_MELDED_KONGS] = 1;
-            switch (concealed_pung_cnt) {  // 暗刻的个数
-            case 2: fan_table[TWO_CONCEALED_PUNGS] = 1; break;
-            default: break;
+            if (concealed_pung_cnt == 2) {  // 暗刻的个数
+                fan_table[TWO_CONCEALED_PUNGS] = 1;
             }
             break;
         case 1:  // 明暗杠
