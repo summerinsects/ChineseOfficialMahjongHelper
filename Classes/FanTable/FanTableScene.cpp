@@ -169,7 +169,7 @@ static void replaceTilesToImage(std::string &text, float scale) {
             const char *p = tilesStr;
             if (*p == '_') {
                 int writeLen = snprintf(imgStr, sizeof(imgStr),
-                    "<img src=\"tiles/bg.png\" width=\"%d\" height=\"%d\"/>", width, height);
+                    R"(<img src="tiles/bg.png" width="%d" height="%d"/>)", width, height);
                 totalWriteLen += writeLen;
                 ++p;
             }
@@ -177,13 +177,13 @@ static void replaceTilesToImage(std::string &text, float scale) {
             intptr_t tilesCnt = mahjong::parse_tiles(p, readLen, tiles);
             for (intptr_t i = 0; i < tilesCnt; ++i) {
                 int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
-                    "<img src=\"%s\" width=\"%d\" height=\"%d\"/>", tilesImageName[tiles[i]], width, height);
+                    R"(<img src="%s" width="%d" height="%d"/>)", tilesImageName[tiles[i]], width, height);
                 totalWriteLen += writeLen;
             }
 
             if (tilesStr[readLen - 1] == '_') {
                 int writeLen = snprintf(imgStr + totalWriteLen, sizeof(imgStr) - totalWriteLen,
-                    "<img src=\"tiles/bg.png\" width=\"%d\" height=\"%d\"/>", width, height);
+                    R"(<img src="tiles/bg.png" width="%d" height="%d"/>)", width, height);
                 totalWriteLen += writeLen;
             }
 
