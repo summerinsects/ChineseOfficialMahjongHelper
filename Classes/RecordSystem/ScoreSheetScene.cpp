@@ -972,8 +972,8 @@ void ScoreSheetScene::editNameAndTitle() {
             }
         }
 
-        srand(static_cast<unsigned>(time(nullptr)));
-        std::random_shuffle(std::begin(names), std::end(names));
+        std::mt19937_64 engine(std::chrono::system_clock::now().time_since_epoch().count());
+        std::shuffle(std::begin(names), std::end(names), engine);
         for (int i = 0; i < 4; ++i) {
             editBoxes[i]->setText(names[i].c_str());
         }
