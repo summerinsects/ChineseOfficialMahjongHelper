@@ -1369,14 +1369,14 @@ void RecordScene::showCalculator(const mahjong::calculate_param_t &param) {
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [this, tilePicker, extraInfo, param](AlertDialog *dlg, int) {
+        .setPositiveButton(__UTF8("确定"), [this, tilePicker, extraInfo](AlertDialog *dlg, int) {
         mahjong::calculate_param_t temp = { 0 };
         tilePicker->getData(&temp.hand_tiles, &temp.win_tile);
         if (temp.win_tile == 0 && temp.hand_tiles.tile_count == 0 && temp.hand_tiles.pack_count == 0) {
             AlertDialog::Builder(this)
                 .setTitle(__UTF8("记录和牌"))
                 .setMessage(__UTF8("确定不记录和牌吗？"))
-                .setPositiveButton(__UTF8("确定"), [this, dlg](AlertDialog *, int) { dlg->dismiss(); return true; })
+                .setPositiveButton(__UTF8("确定"), [dlg](AlertDialog *, int) { dlg->dismiss(); return true; })
                 .setNegativeButton(__UTF8("取消"), nullptr)
                 .create()->show();
             return false;

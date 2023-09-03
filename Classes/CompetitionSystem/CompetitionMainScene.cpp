@@ -19,7 +19,7 @@ bool CompetitionMainScene::init() {
     button->setTitleFontSize(20);
     button->setTitleText(__UTF8("近期赛事"));
     button->setPosition(Vec2(origin.x + visibleSize.width * 0.5f, origin.y + visibleSize.height * 0.5f));
-    button->addClickEventListener([this](Ref *) {
+    button->addClickEventListener([](Ref *) {
         Director::getInstance()->pushScene(LatestCompetitionScene::create());
     });
 
