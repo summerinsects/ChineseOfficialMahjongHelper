@@ -2237,6 +2237,8 @@ static bool calculate_nine_gates_fan(const tile_table_t &standing_table, tile_t 
     case 4: case 7: case 3: case 6:
         fan_table[SHORT_STRAIGHT] = 1;
         break;
+    default:
+        break;
     }
 
     adjust_by_win_flag_4_special_form(seat_wind, win_flag, fan_table);
