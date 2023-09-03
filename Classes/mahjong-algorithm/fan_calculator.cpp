@@ -594,26 +594,11 @@ static void calculate_4_chows(const tile_t (&mid_tiles)[4], fan_table_t &fan_tab
     }
 
     // 3组顺子判断
-    bool has_3_chows_fan = false;
-
-    // 012构成3组顺子的番种
-    if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[1], mid_tiles[2], mid_tiles[3], fan_table)) {
-        has_3_chows_fan = true;
-    }
-    // 013构成3组顺子的番种
-    else if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[1], mid_tiles[3], mid_tiles[2], fan_table)) {
-        has_3_chows_fan = true;
-    }
-    // 023构成3组顺子的番种
-    else if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[2], mid_tiles[3], mid_tiles[1], fan_table)) {
-        has_3_chows_fan = true;
-    }
-    // 123构成3组顺子的番种
-    else if (calculate_3_of_4_chows(mid_tiles[1], mid_tiles[2], mid_tiles[3], mid_tiles[0], fan_table)) {
-        has_3_chows_fan = true;
-    }
-
-    if (has_3_chows_fan) {
+    if (calculate_3_of_4_chows(mid_tiles[0], mid_tiles[1], mid_tiles[2], mid_tiles[3], fan_table)  // 012构成3组顺子的番种
+        || calculate_3_of_4_chows(mid_tiles[0], mid_tiles[1], mid_tiles[3], mid_tiles[2], fan_table)  // 013构成3组顺子的番种
+        || calculate_3_of_4_chows(mid_tiles[0], mid_tiles[2], mid_tiles[3], mid_tiles[1], fan_table)  // 023构成3组顺子的番种
+        || calculate_3_of_4_chows(mid_tiles[1], mid_tiles[2], mid_tiles[3], mid_tiles[0], fan_table)  // 123构成3组顺子的番种
+        ) {
 #if DISTINGUISH_PURE_SHIFTED_CHOWS
         // 一色三步高（宽）+连六，有可能是窄三步
         if (fan_table[PURE_SHIFTED_CHOWS_2] && fan_table[SHORT_STRAIGHT]) {
