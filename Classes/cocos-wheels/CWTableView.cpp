@@ -41,11 +41,11 @@ namespace cw {
     }
 
     void TableView::onSizeChanged() {
-        Size orginSize = _innerContainer->getContentSize();
-        Vec2 orginPos = _innerContainer->getPosition();
+        Size originSize = _innerContainer->getContentSize();
+        Vec2 originPos = _innerContainer->getPosition();
         ScrollView::onSizeChanged();
-        if (orginSize.equals(_innerContainer->getContentSize())) {
-            _innerContainer->setPosition(orginPos);
+        if (originSize.equals(_innerContainer->getContentSize())) {
+            _innerContainer->setPosition(originPos);
         }
     }
 

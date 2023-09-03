@@ -405,7 +405,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
         cell->addChild(layerColors[1]);
 
         // 标题
-        Label *label = Label::createWithSystemFont("", "Arail", 10);
+        Label *label = Label::createWithSystemFont("", "Arial", 10);
         label->setTextColor(C4B_BLACK);
         cell->addChild(label);
         label->setPosition(Vec2(2.0f, 55.0f));
@@ -413,7 +413,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
         titleLabel = label;
 
         // 时间
-        label = Label::createWithSystemFont("", "Arail", 10);
+        label = Label::createWithSystemFont("", "Arial", 10);
         label->setTextColor(C4B_GRAY);
         cell->addChild(label);
         label->setPosition(Vec2(2.0f, 40.0f));
@@ -422,7 +422,7 @@ cw::TableViewCell *RecordHistoryScene::tableCellAtIndex(cw::TableView *table, ss
 
         // 四名选手
         for (int i = 0; i < 4; ++i) {
-            label = Label::createWithSystemFont("", "Arail", 10);
+            label = Label::createWithSystemFont("", "Arial", 10);
             cell->addChild(label);
             label->setPosition(Vec2(2.0f + (i & 1) * cellWidth * 0.5f, 23.0f - (i >> 1) * 15.0f));
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -862,14 +862,14 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
 
     const float labelWidth = width * 0.5f - 4.0f;
 
-    Label *label = Label::createWithSystemFont(texts[14], "Arail", 10);
+    Label *label = Label::createWithSystemFont(texts[14], "Arial", 10);
     label->setTextColor(C4B_GRAY);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(2.0f, 125.0f));
     rootNode->addChild(label);
     cw::scaleLabelToFitWidth(label, labelWidth);
 
-    label = Label::createWithSystemFont(texts[15], "Arail", 10);
+    label = Label::createWithSystemFont(texts[15], "Arial", 10);
     label->setTextColor(C4B_GRAY);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
     label->setPosition(Vec2(2.0f + width * 0.5f, 125.0f));
@@ -878,14 +878,14 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
 
     for (int i = 0; i < 4; ++i) {
         const float yPos = 105.0f - 15.0f * i;
-        label = Label::createWithSystemFont(texts[i], "Arail", 10);
+        label = Label::createWithSystemFont(texts[i], "Arial", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(2.0f, yPos));
         rootNode->addChild(label);
         cw::scaleLabelToFitWidth(label, labelWidth);
 
-        label = Label::createWithSystemFont(texts[4 + i], "Arail", 10);
+        label = Label::createWithSystemFont(texts[4 + i], "Arial", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(2.0f + width * 0.5f, yPos));
@@ -895,14 +895,14 @@ static cocos2d::Node *createStatisticNode(const RecordsStatistic &rs) {
 
     for (int i = 0; i < 3; ++i) {
         const float yPos = 40.0f - 15.0f * i;
-        label = Label::createWithSystemFont(texts[8 + i], "Arail", 10);
+        label = Label::createWithSystemFont(texts[8 + i], "Arial", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(2.0f, yPos));
         rootNode->addChild(label);
         cw::scaleLabelToFitWidth(label, labelWidth);
 
-        label = Label::createWithSystemFont(texts[11 + i], "Arail", 10);
+        label = Label::createWithSystemFont(texts[11 + i], "Arial", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(2.0f + width * 0.5f, yPos));
@@ -957,7 +957,7 @@ namespace {
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-        Label *label = Label::createWithSystemFont("", "Arail", 10);
+        Label *label = Label::createWithSystemFont("", "Arial", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(origin.x + 5.0f, origin.y + 15.0f));
@@ -1043,7 +1043,7 @@ namespace {
             cell->addChild(layerColors[1]);
 
             // 标题
-            Label *label = Label::createWithSystemFont("", "Arail", 10);
+            Label *label = Label::createWithSystemFont("", "Arial", 10);
             label->setTextColor(C4B_BLACK);
             cell->addChild(label);
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -1051,7 +1051,7 @@ namespace {
             titleLabel = label;
 
             // 时间
-            label = Label::createWithSystemFont("", "Arail", 10);
+            label = Label::createWithSystemFont("", "Arial", 10);
             label->setTextColor(C4B_GRAY);
             cell->addChild(label);
             label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -1073,7 +1073,7 @@ namespace {
 
                 radioGroup->addRadioButton(radioButton);
 
-                label = Label::createWithSystemFont("", "Arail", 10);
+                label = Label::createWithSystemFont("", "Arial", 10);
                 cell->addChild(label);
                 label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
                 label->setPosition(Vec2(cellWidth * 0.25f * i + 20.0f, 10.0f));
@@ -1219,7 +1219,7 @@ namespace {
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-        Label *label = Label::createWithSystemFont("", "Arail", 10);
+        Label *label = Label::createWithSystemFont("", "Arial", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
         label->setPosition(Vec2(origin.x + visibleSize.width - 115.0f, origin.y + 15.0f));
@@ -1279,7 +1279,7 @@ namespace {
             refreshCountLabel();
         });
 
-        label = Label::createWithSystemFont(__UTF8("全选"), "Arail", 10);
+        label = Label::createWithSystemFont(__UTF8("全选"), "Arial", 10);
         label->setTextColor(C4B_GRAY);
         label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
         label->setPosition(Vec2(origin.x + 25.0f, origin.y + 15.0f));
@@ -1330,7 +1330,7 @@ namespace {
             cell->addChild(layerColors[1]);
 
             // 标题
-            Label *label = Label::createWithSystemFont("", "Arail", 10);
+            Label *label = Label::createWithSystemFont("", "Arial", 10);
             label->setTextColor(C4B_BLACK);
             cell->addChild(label);
             label->setPosition(Vec2(25.0f, 55.0f));
@@ -1338,7 +1338,7 @@ namespace {
             titleLabel = label;
 
             // 时间
-            label = Label::createWithSystemFont("", "Arail", 10);
+            label = Label::createWithSystemFont("", "Arial", 10);
             label->setTextColor(C4B_GRAY);
             cell->addChild(label);
             label->setPosition(Vec2(25.0f, 40.0f));
@@ -1347,7 +1347,7 @@ namespace {
 
             // 四名选手
             for (int i = 0; i < 4; ++i) {
-                label = Label::createWithSystemFont("", "Arail", 10);
+                label = Label::createWithSystemFont("", "Arial", 10);
                 cell->addChild(label);
                 label->setPosition(Vec2(25.0f + (i & 1) * nameWidth, 23.0f - (i >> 1) * 15.0f));
                 label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);

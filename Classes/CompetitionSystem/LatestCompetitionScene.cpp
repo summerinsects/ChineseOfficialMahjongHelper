@@ -194,13 +194,13 @@ cw::TableViewCell *LatestCompetitionScene::tableCellAtIndex(cw::TableView *table
         layerColors[1] = LayerColor::create(Color4B(0xC0, 0xC0, 0xC0, 0x10), cellWidth, 50.0f);
         cell->addChild(layerColors[1]);
 
-        label[0] = Label::createWithSystemFont("", "Arail", 10);
+        label[0] = Label::createWithSystemFont("", "Arial", 10);
         label[0]->setTextColor(C4B_BLACK);
         cell->addChild(label[0]);
         label[0]->setPosition(Vec2(5.0f, 35.0f));
         label[0]->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
-        label[1] = Label::createWithSystemFont("", "Arail", 10);
+        label[1] = Label::createWithSystemFont("", "Arial", 10);
         label[1]->setTextColor(C4B_GRAY);
         cell->addChild(label[1]);
         label[1]->setPosition(Vec2(5.0f, 15.0f));

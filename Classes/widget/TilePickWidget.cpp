@@ -37,13 +37,13 @@ bool TilePickWidget::init(float maxWidth) {
     tilesContainer->setContentSize(tableSize);
     this->addChild(tilesContainer);
 
-#define BUTTON_WIDHT 40
+#define BUTTON_WIDTH 40
 #define BUTTON_HEIGHT 20
 #define FONT_SIZE 12
 #define GAP_H (GAP * 2)
 
     // 上方右边的按钮
-    Size rightSize = Size(BUTTON_WIDHT * 2 + GAP, BUTTON_HEIGHT * 4 + GAP_H * 3);
+    Size rightSize = Size(BUTTON_WIDTH * 2 + GAP, BUTTON_HEIGHT * 4 + GAP_H * 3);
     Node *buttonsContainer = Node::create();
     buttonsContainer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     buttonsContainer->setIgnoreAnchorPointForPosition(false);
@@ -149,12 +149,12 @@ bool TilePickWidget::init(float maxWidth) {
 
         ui::Button *button = UICommon::createButton();
         button->setScale9Enabled(true);
-        button->setContentSize(Size(BUTTON_WIDHT, BUTTON_HEIGHT));
+        button->setContentSize(Size(BUTTON_WIDTH, BUTTON_HEIGHT));
         button->setTitleFontSize(FONT_SIZE);
         button->setTitleColor(C3B_GRAY);
         button->setTitleText(titleText[i]);
         buttonsContainer->addChild(button);
-        button->setPosition(Vec2(BUTTON_WIDHT * (col + 0.5f) + col * GAP, static_cast<float>((3 - row) * (BUTTON_HEIGHT + GAP_H) + BUTTON_HEIGHT / 2)));
+        button->setPosition(Vec2(BUTTON_WIDTH * (col + 0.5f) + col * GAP, static_cast<float>((3 - row) * (BUTTON_HEIGHT + GAP_H) + BUTTON_HEIGHT / 2)));
         buttons[i] = button;
     }
 

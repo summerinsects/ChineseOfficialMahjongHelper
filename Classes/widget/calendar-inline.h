@@ -30,7 +30,7 @@ namespace calendar {
         return ((m != 2 || !Gregorian_IsLeapYear(y)) ? table[m - 1] : 29);
     }
 
-    static FORCE_INLINE int Gregorian_CaculateWeekDay(int y, int m, int d) {
+    static FORCE_INLINE int Gregorian_CalculateWeekDay(int y, int m, int d) {
         // 基姆拉尔森计算公式[0,6]->[Sun, Sat]
         if (m == 1 || m == 2) {
             m += 12;

@@ -145,7 +145,7 @@ bool AlertDialog::initWithBuilder(Builder &&builder) {
     if (!builder._message.empty()) {
         totalHeight += 10.0f;
 
-        Label *label = Label::createWithSystemFont(builder._message, "Arail", 12);
+        Label *label = Label::createWithSystemFont(builder._message, "Arial", 12);
         label->setTextColor(C4B_BLACK);
         if (label->getContentSize().width > maxWidth1) {  // 当宽度超过时，设置范围，使文本换行
             label->setDimensions(maxWidth1, 0.0f);
@@ -170,7 +170,7 @@ bool AlertDialog::initWithBuilder(Builder &&builder) {
         totalHeight += 2.0f;
 
         // 标题
-        Label *label = Label::createWithSystemFont(builder._title, "Arail", 14);
+        Label *label = Label::createWithSystemFont(builder._title, "Arial", 14);
         label->setTextColor(C4B_BLUE_THEME);
         background->addChild(label);
         label->setPosition(Vec2(totalWidth * 0.5f, totalHeight + 15.0f));

@@ -130,7 +130,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第1栏：选手姓名
     const float line1Y = tableHeight - cellHeight * 0.5f;
-    label = Label::createWithSystemFont(__UTF8("选手姓名"), "Arail", 12);
+    label = Label::createWithSystemFont(__UTF8("选手姓名"), "Arial", 12);
     label->setTextColor(C4B_ORANGE);
     label->setPosition(Vec2(colPosX[0], line1Y));
     drawNode->addChild(label);
@@ -138,7 +138,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 4个名字label
     for (int i = 0; i < 4; ++i) {
-        label = Label::createWithSystemFont("", "Arail", 12);
+        label = Label::createWithSystemFont("", "Arial", 12);
         label->setTextColor(C4B_ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line1Y));
         drawNode->addChild(label);
@@ -173,13 +173,13 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     static const char *row0Text[] = { __UTF8("开局座位"), __UTF8("东"), __UTF8("南"), __UTF8("西"), __UTF8("北") };
     static const char *row1Text[] = { __UTF8("每圈座位"), __UTF8("东南北西"), __UTF8("南东西北"), __UTF8("西北东南"), __UTF8("北西南东") };
     for (int i = 0; i < 5; ++i) {
-        label = Label::createWithSystemFont(row0Text[i], "Arail", 12);
+        label = Label::createWithSystemFont(row0Text[i], "Arial", 12);
         label->setTextColor(C4B_BLACK);
         label->setPosition(Vec2(colPosX[i], line2Y));
         drawNode->addChild(label);
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
-        label = Label::createWithSystemFont(row1Text[i], "Arail", 12);
+        label = Label::createWithSystemFont(row1Text[i], "Arial", 12);
         label->setTextColor(C4B_BLACK);
         label->setPosition(Vec2(colPosX[i], line3Y));
         drawNode->addChild(label);
@@ -188,21 +188,21 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
     // 第4栏：累计
     const float line4Y = tableHeight - cellHeight * 3.5f;
-    label = Label::createWithSystemFont(__UTF8("累计"), "Arail", 12);
+    label = Label::createWithSystemFont(__UTF8("累计"), "Arial", 12);
     label->setTextColor(C4B_ORANGE);
     label->setPosition(Vec2(colPosX[0], line4Y));
     drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
-        label = Label::createWithSystemFont("+0", "Arail", 12);
+        label = Label::createWithSystemFont("+0", "Arial", 12);
         label->setTextColor(C4B_ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line4Y));
         drawNode->addChild(label);
         _totalLabel[i] = label;
     }
 
-    label = Label::createWithSystemFont("0", "Arail", 12);
+    label = Label::createWithSystemFont("0", "Arial", 12);
     label->setTextColor(C4B_GRAY);
     label->setPosition(Vec2(colPosX[5], line4Y));
     drawNode->addChild(label);
@@ -211,14 +211,14 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
     // 第5栏：名次
     const float line5Y = tableHeight - cellHeight * 4.5f;
 
-    label = Label::createWithSystemFont(__UTF8("名次"), "Arail", 12);
+    label = Label::createWithSystemFont(__UTF8("名次"), "Arial", 12);
     label->setTextColor(C4B_ORANGE);
     label->setPosition(Vec2(colPosX[0], line5Y));
     drawNode->addChild(label);
     cw::scaleLabelToFitWidth(label, gap - 4.0f);
 
     for (int i = 0; i < 4; ++i) {
-        label = Label::createWithSystemFont("", "Arail", 12);
+        label = Label::createWithSystemFont("", "Arial", 12);
         label->setTextColor(C4B_ORANGE);
         label->setPosition(Vec2(colPosX[i + 1], line5Y));
         drawNode->addChild(label);
@@ -226,7 +226,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         _rankLabels[i] = label;
     }
 
-    label = Label::createWithSystemFont(__UTF8("番种备注"), "Arail", 12);
+    label = Label::createWithSystemFont(__UTF8("番种备注"), "Arial", 12);
     label->setTextColor(C4B_BLACK);
     label->setPosition(Vec2(colPosX[5], line5Y));
     drawNode->addChild(label);
@@ -237,7 +237,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         const float y = tableHeight - cellHeight * (5.5f + k);
 
         // 东风东~北风北名字
-        label = Label::createWithSystemFont(handNameText[k], "Arail", 12);
+        label = Label::createWithSystemFont(handNameText[k], "Arial", 12);
         label->setTextColor(C4B_GRAY);
         label->setPosition(Vec2(colPosX[0], y));
         drawNode->addChild(label);
@@ -245,7 +245,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
 
         // 四位选手得分
         for (int i = 0; i < 4; ++i) {
-            _scoreLabels[k][i] = Label::createWithSystemFont("", "Arail", 12);
+            _scoreLabels[k][i] = Label::createWithSystemFont("", "Arial", 12);
             _scoreLabels[k][i]->setPosition(Vec2(colPosX[i + 1], y));
             drawNode->addChild(_scoreLabels[k][i]);
         }
@@ -264,7 +264,7 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         _recordButton[k] = button;
 
         // 备注的番种label
-        label = Label::createWithSystemFont("", "Arail", 12);
+        label = Label::createWithSystemFont("", "Arial", 12);
         label->setTextColor(C4B_GRAY);
         label->setPosition(Vec2(colPosX[5], y));
         drawNode->addChild(label);
@@ -1321,7 +1321,7 @@ void ScoreSheetScene::showSettingAlert() {
     std::array<ui::RadioButtonGroup *, 2> radioGroups;
 
     // 1.计分表格分数显示
-    Label *label = Label::createWithSystemFont(__UTF8("1. 计分表格分数显示"), "Arail", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("1. 计分表格分数显示"), "Arial", 12);
     label->setTextColor(C4B_BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -1353,7 +1353,7 @@ void ScoreSheetScene::showSettingAlert() {
     }
 
     // 2.计分界面选手顺序
-    label = Label::createWithSystemFont(__UTF8("2. 计分界面选手顺序"), "Arail", 12);
+    label = Label::createWithSystemFont(__UTF8("2. 计分界面选手顺序"), "Arial", 12);
     label->setTextColor(C4B_BLACK);
     rootNode->addChild(label);
     label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
@@ -1440,7 +1440,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     Node *rootNode = Node::create();
     rootNode->setContentSize(Size(200.0f, 75.0f));
 
-    Label *label = Label::createWithSystemFont(__UTF8("在清空表格之前，请选择「保存」或「丢弃」"), "Arail", 12);
+    Label *label = Label::createWithSystemFont(__UTF8("在清空表格之前，请选择「保存」或「丢弃」"), "Arial", 12);
     rootNode->addChild(label);
     label->setPosition(Vec2(100.0f, 65.0f));
     label->setTextColor(C4B_GRAY);
@@ -1541,7 +1541,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
     static const Color4B titleColor[] = { C4B_ORANGE, C4B_ORANGE, C4B_GRAY, C4B_RED, C4B_BLUE, C4B_GREEN };
 
     for (int i = 0; i < 6; ++i) {
-        Label *label = Label::createWithSystemFont(titleText[i], "Arail", 12);
+        Label *label = Label::createWithSystemFont(titleText[i], "Arial", 12);
         label->setTextColor(titleColor[i]);
         label->setPosition(Vec2(xPos[i], 190.0f));
         drawNode->addChild(label);
@@ -1553,7 +1553,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
 
     // n位。n=1表示二位，以此类推
     for (int n = 1; n < 4; ++n) {
-        Label *label = Label::createWithSystemFont(name[indices[n]], "Arail", 12);
+        Label *label = Label::createWithSystemFont(name[indices[n]], "Arial", 12);
         label->setTextColor(titleColor[0]);
         label->setPosition(Vec2(xPos[0], nameY[n - 1]));
         drawNode->addChild(label);
@@ -1563,7 +1563,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
         for (int k = 0; k < n; ++k) {
             const float posY = numbersStartY[n - 1] - k * 20;
 
-            label = Label::createWithSystemFont(name[indices[k]], "Arail", 12);
+            label = Label::createWithSystemFont(name[indices[k]], "Arial", 12);
             label->setTextColor(titleColor[1]);
             label->setPosition(Vec2(xPos[1], posY));
             drawNode->addChild(label);
@@ -1578,7 +1578,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
             numbers[3] = std::max(d + 1, 8);  // 旁点
 
             for (int i = 0; i < 4; ++i) {
-                label = Label::createWithSystemFont(std::to_string(numbers[i]), "Arail", 12);
+                label = Label::createWithSystemFont(std::to_string(numbers[i]), "Arial", 12);
                 label->setTextColor(titleColor[i + 2]);
                 label->setPosition(Vec2(xPos[2 + i], posY));
                 drawNode->addChild(label);

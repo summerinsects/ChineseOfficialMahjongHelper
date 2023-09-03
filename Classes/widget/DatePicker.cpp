@@ -281,7 +281,7 @@ static void adjustDate(calendar::GregorianDate *date) {
 
 void DatePicker::refreshTitle(const calendar::ChineseDate *date) {
     _titleLabel->setString(Common::format(__UTF8("%d年%d月%d日 星期%s"),
-        _picked.year, _picked.month, _picked.day, weekTexts[calendar::Gregorian_CaculateWeekDay(_picked.year, _picked.month, _picked.day)]));
+        _picked.year, _picked.month, _picked.day, weekTexts[calendar::Gregorian_CalculateWeekDay(_picked.year, _picked.month, _picked.day)]));
     _chineseDateLabel->setString(calendar::GetChineseDateTextLong(date != nullptr ? *date : calendar::Gregorian2Chinese(_picked)));
 }
 
@@ -343,7 +343,7 @@ void DatePicker::setupDayContainer() {
     char str[32];
 
     // 本月的1号是星期几，那么前面的天数属于上个月
-    int weekday = calendar::Gregorian_CaculateWeekDay(_picked.year, _picked.month, 1);
+    int weekday = calendar::Gregorian_CalculateWeekDay(_picked.year, _picked.month, 1);
     for (int i = 0; i < weekday; ++i) {
         _dayBoxes[i]->setVisible(false);
     }

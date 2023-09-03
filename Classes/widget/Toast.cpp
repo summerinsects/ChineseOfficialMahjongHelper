@@ -23,7 +23,7 @@ bool Toast::initWithText(cocos2d::Scene *scene, const std::string &text, Duratio
 
     const float width = maxWidth();
 
-    Label *label = Label::createWithSystemFont(text, "Arail", 12);
+    Label *label = Label::createWithSystemFont(text, "Arial", 12);
     Size size = label->getContentSize();
     if (size.width > width - 15.0f) {
         label->setHorizontalAlignment(TextHAlignment::CENTER);

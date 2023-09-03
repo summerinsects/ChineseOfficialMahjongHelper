@@ -551,7 +551,7 @@ cw::TableViewCell *RecordScene::tableCellAtIndex(cw::TableView *table, ssize_t i
             cell->addChild(checkBox);
             checkBoxes[k] = checkBox;
 
-            Label *titleLabel = Label::createWithSystemFont("", "Arail", 12);
+            Label *titleLabel = Label::createWithSystemFont("", "Arial", 12);
             titleLabel->setTextColor(C4B_GRAY);
             checkBox->addChild(titleLabel);
             titleLabel->setPosition(pos);
