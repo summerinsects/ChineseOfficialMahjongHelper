@@ -49,11 +49,11 @@ namespace p2p {
         }
     }
 
-    ssize_t Socket::recv(char *buf, size_t len) {
+    ssize_t Socket::recv(char *buf, size_t len) const {
         return ::recv(_socket, buf, len, 0);
     }
 
-    ssize_t Socket::send(const char *buf, size_t len) {
+    ssize_t Socket::send(const char *buf, size_t len) const {
         return ::send(_socket, buf, len, 0);
     }
 

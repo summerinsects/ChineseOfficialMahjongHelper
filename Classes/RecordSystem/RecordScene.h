@@ -81,7 +81,7 @@ private:
     void onFanNameBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::EventType event);
     void onSubmitButton(cocos2d::Ref *sender);
 
-    void adjustRecentFans();
+    void adjustRecentFans() const;
     void finish();
 
     void showCalculator(const mahjong::calculate_param_t &param);

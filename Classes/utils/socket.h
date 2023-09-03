@@ -31,8 +31,8 @@ namespace p2p {
 
         virtual void quit();
 
-        ssize_t send(const char *buf, size_t len);
-        ssize_t recv(char *buf, size_t len);
+        ssize_t send(const char *buf, size_t len) const;
+        ssize_t recv(char *buf, size_t len) const;
 
     protected:
         SOCKET _socket;

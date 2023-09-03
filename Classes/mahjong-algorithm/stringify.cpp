@@ -31,7 +31,7 @@ static const char s_digit_chars[] = "123456789";
 static const char s_suffix_chars[] = "msp";
 static const char s_honor_chars[] = "ESWNCFP";
 
-static void submit_suit(tile_t *digit_tiles, intptr_t digit_cnt, uint8_t suit, tile_t *tiles) {
+static void submit_suit(const tile_t *digit_tiles, intptr_t digit_cnt, uint8_t suit, tile_t *tiles) {
     for (intptr_t i = 0; i < digit_cnt; ++i) {
         tiles[i] = digit_tiles[i] | suit;
     }

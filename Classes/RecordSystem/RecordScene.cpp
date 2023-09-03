@@ -1248,7 +1248,7 @@ void RecordScene::onFanNameBox(cocos2d::Ref *sender, cocos2d::ui::CheckBox::Even
     }
 }
 
-void RecordScene::adjustRecentFans() {
+void RecordScene::adjustRecentFans() const {
     uint64_t fanBits = _detail.fan_bits;
     if (fanBits == 0) {
         return;
