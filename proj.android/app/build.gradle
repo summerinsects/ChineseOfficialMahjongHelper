@@ -9,8 +9,8 @@ android {
         applicationId "xyz.tziakcha.ChineseOfficialMahjongHelper"
         minSdkVersion PROP_MIN_SDK_VERSION
         targetSdkVersion PROP_TARGET_SDK_VERSION
-        versionCode 44
-        versionName "1.5.1.9"
+        versionCode 45
+        versionName "1.5.2.0"
 
         externalNativeBuild {
             cmake {
