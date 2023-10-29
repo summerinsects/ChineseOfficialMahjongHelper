@@ -228,6 +228,16 @@ typedef uint16_t fan_table_t[FAN_TABLE_SIZE];
  */
 int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_table);
 
+#if SUPPORT_BLESSINGS
+/**
+ * @brief 撤销天地人和
+ *
+ * @param [out] fan_table 番表
+ * @retval 番数校正
+ */
+int revoke_blessings(fan_table_t &fan_table);
+#endif
+
 // unused
 #ifndef UNUSED
 #if __cplusplus >= 201703L

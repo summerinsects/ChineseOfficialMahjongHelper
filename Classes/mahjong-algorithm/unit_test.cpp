@@ -68,6 +68,10 @@ void test_points(const char *str, win_flag_t win_flag, wind_t prevalent_wind, wi
     param.seat_wind = seat_wind;
     int points = calculate_fan(&param, &fan_table);
 
+#if SUPPORT_BLESSINGS
+    points -= revoke_blessings(fan_table);
+#endif
+
     printf("max points = %d\n\n", points);
     if (points < 0) {
         return;

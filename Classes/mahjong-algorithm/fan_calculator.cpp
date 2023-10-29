@@ -2428,4 +2428,68 @@ int calculate_fan(const calculate_param_t *calculate_param, fan_table_t *fan_tab
     return max_fan;
 }
 
+#if SUPPORT_BLESSINGS
+// 判断必然门清（状态）
+static bool inevitably_concealed(const fan_table_t &fan_table) {
+    return fan_table[SEVEN_PAIRS]
+        || fan_table[LESSER_HONORS_AND_KNITTED_TILES]
+        || fan_table[GREATER_HONORS_AND_KNITTED_TILES]
+        || fan_table[FOUR_CONCEALED_PUNGS]
+        || fan_table[THIRTEEN_ORPHANS]
+        || fan_table[SEVEN_SHIFTED_PAIRS]
+        || fan_table[NINE_GATES];
+}
+
+// 撤销天地人和
+int revoke_blessings(fan_table_t &fan_table) {
+    if (fan_table[BLESSING_OF_HEAVEN]) {
+        int res = fan_value_table[BLESSING_OF_HEAVEN];
+        fan_table[BLESSING_OF_HEAVEN] = 0;
+        if (!inevitably_concealed(fan_table)) {
+            fan_table[FULLY_CONCEALED_HAND] = 1;
+            return res - fan_value_table[FULLY_CONCEALED_HAND];
+        }
+        else {
+            fan_table[SELF_DRAWN] = 1;
+            return res - fan_value_table[SELF_DRAWN];
+        }
+    }
+    else if (fan_table[BLESSING_OF_HUMAN_2]) {
+        int res = fan_value_table[BLESSING_OF_HUMAN_2];
+        fan_table[BLESSING_OF_HUMAN_2] = 0;
+        if (!inevitably_concealed(fan_table)) {
+            fan_table[FULLY_CONCEALED_HAND] = 1;
+            return res - fan_value_table[FULLY_CONCEALED_HAND];
+        }
+        else {
+            fan_table[SELF_DRAWN] = 1;
+            return res - fan_value_table[SELF_DRAWN];
+        }
+    }
+    else if (fan_table[BLESSING_OF_EARTH]) {
+        int res = fan_value_table[BLESSING_OF_EARTH];
+        fan_table[BLESSING_OF_EARTH] = 0;
+        if (!inevitably_concealed(fan_table)) {
+            fan_table[CONCEALED_HAND] = 1;
+            return res - fan_value_table[CONCEALED_HAND];
+        }
+        else {
+            return res;
+        }
+    }
+    else if (fan_table[BLESSING_OF_HUMAN_1]) {
+        int res = fan_value_table[BLESSING_OF_HUMAN_1];
+        fan_table[BLESSING_OF_HUMAN_1] = 0;
+        if (!inevitably_concealed(fan_table)) {
+            fan_table[CONCEALED_HAND] = 1;
+            return res - fan_value_table[CONCEALED_HAND];
+        }
+        else {
+            return res;
+        }
+    }
+    return 0;
+}
+#endif
+
 }
