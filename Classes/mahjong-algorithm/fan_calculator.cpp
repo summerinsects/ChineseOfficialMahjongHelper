@@ -1995,11 +1995,9 @@ static bool calculate_knitted_straight_fan(const tile_table_t &fixed_table, cons
         && fixed_cnt == 0
         && (win_flag & (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN);
 
-    // 和牌张是组合龙范围的牌，不计边张、嵌张、单钓将
 #if KNITTED_STRAIGHT_BODY_WITH_ECS == 0
-    if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; }))
-#endif
-    {
+    // 和牌张是组合龙范围的牌，不计边张、嵌张、单钓将
+    if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; })) {
         if (fixed_cnt == 0) {  // 门清的牌有可能存在边张、嵌张、单钓将
             // 天和不计边张、嵌张、单钓将
             if (!heavenly) {
@@ -2014,6 +2012,30 @@ static bool calculate_knitted_straight_fan(const tile_table_t &fixed_table, cons
             fan_table[SINGLE_WAIT] = 1;
         }
     }
+#else
+    // 如果听牌既可以解释为组合龙的部分，也可以解释为边张、嵌张、单钓将，可加计边张、嵌张、单钓将
+    if (fixed_cnt == 0) {  // 门清的牌有可能存在边张、嵌张、单钓将
+        // 天和不计边张、嵌张、单钓将
+        if (!heavenly) {
+            if (is_unique_waiting(tile_table, 4, win_tile)) {
+                // 根据听牌方式调整——涉及番种：边张、嵌张、单钓将
+                adjust_by_waiting_form(packs + 3, 2, win_tile, fan_table);
+            }
+        }
+    }
+    else {
+        // 非门清状态如果听牌不在组合龙范围内，必然是单钓将
+        if (std::none_of(std::begin(*matched_seq), std::end(*matched_seq), [win_tile](tile_t t) { return t == win_tile; })) {
+            fan_table[SINGLE_WAIT] = 1;
+        }
+        else {
+            // 非门清状态如果在龙身上钓将，那么该牌会出现3张
+            if (standing_table[win_tile] == 3) {
+                fan_table[SINGLE_WAIT] = 1;
+            }
+        }
+    }
+#endif
 
     // 统一调整一些不计的
     final_adjust(fan_table);

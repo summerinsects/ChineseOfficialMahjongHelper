@@ -159,6 +159,11 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+    // 组合龙的边嵌钓问题 2023.10.29
+    test_points("[345m3]258m1488s369p7s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[345m3]258m1477s369p7s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+    test_points("[345m3]258m1478s369p8s", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
+
     // 天和九莲宝灯 2023.10.27
     // 支持的算法：107 93 90 90 92
     // 不支持的算法：47 33 30 30 32
