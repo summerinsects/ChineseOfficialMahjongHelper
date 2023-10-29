@@ -2167,36 +2167,79 @@ static bool calculate_special_form_fan(const tile_table_t &standing_table, tile_
 
 // 九莲宝灯算番
 static bool calculate_nine_gates_fan(const tile_table_t &standing_table, tile_t win_tile, wind_t seat_wind, win_flag_t win_flag, fan_table_t &fan_table) {
+    suit_t s;
+    rank_t r;
     const bool heavenly = seat_wind == wind_t::EAST
         && (win_flag & (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN)) == (WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN);
     if (heavenly) {
-        // NOTE: 天和不计九莲宝灯
-        return false;
-    }
+#if NINE_GATES_WHEN_BLESSING_OF_HEAVEN
+        // NOTE: 天和的九莲宝灯与常规的判断方式不一样
 
-    suit_t s = tile_get_suit(win_tile);
-    rank_t r = tile_get_rank(win_tile);
-    if (r == 1) {
-        if (standing_table[win_tile] != 4
-            || standing_table[make_tile(s, 9)] != 3
-            || std::any_of(standing_table + make_tile(s, 2), standing_table + make_tile(s, 9), [](int n) { return n != 1; })) {
-            return false;
+        s = tile_get_suit(win_tile);
+
+        // 查找2~8的牌，出现2张的，若出现缺张，则必定不是九莲宝灯
+        tile_t win_tile2 = 0;
+        for (rank_t i = 2; i < 9; ++i) {
+            tile_t tmp = make_tile(s, i);
+            const uint16_t cnt = standing_table[tmp];
+            if (cnt == 0) {
+                return false;
+            }
+            else if (cnt == 2) {
+                win_tile2 = tmp;
+            }
         }
-    }
-    else if (r == 9) {
-        if (standing_table[win_tile] != 4
-            || standing_table[make_tile(s, 1)] != 3
-            || std::any_of(standing_table + make_tile(s, 2), standing_table + make_tile(s, 9), [](int n) { return n != 1; })) {
-            return false;
+
+        if (win_tile2 != 0) {
+            // 如果有出现2张的，且1和9都有3张，则是九莲宝灯
+            if (standing_table[make_tile(s, 1)] == 3 && standing_table[make_tile(s, 9)] == 3) {
+                r = tile_get_rank(win_tile2);
+            }
+            else {
+                return false;
+            }
         }
+        else {
+            // 如果2~8都只有1张，那么1和9其中一种要4张，另外一种要3张
+            if (standing_table[make_tile(s, 1)] == 4 && standing_table[make_tile(s, 9)] == 3) {
+                r = 1;
+            }
+            else if (standing_table[make_tile(s, 1)] == 3 && standing_table[make_tile(s, 9)] == 4) {
+                r = 2;
+            }
+            else {
+                return false;
+            }
+        }
+#else
+        return false;
+#endif
     }
     else {
-        if (standing_table[win_tile] != 2
-            || standing_table[make_tile(s, 1)] != 3
-            || standing_table[make_tile(s, 9)] != 3
-            || std::any_of(standing_table + make_tile(s, 2), standing_table + make_tile(s, r), [](int n) { return n != 1; })
-            || std::any_of(standing_table + make_tile(s, r + 1), standing_table + make_tile(s, 9), [](int n) { return n != 1; })) {
-            return false;
+        s = tile_get_suit(win_tile);
+        r = tile_get_rank(win_tile);
+        if (r == 1) {
+            if (standing_table[win_tile] != 4
+                || standing_table[make_tile(s, 9)] != 3
+                || std::any_of(standing_table + make_tile(s, 2), standing_table + make_tile(s, 9), [](int n) { return n != 1; })) {
+                return false;
+            }
+        }
+        else if (r == 9) {
+            if (standing_table[win_tile] != 4
+                || standing_table[make_tile(s, 1)] != 3
+                || std::any_of(standing_table + make_tile(s, 2), standing_table + make_tile(s, 9), [](int n) { return n != 1; })) {
+                return false;
+            }
+        }
+        else {
+            if (standing_table[win_tile] != 2
+                || standing_table[make_tile(s, 1)] != 3
+                || standing_table[make_tile(s, 9)] != 3
+                || std::any_of(standing_table + make_tile(s, 2), standing_table + make_tile(s, r), [](int n) { return n != 1; })
+                || std::any_of(standing_table + make_tile(s, r + 1), standing_table + make_tile(s, 9), [](int n) { return n != 1; })) {
+                return false;
+            }
         }
     }
 

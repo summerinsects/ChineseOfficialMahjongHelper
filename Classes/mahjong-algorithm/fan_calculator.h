@@ -28,6 +28,7 @@
 #define SUPPORT_CONCEALED_KONG_AND_MELDED_KONG      1  // 支持明暗杠
 #define KNITTED_STRAIGHT_BODY_WITH_ECS              0  // 组合龙龙身的边嵌钓
 #define DISTINGUISH_PURE_SHIFTED_CHOWS              0  // 区分一色三（四）步的宽窄
+#define NINE_GATES_WHEN_BLESSING_OF_HEAVEN          1  // 天和支持九莲宝灯
 #define SUPPORT_BLESSINGS                           0  // 支持天和、地和、人和
 
 namespace mahjong {

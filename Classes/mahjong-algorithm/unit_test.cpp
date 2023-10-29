@@ -155,6 +155,15 @@ int main(int argc, const char *argv[]) {
     //return 0;
 
 #if 1
+    // 天和九莲宝灯 2023.10.27
+    // 支持的算法：107 93 90 90 92
+    // 不支持的算法：47 33 30 30 32
+    test_points("11112345678999p", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("11122345678999p", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("11123345678999p", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("11123445678999p", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+    test_points("11123455678999p", WIN_FLAG_INITIAL | WIN_FLAG_SELF_DRAWN, wind_t::EAST, wind_t::EAST);
+
     // 优先选择三同刻 2023.9.2
     test_points("4445677m777s777p7m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
     test_points("4456777m444s444p4m", WIN_FLAG_DISCARD, wind_t::EAST, wind_t::EAST);
