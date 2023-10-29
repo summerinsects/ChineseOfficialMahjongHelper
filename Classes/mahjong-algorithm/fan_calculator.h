@@ -140,9 +140,9 @@ enum fan_t {
     MELDED_KONG,                        ///< 明杠
     ONE_VOIDED_SUIT,                    ///< 缺一门
     NO_HONORS,                          ///< 无字
-    EDGE_WAIT,                          ///< 边张
-    CLOSED_WAIT,                        ///< 嵌张
-    SINGLE_WAIT,                        ///< 单钓将
+    EDGE_WAIT,                          ///< 独听・边张
+    CLOSED_WAIT,                        ///< 独听・嵌张
+    SINGLE_WAIT,                        ///< 独听・单钓
     SELF_DRAWN,                         ///< 自摸
 
     FLOWER_TILES,                       ///< 花牌
@@ -281,7 +281,7 @@ UNUSED static const char *fan_name[] = {
     "Outside Hand", "Fully Concealed Hand", "Two Melded Kongs", "Last Tile",
     "Dragon Pung", "Prevalent Wind", "Seat Wind", "Concealed Hand", "All Chows", "Tile Hog", "Double Pung",
     "Two Concealed Pungs", "Concealed Kong", "All Simples",
-    "Pure Double Chow", "Mixed Double Chow", "Short Straight", "Two Terminal Chows", "Pung of Terminals or Honors", "Melded Kong", "One Voided Suit", "No Honors", "Edge Wait", "Closed Wait", "Single Wait", "Self-Drawn",
+    "Pure Double Chow", "Mixed Double Chow", "Short Straight", "Two Terminal Chows", "Pung of Terminals or Honors", "Melded Kong", "One Voided Suit", "No Honors", "Unique Wait (Edge)", "Unique Wait (Closed)", "Unique Wait (Single)", "Self-Drawn",
     "Flower Tiles"
 #if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     , "Concealed Kong and Melded Kong"
@@ -338,7 +338,7 @@ UNUSED static const char *fan_name[] = {
     __UTF8("碰碰和"), __UTF8("混一色"), __UTF8("三色三步高"), __UTF8("五门齐"), __UTF8("全求人"), __UTF8("双暗杠"), __UTF8("双箭刻"),
     __UTF8("全带幺"), __UTF8("不求人"), __UTF8("双明杠"), __UTF8("和绝张"),
     __UTF8("箭刻"), __UTF8("圈风刻"), __UTF8("门风刻"), __UTF8("门前清"), __UTF8("平和"), __UTF8("四归一"), __UTF8("双同刻"), __UTF8("双暗刻"), __UTF8("暗杠"), __UTF8("断幺"),
-    __UTF8("一般高"), __UTF8("喜相逢"), __UTF8("连六"), __UTF8("老少副"), __UTF8("幺九刻"), __UTF8("明杠"), __UTF8("缺一门"), __UTF8("无字"), __UTF8("边张"), __UTF8("嵌张"), __UTF8("单钓将"), __UTF8("自摸"),
+    __UTF8("一般高"), __UTF8("喜相逢"), __UTF8("连六"), __UTF8("老少副"), __UTF8("幺九刻"), __UTF8("明杠"), __UTF8("缺一门"), __UTF8("无字"), __UTF8("独听・边张"), __UTF8("独听・嵌张"), __UTF8("独听・单钓"), __UTF8("自摸"),
     __UTF8("花牌")
 #if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     , __UTF8("明暗杠")
