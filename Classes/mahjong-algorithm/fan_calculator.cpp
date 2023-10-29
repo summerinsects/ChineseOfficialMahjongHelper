@@ -1630,20 +1630,20 @@ static void adjust_by_win_flag(win_flag_t win_flag, fan_table_t &fan_table) {
     }
 }
 
-#if SUPPORT_INITIAL_HANDS
+#if SUPPORT_BLESSINGS
 static void adjust_by_initial_hands(bool east, win_flag_t win_flag, fan_table_t &fan_table) {
-    // 自摸时，庄家为天和、闲家为人和
+    // 自摸时，庄家为天和、闲家为人和Ⅱ
     if (win_flag & WIN_FLAG_SELF_DRAWN) {
-        fan_table[east ? HEAVENLY_HAND : HUMANLY_HAND_2] = 1;
+        fan_table[east ? BLESSING_OF_HEAVEN : BLESSING_OF_HUMAN_2] = 1;
         fan_table[FULLY_CONCEALED_HAND] = 0;
         fan_table[SELF_DRAWN] = 0;
     }
-    // 点炮时，庄家点的为地和、闲家点的为人和
+    // 点炮时，庄家点的为地和、闲家点的为人和Ⅰ
     // NOTE: 这里统一当作地和，需要外部再区分
     else {
         // 庄家没有地和、人和
         if (!east) {
-            fan_table[EARTHLY_HAND] = 1;
+            fan_table[BLESSING_OF_EARTH] = 1;
             fan_table[CONCEALED_HAND] = 0;
         }
     }
@@ -1802,7 +1802,7 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const tile_table_t &
     // 根据和牌方式调整——涉及番种：不求人、全求人
     adjust_by_self_drawn(packs, fixed_cnt, (win_flag & WIN_FLAG_SELF_DRAWN) != 0, fan_table);
 
-#if SUPPORT_INITIAL_HANDS
+#if SUPPORT_BLESSINGS
     // 天和、地和、人和
     if (fixed_cnt == 0 && (win_flag & WIN_FLAG_INITIAL)) {
         adjust_by_initial_hands(calculate_param->seat_wind == wind_t::EAST, win_flag, fan_table);
@@ -1984,7 +1984,7 @@ static bool calculate_knitted_straight_fan(const tile_table_t &fixed_table, cons
         }
     }
 
-#if SUPPORT_INITIAL_HANDS
+#if SUPPORT_BLESSINGS
     // 天和、地和、人和
     if (fixed_cnt == 0 && (win_flag & WIN_FLAG_INITIAL)) {
         adjust_by_initial_hands(calculate_param->seat_wind == wind_t::EAST, win_flag, fan_table);
@@ -2097,7 +2097,7 @@ static bool calculate_honors_and_knitted_tiles(const tile_t *unique_tiles, intpt
 
 static void adjust_by_win_flag_4_special_form(wind_t seat_wind, win_flag_t win_flag, fan_table_t &fan_table) {
     adjust_by_win_flag(win_flag, fan_table);
-#if SUPPORT_INITIAL_HANDS
+#if SUPPORT_BLESSINGS
     // 天和、地和、人和
     if (win_flag & WIN_FLAG_INITIAL) {
         adjust_by_initial_hands(seat_wind == wind_t::EAST, win_flag, fan_table);

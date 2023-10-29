@@ -28,7 +28,7 @@
 #define SUPPORT_CONCEALED_KONG_AND_MELDED_KONG      1  // 支持明暗杠
 #define KNITTED_STRAIGHT_BODY_WITH_ECS              0  // 组合龙龙身的边嵌钓
 #define DISTINGUISH_PURE_SHIFTED_CHOWS              0  // 区分一色三（四）步的宽窄
-#define SUPPORT_INITIAL_HANDS                       0  // 支持天和、地和、人和
+#define SUPPORT_BLESSINGS                           0  // 支持天和、地和、人和
 
 namespace mahjong {
 
@@ -150,11 +150,11 @@ enum fan_t {
     CONCEALED_KONG_AND_MELDED_KONG,     ///< 明暗杠
 #endif
 
-#if SUPPORT_INITIAL_HANDS
-    HEAVENLY_HAND,                      ///< 天和
-    EARTHLY_HAND,                       ///< 地和
-    HUMANLY_HAND_1,                     ///< 人和Ⅰ
-    HUMANLY_HAND_2,                     ///< 人和Ⅱ
+#if SUPPORT_BLESSINGS
+    BLESSING_OF_HEAVEN,                 ///< 天和
+    BLESSING_OF_EARTH,                  ///< 地和
+    BLESSING_OF_HUMAN_1,                ///< 人和Ⅰ（点和）
+    BLESSING_OF_HUMAN_2,                ///< 人和Ⅱ（自摸）
 #endif
 
     FAN_TABLE_SIZE
@@ -275,8 +275,8 @@ UNUSED static const char *fan_name[] = {
 #if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     , "Concealed Kong and Melded Kong"
 #endif
-#if SUPPORT_INITIAL_HANDS
-    , "Heavenly Hand", "Earthly Hand", "Humanly Hand I", "Humanly Hand II"
+#if SUPPORT_BLESSINGS
+    , "Blessing of Heaven", "Blessing of Earth", "Blessing of Human I", "Blessing of Human II"
 #endif
 };
 
@@ -332,7 +332,7 @@ UNUSED static const char *fan_name[] = {
 #if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     , __UTF8("明暗杠")
 #endif
-#if SUPPORT_INITIAL_HANDS
+#if SUPPORT_BLESSINGS
     , __UTF8("天和"), __UTF8("地和"), __UTF8("人和Ⅰ"), __UTF8("人和Ⅱ")
 #endif
 };
@@ -366,7 +366,7 @@ static const uint16_t fan_value_table[FAN_TABLE_SIZE] = {
 #if SUPPORT_CONCEALED_KONG_AND_MELDED_KONG
     , 5
 #endif
-#if SUPPORT_INITIAL_HANDS
+#if SUPPORT_BLESSINGS
     , 8, 8, 8, 8
 #endif
 };
