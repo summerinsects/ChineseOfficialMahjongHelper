@@ -186,6 +186,14 @@ bool ScoreSheetScene::initWithRecord(Record *record) {
         cw::scaleLabelToFitWidth(label, gap - 4.0f);
     }
 
+#if SUPPORT_FULLY_SHOOT
+    label = Label::createWithSystemFont("", "Arail", 12);
+    label->setTextColor(C4B_GRAY);
+    label->setPosition(Vec2(colPosX[5], line3Y));
+    drawNode->addChild(label);
+    _modeLabel = label;
+#endif
+
     // 第4栏：累计
     const float line4Y = tableHeight - cellHeight * 3.5f;
     label = Label::createWithSystemFont(__UTF8("累计"), "Arial", 12);
@@ -302,7 +310,7 @@ void ScoreSheetScene::cleanRow(unsigned handIdx) {
 void ScoreSheetScene::addUpScores(unsigned handIdx, int (&totalScores)[4]) const {
     int scoreTable[4];
     const Record::Detail &detail = _record.detail[handIdx];
-    TranslateDetailToScoreTable(detail, scoreTable);
+    TranslateDetailToScoreTable(detail, _record.mode, scoreTable);
 
     for (int i = 0; i < 4; ++i) {
         totalScores[i] += scoreTable[i];  // 更新总分
@@ -312,7 +320,7 @@ void ScoreSheetScene::addUpScores(unsigned handIdx, int (&totalScores)[4]) const
 void ScoreSheetScene::fillScoresForSingleMode(unsigned handIdx, int (&totalScores)[4]) {
     int scoreTable[4];
     const Record::Detail &detail = _record.detail[handIdx];
-    TranslateDetailToScoreTable(detail, scoreTable);
+    TranslateDetailToScoreTable(detail, _record.mode, scoreTable);
 
     // 填入这一盘四位选手的得分
     for (int i = 0; i < 4; ++i) {
@@ -327,7 +335,7 @@ void ScoreSheetScene::fillScoresForSingleMode(unsigned handIdx, int (&totalScore
 void ScoreSheetScene::fillScoresForTotalMode(unsigned handIdx, int (&totalScores)[4]) {
     int scoreTable[4];
     const Record::Detail &detail = _record.detail[handIdx];
-    TranslateDetailToScoreTable(detail, scoreTable);
+    TranslateDetailToScoreTable(detail, _record.mode, scoreTable);
 
     // 填入这一盘之后四位选手的总分
     for (int i = 0; i < 4; ++i) {
@@ -602,6 +610,10 @@ void ScoreSheetScene::recover() {
     unsigned currentIdx = _record.current_index;
     int totalScores[4] = { 0 };
 
+#if SUPPORT_FULLY_SHOOT
+    _modeLabel->setString(_record.mode == 0 ? __UTF8("传统") : __UTF8("全铳"));
+#endif
+
     // 逐行填入数据
     if (_isTotalMode) {
         for (unsigned i = 0; i < currentIdx; ++i) {
@@ -662,6 +674,10 @@ void ScoreSheetScene::reset() {
     }
 
     refreshTitle();
+
+#if SUPPORT_FULLY_SHOOT
+    _modeLabel->setString("");
+#endif
 
     for (int i = 0; i < 4; ++i) {
         _nameLabel[i]->setVisible(false);
@@ -737,9 +753,15 @@ static std::string &fixString(std::string &str, size_t bytes) {
 
 void ScoreSheetScene::editNameAndTitle() {
     const float limitWidth = std::min(AlertDialog::maxWidth(), 180.0f);
+#if SUPPORT_FULLY_SHOOT
+    constexpr float limitHeight = 220.0f;
+#else
+    constexpr float limitHeight = 175.0f;
+#endif
+
 
     Node *rootNode = Node::create();
-    rootNode->setContentSize(Size(limitWidth, 175.0f));
+    rootNode->setContentSize(Size(limitWidth, limitHeight));
 
     // 输入框及上下按钮
     const float editBoxWidth = limitWidth - 20 - 50;
@@ -750,7 +772,7 @@ void ScoreSheetScene::editNameAndTitle() {
     ui::EditBox **editBoxes = sharedEditBoxes->data();
     ui::Button *upButtons[4], *downButtons[4];
     for (int i = 0; i < 4; ++i) {
-        const float yPos = 160.0f - i * 25.0f;
+        const float yPos = limitHeight - 15.0f - i * 25.0f;
         Label *label = Label::createWithSystemFont(s_wind[i], "Arial", 12);
         label->setTextColor(C4B_BLACK);
         rootNode->addChild(label);
@@ -808,7 +830,7 @@ void ScoreSheetScene::editNameAndTitle() {
     button1->setContentSize(Size(55.0f, 20.0f));
     button1->setTitleFontSize(12);
     button1->setTitleText(__UTF8("清空全部"));
-    button1->setPosition(Vec2((limitWidth - 110.0f) / 3.0f + 27.5f, 55.0f));
+    button1->setPosition(Vec2((limitWidth - 110.0f) / 3.0f + 27.5f, limitHeight - 120.0f));
     cw::scaleLabelToFitWidth(button1->getTitleLabel(), 45.0f);
 
     ui::Button *button2 = UICommon::createButton();
@@ -817,7 +839,7 @@ void ScoreSheetScene::editNameAndTitle() {
     button2->setContentSize(Size(55.0f, 20.0f));
     button2->setTitleFontSize(12);
     button2->setTitleText(__UTF8("随机排座"));
-    button2->setPosition(Vec2(limitWidth - button1->getPositionX(), 55.0f));
+    button2->setPosition(Vec2(limitWidth - button1->getPositionX(), limitHeight - 120.0f));
     cw::scaleLabelToFitWidth(button2->getTitleLabel(), 45.0f);
 
     if (_record.start_time != 0) {
@@ -835,14 +857,51 @@ void ScoreSheetScene::editNameAndTitle() {
     editBox->setMaxLength(TITLE_SIZE - 1);
     editBox->setPlaceHolder(__UTF8("在此输入对局名称"));
     rootNode->addChild(editBox);
-    editBox->setPosition(Vec2(limitWidth * 0.5f, 25.0f));
+    editBox->setPosition(Vec2(limitWidth * 0.5f, limitHeight - 150.0f));
     editBoxes[4] = editBox;
 
     Label *label = Label::createWithSystemFont(__UTF8("输入的对局名称将在标题上显示"), "Arial", 10);
     label->setTextColor(C4B_GRAY);
     rootNode->addChild(label);
-    label->setPosition(Vec2(limitWidth * 0.5f, 5.0f));
+    label->setPosition(Vec2(limitWidth * 0.5f, limitHeight - 170.0f));
     cw::scaleLabelToFitWidth(label, limitWidth - 4.0f);
+
+#if SUPPORT_FULLY_SHOOT
+    label = Label::createWithSystemFont(__UTF8("授受制选择"), "Arail", 12);
+    label->setTextColor(C4B_BLACK);
+    rootNode->addChild(label);
+    label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    label->setPosition(Vec2(5.0f, 30.0f));
+
+    ui::RadioButtonGroup *radioGroup = ui::RadioButtonGroup::create();
+    rootNode->addChild(radioGroup);
+
+    static const char *recordTitleText[] = { __UTF8("传统"), __UTF8("全铳") };
+    for (int i = 0; i < 2; ++i) {
+        ui::RadioButton *radioButton = UICommon::createRadioButton();
+        radioButton->setZoomScale(0.0f);
+        radioButton->ignoreContentAdaptWithSize(false);
+        radioButton->setContentSize(Size(20.0f, 20.0f));
+        radioButton->setPosition(Vec2(limitWidth * 0.5f * i + 20.0f, 10.0f));
+        rootNode->addChild(radioButton);
+        radioGroup->addRadioButton(radioButton);
+
+        label = Label::createWithSystemFont(recordTitleText[i], "Arial", 12);
+        label->setTextColor(C4B_BLACK);
+        label->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+        cw::scaleLabelToFitWidth(label, limitWidth * 0.5f - 30.0f);
+        radioButton->addChild(label);
+        label->setPosition(Vec2(25.0f, 10.0f));
+    }
+    if (_record.mode == 1) {
+        radioGroup->setSelectedButton(1);
+    }
+    //if (_record.start_time != 0) {
+    //    radioGroup->setEnabled(false);
+    //    radioGroup->getRadioButtonByIndex(0)->setEnabled(false);
+    //    radioGroup->getRadioButtonByIndex(1)->setEnabled(false);
+    //}
+#endif
 
     // 如果选手姓名皆为空，则填入上次对局的姓名
     if (std::all_of(std::begin(_record.name), std::end(_record.name), [](const char (&s)[NAME_SIZE]) { return s[0] == '\0'; })) {
@@ -874,7 +933,11 @@ void ScoreSheetScene::editNameAndTitle() {
         .setContentNode(rootNode)
         .setCloseOnTouchOutside(false)
         .setNegativeButton(__UTF8("取消"), nullptr)
-        .setPositiveButton(__UTF8("确定"), [this, sharedEditBoxes, delegate](AlertDialog *, int) {
+        .setPositiveButton(__UTF8("确定"), [this, sharedEditBoxes, delegate
+#if SUPPORT_FULLY_SHOOT
+            , radioGroup
+#endif
+        ](AlertDialog *, int) {
         ui::EditBox **editBoxes = sharedEditBoxes->data();
         // 获取四个输入框内容
         std::string names[4];
@@ -910,6 +973,18 @@ void ScoreSheetScene::editNameAndTitle() {
                 }
             }
         }
+
+#if SUPPORT_FULLY_SHOOT
+        if (_record.start_time == 0) {
+            _record.mode = radioGroup->getSelectedButtonIndex();
+        }
+        else {
+            if (_record.mode != radioGroup->getSelectedButtonIndex()) {
+                Toast::makeText(this, __UTF8("对局开始后不允许更改授受制"), Toast::LENGTH_LONG)->show();
+                return false;
+            }
+        }
+#endif
 
         // 提交标题
         const char *text = editBoxes[4]->getText();
@@ -996,6 +1071,10 @@ void ScoreSheetScene::onStartButton(cocos2d::Ref *) {
     _recordButton[0]->setVisible(true);
     _startButton->setVisible(false);
 
+#if SUPPORT_FULLY_SHOOT
+    _modeLabel->setString(_record.mode == 0 ? __UTF8("传统") : __UTF8("全铳"));
+#endif
+
     _record.start_time = time(nullptr);
     onTimeScheduler(0.0f);
 
@@ -1038,7 +1117,7 @@ void ScoreSheetScene::onRecordButton(cocos2d::Ref *sender) {
 
 void ScoreSheetScene::editRecord(unsigned handIdx, const Record::Detail *detail) {
     const char *name[4] = { _record.name[0], _record.name[1], _record.name[2], _record.name[3] };
-    auto scene = RecordScene::create(handIdx, name, detail, [this, handIdx](const Record::Detail &detail) {
+    auto scene = RecordScene::create(handIdx, name, _record.mode, detail, [this, handIdx](const Record::Detail &detail) {
         unsigned currentIdx = _record.current_index;
         bool isModify = (handIdx != currentIdx);
 
@@ -1498,7 +1577,7 @@ void ScoreSheetScene::onResetButton(cocos2d::Ref *) {
     }).create()->show();
 }
 
-static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int (&totalScores)[4]) {
+static DrawNode *createPursuitTable(uint8_t mode, const char (&name)[4][NAME_SIZE], const int (&totalScores)[4]) {
     // 下标
     int indices[4] = { 0, 1, 2, 3 };
     // 按分数排序
@@ -1573,7 +1652,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
             int d = delta - 32;
             int numbers[4];
             numbers[0] = delta;  // 分差
-            numbers[1] = std::max((d >> 2) + 1, 8);  // 自摸
+            numbers[1] = std::max(mode == 0 ? ((d >> 2) + 1) : ((d >> 2) * 3 + 1), 8);  // 自摸
             numbers[2] = std::max((d >> 1) + 1, 8);  // 对点
             numbers[3] = std::max(d + 1, 8);  // 旁点
 
@@ -1590,7 +1669,7 @@ static DrawNode *createPursuitTable(const char (&name)[4][NAME_SIZE], const int 
     return drawNode;
 }
 
-static void showPursuit() {
+static void showPursuit(uint8_t mode) {
     const float limitWidth = AlertDialog::maxWidth();
 
     Label *label = Label::createWithSystemFont(
@@ -1642,14 +1721,14 @@ static void showPursuit() {
     }
 
     for (int i = 0; i < 4; ++i) {
-        buttons[i]->addClickEventListener([editBoxes, i](Ref *) {
+        buttons[i]->addClickEventListener([mode, editBoxes, i](Ref *) {
             const char *text = editBoxes[i]->getText();
             if (!Common::isCStringEmpty(text)) {
                 int value = atoi(text);
                 char buf[16];
                 if (i == 0) {
                     int delta = value - 32;
-                    snprintf(buf, sizeof(buf), "%d", std::max((delta >> 2) + 1, 8));
+                    snprintf(buf, sizeof(buf), "%d", std::max(mode == 0 ? ((delta >> 2) + 1) : ((delta >> 2) * 3 + 1), 8));
                     editBoxes[1]->setText(buf);
                     snprintf(buf, sizeof(buf), "%d", std::max((delta >> 1) + 1, 8));
                     editBoxes[2]->setText(buf);
@@ -1657,7 +1736,13 @@ static void showPursuit() {
                     editBoxes[3]->setText(buf);
                 }
                 else {
-                    snprintf(buf, sizeof(buf), "%d", (value << (3 - i)) + 32);
+                    if (i != 1 || mode == 0) {
+                        snprintf(buf, sizeof(buf), "%d", (value << (3 - i)) + 32);
+                    }
+                    else {
+                        div_t ret = div(value, 3);
+                        snprintf(buf, sizeof(buf), "%d", ((ret.quot + !!ret.rem) << 2) + 32);
+                    }
                     editBoxes[0]->setText(buf);
                     for (int k = 1; k < 4; ++k) {
                         if (k != i) {
@@ -1679,7 +1764,7 @@ static void showPursuit() {
 void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     // 比赛未开始时，直接显示更多追分界面
     if (_record.start_time == 0 || _record.current_index >= 16) {
-        showPursuit();
+        showPursuit(_record.mode);
         return;
     }
 
@@ -1688,7 +1773,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
         addUpScores(i, totalScores);
     }
 
-    DrawNode *drawNode = createPursuitTable(_record.name, totalScores);
+    DrawNode *drawNode = createPursuitTable(_record.mode, _record.name, totalScores);
     const Size &drawNodeSize = drawNode->getContentSize();
 
     Node *rootNode = Node::create();
@@ -1702,7 +1787,7 @@ void ScoreSheetScene::onPursuitButton(cocos2d::Ref *) {
     button->setContentSize(Size(55.0f, 20.0f));
     button->setTitleFontSize(12);
     button->setTitleText(__UTF8("更多追分"));
-    button->addClickEventListener([](Ref *) { showPursuit(); });
+    button->addClickEventListener([this](Ref *) { showPursuit(_record.mode); });
 
     rootNode->addChild(button);
     const Size &rootSize = rootNode->getContentSize();

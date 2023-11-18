@@ -8,7 +8,7 @@ struct Record;
 
 struct RecordTexts {
     const Record *source;
-    const char *title;
+    std::string title;
     std::string time;
     std::string players[4];
     int seats[4];
@@ -68,6 +68,7 @@ private:
     void saveRecordsAndRefresh();
 
     cocos2d::Label *_emptyLabel = nullptr;
+    cocos2d::ui::Button *_moreButton = nullptr;
     cw::TableView *_tableView = nullptr;
     ViewCallback _viewCallback;
 };

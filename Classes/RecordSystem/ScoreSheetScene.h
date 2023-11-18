@@ -14,6 +14,9 @@ private:
     float _cellWidth = 0.0f;
     cocos2d::Label *_titleLabel = nullptr;
     cocos2d::Label *_nameLabel[4];
+#if SUPPORT_FULLY_SHOOT
+    cocos2d::Label *_modeLabel = nullptr;
+#endif
     cocos2d::ui::Button *_startButton = nullptr;
     cocos2d::ui::Button *_finishButton = nullptr;
     cocos2d::Label *_totalLabel[4];
