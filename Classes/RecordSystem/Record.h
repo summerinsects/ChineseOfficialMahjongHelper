@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#define SUPPORT_FULLY_SHOOT 0
+#define SUPPORT_FULLY_SHOOT 1
 
 #define NAME_SIZE 32
 #define TITLE_SIZE 64
