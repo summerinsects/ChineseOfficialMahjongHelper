@@ -10,7 +10,7 @@ android {
         minSdkVersion PROP_MIN_SDK_VERSION
         targetSdkVersion PROP_TARGET_SDK_VERSION
         versionCode 45
-        versionName "1.5.2.0"
+        versionName "1.5.2.1"
 
         externalNativeBuild {
             cmake {
