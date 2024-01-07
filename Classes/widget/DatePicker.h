@@ -4,17 +4,7 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "../cocos-wheels/CWCommon.h"
-
-namespace calendar {
-    struct GregorianDate {
-        int year, month, day;
-    };
-
-    struct ChineseDate {
-        int year, month, day;
-        bool leap, major;
-    };
-}
+#include "../utils/calendar.h"
 
 #define DATE_PICKER_Z_ORDER 100
 
