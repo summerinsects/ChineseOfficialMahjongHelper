@@ -11,17 +11,6 @@
 #include "../widget/LoadingView.h"
 #include "../widget/CommonWebViewScene.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-#define DOWNLOAD_URL "https://www.pgyer.com/comh-android"
-#define QR_CODE_URL "https://www.pgyer.com/app/qrcode/comh-android"
-#elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-#define DOWNLOAD_URL "https://www.pgyer.com/comh-ios"
-#define QR_CODE_URL "https://www.pgyer.com/app/qrcode/comh-ios"
-#else
-#define DOWNLOAD_URL ""
-#define QR_CODE_URL "https://www.pgyer.com/app/qrcode/comh-android"
-#endif
-
 class SettingScene : public BaseScene {
 public:
     CREATE_FUNC(SettingScene);
@@ -530,14 +519,24 @@ bool LeftSideMenu::_checkVersion(cocos2d::Scene *scene, bool manual, const std::
             body = it->value.GetString();
         }
 
+        std::string download_url;
+        it = doc.FindMember("assets");
+        if (it != doc.MemberEnd() && it->value.IsArray() && it->value.Size() != 0) {
+            const rapidjson::Value &assets0 = it->value.GetArray()[0];
+            rapidjson::Value::ConstMemberIterator jt = assets0.FindMember("browser_download_url");
+            if (jt != assets0.MemberEnd() && jt->value.IsString()) {
+                download_url.assign(jt->value.GetString(), jt->value.GetStringLength());
+            }
+        }
+
         AlertDialog::Builder(scene)
             .setTitle(__UTF8("检测到新版本"))
             .setMessage(Common::format(__UTF8("%s，是否下载？\n\n%s"), tag.c_str(), body.c_str()))
             .setCloseOnTouchOutside(false)
             .setNegativeButton(__UTF8("取消"), nullptr)
-            .setPositiveButton(__UTF8("更新"), [](AlertDialog *, int) {
-#if 0
-                Application::getInstance()->openURL(DOWNLOAD_URL);
+            .setPositiveButton(__UTF8("更新"), [download_url](AlertDialog *, int) {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+                Application::getInstance()->openURL(download_url);
 #endif
                 return true;
             })
