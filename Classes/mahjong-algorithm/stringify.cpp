@@ -103,7 +103,7 @@ static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *
             if (tiles[0] == tiles[1] && tiles[1] == tiles[2]) {
                 *pack = make_pack(offer, PACK_TYPE_PUNG, tiles[0]);
             }
-            else {
+            else if (!is_honor(tiles[0])) {
                 if ((tiles[0] + 1 == tiles[1] && tiles[1] + 1 == tiles[2])
                     || (tiles[2] + 1 == tiles[1] && tiles[1] + 1 == tiles[0])) {
                     *pack = make_pack(offer, PACK_TYPE_CHOW, tiles[1]);
@@ -119,6 +119,9 @@ static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *
                 else {
                     return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
                 }
+            }
+            else {
+                return PARSE_ERROR_CANNOT_MAKE_FIXED_PACK;
             }
         }
         else {
