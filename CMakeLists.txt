@@ -89,7 +89,11 @@ list(APPEND GAME_SOURCE
      )
 list(APPEND GAME_HEADER
      Classes/AppDelegate.h
+     Classes/BaseScene.h
      Classes/HelloWorldScene.h
+     Classes/TilesImage.h
+     Classes/UIColors.h
+     Classes/UICommon.h
      Classes/cocos-wheels/CWCommon.h
      Classes/cocos-wheels/CWTableView.h
      Classes/CompetitionSystem/CompetitionMainScene.h
@@ -108,11 +112,11 @@ list(APPEND GAME_HEADER
      Classes/RecordSystem/RecordScene.h
      Classes/RecordSystem/ScoreSheetScene.h
      Classes/Training/TrainingScene.h
+     Classes/utils/calendar.h
      Classes/utils/common.h
      Classes/utils/compiler.h
      Classes/utils/socket.h
      Classes/widget/AlertDialog.h
-     Classes/widget/calendar-inline.h
      Classes/widget/CheckBoxScale9.h
      Classes/widget/CommonWebViewScene.h
      Classes/widget/DatePicker.h
