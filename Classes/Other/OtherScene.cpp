@@ -6,6 +6,8 @@
 
 USING_NS_CC;
 
+#define WWW_PATH "https://summerinsects.github.io/ChineseOfficialMahjongHelper/"
+
 static std::string g_text;
 
 bool OtherScene::init() {
@@ -80,5 +82,7 @@ void OtherScene::onCompetitionButton(cocos2d::Ref *) {
 
 void OtherScene::onRecreationsButton(cocos2d::Ref *) {
     Director::getInstance()->pushScene(
-        CommonWebViewScene::create(__UTF8("娱乐消遣"), "http://www.tziakcha.xyz/almanac.html", CommonWebViewScene::ContentType::URL));
+        CommonWebViewScene::create(__UTF8("娱乐消遣"),
+            WWW_PATH "almanac.html",
+            CommonWebViewScene::ContentType::URL));
 }
