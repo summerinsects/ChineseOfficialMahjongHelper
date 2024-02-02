@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>国标麻将求签</title>
+  <meta name="viewport" content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width,height=device-height">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <style type="text/css">
+    body *{font-family:"Consolas","Microsoft Yahei",Arial,sans-serif;}
+    div{font-size:10pt;}
+    body{background:white;margin:0;padding:0;}
+    .container{width:320px;margin:0 auto 50px;}
+    .info{text-align:center;color:#dc143c;font-size:9pt;}
+    .info strong{background:crimson;color:white;padding:0 3px;margin:0 1px;}
+    .container>.title{color:#bbb;font-weight:bold;margin-bottom:10px;background:#555;padding:5px 15px;font-size:120%;}
+    .date{font-size:16pt;font-weight:bold;text-align:center;border-bottom:1px solid #999;}
+    .check_luck{padding-top:10px;}
+    .selecttable{width:100%;}
+    .selecttable td{text-align:center;padding:10px 0;margin:1px;background:#ccc;cursor:pointer;width:20%;border-radius:2px;}
+    .selecttable td:hover{background:#aaa;}
+    .selecttable td.selected{background:#333;color:#fff;}
+    .roll{height:200px;border:1px solid #faa;margin-top:10px;overflow:hidden;position:relative;}
+    .card{background:#ffffff;text-align:center;line-height:200px;border-top:1px solid #faa;position:absolute;top:201px;width:100%;}
+    .card .title{font-size:70pt;font-weight:bold;}
+    .card .value{font-size:48pt;font-weight:bold;line-height:100px;}
+    .card .face{font-size:18pt;line-height:40px;color:#555;}
+    .card .words{font-size:12pt;line-height:normal;color:#555;}
+    .card.clickable{background:crimson;color:#ffffff;cursor:pointer;}
+    @keyframes move{
+      from{top:201px;}
+      to{top:-1px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">国标麻将求签<sup>alpha</sup></div>
+    <div class="info">
+      <strong>求</strong>婚丧嫁娶亲友疾病自摸点炮升职跳槽陨石核弹各类吉凶
+    </div>
+    <div class="date">&nbsp;<br>&nbsp;</div>
+    <div class="check_luck">
+      <ul style="margin-top:0;padding-left:30px;line-height:130%">
+        <li>战前求一签，可避凶趋吉</li>
+        <li>选择所求之事并在心中默念，再单击“求”即可</li>
+        <li>同一件事只能求一次，下次再求请刷新页面</li>
+      </ul>
+      <table class="event_table selecttable">
+        <tr>
+          <td class="" data-event="100" onclick="onSel(this)">小牌</td>
+          <td class="" data-event="200" onclick="onSel(this)">大牌</td>
+          <td class="" data-event="300" onclick="onSel(this)">防守</td>
+          <td class="" data-event="400" onclick="onSel(this)">进攻</td>
+          <td class="" data-event="500" onclick="onSel(this)">神棍</td>
+        </tr>
+      </table>
+    </div>
+    <div class="roll">
+      <div class="card" style="top:-1px;font-size:20pt">
+        请点击所求之事
+      </div>
+      <div class="card clickable" onclick="onStick(this)">
+        <div class="title">求</div>
+      </div>
+    </div>
+  </div>
+  <script src="./js/tz-chn-cal.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    var weeks=['日','一','二','三','四','五','六'];
+    var sticks=[
+      {value:'上上',face:'困龙得水',words:'困龙得水好运交，不由喜气上眉梢。<br>一切谋望皆如意，向后时运渐渐高。'},
+      {value:'上中',face:'饿虎得食',words:'饿虎得食喜气欢，求名应事主高迁。<br>出门吉利行人到，是非口舌不相干。'},
+      {value:'下下',face:'乱丝无头',words:'风刮乱丝不见头，颠三倒四犯忧愁。<br>慢行缓来头有绪，急促反惹不自由。'},
+      {value:'中下',face:'小鬼偷钱',words:'卦中气象犯小耗，谋望求财枉徒劳。<br>婚姻合伙有人破，交易出行犯唠叨。'},
+      {value:'上上',face:'明珠出土',words:'明珠土埋日久深，无光无毫到如今。<br>忽然大风吹去土，自然显露又重新。'},
+      {value:'平平',face:'二人争路',words:'二人争路未肯降，占着此卦费主张。<br>交易出行有阻隔，生意合伙有平常。'},
+      {value:'上平',face:'马到成功',words:'将帅领旨去出征，骑着烈马拉硬弓。<br>百步穿杨去的准，箭射金钱喜气生。'},
+      {value:'上吉',face:'船得顺风',words:'顺风行船撒起棚，上天又助一篷风。<br>不用费力逍遥去，任意而行大亨通。'},
+      {value:'下平',face:'密云不雨',words:'浓云密排下雨难，盼望行人不见还。<br>交易出行空费力，婚姻求谋是枉然。'},
+      {value:'中吉',face:'俊鸟出笼',words:'俊鸟幸得出笼中，脱离灾难显威风。<br>一朝得志凌云去，东南西北任意行。'},
+      {value:'上吉',face:'喜报三元',words:'喜报三元运气强，谋望求财大吉祥。<br>交易出行多得意，是非口舌总无妨。'},
+      {value:'下平',face:'虎落陷坑',words:'虎落陷坑不堪言，前进容易退后难。<br>谋望不遂自己便，疾病口舌有牵连。'},
+      {value:'中吉',face:'仙人指路',words:'仙人指路过路通，劝君任意走西东。<br>交易求财不费力，生意合伙也相通。'},
+      {value:'上中',face:'砍树摸雀',words:'砍树摸雀做事牢，是非口舌自然消。<br>婚姻合伙不费力，若问走失未脱逃。'},
+      {value:'上平',face:'二人分金',words:'天赐贫人一封金，不用争来二人分。<br>彼此分得金到手，一切谋望皆遂心。'},
+      {value:'上中',face:'青龙得位',words:'青龙得意喜气生，谋望求财事有成。<br>婚姻出行无阻隔，是非口舌的安宁。'},
+      {value:'下吉',face:'推车靠岸',words:'推车靠堰道路干，谋望求财不费难。<br>婚姻出行无阻隔，疾病口舌保平安。'},
+      {value:'中下',face:'推磨岔道',words:'卦中象，如推磨，顺当为福反为祸。<br>心中有数事改变，凡事尽从忙里错。'},
+      {value:'上平',face:'发政施仁',words:'发政施仁志量高，出外求财任逍遥。<br>交易婚姻大有意，走失行人有信耗。'},
+      {value:'下中',face:'鹰鹊同林',words:'鹊遇天晚宿林中，不知林内先有鹰。<br>虽然同处心生恶，卦外逢之事非轻。'},
+      {value:'中平',face:'饥人遇食',words:'运拙如同身受饥，幸得送饭又遇食。<br>适口充肠心欢喜，忧愁从此渐消移。'},
+      {value:'中上',face:'喜气盈门',words:'时来运转锐气周，窈窕淑女君子求。<br>钟古乐之大吉庆，占着此卦喜临头。'},
+      {value:'上吉',face:'旱莲逢河',words:'花遇甘露旱逢河，生意买卖利息多。<br>婚姻自有人来助，出门永不受折磨。'},
+      {value:'中下',face:'夫妻反目',words:'若占此卦不相和，忧疑愁闲无定夺。<br>恩人无义反成怨，是非平地起风波。'}, 
+      {value:'中下',face:'鸟困牢笼',words:'鸟如笼中难出头，占着此卦不自由。<br>谋望求财不定准，疾病忧犯口舌愁。'},
+      {value:'中吉',face:'阵势得开',words:'忧愁常锁两眉间，千头万绪挂心间。<br>从今以后打开阵，任意而行不相干。'},
+      {value:'上吉',face:'渭水访贤',words:'文王访贤在渭滨，谋望求财事遂心。<br>交易出行方如意，疾病口舌可离身。'},
+      {value:'下下',face:'夜梦金银',words:'夜梦金银醒来空，求名求利大不通。<br>婚姻难成交易散，走失行人不见踪。'},
+      {value:'下下',face:'水底捞月',words:'一路明月照水中，只见影儿不见踪。<br>愚人当财下去取，摸来摸去一场空。'},
+      {value:'上上',face:'天官赐福',words:'占此卦者遇天宫，富禄必然降人间。<br>一切谋望皆吉庆，愁闲消散主平安。'},
+      {value:'平平',face:'棒槌发芽',words:'脚踏棒槌转悠悠，时运不来莫强求。<br>幸喜今日时运转，自有好事在后头。'},
+      {value:'上平',face:'鱼来撞网',words:'鱼来撞网乐自然，卦占行人不久还。<br>交易婚姻两成就，谋望求财不费难。'}, 
+      {value:'中平',face:'浓云蔽日',words:'浓云遮日不光明，劝君切莫远出行。<br>婚姻求财皆不吉，须防口舌到门庭。'},
+      {value:'上平',face:'工师得木',words:'卦占工师得大木，眼前该着走上路。<br>时来运转多顺当，有事自管放心做。'},
+      {value:'上平',face:'锄地得金',words:'锄地锄去苗里草，谁想财帛将人找，<br>谋望求财皆如意，这个运气也算好。'},
+      {value:'下平',face:'过河拆桥',words:'时乖运拙走不着，急忙过河拆了桥。<br>恩人无义反为怨，凡事无功枉受劳。'},
+      {value:'下下',face:'镜里观花',words:'镜里观花休认真，谋望求财不遂心。<br>交易慢成婚姻散，走失行人无音信。'},
+      {value:'下平',face:'行走薄冰',words:'路上行人色匆匆，过河无桥遇薄冰。<br>小心谨慎过得去，一步错了落水中。'},
+      {value:'下下',face:'雨雪载途',words:'大雨倾地雪满天，路上行人苦又难，<br>拖泥带水费尽力，事不遂心且耐烦。'},
+      {value:'中吉',face:'五关脱难',words:'五关脱难运抬头，劝君须当把财求。<br>交易出行有人助，疾病口舌不用愁。'}, 
+      {value:'下中',face:'推车掉耳',words:'时运不至费心多，比作推车受折磨。<br>山路崎岖掉了耳，左插右安安不着。'}, 
+      {value:'中吉',face:'枯木开花',words:'时来运转喜气发，多年枯木又开花。<br>枝叶重生多茂盛，几人见了几人夸。'},
+      {value:'中吉',face:'游蜂脱网',words:'游蜂脱网喜无边，添财进口福禄连。<br>外则通达内则顺，富贵荣华胜以前。'},
+      {value:'上平',face:'他乡遇友',words:'他乡遇友喜气欢，须知运气福重添。<br>自今交了顺当运，向后保管不相干。'}, 
+      {value:'中吉',face:'鲤鱼化龙',words:'鲤鱼化龙喜气来，口舌疾病永无灾。<br>愁疑从此都消散，祸门闭来福门开。'},
+      {value:'上吉',face:'指日高升',words:'指日离升气象新，走失行人有音信。<br>功名出行遂心好，疾病口舌皆除根。'},
+      {value:'下平',face:'撮杆抽梯',words:'时运不来有人欺，千方百计费商议。<br>明明与你说好话，撮上杆去抽了梯。'},
+      {value:'上中',face:'枯井生泉',words:'枯井破了已多年，一朝涌泉出水新。<br>资生济渴人称羡，时来运转乐自然。'},
+      {value:'上平',face:'旱苗得雨',words:'苗逢旱天渐渐衰，幸得天恩降雨来。<br>忧去喜来能变化，求谋诸事遂心怀。'},
+      {value:'上中',face:'渔人得利',words:'若占此卦喜自然，求名求利两周全。<br>婚姻合伙皆如意，生意兴隆乐自然。'},
+      {value:'中吉',face:'金钟夜撞',words:'占者逢之撞金钟，时来运转响一声。<br>谋事求财不费力，交易合伙大亨通。'},
+      {value:'下中',face:'矬巴勾枣',words:'矬巴勾枣难捞枝，交易寻人不投机，<br>谋望求财最费力，婚姻合伙终是虚。'},
+      {value:'上上',face:'凤鸣歧山',words:'凤凰落在西岐山，长鸣几声出圣贤。<br>天降文王开基业，富贵荣华八百年。'},
+      {value:'下平',face:'缘木求鱼',words:'求鱼须当向水中，树上求之不顺情。<br>受尽爬揭难遂意，劳而无功事不成。'},
+      {value:'中吉',face:'古镜重明',words:'古镜昏暗好几年，一朝磨明似月圆。<br>君子谋事占此卦，时来运转乐自然。'},
+      {value:'下下',face:'宿鸟焚巢',words:'飞鸟树上筑高巢，小人使计用火烧。<br>如占此卦大不利，一切谋望枉徒劳。'},
+      {value:'中吉',face:'孤舟得水',words:'泛舟得水离沙滩，出外行人早回家。<br>是非口舌皆无碍，婚姻合伙更不差。'},
+      {value:'中吉',face:'趁水和泥',words:'这个卦象真有趣，觉着做事不费力。<br>休要错过这机会，事事就觉遂心意。'},
+      {value:'下下',face:'隔河望金',words:'隔河望见一锭金，欲取河宽水又深。<br>指望钱财难到手，日夜思想妄费心。'},
+      {value:'上吉',face:'斩将封神',words:'时来运转喜气生，登台封神姜太公。<br>到此诸神皆退位，纵然有祸不成凶。'},
+      {value:'下下',face:'贩卖猪羊',words:'此卦占之运气歹，如同太公做买卖。<br>贩猪羊快贩牛迟，猪羊齐贩断了宰。'},
+      {value:'中平',face:'急过独桥',words:'行人路过独木桥，心内惶恐眼里跳。<br>爽利保保过得去，慢行一步不安牢。'},
+      {value:'上中',face:'金榜题名',words:'金榜之上提姓名，不负当年苦用功。<br>人逢此卦多吉庆，一切谋望大亨通。'},
+      {value:'中平',face:'太岁月建',words:'太岁入运事多愁，婚姻财帛莫强求。<br>交易出门走见吉，走失行人不露头。'},
+    ];
+    function dateString(t){
+      var y=t.getFullYear(),m=t.getMonth()+1,d=t.getDate(),o=CHN_CAL.greg2chn({'y':y,'m':m,'d':d});
+      return '今天是'+y+'年'+m+'月'+d+'日 星期'+weeks[t.getDay()]
+        +'<br>农历'+CHN_CAL.chn_date_text(o);
+    }
+    function random(s1,s2){
+      var n=s1%11117,i;
+      for(i=0;i<100+s2;++i){
+        n*=n;
+        n%=11117;
+      }
+      return n;
+    }
+    var timeseed=0,selectedEvent=0,rolling=false;
+    function onSel(e){
+      var i,l,c,r;
+      if(rolling){return;}
+      var a=document.getElementsByTagName('td');
+      for(i=0,l=a.length;i<l;++i){
+        if(a[i]===e)a[i].className='selected';
+        else a[i].className='';
+      }
+      selectedEvent=parseInt(e.dataset['event']);
+      c=document.querySelector('.clickable');
+      c.style.display='inline';
+      c.style.animation='move .3s ease-in-out forwards';
+      r=document.querySelector('.roll');
+      r.querySelector('.card').style.display='none';
+      a=r.getElementsByClassName('tmp');
+      for(i=a.length-1;i>=0;--i){
+        a.item(i).remove();
+      }
+    }
+    function onStick(e){
+      e.style.display='none';
+      rolling=true;
+      slide(document.querySelector('.roll'),0);
+    }
+    function slide(r,n) {
+      var d,e,s;
+      if(n>35){rolling=false;return;}
+      d=n>33?1500:(n>32?800:(n>25?400:(n>20?200:(n>15?150:100))));
+      s=sticks[random(timeseed+selectedEvent,n)%64];
+      e=document.createElement('div');
+      e.className='card tmp';
+      e.innerHTML='<div class="value">'+s['value']+'</div><div class="face">'+s['face']+'</div><div class="words">'+s['words']+'</div>';
+      r.appendChild(e);
+      e.style.animation='move '+(d/1000)+'s ease-in-out forwards';
+      setTimeout(slide.bind(this,r,n+1),d);
+    }
+    (function(){
+      var d=new Date();
+      timeseed=d.getMilliseconds();
+      document.querySelector('.date').innerHTML=dateString(d);
+    })();
+  </script>
+</body>
+</html>

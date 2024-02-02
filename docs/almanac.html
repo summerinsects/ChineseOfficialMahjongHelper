@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>国标麻将老黄历</title>
+  <meta name="viewport" content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width,height=device-height">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <style type="text/css">
+    body *{font-family:"Consolas","Microsoft Yahei",Arial,sans-serif;}
+    body{background:white;margin:0;padding:0;}
+    .container{width:320px;margin:0 auto 50px;}
+    .container>.title{color:#bbb;font-weight:bold;margin-bottom:10px;background:#555;padding:5px 15px;}
+    .adlink{text-align:center;font-size:11pt;}
+    .adlink a{text-decoration:none;display:block;color:#666;font-weight:bold;margin-bottom:10px;background:#eee;border:1px solid #ddd;border-radius:4px;padding:10pt;margin-top:10pt;}
+    .date{font-size:16pt;font-weight:bold;text-align:center;}
+    .split,.clear{clear:both;height:1px;overflow-y:hidden;}
+    .advised,.taboo{clear:both;position:relative;}
+    .advised .title,.taboo .title{float:left;width:100px;font-weight:bold;text-align:center;font-size:30pt;position:absolute;top:0;bottom:0;}
+    .advised .title>table,.taboo .title>table{width:100%;height:100%;border:none;}
+    .advised .title{background:#ffee44;}
+    .taboo .title {background:#ff4444;color:#fff;}
+    .advised .content,.taboo .content{margin-left:115px;padding-right:10px;padding-top:1px;font-size:15pt;}
+    .advised{background:#ffffaa;}
+    .taboo{background:#ffddd3;}
+    .content ul{list-style:none;margin:10px 0 0;padding:0;}
+    .content ul li{line-height:150%;font-size:15pt;font-weight:bold;color:#444;}
+    .content ul li div.description{font-size:11pt;font-weight:normal;color:#777;line-height:110%;margin-bottom:10px;}
+    .line-tip{font-size:11pt;margin-top:10px;margin-left:10px;}
+    .direction_value{color:#4a4;font-weight:bold;}
+    .goddes_value{color:#f87;}
+    .comment{margin-top:50px;font-size:11pt;margin-left:10px;}
+    .comment ul{margin-left:0;padding-left:20px;color:#999;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">国标麻将老黄历<sup>alpha</sup></div>
+    <div class="date">&nbsp;<br>&nbsp;</div>
+    <div class="advised">
+      <div class="title">
+        <table>
+          <tr><td>宜</td></tr>
+        </table>
+      </div>
+      <div class="content">
+        <ul><li>&nbsp;</li><li>&nbsp;</li></ul>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="split"></div>
+    <div class="taboo">
+      <div class="title">
+        <table>
+          <tr><td>忌</td></tr>
+        </table>
+      </div>
+      <div class="content">
+        <ul><li>&nbsp;</li><li>&nbsp;</li></ul>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="split"></div>
+    <div class="line-tip">
+      <strong>座位朝向：</strong>面向<span class="direction_value"></span>打牌，手气最好。
+    </div>
+    <div class="line-tip">
+      <strong>今日宜饮：</strong><span id="drinks"></span>
+    </div>
+    <div class="line-tip">
+      <strong>发牌姬亲近指数：</strong><span class="goddes_value"></span>
+    </div>
+    <div class="adlink">
+      <a href="./divination.html" target="_blank">想求签？</a>
+    </div>
+    <div class="comment">
+      <ul>
+        <li>本老黄历尚处于alpha阶段，作者随时会修改，所以如果上午看到的内容跟下午不同，请勿惊慌；</li>
+        <li>本老黄历仅面向国标鶸，猪手请无视；</li>
+        <li>本老黄历内容是随机生成的，大家都是伪随机，和打麻将差不多一个意思。</li>
+      </ul>
+    </div>
+  </div>
+  <script src="./js/tz-chn-cal.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    var weeks=['日','一','二','三','四','五','六'];
+    var directions=['东方','东南方','南方','西南方','西方','西北方','北方','东北方'];
+    var items=[
+      [
+        {name:'边吃东西边打牌',advised:'谈笑间樯橹灰飞烟灭',taboo:'顺势一波直接吃四'},
+        {name:'打牌时闲聊',advised:'其他人频频判断失误',taboo:'沉迷聊天，错过和牌'},
+        {name:'左手摸牌',advised:'神仙也怕左手',taboo:'一摸就是炮牌'},
+        {name:'和朋友讨论',advised:'各种喜闻乐见的剧本',taboo:'大牌是别人的，你什么都没有'},
+        {name:'和新人打牌',advised:'对方战斗力不足',taboo:'被新人虐成四位'},
+        {name:'打线下',advised:'自摸拍桌轻松愉快',taboo:'手抖眼斜漏番诈和'},
+        {name:'打线上',advised:'网络平台女婿已上线',taboo:'摸牌进张就卡掉线'},
+        {name:'戒麻',advised:'每个月总有那么三十几天不想打牌',taboo:'此时不战更待何时！'},
+        {name:'换账号打牌',advised:'摇身一变一扫颓势',taboo:'换号照样吃四'},
+        {name:'连续对局',advised:'一路高歌猛进',taboo:'越打越衰'},
+      ],[
+        {name:'拆对子',advised:'其实已经对死了',taboo:'拆一对摸一对'},
+        {name:'拆边张',advised:'被别人拿了暗刻',taboo:'拆完就摸回来'},
+        {name:'拆嵌张',advised:'想吃的时候被人碰走',taboo:'拆完就摸回来'},
+        {name:'听生张',advised:'都在牌墙里',taboo:'听在别人暗刻上'},
+        {name:'听绝张',advised:'越绝越有',taboo:'在别人手里'},
+        {name:'听对倒',advised:'自摸才够番的三暗刻也能和到',taboo:'宁叫卡窿，莫叫对碰'},
+        {name:'听嵌张',advised:'宁叫卡窿，莫叫对碰',taboo:'都在别人手里'},
+        {name:'听「%w」',advised:'总是能和牌',taboo:'被上家截和'},
+      ],[
+        {name:'东风东和牌',advised:'先攻我拿下了！',taboo:'千刀万剐，不和头把'},
+        {name:'强凹大牌',advised:'神进张找回自信',taboo:'上听就点炮'},
+      ],[
+        {name:'做「%f」',advised:'和牌率显著提高'},
+      ],[
+        {name:'改变牌风',advised:'重拾对雀力的信心',taboo:'自断经脉雀力尽失'},
+        {name:'靠科学打牌',advised:'判断精准如有神助',taboo:'看运气的垃圾游戏猪手永远是对的'},
+        {name:'读概率论',advised:'端正心态，科学打牌',taboo:'打牌读书，越读越输'},
+      ],[
+        {name:'打花',advised:'避免摸到炮牌',taboo:'会将海底转移给别人被妙手'},
+        {name:'晚巡碰牌',advised:'错开下家和牌',taboo:'上碰下自摸'},
+        {name:'多吃多碰',advised:'快速推进上听',taboo:'打到最后满手炮牌'},
+        {name:'保持门清',advised:'上家的牌有毒',taboo:'死活不进张'},
+        {name:'上来就吃牌',advised:'震慑三家',taboo:'牌从门前过，不如摸一个'},
+        {name:'碰牌',advised:'碰出运势，断别人边张、嵌张',taboo:'上家碰一碰，下家有餐送'},
+        {name:'大明杠',advised:'一气呵成杠开高目',taboo:'削减暗刻，杠来炮牌'},
+        {name:'留回头张',advised:'牌回头，留一留',taboo:'死活不靠张'},
+        {name:'食替',advised:'避免摸到炮牌',taboo:'吃完下家就进张'},
+      ],[
+        {name:'信375神教',advised:'信神教，和得到',taboo:'封建迷信害死人'},
+      ],[
+        {name:'缩着打',advised:'怂出一片天',taboo:'无铳吃四，心情复杂'},
+        {name:'好形对攻',advised:'等得太多，随便自摸',taboo:'两面输单钓，三面输嵌张'},
+        {name:'电报下家',advised:'点小牌，破大牌',taboo:'下家其实牌更大'},
+      ],[
+        {name:'好牌先打',advised:'有效避炮',taboo:'会摸回周边搭子'},
+        {name:'起手打「发财」',advised:'要和牌，打发财',taboo:'错失绿一色'},
+        {name:'起手打「东风」',advised:'有风先打东，打东不落空',taboo:'会摸回来一对'},
+        {name:'起手打「北风」',advised:'先打北，不后悔',taboo:'会摸回来一对'},
+        {name:'起手打「南风」',advised:'先打南，不输钱',taboo:'会摸回来一对'},
+        {name:'把%w留手里',advised:'孤张摸成面子',taboo:'留久成炮牌'},
+      ],[
+        {name:'见逃低目',advised:'没有理想打什么麻将',taboo:'被人咸鱼突刺，8番屁和带走'},
+        {name:'见逃小姐姐点炮',advised:'舍得小炮，才有自摸',taboo:'再也和不到'},
+      ]
+    ];
+    var waiting=['万子','条子','饼子','字牌','中张','幺九牌','小序数牌','大序数牌','3条','7饼','5万'];
+    var drinks=['热水','茶','红茶','绿茶','咖啡','奶茶','可乐','鲜奶','豆奶','果汁','果味汽水','苏打水','运动饮料','酸奶','酒'];
+    var fans=[
+      {name:'七对',taboo:'摸来的永远是前几巡打过的'},
+      {name:'碰碰和',taboo:'跟别人的手牌对死'},
+      {name:'无番和',taboo:'无番必自摸，打出就点炮'},
+      {name:'清龙',taboo:'想吃牌的时候被人碰走'},
+      {name:'混一色',taboo:'你不要的花色会喂下家16番下地'},
+      {name:'不求人',taboo:'7番不求人无法直视'},
+      {name:'全不靠',taboo:'打出的中张直接把下家喂听'},
+      {name:'五门齐',taboo:'字牌对子碰不出'},
+      {name:'组合龙',taboo:'无法听牌'},
+      {name:'凑番牌',taboo:'会因算错番而错和、漏和'},
+      {name:'门断平',taboo:'打出一套十三幺'},
+    ];
+    function dateString(t){
+      var y=t.getFullYear(),m=t.getMonth()+1,d=t.getDate(),o=CHN_CAL.greg2chn({'y':y,'m':m,'d':d});
+      return '今天是'+y+'年'+m+'月'+d+'日 星期'+weeks[t.getDay()]
+        +'<br>农历'+CHN_CAL.chn_date_text(o);
+    }
+    function star(n){
+      var s='',i=0;
+      for(;i<n;++i){s+='\u2605';}
+      for(;i<5;++i){s+='\u2606';}
+      return s;
+    }
+    var seed=0;
+    function rand(m){
+      seed=(seed*9301+49297)%233280;
+      var r=seed/233280.0;
+      return Math.floor(r*m);
+    }
+    function pickRandom(a,c){
+      var f={},r=[],k,n=0;
+      do {
+        k=rand(a.length);
+        if(f[k]){continue;}
+        f[k]=true;
+        r.push(a[k]);
+        ++n;
+      }while(n<c);
+      return r;
+    }
+    function pickItems(){
+      var a=rand(3)+2,t=rand(3)+2,i,r,l,e,sa='',st='';
+      if(a===2&&t===2)++a;
+      if(a===4&&t===4)--t;
+      r=pickRandom(items,a+t);
+      for(i=0,l=r.length;i<l;++i){
+        e=parse(r[i]);
+        if(i<a)sa+='<li><div class="name">'+e.name+'</div><div class="description">'+e.advised+'</div></li>';
+        else st+='<li><div class="name">'+e.name+'</div><div class="description">'+e.taboo+'</div></li>';
+      }
+      document.querySelector('.advised').querySelector('ul').innerHTML=sa;
+      document.querySelector('.taboo').querySelector('ul').innerHTML=st;
+    }
+    function parse(e){
+      var i=0,r,f;
+      if(e.length>1){
+        i=rand(e.length);
+      }
+      r={name:e[i].name,advised:e[i].advised,taboo:e[i].taboo};
+      if(r.name.indexOf('%w')!=-1){
+        r.name=r.name.replace('%w',waiting[rand(waiting.length)]);
+      }
+      if(r.name.indexOf('%f')!=-1){
+        f=fans[rand(fans.length)];
+        r.name=r.name.replace('%f',f.name);
+        r.taboo=f.taboo;
+      }
+      return r;
+    }
+    (function(){
+      var d=new Date();
+      seed=((d.getFullYear()<<9)|(d.getMonth()<<5)|(d.getDate()))<<1;
+      document.querySelector('.date').innerHTML=dateString(d);
+      document.querySelector('.direction_value').innerHTML=directions[rand(directions.length)];
+      document.getElementById('drinks').innerHTML=pickRandom(drinks,2).join('、');
+      document.querySelector('.goddes_value').innerHTML=star(rand(5)+1);
+      pickItems();
+    })();
+  </script>
+</body>
+</html>
