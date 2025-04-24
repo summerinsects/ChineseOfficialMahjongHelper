@@ -31,6 +31,17 @@ static const char s_digit_chars[] = "123456789";
 static const char s_suffix_chars[] = "msp";
 static const char s_honor_chars[] = "ESWNCFP";
 
+static const unsigned char s_hand_map[256] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 0x00 ~ 0x0f
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 0x10 ~ 0x1f
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 0x20 ~ 0x2f
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,  // 0x30 ~ 0x3f
+    0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0,  // 0x40 ~ 0x4f
+    1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0,  // 0x50 ~ 0x5f
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,  // 0x60 ~ 0x6f
+    1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 0x70 ~ 0x7f
+};
+
 static void submit_suit(const tile_t *digit_tiles, intptr_t digit_cnt, uint8_t suit, tile_t *tiles) {
     for (intptr_t i = 0; i < digit_cnt; ++i) {
         tiles[i] = digit_tiles[i] | suit;
@@ -137,8 +148,10 @@ static intptr_t make_fixed_pack(const tile_t *tiles, intptr_t tile_cnt, pack_t *
 
 // 字符串转换为手牌结构和上牌
 intptr_t string_to_tiles(const char *str, size_t len, hand_tiles_t *hand_tiles, tile_t *serving_tile) {
-    if (strspn(str, "0123456789mpsESWNCFP[]") != len) {
-        return PARSE_ERROR_ILLEGAL_CHARACTER;
+    for (size_t k = 0; k < len; ++k) {
+        if (s_hand_map[(unsigned char)str[k]] == 0) {
+            return PARSE_ERROR_ILLEGAL_CHARACTER;
+        }
     }
 
     pack_t packs[4];
