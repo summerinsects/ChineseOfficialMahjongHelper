@@ -1816,7 +1816,7 @@ static void calculate_regular_fan(const pack_t (&packs)[5], const tile_table_t &
 
     tile_table_t merged_table{};
     std::transform(std::begin(standing_table), std::end(standing_table), std::begin(fixed_table), std::begin(merged_table),
-        [](uint16_t a, uint16_t b) { return a + b; });
+        [](uint16_t a, uint16_t b)->uint16_t { return a + b; });
 
     // 根据花色调整——涉及番种：无字、缺一门、混一色、清一色、五门齐
     adjust_by_suits(unique_tiles, unique_cnt, fan_table);
