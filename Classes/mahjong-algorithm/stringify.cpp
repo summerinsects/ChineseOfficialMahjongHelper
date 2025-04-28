@@ -186,6 +186,10 @@ intptr_t string_to_tiles(const char *str, size_t len, hand_tiles_t *hand_tiles, 
                 return PARSE_ERROR_SUFFIX;
             }
 
+            if (temp_cnt + digit_cnt > max_cnt) {
+                return PARSE_ERROR_TOO_MANY_TILES;
+            }
+
             submit_suit(digit_tiles, digit_cnt, static_cast<uint8_t>(((p - s_suffix_chars) + 1) << 4), temp_tiles + temp_cnt);
             temp_cnt += digit_cnt;
             digit_cnt = 0;
