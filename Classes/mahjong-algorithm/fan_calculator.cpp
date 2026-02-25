@@ -135,6 +135,11 @@ namespace {
 
 // 递归划分算法的最后一步，添加划分
 static void divide_tail_add_division(intptr_t fixed_cnt, const division_t *work_division, division_result_t *result) {
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
     // 拷贝一份当前的划分出来的面子，并排序暗手的面子
     // 这里不能直接在work_division->packs上排序，否则会破坏递归外层的数据
     division_t temp;
@@ -155,6 +160,10 @@ static void divide_tail_add_division(intptr_t fixed_cnt, const division_t *work_
     else {
         LOG("same case");
     }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 }
 
 // 递归划分的最后一步
