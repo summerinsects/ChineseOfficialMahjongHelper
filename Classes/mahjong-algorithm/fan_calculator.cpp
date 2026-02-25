@@ -139,7 +139,9 @@ static void divide_tail_add_division(intptr_t fixed_cnt, const division_t *work_
     // 这里不能直接在work_division->packs上排序，否则会破坏递归外层的数据
     division_t temp;
     memcpy(&temp, work_division, sizeof(temp));
-    std::sort(temp.packs + fixed_cnt, temp.packs + 4);
+    if (fixed_cnt < 4) {
+        std::sort(temp.packs + fixed_cnt, temp.packs + 4);
+    }
 
     // 如果这种划分是否已经存在了
     if (std::none_of(&result->divisions[0], &result->divisions[result->count],
